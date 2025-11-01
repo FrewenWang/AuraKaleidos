@@ -1,0 +1,82 @@
+Name Strings
+
+    cl_qcom_reqd_sub_group_size
+
+Contributors
+
+    Liang Wang, Qualcomm Technologies, Inc.
+    Balaji Calidas, Qualcomm Technologies, Inc.
+    Samuel Pauls, Qualcomm Technologies, Inc.
+
+Contact
+
+    bcalidas at qti dot qualcomm dot com
+
+Version
+
+    Version 1, 2018/10/17
+
+Status
+
+    Shipping
+
+Extension Type
+
+    OpenCL device extension
+
+Dependencies
+
+    A6xx series or later GPU is required.
+
+    OpenCL 2.0 or later is required.
+
+    cl_khr_subgroups is required.
+
+    This extension is written against the OpenCL 2.0 Specification.
+
+Overview
+
+    This extension allows an application to control the sub-group size with
+    which a kernel executes. The size specified can either be "half" or "full".
+    Applications may derive a performance benefit by experimentally determining
+    the optimal sub-group size.
+
+Header File
+
+    None
+
+New Procedures and Functions
+
+    None
+
+New Tokens
+
+    None
+
+Additions to Chapter 6.7.2 of the OpenCL 2.0 Specification
+(Optional Attribute Qualifiers)
+
+    The optional __attribute__((qcom_reqd_sub_group_size(size))) specifies the
+    sub-group size where size is either "half" or "full" with the quotes.
+
+Sample Code
+
+    1) Selecting the sub-group size of a kernel.
+
+        #pragma OPENCL EXTENSION cl_qcom_reqd_sub_group_size : enable
+
+        __attribute__((qcom_reqd_sub_group_size("half")))
+        kernel void half_sub_group_kernel(...)
+        {
+            ...
+        }
+
+        __attribute__((qcom_reqd_sub_group_size("full")))
+        kernel void full_sub_group_kernel(...)
+        {
+            ...
+        }
+
+Revision History
+
+    Revision 1, 2019/07/12: Initial version.

@@ -1,0 +1,38 @@
+syntax = "proto2";
+package vision;
+
+message ModelFlag {
+  required string magic = 1;        // 魔法数
+  required int32 model_cnt = 2;     // 模型数量
+  required int32 encrypt_type = 3;  // 加密类型
+}
+
+message MemBlock {
+  required int32 len = 1;       // 长度
+  required int32 offset = 2;    // 偏移量
+  required bool encrypted = 3;  // 是否加密
+}
+
+message ModelDesc {
+  required int32 model_id = 1;      // 能力类型
+  required int32 infer_type = 2;    // 模型格式
+  repeated MemBlock mem_blocks = 3; // 内存块（1个或多个）
+
+  /// fp32、fp16、int8
+  optional int32 dtype = 11 [default = 0]; // 默认fp32
+  optional string version = 12 [default = "unknown"];
+  optional int32 device = 13 [default = 0]; // 0-cpu, 1-gpu, 2-dsp ...
+  optional bool enable_omp = 14 [default = false];
+  optional int32 version_code = 15;
+  optional string extends = 16;
+}
+
+message ModelHeader {
+  repeated ModelDesc model_descs = 1;
+}
+
+message ModelData {
+  required ModelFlag model_flag = 1;
+  required bytes model_header = 2;
+  required bytes model_blob = 3;
+}

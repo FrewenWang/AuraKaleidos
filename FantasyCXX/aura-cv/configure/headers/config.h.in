@@ -1,0 +1,43 @@
+#ifndef AURA_CONFIG_H__
+#define AURA_CONFIG_H__
+
+// !!! WARNING !!! AUTO-GENERATED FILE!
+//  PLEASE DO NOT MODIFY IT
+
+#if !defined(ANDROID)
+#  cmakedefine ANDROID
+#  cmakedefine ANDROID_ABI          "@ANDROID_ABI@"
+#  cmakedefine ANDROID_STL          "@ANDROID_STL@"
+#  cmakedefine ANDROID_PLATFORM     "@ANDROID_PLATFORM@"
+#endif // ANDROID
+
+#cmakedefine AURA_ARM82
+
+#cmakedefine AURA_API_EXPORTS
+#cmakedefine AURA_SHARED_LIBRARY
+
+#cmakedefine AURA_CXX_STANDARD_11
+
+#cmakedefine AURA_RELEASE
+
+#cmakedefine AURA_BUILD_HOST
+#cmakedefine AURA_BUILD_WIN
+#cmakedefine AURA_BUILD_LINUX
+#cmakedefine AURA_BUILD_EMBEDDED_LINUX
+#cmakedefine AURA_BUILD_ANDROID
+
+#cmakedefine AURA_BUILD_HEXAGON
+#cmakedefine AURA_BUILD_XPLORER
+#cmakedefine AURA_BUILD_XTENSA
+
+#cmakedefine AURA_ENABLE_ASAN
+
+#cmakedefine AURA_ENABLE_OPENCL
+#cmakedefine CL_TARGET_OPENCL_VERSION       @CL_TARGET_OPENCL_VERSION@
+#cmakedefine CL_HPP_TARGET_OPENCL_VERSION   @CL_HPP_TARGET_OPENCL_VERSION@
+#cmakedefine AURA_ENABLE_HEXAGON
+#cmakedefine AURA_ENABLE_XTENSA
+
+#cmakedefine AURA_ENABLE_NN
+#cmakedefine AURA_ENABLE_NN_LITE
+#endif // AURA_CONFIG_H__

@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package lightbuf_example;
+
+message Address {
+    required string addr = 1;
+    optional int64 type = 2;
+    repeated bytes coordinates = 3;
+}
+
+message Person {
+    required int32 id = 1;
+    required string name = 2;
+    required bool gender = 3;
+    optional bytes face_feature = 4;
+    repeated float score = 5;
+    repeated Address address = 6;
+}

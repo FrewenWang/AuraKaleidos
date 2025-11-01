@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sshpass -p togxuh-8Cyzto-juqven ssh root@192.168.78.2
+
+

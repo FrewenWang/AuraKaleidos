@@ -1,0 +1,82 @@
+# ===================================================================================
+#  The Aura CMake configuration file
+#
+#             ** File generated automatically, do not modify **
+#
+#  Usage from an external project:
+#    In your CMakeLists.txt, add these lines:
+#
+#    find_package(Aura REQUIRED)
+#    include_directories(${Aura_INCLUDE_DIRS}) # Not needed for CMake >= 2.8.11
+#    target_link_libraries(YOUR_TARGET_NAME ${Aura_LIBS})
+#
+#    If aura is found then Aura_FOUND is set to TRUE.
+#
+#    This file will define the following variables:
+#      - Aura_LIBS                     : The list of all imported targets for Aura modules.
+#      - Aura_INCLUDE_DIRS             : The Aura include directories.
+#
+#    Advanced variables:
+#      - Aura_ANDROID_ABI              : Aura android abi, reserve
+#      - Aura_ANDROID_PLATFORM         : Aura android platrorm, reserve
+#      - Aura_ENABLE_ARM82             : Aura enable ARMv8.2 support
+#      - Aura_ENABLE_OPENCL            : Aura enable OpenCL support
+#      - Aura_SHARED_LIBRARY           : Use Aura as shared library
+#      - Aura_INSTALL_PATH             : Aura location
+#      - Aura_BUILD_XPLORER            : Aura build xplorer
+#      - Aura_BUILD_XTENSA             : Aura build xtensa
+#
+# ===================================================================================
+
+set(Aura_ANDROID_ABI @ANDROID_ABI@)
+set(Aura_ANDROID_PLATFORM @ANDROID_PLATFORM@)
+set(Aura_ENABLE_ARM82 @AURA_ENABLE_ARM82@)
+set(Aura_ENABLE_OPENCL @AURA_ENABLE_OPENCL@)
+set(Aura_SHARED_LIBRARY @AURA_SHARED_LIBRARY@)
+set(Aura_BUILD_XTENSA @AURA_BUILD_XTENSA@)
+set(Aura_BUILD_XPLORER @AURA_BUILD_XPLORER@)
+
+get_filename_component(Aura_INSTALL_PATH "${CMAKE_CURRENT_LIST_DIR}/../" REALPATH)
+
+set(Aura_INCLUDE_DIRS ${Aura_INSTALL_PATH}/include)
+if(NOT EXISTS "${Aura_INCLUDE_DIRS}")
+    message(FATAL_ERROR "Aura: Include directory doesn't exist: '${Aura_INCLUDE_DIRS}'. Aura installation may be broken.")
+endif()
+include_directories(BEFORE ${Aura_INSTALL_PATH}/include)
+link_directories(BEFORE ${Aura_INSTALL_PATH}/lib)
+set(Aura_LIBS @AURA_LIB_NAME@)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+    set(Aura_LIBS ${Aura_LIBS} log)
+endif()
+
+if(Aura_ENABLE_OPENCL)
+    include_directories(BEFORE ${Aura_INSTALL_PATH}/include/3rdparty/opencl)
+    if(Aura_SHARED_LIBRARY)
+        set(Aura_LIBS ${Aura_LIBS} aura_opencl_library)
+    endif()
+endif()
+
+if(${Aura_ENABLE_ARM82})
+    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
+        add_compile_options(-march=armv8.2a+fp16)
+    endif()
+endif()
+
+if(Aura_BUILD_XTENSA)
+    include_directories(BEFORE ${Aura_INSTALL_PATH}/include/3rdparty/tile_manager)
+    include_directories(BEFORE ${Aura_INSTALL_PATH}/include/3rdparty/runtime)
+
+    set(Aura_XTENSA_LSP_DIRS ${Aura_INSTALL_PATH}/include/3rdparty/lsp)
+    list(APPEND Aura_LINK_OPTIONS "-Wl,--shared-pagesize=128;-Wl,-pie;-mlsp=${Aura_XTENSA_LSP_DIRS}")
+    add_link_options(${Aura_LINK_OPTIONS})
+endif()
+
+if(Aura_BUILD_XPLORER)
+    include_directories(BEFORE ${Aura_INSTALL_PATH}/include/3rdparty/tile_manager)
+    include_directories(BEFORE ${Aura_INSTALL_PATH}/include/3rdparty/runtime)
+
+    set(Aura_XTENSA_LSP_DIRS ${Aura_INSTALL_PATH}/include/3rdparty/lsp)
+    list(APPEND Aura_LINK_OPTIONS "-lxmem-bank-xtos;-lxmem-xtos;-lidma-xtos;-mlsp=${Aura_XTENSA_LSP_DIRS}")
+    add_link_options(${Aura_LINK_OPTIONS})
+endif()

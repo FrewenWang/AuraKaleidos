@@ -1,0 +1,9 @@
+set(3RDPARTY_XTENSA_RT_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/xtensa/runtime")
+if(AURA_ENABLE_XTENSA)
+    set(3RDPARTY_XTENSA_RT_INC_DIRS ${3RDPARTY_XTENSA_RT_DIRS}/include/host)
+elseif(AURA_BUILD_XTENSA)
+    set(3RDPARTY_XTENSA_RT_INC_DIRS ${3RDPARTY_XTENSA_RT_DIRS}/include/device)
+endif()
+
+include_directories(${3RDPARTY_XTENSA_RT_INC_DIRS})
+install(DIRECTORY "${3RDPARTY_XTENSA_RT_INC_DIRS}/" DESTINATION include/3rdparty/runtime)

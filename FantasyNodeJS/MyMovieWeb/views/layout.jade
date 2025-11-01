@@ -1,0 +1,10 @@
+doctype html
+html
+    head
+        meta(charset="utf-8")
+        title= title /**注意Jade中的变量赋值是这样形式。或者是后面这个title #{title}*/
+        link(rel='stylesheet', href='/stylesheets/style.css')
+        include ./includes/header
+    body
+        include ./includes/bodyHeader
+        block content

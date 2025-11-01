@@ -1,0 +1,9 @@
+diff a/AuraFantasyCXX/aura-aura/src/ops/matrix/src/make_border.cpp b/AuraFantasyCXX/aura-aura/src/ops/matrix/src/make_border.cpp	(rejected hunks)
+@@ -91,6 +91,7 @@
+                                 MI_S32 left, MI_S32 right, BorderType type, const Scalar &border_value,
+                                 const OpTarget &target)
+ {
++    /// 这个也是也是矩阵处理算子
+     MakeBorder make_border(ctx, target);
+ 
+     return OpCall(ctx, make_border, &src, &dst, top, bottom, left, right, type, border_value);

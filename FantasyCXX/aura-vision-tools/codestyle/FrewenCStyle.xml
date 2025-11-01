@@ -1,0 +1,16 @@
+<code_scheme name="FrewenCStyle" version="173">
+  <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="true" />
+  <option name="SOFT_MARGINS" value="120" />
+  <Objective-C>
+    <option name="INDENT_NAMESPACE_MEMBERS" value="0" />
+    <option name="SPACE_WITHIN_EMPTY_BRACES" value="true" />
+  </Objective-C>
+  <codeStyleSettings language="CMake">
+    <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
+  </codeStyleSettings>
+  <codeStyleSettings language="ObjectiveC">
+    <option name="RIGHT_MARGIN" value="120" />
+    <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+    <option name="LINE_COMMENT_ADD_SPACE" value="true" />
+  </codeStyleSettings>
+</code_scheme>

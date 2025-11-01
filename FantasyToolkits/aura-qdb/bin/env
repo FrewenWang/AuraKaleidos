@@ -1,0 +1,453 @@
+_docker () {
+  case $1 in
+    --install)
+      local tmp_file=$(mktemp)
+      curl -fsSL https://get.docker.com -o $tmp_file
+      sh $tmp_file --mirror Aliyun
+
+      cat>$tmp_file<<-EOF
+				{
+					"registry-mirrors": ["https://9cpn8tt6.mirror.aliyuncs.com"],
+					"insecure-registries": ["10.27.167.5:8005"],
+					"bip": "10.27.168.20/24",
+					"default-address-pools": [
+					{
+						"base": "10.27.169.21/16",
+						"size": 24
+					}
+					],
+					"runtimes": {
+					nvidia": {
+						"path": "/usr/bin/nvidia-container-runtime",
+						"runtimeArgs": []
+					}
+					}
+				}
+			EOF
+      sudo mv $tmp_file /etc/docker/daemon.json ;;
+    *)
+      docker run -it --rm --name "qnx710" \
+        --privileged \
+        -v /etc/passwd:/etc/passwd:ro \
+        -v /etc/shadow:/etc/shadow:ro \
+        -v /etc/group:/etc/group:ro \
+        -v /etc/hosts:/etc/hosts:ro \
+        -v ${HOME}:${HOME} \
+        -v /mnt:/mnt \
+        -e TZ=Asia/Shanghai \
+        -e HOME=${HOME} \
+        -e USER=${USER} \
+        -u $(id -u):$(id -g) \
+        --tmpfs $(mktemp -d) \
+        --workdir $(pwd)\
+        iregistry.baidu-int.com/cdc-os/ubuntu-20.04_build-qnx:latest $@
+  esac
+}
+
+_qdb() {
+  local HOST_PREFIX=~/.local/utils
+  local TARGET_PREFIX=${TARGET_PREFIX-/data/local/tmp/utils}
+
+  case $SHELL in
+    *zsh)
+      HOST_PREFIX=($(type _qdb))
+      HOST_PREFIX=${HOST_PREFIX[7]}
+      test ${HOST_PREFIX:0:1} = / || HOST_PREFIX=${HOST_PREFIX/#/$(pwd)/}
+      HOST_PREFIX=${HOST_PREFIX%/*/*/*} ;;
+    *bash)
+      HOST_PREFIX=${BASH_SOURCE[0]}
+      test ${HOST_PREFIX:0:1} = / || HOST_PREFIX=${HOST_PREFIX/#/$(pwd)/}
+      HOST_PREFIX=${HOST_PREFIX%/*/*/*} ;;
+  esac
+
+  export HOST_INTERMEDIATES=$HOST_PREFIX/.intermediates
+
+  local -l HOST_OS=$(uname -s)
+  export QNX_HOST=${QNX_HOST-$HOST_PREFIX/host/$(uname -s)/qnx710/host/${HOST_OS}/x86_64}
+  export QNX_TARGET=${QNX_TARGET-$HOST_PREFIX/host/$(uname -s)/qnx710/target/qnx7}
+  export QNX_CONFIGURATION_EXCLUSIVE=${QNX_CONFIGURATION_EXCLUSIVE-$HOST_PREFIX/host/.verification/qnx}
+
+  local _path=${HOST_PREFIX}/host/bin/$(uname -s)
+  export PATH=${PATH%%:$_path*}:${_path}
+  export TARGET_QNX=${TARGET_QNX-$(cat $HOST_INTERMEDIATES/.target_qnx 2>/dev/null)}
+
+
+  _clean() {
+    local vars=(HOST_PREFIX QNX_HOST QNX_TARGET TARGET_PREFIX TARGET_QNX)
+    for var in ${vars[@]}; do eval echo $var=\$$var; done
+
+    (
+      case "$*" in
+        --force)
+        git -C $HOST_PREFIX clean -fdx
+      esac
+
+      adb kill-server
+      adb wait-for-device root
+      adb wait-for-device shell rm -rf $TARGET_PREFIX
+    ) &>/dev/null
+  }
+
+  _fetch() {
+    local HOST_$(uname -s)=" "
+    git -C $HOST_PREFIX submodule update --init ${HOST_Linux-"--single-branch"} $@
+  }
+
+  _update() {
+    git -C $HOST_PREFIX pull origin master
+    source $HOST_PREFIX/host/bin/env
+  }
+
+  _exec_background() {
+    (
+      case $SHELL in
+        *zsh)
+          stty -tostop
+          $@ & ;;
+        *bash)
+          setsid $@
+      esac
+      sleep 2
+    ) </dev/null &>/dev/null
+  }
+
+  _ifname() {
+    case $1 in
+      --usb)
+        case $(uname -s) in
+          Linux)
+            for f in /sys/class/net/*; do
+              case $(realpath $f) in
+                *usb*)
+                  echo $(basename $f)
+                  return ;;
+              esac
+            done ;;
+          Darwin)
+            local if_name=$(system_profiler SPEthernetDataType |grep "Device Name")
+            echo ${if_name#*: } ;;
+        esac ;;
+      *)
+        local if_name=($(ip route show default)) && echo ${if_name[4]}
+    esac
+  }
+
+  _vlan_setup() {
+    local _1=$(_ifname)
+    case $1 in
+      usb)
+        _1=$(_ifname --usb)
+    esac
+
+    ip link f $2 &>/dev/null || {
+      sudo ip link add link $1 name $2 type vlan id ${2#*vlan}
+      sudo ip link set $2 up
+      sudo ifconfig $2 $3 netmask 255.255.255.0 up
+
+      sudo ifconfig $_1 down
+      sudo ifconfig $_1 hw ether 02:00:00:00:10:01
+      sudo ifconfig $_1 up
+    }
+  }
+
+  _prepare() {
+    (
+      adb wait-for-device root
+      adb wait-for-device shell mkdir -p $TARGET_PREFIX
+      adb wait-for-device push --sync $HOST_PREFIX/target/* $TARGET_PREFIX
+      mkdir -p $HOST_INTERMEDIATES/
+    ) &>/dev/null
+
+    for target in $TARGET_QNX 192.168.78.2 198.18.34.2 198.18.32.11; do
+      adb wait-for-device shell ping -W 2 -c 1 $target >/dev/null && {
+        echo $target > $HOST_INTERMEDIATES/.target_qnx
+        export TARGET_QNX=$target
+        return
+      }
+    done
+  }
+
+  _ssh() {
+    local background=
+    local control_path_suffix=
+    local forward_args=
+    local other_args=
+    while [ $# -ne 0 ]; do
+      case $1 in
+        --background)
+          background=_exec_background ;;
+        --forward)
+          shift
+          _prepare
+          adb wait-for-device forward tcp:${1%%:*} tcp:${1%%:*} &>/dev/null
+          control_path_suffix="_${1%%:*}_${1##*:}"
+          forward_args="$forward_args -L ${1%%:*}:${TARGET_QNX}:${1##*:}" ;;
+        --3x)
+          _vlan_setup usb vlan9 172.16.9.1
+          sshpass -p caros ssh caros@172.16.9.21
+          return $? ;;
+        --4x)
+          __network_setup () {
+            local if_unique=$(_ifname --usb)
+            ifconfig $if_unique | grep 172.16.104.10 &>/dev/null || {
+              sudo ifconfig $if_unique down
+              sudo ifconfig $if_unique 172.16.104.10/24
+              sudo ifconfig $if_unique up
+
+              case $(uname -s) in
+              Linux)
+                sudo sysctl -w net.ipv4.ip_forward=1
+                sudo iptables -F
+                sudo iptables -t nat -A POSTROUTING -o $(_ifname) -j MASQUERADE
+                sudo iptables -A FORWARD -i $(_ifname) -o $if_unique  -j ACCEPT
+                sudo iptables -A FORWARD -i $if_unique -o $(_ifname)  -j ACCEPT
+              esac
+            }
+          }
+
+          __network_setup
+          sshpass -p 123 ssh -o StrictHostKeyChecking=no root@172.16.104.90
+          return $? ;;
+        --qemu)
+        local target=($(arp -i br0 | grep -E "172.*ether"))
+          sshpass -p root ssh -o StrictHostKeyChecking=no root@$target
+          return $? ;;
+        *)
+          other_args="$other_args $1" ;;
+      esac
+      shift
+    done
+
+    _prepare
+    test -z "$other_args"  && test -n "$forward_args" && {
+      test -n "$(adb wait-for-device shell ps -ef | grep -E "ssh_mux.*${control_path_suffix}")" && return
+      background=_exec_background
+      forward_args="$forward_args -N"
+    }
+
+    $background adb wait-for-device shell -tt LD_LIBRARY_PATH=$TARGET_PREFIX/lib exec \
+      $TARGET_PREFIX/bin/ssh \
+      -E /dev/null \
+      -o StrictHostKeyChecking=no \
+      -o HostKeyAlgorithms=ssh-rsa \
+      -o ControlMaster=auto \
+      -o ControlPath=/data/local/tmp/utils/ssh_mux_%h_%p_%r${control_path_suffix} \
+      -o ControlPersist=600 \
+      ${forward_args} root@$TARGET_QNX $other_args
+  }
+
+  _scrcpy() {
+    if [ $(uname -s) != "Linux" ]; then
+      exit -1
+    fi
+
+    case $1 in
+      --fix)
+        sudo apt install ffmpeg libsdl2-2.0-0 wget \
+          gcc git pkg-config meson ninja-build libsdl2-dev \
+          libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev \
+          libusb-1.0-0 libusb-1.0-0-dev ;;
+      *)
+        SCRCPY_SERVER_PATH=$HOST_PREFIX/host/bin/Linux/scrcpy/scrcpy-server \
+        ADB=$HOST_PREFIX/host/bin/Linux/adb \
+        $HOST_PREFIX/host/bin/Linux/scrcpy/scrcpy $@ ;;
+    esac
+  }
+
+  _sync() {
+    _scp() { 
+      scp -Cpr -o StrictHostKeyChecking=no -o HostKeyAlgorithms=ssh-rsa -o ConnectTimeout=1 -P 8022 $@
+    }
+
+    _sftp() {
+      adb wait-for-device shell LD_LIBRARY_PATH=$TARGET_PREFIX/lib \
+        $TARGET_PREFIX/bin/sftp -r -f -S $TARGET_PREFIX/bin/ssh -b $1 \
+        -o StrictHostKeyChecking=no \
+        -o HostKeyAlgorithms=ssh-rsa \
+        -o ControlMaster=auto \
+        -o ControlPath=/data/local/tmp/utils/ssh_mux_%h_%p_%r \
+        -o ControlPersist=600 \
+        root@$TARGET_QNX
+    }
+
+    local tmp_file=$(mktemp -u)
+    (
+      _ssh --forward 8022:22 /ifs/bin/mount -uw /mnt
+      _scp root@localhost:/proc/1/cmdline $tmp_file
+    ) &>/dev/null
+
+    local cmd=$1
+    shift
+    set -- $@
+
+    case $cmd in
+      --push)
+        if [ -f $tmp_file ]; then 
+          _scp ${@:1:$((${#@} - 1))} root@localhost:${@:${#@}:1}
+        else 
+          adb wait-for-device shell "cat /dev/null >$TARGET_PREFIX/sftp.bat"
+          for f in ${@:1:$((${#@} - 1))}; do
+            adb wait-for-device shell mkdir -p $(dirname $TARGET_PREFIX/cache/$f)
+            adb wait-for-device push ${f// /} $(dirname $TARGET_PREFIX/cache/$f)
+            adb wait-for-device shell "echo put $TARGET_PREFIX/cache/$f ${@:${#@}:1}>> $TARGET_PREFIX/sftp.bat"
+          done
+          _sftp $TARGET_PREFIX/sftp.bat
+        fi ;;
+      --pull)
+        if [ -f $tmp_file ]; then
+          set -- "${@/#/root@localhost:}"
+          _scp $@ .
+        else
+          adb wait-for-device shell "echo get $1 $TARGET_PREFIX/ > $TARGET_PREFIX/sftp.bat"
+          _sftp $TARGET_PREFIX/sftp.bat
+          adb wait-for-device pull $TARGET_PREFIX/$(basename $1)
+        fi
+    esac
+
+    unset _scp _sftp
+  }
+
+  _remount() {
+    _prepare
+    _ssh /ifs/bin/mount -uw $@
+  }
+
+  _pdebug() {
+    (
+      _prepare
+      test -n "$(adb shell ps -ef | grep pdebug.*$1)" || {
+        _ssh --background --forward $1:$1 "/mnt/usr/bin/pdebug $1"
+      }
+    ) &>/dev/null
+  }
+
+  _qconn() {
+    if [ -z "$(_ssh /mnt/bin/pidin -p qconn fds | grep $1)" ]; then
+      _push $QNX_TARGET/aarch64le/usr/sbin/qconn /mnt/usr/sbin/
+      _ssh --background --forward $1:$1 /mnt/usr/sbin/qconn
+    else
+      _ssh --forward $1:$1
+    fi
+  }
+
+  _ide() {
+    _fetch host/$(uname -s) host/.verification
+    _fetch --remote --depth=1 host/build
+    export TOP=${TOP-$HOST_INTERMEDIATES}
+    source $HOST_PREFIX/host/build/envsetup.sh
+
+    make() {
+      _clone() {
+        test -d $2/.git || git clone --depth=1 $1 $2
+        git -C $2 fetch origin ${3-master}
+        git -C $2 checkout FETCH_HEAD
+      }
+
+      _fix_sdk() {
+        git -C $BUILD_ROOT/sdk submodule init \
+          baidu/cdc-os/framework/apus \
+          baidu/cdc-os/sdk \
+          geely/install
+
+        git -C $BUILD_ROOT/sdk submodule update --remote --checkout --force --depth=7
+        git -C $BUILD_ROOT/sdk/baidu/cdc-os/framework/apus pull origin e171_zbb:e171_zbb --depth=7
+        git -C $BUILD_ROOT submodule status
+
+        git -C $BUILD_ROOT/sdk/geely/install lfs install
+        git -C $BUILD_ROOT/sdk/geely/install lfs pull
+        cp -rf $BUILD_ROOT/sdk/geely/install/. ${INSTALL_ROOT_nto-$TOP/install}
+
+        if [ -f CMakeLists.txt ] &&
+          [ -n "$(grep -nr baidu/cdc-os/service/proto/ $(find . -name CMakeLists.txt))" ]; then
+          _clone ssh://icode.baidu.com:8235/baidu/cdc-os/cdc-service-proto \
+            ${TOP}/baidu/cdc-os/service/proto cdc_e171_vp2
+        fi
+      }
+
+      local __verbose=
+      local __fetch=
+      local __dev=
+      local __others=
+
+      while [ $# -ne 0 ]; do
+        case "$1" in
+        --verbose)
+          __verbose=1 ;;
+        --fetch)
+          __fetch=1 ;;
+        --dev)
+          __dev=1 ;;
+        --no-dev)
+          __dev= ;;
+        *)
+          __others="${__others} $1"
+        esac
+        shift
+      done
+
+      if [ -n "${__fetch}" ]; then
+        if [ -n "${__verbose}" ]; then
+          _fix_sdk
+        else
+          (_fix_sdk) &>/dev/null
+        fi
+      fi
+
+      _mk --aarch64 -C $(pwd) IDE=1 CMAKE_ECLIPSE_VERSION=4.6 $__others
+
+      if [ -n "$__dev" ]; then
+        cp -rf $HOST_PREFIX/host/.ide-configrue/. $(pwd)/build
+        case $(uname -s) in
+          Darwin)
+            open $HOST_PREFIX/host/$(uname -s)/Momentics.app --args -data $(pwd)/build ;;
+          Linux)
+            LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libfreetype.so.6 \
+            _exec_background $HOST_PREFIX/host/$(uname -s)/Momentics.app/qde -data $(pwd)/build ;;
+        esac
+
+        {
+          _qdb qconn 8000
+          _qdb pdebug 8023
+        } & </dev/null &>/dev/null
+      fi
+      unset -f _clone _fix_sdk
+    }
+
+    make --fetch --dev clean $@
+  }
+
+  _() {
+    test -x $QNX_HOST/usr/bin/aarch64-unknown-nto-qnx7.1.0-gdb || (
+      _fetch host/$(uname -s) host/.verification
+    )
+
+    case "$1" in
+      --target)
+        shift
+        _pdebug 8023
+        set -- -iex \"target qnx localhost:8023\" $@ ;;
+      --qemu)
+        shift
+        local target=($(arp -i br0 | grep -E "172.*ether"))
+        set -- -iex \"target qnx $target:8023\" $@ ;;
+    esac
+
+    eval $QNX_HOST/usr/bin/aarch64-unknown-nto-qnx7.1.0-gdb -q \
+      -iex \"set auto-load local-gdbinit\" -iex \"set sysroot $QNX_TARGET\" "$@"
+  }
+
+  type _$1 &>/dev/null && set -- _$@ || set -- _ $@
+  $@
+
+  unset -f _clean _fetch _update _exec_background _ifname _vlan_setup \
+    _prepare _ssh _scrcpy _sync _remount _pdebug _qconn _ide _
+}
+
+alias _cleanup='_qdb clean'
+alias qdb='_qdb --target'
+alias qupdate='_qdb update'
+alias qssh='_qdb ssh'
+alias qpush='_qdb sync --push'
+alias qpull='_qdb sync --pull'
+alias qremount='_qdb remount'
+alias qde='_qdb ide'

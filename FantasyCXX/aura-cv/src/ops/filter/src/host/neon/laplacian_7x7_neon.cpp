@@ -1,0 +1,1030 @@
+#include "laplacian_impl.hpp"
+#include "aura/runtime/logger.h"
+#include "aura/runtime/worker_pool.h"
+
+namespace aura
+{
+
+template <typename Tp>
+AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Prepare(Tp *mv_src_p2, Tp *mv_src_p1, Tp *mv_src_p0, Tp *mv_src_c,
+                                               Tp *mv_src_n0, Tp *mv_src_n1, Tp *mv_src_n2)
+{
+    mv_src_p2[0] = mv_src_p2[1];
+    mv_src_p1[0] = mv_src_p1[1];
+    mv_src_p0[0] = mv_src_p0[1];
+    mv_src_c[0]  = mv_src_c[1];
+    mv_src_n0[0] = mv_src_n0[1];
+    mv_src_n1[0] = mv_src_n1[1];
+    mv_src_n2[0] = mv_src_n2[1];
+
+    mv_src_p2[1] = mv_src_p2[2];
+    mv_src_p1[1] = mv_src_p1[2];
+    mv_src_p0[1] = mv_src_p0[2];
+    mv_src_c[1]  = mv_src_c[2];
+    mv_src_n0[1] = mv_src_n0[2];
+    mv_src_n1[1] = mv_src_n1[2];
+    mv_src_n2[1] = mv_src_n2[2];
+}
+
+template <typename Tp>
+AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Prepare(Tp *mv_src_p2, Tp *mv_src_p1, Tp *mv_src_p0, Tp *mv_src_c0,
+                                               Tp *mv_src_c1, Tp *mv_src_n0, Tp *mv_src_n1, Tp *mv_src_n2)
+{
+    mv_src_p2[0] = mv_src_p2[1];
+    mv_src_p1[0] = mv_src_p1[1];
+    mv_src_p0[0] = mv_src_p0[1];
+    mv_src_c0[0] = mv_src_c0[1];
+    mv_src_c1[0] = mv_src_c1[1];
+    mv_src_n0[0] = mv_src_n0[1];
+    mv_src_n1[0] = mv_src_n1[1];
+    mv_src_n2[0] = mv_src_n2[1];
+
+    mv_src_p2[1] = mv_src_p2[2];
+    mv_src_p1[1] = mv_src_p1[2];
+    mv_src_p0[1] = mv_src_p0[2];
+    mv_src_c0[1] = mv_src_c0[2];
+    mv_src_c1[1] = mv_src_c1[2];
+    mv_src_n0[1] = mv_src_n0[2];
+    mv_src_n1[1] = mv_src_n1[2];
+    mv_src_n2[1] = mv_src_n2[2];
+}
+
+// d16x4_t = uint16x4_t, int16x4_t
+template <typename d16x4_t, typename WSType = typename Promote<typename neon::Scalar<d16x4_t>::SType>::Type,
+          typename WVType = typename neon::QVector<WSType>::VType,
+          typename std::enable_if<std::is_same<d16x4_t, uint16x4_t>::value ||
+                                  std::is_same<d16x4_t, int16x4_t>::value>::type* = MI_NULL>
+AURA_ALWAYS_INLINE WVType Laplacian7x7Core(d16x4_t &vd16_src_px0, d16x4_t &vd16_src_px1, d16x4_t &vd16_src_px2,
+                                           d16x4_t &vd16_src_nx0, d16x4_t &vd16_src_nx1, d16x4_t &vd16_src_nx2,
+                                           WSType k0, WSType k1, WSType k2, WSType k3)
+{
+    d16x4_t vd16_src_pl2    = neon::vext<1>(vd16_src_px0, vd16_src_px1);
+    d16x4_t vd16_src_pl1    = neon::vext<2>(vd16_src_px0, vd16_src_px1);
+    d16x4_t vd16_src_pl0    = neon::vext<3>(vd16_src_px0, vd16_src_px1);
+    d16x4_t vd16_src_pr0    = neon::vext<1>(vd16_src_px1, vd16_src_px2);
+    d16x4_t vd16_src_pr1    = neon::vext<2>(vd16_src_px1, vd16_src_px2);
+    d16x4_t vd16_src_pr2    = neon::vext<3>(vd16_src_px1, vd16_src_px2);
+
+    WVType vq32_sum_p_l2r2  = neon::vaddl(vd16_src_pl2, vd16_src_pr2);
+    WVType vq32_sum_p_l1r1  = neon::vaddl(vd16_src_pl1, vd16_src_pr1);
+    WVType vq32_sum_p_l0r0  = neon::vaddl(vd16_src_pl0, vd16_src_pr0);
+
+    d16x4_t vd16_src_nl2    = neon::vext<1>(vd16_src_nx0, vd16_src_nx1);
+    d16x4_t vd16_src_nl1    = neon::vext<2>(vd16_src_nx0, vd16_src_nx1);
+    d16x4_t vd16_src_nl0    = neon::vext<3>(vd16_src_nx0, vd16_src_nx1);
+    d16x4_t vd16_src_nr0    = neon::vext<1>(vd16_src_nx1, vd16_src_nx2);
+    d16x4_t vd16_src_nr1    = neon::vext<2>(vd16_src_nx1, vd16_src_nx2);
+    d16x4_t vd16_src_nr2    = neon::vext<3>(vd16_src_nx1, vd16_src_nx2);
+
+    WVType vq32_sum_n_l2r2  = neon::vaddl(vd16_src_nl2, vd16_src_nr2);
+    WVType vq32_sum_n_l1r1  = neon::vaddl(vd16_src_nl1, vd16_src_nr1);
+    WVType vq32_sum_n_l0r0  = neon::vaddl(vd16_src_nl0, vd16_src_nr0);
+
+    WVType vq32_sum_pn_c    = neon::vaddl(vd16_src_px1, vd16_src_nx1);
+    WVType vq32_sum_pn_l2r2 = neon::vadd(vq32_sum_p_l2r2, vq32_sum_n_l2r2);
+    WVType vq32_sum_pn_l1r1 = neon::vadd(vq32_sum_p_l1r1, vq32_sum_n_l1r1);
+    WVType vq32_sum_pn_l0r0 = neon::vadd(vq32_sum_p_l0r0, vq32_sum_n_l0r0);
+
+    WVType vq32_sum_pn      = neon::vmul(vq32_sum_pn_c, k3);
+    vq32_sum_pn             = neon::vmla(vq32_sum_pn, vq32_sum_pn_l2r2, k0);
+    vq32_sum_pn             = neon::vmla(vq32_sum_pn, vq32_sum_pn_l1r1, k1);
+
+    return neon::vmla(vq32_sum_pn, vq32_sum_pn_l0r0, k2);
+}
+
+template <typename d16x4_t, typename std::enable_if<std::is_same<d16x4_t, uint16x4_t>::value ||
+                                                    std::is_same<d16x4_t, int16x4_t>::value>::type* = MI_NULL>
+AURA_ALWAYS_INLINE d16x4_t Laplacian7x7Vector(d16x4_t &vd16_src_p2x0, d16x4_t &vd16_src_p2x1, d16x4_t &vd16_src_p2x2,
+                                              d16x4_t &vd16_src_p1x0, d16x4_t &vd16_src_p1x1, d16x4_t &vd16_src_p1x2,
+                                              d16x4_t &vd16_src_p0x0, d16x4_t &vd16_src_p0x1, d16x4_t &vd16_src_p0x2,
+                                              d16x4_t &vd16_src_cx0,  d16x4_t &vd16_src_cx1,  d16x4_t &vd16_src_cx2,
+                                              d16x4_t &vd16_src_n0x0, d16x4_t &vd16_src_n0x1, d16x4_t &vd16_src_n0x2,
+                                              d16x4_t &vd16_src_n1x0, d16x4_t &vd16_src_n1x1, d16x4_t &vd16_src_n1x2,
+                                              d16x4_t &vd16_src_n2x0, d16x4_t &vd16_src_n2x1, d16x4_t &vd16_src_n2x2)
+{
+    using D32     = typename Promote<typename neon::Scalar<d16x4_t>::SType>::Type;
+    using d32x4_t = typename neon::QVector<D32>::VType;
+
+    // p2n2
+    d32x4_t vq32_sum_p2n2 = Laplacian7x7Core(vd16_src_p2x0, vd16_src_p2x1, vd16_src_p2x2,
+                                                vd16_src_n2x0, vd16_src_n2x1, vd16_src_n2x2,
+                                                1, 4, 7, 8);
+
+    // p1n1
+    d32x4_t vq32_sum_p1n1 = Laplacian7x7Core(vd16_src_p1x0, vd16_src_p1x1, vd16_src_p1x2,
+                                                vd16_src_n1x0, vd16_src_n1x1, vd16_src_n1x2,
+                                                4, 12, 12, 8);
+
+    // p0n0
+    d16x4_t vd16_src_p0l2       = neon::vext<1>(vd16_src_p0x0, vd16_src_p0x1);
+    d16x4_t vd16_src_p0l1       = neon::vext<2>(vd16_src_p0x0, vd16_src_p0x1);
+    d16x4_t vd16_src_p0l0       = neon::vext<3>(vd16_src_p0x0, vd16_src_p0x1);
+    d16x4_t vd16_src_p0r0       = neon::vext<1>(vd16_src_p0x1, vd16_src_p0x2);
+    d16x4_t vd16_src_p0r1       = neon::vext<2>(vd16_src_p0x1, vd16_src_p0x2);
+    d16x4_t vd16_src_p0r2       = neon::vext<3>(vd16_src_p0x1, vd16_src_p0x2);
+
+    d32x4_t vq32_sum_p0_l2r2    = neon::vaddl(vd16_src_p0l2, vd16_src_p0r2);
+    d32x4_t vq32_sum_p0_l1r1    = neon::vaddl(vd16_src_p0l1, vd16_src_p0r1);
+    d32x4_t vq32_sum_p0_l0r0    = neon::vaddl(vd16_src_p0l0, vd16_src_p0r0);
+
+    d16x4_t vd16_src_n0l2       = neon::vext<1>(vd16_src_n0x0, vd16_src_n0x1);
+    d16x4_t vd16_src_n0l1       = neon::vext<2>(vd16_src_n0x0, vd16_src_n0x1);
+    d16x4_t vd16_src_n0l0       = neon::vext<3>(vd16_src_n0x0, vd16_src_n0x1);
+    d16x4_t vd16_src_n0r0       = neon::vext<1>(vd16_src_n0x1, vd16_src_n0x2);
+    d16x4_t vd16_src_n0r1       = neon::vext<2>(vd16_src_n0x1, vd16_src_n0x2);
+    d16x4_t vd16_src_n0r2       = neon::vext<3>(vd16_src_n0x1, vd16_src_n0x2);
+
+    d32x4_t vq32_sum_n0_l2r2    = neon::vaddl(vd16_src_n0l2, vd16_src_n0r2);
+    d32x4_t vq32_sum_n0_l1r1    = neon::vaddl(vd16_src_n0l1, vd16_src_n0r1);
+    d32x4_t vq32_sum_n0_l0r0    = neon::vaddl(vd16_src_n0l0, vd16_src_n0r0);
+
+    d32x4_t vq32_sum_c_p0n0     = neon::vaddl(vd16_src_p0x1, vd16_src_n0x1);
+    d32x4_t vq32_sum_p0n0_l2r2  = neon::vadd(vq32_sum_p0_l2r2, vq32_sum_n0_l2r2);
+    d32x4_t vq32_sum_p0n0_l1r1  = neon::vadd(vq32_sum_p0_l1r1, vq32_sum_n0_l1r1);
+    d32x4_t vq32_sum_p0n0_l0r0  = neon::vadd(vq32_sum_p0_l0r0, vq32_sum_n0_l0r0);
+
+    d32x4_t vq32_sum_neg_p0n0   = neon::vmul(vq32_sum_c_p0n0, static_cast<D32>(40));
+    d32x4_t vq32_sum_pos_p0n0   = neon::vmul(vq32_sum_p0n0_l2r2, static_cast<D32>(7));
+    vq32_sum_pos_p0n0           = neon::vmla(vq32_sum_pos_p0n0, vq32_sum_p0n0_l1r1, static_cast<D32>(12));
+    vq32_sum_neg_p0n0           = neon::vmla(vq32_sum_neg_p0n0, vq32_sum_p0n0_l0r0, static_cast<D32>(15));
+
+    // c
+    d16x4_t vd16_src_cl2        = neon::vext<1>(vd16_src_cx0, vd16_src_cx1);
+    d16x4_t vd16_src_cl1        = neon::vext<2>(vd16_src_cx0, vd16_src_cx1);
+    d16x4_t vd16_src_cl0        = neon::vext<3>(vd16_src_cx0, vd16_src_cx1);
+    d16x4_t vd16_src_cr0        = neon::vext<1>(vd16_src_cx1, vd16_src_cx2);
+    d16x4_t vd16_src_cr1        = neon::vext<2>(vd16_src_cx1, vd16_src_cx2);
+    d16x4_t vd16_src_cr2        = neon::vext<3>(vd16_src_cx1, vd16_src_cx2);
+
+    d32x4_t vq32_sum_c_l2r2     = neon::vaddl(vd16_src_cl2, vd16_src_cr2);
+    d32x4_t vq32_sum_c_l1r1     = neon::vaddl(vd16_src_cl1, vd16_src_cr1);
+    d32x4_t vq32_sum_c_l0r0     = neon::vaddl(vd16_src_cl0, vd16_src_cr0);
+
+    d32x4_t vq32_sum_neg_c      = neon::vmul(neon::vmovl(vd16_src_cx1), static_cast<D32>(80));
+    d32x4_t vq32_sum_pos_c      = neon::vmul(vq32_sum_c_l2r2, static_cast<D32>(8));
+    vq32_sum_pos_c              = neon::vmla(vq32_sum_pos_c, vq32_sum_c_l1r1, static_cast<D32>(8));
+    vq32_sum_neg_c              = neon::vmla(vq32_sum_neg_c, vq32_sum_c_l0r0, static_cast<D32>(40));
+
+    // sum
+    d32x4_t vq32_sum_pos0156    = neon::vadd(vq32_sum_p2n2, vq32_sum_p1n1);
+    d32x4_t vq32_sum_pos234     = neon::vadd(vq32_sum_pos_p0n0, vq32_sum_pos_c);
+    d32x4_t vq32_sum_pos        = neon::vadd(vq32_sum_pos0156, vq32_sum_pos234);
+    d32x4_t vq32_sum_neg        = neon::vadd(vq32_sum_neg_p0n0, vq32_sum_neg_c);
+
+    vq32_sum_pos                = neon::vshln<1>(vq32_sum_pos);
+    vq32_sum_neg                = neon::vshln<1>(vq32_sum_neg);
+
+    return neon::vqmovn(neon::vqsub(vq32_sum_pos, vq32_sum_neg));
+}
+
+AURA_ALWAYS_INLINE int16x8_t Laplacian7x7Core(uint8x8_t &vdu8_src_px0, uint8x8_t &vdu8_src_px1, uint8x8_t &vdu8_src_px2,
+                                              uint8x8_t &vdu8_src_nx0, uint8x8_t &vdu8_src_nx1, uint8x8_t &vdu8_src_nx2,
+                                              MI_S32 k0, MI_S32 k1, MI_S32 k2, MI_S32 k3)
+{
+    uint8x8_t vdu8_src_pl2      = neon::vext<5>(vdu8_src_px0, vdu8_src_px1);
+    uint8x8_t vdu8_src_pl1      = neon::vext<6>(vdu8_src_px0, vdu8_src_px1);
+    uint8x8_t vdu8_src_pl0      = neon::vext<7>(vdu8_src_px0, vdu8_src_px1);
+    uint8x8_t vdu8_src_pr0      = neon::vext<1>(vdu8_src_px1, vdu8_src_px2);
+    uint8x8_t vdu8_src_pr1      = neon::vext<2>(vdu8_src_px1, vdu8_src_px2);
+    uint8x8_t vdu8_src_pr2      = neon::vext<3>(vdu8_src_px1, vdu8_src_px2);
+
+    uint16x8_t vqu16_sum_p_l2r2 = neon::vaddl(vdu8_src_pl2, vdu8_src_pr2);
+    uint16x8_t vqu16_sum_p_l1r1 = neon::vaddl(vdu8_src_pl1, vdu8_src_pr1);
+    uint16x8_t vqu16_sum_p_l0r0 = neon::vaddl(vdu8_src_pl0, vdu8_src_pr0);
+
+    uint8x8_t vdu8_src_nl2      = neon::vext<5>(vdu8_src_nx0, vdu8_src_nx1);
+    uint8x8_t vdu8_src_nl1      = neon::vext<6>(vdu8_src_nx0, vdu8_src_nx1);
+    uint8x8_t vdu8_src_nl0      = neon::vext<7>(vdu8_src_nx0, vdu8_src_nx1);
+    uint8x8_t vdu8_src_nr0      = neon::vext<1>(vdu8_src_nx1, vdu8_src_nx2);
+    uint8x8_t vdu8_src_nr1      = neon::vext<2>(vdu8_src_nx1, vdu8_src_nx2);
+    uint8x8_t vdu8_src_nr2      = neon::vext<3>(vdu8_src_nx1, vdu8_src_nx2);
+
+    uint16x8_t vqu16_sum_n_l2r2 = neon::vaddl(vdu8_src_nl2, vdu8_src_nr2);
+    uint16x8_t vqu16_sum_n_l1r1 = neon::vaddl(vdu8_src_nl1, vdu8_src_nr1);
+    uint16x8_t vqu16_sum_n_l0r0 = neon::vaddl(vdu8_src_nl0, vdu8_src_nr0);
+
+    int16x8_t vqs16_sum_c_pn    = neon::vreinterpret(neon::vaddl(vdu8_src_px1, vdu8_src_nx1));
+    int16x8_t vqs16_sum_pn_l2r2 = neon::vreinterpret(neon::vadd(vqu16_sum_p_l2r2, vqu16_sum_n_l2r2));
+    int16x8_t vqs16_sum_pn_l1r1 = neon::vreinterpret(neon::vadd(vqu16_sum_p_l1r1, vqu16_sum_n_l1r1));
+    int16x8_t vqs16_sum_pn_l0r0 = neon::vreinterpret(neon::vadd(vqu16_sum_p_l0r0, vqu16_sum_n_l0r0));
+
+    int16x8_t vqs16_sum_pn      = neon::vmul(vqs16_sum_c_pn, static_cast<MI_S16>(k3));
+    vqs16_sum_pn                = neon::vmla(vqs16_sum_pn, vqs16_sum_pn_l2r2, static_cast<MI_S16>(k0));
+    vqs16_sum_pn                = neon::vmla(vqs16_sum_pn, vqs16_sum_pn_l1r1, static_cast<MI_S16>(k1));
+
+    return neon::vmla(vqs16_sum_pn, vqs16_sum_pn_l0r0, static_cast<MI_S16>(k2));
+}
+
+AURA_ALWAYS_INLINE int16x8_t Laplacian7x7Vector(uint8x8_t &vdu8_src_p2x0, uint8x8_t &vdu8_src_p2x1, uint8x8_t &vdu8_src_p2x2,
+                                                uint8x8_t &vdu8_src_p1x0, uint8x8_t &vdu8_src_p1x1, uint8x8_t &vdu8_src_p1x2,
+                                                uint8x8_t &vdu8_src_p0x0, uint8x8_t &vdu8_src_p0x1, uint8x8_t &vdu8_src_p0x2,
+                                                uint8x8_t &vdu8_src_cx0,  uint8x8_t &vdu8_src_cx1,  uint8x8_t &vdu8_src_cx2,
+                                                uint8x8_t &vdu8_src_n0x0, uint8x8_t &vdu8_src_n0x1, uint8x8_t &vdu8_src_n0x2,
+                                                uint8x8_t &vdu8_src_n1x0, uint8x8_t &vdu8_src_n1x1, uint8x8_t &vdu8_src_n1x2,
+                                                uint8x8_t &vdu8_src_n2x0, uint8x8_t &vdu8_src_n2x1, uint8x8_t &vdu8_src_n2x2)
+{
+    // p2n2
+    int16x8_t vqs16_sum_p2n2 = Laplacian7x7Core(vdu8_src_p2x0, vdu8_src_p2x1, vdu8_src_p2x2,
+                                                    vdu8_src_n2x0, vdu8_src_n2x1, vdu8_src_n2x2,
+                                                    1, 4, 7, 8);
+
+    // p1n1
+    int16x8_t vqs16_sum_p1n1 = Laplacian7x7Core(vdu8_src_p1x0, vdu8_src_p1x1, vdu8_src_p1x2,
+                                                    vdu8_src_n1x0, vdu8_src_n1x1, vdu8_src_n1x2,
+                                                    4, 12, 12, 8);
+
+    // p0n0
+    int16x8_t vqs16_sum_p0n0 = Laplacian7x7Core(vdu8_src_p0x0, vdu8_src_p0x1, vdu8_src_p0x2,
+                                                    vdu8_src_n0x0, vdu8_src_n0x1, vdu8_src_n0x2,
+                                                    7, 12, -15, -40);
+
+    // c
+    uint8x8_t vdu8_src_cl2      = neon::vext<5>(vdu8_src_cx0, vdu8_src_cx1);
+    uint8x8_t vdu8_src_cl1      = neon::vext<6>(vdu8_src_cx0, vdu8_src_cx1);
+    uint8x8_t vdu8_src_cl0      = neon::vext<7>(vdu8_src_cx0, vdu8_src_cx1);
+    uint8x8_t vdu8_src_cr0      = neon::vext<1>(vdu8_src_cx1, vdu8_src_cx2);
+    uint8x8_t vdu8_src_cr1      = neon::vext<2>(vdu8_src_cx1, vdu8_src_cx2);
+    uint8x8_t vdu8_src_cr2      = neon::vext<3>(vdu8_src_cx1, vdu8_src_cx2);
+
+    uint16x8_t vqu16_sum_c_l2r2 = neon::vaddl(vdu8_src_cl2, vdu8_src_cr2);
+    uint16x8_t vqu16_sum_c_l1r1 = neon::vaddl(vdu8_src_cl1, vdu8_src_cr1);
+    uint16x8_t vqu16_sum_c_l0r0 = neon::vaddl(vdu8_src_cl0, vdu8_src_cr0);
+
+    int16x8_t vqs16_sum_c_c     = neon::vreinterpret(neon::vmovl(vdu8_src_cx1));
+    int16x8_t vqs16_sum_c_l2r2  = neon::vreinterpret(vqu16_sum_c_l2r2);
+    int16x8_t vqs16_sum_c_l1r1  = neon::vreinterpret(vqu16_sum_c_l1r1);
+    int16x8_t vqs16_sum_c_l0r0  = neon::vreinterpret(vqu16_sum_c_l0r0);
+
+    int16x8_t vqs16_sum_c       = neon::vmul(vqs16_sum_c_c, static_cast<MI_S16>(-80));
+    vqs16_sum_c                 = neon::vmla(vqs16_sum_c, vqs16_sum_c_l2r2, static_cast<MI_S16>(8));
+    vqs16_sum_c                 = neon::vmla(vqs16_sum_c, vqs16_sum_c_l1r1, static_cast<MI_S16>(8));
+    vqs16_sum_c                 = neon::vmla(vqs16_sum_c, vqs16_sum_c_l0r0, static_cast<MI_S16>(-40));
+
+    // sum
+    int16x8_t vqs16_sum0        = neon::vadd(vqs16_sum_p2n2, vqs16_sum_p0n0);
+    int16x8_t vqs16_sum1        = neon::vadd(vqs16_sum_p1n1, vqs16_sum_c);
+
+    int16x4_t vds16_sum_l0      = neon::vgetlow(vqs16_sum0);
+    int16x4_t vds16_sum_11      = neon::vgetlow(vqs16_sum1);
+    int32x4_t vqs32_sum_l       = neon::vaddl(vds16_sum_l0, vds16_sum_11);
+
+    int16x4_t vds16_sum_h0      = neon::vgethigh(vqs16_sum0);
+    int16x4_t vds16_sum_h1      = neon::vgethigh(vqs16_sum1);
+    int32x4_t vqs32_sum_h       = neon::vaddl(vds16_sum_h0, vds16_sum_h1);
+
+    vqs32_sum_l                 = neon::vshln<1>(vqs32_sum_l);
+    vqs32_sum_h                 = neon::vshln<1>(vqs32_sum_h);
+
+    return neon::vcombine(neon::vqmovn(vqs32_sum_l), neon::vqmovn(vqs32_sum_h));
+}
+
+AURA_ALWAYS_INLINE float32x4_t Laplacian7x7Core(float32x4_t &vqf32_src_px0, float32x4_t &vqf32_src_px1, float32x4_t &vqf32_src_px2,
+                                                float32x4_t &vqf32_src_nx0, float32x4_t &vqf32_src_nx1, float32x4_t &vqf32_src_nx2,
+                                                MI_F32 k0, MI_F32 k1, MI_F32 k2, MI_F32 k3)
+{
+    float32x4_t vqf32_src_pl2     = neon::vext<1>(vqf32_src_px0, vqf32_src_px1);
+    float32x4_t vqf32_src_pl1     = neon::vext<2>(vqf32_src_px0, vqf32_src_px1);
+    float32x4_t vqf32_src_pl0     = neon::vext<3>(vqf32_src_px0, vqf32_src_px1);
+    float32x4_t vqf32_src_pr0     = neon::vext<1>(vqf32_src_px1, vqf32_src_px2);
+    float32x4_t vqf32_src_pr1     = neon::vext<2>(vqf32_src_px1, vqf32_src_px2);
+    float32x4_t vqf32_src_pr2     = neon::vext<3>(vqf32_src_px1, vqf32_src_px2);
+
+    float32x4_t vqf32_sum_p_l2r2  = neon::vadd(vqf32_src_pl2, vqf32_src_pr2);
+    float32x4_t vqf32_sum_p_l1r1  = neon::vadd(vqf32_src_pl1, vqf32_src_pr1);
+    float32x4_t vqf32_sum_p_l0r0  = neon::vadd(vqf32_src_pl0, vqf32_src_pr0);
+
+    float32x4_t vqf32_src_nl2     = neon::vext<1>(vqf32_src_nx0, vqf32_src_nx1);
+    float32x4_t vqf32_src_nl1     = neon::vext<2>(vqf32_src_nx0, vqf32_src_nx1);
+    float32x4_t vqf32_src_nl0     = neon::vext<3>(vqf32_src_nx0, vqf32_src_nx1);
+    float32x4_t vqf32_src_nr0     = neon::vext<1>(vqf32_src_nx1, vqf32_src_nx2);
+    float32x4_t vqf32_src_nr1     = neon::vext<2>(vqf32_src_nx1, vqf32_src_nx2);
+    float32x4_t vqf32_src_nr2     = neon::vext<3>(vqf32_src_nx1, vqf32_src_nx2);
+
+    float32x4_t vqf32_sum_n_l2r2  = neon::vadd(vqf32_src_nl2, vqf32_src_nr2);
+    float32x4_t vqf32_sum_n_l1r1  = neon::vadd(vqf32_src_nl1, vqf32_src_nr1);
+    float32x4_t vqf32_sum_n_l0r0  = neon::vadd(vqf32_src_nl0, vqf32_src_nr0);
+
+    float32x4_t vqf32_sum_c_pn    = neon::vadd(vqf32_src_px1, vqf32_src_nx1);
+    float32x4_t vqf32_sum_pn_l2r2 = neon::vadd(vqf32_sum_p_l2r2, vqf32_sum_n_l2r2);
+    float32x4_t vqf32_sum_pn_l1r1 = neon::vadd(vqf32_sum_p_l1r1, vqf32_sum_n_l1r1);
+    float32x4_t vqf32_sum_pn_l0r0 = neon::vadd(vqf32_sum_p_l0r0, vqf32_sum_n_l0r0);
+
+    float32x4_t vqf32_sum_pn      = neon::vmul(vqf32_sum_c_pn, k3);
+    vqf32_sum_pn                  = neon::vmla(vqf32_sum_pn, vqf32_sum_pn_l2r2, k0);
+    vqf32_sum_pn                  = neon::vmla(vqf32_sum_pn, vqf32_sum_pn_l1r1, k1);
+
+    return neon::vmla(vqf32_sum_pn, vqf32_sum_pn_l0r0, k2);
+}
+
+#if defined(AURA_ENABLE_NEON_FP16)
+AURA_ALWAYS_INLINE float16x4_t Laplacian7x7Vector(float16x4_t &vdf16_src_p2x0, float16x4_t &vdf16_src_p2x1, float16x4_t &vdf16_src_p2x2,
+                                                  float16x4_t &vdf16_src_p1x0, float16x4_t &vdf16_src_p1x1, float16x4_t &vdf16_src_p1x2,
+                                                  float16x4_t &vdf16_src_p0x0, float16x4_t &vdf16_src_p0x1, float16x4_t &vdf16_src_p0x2,
+                                                  float16x4_t &vdf16_src_cx0,  float16x4_t &vdf16_src_cx1,  float16x4_t &vdf16_src_cx2,
+                                                  float16x4_t &vdf16_src_n0x0, float16x4_t &vdf16_src_n0x1, float16x4_t &vdf16_src_n0x2,
+                                                  float16x4_t &vdf16_src_n1x0, float16x4_t &vdf16_src_n1x1, float16x4_t &vdf16_src_n1x2,
+                                                  float16x4_t &vdf16_src_n2x0, float16x4_t &vdf16_src_n2x1, float16x4_t &vdf16_src_n2x2)
+{
+    // p2n2
+    float32x4_t vqf32_src_p2x0   = neon::vcvt<MI_F32>(vdf16_src_p2x0);
+    float32x4_t vqf32_src_p2x1   = neon::vcvt<MI_F32>(vdf16_src_p2x1);
+    float32x4_t vqf32_src_p2x2   = neon::vcvt<MI_F32>(vdf16_src_p2x2);
+    float32x4_t vqf32_src_n2x0   = neon::vcvt<MI_F32>(vdf16_src_n2x0);
+    float32x4_t vqf32_src_n2x1   = neon::vcvt<MI_F32>(vdf16_src_n2x1);
+    float32x4_t vqf32_src_n2x2   = neon::vcvt<MI_F32>(vdf16_src_n2x2);
+    float32x4_t vqf32_sum_p2n2   = Laplacian7x7Core(vqf32_src_p2x0, vqf32_src_p2x1, vqf32_src_p2x2,
+                                                      vqf32_src_n2x0, vqf32_src_n2x1, vqf32_src_n2x2,
+                                                      2.f, 8.f, 14.f, 16.f);
+
+    // p1n1
+    float32x4_t vqf32_src_p1x0   = neon::vcvt<MI_F32>(vdf16_src_p1x0);
+    float32x4_t vqf32_src_p1x1   = neon::vcvt<MI_F32>(vdf16_src_p1x1);
+    float32x4_t vqf32_src_p1x2   = neon::vcvt<MI_F32>(vdf16_src_p1x2);
+    float32x4_t vqf32_src_n1x0   = neon::vcvt<MI_F32>(vdf16_src_n1x0);
+    float32x4_t vqf32_src_n1x1   = neon::vcvt<MI_F32>(vdf16_src_n1x1);
+    float32x4_t vqf32_src_n1x2   = neon::vcvt<MI_F32>(vdf16_src_n1x2);
+    float32x4_t vqf32_sum_p1n1   = Laplacian7x7Core(vqf32_src_p1x0, vqf32_src_p1x1, vqf32_src_p1x2,
+                                                      vqf32_src_n1x0, vqf32_src_n1x1, vqf32_src_n1x2,
+                                                      8.f, 24.f, 24.f, 16.f);
+
+    // p0n0
+    float32x4_t vqf32_src_p0x0   = neon::vcvt<MI_F32>(vdf16_src_p0x0);
+    float32x4_t vqf32_src_p0x1   = neon::vcvt<MI_F32>(vdf16_src_p0x1);
+    float32x4_t vqf32_src_p0x2   = neon::vcvt<MI_F32>(vdf16_src_p0x2);
+    float32x4_t vqf32_src_n0x0   = neon::vcvt<MI_F32>(vdf16_src_n0x0);
+    float32x4_t vqf32_src_n0x1   = neon::vcvt<MI_F32>(vdf16_src_n0x1);
+    float32x4_t vqf32_src_n0x2   = neon::vcvt<MI_F32>(vdf16_src_n0x2);
+    float32x4_t vqf32_sum_p0n0   = Laplacian7x7Core(vqf32_src_p0x0, vqf32_src_p0x1, vqf32_src_p0x2,
+                                                      vqf32_src_n0x0, vqf32_src_n0x1, vqf32_src_n0x2,
+                                                      14.f, 24.f, -30.f, -80.f);
+
+    // c
+    float32x4_t vqf32_src_cx0    = neon::vcvt<MI_F32>(vdf16_src_cx0);
+    float32x4_t vqf32_src_cx1    = neon::vcvt<MI_F32>(vdf16_src_cx1);
+    float32x4_t vqf32_src_cx2    = neon::vcvt<MI_F32>(vdf16_src_cx2);
+    float32x4_t vqf32_src_cl2    = neon::vext<1>(vqf32_src_cx0, vqf32_src_cx1);
+    float32x4_t vqf32_src_cl1    = neon::vext<2>(vqf32_src_cx0, vqf32_src_cx1);
+    float32x4_t vqf32_src_cl0    = neon::vext<3>(vqf32_src_cx0, vqf32_src_cx1);
+    float32x4_t vqf32_src_cr0    = neon::vext<1>(vqf32_src_cx1, vqf32_src_cx2);
+    float32x4_t vqf32_src_cr1    = neon::vext<2>(vqf32_src_cx1, vqf32_src_cx2);
+    float32x4_t vqf32_src_cr2    = neon::vext<3>(vqf32_src_cx1, vqf32_src_cx2);
+
+    float32x4_t vqf32_sum_c_l2r2 = neon::vadd(vqf32_src_cl2, vqf32_src_cr2);
+    float32x4_t vqf32_sum_c_l1r1 = neon::vadd(vqf32_src_cl1, vqf32_src_cr1);
+    float32x4_t vqf32_sum_c_l0r0 = neon::vadd(vqf32_src_cl0, vqf32_src_cr0);
+
+    float32x4_t vqf32_sum_c      = neon::vmul(vqf32_src_cx1, -160.f);
+    vqf32_sum_c                  = neon::vmla(vqf32_sum_c, vqf32_sum_c_l2r2, 16.f);
+    vqf32_sum_c                  = neon::vmla(vqf32_sum_c, vqf32_sum_c_l1r1, 16.f);
+    vqf32_sum_c                  = neon::vmla(vqf32_sum_c, vqf32_sum_c_l0r0, -80.f);
+
+    // sum
+    float32x4_t vqf32_sum0       = neon::vadd(vqf32_sum_p2n2, vqf32_sum_p0n0);
+    float32x4_t vqf32_sum1       = neon::vadd(vqf32_sum_p1n1, vqf32_sum_c);
+
+    return neon::vcvt<MI_F16>(neon::vadd(vqf32_sum0, vqf32_sum1));
+}
+#endif // AURA_ENABLE_NEON_FP16
+
+AURA_ALWAYS_INLINE float32x4_t Laplacian7x7Vector(float32x4_t &vqf32_src_p2x0, float32x4_t &vqf32_src_p2x1, float32x4_t &vqf32_src_p2x2,
+                                                  float32x4_t &vqf32_src_p1x0, float32x4_t &vqf32_src_p1x1, float32x4_t &vqf32_src_p1x2,
+                                                  float32x4_t &vqf32_src_p0x0, float32x4_t &vqf32_src_p0x1, float32x4_t &vqf32_src_p0x2,
+                                                  float32x4_t &vqf32_src_cx0,  float32x4_t &vqf32_src_cx1,  float32x4_t &vqf32_src_cx2,
+                                                  float32x4_t &vqf32_src_n0x0, float32x4_t &vqf32_src_n0x1, float32x4_t &vqf32_src_n0x2,
+                                                  float32x4_t &vqf32_src_n1x0, float32x4_t &vqf32_src_n1x1, float32x4_t &vqf32_src_n1x2,
+                                                  float32x4_t &vqf32_src_n2x0, float32x4_t &vqf32_src_n2x1, float32x4_t &vqf32_src_n2x2)
+{
+    // p2n2
+    float32x4_t vqf32_sum_p2n2 = Laplacian7x7Core(vqf32_src_p2x0, vqf32_src_p2x1, vqf32_src_p2x2,
+                                                      vqf32_src_n2x0, vqf32_src_n2x1, vqf32_src_n2x2,
+                                                      2.f, 8.f, 14.f, 16.f);
+
+    // p1n1
+    float32x4_t vqf32_sum_p1n1 = Laplacian7x7Core(vqf32_src_p1x0, vqf32_src_p1x1, vqf32_src_p1x2,
+                                                      vqf32_src_n1x0, vqf32_src_n1x1, vqf32_src_n1x2,
+                                                      8.f, 24.f, 24.f, 16.f);
+
+    // p0n0
+    float32x4_t vqf32_sum_p0n0 = Laplacian7x7Core(vqf32_src_p0x0, vqf32_src_p0x1, vqf32_src_p0x2,
+                                                      vqf32_src_n0x0, vqf32_src_n0x1, vqf32_src_n0x2,
+                                                      14.f, 24.f, -30.f, -80.f);
+
+    // c
+    float32x4_t vqf32_src_cl2    = neon::vext<1>(vqf32_src_cx0, vqf32_src_cx1);
+    float32x4_t vqf32_src_cl1    = neon::vext<2>(vqf32_src_cx0, vqf32_src_cx1);
+    float32x4_t vqf32_src_cl0    = neon::vext<3>(vqf32_src_cx0, vqf32_src_cx1);
+    float32x4_t vqf32_src_cr0    = neon::vext<1>(vqf32_src_cx1, vqf32_src_cx2);
+    float32x4_t vqf32_src_cr1    = neon::vext<2>(vqf32_src_cx1, vqf32_src_cx2);
+    float32x4_t vqf32_src_cr2    = neon::vext<3>(vqf32_src_cx1, vqf32_src_cx2);
+
+    float32x4_t vqf32_sum_c_l2r2 = neon::vadd(vqf32_src_cl2, vqf32_src_cr2);
+    float32x4_t vqf32_sum_c_l1r1 = neon::vadd(vqf32_src_cl1, vqf32_src_cr1);
+    float32x4_t vqf32_sum_c_l0r0 = neon::vadd(vqf32_src_cl0, vqf32_src_cr0);
+
+    float32x4_t vqf32_sum_c      = neon::vmul(vqf32_src_cx1, -160.f);
+    vqf32_sum_c                  = neon::vmla(vqf32_sum_c, vqf32_sum_c_l2r2, 16.f);
+    vqf32_sum_c                  = neon::vmla(vqf32_sum_c, vqf32_sum_c_l1r1, 16.f);
+    vqf32_sum_c                  = neon::vmla(vqf32_sum_c, vqf32_sum_c_l0r0, -80.f);
+
+    // sum
+    float32x4_t vqf32_sum0       = neon::vadd(vqf32_sum_p2n2, vqf32_sum_p0n0);
+    float32x4_t vqf32_sum1       = neon::vadd(vqf32_sum_p1n1, vqf32_sum_c);
+
+    return neon::vadd(vqf32_sum0, vqf32_sum1);
+}
+
+template <typename St, BorderType BORDER_TYPE, MI_S32 C, typename Dt>
+static AURA_VOID Laplacian7x7OneRow(const St *src_p2, const St *src_p1, const St *src_p0, const St *src_c, const St *src_n0,
+                                  const St *src_n1, const St *src_n2, Dt *dst, const std::vector<St> &border_value, MI_S32 width)
+{
+    using MVSt = typename std::conditional<std::is_same<St, MI_F32>::value, typename neon::MQVector<St, C>::MVType,
+                                                typename neon::MDVector<St, C>::MVType>::type;
+    using MVDt = typename std::conditional<std::is_same<St, MI_U8>::value, typename neon::MQVector<Dt, C>::MVType, MVSt>::type;
+
+    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(sizeof(MVDt) / C / sizeof(Dt));
+    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
+    const MI_S32 width_align     = (width & -ELEM_COUNTS) * C;
+
+    MVSt mv_src_p2[3], mv_src_p1[3], mv_src_p0[3], mv_src_c[3], mv_src_n0[3], mv_src_n1[3], mv_src_n2[3];
+    MVDt mv_result;
+
+    // left
+    {
+        neon::vload(src_p2,           mv_src_p2[1]);
+        neon::vload(src_p2 + VOFFSET, mv_src_p2[2]);
+        neon::vload(src_p1,           mv_src_p1[1]);
+        neon::vload(src_p1 + VOFFSET, mv_src_p1[2]);
+        neon::vload(src_p0,           mv_src_p0[1]);
+        neon::vload(src_p0 + VOFFSET, mv_src_p0[2]);
+        neon::vload(src_c,            mv_src_c[1]);
+        neon::vload(src_c  + VOFFSET, mv_src_c[2]);
+        neon::vload(src_n0,           mv_src_n0[1]);
+        neon::vload(src_n0 + VOFFSET, mv_src_n0[2]);
+        neon::vload(src_n1,           mv_src_n1[1]);
+        neon::vload(src_n1 + VOFFSET, mv_src_n1[2]);
+        neon::vload(src_n2,           mv_src_n2[1]);
+        neon::vload(src_n2 + VOFFSET, mv_src_n2[2]);
+
+        for (MI_S32 ch = 0; ch < C; ch++)
+        {
+            mv_src_p2[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p2[1].val[ch], src_p2[ch], border_value[ch]);
+            mv_src_p1[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
+            mv_src_p0[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p0[1].val[ch], src_p0[ch], border_value[ch]);
+            mv_src_c[0].val[ch]  = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_c[1].val[ch],  src_c[ch],  border_value[ch]);
+            mv_src_n0[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_n0[1].val[ch], src_n0[ch], border_value[ch]);
+            mv_src_n1[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_n1[1].val[ch], src_n1[ch], border_value[ch]);
+            mv_src_n2[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_n2[1].val[ch], src_n2[ch], border_value[ch]);
+            mv_result.val[ch]    = Laplacian7x7Vector(mv_src_p2[0].val[ch], mv_src_p2[1].val[ch], mv_src_p2[2].val[ch],
+                                                      mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                      mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                      mv_src_c[0].val[ch],  mv_src_c[1].val[ch],  mv_src_c[2].val[ch],
+                                                      mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                      mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch],
+                                                      mv_src_n2[0].val[ch], mv_src_n2[1].val[ch], mv_src_n2[2].val[ch]);
+        }
+        neon::vstore(dst, mv_result);
+
+        Laplacian7x7Prepare(mv_src_p2, mv_src_p1, mv_src_p0, mv_src_c, mv_src_n0, mv_src_n1, mv_src_n2);
+    }
+
+    // middle
+    {
+        for (MI_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
+        {
+            neon::vload(src_p2 + x + VOFFSET, mv_src_p2[2]);
+            neon::vload(src_p1 + x + VOFFSET, mv_src_p1[2]);
+            neon::vload(src_p0 + x + VOFFSET, mv_src_p0[2]);
+            neon::vload(src_c  + x + VOFFSET, mv_src_c[2]);
+            neon::vload(src_n0 + x + VOFFSET, mv_src_n0[2]);
+            neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
+            neon::vload(src_n2 + x + VOFFSET, mv_src_n2[2]);
+
+            for (MI_S32 ch = 0; ch < C; ch++)
+            {
+                mv_result.val[ch] = Laplacian7x7Vector(mv_src_p2[0].val[ch], mv_src_p2[1].val[ch], mv_src_p2[2].val[ch],
+                                                       mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                       mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                       mv_src_c[0].val[ch],  mv_src_c[1].val[ch],  mv_src_c[2].val[ch],
+                                                       mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                       mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch],
+                                                       mv_src_n2[0].val[ch], mv_src_n2[1].val[ch], mv_src_n2[2].val[ch]);
+            }
+            neon::vstore(dst + x, mv_result);
+
+            Laplacian7x7Prepare(mv_src_p2, mv_src_p1, mv_src_p0, mv_src_c, mv_src_n0, mv_src_n1, mv_src_n2);
+        }
+    }
+
+    // back
+    {
+        if (width_align != width * C)
+        {
+            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+
+            neon::vload(src_p2 + x - VOFFSET, mv_src_p2[0]);
+            neon::vload(src_p2 + x,           mv_src_p2[1]);
+            neon::vload(src_p2 + x + VOFFSET, mv_src_p2[2]);
+            neon::vload(src_p1 + x - VOFFSET, mv_src_p1[0]);
+            neon::vload(src_p1 + x,           mv_src_p1[1]);
+            neon::vload(src_p1 + x + VOFFSET, mv_src_p1[2]);
+            neon::vload(src_p0 + x - VOFFSET, mv_src_p0[0]);
+            neon::vload(src_p0 + x,           mv_src_p0[1]);
+            neon::vload(src_p0 + x + VOFFSET, mv_src_p0[2]);
+            neon::vload(src_c  + x - VOFFSET, mv_src_c[0]);
+            neon::vload(src_c  + x,           mv_src_c[1]);
+            neon::vload(src_c  + x + VOFFSET, mv_src_c[2]);
+            neon::vload(src_n0 + x - VOFFSET, mv_src_n0[0]);
+            neon::vload(src_n0 + x,           mv_src_n0[1]);
+            neon::vload(src_n0 + x + VOFFSET, mv_src_n0[2]);
+            neon::vload(src_n1 + x - VOFFSET, mv_src_n1[0]);
+            neon::vload(src_n1 + x,           mv_src_n1[1]);
+            neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
+            neon::vload(src_n2 + x - VOFFSET, mv_src_n2[0]);
+            neon::vload(src_n2 + x,           mv_src_n2[1]);
+            neon::vload(src_n2 + x + VOFFSET, mv_src_n2[2]);
+
+            for (MI_S32 ch = 0; ch < C; ch++)
+            {
+                mv_result.val[ch] = Laplacian7x7Vector(mv_src_p2[0].val[ch], mv_src_p2[1].val[ch], mv_src_p2[2].val[ch],
+                                                       mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                       mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                       mv_src_c[0].val[ch],  mv_src_c[1].val[ch],  mv_src_c[2].val[ch],
+                                                       mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                       mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch],
+                                                       mv_src_n2[0].val[ch], mv_src_n2[1].val[ch], mv_src_n2[2].val[ch]);
+            }
+            neon::vstore(dst + x, mv_result);
+
+            Laplacian7x7Prepare(mv_src_p2, mv_src_p1, mv_src_p0, mv_src_c, mv_src_n0, mv_src_n1, mv_src_n2);
+        }
+    }
+
+    // right
+    {
+        MI_S32 x    = (width - ELEM_COUNTS) * C;
+        MI_S32 last = (width - 1) * C;
+
+        for (MI_S32 ch = 0; ch < C; ch++)
+        {
+            mv_src_p2[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p2[1].val[ch], src_p2[last], border_value[ch]);
+            mv_src_p1[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p1[1].val[ch], src_p1[last], border_value[ch]);
+            mv_src_p0[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p0[1].val[ch], src_p0[last], border_value[ch]);
+            mv_src_c[2].val[ch]  = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_c[1].val[ch],  src_c[last],  border_value[ch]);
+            mv_src_n0[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_n0[1].val[ch], src_n0[last], border_value[ch]);
+            mv_src_n1[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_n1[1].val[ch], src_n1[last], border_value[ch]);
+            mv_src_n2[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_n2[1].val[ch], src_n2[last], border_value[ch]);
+            mv_result.val[ch]    = Laplacian7x7Vector(mv_src_p2[0].val[ch], mv_src_p2[1].val[ch], mv_src_p2[2].val[ch],
+                                                      mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                      mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                      mv_src_c[0].val[ch],  mv_src_c[1].val[ch],  mv_src_c[2].val[ch],
+                                                      mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                      mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch],
+                                                      mv_src_n2[0].val[ch], mv_src_n2[1].val[ch], mv_src_n2[2].val[ch]);
+            last++;
+        }
+        neon::vstore(dst + x, mv_result);
+    }
+}
+
+template <typename St, BorderType BORDER_TYPE, MI_S32 C, typename Dt>
+static AURA_VOID Laplacian7x7TwoRow(const St *src_p2, const St *src_p1, const St *src_p0, const St *src_c0, const St *src_c1,
+                                  const St *src_n0, const St *src_n1, const St *src_n2, Dt *dst_c0, Dt *dst_c1,
+                                  const std::vector<St> &border_value, MI_S32 width)
+{
+    using MVSt = typename std::conditional<std::is_same<St, MI_F32>::value, typename neon::MQVector<St, C>::MVType,
+                                                typename neon::MDVector<St, C>::MVType>::type;
+    using MVDt = typename std::conditional<std::is_same<St, MI_U8>::value, typename neon::MQVector<Dt, C>::MVType, MVSt>::type;
+
+    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(sizeof(MVDt) / C / sizeof(Dt));
+    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
+    const MI_S32 width_align     = (width & -ELEM_COUNTS) * C;
+
+    MVSt mv_src_p2[3], mv_src_p1[3], mv_src_p0[3], mv_src_c0[3], mv_src_c1[3], mv_src_n0[3], mv_src_n1[3], mv_src_n2[3];
+    MVDt mv_result0, mv_result1;
+
+    // left
+    {
+        neon::vload(src_p2,           mv_src_p2[1]);
+        neon::vload(src_p2 + VOFFSET, mv_src_p2[2]);
+        neon::vload(src_p1,           mv_src_p1[1]);
+        neon::vload(src_p1 + VOFFSET, mv_src_p1[2]);
+        neon::vload(src_p0,           mv_src_p0[1]);
+        neon::vload(src_p0 + VOFFSET, mv_src_p0[2]);
+        neon::vload(src_c0,           mv_src_c0[1]);
+        neon::vload(src_c0 + VOFFSET, mv_src_c0[2]);
+        neon::vload(src_c1,           mv_src_c1[1]);
+        neon::vload(src_c1 + VOFFSET, mv_src_c1[2]);
+        neon::vload(src_n0,           mv_src_n0[1]);
+        neon::vload(src_n0 + VOFFSET, mv_src_n0[2]);
+        neon::vload(src_n1,           mv_src_n1[1]);
+        neon::vload(src_n1 + VOFFSET, mv_src_n1[2]);
+        neon::vload(src_n2,           mv_src_n2[1]);
+        neon::vload(src_n2 + VOFFSET, mv_src_n2[2]);
+
+        for (MI_S32 ch = 0; ch < C; ch++)
+        {
+            mv_src_p2[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p2[1].val[ch], src_p2[ch], border_value[ch]);
+            mv_src_p1[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
+            mv_src_p0[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p0[1].val[ch], src_p0[ch], border_value[ch]);
+            mv_src_c0[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_c0[1].val[ch], src_c0[ch], border_value[ch]);
+            mv_src_c1[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_c1[1].val[ch], src_c1[ch], border_value[ch]);
+            mv_src_n0[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_n0[1].val[ch], src_n0[ch], border_value[ch]);
+            mv_src_n1[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_n1[1].val[ch], src_n1[ch], border_value[ch]);
+            mv_src_n2[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_n2[1].val[ch], src_n2[ch], border_value[ch]);
+            mv_result0.val[ch]   = Laplacian7x7Vector(mv_src_p2[0].val[ch], mv_src_p2[1].val[ch], mv_src_p2[2].val[ch],
+                                                      mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                      mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                      mv_src_c0[0].val[ch], mv_src_c0[1].val[ch], mv_src_c0[2].val[ch],
+                                                      mv_src_c1[0].val[ch], mv_src_c1[1].val[ch], mv_src_c1[2].val[ch],
+                                                      mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                      mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch]);
+            mv_result1.val[ch]   = Laplacian7x7Vector(mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                      mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                      mv_src_c0[0].val[ch], mv_src_c0[1].val[ch], mv_src_c0[2].val[ch],
+                                                      mv_src_c1[0].val[ch], mv_src_c1[1].val[ch], mv_src_c1[2].val[ch],
+                                                      mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                      mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch],
+                                                      mv_src_n2[0].val[ch], mv_src_n2[1].val[ch], mv_src_n2[2].val[ch]);
+        }
+        neon::vstore(dst_c0, mv_result0);
+        neon::vstore(dst_c1, mv_result1);
+
+        Laplacian7x7Prepare(mv_src_p2, mv_src_p1, mv_src_p0, mv_src_c0, mv_src_c1, mv_src_n0, mv_src_n1, mv_src_n2);
+    }
+
+    // middle
+    {
+        for (MI_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
+        {
+            neon::vload(src_p2 + x + VOFFSET, mv_src_p2[2]);
+            neon::vload(src_p1 + x + VOFFSET, mv_src_p1[2]);
+            neon::vload(src_p0 + x + VOFFSET, mv_src_p0[2]);
+            neon::vload(src_c0 + x + VOFFSET, mv_src_c0[2]);
+            neon::vload(src_c1 + x + VOFFSET, mv_src_c1[2]);
+            neon::vload(src_n0 + x + VOFFSET, mv_src_n0[2]);
+            neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
+            neon::vload(src_n2 + x + VOFFSET, mv_src_n2[2]);
+
+            for (MI_S32 ch = 0; ch < C; ch++)
+            {
+                mv_result0.val[ch] = Laplacian7x7Vector(mv_src_p2[0].val[ch], mv_src_p2[1].val[ch], mv_src_p2[2].val[ch],
+                                                        mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                        mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                        mv_src_c0[0].val[ch], mv_src_c0[1].val[ch], mv_src_c0[2].val[ch],
+                                                        mv_src_c1[0].val[ch], mv_src_c1[1].val[ch], mv_src_c1[2].val[ch],
+                                                        mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                        mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch]);
+                mv_result1.val[ch] = Laplacian7x7Vector(mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                        mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                        mv_src_c0[0].val[ch], mv_src_c0[1].val[ch], mv_src_c0[2].val[ch],
+                                                        mv_src_c1[0].val[ch], mv_src_c1[1].val[ch], mv_src_c1[2].val[ch],
+                                                        mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                        mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch],
+                                                        mv_src_n2[0].val[ch], mv_src_n2[1].val[ch], mv_src_n2[2].val[ch]);
+            }
+            neon::vstore(dst_c0 + x, mv_result0);
+            neon::vstore(dst_c1 + x, mv_result1);
+
+            Laplacian7x7Prepare(mv_src_p2, mv_src_p1, mv_src_p0, mv_src_c0, mv_src_c1, mv_src_n0, mv_src_n1, mv_src_n2);
+        }
+    }
+
+    // back
+    {
+        if (width_align != width * C)
+        {
+            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+
+            neon::vload(src_p2 + x - VOFFSET, mv_src_p2[0]);
+            neon::vload(src_p2 + x,           mv_src_p2[1]);
+            neon::vload(src_p2 + x + VOFFSET, mv_src_p2[2]);
+            neon::vload(src_p1 + x - VOFFSET, mv_src_p1[0]);
+            neon::vload(src_p1 + x,           mv_src_p1[1]);
+            neon::vload(src_p1 + x + VOFFSET, mv_src_p1[2]);
+            neon::vload(src_p0 + x - VOFFSET, mv_src_p0[0]);
+            neon::vload(src_p0 + x,           mv_src_p0[1]);
+            neon::vload(src_p0 + x + VOFFSET, mv_src_p0[2]);
+            neon::vload(src_c0 + x - VOFFSET, mv_src_c0[0]);
+            neon::vload(src_c0 + x,           mv_src_c0[1]);
+            neon::vload(src_c0 + x + VOFFSET, mv_src_c0[2]);
+            neon::vload(src_c1 + x - VOFFSET, mv_src_c1[0]);
+            neon::vload(src_c1 + x,           mv_src_c1[1]);
+            neon::vload(src_c1 + x + VOFFSET, mv_src_c1[2]);
+            neon::vload(src_n0 + x - VOFFSET, mv_src_n0[0]);
+            neon::vload(src_n0 + x,           mv_src_n0[1]);
+            neon::vload(src_n0 + x + VOFFSET, mv_src_n0[2]);
+            neon::vload(src_n1 + x - VOFFSET, mv_src_n1[0]);
+            neon::vload(src_n1 + x,           mv_src_n1[1]);
+            neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
+            neon::vload(src_n2 + x - VOFFSET, mv_src_n2[0]);
+            neon::vload(src_n2 + x,           mv_src_n2[1]);
+            neon::vload(src_n2 + x + VOFFSET, mv_src_n2[2]);
+
+            for (MI_S32 ch = 0; ch < C; ch++)
+            {
+                mv_result0.val[ch] = Laplacian7x7Vector(mv_src_p2[0].val[ch], mv_src_p2[1].val[ch], mv_src_p2[2].val[ch],
+                                                        mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                        mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                        mv_src_c0[0].val[ch], mv_src_c0[1].val[ch], mv_src_c0[2].val[ch],
+                                                        mv_src_c1[0].val[ch], mv_src_c1[1].val[ch], mv_src_c1[2].val[ch],
+                                                        mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                        mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch]);
+                mv_result1.val[ch] = Laplacian7x7Vector(mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                        mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                        mv_src_c0[0].val[ch], mv_src_c0[1].val[ch], mv_src_c0[2].val[ch],
+                                                        mv_src_c1[0].val[ch], mv_src_c1[1].val[ch], mv_src_c1[2].val[ch],
+                                                        mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                        mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch],
+                                                        mv_src_n2[0].val[ch], mv_src_n2[1].val[ch], mv_src_n2[2].val[ch]);
+            }
+            neon::vstore(dst_c0 + x, mv_result0);
+            neon::vstore(dst_c1 + x, mv_result1);
+
+            Laplacian7x7Prepare(mv_src_p2, mv_src_p1, mv_src_p0, mv_src_c0, mv_src_c1, mv_src_n0, mv_src_n1, mv_src_n2);
+        }
+    }
+
+    // right
+    {
+        MI_S32 x    = (width - ELEM_COUNTS) * C;
+        MI_S32 last = (width - 1) * C;
+
+        for (MI_S32 ch = 0; ch < C; ch++)
+        {
+            mv_src_p2[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p2[1].val[ch], src_p2[last], border_value[ch]);
+            mv_src_p1[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p1[1].val[ch], src_p1[last], border_value[ch]);
+            mv_src_p0[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p0[1].val[ch], src_p0[last], border_value[ch]);
+            mv_src_c0[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_c0[1].val[ch], src_c0[last], border_value[ch]);
+            mv_src_c1[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_c1[1].val[ch], src_c1[last], border_value[ch]);
+            mv_src_n0[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_n0[1].val[ch], src_n0[last], border_value[ch]);
+            mv_src_n1[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_n1[1].val[ch], src_n1[last], border_value[ch]);
+            mv_src_n2[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_n2[1].val[ch], src_n2[last], border_value[ch]);
+            mv_result0.val[ch]   = Laplacian7x7Vector(mv_src_p2[0].val[ch], mv_src_p2[1].val[ch], mv_src_p2[2].val[ch],
+                                                      mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                      mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                      mv_src_c0[0].val[ch], mv_src_c0[1].val[ch], mv_src_c0[2].val[ch],
+                                                      mv_src_c1[0].val[ch], mv_src_c1[1].val[ch], mv_src_c1[2].val[ch],
+                                                      mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                      mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch]);
+            mv_result1.val[ch]   = Laplacian7x7Vector(mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
+                                                      mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
+                                                      mv_src_c0[0].val[ch], mv_src_c0[1].val[ch], mv_src_c0[2].val[ch],
+                                                      mv_src_c1[0].val[ch], mv_src_c1[1].val[ch], mv_src_c1[2].val[ch],
+                                                      mv_src_n0[0].val[ch], mv_src_n0[1].val[ch], mv_src_n0[2].val[ch],
+                                                      mv_src_n1[0].val[ch], mv_src_n1[1].val[ch], mv_src_n1[2].val[ch],
+                                                      mv_src_n2[0].val[ch], mv_src_n2[1].val[ch], mv_src_n2[2].val[ch]);
+            last++;
+        }
+        neon::vstore(dst_c0 + x, mv_result0);
+        neon::vstore(dst_c1 + x, mv_result1);
+    }
+}
+
+template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C>
+static Status Laplacian7x7NeonImpl(const Mat &src, Mat &dst, const std::vector<St> &border_value,
+                                   const St *border_buffer, MI_S32 start_row, MI_S32 end_row)
+{
+    const St *src_p2 = MI_NULL, *src_p1 = MI_NULL, *src_p0 = MI_NULL;
+    const St *src_c0 = MI_NULL, *src_c1 = MI_NULL;
+    const St *src_n0 = MI_NULL, *src_n1 = MI_NULL, *src_n2 = MI_NULL;
+    Dt *dst_c0 = MI_NULL, *dst_c1 = MI_NULL;
+
+    MI_S32 width = dst.GetSizes().m_width;
+    MI_S32 y     = start_row;
+
+    src_p2 = src.Ptr<St, BORDER_TYPE>(y - 3, border_buffer);
+    src_p1 = src.Ptr<St, BORDER_TYPE>(y - 2, border_buffer);
+    src_p0 = src.Ptr<St, BORDER_TYPE>(y - 1, border_buffer);
+    src_c0 = src.Ptr<St>(y);
+    src_c1 = src.Ptr<St>(y + 1);
+    src_n0 = src.Ptr<St, BORDER_TYPE>(y + 2, border_buffer);
+    src_n1 = src.Ptr<St, BORDER_TYPE>(y + 3, border_buffer);
+    src_n2 = src.Ptr<St, BORDER_TYPE>(y + 4, border_buffer);
+
+    MI_S32 h_align2 = (end_row - start_row) & (-2);
+    for (; y < start_row + h_align2; y += 2)
+    {
+        dst_c0 = dst.Ptr<Dt>(y);
+        dst_c1 = dst.Ptr<Dt>(y + 1);
+        Laplacian7x7TwoRow<St, BORDER_TYPE, C, Dt>(src_p2, src_p1, src_p0, src_c0, src_c1, src_n0, src_n1, src_n2, dst_c0, dst_c1, border_value, width);
+
+        src_p2 = src_p0;
+        src_p1 = src_c0;
+        src_p0 = src_c1;
+        src_c0 = src_n0;
+        src_c1 = src_n1;
+        src_n0 = src_n2;
+        src_n1 = src.Ptr<St, BORDER_TYPE>(y + 5, border_buffer);
+        src_n2 = src.Ptr<St, BORDER_TYPE>(y + 6, border_buffer);
+    }
+
+    src_n0 = src.Ptr<St, BORDER_TYPE>(y + 1, border_buffer);
+    src_n1 = src.Ptr<St, BORDER_TYPE>(y + 2, border_buffer);
+    src_n2 = src.Ptr<St, BORDER_TYPE>(y + 3, border_buffer);
+
+    if (y < end_row)
+    {
+        dst_c0 = dst.Ptr<Dt>(y);
+        Laplacian7x7OneRow<St, BORDER_TYPE, C, Dt>(src_p2, src_p1, src_p0, src_c0, src_n0, src_n1, src_n2, dst_c0, border_value, width);
+    }
+
+    return Status::OK;
+}
+
+template <typename St, typename Dt, BorderType BORDER_TYPE>
+static Status Laplacian7x7NeonHelper(Context *ctx, const Mat &src, Mat &dst, const std::vector<St> &border_value,
+                                     const St *border_buffer, const OpTarget &target)
+{
+    Status ret = Status::ERROR;
+
+    AURA_UNUSED(target);
+
+    WorkerPool *wp = ctx->GetWorkerPool();
+    if (MI_NULL == wp)
+    {
+        AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
+        return ret;
+    }
+
+    MI_S32 height  = dst.GetSizes().m_height;
+    MI_S32 channel = dst.GetSizes().m_channel;
+
+    switch (channel)
+    {
+        case 1:
+        {
+            ret = wp->ParallelFor(0, height, Laplacian7x7NeonImpl<St, Dt, BORDER_TYPE, 1>, std::cref(src),
+                                  std::ref(dst), std::cref(border_value), border_buffer);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonImpl<St, BORDER_TYPE, 1> failed");
+            }
+            break;
+        }
+
+        case 2:
+        {
+            ret = wp->ParallelFor(0, height, Laplacian7x7NeonImpl<St, Dt, BORDER_TYPE, 2>, std::cref(src),
+                                  std::ref(dst), std::cref(border_value), border_buffer);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonImpl<St, BORDER_TYPE, 2> failed");
+            }
+            break;
+        }
+
+        case 3:
+        {
+            ret = wp->ParallelFor(0, height, Laplacian7x7NeonImpl<St, Dt, BORDER_TYPE, 3>, std::cref(src),
+                                  std::ref(dst), std::cref(border_value), border_buffer);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonImpl<St, BORDER_TYPE, 3> failed");
+            }
+            break;
+        }
+
+        default:
+        {
+            AURA_ADD_ERROR_STRING(ctx, "unsupported channel");
+            return Status::ERROR;
+        }
+    }
+
+    AURA_RETURN(ctx, ret);
+}
+
+template <typename St, typename Dt>
+static Status Laplacian7x7NeonHelper(Context *ctx, const Mat &src, Mat &dst, BorderType border_type,
+                                     const Scalar &border_value, const OpTarget &target)
+{
+    Status ret = Status::ERROR;
+
+    St *border_buffer = MI_NULL;
+    std::vector<St> vec_border_value = border_value.ToVector<St>();
+
+    MI_S32 width   = dst.GetSizes().m_width;
+    MI_S32 channel = dst.GetSizes().m_channel;
+
+    switch (border_type)
+    {
+        case BorderType::CONSTANT:
+        {
+            border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
+            if (MI_NULL == border_buffer)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
+                return Status::ERROR;
+            }
+
+            ret = Laplacian7x7NeonHelper<St, Dt, BorderType::CONSTANT>(ctx, src, dst, vec_border_value, border_buffer, target);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonHelper<St, BorderType::CONSTANT> failed");
+            }
+
+            AURA_FREE(ctx, border_buffer);
+            break;
+        }
+
+        case BorderType::REPLICATE:
+        {
+            ret = Laplacian7x7NeonHelper<St, Dt, BorderType::REPLICATE>(ctx, src, dst, vec_border_value, border_buffer, target);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonHelper<St, BorderType::REPLICATE> failed");
+            }
+            break;
+        }
+
+        case BorderType::REFLECT_101:
+        {
+            ret = Laplacian7x7NeonHelper<St, Dt, BorderType::REFLECT_101>(ctx, src, dst, vec_border_value, border_buffer, target);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonHelper<St, BorderType::REFLECT_101> failed");
+            }
+            break;
+        }
+
+        default:
+        {
+            AURA_ADD_ERROR_STRING(ctx, "unsupported border type");
+            return ret;
+        }
+    }
+
+    AURA_RETURN(ctx, ret);
+}
+
+Status Laplacian7x7Neon(Context *ctx, const Mat &src, Mat &dst, BorderType border_type,
+                        const Scalar &border_value, const OpTarget &target)
+{
+    Status ret = Status::ERROR;
+    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
+
+    switch (pattern)
+    {
+        case AURA_MAKE_PATTERN(ElemType::U8, ElemType::S16):
+        {
+            ret = Laplacian7x7NeonHelper<MI_U8, MI_S16>(ctx, src, dst, border_type, border_value, target);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonHelper<MI_U8> failed");
+            }
+            break;
+        }
+
+        case AURA_MAKE_PATTERN(ElemType::U16, ElemType::U16):
+        {
+            ret = Laplacian7x7NeonHelper<MI_U16, MI_U16>(ctx, src, dst, border_type, border_value, target);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonHelper<MI_U16> failed");
+            }
+            break;
+        }
+
+        case AURA_MAKE_PATTERN(ElemType::S16, ElemType::S16):
+        {
+            ret = Laplacian7x7NeonHelper<MI_S16, MI_S16>(ctx, src, dst, border_type, border_value, target);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonHelper<MI_S16> failed");
+            }
+            break;
+        }
+
+#if defined(AURA_ENABLE_NEON_FP16)
+        case AURA_MAKE_PATTERN(ElemType::F16, ElemType::F16):
+        {
+            ret = Laplacian7x7NeonHelper<MI_F16, MI_F16>(ctx, src, dst, border_type, border_value, target);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonHelper<MI_F16> failed");
+            }
+            break;
+        }
+#endif // AURA_ENABLE_NEON_FP16
+
+        case AURA_MAKE_PATTERN(ElemType::F32, ElemType::F32):
+        {
+            ret = Laplacian7x7NeonHelper<MI_F32, MI_F32>(ctx, src, dst, border_type, border_value, target);
+            if (ret != Status::OK)
+            {
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian7x7NeonHelper<MI_F32> failed");
+            }
+            break;
+        }
+
+        default:
+        {
+            AURA_ADD_ERROR_STRING(ctx, "unsupported combination of source format and destination format");
+            return Status::ERROR;
+        }
+    }
+
+    AURA_RETURN(ctx, ret);
+}
+
+} // namespace aura

@@ -1,0 +1,13 @@
+collect_source_files(lib_srcs GLOB config/static_config/model_ports)
+
+set(model_port_name model_port.prototxt.in)
+if (${PRODUCT} MATCHES "mainline")
+    add_definitions(-DMODEL_PORT_PROTOTXT_IN_PATH="${SRC_ROOT}/config/static_config/model_ports/${model_port_name}")
+else ()
+    set(customize_src ${SRC_ROOT}/config/static_config/model_ports/customize/${PRODUCT}/${model_port_name})
+    if (EXISTS ${customize_src})
+        add_definitions(-DMODEL_PORT_PROTOTXT_IN_PATH="${customize_src}")
+    else ()
+        add_definitions(-DMODEL_PORT_PROTOTXT_IN_PATH="${SRC_ROOT}/config/static_config/model_ports/${model_port_name}")
+    endif ()
+endif ()

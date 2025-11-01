@@ -1,0 +1,625 @@
+Name Strings
+
+    cl_qcom_recordable_queues
+
+Contributors
+
+    Joshua Kelly, Qualcomm Technologies, Inc.
+    Balaji Calidas, Qualcomm Technologies, Inc.
+
+Contact
+
+    bcalidas at qti dot qualcomm dot com
+
+Version
+
+    Version 1, 2019/10/22
+
+Status
+
+    Shipping
+
+Extension Type
+
+    OpenCL device extension
+
+Dependencies
+
+    OpenCL 2.0 or later is required.
+
+    This extension is written against the OpenCL 2.0 Specification.
+
+Overview
+
+    This extension introduces a new set of procedures for recording sequences
+    of kernel enqueues, such that a sequence only needs to be generated once but
+    can be dispatched multiple times.  A recorded sequence is referred to as a
+    recording.  Any argument to any kernel in a recording may be modified
+    without having to re-record the entire command sequence. For applications
+    that repetitively enqueue a fixed sequence kernels with only minor  changes
+    to arguments, recordable queues can provide savings in CPU power and improve
+    dispatch latency.  Kernel Enqueue Kernel and printf features are not
+    supported with this extension.
+
+Header File
+
+    cl_ext_qcom.h
+
+New Procedures and Functions
+
+    cl_recording_qcom clNewRecordingQCOM(cl_command_queue command_queue,
+                                         cl_int          *errcode_ret);
+
+    cl_int clEndRecordingQCOM(cl_recording_qcom recording);
+
+    cl_int clReleaseRecordingQCOM(cl_recording_qcom recording);
+
+    cl_int clRetainRecordingQCOM(cl_recording_qcom recording);
+
+    cl_int clEnqueueRecordingQCOM(
+                    cl_command_queue                    command_queue,
+                    cl_recording_qcom                   recording,
+                    size_t                              num_args,
+                    const cl_array_arg_qcom            *arg_array,
+                    size_t                              num_global_offsets,
+                    const cl_offset_qcom               *global_offset_array,
+                    size_t                              num_global_workgroups,
+                    const cl_workgroup_qcom            *global_workgroup_array,
+                    size_t                              num_local_workgroups,
+                    const cl_workgroup_qcom            *local_workgroups_array,
+                    cl_uint                             num_events_in_wait_list,
+                    const cl_event                     *event_wait_list,
+                    cl_event                           *event);
+
+    cl_int clEnqueueRecordingSVMQCOM(
+                 cl_command_queue                       command_queue,
+                 cl_recording_qcom                      recording,
+                 size_t                                 num_args,
+                 const cl_array_arg_qcom               *arg_array,
+                 size_t                                 num_svm_args,
+                 const cl_array_arg_qcom               *arg_svm_array,
+                 size_t                                 num_global_offsets,
+                 const cl_offset_qcom                  *global_offset_array,
+                 size_t                                 num_global_workgroups,
+                 const cl_workgroup_qcom               *global_workgroup_array,
+                 size_t                                 num_local_workgroups,
+                 const cl_workgroup_qcom               *local_workgroups_array,
+                 size_t                                 num_non_arg_objs,
+                 const cl_array_kernel_exec_info_qcom  *non_arg_obj_array,
+                 cl_uint                                num_events_in_wait_list,
+                 const cl_event                        *event_wait_list,
+                 cl_event                              *event);
+
+New Tokens
+
+    Accepted as a property being queried in the <param_name> argument of
+    clGetDeviceInfo:
+
+        CL_DEVICE_RECORDABLE_QUEUE_MAX_SIZE_QCOM
+
+    Accepted as a flag being set in the <properties> argument of
+    clCreateCommandQueue or a property in the <properties> array of
+    clCreateCommandQueueWithProperties:
+
+        CL_QUEUE_RECORDABLE_QCOM
+
+New Data Structures
+
+    cl_array_arg_qcom
+    cl_array_kernel_exec_info_qcom
+    cl_workgroup_qcom
+    cl_offset_qcom
+
+Additions to table 4.3 (OpenCL Device Queries)
+
+    ---------------------------------------------------------------------------
+    param_name,
+    return type                                info. returned in param_value
+    -----------                    --------------------------------------------
+    CL_DEVICE_RECORDABLE_QUEUE_MAX_SIZE_QCOM
+    cl_uint                        Maximum number of commands that may be
+                                   recorded in a cl_recording_qcom object.
+
+    ---------------------------------------------------------------------------
+    Table 4.3 List of supported values for <param_name> by clGetDeviceInfo
+
+Additions to table 5.1 (Supported cl_queue_properties values and description)
+
+    ---------------------------------------------------------------------------
+    Queue Properties,
+    Property Value                                Description
+    -----------                    --------------------------------------------
+    CL_QUEUE_PROPERTIES
+    cl_command_queue_properties    CL_QUEUE_RECORDABLE_QCOM - Make the command
+                                   queue recordable. Only clEnqueueNDRangeKernel
+                                   may be recorded. All other API enqueues to a
+                                   recordable queue will return
+                                   CL_INVALID_OPERATION.
+                                   CL_QUEUE_RECORDABLE_QCOM may not be combined
+                                   with CL_QUEUE_PROFILING_ENABLE,
+                                   CL_QUEUE_ON_DEVICE, or
+                                   CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE.
+
+    ---------------------------------------------------------------------------
+    Table 5.1 List of supported cl_queue_properties values and description.
+
+New Data Structures for Updating Recordings.
+
+        // Array element struct used to set kernel arguments
+        typedef struct _cl_array_arg_qcom{
+            cl_uint dispatch_index;
+            cl_uint arg_index;
+            size_t arg_size;
+            const void *arg_value;
+        } cl_array_arg_qcom;
+
+    Kernel executions that have been saved to a recording are indexed according
+    to the order in which they were enqueued. The cl_array_arg_qcom structure
+    can be used to update the value of argument <arg_index> for kernel execution
+    <dispatch_index>.  The updated argument value is applied before the
+    recording is executed, and is persistent for the life of the recording. If a
+    given kernel is executed multiple times within a recording each execution is
+    considered a separate dispatch instance and given a separate dispatch index.
+    Kernel argument values that are updated through cl_array_arg_qcom are
+    applied and saved  independently for each dispatch instance. These updated
+    values are not reflected in the original kernel object but are visible only
+    within the recording. Therefore if that same kernel is executed directly on
+    a regular command queue it will not have any of the argument updates that
+    were applied by clEnqueueRecordingQCOM.
+
+       typedef struct _cl_array_kernel_exec_info_qcom{
+             cl_uint dispatch_index;
+             cl_kernel_exec_info param_name;
+             size_t param_value_size;
+             const void *param_value;
+        } cl_array_kernel_exec_info_qcom;
+
+    For kernels that recieve additional information through clSetKernelExecInfo,
+    these values can be updated using cl_array_kernel_exec_info_qcom.
+    Fields param_name, param_value_size, and param_value retain the same meaning
+    as for clSetKernelExecInfo.
+
+        typedef struct _cl_offset_qcom
+        {
+            cl_uint dispatch_index;
+            size_t offsets[3];
+        } cl_offset_qcom;
+
+    The cl_offset_qcom data structure can update the global offsets of a kernel
+    recorded at <dispatch_index>. The offsets field is a three element
+    array, each element corresponding to a work dimension.  If the kernel is
+    executed with work dimension less than three, the higher array elements
+    are ignored.
+
+        typedef struct _cl_workgroup_qcom {
+            cl_uint dispatch_index;
+            const size_t *workgroup_size;
+        } cl_workgroup_qcom;
+
+    The cl_workgroup_qcom structure is used to set either the global or local
+    work size at <dispatch_index>.  The field <workgroup_size>
+    is a pointer to an array containing the new work sizes.  It must have one
+    array element per work dimension.  Parameter <workgroup_size> may be NULL if
+    setting a local work size, and has the same meaning as NULL local work size
+    when used in clEnqueueNDRangeKernel.  If setting a global work size,
+    <workgroup_size> must be non-NULL.
+
+    Creating Recordings
+
+    The function
+
+           cl_recording_qcom clNewRecordingQCOM(cl_command_queue command_queue,
+                                                cl_int          *errcode_ret)
+
+    is used to create a new recording.  Commands enqueued to <command_queue>
+    will be recorded until clEndRecordingQCOM is called. Recording more commands
+    than CL_DEVICE_RECORDABLE_QUEUE_MAX_SIZE_QCOM will result in an error being
+    returned.
+
+    <command_queue> is a command queue created with property
+    CL_QUEUE_RECORDABLE_QCOM.
+
+    <errcode_ret> is a pointer to a cl_int used to return an error code.
+
+    clNewRecordingQCOM returns a cl_recording_qcom object if successful and NULL
+    on failure.  Once a new cl_recording_qcom object is created,
+    <command_queue> is said to have an active recording. All subsequent
+    EnqueueNDRangeKernel calls to <command_queue> are saved to this recording.
+    Enqueuing any other command to <command_queue> will result in a
+    CL_INVALID_OPERATION error being returned. There can be only one active
+    recording on a recordable command queue at any point in time.
+
+    The new cl_recording_qcom object holds a refcount on <command_queue>
+
+    This function can return one of the following errors:
+
+        CL_INVALID_COMMAND_QUEUE if <command_queue> is not a valid command queue
+
+        CL_INVALID_CONTEXT if the context associated with <command_queue> is
+        invalid.
+
+        CL_INVALID_QUEUE_PROPERTIES if <command_queue> is not recordable.
+
+        CL_INVALID_OPERATION if an active recording is already open on
+        <command_queue>
+
+        CL_OUT_OF_HOST_MEMORY failure to allocate required host memory.
+
+        CL_OUT_OF_RESOURCES failure to allocate required resources.
+
+    The function
+
+          cl_int clEndRecordingQCOM(cl_recording_qcom recording)
+
+    is used to end <recording>.  Once clEndRecording is called, the <recording>
+    object becomes immutable and the refcount on the recordable queue which is
+    held by <recording> will be released. This recording can now be enqueued to
+    a regular in-order OpenCL queue. The recordable queue will no longer have an
+    active recording. Commands can only be enqueued to a recordable queue when
+    a recording is active. Enqueueing a command to a recordable queue when no
+    recording is active will result in a CL_INVALID_OPERATION error being
+    returned. This function returns CL_SUCCESS if there are no errors.
+    Otherwise it returns one of the following error codes:
+
+         CL_INVALID_VALUE if <recording> is not a valid cl_recording_qcom
+         object.
+
+         CL_INVALID_OPERATION if <recording> has already been closed.
+
+         CL_INVALID_COMMAND_QUEUE if <recording> if active recording is on an
+         invalid command queue.
+
+         CL_INVALID_CONTEXT if the recordable queue is made from an invalid
+         context.
+
+         CL_OUT_OF_HOST_MEMORY failure to allocate required host memory.
+
+    The function
+
+         cl_int clReleaseRecordingQCOM(cl_recording_qcom recording)
+
+    decreases the reference count on <recording>.  It returns CL_SUCCESS on
+    success. If <recording> is an active recording on a recordable queue
+    clReleaseRecordingQCOM will return CL_INVALID_OPERATION. It can also return
+    one of the following errors:
+
+        CL_INVALID_OPERATION if <recording> is not a valid cl_recording_qcom
+        object.
+
+        CL_OUT_OF_RESOURCES failure to allocate required resources.
+
+        CL_OUT_OF_HOST_MEMORY failure to allocate required host memory.
+
+    The function
+
+        cl_int clRetainRecordingQCOM(cl_recording_qcom recording)
+
+    increases the reference count on <recording>.  It returns
+    CL_SUCCESS on success. Otherwise, it returns one of the following errors:
+
+        CL_INVALID_OPERATION if <recording> is not a valid cl_recording_qcom
+        object.
+
+        CL_OUT_OF_RESOURCES failure to allocate required resources.
+
+        CL_OUT_OF_HOST_MEMORY failure to allocate required host memory.
+
+    Executing Recordings
+
+    The function
+
+  cl_int clEnqueueRecordingQCOM(
+                cl_command_queue                      command_queue,
+                cl_recording_qcom                     recording,
+                size_t                                num_args,
+                const cl_array_arg_qcom              *arg_array,
+                size_t                                num_global_offsets,
+                const cl_offset_qcom                 *global_offset_array,
+                size_t                                num_global_workgroups,
+                const cl_workgroup_qcom              *global_workgroup_array,
+                size_t                                num_local_workgroups,
+                const cl_workgroup_qcom              *local_workgroups_array,
+                cl_uint                               num_events_in_wait_list,
+                const cl_event                       *event_wait_list,
+                cl_event                             *event)
+
+    Is used to enqueue recordings to regular OpenCL command queues. It can also
+    update the local and global work sizes and kernel argument values for each
+    execution.
+
+    <command_queue> must be an in-order command queue.  It must not be a
+    recordable queue.
+
+    <recording> must be a valid recording object that has been closed with
+    clEndRecordingQCOM.
+
+    <num_args> is the number of kernel arguments being changed. This may be 0.
+
+    <arg_array> is an array describing the new kernel arguments to update. It
+    must contain <num_args> array elements.
+
+    <num_global_offsets> is the number of global offsets to update.
+
+    <global_offset_array> is an array containing <num_global_offsets> elements
+    specifying the new global offsets.
+
+    <num_global_workgroups> is the number of global work groups to update.
+
+    <global_workgroups_array> is an array containing <num_global_workgroups>
+    elements specifying the new global work sizes.
+
+    <num_local_workgroups> is the number of local work groups to update.
+
+    <local_workgroups_array> is an array containing <num_local_workgroups>
+    elements specifying the new local work sizes.
+
+    <num_events_in_wait_list>, <event_wait_list>, and <event> have the same
+    meaning as in clEnqueueNDRangeKernel.
+
+    clEnqueueRecordingQCOM returns CL_SUCCESS if the recording was enqueued.
+    Otherwise, it returns one of the following error codes:
+
+        CL_INVALID_COMMAND_QUEUE if <command_queue> is invalid.
+
+        CL_INVALID_VALUE if <recording> is invalid
+
+        CL_INVALID_OPERATION if <command_queue> has note been closed via
+        clEndRecordingQCOM. A zero length recording will also cause this error.
+
+        CL_INVALID_DEVICE_TYPE if <command_queue> has an invalid device type.
+
+        CL_INVALID_CONTEXT if <command_queue> was not created on the same
+        context as <recording>.
+
+        CL_INVALID_KERNEL_ARGS if a dispatch index is out of bounds.
+
+        CL_INVALID_ARG_INDEX if <arg_array> or <arg_svm_array> tries to modify
+        a valid dispatch index, but invalid kernel argument index.
+
+        CL_OUT_OF_HOST_MEMORY failure to allocate required host memory.
+
+        CL_INVALID_GLOBAL_WORK_SIZE if a global work size is set to NULL
+
+        CL_INVALID_WORK_GROUP_SIZE if the global or local work group size is
+        invalid.
+
+        CL_OUT_OF_RESOURCES failure to allocate required resources.
+
+        CL_OUT_OF_HOST_MEMORY failure to allocate required host memory.
+
+        CL_INVALID_EVENT_WAIT_LIST if event_wait_list is NULL and
+        num_events_in_wait_list > 0, or event_wait_list is not NULL and
+        num_events_in_wait_list is 0, or if event objects in event_wait_list
+        are not valid events.
+
+     The function
+
+cl_int clEnqueueRecordingSVMQCOM(
+        cl_command_queue                      command_queue,
+        cl_recording_qcom                     recording,
+        size_t                                num_args,
+        const cl_array_arg_qcom              *arg_array,
+        size_t                                num_svm_args,
+        const cl_array_arg_qcom              *arg_svm_array,
+        size_t                                num_global_offsets,
+        const cl_offset_qcom                 *global_offset_array,
+        size_t                                num_global_workgroups,
+        const cl_workgroup_qcom              *global_workgroup_array,
+        size_t                                num_local_workgroups,
+        const cl_workgroup_qcom              *local_workgroups_array,
+        size_t                                num_non_arg_objs,
+        const cl_array_kernel_exec_info_qcom *non_arg_obj_array,
+        cl_uint                               num_events_in_wait_list,
+        const cl_event                       *event_wait_list,
+        cl_event                             *event)
+
+    Is used to enqueue recordings to regular OpenCL command queues. It also can
+    update the work size and kernel arguments. It is identical to
+    clEnqueueRecordingQCOM, with the additional ability to set SVM pointers as
+    kernel arguments via <arg_svm_array>, as well as non-argument objects via
+    <non_arg_obj_array>.
+
+    <command_queue> must be an in-order command queue.  It must not be a
+    recordable queue.
+
+    <recording> must be a valid recording object that has been closed with
+    clEndRecordingQCOM.
+
+    <num_args> is the number of kernel arguments being changed. This may be 0.
+
+    <arg_array> is an array describing the new kernel arguments to update. It
+    must contain <num_args> array elements.
+
+    <num_svm_args> is the number of kernel arguments being changed.
+    This may be 0.
+
+    <arg_svm_array> is an array describing the new SVM kernel arguments to
+    update. It must contain <num_svm_args> array elements.
+
+    <num_global_offsets> is the number of global offsets to update.
+
+    <global_offset_array> is an array containing <num_global_offsets> elements
+    specifying the new global offsets.
+
+    <num_global_workgroups> is the number of global work groups to update.
+
+    <global_workgroups_array> is an array containing <num_global_workgroups>
+    elements specifying the new global work sizes.
+
+    <num_local_workgroups> is the number of local work groups to update.
+
+    <local_workgroups_array> is an array containing <num_local_workgroups>
+    elements specifying the new local work sizes.
+
+    <num_non_arg_objs> is the number of non-argument object lists to update.
+
+    <non_arg_obj_array> is an array specifying the new non-argument object list
+    to update
+
+    <num_events_in_wait_list>, <event_wait_list>, and <event> have the same
+    meaning as in clEnqueueNDRangeKernel.
+
+Modify section 5.10 "Executing Kernels" of the OpenCL 2.0 specification.
+
+The description of parameter <command_queue> should be modified to read:
+
+    <command_queue> is a valid host command-queue. The kernel will be queued for
+    execution on the device associated with command_queue. A recordable command
+    queue may also be passed, in which case the kernel will be recorded and not
+    queued for execution.
+
+To the description of parameters <event_wait_list> and <num_events_in_wait_list>
+append:
+
+    If <command_queue> is a recordable command queue, <event_wait_list> must be
+    0 and <num_events_wait_list> must be NULL.
+
+To the description parameter <event> append:
+
+    If <command_queue> is a recordable command queue, <event> must be NULL.
+
+The error codes to clEnqueueNDRangeKernel are to be updated as follows:
+
+    Append to CL_INVALID_OPERATION:
+
+        If <command_queue> is recordable and <kernel> is not recordable because
+        it uses Kernel Enqueue Kernel, printf, or the recording is full.
+
+    Add the following error code:
+
+         CL_INVALID_QUEUE_PROPERTIES if a recording is enqueued in an on-device
+         queue or out of order queue.
+
+Sample Code:
+
+    Please note that these code samples are for illustrative purpose only and
+    may not compile in their current form.
+
+    1) Querying max recordable queue size.
+
+    errcode = clGetDeviceInfo(device, CL_DEVICE_RECORDABLE_QUEUE_MAX_SIZE,
+                    sizeof(cl_uint),
+                    &max_recordable_queue_size,
+                    &ret_size);
+    ASSERT_ERRCODE(errcode);
+
+    2)Creating and executing a recording
+
+    // Find maximum recording size
+    errcode = clGetDeviceInfo(device, CL_DEVICE_RECORDABLE_QUEUE_MAX_SIZE,
+                    sizeof(cl_uint), &max_recordable_queue_size, &ret_size);
+    ASSERT_ERRCODE(errcode);
+
+    // Create regular OpenCL command queue
+    cl_command_queue live_queue = clCreateCommandQueue(context, device, 0,
+                    &errcode);
+    ASSERT_ERRCODE(errcode);
+
+    ...Create N OpenCL kernels, kernel1 through kernelN ...
+    cl_kernel kernel1 = ...
+    cl_kernel kernel2 = ...
+          ...
+    cl_kernel kernelN = ...
+
+    ...Set all kernel arguments on kernel1 through kernelN...
+
+    // Create recordable command queue
+    cl_command_queue recordable_queue = clCreateCommandQueue(context, device,
+                                        CL_QUEUE_RECORDABLE_QCOM, &errcode);
+    ASSERT_ERRCODE(errcode);
+
+    // Create new recording
+    cl_recording_qcom recording = clNewRecordingQCOM(recordable_queue,
+                                                     &errcode);
+    ASSERT_ERRCODE(errcode);
+
+    // Record kernel1
+    errcode = clEnqueueNDRangeKernel(recordable_queue, kernel1, KERNEL_1_DIM,
+                                        NULL, global_size, NULL, 0, NULL, NULL);
+    ASSERT_ERRCODE(errcode);
+
+    // Record kernel2
+    errcode = clEnqueueNDRangeKernel(recordable_queue, kernel2, KERNEL_2_DIM,
+                                        NULL, global_size, NULL, 0, NULL, NULL);
+    ASSERT_ERRCODE(errcode);
+
+    ...Enqueue up to kernel N-1...
+
+    // Record kernelN
+    errcode = clEnqueueNDRangeKernel(recordable_queue, kernelN, KERNEL_3_DIM,
+                                     NULL, global_size, NULL, 0, NULL, NULL);
+    ASSERT_ERRCODE(errcode);
+
+    // End the recording
+    errcode = clEndRecordingQCOM(recording);
+    ASSERT_ERRCODE(errcode);
+
+    // Enqueue the recording in the regular OpenCL command queue.  This example
+    // does not modify any kernel arguments or work sizes
+    errcode = clEnqueueRecordingQCOM(live_queue, recording,
+            0, NULL,
+            0, NULL,
+            0, NULL,
+            0, NULL,
+            0, NULL, &event);
+    clWaitForEvents(1, &event);
+    clReleaseEvent(event);
+
+    // Now change argument 3 to kernel1 (at dispatch_index 0),
+    // assume it is a buffer called new_input_buffer.
+    // Additionally, change the global work size using an array of type
+    // cl_workgroup_qcom.
+
+    cl_array_arg_qcom update_args[1];
+    cl_workgroup_qcom update_global_size[1];
+    size_t new_global_size[3] = {GLOBAL_SIZE_X, GLOBAL_SIZE_Y, GLOBAL_SIZE_Z};
+
+    update_args[0].dispatch_index = 0;
+    update_args[0].arg_index = 3;
+    update_args[0].arg_size = sizeof(cl_mem);
+    update_args[0].arg_value = &new_input_buffer;
+
+    update_global_size[0].dispatch_index = 0;
+    update_global_size[0].workgroup_size = new_global_size;
+
+    // Dispatch recording again, only changing a single kernel parameter
+    errcode = clEnqueueRecordingQCOM(live_queue, recording,
+            1, update_args,
+            0, NULL,
+            1, update_global_size,
+            0, NULL,
+            0, NULL, &event);
+    clWaitForEvents(1, &event);
+    clReleaseEvent(event);
+
+    // Create SVM buffer
+    cl_array_arg_qcom set_svm_args[1];
+    cl_int *svm_buffer = (cl_int *)clSVMAlloc(...);
+
+    // Prepare array to set an SVM pointer as a kernel argument
+    set_svm_args[1].dispatch_index = 0;
+    set_svm_args[1].arg_index = 3;
+    set_svm_args[1].arg_value = svm_buffer;
+    set_svm_args[1].arg_size = 0;  // Always 0
+
+    // Set kernel argument 3 on kernel1 to the SVM pointer svm_buffer
+    errcode = clEnqueueRecordingSVMQCOM(live_queue, recording,
+            1, NULL,
+            1, set_svm_args,
+            0, NULL,
+            0, NULL,
+            0, NULL,
+            0, NULL,
+            0, NULL,  &event);
+     clWaitForEvents(1, &event);
+     clReleaseEvent(event);
+
+    errcode = clReleaseRecordingQCOM(recording);
+    ASSERT_ERRCODE(errcode);
+
+Revision History
+
+    Revision 1, 2019/10/22: Initial version.
+
+
+

@@ -1,0 +1,40 @@
+extends ../layout
+
+block content
+    .container
+        .row
+            //添加一个Table表格
+            table.table.table-hover.table-bordered
+                //table head 表头
+                thead
+                    tr
+                        th 类别
+                        th 电影名字
+                        th 导演
+                        th 国家
+                        th 上映年份
+                        th 录入时间
+                        th pv
+                        th 查看
+                        th 修改
+                        th 删除
+                //table body
+                tbody
+                    //遍历电影列表
+                    each item in movies
+                        //根据电影的ID
+                        tr(class="item-id-#{item._id}")
+                            td #{item.category.name}
+                            td #{item.title}
+                            td #{item.derector}
+                            td #{item.country}
+                            td #{item.year}
+                            //调用moment方法，来执行当前更新的时间，然后还有时间的格式化
+                            td #{moment(item.meta.updateAt).format('MM/DD/YYYY')}
+                            td #{item.pv}
+                            //在这个地方加一个超链接，根据超链接然后执行相关操作：查看详情
+                            td: a(target="_blank", href="/movieDetail/#{item._id}") 查看
+                            td: a(target="_blank", href="/admin/update/#{item._id}") 修改
+                            td
+                                button.btn.btn-danger.del(type="button", data-id="#{item._id}") 删除
+    script(src="/js/admin.js")

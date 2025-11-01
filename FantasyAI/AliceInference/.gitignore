@@ -1,0 +1,13 @@
+/.idea/
+
+/models/onnx_models/
+!/models/onnx_models/.gitkeep
+
+/models/paddle-lite_models/
+!/models/paddle-lite_models/.gitkeep
+
+/models/paddle_models/
+!/models/paddle_models/.gitkeep
+
+/res/
+!/res/.gitkeep

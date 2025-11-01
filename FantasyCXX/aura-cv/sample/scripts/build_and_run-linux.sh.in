@@ -1,0 +1,30 @@
+#!/bin/bash
+
+build()
+{
+    # the install path of aura, you can change it to your own path
+    Aura_DIR="${PWD}/.."
+
+    if [ ! -d ${Aura_DIR} ]; then
+      echo "Please check the install path of aura"
+      exit 0
+    fi
+
+    mkdir build; cd build
+
+    cmake -DAura_DIR=${Aura_DIR}/cmake @AURA_ADD_COMPILE_OPTIONS@ \
+          .. && make -j8 install
+
+    cd ..
+}
+
+run()
+{
+    @AURA_SET_LIBRARIES@ ./build/install/ops/sample_filter gaussian none
+}
+
+script_dir=$(cd "$(dirname "$0")"; pwd)
+cd "${script_dir}"
+
+build
+run

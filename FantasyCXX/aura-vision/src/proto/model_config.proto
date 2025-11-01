@@ -1,0 +1,19 @@
+syntax = "proto2";
+package vision;
+
+message Model {
+  required string ability = 1;
+  required string version = 2;
+  required string infer_type = 3;
+  optional bool enable = 4 [default = true];
+  optional string dtype = 5 [default = "fp32"]; // 可选 "fp32", "fp16", "int8"
+  optional string device = 6 [default = "cpu"]; // 可选 "cpu", "gpu", "dsp"
+  optional bool enable_omp = 7 [default = false];
+  optional int version_code = 8;
+  optional string extends = 9;
+};
+
+message ModelConfig {
+  optional string product = 1 [default = "mainline"];
+  repeated Model model = 3;
+}

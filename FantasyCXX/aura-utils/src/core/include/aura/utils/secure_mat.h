@@ -1,0 +1,8 @@
+//
+// Created by Frewen.Wang on 2024/10/19.
+//
+
+#ifndef AURAKALEIDOCXX_SECUREMAT_H
+#define AURAKALEIDOCXX_SECUREMAT_H
+
+#endif //AURAKALEIDOCXX_SECUREMAT_H

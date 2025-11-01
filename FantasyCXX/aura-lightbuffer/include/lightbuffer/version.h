@@ -1,0 +1,24 @@
+//
+// Created by Frewen.Wong on 2022/4/23.
+//
+#ifndef TYCHE_VISION_ABILITY_VERSION_H
+#define TYCHE_VISION_ABILITY_VERSION_H
+
+// 8-bit unsigned int, min: 0, max: 255
+#define PLAIN_BUFFER_VERSION_MAJOR 0
+
+// 8-bit unsigned int, min: 0, max: 255
+#define PLAIN_BUFFER_VERSION_MINOR 1
+
+// 8-bit unsigned int, min: 0, max: 255
+#define PLAIN_BUFFER_VERSION_PATCH 0
+
+#define PLAIN_BUFFER_STRING(x) #x
+#define PLAIN_BUFFER_TOSTRING(x) PLAIN_BUFFER_STRING(x)
+
+// get version string
+#define PLAIN_BUFFER_VERSION_STR                      \
+    PLAIN_BUFFER_TOSTRING(PLAIN_BUFFER_VERSION_MAJOR) \
+    "." PLAIN_BUFFER_TOSTRING(PLAIN_BUFFER_VERSION_MINOR) "." PLAIN_BUFFER_TOSTRING(PLAIN_BUFFER_VERSION_PATCH)
+
+#endif //TYCHE_VISION_ABILITY_VERSION_H

@@ -1,0 +1,14 @@
+com.baidu.iov.ability.sdk
+com.baidu.iov.ability.sdk.bean
+com.baidu.iov.ability.sdk.callback
+com.baidu.iov.ability.sdk.callback.visionRequest
+com.baidu.iov.ability.sdk.callback.result
+com.baidu.iov.ability.sdk.config
+com.baidu.iov.ability.sdk.data
+com.baidu.iov.ability.sdk.db
+com.baidu.iov.ability.sdk.decode
+com.baidu.iov.ability.sdk.graphic
+com.baidu.iov.ability.sdk.net
+com.baidu.iov.ability.sdk.strategy
+com.baidu.iov.ability.sdk.task
+com.baidu.iov.ability.sdk.utils

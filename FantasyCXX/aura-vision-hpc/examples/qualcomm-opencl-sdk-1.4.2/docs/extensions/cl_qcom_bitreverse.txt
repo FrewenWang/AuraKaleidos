@@ -1,0 +1,91 @@
+Name Strings
+
+    cl_qcom_bitreverse
+
+Contributors
+
+    Balaji Calidas, Qualcomm Technologies, Inc.
+
+Contact
+
+    bcalidas at qti dot qualcomm dot com
+
+Version
+
+    Version 1, 2020/06/26
+
+Status
+
+    Shipping
+
+Extension Type
+
+    OpenCL device extension
+
+Dependencies
+
+    OpenCL 2.0 or later is required.
+
+    This extension is written against the OpenCL 2.0 Specification.
+
+Overview
+
+    This extension introduces a new OpenCL-C built-in function for accelerated reversal
+    of bits in a unsigned integer. Applications using this built-in may get a performance
+    benefit relative to applications that use other methods to reverse bits.
+
+Header File
+
+    None
+
+OpenCL C Changes
+
+    New Compiler Directives
+
+        #pragma OPNCL EXTENSION cl_qcom_bitreverse : <behavior>
+
+        where <behavior> can be enable or disable.
+
+        This #pragma directive controls the behavior of the cl_qcom_bitreverse
+        extension.
+
+        * If <behavior> is set to enable, the device compiler behaves as
+          specified by the cl_qcom_bitreverse extension.
+
+        * If <behavior> is set to disable, the device compiler behaves
+          (including issuing errors and warnings) as if the cl_qcom_bitreverse
+          extension is not part of the language specification.
+
+    New Functions
+
+        New OpenCL C built-in for bit reversal:
+
+        The bitreverse operation reverses the order of bits in the unsigned 32
+        bit input to produce the unsigned 32 bit output value.
+
+            uint qcom_bitreverse(uint value);
+
+    Additions to Table 6.13 of the OpenCL 2.0 Specification
+    (Scalar and Vector Argument Built-in Geometric Function Table)
+
+        Function
+        --------
+
+        uint qcom_bitreverse(uint value);
+
+        Description
+        -----------
+
+        Reverse order of bits.
+
+Sample Code
+
+
+        uint  input  = 0x1248edbf;
+        uint  output = qcom_bitreverse (input);
+       //output = 0xfdb71248
+
+
+Revision History
+
+    Revision 1, 2020/06/26: Initial version.

@@ -1,0 +1,34 @@
+Qualcomm:
+  run:
+    - filter_Boxfilter_neon
+    - filter_Boxfilter_none
+    - filter_Boxfilter_hvx
+    - filter_Gaussian_none
+
+  filter:
+
+  balcklist:
+    - filter_Gaussian_none
+
+MTK:
+  run:
+    - filter_Boxfilter_neon
+    - filter_Boxfilter_none
+    - filter_Gaussian_none
+
+  filter:
+
+  balcklist:
+    - filter_Gaussian_none
+
+# No stress test for Linux
+Linux:
+  run:
+
+  filter:
+
+  balcklist:
+
+stress: 100
+
+filter_width: 1000

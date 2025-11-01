@@ -1,0 +1,113 @@
+product: "jidu_vehicle"
+
+model {
+    ability: "source1_camera_cover"
+    version: "DMSCameraCover20240820FP16SimSkipbn"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "face_rect"
+    version: "FaceDetection20240903V7MainNoquantSimSkipbnFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "face_landmark"
+    version: "FacialLandmark230403V26MainFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "face_feature"
+    version: "FaceRecognize230320V16Main"
+    infer_type: "qnn"
+    enable_omp: false
+    version_code: 1
+    extends: "{dm:0.364 om:0.38 dd:0.532 oo:0.475 mm:0.582}"
+}
+
+model {
+    ability: "face_no_interact_living_rgb"
+    version: "Liveness230504V9MainOMSIRRGBFP16"
+    infer_type: "qnn"
+}
+
+model {
+    ability: "face_no_interact_living_ir"
+    version: "Liveness240516V9MainDMSIRQATFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "face_dangerous_driving"
+    version: "DMSSeven230908V14MainQATFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "face_attribute_ir"
+    version: "FaceAttrIR231220V7MainQATFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "face_call"
+    version: "DMSCall240813V14MainNOQATSimSkipbnFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "face_quality"
+    version: "Quality230420V8MainFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "face_emotion"
+    version: "FaceExpression240117V7MainQATFP16"
+    infer_type: "qnn"
+}
+
+model {
+     ability: "face_mouth_landmark"
+     version: "mouthLandmark230406V1FP16"
+     infer_type: "qnn"
+     device: "cpu"
+}
+
+model {
+     ability: "face_eye_center"
+     version: "EyeCenter241028V12imSkipBNFP16"
+     infer_type: "qnn"
+     device: "cpu"
+}
+
+model {
+    ability: "gesture_rect"
+    version: "HandPhoneDetection231208MainNoQATFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "head_shoulder"
+    version: "HeadShoulder20230915MainQATFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}
+
+model {
+    ability: "body_landmark"
+    version: "BodyLandmark20231025MainV1NoQATFP16"
+    infer_type: "qnn"
+    device: "cpu"
+}

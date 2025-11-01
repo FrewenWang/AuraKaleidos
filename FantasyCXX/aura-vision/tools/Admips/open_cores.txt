@@ -1,0 +1,14 @@
+echo 1 > /sys/devices/system/cpu/cpu0/online
+echo "======打开第 0 个核========"
+echo 1 > /sys/devices/system/cpu/cpu1/online
+echo "======打开第 1 个核========"
+echo 1 > /sys/devices/system/cpu/cpu2/online
+echo "======打开第 2 个核========"
+echo 1 > /sys/devices/system/cpu/cpu3/online
+echo "======打开第 3 个核========"
+echo 1 > /sys/devices/system/cpu/cpu4/online
+echo "======打开第 4 个核========"
+echo 1 > /sys/devices/system/cpu/cpu5/online
+echo "======打开第 5 个核========"
+echo "======当前运行的核========"
+cat /sys/devices/system/cpu/online

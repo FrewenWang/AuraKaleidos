@@ -1,0 +1,23 @@
+# inc
+list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/incs")
+list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/incs/stddef")
+
+if(HEXAGON_TOOL_VERSION GREATER_EQUAL "8.8")
+    set(HEXAGON_QAIC_PATH "${HEXAGON_SDK_PATH}/ipc/fastrpc/qaic/Ubuntu/qaic")
+    list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/rtos/qurt/compute${AURA_HEXAGON_ARCH}/include")
+    list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/rtos/qurt/compute${AURA_HEXAGON_ARCH}/include/qurt")
+    list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/rtos/qurt/compute${AURA_HEXAGON_ARCH}/include/posix")
+elseif(HEXAGON_TOOL_VERSION MATCHES "8.4|8.5|8.6|8.7")
+    set(HEXAGON_QAIC_PATH "${HEXAGON_SDK_PATH}/ipc/fastrpc/qaic/${UBUNTU_NAME}/qaic")
+    list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/rtos/qurt/compute${AURA_HEXAGON_ARCH}/include")
+    list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/rtos/qurt/compute${AURA_HEXAGON_ARCH}/include/qurt")
+    list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/rtos/qurt/compute${AURA_HEXAGON_ARCH}/include/posix")
+elseif(HEXAGON_TOOL_VERSION MATCHES "8.3")
+    list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/libs/common/qurt/compute${AURA_HEXAGON_ARCH}/include")
+    list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/libs/common/qurt/compute${AURA_HEXAGON_ARCH}/include/qurt")
+    list(APPEND HEXAGON_SDK_INC_DIR "${HEXAGON_SDK_PATH}/libs/common/qurt/compute${AURA_HEXAGON_ARCH}/include/posix")
+else()
+    message(FATAL_ERROR "Cannot support Hexagon toolchain version, only suppose toolv83/v84/v85/v86/v87")
+endif()
+
+include_directories(${HEXAGON_SDK_INC_DIR})

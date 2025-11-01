@@ -1,0 +1,10 @@
+diff a/AuraFantasyCXX/aura-aura/src/runtime/include/aura/runtime/core/types/sizes.hpp b/AuraFantasyCXX/aura-aura/src/runtime/include/aura/runtime/core/types/sizes.hpp	(rejected hunks)
+@@ -413,7 +413,7 @@
+     }
+ 
+     Tp0 m_height;   /*!< Height value of the size. */
+-    Tp0 m_width;    /*!< Width value of the size. */
++    Tp0 m_width;    /*!< Width value of the size. 图像的宽度像素个数 */
+ };
+ 
+ typedef Sizes2_<MI_S32> Sizes;

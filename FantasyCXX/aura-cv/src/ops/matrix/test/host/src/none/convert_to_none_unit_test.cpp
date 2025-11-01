@@ -1,0 +1,52 @@
+#include "host/include/convert_to_unit_test.hpp"
+
+static ConvertToParam::TupleTable g_convert_to_table_none
+{
+    // src_type
+    {
+        ElemType::U8,  ElemType::S8,
+        ElemType::U16, ElemType::S16,
+        ElemType::U32, ElemType::S32,
+        ElemType::F16, ElemType::F32,
+    },
+    // dst_type
+    {
+        ElemType::U8,  ElemType::S8,
+        ElemType::U16, ElemType::S16,
+        ElemType::U32, ElemType::S32,
+        ElemType::F16, ElemType::F32,
+    },
+    // MatSize
+    {
+        {Sizes3(2048, 4096, 1), Sizes()},
+        {Sizes3(479,  639,  1), Sizes(480,  2560 * 1)},
+        {Sizes3(239,  319,  1), Sizes()},
+
+        {Sizes3(1024, 2048, 2), Sizes()},
+        {Sizes3(479,  639,  2), Sizes(480,  2560 * 2)},
+        {Sizes3(239,  319,  2), Sizes()},
+
+        {Sizes3(1024, 2048, 3), Sizes()},
+        {Sizes3(479,  639,  3), Sizes(480,  2560 * 3)},
+        {Sizes3(239,  319,  3), Sizes()},
+    },
+    // coef_a
+    {
+        1.0, 3.141,
+    },
+    // coef_b
+    {
+        0.0, 1.234, 128,
+    },
+
+    // target
+    {
+        OpTarget::None()
+    },
+};
+
+NEW_TESTCASE(matrix, ConvertTo, none)
+{
+    MatrixConvertToTest matrix_convert_to_test(UnitTest::GetInstance()->GetContext(), g_convert_to_table_none);
+    matrix_convert_to_test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
+}

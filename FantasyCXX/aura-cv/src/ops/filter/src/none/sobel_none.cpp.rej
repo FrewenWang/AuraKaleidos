@@ -1,0 +1,58 @@
+diff a/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/sobel_none.cpp b/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/sobel_none.cpp	(rejected hunks)
+@@ -44,6 +44,7 @@
+ 
+ static Status SobelKernelMat(Context *ctx, Mat &kx, Mat &ky, MI_S32 dx, MI_S32 dy, MI_S32 ksize)
+ {
++    ///
+     if (ksize <= 0)
+     {
+         if (ScharrKernelMat(ctx, kx, ky, dx, dy) != Status::OK)
+@@ -54,7 +55,8 @@
+ 
+         return Status::OK;
+     }
+-
++    
++    ///
+     const MI_S32 ksx = (1 == ksize && dx > 0) ? 3 : ksize;
+     const MI_S32 ksy = (1 == ksize && dy > 0) ? 3 : ksize;
+ 
+@@ -140,6 +142,7 @@
+ template <typename St, typename Dt>
+ static Status SobelNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &kx, const Mat &ky, MI_S32 start_row, MI_S32 end_row)
+ {
++    ///
+     MI_S32 ksx = kx.GetSizes().m_width;
+     MI_S32 ksy = ky.GetSizes().m_width;
+ 
+@@ -224,6 +227,12 @@
+     return Status::OK;
+ }
+ 
++/**
++ * @brief 进行初始化的时候，
++ * 1. 需要对Sobel算子的卷积核进行初始化
++ * 2. 进行乘法计算
++ * @return
++ */
+ Status SobelNone::Initialize()
+ {
+     if (SobelImpl::Initialize() != Status::OK)
+@@ -231,7 +240,7 @@
+         AURA_ADD_ERROR_STRING(m_ctx, "SobelImpl::Initialize() failed");
+         return Status::ERROR;
+     }
+-
++    
+     if (SobelKernelMat(m_ctx, m_kx, m_ky, m_dx, m_dy, m_ksize) != Status::OK)
+     {
+         AURA_ADD_ERROR_STRING(m_ctx, "SobelKernelMat failed");
+@@ -268,7 +277,7 @@
+         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
+         return Status::ERROR;
+     }
+-
++    ///
+     const MI_S32 kshx = m_kx.GetSizes().m_width >> 1;
+     const MI_S32 kshy = m_ky.GetSizes().m_width >> 1;
+     if (IMakeBorder(m_ctx, *src, m_src_border, kshy, kshy, kshx, kshx, m_border_type, m_border_value) != Status::OK)

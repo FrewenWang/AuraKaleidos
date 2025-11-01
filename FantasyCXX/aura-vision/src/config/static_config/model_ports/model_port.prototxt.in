@@ -1,0 +1,193 @@
+R"(
+
+model_port {
+    ability: "source1_camera_cover"
+    input {
+        name: "x"
+        shape { c: 1 w: 320 h: 224 }
+    }
+    output: "linear_1.tmp_1"
+}
+
+model_port {
+    ability: "face_rect"
+    input {
+        name: "inputs"
+        shape { c: 1 w: 320 h: 224 }
+    }
+    output: "conv2d_69.tmp_1"
+    output: "conv2d_74.tmp_1"
+    output: "conv2d_78.tmp_1"
+}
+
+model_port {
+    ability: "face_landmark"
+    input {
+        name: "inputs"
+        shape { c: 1 w: 192 h: 192 }
+    }
+    output: "elementwise_add_8"
+}
+
+model_port {
+    ability: "face_feature"
+    input {
+        name: "data"
+        shape { c: 3 w: 112 h: 112 }
+    }
+    output: "squeeze_0.tmp_0"
+}
+
+model_port {
+    ability: "face_no_interact_living_rgb"
+    input {
+        name: "x"
+        shape { c: 3 w: 112 h: 112 }
+    }
+    output: "linear_1.tmp_1"
+}
+
+model_port {
+    ability: "face_no_interact_living_ir"
+    input {
+        name: "x"
+        shape { c: 1 w: 112 h: 112 }
+    }
+    output: "linear_1.tmp_1"
+}
+
+model_port {
+    ability: "face_dangerous_driving"
+    input {
+        name: "inputs"
+        shape { c: 1 w: 112 h: 112 }
+    }
+    output: "linear_1.tmp_1"
+}
+
+model_port {
+    ability: "face_call"
+    input {
+        name: "x"
+        shape { c: 1 w: 64 h: 48 }
+    }
+    output: "linear_1_tmp_1"
+}
+
+model_port {
+    ability: "face_quality"
+    input {
+        name: "x"
+        shape { c: 1 w: 112 h: 112 }
+    }
+    output: "linear_6.tmp_1"
+    output: "linear_7.tmp_1"
+    output: "linear_8.tmp_1"
+    output: "linear_9.tmp_1"
+    output: "linear_10.tmp_1"
+    output: "linear_11.tmp_1"
+}
+
+model_port {
+    ability: "face_emotion"
+    input {
+        name: "x"
+        shape { c: 1 w: 112 h: 112 }
+    }
+    output: "linear_1_tmp_1_tmp"
+}
+
+model_port {
+    ability: "face_attribute_ir"
+    input {
+        name: "x"
+        shape { c: 1 w: 112 h: 112 }
+    }
+    output: "linear_3_tmp_1_tmp"
+    output: "linear_4_tmp_1_tmp"
+    output: "linear_5_tmp_1_tmp"
+}
+
+model_port {
+    ability: "face_attribute_rgb"
+    input {
+        name: "data"
+        shape { c: 1 w: 80 h: 104 }
+    }
+    output: "gender"
+    output: "age"
+    output: "race"
+    output: "glasess"
+}
+
+model_port {
+    ability: "face_mouth_landmark"
+    input {
+        name: "inputs"
+        shape { c: 1 w: 96 h: 96 }
+    }
+    output: "elementwise_add_8"
+}
+
+model_port {
+    ability: "face_eye_center"
+    input {
+        name: "x2paddle_x"
+        shape { c: 1 w: 96 h: 96 }
+    }
+    output: "elementwise_add_8"
+}
+
+
+model_port {
+    ability: "gesture_rect"
+    input {
+        name: "inputs"
+        shape { c: 1 w: 256 h: 160 }
+    }
+    output: "conv2d_69.tmp_1"
+    output: "conv2d_74.tmp_1"
+    output: "conv2d_78.tmp_1"
+}
+
+model_port {
+    ability: "gesture_landmark"
+    input {
+        name: "inputs"
+        shape { c: 1 w: 96 h: 96 }
+    }
+    output: "elementwise_add_8"
+    output: "softmax_1.tmp_0"
+}
+
+model_port {
+    ability: "biology_category"
+    input {
+        name: "inputs"
+        shape { c: 3 w: 288 h: 160 }
+    }
+    output: "conv2d_69.tmp_1"
+    output: "conv2d_74.tmp_1"
+    output: "conv2d_78.tmp_1"
+}
+
+model_port {
+    ability: "head_shoulder"
+    input {
+        name: "inputs"
+        shape { c: 1 w: 288 h: 192 }
+    }
+    output: "conv2d_69.tmp_1"
+    output: "conv2d_74.tmp_1"
+    output: "conv2d_78.tmp_1"
+}
+
+model_port {
+    ability: "body_landmark"
+    input {
+        name: "inputs"
+        shape { c: 1 w: 224 h: 224 }
+    }
+    output: "elementwise_add_8"
+}
+)"

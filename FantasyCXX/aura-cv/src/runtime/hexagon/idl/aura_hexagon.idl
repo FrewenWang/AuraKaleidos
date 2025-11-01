@@ -1,0 +1,26 @@
+#ifndef AURA_RUNTIME_HEXAGON_AURA_HEXAGON_IDL__
+#define AURA_RUNTIME_HEXAGON_AURA_HEXAGON_IDL__
+
+#include "AEEStdDef.idl"
+#include "remote.idl"
+
+struct RpcMem
+{
+    sequence<uint8> mem;
+};
+
+struct RpcProfiling
+{
+    uint32 status;
+    uint64 skel_time;
+    uint64 clk_mhz;
+};
+
+interface aura_hexagon : remote_handle64
+{
+
+AEEResult call(in sequence<char> full_name, in sequence<RpcMem> rpc_mem, inrout sequence<uint8> rpc_param, inrout RpcProfiling profiling);
+
+};
+
+#endif // AURA_RUNTIME_HEXAGON_AURA_HEXAGON_IDL__

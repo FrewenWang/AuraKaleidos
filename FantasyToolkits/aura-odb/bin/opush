@@ -1,0 +1,22 @@
+#!/bin/bash
+
+file=$1
+user_name="caros"
+password="Csec@keyL7256"
+ip_address=192.168.137.170
+dst_dir="/data/wzj/"
+
+
+expect << EOF
+    # set timeout -1用于设置等待超时时间。
+    # 具体来说，这条指令的作用是禁用超时功能，使expect命令在等待指定的模式时不超时。
+    set timeout -1
+    # spawn命令用于启动一个新的进程（如下是启动一个新的ssh进程）
+    spawn ssh -u $user_name -p $password $ip_address
+    expect "orin:" { send "sudo mountrw" }
+    expect "orin:" { send "rm -r $dst_dir" }
+    expect "orin:" { send "exit\r" }
+    expect eof
+EOF
+
+scp $file $user_name@$ip_address:$dst_dir

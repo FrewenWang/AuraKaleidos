@@ -1,0 +1,10 @@
+diff a/AuraFantasyCXX/aura-aura/src/runtime/memory/include/aura/runtime/memory/allocator.hpp b/AuraFantasyCXX/aura-aura/src/runtime/memory/include/aura/runtime/memory/allocator.hpp	(rejected hunks)
+@@ -287,6 +287,8 @@
+     template<typename Tp>
+     Tp GetData(MI_S32 offset = 0)
+     {
++        /// 就是前面略过的字节数就是offset
++        /// 如果数据是指针
+         if (std::is_pointer<Tp>::value)
+         {
+             return reinterpret_cast<Tp>(reinterpret_cast<MI_U8*>(m_data) + offset);

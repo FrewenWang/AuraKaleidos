@@ -1,0 +1,27 @@
+syntax = "proto2";
+package vision;
+
+message TensorShape {
+  required int32 w = 1;
+  required int32 h = 2;
+  required int32 c = 3;
+}
+
+message ModelInput {
+  optional string name = 1;
+  optional int32 index = 2;
+  optional TensorShape shape = 3;
+}
+
+message PortDesc {
+  required string ability = 1;
+  optional string model_version = 2;
+  repeated ModelInput input = 3;
+  repeated string output = 4;
+  repeated string snpe_output = 5;
+  repeated string qnn_output = 6;
+}
+
+message ModelPort {
+  repeated PortDesc model_port = 1;
+}

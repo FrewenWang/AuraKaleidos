@@ -1,0 +1,21 @@
+#!/bin/bash
+if test -z $*
+then
+    cmd="sh"
+else
+    cmd="$*"
+fi
+echo $cmd
+adb root
+adb remount
+expect << EOF
+    set timeout -1
+    spawn adb shell
+
+    expect "e171" { send "busybox telnet 192.168.78.2 ; exit\r" }
+    expect "login" { send "root\r" }
+    expect "Password" { send "togxuh-8Cyzto-juqven\r" }
+    expect "#" { send "$cmd\r" }
+    expect "#" { send "exit\r" }
+    expect eof
+EOF

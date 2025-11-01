@@ -1,0 +1,79 @@
+diff a/AuraFantasyCXX/aura-aura/src/ops/matrix/src/none/make_border_none.cpp b/AuraFantasyCXX/aura-aura/src/ops/matrix/src/none/make_border_none.cpp	(rejected hunks)
+@@ -10,10 +10,14 @@
+ static AURA_VOID MakeBorderConstantNoneImpl(const Mat &src, Mat &dst, MI_S32 top, MI_S32 bottom,
+                                           MI_S32 left, MI_S32 right, const Scalar &border_value)
+ {
++    /// 获取src和dst的Size3的引用
+     const Sizes3 &src_sz = src.GetSizes();
+     const Sizes3 &dst_sz = dst.GetSizes();
+-
++    //// Tp是MI_U8
++    /// SaturateCast 是进行饱和转换，即超过对应数据类型大小。则按照对应数据类型大小来处理
++    /// 创建vector 的元素个数，最多创建4个元素。常量数据就是border_value.m_val[0]。默认是border_value.m_val[0]
+     std::vector<Tp> border_val(Max(static_cast<MI_S32>(4), src_sz.m_channel), SaturateCast<Tp>(border_value.m_val[0]));
++    /// 如果原始数据的channel小于4，则则设置对应通道的常量数据
+     if (src_sz.m_channel <= 4)
+     {
+         border_val[1] = SaturateCast<Tp>(border_value.m_val[1]);
+@@ -21,12 +25,14 @@
+         border_val[3] = SaturateCast<Tp>(border_value.m_val[3]);
+     }
+ 
+-    // Process the top rows
++    // Process the top rows  进行顶部行数的补边
+     for (MI_S32 y = 0; y < top; ++y)
+     {
++        ////
+         Tp *dst_row = dst.Ptr<Tp>(y);
+         for (MI_S32 x = 0; x < dst_sz.m_width; ++x)
+         {
++            //// 这个就是填充对应channel的补边数据
+             for (MI_S32 ch = 0; ch < dst_sz.m_channel; ++ch)
+             {
+                 *dst_row++ = border_val[ch];
+@@ -34,12 +40,12 @@
+         }
+     }
+ 
+-    // Process the middle rows
++    // Process the middle rows  进行中间组数的处理
+     for (MI_S32 y = 0; y < src_sz.m_height; ++y)
+     {
+         const Tp *src_row = src.Ptr<Tp>(y);
+-        Tp *dst_row       = dst.Ptr<Tp>(y + top);
+-
++        Tp *dst_row = dst.Ptr<Tp>(y + top);
++        
+         // Process left border
+         for (MI_S32 x = 0; x < left; ++x)
+         {
+@@ -48,10 +54,10 @@
+                 *dst_row++ = border_val[ch];
+             }
+         }
+-
++        
+         // Process middle cols
+         memcpy(dst_row, src_row, src_sz.m_width * src_sz.m_channel * sizeof(Tp));
+-
++        
+         // Process right border
+         dst_row += src_sz.m_width * src_sz.m_channel;
+         for (MI_S32 x = 0; x < right; ++x)
+@@ -215,6 +221,7 @@
+ {
+     switch (type)
+     {
++        /// 如果补边是常量（比如都是0000000）
+         case BorderType::CONSTANT:
+         {
+             MakeBorderConstantNoneImpl<Tp>(src, dst, top, bottom, left, right, border_value);
+@@ -274,7 +281,7 @@
+     }
+ 
+     Status ret = Status::ERROR;
+-
++    /// 如果数据是U8，则进行补边的数据就是U8
+     switch (src->GetElemType())
+     {
+         case ElemType::U8:

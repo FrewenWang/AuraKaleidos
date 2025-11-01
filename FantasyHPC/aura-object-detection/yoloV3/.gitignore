@@ -1,0 +1,8 @@
+
+weights/
+
+!weights/download_weights.sh
+
+data/
+
+logs/

@@ -1,0 +1,31 @@
+@echo off
+
+set script_dir=%~dp0
+cd %script_dir%
+
+call :build
+call :run
+exit /b
+
+:build
+    REM the install path of aura, you can change it to your own path
+    set Aura_DIR="%cd%/.."
+
+    if not exist %Aura_DIR% (
+      echo "Please check the install path of aura"
+      goto :eof
+    )
+
+    md build
+    cd build
+
+    cmake -DAura_DIR=%Aura_DIR%/cmake -G "@CMAKE_GENERATOR@" -A @CMAKE_GENERATOR_PLATFORM@ ..
+    cmake --build . --target install --config @AURA_BUILD_TYPE@ -- /m:8
+
+    cd ..
+    goto :eof
+
+:run
+    @AURA_SET_LIBRARIES@
+    build\install\ops\sample_filter.exe gaussian none
+    goto :eof

@@ -1,0 +1,30 @@
+product: "jidu_mobile"
+
+model {
+    ability: "face_rect"
+    version: "FaceDetection20230424V4Main"
+    infer_type: "paddle-lite"
+    device: "cpu"
+}
+
+model {
+    ability: "face_landmark"
+    version: "FacialLandmark230403V26MainFP16"
+    infer_type: "paddle-lite"
+    enable_omp: false
+}
+
+model {
+    ability: "face_feature"
+    version: "FaceRecognize230320V16MainNoQAT"
+    infer_type: "paddle-lite"
+    enable_omp: false
+    version_code: 1
+    extends: "{dm:0.364 om:0.38 dd:0.532 oo:0.475 mm:0.582}"
+}
+
+model {
+    ability: "face_quality"
+    version: "Quality230420V8MainFP16"
+    infer_type: "paddle-lite"
+}

@@ -1,0 +1,17 @@
+#!/bin/bash
+adb root
+adb remount
+
+expect << EOF
+    spawn adb shell
+
+    expect "e171" { send "busybox telnet 192.168.78.2; exit\r" }
+    expect "login" { send "root\r" }
+    expect "Password" { send "togxuh-8Cyzto-juqven\r" }
+    expect "#" { send "rm -r /var/log/perf/*\r" }
+    expect "#" { send "rm -r /var/log/slog/*\r" }
+    expect "#" { send "cat /mnt/vendor/adas/conf/base/polaris_recorder.config\r" }
+    expect "#" { send "sh /mnt/vendor/adas/scripts/recordbag.sh\r" }
+    expect "#" { send "exit\r" }
+    expect eof
+EOF

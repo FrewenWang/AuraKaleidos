@@ -1,0 +1,5 @@
+.gradle
+.cxx
+*.iml
+!.gitkeep
+local.properties

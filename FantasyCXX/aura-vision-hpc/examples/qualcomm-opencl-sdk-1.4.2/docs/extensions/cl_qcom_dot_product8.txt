@@ -1,0 +1,135 @@
+Name Strings
+
+    cl_qcom_dot_product8
+
+Contributors
+
+    Yongsheng Liu, Qualcomm Technologies, Inc.
+    Samuel Pauls, Qualcomm Technologies, Inc.
+    Liang Wang, Qualcomm Technologies, Inc.
+    Balaji Calidas, Qualcomm Technologies, Inc.
+
+Contact
+
+    bcalidas at qti dot qualcomm dot com
+
+Version
+
+    Version 1.1, 2020/7/13
+
+Status
+
+    Shipping
+
+Extension Type
+
+    OpenCL device extension
+
+Dependencies
+
+    OpenCL 2.0 or later is required.
+
+    This extension is written against the OpenCL 2.0 Specification.
+
+Overview
+
+    This extension introduces a new set of OpenCL-C built-in functions for
+    calculating dot products with a pair of four 8-bit components, followed by
+    saturating addition of the dot product result with a 32-bit accumulator.
+
+Header File
+
+    None
+
+OpenCL C Changes
+
+    New Compiler Directives
+
+        #pragma OPNCL EXTENSION cl_qcom_dot_product8 : <behavior>
+
+        where <behavior> can be enable or disable.
+
+        This #pragma directive controls the behavior of the cl_qcom_dot_product8
+        extension.
+
+        * If <behavior> is set to enable, the device compiler behaves as
+          specified by the cl_qcom_dot_product8 extension.
+
+        * If <behavior> is set to disable, the device compiler behaves
+          (including issuing errors and warnings) as if the cl_qcom_dot_product8
+          extension is not part of the language specification.
+
+    New Functions
+
+        New OpenCL C built-ins for dot product operations:
+
+        Assume p0 and p1 can each be interpreted as four unsigned 8-bit
+        components and that acc is interpreted as a signed 32-bit accumulator.
+        qcom_udot8_acc sums the products of the components and adds the
+        accumulator to get a signed 32-bit result, using signed saturation.
+
+            int qcom_udot8_acc(uint p0, uint p1, int acc);
+
+        Assume p0 and p1 can be interpreted as four signed 8-bit components
+        and four unsigned 8-bit components respectively and that acc is
+        interpreted as a signed 32-bit accumulator. qcom_dot8_acc sums the
+        products of the components and adds the accumulator to get a signed
+        32-bit result, using signed saturation.
+
+            int qcom_dot8_acc(uint p0, uint p1, int acc);
+
+    Additions to Table 6.13 of the OpenCL 2.0 Specification
+    (Scalar and Vector Argument Built-in Geometric Function Table)
+
+        Function
+        --------
+
+        int qcom_udot8_acc(uint p0, uint p1, int acc);
+        int qcom_dot8_acc(uint p0, uint p1, int acc);
+
+        Description
+        -----------
+
+        Compute dot product with 32-bit accumulator.
+
+Sample Code
+
+    1) Calculating a dot product with unsigned dot product operands of
+       (11, 22, 33, 44) and (55, 66, 77, 88) and an accumulator of 9:
+
+        uchar p0a = 11;
+        uchar p0b = 22;
+        uchar p0c = 33;
+        uchar p0d = 44;
+        uchar p1a = 55;
+        uchar p1b = 66;
+        uchar p1c = 77;
+        uchar p1d = 88;
+        uint  p0  = (p0a << 24) | (p0b << 16) | (p0c << 8) | p0d;
+        uint  p1  = (p1a << 24) | (p1b << 16) | (p1c << 8) | p1d;
+        int   acc = 9;
+
+        int result = qcom_udot8_acc(p0, p1, acc);
+
+    2) Calculating a dot product with a signed dot product operand of
+       (-11, 22, -33, 44), an unsigned operand of (55, 66, 77, 88), and an
+       accumulator of 9:
+
+        uchar p0a = -11;
+        uchar p0b =  22;
+        uchar p0c = -33;
+        uchar p0d =  44;
+        uchar p1a =  55;
+        uchar p1b =  66;
+        uchar p1c =  77;
+        uchar p1d =  88;
+        uint  p0  = (p0a << 24) | (p0b << 16) | (p0c << 8) | p0d;
+        uint  p1  = (p1a << 24) | (p1b << 16) | (p1c << 8) | p1d;
+        int   acc = 9;
+
+        int result = qcom_dot8_acc(p0, p1, acc);
+
+Revision History
+
+    Revision 1,     2019/06/27: Initial version.
+    Revision 1.1,   2020/07/13: Clarified signedness of saturation during addition of accumulator to dot product result

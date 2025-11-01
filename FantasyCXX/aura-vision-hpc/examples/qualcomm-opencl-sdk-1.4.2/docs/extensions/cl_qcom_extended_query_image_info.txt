@@ -1,0 +1,226 @@
+Name Strings
+
+    cl_qcom_extended_query_image_info
+
+Contributors
+
+    Padmanabham Bodda, Qualcomm Technologies, Inc.
+    Balaji Calidas, Qualcomm Technologies, Inc.
+    Sreelakshmi Haridas Maruthur, Qualcomm Innovation Center, Inc.
+
+Contact
+
+    bcalidas at qti dot qualcomm dot com
+
+Version
+
+    Version 1.0.0, 2021/03/11
+
+Number
+
+    OpenCL Extension #TBD
+
+Status
+
+    Shipping
+
+Extension Type
+
+    OpenCL device extension
+
+Dependencies
+
+    OpenCL 2.0 or later is required.
+
+    cl_qcom_ext_host_ptr is required.
+
+    This extension is written against the OpenCL 3.0 Specification.
+
+Overview
+
+    This extension enables the application to query image attributes such as image size, image element size,
+    row pitch, slice pitch and alignment based on the image format and image descriptor.
+    It is not necessary to create an image to query these attributes.
+    This extension accepts both conventional RGBA images and non-conventional images
+    such as NV12, TP10, MIPI packed, Bayer pattern, tiled and compresessed images.
+
+Header File
+
+    cl_ext_qcom.h
+
+New Procedures and Functions
+
+    cl_int clQueryImageInfoQCOM(
+        cl_device_id                  device,
+        cl_mem_flags                  flags,
+        const cl_image_format*        image_format,
+        const cl_image_desc*          image_desc,
+        cl_extended_image_info_qcom   param_name,
+        size_t                        param_value_size,
+        void*                         param_value,
+        size_t*                       param_value_size_ret);
+
+New Tokens
+
+    Accepted by the <param_name> argument of clQueryImageInfoQCOM
+
+        CL_IMAGE_SIZE_QCOM                          0x411B
+        CL_IMAGE_BASE_ADDRESS_ALIGNMENT_QCOM        0x411F
+
+Additions to Section 5.3.7 of the OpenCL 3.0 specification after clGetImageInfo
+
+    An application that creates OpenCL image objects with a clCreateImage* function can invoke
+    the following function to query the required image size, image element size, row pitch, slice pitch and height alignment for a particular device:
+
+    cl_int clQueryImageInfoQCOM(
+        cl_device_id                     device,
+        cl_mem_flags                     flags,
+        const cl_image_format*           image_format,
+        const cl_image_desc*             image_desc,
+        cl_extended_image_info_qcom      param_name,
+        size_t                           param_value_size,
+        void*                            param_value,
+        size_t*                          param_value_size_ret);
+
+    device               - is a valid device
+
+    cl_mem_flags         - is a bit-field that is used to specify allocation and usage information about the memory object being created
+
+    image_format         - is a pointer to image format descriptor structure
+
+    image_desc           - is an image descriptor structure that describes the type and dimensions of the image
+
+    param_name           - specifies the information to query. The list of
+                           supported param_name types and the information
+                           returned in param_value by clQueryImageInfoQCOM is
+                           described in Table 5.1.XXX
+
+    param_value          - is a pointer to memory where the appropriate result
+                           being queried is returned. If param_value is NULL, it
+                           is ignored.
+
+    param_value_size     - is used to specify the size in bytes of memory
+                           pointed to by param_value. This size must be ≥ size of return type.
+
+    param_value_size_ret - returns the actual size in bytes of data being
+                           queried by param_value. If param_value_size_ret is
+                           NULL, it is ignored.
+
+    clQueryImageInfoQCOM returns CL_SUCCESS if the function is executed
+    successfully. Otherwise, it returns one of the following errors:
+
+    CL_INVALID_DEVICE                  - if device is an invalid device or is not associated with the specified platform.
+
+    CL_INVALID_VALUE                   - if flags or param_name is not valid, or if size in bytes
+                                         specified by param_value_size is less than the
+                                         size of return type for that param_value and
+                                         param_value is not NULL.
+
+    CL_OUT_OF_HOST_MEMORY              - if there is a failure to allocate resources required
+                                         by the OpenCL implementation on the host.
+
+    CL_INVALID_IMAGE_FORMAT_DESCRIPTOR - if values specified in image_format are not valid or if image_format is NULL.
+
+    CL_INVALID_IMAGE_DESCRIPTOR        - if values specified in image_desc are not valid or if image_desc is NULL.
+
+
+    Please note that CL_IMAGE_HEIGHT_ALIGNMENT_QCOM applies only for planar non compressed YUV formats. For other formats, return value is undefined.
+
+Table 5.1.XXX
+
+    List of supported param_names by clQueryImageInfoQCOM
+
+        cl_extended_image_info_qcom                     Return Type   Info returned in param_value (in bytes)
+
+        CL_IMAGE_ROW_PITCH                              size_t        Returns the image row pitch for an image
+                                                                      with the specified image format and
+                                                                      image descriptor on this device
+
+        CL_IMAGE_SLICE_PITCH                            size_t        Returns the image slice pitch for an image
+                                                                      with the specified image format and
+                                                                      image descriptor on this device
+
+        CL_IMAGE_ROW_ALIGNMENT_QCOM                     size_t        Returns the row alignment for an image
+                                                                      with the specified image format and
+                                                                      image descriptor on this device
+
+        CL_IMAGE_HEIGHT_ALIGNMENT_QCOM                  size_t        Returns the height alignment for an image
+                                                                      with the specified image format and
+                                                                      image descriptor on this device
+
+        CL_IMAGE_SLICE_ALIGNMENT_QCOM                   size_t        Returns the slice alignment for an image
+                                                                      with the specified image format and
+                                                                      image descriptor on this device
+
+        CL_IMAGE_SIZE_QCOM                              size_t        Returns the image size for an image
+                                                                      with the specified image format and
+                                                                      image descriptor on this device
+
+        CL_IMAGE_ELEMENT_SIZE                           size_t        Return size of each element of an image
+                                                                      with the specified image format and
+                                                                      image descriptor on this device
+
+        CL_IMAGE_BASE_ADDRESS_ALIGNMENT_QCOM            size_t        Return base address alignment required
+                                                                      for an image with the specified image format
+                                                                      and image descriptor on this device
+
+Sample Code
+        size_t image_size = 0;
+        size_t device_page_size = 0;
+
+        cl_image_desc image_desc = { 0 };
+
+        // Get image size of a proposed 2D image array type and RGBA format
+        cl_image_format image_fmt = { CL_RGBA, CL_UNORM_INT8 };
+
+        image_desc.image_type = CL_MEM_OBJECT_IMAGE2D_ARRAY;
+        image_desc.image_width = 1920;
+        image_desc.image_height = 1080;
+        image_desc.image_depth = 1;
+        image_desc.image_array_size = 2;
+        image_desc.image_row_pitch = 0;
+        image_desc.image_slice_pitch = 0;
+        image_desc.mem_object = NULL;
+
+        cl_int err = clQueryImageInfoQCOM(device, CL_MEM_READ_ONLY, &image_fmt, &image_desc, CL_IMAGE_SIZE_QCOM, sizeof(image_size), &image_size, NULL);
+
+        // Get image size of a proposed NV12 image
+        image_fmt = { CL_QCOM_NV12, CL_UNORM_INT8 };
+
+        image_desc.image_type = CL_MEM_OBJECT_IMAGE2D;
+        image_desc.image_array_size = 1;
+
+        err = clQueryImageInfoQCOM(device, CL_MEM_READ_ONLY, &image_fmt, &image_desc, CL_IMAGE_SIZE_QCOM, sizeof(image_size), &image_size, NULL);
+
+        // Make an ION memory allocation of size image_size here.
+        // Let's say the parameters of the allocation are stored
+        // in a struct named ion_info that we will use below.
+        // Create an OpenCL image object that uses ion_info as its data store.
+
+        cl_mem_ion_host_ptr myionmem = {0};
+        myionmem.ext_host_ptr.allocation_type = CL_MEM_ION_HOST_PTR_QCOM;
+        myionmem.ext_host_ptr.host_cache_policy = CL_MEM_HOST_UNCACHED_QCOM;
+        // file descriptor for ION
+        myionmem.ion_filedesc = ion_info_fd.file_descriptor;
+        // hostptr returned by ION which is device page size aligned
+        myionmem.ion_hostptr = ion_info.host_virtual_address;
+
+        // Query the device's page size and the amount of padding necessary at
+        // the end of the buffer.
+        clGetDeviceInfo(device, CL_DEVICE_PAGE_SIZE_QCOM,
+            sizeof(device_page_size), &device_page_size, NULL);
+        if(myionmem.ion_hostptr % device_page_size)
+        {
+            error("Host pointer must be aligned to device_page_size!");
+        }
+
+        cl_mem image_object = clCreateImage(context,
+            CL_MEM_USE_HOST_PTR | CL_MEM_EXT_HOST_PTR_QCOM,
+            &image_fmt,
+            image_desc,
+            &myionmem,
+            &errcode);
+
+Revision History
+
+    Revision 1, 2021/03/01: Initial version.

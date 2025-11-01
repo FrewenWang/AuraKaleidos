@@ -1,0 +1,5 @@
+/build
+.cxx
+.iml
+/src/main/jniLibs/*
+!.gitkeep

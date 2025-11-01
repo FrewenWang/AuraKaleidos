@@ -1,0 +1,18 @@
+#!/bin/bash
+file=$1
+
+adb root
+adb remount
+
+expect << EOF
+    set timeout -1
+    spawn adb shell
+    expect "e171" { send "mkdir /data/local/tmp\r" }
+    expect "e171" { send "rm -r /data/local/tmp/`basename $file`\r" }
+    expect "e171" { send "echo `basename $file`\r" }
+    expect "e171" { send "busybox ftpget -u root -p togxuh-8Cyzto-juqven 192.168.78.2 /data/local/tmp/$(basename $file) $file\r" }
+    expect "e171" { send "exit\r" }
+    expect eof
+EOF
+
+adb pull /data/local/tmp/`basename $file`

@@ -1,0 +1,9 @@
+diff a/AuraFantasyCXX/aura-aura/src/runtime/include/aura/runtime/core/traits.hpp b/AuraFantasyCXX/aura-aura/src/runtime/include/aura/runtime/core/traits.hpp	(rejected hunks)
+@@ -34,6 +34,7 @@
+ /// 其核心目的是在编译期自动为数值类型选择更高精度的类型，以防止计算过程中的溢出或精度损失。
+ template <typename Tp> struct Promote;
+ // 声明一个泛型模板 Promote，但未提供实现。这表示该模板的特化版本必须覆盖所有需要用到的类型，否则编译会失败
++///
+ template <> struct Promote<MI_U8>  { using Type = MI_U16; };
+ template <> struct Promote<MI_S8>  { using Type = MI_S16; };
+ template <> struct Promote<MI_U16> { using Type = MI_U32; };

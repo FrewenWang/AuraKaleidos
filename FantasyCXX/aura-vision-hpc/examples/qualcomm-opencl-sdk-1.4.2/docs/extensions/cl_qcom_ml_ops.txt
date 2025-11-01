@@ -1,0 +1,2493 @@
+Name Strings
+
+    cl_qcom_ml_ops
+
+Contributors
+
+    Adreno SW Team, Qualcomm Technologies, Inc.
+
+
+Contact
+
+    bcalidas at qti dot qualcomm dot com
+
+Version
+
+    Version 1.1, 2020/11/20
+
+Status
+
+    Shipping
+
+Extension Type
+
+    OpenCL device extension
+
+Dependencies
+
+    OpenCL 2.0 or later is required.
+
+    This extension is written against the OpenCL 2.0 Specification.
+
+Overview
+
+    This extension provides the application access to key Machine Learning
+    Operations which are accelerated by the implementation.
+    It introduces a new set of CL API calls, data structures and tokens for
+    specifying and enqueuing Machine Learning Operations. From here on we shall
+    use ML as an abbreviation for Machine Learning and Op as an abbreviation
+    for Operation. Application developers using ML Ops as opposed to writing
+    their own OpenCL kernels could see performance gains.
+
+ML Ops
+    ML Ops are operations associated with specific layers in a ML model.
+    Examples are convolution and pooling. ML Ops can be enqueued to OpenCL
+    command queues and tracked with OpenCL events. From
+    this point on, we shall use Op to refer to ML Op.
+
+Tensors
+    A tensor is an n dimensional object which represents how ML data is stored.
+    A tensor does not have any intrinsically allocated memory but can be backed
+    by a cl_mem object when used in an Op or a data copy. Tensor data can have
+    either a linear or an optimal layout. Optimal layouts are opaque to the
+    application but result in better performance for the Op. Linear Tensors
+    can be either NCHW or NHWC. Tensors are said to have been finalized once their
+    size requirement is fixed. The required memory size for backing a
+    tensor can be queried once it has been finalized. A linear tensor is finalized
+    as soon as it is created.  An optimal tensor is finalized when it is used in
+    an Op for the first time. Copy operations do not finalize an optimal tensor.
+
+Header File
+
+    cl_qcom_ml_ops.h
+
+
+New Procedures, Functions and Data Structures
+
+
+  API acquisition
+
+    The function
+
+    cl_int clQueryMLInterfaceVersionsQCOM(
+        cl_int*  pMajorVersions,
+        cl_int*  pMinorVersions,
+        cl_uint  numVersions,
+        cl_uint* pNumVersionsRet);
+
+    returns the different extension interface versions supported by the
+    implementation. Newer interface versions may expose additional Ops.
+
+    pMajorVersion is a pointer to a list of integers that correspond to the
+    major version numbers of the supported interfaces.
+
+    pMinorVersion is a pointer to a list of integers that correspond to the
+    minor version numbers of the supported interfaces.
+
+    numVersions is the number of interface versions to be queried. If
+    numVersions is zero, no version numbers are returned but
+    pNumVersionsRet has the number of interfaces available.
+
+    pNumVersionsRet is a pointer to an integer that returns the number of
+    interfaces that are actually available.
+
+    clQueryMLInterfaceVersionsQCOM returns CL_SUCCESS if the function is
+    executed successfully. Otherwise it returns one of the following errors.
+
+    CL_INVALID_VALUE if numVersions is not zero but is less than the
+    actual number of interfaces available.
+
+
+    The function
+
+    cl_int CL_API_CALL clGetMLInterfaceQCOM(void*             pInterface,
+                                            cl_int            majorVersion,
+                                            cl_int            minorVersion);
+
+    returns the extension interface that was specified by <majorVersion> and
+    <minorVersion>. An implementation may support multiple interfaces. Each
+    interface is implemented using an interface struct, where first two entries
+    are of type cl_int and they represent major and minor version.
+    Applications should interpret pInterface based on the interface struct for that version.
+    Each version of the interface structure contains function pointers to accelerated Ops.
+    Applications are expected to use these function pointers to execute Ops.
+
+    #define CL_GET_ML_INTERFACE_QCOM(P_INTERFACE, MAJOR_VER, MINOR_VER) \
+      clGetMLInterfaceQCOM((void*) &P_INTERFACE, MAJOR_VER, MINOR_VER)
+
+
+  New Data Structures for extension interface
+
+    typedef struct _CLMLInterfaceV1QCOM
+    {
+
+        cl_int                                                         majorVersion;
+        cl_int                                                         minorVersion;
+        pfnClCreateMLOpGemmQCOM                                        clCreateMLOpGemmQCOM;
+        pfnClCreateMLOpTransposeQCOM                                   clCreateMLOpTransposeQCOM;
+        pfnClCreateMLOpFullyConnectedQCOM                              clCreateMLOpFullyConnectedQCOM;
+        pfnClCreateMLOpConvolutionForwardQCOM                          clCreateMLOpConvolutionForwardQCOM;
+        pfnClCreateMLOpBatchNormForwardQCOM                            clCreateMLOpBatchNormForwardQCOM;
+        pfnClCreateMLOpActivationForwardQCOM                           clCreateMLOpActivationForwardQCOM;
+        pfnClCreateMLOpPoolingForwardQCOM                              clCreateMLOpPoolingForwardQCOM;
+        pfnClCreateMLOpFusedConvolutionActivationForwardQCOM           clCreateMLOpFusedConvolutionActivationForwardQCOM;
+        pfnClCreateMLOpFusedConvolutionBatchNormForwardQCOM            clCreateMLOpFusedConvolutionBatchNormForwardQCOM;
+        pfnClCreateMLOpFusedConvolutionBatchNormActivationForwardQCOM  clCreateMLOpFusedConvolutionBatchNormActivationForwardQCOM;
+        pfnClCreateMLOpBinaryQCOM                                      clCreateMLOpBinaryQCOM;
+        pfnClCreateMLOpSoftmaxQCOM                                     clCreateMLOpSoftmaxQCOM;
+        pfnClCreateMLOpFillQCOM                                        clCreateMLOpFillQCOM;
+        pfnClCreateMLOpConcatQCOM                                      clCreateMLOpConcatQCOM;
+        pfnClCreateMLOpPermuteQCOM                                     clCreateMLOpPermuteQCOM;
+        pfnClCreateMLOpReshapeQCOM                                     clCreateMLOpReshapeQCOM;
+        pfnClCreateMLOpDepthToSpaceQCOM                                clCreateMLOpDepthToSpaceQCOM;
+        pfnClCreateMLOpFusedDepthToSpaceActivationQCOM                 clCreateMLOpFusedDepthToSpaceActivationQCOM;
+        pfnClCreateMLOpResizeBilinearQCOM                              clCreateMLOpResizeBilinearQCOM;
+        pfnClCreateMLOpPadQCOM                                         clCreateMLOpPadQCOM;
+        pfnClCreateMLTensorQCOM                                        clCreateMLTensorQCOM;
+        pfnClGetMLTensorMemorySizeQCOM                                 clGetMLTensorMemorySizeQCOM;
+        pfnClReleaseMLOpQCOM                                           clReleaseMLOpQCOM;
+        pfnClReleaseMLTensorQCOM                                       clReleaseMLTensorQCOM;
+        pfnClEnqueueMLOpQCOM                                           clEnqueueMLOpQCOM;
+        pfnClEnqueueMLOpImmutableQCOM                                  clEnqueueMLOpImmutableQCOM;
+        pfnClEnqueueRecordingMLOpQCOM                                  clEnqueueRecordingMLOpQCOM;
+        pfnClEnqueueReadMLTensorDataQCOM                               clEnqueueReadMLTensorDataQCOM;
+        pfnClEnqueueWriteMLTensorDataQCOM                              clEnqueueWriteMLTensorDataQCOM;
+        pfnClEnqueueCopyMLTensorDataQCOM                               clEnqueueCopyMLTensorDataQCOM;
+        pfnClCreateMLTuningCacheQCOM                                   clCreateMLTuningCacheQCOM;
+        pfnClTuneMLOpQCOM                                              clTuneMLOpQCOM;
+        pfnClSaveMLTuningCacheQCOM                                     clSaveMLTuningCacheQCOM;
+        pfnClLoadMLTuningCacheQCOM                                     clLoadMLTuningCacheQCOM;
+        pfnClReleaseMLTuningCacheQCOM                                  clReleaseMLTuningCacheQCOM;
+        pfnClCreateMLTensorMemoryDescriptorSetQCOM                     clCreateMLTensorMemoryDescriptorSetQCOM;
+        pfnClReleaseMLTensorMemoryDescriptorSetQCOM                    clReleaseMLTensorMemoryDescriptorSetQCOM;
+        pfnClUpdateMLTensorMemoryDescriptorSetQCOM                     clUpdateMLTensorMemoryDescriptorSetQCOM;
+
+    } CLMLInterfaceV1QCOM;
+
+
+    In addition, we provide a convenience getter function for each API version
+
+    inline CLMLInterfaceV1QCOM* clGetMLInterfaceV1QCOM(cl_int minorVersion)
+    {
+        CLMLInterfaceV1QCOM* pInterface = NULL;
+        cl_int result = CL_GET_ML_INTERFACE_QCOM(pInterface, 1, minorVersion);
+        if (result != CL_SUCCESS) return NULL;
+        else return pInterface;
+    }
+
+    Developers are highly encouraged to use these getter functions.
+
+  Tensor Creation
+
+    Tensors can be created by calling the function pointer clCreateMLTensorQCOM
+    which is a member of the CLMLInterface structure.
+
+    cl_int (*clCreateMLTensorQCOM)(cl_context                           context,
+                                 const cl_ml_tensor_properties_qcom*    pTensorProperties,
+                                 const cl_ml_tensor_desc_qcom*          pTensorDescriptor,
+                                 cl_ml_tensor_qcom*                     pTensor);
+
+    context must be a valid OpenCL context.
+
+    pTensorProperties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Tensor properties.
+    It can be set to NULL, if default Tensor behavior is desired.
+
+    pTensorDescriptor is a pointer to a structure specifying the properties of
+    the tensor to be created.
+
+    pTensor returns a cl_ml_tensor_qcom object.
+
+    If this function executes successfully, pTensor points to a valid
+    cl_ml_tensor_qcom object and CL_SUCCESS is returned. Otherwise one of the
+    following errors is returned.
+
+    CL_INVALID_VALUE if any of the members of pTensorDescriptor does not have
+    a valid value.
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host
+    resources.
+
+
+    The tensor descriptor structure describes the properties of the tensor.
+
+    typedef struct _cl_ml_tensor_desc_qcom {
+        cl_channel_type             data_type;
+        cl_tensor_layout_qcom       layout;
+        cl_uint                     n;
+        cl_uint                     c;
+        cl_uint                     h;
+        cl_uint                     w;
+        cl_uint                     d;
+        cl_tensor_dimensions_qcom   num_dimensions;
+        cl_uint                     stride_bytes[CL_TENSOR_MAX_DIMS_QCOM];
+    } cl_ml_tensor_desc_qcom;
+
+    data_type is the size of the tensor data type. The supported values are
+    CL_FLOAT, CL_HALF_FLOAT and CL_SIGNED_INT8
+
+    layout describes the layout of the tensor data. The layout can be one of
+    CL_TENSOR_LAYOUT_OPTIMAL_QCOM, CL_TENSOR_LAYOUT_NCHW_QCOM or
+    CL_TENSOR_LAYOUT_NHWC_QCOM.
+
+    n,c,h,w and d specify the sizes of the tensor along each of these
+    dimensions.
+
+    num_dimensions specifies the number of dimensions for the tensor. The
+    supported dimensions are CL_TENSOR_DIMENSIONS_4D_QCOM and
+    CL_TENSOR_DIMENSIONS_5D_QCOM.
+
+    If num_dimensions is set to CL_TENSOR_UNUSED_QCOM, the tensor is marked as
+    empty and the other values in cl_ml_tensor_desc_qcom are ignored. Empty
+    tensors do not require backing memory. They are helpful for creating
+    Ops where one or more tensors does not participate in the operation. For
+    example, Convolution without Bias.
+
+    stride_bytes specifies the stride for the tensor data along each
+    of the tensor dimensions.
+
+
+
+
+  Op Creation
+
+    Each Op has a unique function that reads in the Op properties and returns
+    a cl_ml_op_qcom object.
+
+    In deep learning, we follow up common layer operations with activation
+    functions like ReLU or Tanh. These Activation Ops are created using the
+    function
+
+    cl_int (*clCreateMLOpActivationForwardQCOM)(
+        cl_context                           context,
+        const cl_ml_op_properties_qcom*      pOp_properties,
+        const cl_ml_op_activation_desc_qcom* pActivation_descriptor,
+        cl_ml_tensor_qcom                    input_tensor,
+        cl_ml_tensor_qcom                    param_tensor,
+        cl_ml_tensor_qcom                    output_tensor,
+        cl_ml_op_qcom*                       pOperation,
+        cl_ml_tuningcache_qcom               tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pActivation_descriptor describes the specific properties of the
+    Activation operation.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    param_tensor is the cl_ml_tensor_qcom object that has the parameter data
+    for this Op.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pActivation_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The activation descriptor describes the properties of the activation
+    operation.
+
+    typedef struct _cl_ml_op_activation_desc_qcom {
+        cl_activation_function_qcom     function;
+        cl_nan_mode_qcom                nan_propagation;
+        cl_arithmetic_mode_qcom         arithmetic_mode;
+    } cl_ml_op_activation_desc_qcom;
+
+    function determines which activation function will be applied.
+    It can be set to CL_ACTIVATION_RELU, CL_ACTIVATION_TANH,
+    CL_ACTIVATION_SIGMOID, or CL_ACTIVATION_RELU6.
+
+    nan_propagation determines if we propagate NANs in the Activation Op.
+    It can be either CL_DO_NOT_PROPAGATE_NAN_QCOM or CL_PROPAGATE_NAN_QCOM.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The Gemm operation is provided for use with linear input and output tensors.
+    It implements matrix C = (alpha * matrix A) matmul matrix B + beta * matrix C.
+    Input and Output tensors can be implicitly flattened, then re-interpreted as a 2D matrix.
+    All tensors in GEMM need to have the same memory layout, either NCHW or NHWC.
+
+    Therefore, we can interpret an NCHW 4D tensor of size {N, C, H, W}
+    as an array where the tensor element {i, j, k, l} is accessed with
+    a row-major order rule: l + k * W + j * H * W + i * C * H * W
+
+    Parameters M, N, and K determine how tensors get interpreted.
+    We index the array in the row-major order to get a 2D matrix view.
+    If A is MxK and B is KxN, C is bound to be MxN
+
+    The Gemm Op is created using clCreateMLOpGemmQCOM.
+
+    cl_int (*clCreateMLOpGemmQCOM)(
+        cl_context                       context,
+        const cl_ml_op_properties_qcom*  pOp_properties,
+        const cl_ml_op_gemm_desc_qcom*   pGemm_descriptor,
+        cl_ml_tensor_qcom                input_A_tensor,
+        cl_ml_tensor_qcom                input_B_tensor,
+        cl_ml_tensor_qcom                output_C_tensor,
+        cl_ml_op_qcom*                   pOperation,
+        cl_ml_tuningcache_qcom           tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pGemm_descriptor describes the specific properties of the
+    Gemm operation.
+
+    input_A_tensor is the tensor corresponding to matrix A of the Gemm operation.
+    The tensor data is interpreted as a 2D matrix of dimensions:
+    KxM if trans_a is set to CL_GEMM_TRANSFORM_TRANSPOSE_QCOM.
+    MxK if trans_a is set to CL_GEMM_TRANSFORM_NONE_QCOM.
+    The product of tensor A sizes along the n, c, h and w dimensions must equal M * K.
+    The layout of tensor A must be CL_TENSOR_LAYOUT_NHWC_QCOM or CL_TENSOR_LAYOUT_NCHW_QCOM.
+
+    input_B_tensor is the tensor corresponding to matrix B of the Gemm operation.
+    The tensor data is interpreted as a 2D matrix of dimensions:
+    NxK if trans_b is set to CL_GEMM_TRANSFORM_TRANSPOSE_QCOM.
+    KxN if trans_b is set to CL_GEMM_TRANSFORM_NONE_QCOM.
+    The product of tensor B sizes along the n, c, h and w dimensions must equal K * N.
+    The layout of tensor B must be CL_TENSOR_LAYOUT_NHWC_QCOM or CL_TENSOR_LAYOUT_NCHW_QCOM.
+
+    output_C_tensor is the tensor corresponding to matrix C of the Gemm operation.
+    The tensor data is interpreted as a 2D matrix of dimensions MxN.
+    The product of tensor C sizes along the n, c, h and w dimensions must equal M * N.
+    The layout of tensor C must be CL_TENSOR_LAYOUT_NHWC_QCOM or CL_TENSOR_LAYOUT_NCHW_QCOM.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pGemm_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The Gemm descriptor describes the properties of the Gemm
+    operation.
+
+    typedef struct _cl_ml_op_gemm_desc_qcom {
+        cl_uint                    m;
+        cl_uint                    n;
+        cl_uint                    k;
+        cl_gemm_transform_qcom     trans_a;
+        cl_gemm_transform_qcom     trans_b;
+        cl_ml_value_qcom           alpha;
+        cl_ml_value_qcom           beta;
+        cl_arithmetic_mode_qcom    arithmetic_mode;
+    } cl_ml_op_gemm_desc_qcom;
+
+    m is the number of rows in the output matrix C
+
+    n is the number of columns in the output matrix C
+
+    k is the inner dimension of matrix multiplicands
+
+    trans_a controls whether or not A should be transposed prior to matmul.
+    It can be one of CL_GEMM_TRANSFORM_NONE_QCOM or
+    CL_GEMM_TRANSFORM_TRANSPOSE_QCOM.
+
+    trans_b controls whether or not A should be transposed prior to matmul.
+    It can be one of CL_GEMM_TRANSFORM_NONE_QCOM or
+    CL_GEMM_TRANSFORM_TRANSPOSE_QCOM.
+
+    alpha is the factor of matrix A
+
+    beta is the factor of matrix C
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The Transpose Op implements out-of-place matrix transposition for linear tensors.
+    The Transpose Op does a matrix transposition on a linear tensor, which is implicitly
+    flattened, then re-interpreted as a 2D matrix. The output is also a linear tensor,
+    which is re-interpreted as a 2D matrix. Applications typically use the Transpose
+    operation in conjunction with Gemm. All tensors in Transpose need to have the
+    same linear memory layout, either NCHW or NHWC.
+
+    Parameters M and N determine how tensors get interpreted.
+    We index the array in the row-major order to get a 2D matrix view.
+
+    The Transpose Op is created using clCreateMLOpTransposeQCOM.
+
+    cl_int (*clCreateMLOpTransposeQCOM)(
+        cl_context                           context,
+        const cl_ml_op_properties_qcom*      pOp_properties,
+        const cl_ml_op_transpose_desc_qcom*  pTranspose_descriptor,
+        cl_ml_tensor_qcom                    input_tensor,
+        cl_ml_tensor_qcom                    output_tensor,
+        cl_ml_op_qcom*                       pOperation,
+        cl_ml_tuningcache_qcom               tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pTranspose_descriptor describes the specific properties of the
+    Transpose operation.
+
+    input_tensor is the input of the out-of-place Transpose operation.
+    The tensor data is interpreted as a 2D matrix of dimensions MxN.
+    The layout of input tensor must be CL_TENSOR_LAYOUT_NHWC_QCOM or CL_TENSOR_LAYOUT_NCHW_QCOM.
+
+    output_tensor is the output of the out-of-place Transpose operation.
+    The tensor data is interpreted as a 2D matrix of dimensions NxM.
+    The layout of output tensor must be CL_TENSOR_LAYOUT_NHWC_QCOM or CL_TENSOR_LAYOUT_NCHW_QCOM.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pTranspose_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The transpose descriptor describes the properties of the transpose
+    operation.
+
+    typedef struct _cl_ml_op_transpose_desc_qcom {
+        cl_uint                    m;
+        cl_uint                    n;
+        cl_arithmetic_mode_qcom    arithmetic_mode;
+    } cl_ml_op_transpose_desc_qcom;
+
+    m is the number of rows in the input matrix
+
+    n is the number of columns in the input matrix
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The Binary Op implements element-wise operations between two tensors.
+    It implements tensor C = (alpha * tensor A) operation (beta * tensor B) + gamma * tensor C
+    or tensor C = (gamma * tensor C) operation (alpha * tensor A)
+    if tensor B is set as unused.
+
+    cl_int (*clCreateMLOpBinaryQCOM)(
+        cl_context                        context,
+        const cl_ml_op_properties_qcom*   pOp_properties,
+        const cl_ml_op_binary_desc_qcom*  pBinary_descriptor,
+        cl_ml_tensor_qcom                 input_A_tensor,
+        cl_ml_tensor_qcom                 input_B_tensor,
+        cl_ml_tensor_qcom                 output_C_tensor,
+        cl_ml_op_qcom*                    pOperation,
+        cl_ml_tuningcache_qcom            tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pBinary_descriptor describes the specific properties of the
+    Binary operation.
+
+    input_A_tensor is the tensor corresponding to the left operand
+    of the Binary operation.
+
+    input_B_tensor is the tensor corresponding to the right operand
+    of the Binary operation.
+
+    output_C_tensor is the tensor corresponding to the output
+    of the Binary operation.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pBinary_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The binary descriptor describes the properties of the binary
+    operation.
+
+    typedef struct _cl_ml_op_binary_desc_qcom {
+        cl_binary_op_qcom          binary_op;
+        cl_ml_value_qcom           alpha;
+        cl_ml_value_qcom           beta;
+        cl_ml_value_qcom           gamma;
+        cl_arithmetic_mode_qcom    arithmetic_mode;
+    } cl_ml_op_binary_desc_qcom;
+
+    binary_op determines the binary operation that will take place.
+    It can be CL_TENSOR_OP_ADD_QCOM, CL_TENSOR_OP_SUB_QCOM,
+    CL_TENSOR_OP_MUL_QCOM, CL_TENSOR_OP_MIN_QCOM, or CL_TENSOR_OP_MAX_QCOM.
+
+    alpha is the factor of tensor A
+
+    beta is the factor of tensor B
+
+    gamma is the factor of tensor C
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The Fill Op is provided so you can set all values in the tensor to
+    one value.
+
+    cl_int (*clCreateMLOpFillQCOM)(
+        cl_context                        context,
+        const cl_ml_op_properties_qcom*   pOp_properties,
+        const cl_ml_op_fill_desc_qcom*    pFill_descriptor,
+        cl_ml_tensor_qcom                 tensor,
+        cl_ml_op_qcom*                    pOperation,
+        cl_ml_tuningcache_qcom            tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pFill_descriptor describes the specific properties of the
+    Fill operation.
+
+    tensor is the cl_ml_tensor_qcom object that is being filled by this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pFill_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The activation descriptor describes the properties of the activation
+    operation.
+
+    typedef struct _cl_ml_op_fill_desc_qcom {
+        cl_ml_value_qcom             fill_value;
+        cl_arithmetic_mode_qcom      arithmetic_mode;
+    } cl_ml_op_fill_desc_qcom;
+
+    fill_value is the value tensor gets filled with.
+
+    arithmetic_mode specifies how the math is to be done. It can be either
+    CL_ARITHMETIC_MODE_FP16_QCOM or CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    Since Gemm is only supported for linear tensor memory layouts, a separate
+    FullyConnected Op is provided for use with optimal layout tensors.
+    The FullyConnected Op combines Gemm and Binary Ops together.
+    This allows for the implementation of fully-connected layers while keeping
+    the tensor layout optimal.
+
+    cl_int (*clCreateMLOpFullyConnectedQCOM)(
+        cl_context                                context,
+        const cl_ml_op_properties_qcom*           pOp_properties,
+        const cl_ml_op_fully_connected_desc_qcom* pFullyConnected_descriptor,
+        cl_ml_tensor_qcom                         input,
+        cl_ml_tensor_qcom                         weight,
+        cl_ml_tensor_qcom                         bias,
+        cl_ml_tensor_qcom                         output,
+        cl_ml_op_qcom*                            pOperation,
+        cl_ml_tuningcache_qcom                    tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pFullyConnected_descriptor describes the specific properties of the
+    FullyConnected operation.
+
+    input is the input tensor which corresponds to matrix A. The input tensor
+    data is flattened into a vector, iterating over the rightmost dimensions
+    first. The axes to be flattened are indicated with the first_flatten_axis
+    param. All axes starting with the first indicated by the first_flatten_axis
+    (where N=0, C=1, H=2, W=3) are flattened into a vector A. The input tensor
+    must have layout of CL_TENSOR_LAYOUT_OPTIMAL_QCOM.
+
+    The weight tensor is interpreted as a matrix B where the number of columns is
+    given by the width dimension and the number of rows is given by the height
+    dimension. The weight tensor must have layout of CL_TENSOR_LAYOUT_OPTIMAL_QCOM.
+
+    bias is the optional bias tensor. The shape of the optional bias tensor must
+    be 1 in every dimension except width. The width dimension must be equal to the
+    number of elements in C. If present the bias will be added element-wise to the
+    product C. The bias tensor must have  layout CL_TENSOR_LAYOUT_OPTIMAL_QCOM.
+
+    output is the output tensor. The size of the other dimensions of the output
+    tensor after first_flatten_axis must be 1. The size of the dimensions
+    prior to first_flatten_axis must be the same as the input tensor.
+    The vector-matrix computation is repeated by iterating over the unflattened
+    axes in the input tensor. The output tensor must have layout of
+    CL_TENSOR_LAYOUT_OPTIMAL_QCOM.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors do have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The FullyConnected descriptor describes the properties of the FullyConnected
+    operation.
+
+    typedef struct _cl_ml_op_fully_connected_desc_qcom {
+        cl_uint                        first_flatten_axis;
+        cl_fc_weight_transform_qcom    weight_transform;
+        cl_arithmetic_mode_qcom        arithmetic_mode;
+    } cl_ml_op_fully_connected_desc_qcom;
+
+    first_flatten_axis indicates how the input tensor is to be flattened prior
+    to the matrix multiplication. It also controls the shape of the output
+    tensor. For the input tensor all axes starting with the first_flatten_axis
+    (where N=0, C=1, H=2, W=3) are flattened into a vector A.
+
+    weight_transform controls whether the weight tensor data should be transposed.
+    If weight_transform == AML_FC_WEIGHT_TRANSFORM_NONE, then A * B = C is
+    computed. The user must ensure that the number of flattened elements in A
+    is equal to the number of rows in B so that the operation is well-defined.
+    The output tensor's channel dimension must be equal to the number of columns
+    in B, as the product C will be stored along the output tensor's channel
+    dimension.  If weight_transform == AML_FC_WEIGHT_TRANSFORM_TRANSPOSE,
+    then A * B_transpose = C is computed. The user must ensure that the number
+    of flattened elements in A is equal to the number of columns in B so that
+    the operation is well-defined. The output tensor's channel dimension must
+    be equal to the number of rows in B, as the product C will be stored along
+    the output tensor's channel dimension.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The function for creating a ConvolutionForward Op is shown here.
+
+    cl_int (*clCreateMLOpConvolutionForwardQCOM)(
+        cl_context                             context,
+        const cl_ml_op_properties_qcom*        pOp_properties,
+        const cl_ml_op_convolution_desc_qcom*  pConvolution_descriptor,
+        cl_ml_tensor_qcom                      input_tensor,
+        cl_ml_tensor_qcom                      weight_tensor,
+        cl_ml_tensor_qcom                      bias_tensor,
+        cl_ml_tensor_qcom                      output_tensor,
+        cl_ml_op_qcom*                         pOperation,
+        cl_ml_tuningcache_qcom                 tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pConvolution_descriptor describes the specific properties of the
+    Convolution operation. In general each Op creation function accepts a
+    descriptor that is specific to that Op.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    weight_tensor is the cl_ml_tensor_qcom object that has the weight data for
+    this Op.
+
+    bias_tensor is the cl_ml_tensor_qcom object that has the bias data for this Op.
+    The shape of the bias tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pConvolution_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_OP_NOT_ACCELERATED_QCOM if the parameters are valid but the implementation
+    does not accelerate this operation for the specified parameters.
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host
+    resources.
+
+    The convolution descriptor describes the properties of the convolution
+    operation.
+
+    typedef struct _cl_ml_op_convolution_desc_qcom {
+        cl_convolution_mode_qcom    mode;
+        cl_uint                     group_count;
+        cl_uint                     num_dimensions;
+        cl_uint                     input_padding_before[CL_TENSOR_MAX_SPATIAL_DIMS_QCOM];
+        cl_uint                     input_padding_after[CL_TENSOR_MAX_SPATIAL_DIMS_QCOM];
+        cl_uint                     filter_stride[CL_TENSOR_MAX_SPATIAL_DIMS_QCOM];
+        cl_uint                     dilation[CL_TENSOR_MAX_SPATIAL_DIMS_QCOM];
+        cl_bitfield                 flags;
+        cl_arithmetic_mode_qcom     arithmetic_mode;
+    } cl_ml_op_convolution_desc_qcom;
+
+    mode can be one of CL_CONVOLUTION_MODE_CONVOLUTION_QCOM or
+    CL_CONVOLUTION_MODE_DEPTHWISE_QCOM. Depth-wise separable
+    convolution is performed when CL_CONVOLUTION_MODE_DEPTHWISE_QCOM is
+    implemented. Regular convolution is performed when mode is
+    CL_CONVOLUTION_MODE_DEPTHWISE_QCOM.
+
+    group_count refers to the number of groups into which the filter and
+    the input channels are divided. Convolution is only applied within the
+    group. group_count is disregarded for depth-wise separable convolution.
+    For most regular convolutions the group_count is 1.
+
+    num_dimensions is reserved for future use.
+
+    input_padding_before refers to the padding before the sliding kernel
+    in tensor elements for each dimension of the input tensor data.
+
+    input_padding_after refers to the padding after the sliding kernel
+    in tensor elements for each dimension of the input tensor data.
+
+    filter_stride is the stride in tensor elements between filter application
+    points.
+
+    dilation is the expansion of the filter along the w and h dimensions for
+    each application.
+
+    flags is reserved for future use. It can be set to zero for now.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    Additionally fused variants of the ConvolutionForward Op are provided.
+    These perform operations such as BatchNorm or Activation prior to writing
+    the convoluion results to memory and can offer performance gains.
+    The function for creating a Fused Convolution and Activation Op is shown here:
+
+    cl_int (*clCreateMLOpFusedConvolutionActivationForwardQCOM)(
+        cl_context                             context,
+        const cl_ml_op_properties_qcom*        pOp_properties,
+        const cl_ml_op_convolution_desc_qcom*  pConvolution_descriptor,
+        const cl_ml_op_activation_desc_qcom*   pActivation_descriptor,
+        cl_ml_tensor_qcom                      input_tensor,
+        cl_ml_tensor_qcom                      weight_tensor,
+        cl_ml_tensor_qcom                      bias_tensor,
+        cl_ml_tensor_qcom                      param_tensor,
+        cl_ml_tensor_qcom                      output_tensor,
+        cl_ml_op_qcom*                         pOperation,
+        cl_ml_tuningcache_qcom                 tuning_cache);
+
+    The function to create a Fused Activation ConvolutionForward Op is similar to the original
+    ConvolutionForward Op creation, with the addition of:
+
+    pActivation_descriptor, descriptor that describes the specific properties of the fused
+    activation operation. See OP creation info for clCreateMLOpActivationForwardQCOM.
+
+    param_tensor is currently reserved for future use in the Activation Op and
+    can be initialized to NULL.
+
+    All other inputs to the Fused ConvolutionForward Op functions can be assumed to match the
+    original clCreateMLOpConvolutionForwardQCOM descriptions.
+
+    The function for creating a Fused Convolution and BatchNorm Op is shown here:
+
+    cl_int (*clCreateMLOpFusedConvolutionBatchNormForwardQCOM)(
+        cl_context                             context,
+        const cl_ml_op_properties_qcom*        pOp_properties,
+        const cl_ml_op_convolution_desc_qcom*  pConvolution_descriptor,
+        const cl_ml_op_batchnorm_desc_qcom*    pBatchNorm_descriptor,
+        cl_ml_tensor_qcom                      convolution_input_tensor,
+        cl_ml_tensor_qcom                      convolution_weight_tensor,
+        cl_ml_tensor_qcom                      convolution_bias_tensor,
+        cl_ml_tensor_qcom                      batchnorm_output_tensor,
+        cl_ml_tensor_qcom                      batchnorm_mean_tensor,
+        cl_ml_tensor_qcom                      batchnorm_variance_tensor,
+        cl_ml_tensor_qcom                      batchnorm_scale_tensor,
+        cl_ml_tensor_qcom                      batchnorm_bias_tensor,
+        cl_ml_op_qcom*                         pOperation,
+        cl_ml_tuningcache_qcom                 tuning_cache);
+
+    The function to create a Fused Activation ConvolutionForward Op is similar to the original
+    ConvolutionForward Op creation, with the addition of:
+
+    pBatchNorm_descriptor, descriptor that describes the specific properties of the fused
+    activation operation. See OP creation info for clCreateMLOpBatchNormForwardQCOM.
+
+    batchnorm_output_tensor is the cl_ml_tensor_qcom object that is the output to this Op.
+
+    batchnorm_mean_tensor is the cl_ml_tensor_qcom object that has the mean data for this Op.
+    The shape of the mean tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    batchnorm_variance_tensor is the cl_ml_tensor_qcom object that has the variance data for this
+    Op. The shape of the variance tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    batchnorm_scale_tensor is the cl_ml_tensor_qcom object that has the scale data for this Op.
+    The shape of the scale tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    batchnorm_bias_tensor is the cl_ml_tensor_qcom object that has the bias data for this Op.
+    The shape of the bias tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    All other inputs to the Fused ConvolutionForward Op functions can be assumed to match the
+    original clCreateMLOpConvolutionForwardQCOM descriptions.
+
+    The function for creating a Fused Convolution, BatchNorm and Activation Op is shown here:
+
+    cl_int (*pfnClCreateMLOpFusedConvolutionBatchNormActivationForwardQCOM)(
+        cl_context                             context,
+        const cl_ml_op_properties_qcom*        pOp_properties,
+        const cl_ml_op_convolution_desc_qcom*  pConvolution_descriptor,
+        const cl_ml_op_batchnorm_desc_qcom*    pBatchNorm_descriptor,
+        const cl_ml_op_activation_desc_qcom*   pActivation_descriptor,
+        cl_ml_tensor_qcom                      convolution_input_tensor,
+        cl_ml_tensor_qcom                      convolution_weight_tensor,
+        cl_ml_tensor_qcom                      convolution_bias_tensor,
+        cl_ml_tensor_qcom                      activation_output_tensor,
+        cl_ml_tensor_qcom                      activation_param_tensor,
+        cl_ml_tensor_qcom                      batchnorm_mean_tensor,
+        cl_ml_tensor_qcom                      batchnorm_variance_tensor,
+        cl_ml_tensor_qcom                      batchnorm_scale_tensor,
+        cl_ml_tensor_qcom                      batchnorm_bias_tensor,
+        cl_ml_op_qcom*                         pOperation,
+        cl_ml_tuningcache_qcom                 tuning_cache);
+
+    The function to create a Fused Activation ConvolutionForward Op is similar to the original
+    ConvolutionForward Op creation, with the addition of:
+
+    pBatchNorm_descriptor, descriptor that describes the specific properties of the fused
+    activation operation. See OP creation info for clCreateMLOpBatchNormForwardQCOM.
+
+    pActivation_descriptor, descriptor that describes the specific properties of the fused
+    activation operation. See OP creation info for clCreateMLOpActivationForwardQCOM.
+
+    activation_output_tensor is the cl_ml_tensor_qcom object that is the output to this Op.
+
+    activation_param_tensor is currently reserved for future use in the Activation Op and
+    can be initialized to NULL.
+
+    batchnorm_mean_tensor is the cl_ml_tensor_qcom object that has the mean data for this Op.
+    The shape of the mean tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    batchnorm_variance_tensor is the cl_ml_tensor_qcom object that has the variance data for this
+    Op. The shape of the variance tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    batchnorm_scale_tensor is the cl_ml_tensor_qcom object that has the scale data for this Op.
+    The shape of the scale tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    batchnorm_bias_tensor is the cl_ml_tensor_qcom object that has the bias data for this Op.
+    The shape of the bias tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    All other inputs to the Fused ConvolutionForward Op functions can be assumed to match the
+    original clCreateMLOpConvolutionForwardQCOM descriptions.
+
+    Pooling op provides both Max and Average Pooling.
+
+    cl_int (*clCreateMLOpPoolingForwardQCOM)(
+        cl_context                         context,
+        const cl_ml_op_properties_qcom*    pOp_properties,
+        const cl_ml_op_pooling_desc_qcom*  pPooling_descriptor,
+        cl_ml_tensor_qcom                  input_tensor,
+        cl_ml_tensor_qcom                  param_tensor,
+        cl_ml_tensor_qcom                  output_tensor,
+        cl_ml_op_qcom*                     pOperation,
+        cl_ml_tuningcache_qcom             tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pPooling_descriptor describes the specific properties of the
+    Pooling operation. In general each Op creation function accepts a
+    descriptor that is specific to that Op.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    param_tensor is the cl_ml_tensor_qcom object that has the parameter tensor for
+    this Op.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pPooling_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_OP_NOT_ACCELERATED_QCOM if the parameters are valid but the implementation
+    does not accelerate this operation for the specified parameters.
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host
+    resources.
+
+    The pooling descriptor describes the properties of the pooling
+    operation.
+
+    typedef struct _cl_ml_op_pooling_desc_qcom {
+        cl_pooling_mode_qcom         mode;
+        cl_uint                      num_dimensions;
+        cl_uint                      input_padding_before[CL_TENSOR_MAX_SPATIAL_DIMS_QCOM];
+        cl_uint                      input_padding_after[CL_TENSOR_MAX_SPATIAL_DIMS_QCOM];
+        cl_uint                      stride[CL_TENSOR_MAX_SPATIAL_DIMS_QCOM];
+        cl_uint                      window_size[CL_TENSOR_MAX_SPATIAL_DIMS_QCOM];
+        cl_nan_mode_qcom             nan_propagation;
+        cl_arithmetic_mode_qcom      arithmetic_mode;
+    } cl_ml_op_pooling_desc_qcom;
+
+    mode can be CL_POOLING_MODE_MAX_QCOM,
+    CL_POOLING_MODE_AVERAGE_INCLUDE_PADDING_QCOM, or
+    CL_POOLING_MODE_AVERAGE_EXCLUDE_PADDING_QCOM.
+    Max Pooling is performed when CL_POOLING_MODE_MAX_QCOM is used.
+    Average Pooling is performed for the rest.
+    Padding is ignored for CL_POOLING_MODE_AVERAGE_EXCLUDE_PADDING_QCOM
+    and considered for CL_POOLING_MODE_AVERAGE_INCLUDE_PADDING_QCOM
+
+    num_dimensions is reserved for future use.
+
+    input_padding_before refers to the padding before the sliding kernel
+    in tensor elements for each dimension of the input tensor data.
+
+    input_padding_after refers to the padding after the sliding kernel
+    in tensor elements for each dimension of the input tensor data.
+
+    stride is the stride in tensor elements between pooling application
+    points.
+
+    window_size are the dimensions of the sliding kernel.
+
+    nan_propagation determines if we propagate NANs in the Pooling Op.
+    It can be either CL_DO_NOT_PROPAGATE_NAN_QCOM or CL_PROPAGATE_NAN_QCOM.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    Batch Normalization (aka BatchNorm) operation also commonly appears with
+    spatial operations above. The function to create the BatchNorm Op is
+
+    cl_int (*clCreateMLOpBatchNormForwardQCOM)(
+        cl_context                           context,
+        const cl_ml_op_properties_qcom*      pOp_properties,
+        const cl_ml_op_batchnorm_desc_qcom*  pBatchNorm_descriptor,
+        cl_ml_tensor_qcom                    input_tensor,
+        cl_ml_tensor_qcom                    mean_tensor,
+        cl_ml_tensor_qcom                    variance_tensor,
+        cl_ml_tensor_qcom                    scale_tensor,
+        cl_ml_tensor_qcom                    bias_tensor,
+        cl_ml_tensor_qcom                    output_tensor,
+        cl_ml_op_qcom*                       pOperation,
+        cl_ml_tuningcache_qcom               tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pBatchNorm_descriptor describes the specific properties of the
+    BatchNorm operation. In general each Op creation function accepts a
+    descriptor that is specific to that Op.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    mean_tensor is the cl_ml_tensor_qcom object that has the mean data for this Op.
+    The shape of the mean tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    variance_tensor is the cl_ml_tensor_qcom object that has the variance data for this
+    Op. The shape of the variance tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    scale_tensor is the cl_ml_tensor_qcom object that has the scale data for this Op.
+    The shape of the scale tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    bias_tensor is the cl_ml_tensor_qcom object that has the bias data for this Op.
+    The shape of the bias tensor must be 1 in every dimension except channel.
+    The channel dimension must be equal to the number of channels in the output.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pBatchNorm_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_OP_NOT_ACCELERATED_QCOM if the parameters are valid but the implementation
+    does not accelerate this operation for the specified parameters.
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host
+    resources.
+
+    The batchnorm descriptor describes the properties of the batchnorm
+    operation.
+
+    typedef struct _cl_ml_op_batchnorm_desc_qcom {
+        cl_batchnorm_mode_qcom       mode;
+        cl_arithmetic_mode_qcom      arithmetic_mode;
+    } cl_ml_op_batchnorm_desc_qcom;
+
+    mode can be CL_BATCHNORM_MODE_SPATIAL_QCOM. Other modes will be added
+    later.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The Softmax Op acts on the channel dimensions of the tensor to map
+    it into a probability distributions. The function that creates the
+    Softmax Op is
+
+    cl_int (*clCreateMLOpSoftmaxQCOM)(
+        cl_context                          context,
+        const cl_ml_op_properties_qcom*     pOp_properties,
+        const cl_ml_op_softmax_desc_qcom*   pSoftmax_descriptor,
+        cl_ml_tensor_qcom                   input_tensor,
+        cl_ml_tensor_qcom                   output_tensor,
+        cl_ml_op_qcom*                      pOperation,
+        cl_ml_tuningcache_qcom              tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pSoftmax_descriptor describes the specific properties of the
+    Softmax operation.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+    The shape of the input tensor must be 1 in every dimension except channel.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+    The shape of the output tensor must be 1 in every dimension except channel.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pSoftmax_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The softmax descriptor describes the properties of the softmax
+    operation.
+
+    typedef struct _cl_ml_op_softmax_desc_qcom {
+        cl_softmax_algorithm_qcom    algo;
+        cl_softmax_mode_qcom         mode;
+        cl_arithmetic_mode_qcom      arithmetic_mode;
+    } cl_ml_op_softmax_desc_qcom;
+
+    algo can be CL_SOFTMAX_ALGORITHM_ACCURATE_QCOM. Other algorithms will
+    be added later.
+
+    mode can be CL_SOFTMAX_MODE_INSTANCE_QCOM or CL_SOFTMAX_MODE_CHANNEL_QCOM.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The Concat Op concatenate an array of tensors into one tensor.
+    The function to create the op is
+
+    cl_int (*clCreateMLOpConcatQCOM)(
+        cl_context                        context,
+        const cl_ml_op_properties_qcom*   pOp_properties,
+        const cl_ml_op_concat_desc_qcom*  pConcat_descriptor,
+        cl_ml_tensor_qcom*                input_tensor_list,
+        cl_ml_tensor_qcom                 output_tensor,
+        cl_ml_op_qcom*                    pOperation,
+        cl_ml_tuningcache_qcom            tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pConcat_descriptor describes the specific properties of the
+    Concat operation.
+
+    input_tensor_list is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pConcat_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The concat descriptor describes the properties of the concat
+    operation.
+
+    typedef struct _cl_ml_op_concat_desc_qcom {
+        cl_uint                      axis;
+        cl_uint                      num_input_tensors;
+        cl_arithmetic_mode_qcom      arithmetic_mode;
+    } cl_ml_op_concat_desc_qcom;
+
+    axis is the index of axis of concatenation, where N=0, C=1, H=2, W=3.
+
+    num_input_tensors is the number of tensor in the input array.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The Permute Op performs out-of-place permutation the dimension of
+    the tensor. The function to create the Op is
+
+    cl_int (*clCreateMLOpPermuteQCOM)(
+        cl_context                          context,
+        const cl_ml_op_properties_qcom*     pOp_properties,
+        const cl_ml_op_permute_desc_qcom*   pPermute_descriptor,
+        cl_ml_tensor_qcom                   input_tensor,
+        cl_ml_tensor_qcom                   output_tensor,
+        cl_ml_op_qcom*                      pOperation,
+        cl_ml_tuningcache_qcom              tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pPermute_descriptor describes the specific properties of the
+    Permute operation.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pPermute_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The permute descriptor describes the properties of the permute
+    operation.
+
+    typedef struct _cl_ml_op_permute_desc_qcom {
+        cl_uint                      len_order;
+        cl_uint                      order[CL_TENSOR_MAX_DIMS_QCOM];
+        cl_arithmetic_mode_qcom      arithmetic_mode;
+    } cl_ml_op_permute_desc_qcom;
+
+    len_order is the length of the order array to be considered.
+    May be set to 4 or 5, as we support 4D and 5D tensors.
+
+    order is the array that contains order of the dimensions of
+    the permutation.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The Reshape Op changes the shape (dimensions) of the a given tensor,
+    while retaining the original data in the same order.
+    The function to create the Op is
+
+    cl_int (*clCreateMLOpReshapeQCOM)(
+        cl_context                        context,
+        const cl_ml_op_properties_qcom*   pOp_properties,
+        cl_ml_tensor_qcom                 input_tensor,
+        cl_ml_tensor_qcom                 output_tensor,
+        cl_ml_op_qcom*                    pOperation,
+        cl_ml_tuningcache_qcom            tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The DepthToSpace Op rearranges tensor data from the Channel
+    dimension to spatial dimensions: Height and Width.
+    The function to create the Op is
+
+    cl_int (*clCreateMLOpDepthToSpaceQCOM)(
+        cl_context                             context,
+        const cl_ml_op_properties_qcom*        pOp_properties,
+        const cl_ml_op_depthtospace_desc_qcom* pDepthToSpace_descriptor,
+        cl_ml_tensor_qcom                      input_tensor,
+        cl_ml_tensor_qcom                      output_tensor,
+        cl_ml_op_qcom*                         pOperation,
+        cl_ml_tuningcache_qcom                 tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pDepthToSpace_descriptor describes the specific properties of the
+    DepthToSpace operation.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pDepthToSpace_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The DepthToSpace descriptor describes the properties of the DepthToSpace
+    operation.
+
+    typedef struct _cl_ml_op_depthtospace_desc_qcom {
+        cl_uint                      block_dim;
+        cl_arithmetic_mode_qcom      arithmetic_mode;
+    } cl_ml_op_depthtospace_desc_qcom;
+
+    block_dim indicates the desired amount of data to be moved from
+    the Channel dimension to spatial dimensions Height and Width.
+    The result is an output tensor with the Channel dimension reduced
+    by a factor of (block_dim * block_dim), while Height and Width
+    increase by a factor of block_dim.
+    * Note that the Channel dimension of the input tensor must be
+    divisible by (block_dim * block_dim).
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    Additionally fused variants of the DepthToSpace Op are provided.
+    These perform operations such as BatchNorm or Activation prior to writing
+    the convoluion results to memory and can offer performance gains.
+    The function for creating a Fused DepthToSpace and Activation Op is shown here:
+
+    cl_int (*pfnClCreateMLOpFusedDepthToSpaceActivationQCOM)(
+        cl_context                                context,
+        const cl_ml_op_properties_qcom*           pOp_properties,
+        const cl_ml_op_depthtospace_desc_qcom*    pDepthToSpace_descriptor,
+        const cl_ml_op_activation_desc_qcom*      pActivation_descriptor,
+        cl_ml_tensor_qcom                         depth_to_space_input_tensor,
+        cl_ml_tensor_qcom                         activation_param_tensor,
+        cl_ml_tensor_qcom                         activation_output_tensor,
+        cl_ml_op_qcom*                            pOperation,
+        cl_ml_tuningcache_qcom                    tuning_cache);
+
+    The function to create a Fused DepthToSpace and Activation Op is similar to the original
+    DepthToSpace Op creation function, with the addition of:
+
+    pActivation_descriptor, descriptor that describes the specific properties of the fused
+    activation operation. See OP creation info for clCreateMLOpActivationForwardQCOM.
+
+    activation_param_tensor is currently reserved for future use in the Activation Op and
+    can be initialized to NULL.
+
+    activation_output_tensor is the cl_ml_tensor_qcom object that is the output to this Op.
+
+    All other inputs to the Fused DepthToSpace Op functions can be assumed to match the
+    original clCreateMLOpDepthToSpaceQCOM descriptions.
+
+    The ResizeBilinear Op resizes input spatial dimensions Height and Width,
+    to match the output tensor Height and Width using bilinear interpolation.
+    The function to create the Op is
+
+    cl_int (*clCreateMLOpResizeBilinearQCOM)(
+        cl_context                                 context,
+        const cl_ml_op_properties_qcom*            pOp_properties,
+        const cl_ml_op_resize_bilinear_desc_qcom*  pResizeBilinear_descriptor,
+        cl_ml_tensor_qcom                          input_tensor,
+        cl_ml_tensor_qcom                          output_tensor,
+        cl_ml_op_qcom*                             pOperation,
+        cl_ml_tuningcache_qcom                     tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pResizeBilinear_descriptor describes the specific properties of the
+    ResizeBilinear operation.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pResizeBilinear_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The resize bilinear descriptor describes the properties of the resize
+    operation.
+
+    typedef struct _cl_ml_op_resize_bilinear_desc_qcom {
+        cl_bool                      align_corners;
+        cl_bool                      half_pixel_centers;
+        cl_arithmetic_mode_qcom      arithmetic_mode;
+    } cl_ml_op_resize_bilinear_desc_qcom;
+
+    align_corners, if set to true, preserves the input values in each of the four
+    corners of the output tensor HxW planes.
+
+    half_pixel_centers, if set to true, splits the center pixel of each HxW planes.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+    The Pad Op adds padding to a given input tensor.
+    The function to create the Op is
+
+    cl_int (*clCreateMLOpPadQCOM)(
+        cl_context                          context,
+        const cl_ml_op_properties_qcom*     pOp_properties,
+        const cl_ml_op_pad_desc_qcom*       pPad_descriptor,
+        cl_ml_tensor_qcom                   input_tensor,
+        cl_ml_tensor_qcom                   output_tensor,
+        cl_ml_op_qcom*                      pOperation,
+        cl_ml_tuningcache_qcom              tuning_cache);
+
+    context must be a valid OpenCL context.
+
+    pOp_properties is a NULL-terminated list of key-value pairs
+    that can be used to specify additional Op properties.
+    It can be set to NULL, if default Op behavior is desired.
+
+    pPad_descriptor describes the specific properties of the
+    Pad operation.
+
+    input_tensor is the cl_ml_tensor_qcom object that is the input to this Op.
+
+    output_tensor is the cl_ml_tensor_qcom object that is the output for this Op.
+
+    pOperation returns a cl_ml_op_qcom object which represents this Op.
+
+    tuning_cache is the cl_ml_tuningcache_qcom object which contains the tuned
+    dispatch attributes for this Op.  If tuning_cache is NULL, the
+    implementation will apply default values for tunable parameters such as
+    work group size.
+
+    If this function executes successfully, CL_SUCCESS is returned. Otherwise,
+    one of the following errors are returned.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if any of the members of pPad_descriptor is not
+    valid.
+
+    CL_INVALID_VALUE if any of the tensors are not valid cl_ml_tensor_qcom objects.
+
+    CL_INVALID_VALUE if any of the tensors have an incorrect layout
+
+    CL_OP_NOT_ACCELERATED_QCOM if inputs are valid but an accelerated version
+    isn't available
+
+    The pad descriptor describes the properties of the pad
+    operation.
+
+    typedef struct _cl_ml_op_pad_desc_qcom {
+        cl_pad_mode_qcom             pad_mode;
+        cl_uint                      paddings_shape[2];
+        cl_uint                      paddings[8];
+        cl_arithmetic_mode_qcom      arithmetic_mode;
+    } cl_ml_op_pad_desc_qcom;
+
+    pad_mode determines the value of the values used for padding.
+    Currently, the supported pad modes are: CL_PAD_MODE_CONSTANT_QCOM.
+    CL_PAD_MODE_CONSTANT_QCOM pads the input tensor with zeroes.
+
+    paddings_shape is currently reserved for future use and can be initialized to zero.
+
+    paddings is the array that contains the amount of values to pad in
+    each direction of the HxW plane, following the order:
+    {PadLeft, PadRight, PadTop, PadBottom}. Indices 4 through 7
+    are reserved for future use.
+
+    arithmetic_mode specifies how the math is to be done. It can be one of
+    CL_ARITHMETIC_MODE_FP16_QCOM, CL_ARITHMETIC_MODE_FP16_ACC32_QCOM,
+    CL_ARITHMETIC_MODE_FP32_QCOM.
+
+
+    * Note that there are many operations which are accelerated. Their
+    creation follows a similar signature to clCreateMLOpConvolutionForwardQCOM.
+    Their usage can be inferred from the function declarations
+    in cl_qcom_ml_ops.h
+
+  Querying Tensor Size
+
+    The size of a tensor may be queried once it is finalized. Tensors created with
+    CL_TENSOR_LAYOUT_NCHW_QCOM or CL_TENSOR_LAYOUT_NHWC_QCOM are finalized as soon
+    as they are created. Tensors created with  CL_TENSOR_LAYOUT_OPTIMAL_QCOM are
+    finalized when they are used in an Op.
+
+
+    cl_int (*clGetMLTensorMemorySizeQCOM)(
+        cl_context                        context,
+        cl_ml_tensor_qcom                 tensor,
+        cl_uint*                          tensor_memory_size);
+
+    context must be a valid OpenCL context.
+
+    tensor must be a valid finalized cl_ml_tensor_qcom object.
+
+    tensor_memory_size returns the size required by the tensor in bytes.
+
+    This function returns CL_SUCCESS if it executes successfully. Otherwise it
+    returns one of the following errors.
+
+    CL_INVALID_CONTEXT if context is not a valid cl_context object
+
+    CL_INVALID_VALUE if tensor is not a valid cl_ml_tensor_qcom object or if the
+    tensor is not finalized.
+
+  Reading, Writing and Copying Tensor Data
+
+    This function copies data from a tensor to a host buffer in a non blocking manner.
+
+    cl_int (*clEnqueueReadMLTensorDataQCOM)(
+        cl_command_queue                  queue,
+        cl_ml_tensor_qcom                 src_tensor,
+        cl_mem                            src_memory,
+        void*                             dst_dataptr,
+        cl_tensor_layout_qcom             dst_layout,
+        cl_uint                           num_events_in_wait_list,
+        const cl_event*                   event_wait_list,
+        cl_event*                         event);
+
+    queue is a valid host command queue
+
+    src_tensor is a valid tensor
+
+    src_memory refers to a valid buffer object which backs the tensor and
+    contains the tensor data to be read.
+
+    dst_dataptr is the pointer to a buffer in host memory to which data is to
+    be copied
+
+    dst_layout refers to the layout of the destination tensor data. This can be
+    one of CL_TENSOR_LAYOUT_NCHW_QCOM or CL_TENSOR_LAYOUT_NHWC_QCOM.
+
+    event_wait_list and num_events_in_wait_list specify events that need to
+    complete before this particular command can be executed
+
+    event returns an event object that identifies this particular command
+
+    If clEnqueueReadMLTensorDataQCOM executes successfully it returns CL_SUCCESS.
+    Otherwise it returns one of the following errors.
+
+    CL_INVALID_COMMAND_QUEUE if queue is not a valid host command queue.
+
+    CL_INVALID_VALUE if src_tensor is not a valid tensor or if it is not finalized.
+
+    CL_INVALID_MEM_OBJECT if src_memory is not a valid buffer object.
+
+    CL_INVALID_VALUE if dst_dataptr is NULL
+
+    CL_INVALID_VALUE if dst_layout is not one of CL_TENSOR_LAYOUT_NCHW_QCOM or
+    CL_TENSOR_LAYOUT_NHWC_QCOM
+
+    CL_INVALID_EVENT_WAIT_LIST if event_wait_list is NULL and
+    num_events_in_wait_list > 0, or event_wait_list is not NULL and
+    num_events_in_wait_list is 0, or if event objects in event_wait_list are
+    not valid events
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host resources.
+
+
+    This function copies data from a  host buffer to a tensor in a non blocking manner.
+
+    cl_int (*clEnqueueWriteMLTensorDataQCOM)(
+        cl_command_queue                  queue,
+        void*                             src_dataptr,
+        cl_tensor_layout_qcom             src_layout,
+        cl_ml_tensor_qcom                 dst_tensor,
+        cl_mem                            dst_memory,
+        cl_uint                           num_events_in_wait_list,
+        const cl_event*                   event_wait_list,
+        cl_event*                         event);
+
+    queue is a valid host command queue
+
+    src_dataptr is the pointer to a buffer in host memory from which data is to be copied
+
+    src_layout refers to the layout of the destination tensor data. This can be one of
+    CL_TENSOR_LAYOUT_NCHW_QCOM or CL_TENSOR_LAYOUT_NHWC_QCOM.
+
+    dst_tensor is a valid tensor
+
+    dst_memory refers to a valid buffer object which backs the tensor and
+    contains the tensor data to be read.
+
+    event_wait_list and num_events_in_wait_list specify events that need to
+    complete before this particular command can be executed
+
+    event returns an event object that identifies this particular command
+
+    If clEnqueueWriteMLTensorDataQCOM executes successfully it returns CL_SUCCESS.
+    Otherwise it returns one of the following errors.
+
+    CL_INVALID_COMMAND_QUEUE if queue is not a valid host command queue.
+
+    CL_INVALID_VALUE if src_dataptr is NULL
+
+    CL_INVALID_VALUE if src_layout is not one of CL_TENSOR_LAYOUT_NCHW_QCOM or
+    CL_TENSOR_LAYOUT_NHWC_QCOM
+
+    CL_INVALID_VALUE if dst_tensor is not a valid tensor or if it not finalized.
+
+    CL_INVALID_MEM_OBJECT if dst_memory is not a valid buffer object.
+
+    CL_INVALID_EVENT_WAIT_LIST if event_wait_list is NULL and
+    num_events_in_wait_list > 0, or event_wait_list is not NULL and
+    num_events_in_wait_list is 0, or if event objects in event_wait_list are
+    not valid events
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host resources.
+
+    This function copies tensor data from one tensor to another.
+
+    cl_int (*clEnqueueCopyMLTensorDataQCOM)(
+        cl_command_queue                  queue,
+        cl_ml_tensor_qcom                 src_tensor,
+        cl_mem                            src_memory,
+        cl_ml_tensor_qcom                 dst_tensor,
+        cl_mem                            dst_memory,
+        cl_uint                           num_events_in_wait_list,
+        const cl_event*                   event_wait_list,
+        cl_event*                         event);
+
+    queue is a valid host command queue
+
+    src_tensor is a valid tensor
+
+    src_memory refers to a valid buffer object which backs src_tensor and contains the
+    tensor data to be read.
+
+    dst_tensor is a valid tensor
+
+    dst_memory refers to a valid buffer object which backs dst_tensor and
+    will have the tensor data once the copy is complete.
+
+    event_wait_list and num_events_in_wait_list specify events that need to
+    complete before this particular command can be executed
+
+    event returns an event object that identifies this particular command
+
+    If clEnqueueCopyMLTensorDataQCOM executes successfully it returns CL_SUCCESS.
+    Otherwise it returns one of the following errors.
+
+    CL_INVALID_COMMAND_QUEUE if queue is not a valid host command queue.
+
+    CL_INVALID_VALUE if src_tensor is not a valid tensor or if it is not finalized.
+
+    CL_INVALID_MEM_OBJECT if src_memory is not a valid buffer object.
+
+    CL_INVALID_VALUE if dst_tensor is not a valid tensor or if it not finalized.
+
+    CL_INVALID_MEM_OBJECT if dst_memory is not a valid buffer object.
+
+    CL_INVALID_EVENT_WAIT_LIST if event_wait_list is NULL and
+    num_events_in_wait_list > 0, or event_wait_list is not NULL and
+    num_events_in_wait_list is 0, or if event objects in event_wait_list are
+    not valid events
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host
+    resources.
+
+    CL_OP_NOT_ACCELERATED_QCOM if this operation is not supported for the
+    specific combination of source and destination tensors.
+
+  Enqueueing Ops
+
+    This function enqueues a command to execute an Op. Both regular and
+    recordable queues are supported.
+
+
+    cl_int (*clEnqueueMLOpQCOM)(
+        cl_command_queue                    queue,
+        cl_ml_op_qcom                       ml_op,
+        cl_ml_tensor_mem_desc_set_qcom      tensor_mem_descriptor_set,
+        cl_uint                             num_events_in_wait_list,
+        const cl_event*                     event_wait_list,
+        cl_event*                           event);
+
+    queue is a valid host command queue. queue must be an in-order cl_command_queue.
+
+    ml_op is the Op to be enqueued. It must be a valid cl_ml_op_qcom object.
+
+    tensor_mem_descriptor_set is an object that holds an array correlating
+    the tensors referenced by the Op with their backing buffer objects.
+    This object must contain all the tensors that were used in the Op creation function.
+
+    event_wait_list and num_events_in_wait_list specify events that need to complete
+    before this particular command can be executed. If queue is a recordable queue, then
+    event_wait_list must be NULL and num_events must be 0.
+
+    event returns an event object that identifies this particular command. If queue is a
+    recordable queue, then event must be 0.
+
+    If clEnqueueMLOpQCOM executes successfully it returns CL_SUCCESS. Otherwise it returns
+    one of the following errors.
+
+    CL_INVALID_COMMAND_QUEUE if queue is not a valid in-order host command queue.
+
+    CL_INVALID_VALUE if ml_op is not a valid cl_ml_op_qcom object
+
+    CL_INVALID_VALUE if any of the tensors in tensor_memory_list are invalid or if
+    tensor_memory_list does not contain all the tensors used for creating the Op. Note that
+    if an empty tensor was used to create the Op, it does not need to be specified in the
+    tensor_memory_list.
+
+    CL_INVALID_EVENT_WAIT_LIST if event_wait_list is NULL and num_events_in_wait_list > 0,
+    or event_wait_list is not NULL and num_events_in_wait_list is 0, or if event objects
+    in event_wait_list are not valid events
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host resources.
+
+    This function enqueues an Op to a recordable queue. The arguments to this Op may not
+    be changed during replay.
+
+    cl_int (*clEnqueueMLOpImmutableQCOM)(
+        cl_command_queue                    queue,
+        cl_ml_op_qcom                       ml_op,
+        cl_ml_tensor_mem_desc_set_qcom      tensor_mem_descriptor_set,
+        cl_uint                             num_events_in_wait_list,
+        const cl_event*                     event_wait_list,
+        cl_event*                           event);
+
+    queue is a valid host command queue. queue must be an in-order cl_command_queue
+    and it must have been created with CL_QUEUE_RECORDABLE_QCOM set either in the
+    <properties> argument of clCreateCommandQueue or a property in the <properties>
+    array of clCreateCommandQueueWithProperties.
+
+    ml_op is the Op to be enqueued. It must be a valid cl_ml_op_qcom object.
+
+    tensor_mem_descriptor_set is an object that holds an array correlating
+    the tensors referenced by the Op with their backing buffer objects.
+    This object must contain all the tensors that were used in the Op creation function.
+
+    event_wait_list and num_events_in_wait_list specify events that need to complete
+    before this particular command can be executed. If queue is a recordable queue, then
+    event_wait_list must be NULL and num_events must be 0.
+
+    event returns an event object that identifies this particular command. If queue is a
+    recordable queue, then event must be 0.
+
+    If clEnqueueMLOpQCOM executes successfully it returns CL_SUCCESS. Otherwise it returns
+    one of the following errors.
+
+    CL_INVALID_COMMAND_QUEUE if queue is not a valid in-order host command queue.
+
+    CL_INVALID_VALUE if ml_op is not a valid cl_ml_op_qcom object
+
+    CL_INVALID_VALUE if any of the tensors in tensor_memory_list are invalid or if
+    tensor_memory_list does not contain all the tensors used for creating the Op. Note that
+    if an empty tensor was used to create the Op, it does not need to be specified in the
+    tensor_memory_list.
+
+    CL_INVALID_EVENT_WAIT_LIST if event_wait_list is NULL and num_events_in_wait_list > 0,
+    or event_wait_list is not NULL and num_events_in_wait_list is 0, or if event objects
+    in event_wait_list are not valid events
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host resources.
+
+
+  Tensor Memory Descriptors and  Descriptor Sets
+
+
+    The tensor memory descriptor structure associates a tensor with its backing buffer object
+
+    typedef struct _cl_tensor_memory_desc {
+      cl_ml_tensor_qcom          tensor;
+      cl_mem                     memory;
+    } cl_tensor_memory_desc_qcom;
+
+    tensor is a valid cl_ml_tensor_qcom object
+
+    memory is a valid buffer object which backs this tensor
+
+
+    A tensor memory descriptor set is an object which encapsulates an array of tensor memory descriptors.
+    When enqueueing an ML Op, a descriptor set object must be passed in as a parameter
+    and that descriptor set object should contain the backing buffer object for each tensor
+    in the Op.
+
+    The function to create a memory descriptor set object is
+
+    cl_int (*clCreateMLTensorMemoryDescriptorSetQCOM)(
+        cl_ml_tensor_mem_desc_set_qcom* descriptor_set);
+
+    descriptor_set is a pointer that will point to the returned
+    memory descriptor set object.
+
+    Once the descriptor object is created it can be update using the function
+
+    cl_int (*clUpdateMLTensorMemoryDescriptorSetQCOM)(
+        cl_ml_tensor_mem_desc_set_qcom descriptor_set,
+        uint32_t                        num_descriptors,
+        cl_tensor_memory_desc_qcom*     descriptors);
+
+    descriptor_set is a memory descriptor set object.
+
+    num_descriptors is the total number of memory tensors descriptors
+    referenced by the Op.
+
+    descriptors is a list of all the tensors memory descriptors
+    referenced by the Op.
+
+    The function to release a memory descriptor set object is:
+    cl_int (*clReleaseMLTensorMemoryDescriptorSetQCOM)(
+        cl_ml_tensor_mem_desc_set_qcom descriptor_set);
+
+    descriptor_set is a handle to previously created
+    ML tensor memory descriptor set object.
+
+    The function below enqueues a recording to a regular OpenCL command queue. The recording can
+    have both OpenCL kernels and ML Ops. Arguments to both the kernels and the Ops can be
+    updated during playback. Any updates made during replay are only visible within
+    the recording object. The updated values do not get reflected in the original kernel
+    object or the tensor memory descriptor set.
+
+    cl_int (*pfnClEnqueueRecordingMLOpQCOM)(
+    cl_command_queue                        queue,
+    cl_recording_qcom                       recording,
+    size_t                                  num_args,
+    const cl_array_arg_qcom*                arg_array,
+    size_t                                  num_op_args,
+    const cl_ml_op_array_arg_qcom*          op_arg_array,
+    size_t                                  num_svm_args,
+    const cl_array_arg_qcom*                svm_arg_array,
+    size_t                                  num_global_offsets,
+    const cl_offset_qcom*                   global_offset_array,
+    size_t                                  num_global_workgroups,
+    const cl_workgroup_qcom*                global_workgroup_array,
+    size_t                                  num_local_workgroups,
+    const cl_workgroup_qcom*                local_workgroup_array,
+    size_t                                  num_non_arg_objs,
+    const cl_array_kernel_exec_info_qcom*   non_arg_obj_array,
+    cl_uint                                 num_events_in_wait_list,
+    const cl_event*                         event_wait_list,
+    cl_event*                               event);
+
+    queue is a valid host command queue. queue must be an in-order cl_command_queue
+    and it must not have been created with CL_QUEUE_RECORDABLE_QCOM set either in the
+    <properties> argument of clCreateCommandQueue or a property in the <properties>
+    array of clCreateCommandQueueWithProperties.
+
+    recording must be a valid recording object that has been closed with
+    clEndRecordingQCOM.
+
+    num_args is the number of arguments to kernels being changed. This may be 0.
+
+    arg_array is an array describing the new kernel arguments to update. It
+    must contain <num_args> array elements. If num_args is 0, arg_array should be NULL.
+
+    num_op_args is the number of arguments to Ops ( tensor memory descriptors ) being
+    changed. This may be 0.
+
+    op_arg_array is an array specifying the updated tensor arguments with their
+    new mem object backing. It must contain <num_op_args> elements.
+    If num_op_args is 0, op_arg_array should be NULL.
+
+    num_svm_args is the number of kernel arguments being changed.
+    This may be 0.
+
+    arg_svm_array is an array describing the new SVM kernel arguments to
+    update. It must contain <num_svm_args> array elements.
+    If num_svm_args is op, arg_svm_array should be NULL.
+
+    num_global_offsets is the number of global offsets to update.
+
+    global_offset_array is an array containing <num_global_offsets> elements
+    specifying the new global offsets.
+
+    num_global_workgroups is the number of global work groups to update.
+
+    global_workgroup_array is an array containing <num_global_workgroups>
+    elements specifying the new global work sizes.
+
+    num_local_workgroups is the number of local work groups to update.
+
+    local_workgroup_array is an array containing <num_local_workgroups>
+    elements specifying the new local work sizes.
+
+    num_non_arg_objs is the number of non-argument object lists to update.
+
+    non_arg_obj_array is an array specifying the new non-argument object list
+    to update
+
+    num_events_in_wait_list, event_wait_list, and event have the same
+    meaning as in clEnqueueNDRangeKernel.
+
+    The cl_arg_array_qcom structure is described in the cl_qcom_recordable_queues
+    extension specification.
+
+    The cl_ml_op_array_arg_qcom structure specifes the Op and its tensor arguments that are
+    to be updated during replay.
+
+    typedef struct _cl_ml_op_array_arg_qcom {
+        cl_uint                         dispatch_index;
+        cl_ml_tensor_memory_desc_qcom*  tensor_descriptors;
+        cl_uint                         num_tensors;
+    } cl_ml_op_array_arg_qcom;
+
+    dispatch_index is the index of the Op in the recording. Ops and kernels are indexed
+    together. If 4 kernels are dispatched followed by 2 Ops, the 1st Op will have a
+    dispatch index of 4 and the 2nd Op will have a dispatch index of 5.. If the Op is the 
+    nth kernel or Op to be enqueued to the recording, then its dispatch index is n-1.
+
+    tensor_descriptors is the list of tensors and replacment backing memory which
+    will be updated during playback.
+
+    num_tensors is the number of tensors to update for the Op at the given dispatch index.
+
+    clEnqueueRecordingMLOpQCOM returns CL_SUCCESS if the recording was enqueued.
+    Otherwise, it returns one of the following error codes:
+
+        CL_INVALID_COMMAND_QUEUE if <command_queue> is invalid.
+
+        CL_INVALID_VALUE if <recording> is invalid
+
+        CL_INVALID_OPERATION if <command_queue> has not been closed via
+        clEndRecordingQCOM. A zero length recording will also cause this error.
+
+        CL_INVALID_DEVICE_TYPE if <command_queue> has an invalid device type.
+
+        CL_INVALID_CONTEXT if <command_queue> was not created on the same
+        context as <recording>.
+
+        CL_INVALID_KERNEL_ARGS if a dispatch index is out of bounds.
+
+        CL_INVALID_ARG_INDEX if arg_array or arg_svm_array tries to modify
+        a valid dispatch index, but invalid kernel argument index.
+
+        CL_INVALID_VALUE if a mem_object in op_arg_array is invalid
+
+        CL_OUT_OF_HOST_MEMORY failure to allocate required host memory.
+
+        CL_INVALID_GLOBAL_WORK_SIZE if a global work size is set to NULL
+
+        CL_INVALID_WORK_GROUP_SIZE if the global or local work group size is
+        invalid.
+
+        CL_OUT_OF_RESOURCES failure to allocate required resources.
+
+        CL_OUT_OF_HOST_MEMORY failure to allocate required host memory.
+
+        CL_INVALID_EVENT_WAIT_LIST if event_wait_list is NULL and
+        num_events_in_wait_list > 0, or event_wait_list is not NULL and
+        num_events_in_wait_list is 0, or if event objects in event_wait_list
+        are not valid events.
+
+
+
+
+
+  On Device Tuning
+
+    This function creates a tuning cache. A tuning cache can be used to store
+    tunable parameters such as the optimal workgroup sizes for the kernels that
+    accelerate a given Op. The tuning data can be retrieved from a tuning cache and
+    used to create a tuned Ml Op. The tunable parameters for multiple Ops can be stored
+    in a single tuning cache object.
+
+    cl_int (*clCreateMLTuningCacheQCOM)(
+        cl_ml_tuningcache_qcom* p_tuning_cache);
+
+
+    p_tuning_cache returns a cl_ml_tuningcache object.
+
+    If clCreateMLTuningCacheQCOM executes successfully it returns CL_SUCCESS.
+    Otherwise it returns one of the following errors.
+
+    CL_OUT_OF_HOST_MEMORY if there is a failure to allocate the required host
+    resources.
+
+    This function executes the Op several times and dynamically determines the
+    best values for tunable parameters such as workgroup sizes. These
+    parameters are saved to the tuning cache. If the application creates another
+    instance of this Op and passes in the tuning cache as an argument to the
+    Create Op function, the tuned values are automatically associated with the
+    new Op instance. Every execution of this new Op instance will leverage
+    the tuned values.
+
+    cl_int (*clTuneMLOpQCOM)(
+        cl_command_queue                    queue,
+        cl_ml_op_qcom                       ml_op,
+        cl_ml_tensor_mem_desc_set_qcom      tensor_mem_descriptor_set,
+        cl_ml_tuningcache_qcom              tuning_cache
+        cl_ulong*                           tuned_execution_time);
+
+    queue is a valid host command queue. queue must be an in-order cl_command_queue.
+
+    ml_op is the Op to be enqueued. It must be a valid cl_ml_op_qcom object.
+
+    tensor_mem_descriptor_set is an object that holds an array correlating
+    the tensors referenced by the Op with their backing buffer objects.
+    This object must contain all the tensors that were used in the Op creation function.
+
+    tuning_cache is a valid cl_ml_tuningcache_qcom object
+
+    tuned_execution_time is a pointer to returned best execution time achieved by tuning.
+    May be NULL, if returning best execution time is not desired.
+
+    If clTuneMLQCOM executes successfully it returns CL_SUCCESS. Otherwise it
+    returns one of the following errors.
+
+    CL_INVALID_COMMAND_QUEUE if queue is not a valid in-order host command queue.
+
+    CL_INVALID_CONTEXT if context associated with queue and ml_op is not the same
+
+    CL_INVALID_VALUE if ml_op is not a valid cl_ml_op_qcom object
+
+    CL_INVALID_VALUE if any of the tensors in tensor_memory_list are invalid or
+    if tensor_memory_list does not contain all the tensors used for creating the Op.
+    empty tensors do not need to be included in tensor_memory_list.
+
+    CL_INVALID_VALUE if tuning_cache is not a valid cl_ml_tuningcache_qcom object
+
+
+    This function saves the tuning data stored in tuning cache to a host buffer.
+    This buffer can later be used to load tuning data to a tuning cache object.
+    It is expected that applications will execute a tuning run for all the Ops
+    in the ML model, extract the tuning data to a host buffer and save it to a
+    file. On subsequent executions of the model, the tuning data can be retrieved
+    from file and used to populate the tuning cache. Ops created with the tuning
+    cache passed in as an argument will pick up the tuned parameters that have
+    been generated for that Op. Subsequent executions of that Op will use the
+    tuned parameters.
+
+    cl_int (*clSaveMLTuningCacheQCOM)(
+        cl_ml_tuningcache_qcom  tuning_cache,
+        size_t                  len,
+        unsigned char*          pTuningData,
+        size_t*                 pLenRet);
+
+    tuning_cache is a valid cl_ml_tuningcache_qcom object
+
+    len is the size of the host buffer that the tuning data will be saved to.
+    If len is zero, no tuning data is saved but pLenRet will have the number
+    of bytes required.
+
+    pTuningData is a pointer to a host buffer that the tuning data will be
+    saved to.
+
+    pLenRet returns the number of bytes required to store the tuning data.
+
+    If clSaveMLTuningCacheQCOM executes successfully it returns CL_SUCCESS.
+    Otherwise it returns one of the following errors.
+
+    CL_INVALID_VALUE if tuning_cache is not a valid cl_ml_tuningcache_qcom object
+
+    CL_INVALID_VALUE if len is zero but pTuningData is not NULL or if len is non
+    zero but less than the size required to hold the tuning data.
+
+
+    This function loads the tuning data from a host buffer to a tuning cache.
+
+    cl_int (*clLoadMLTuningCacheQCOM)(
+        cl_ml_tuningcache_qcom  tuning_cache,
+        size_t                  len,
+        unsigned char*          pTuningData);
+
+    tuning_cache is a valid cl_ml_tuningcache_qcom object
+
+    len is the size in bytes of the tuning data
+
+    pTuningData is a pointer to a host buffer that holds the tuning data
+
+    If clLoadMLTuningCacheQCOM executes successfully it returns CL_SUCCESS.
+    Otherwise it returns one of the following errors.
+
+    CL_INVALID_VALUE if pTuningData is NULL
+
+    CL_INVALID_VALUE if pTuningData cannot be decoded successfully. This can
+    happen if len does not match the original size of tuning data.
+
+  Releasing Objects
+
+    This function decrements the reference count on a tensor.
+
+    cl_int (*clReleaseMLTensorQCOM)(
+      cl_ml_tensor_qcom              tensor);
+
+    tensor must be a valid cl_ml_tensor_qcom object
+
+    clReleaseMLTensorQCOM returns CL_SUCCESS if it executes successfully.
+    Otherwise, it returns one of the following errors.
+
+    CL_INVALID_VALUE if tensor is not a valid cl_ml_tensor_qcom object.
+
+    This function decrements the reference count on an Op.
+
+    cl_int (*clReleaseMLOpQCOM)(
+        cl_ml_op_qcom              ml_op);
+
+    ml_op must be a valid cl_ml_op_qcom object
+
+    clReleaseMLOpQCOM returns CL_SUCCESS if it executes successfully.
+    Otherwise, it returns one of the following errors.
+
+    CL_INVALID_VALUE if tensor is not a valid cl_ml_op_qcom object.
+
+    This function decrements the reference count on a descriptor set object
+
+    cl_int (*pfnClReleaseDescriptorSet)(
+        cl_ml_tensor_mem_desc_set_qcom descriptor_set);
+
+    descriptor_set is a memory descriptor set object.
+
+    This function decrements the reference count on a tuning cache object
+
+    cl_int (*clReleaseMLTuningCacheQCOM)(
+        cl_ml_tuningcache_qcom    tuning_cache);
+
+    clReleaseMLTuningCacheQCOM returns CL_SUCCESS if it executes successfully.
+    Otherwise, it returns one of the following errors.
+
+    CL_INVALID_VALUE if tuning_cache is not a valid cl_ml_tuningcache_qcom object.
+
+    This function decrements the reference count on a tuning cache
+
+Additional Notes
+
+  Custom Ops
+
+    A custom Op can be implemented by writing an OpenCL kernel and dispatching it
+    inline with  ML Ops.  We shall refer to this kernel as a custom kernel.
+
+
+    To pass tensor data from a QCOM ML Op to the custom kernel, the output
+    tensor of the QCOM ML Op should use one of CL_TENSOR_LAYOUT_NCHW_QCOM or
+    CL_TENSOR_LAYOUT_NHWC_QCOM. The  OpenCL buffer object that is used to
+    back the output tensor can be directly passed as an argument to the custom
+    kernel. A similar approach can be used for passing tensor data from a
+    custom kernel to an QCOM ML Op.
+
+    OpenCL events can be used to synchronize between custom kernels and ML Ops.
+
+Sample Code
+
+    The following code sample is provided for illustrative purposes only.
+
+    //Query The Extension Interface
+
+    CLMLInterfaceV1QCOM* extensionIntf = NULL;
+    cl_int err = CL_SUCCESS;
+    static const cl_uint MAX_VERSIONS = 256;
+    cl_int majorVersions[MAX_VERSIONS];
+    cl_int minorVersions[MAX_VERSIONS];
+    cl_uint numVersions = 0;
+
+    //Create a CL Context
+    cl_context context = clCreateContext(NULL, 1, &deviceId, NULL, NULL, &err);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    err = clQueryMLInterfaceVersionsQCOM(NULL, NULL, 0, &numVersions);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    err = clQueryMLInterfaceVersionsQCOM(majorVersions, minorVersions, numVersions, NULL);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    //Look for and retrieve Extension Interface V1
+
+    for (cl_uint i = 0; i < numVersions; ++i)
+    {
+        if (majorVersions[i] == 1)
+        {
+            err = CL_GET_ML_INTERFACE_QCOM(extensionIntf, majorVersions[i], minorVersions[i]);
+            CHECK_TRUE(err == CL_SUCCESS);
+        }
+    }
+
+    // Create the input tensor
+    cl_ml_tensor_desc_qcom input_desc =
+    {
+        CL_HALF_FLOAT,
+        CL_TENSOR_LAYOUT_OPTIMAL_QCOM,
+        1, 3, 224, 224, 0,
+        CL_TENSOR_DIMENSIONS_4D_QCOM, {}};
+    err = extensionIntf->clCreateMLTensorQCOM(context, NULL, &input_desc, &input);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    // Create the weight tensor
+
+    cl_ml_tensor_desc_qcom weight_desc =
+    {
+        CL_HALF_FLOAT,
+        CL_TENSOR_LAYOUT_OPTIMAL_QCOM,
+        32, 3, 3, 3, 0,
+        CL_TENSOR_DIMENSIONS_4D_QCOM, {}};
+    err = extensionIntf->clCreateMLTensorQCOM(context, NULL, &weight_desc, &weight);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    // Create the output tensor
+
+    cl_ml_tensor_desc_qcom output_desc =
+    {
+        CL_HALF_FLOAT,
+        CL_TENSOR_LAYOUT_OPTIMAL_QCOM,
+        1, 32, 112, 112, 0,
+        CL_TENSOR_DIMENSIONS_4D_QCOM, {}};
+    err = extensionIntf->clCreateMLTensorQCOM(context, NULL, &output_desc, &output);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    // Create the bias tensor. This is an empty tensor
+
+    cl_ml_tensor_desc_qcom desc = {};
+    desc.num_dimensions = CL_TENSOR_UNUSED_QCOM;
+    err = extensionIntf->clCreateMLTensorQCOM(context, NULL, &desc, &bias);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    // Create the Convolution Op
+
+    cl_ml_op_convolution_desc_qcom convDesc =
+    {
+        CL_CONVOLUTION_MODE_CONVOLUTION_QCOM,
+        1, // group count
+        4, // num dimensions
+        {1, 1}, {1, 1}, // spatial padding
+        {1, 1}, // filter stride
+        {1, 1}, // dilation
+        0, // flags
+        CL_ARITHMETIC_MODE_FP16_QCOM
+    };
+
+    cl_ml_op_qcom op_conv;
+    err = extensionIntf->clCreateMLOpConvolutionForwardQCOM(context, NULL, &convDesc,
+              input, weight, bias, output, &op_conv, NULL);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    // Query the tensor sizes and allocate backing buffers for input, output and weight tensors.
+    // since the bias tensor is empty it does not need a backing buffer
+
+    cl_mem inputMem, outputMem, weightMem;
+    cl_uint size = 0;
+
+    err = extensionIntf->clGeMLTensorMemorySizeQCOM(context, input, &size);
+    CHECK_TRUE(err == CL_SUCCESS);
+    inputMem = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR,
+                   size, NULL, &err);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    err = extensionIntf->clGetMLTensorMemorySizeQCOM(context, output, &size);
+    CHECK_TRUE(err == CL_SUCCESS);
+    outputMem = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR,
+                    size, NULL, &err);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    err = extensionIntf->clGetMLTensorMemorySizeQCOM(context, weight, &size);
+    CHECK_TRUE(err == CL_SUCCESS);
+    weightMem = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR,
+                     size, NULL, &err);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+
+    // upload data to input and  weight tensors
+
+    char *inputTensorData = readInputData();
+    err = extensionIntf->clEnqueueWriteMLTensorDataQCOM(queue, inputTensorData,
+              CL_TENSOR_LAYOUT_NCHW_QCOM, input, inputMem, 0, NULL, NULL);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    char *weightTensorData = readWeightData();
+    err = extensionIntf->clEnqueueWriteMLTensorDataQCOM(queue, weightTensorData,
+              CL_TENSOR_LAYOUT_NCHW_QCOM, weight, weightMem, 0, NULL, NULL);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    // set up tensor memory descriptor. The bias tensor is not included since
+    // it is an empty tensor
+
+    cl_ml_tensor_memory_desc_qcom descArray[] =
+    {
+        // {tensor, memory}
+        {input, inputMem},
+        {weight, weightMem},
+        {output, outputMem}
+    };
+
+    cl_ml_tensor_mem_desc_set_qcom descriptorSet;
+    err = extensionIntf->clCreateMLTensorMemoryDescriptorSetQCOM(&descriptorSet);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    err = extensionIntf->clUpdateMLTensorMemoryDescriptorSetQCOM(descriptorSet, sizeof(descArray)/sizeof(descArray[0]), descArray);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    // enqueue the ML Op
+
+    cl_event opEvent;
+    err = extensionIntf->clEnqueueMLOpQCOM(queue, op_conv,
+              descriptorSet, 0, NULL, &opEvent);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    clWaitForEvents(queue, opEvent);
+
+    err = extensionIntf->clReleaseMLDescriptorSet(descriptorSet);
+    CHECK_TRUE(err == CL_SUCCESS);
+
+    //release resources
+    clReleaseMemObject(inputMem);
+    clReleaseMemObject(outputMem);
+    clReleaseMemObject(weightMem);
+
+    extensionIntf->clReleaseMLTensorQCOM(output);
+    extensionIntf->clReleaseMLTensorQCOM(weight);
+    extensionIntf->clReleaseMLTensorQCOM(bias);
+    extensionIntf->clReleaseMLTensorQCOM(input);
+    extensionIntf->clReleaseMLOpQCOM(op);
+
+Release Notes
+
+   Version 1.1 :
+
+   For this version, the following restrictions apply.
+
+   Only 4D tensors are supported. Calling clCreateMLTensorQCOM with num_dimensions in the pTensorDescriptor,
+   set to a value other than 4 will lead to CL_INVALID_VALUE error code being returned.
+
+   Only fully packed tensors are supported. Calling clCreateMLTensorQCOM with
+   stride values other than 0  in the pTensorDescriptor will lead to a
+   CL_INVALID_VALUE error code being returned.
+
+   The size of the N dimension for input and output tensors must be 1.
+
+   Grouped Convolutions are not supported. Calling clCreateMLOpConvolutionForward with  group_count in
+   pConvolution_Descriptor set to a value other than 1 will lead to a CL_INVALID_VALUE
+   error code being returned.
+
+   The weight tensor used in Convolution must have optimal layout. Calling clCreateMLOpConvolutionForward
+   with the weight_tensor parameter referring to a tensor that was not created using
+   CL_TENSOR_LAYOUT_OPTIMAL_QCOM will result in an error code  of CL_INVALID_VALUE being returned.
+
+Revision History
+
+    Revision 1, 2019/10/21: Initial version for Beta1.
+    Revision 2, 2020/11/20: Pre-release version.
+    Revision 3, 2021/01/15: Release version 1.0.

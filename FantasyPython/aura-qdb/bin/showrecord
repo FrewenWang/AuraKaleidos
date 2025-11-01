@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+spawn adb root
+spawn adb remount
+spawn adb shell
+
+expect "e171" { send "busybox telnet 192.168.78.2; exit\r" }
+expect "login" { send "root\r" }
+expect "#" { send "date\r" }
+expect "#" { send "pidin arg | grep pavaro\r" }
+expect "#" { send "ls -l /var/log/pavaro_record_*_*_*.bag\r" }
+expect "#" { send "ls -l /mnt/vendor/logdata/pavaro_record_*_*_*.bag\r" }
+expect "#" { send "exit\r" }
+
+interact

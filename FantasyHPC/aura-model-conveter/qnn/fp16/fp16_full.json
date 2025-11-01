@@ -1,0 +1,15 @@
+{
+  "graphs": {
+    "vtcm_mb": 4,
+    "graph_names": [
+      "DMSCall230714V13MainQAT"
+    ],
+    "fp16_relaxed_precision": 1
+  },
+  "devices": [
+    {
+      "device_id": 0,
+      "dsp_arch": "v68"
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+Name Strings
+
+    cl_qcom_filter_bicubic
+
+Contributors
+
+    Sreelakshmi Haridas Maruthur, Qualcomm Innovation Center, Inc.
+    Shawn Thompson, Qualcomm Technologies, Inc.
+    Bolan Jiang, Qualcomm Technologies, Inc.
+    Yuehai Du, Qualcomm Technologies, Inc.
+    Balaji Calidas, Qualcomm Technologies, Inc.
+
+Contact
+
+    bcalidas at qti dot qualcomm dot com
+
+Version
+
+    Version 1.0.0, 2021/7/26
+
+Status
+
+    Shipping
+
+Extension Type
+
+    OpenCL device extension
+
+Dependencies
+
+    OpenCL 3.0 or later is required.
+
+    This extension is written against the OpenCL 3.0 Specification.
+
+Overview
+
+    This extension introduces a new filter mode for OpenCL that uses hardware acceleration
+    for bicubic interpolation.
+
+Header File
+
+    None
+
+OpenCL C Changes
+
+    New Compiler Directives
+
+        #pragma OPENCL EXTENSION cl_qcom_filter_bicubic : enable
+
+    New Tokens
+
+        New OpenCL-C Built-in Filter Mode:
+
+        QCOM_CLK_FILTER_BICUBIC
+
+        New OpenCL Sampler Filter Mode:
+
+        CL_FILTER_BICUBIC_QCOM
+
+Additions to Table 27 of the OpenCL 3.0 specification:
+
+    In row specifying CL_SAMPLER_FILTER_MODE sampler properties, another type of filter value is available. The two functions
+    clCreateSampler and clCreateSamplerWithProperties have been updated to include a new cl_filter_mode option of CL_FILTER_BICUBIC_QCOM.
+    This value returns a weighted average of the 16 image elements nearest to the image coordinate.
+
+Additions to Section 8.2 of the OpenCL C 3.0 specification:
+
+    A new filter mode of QCOM_CLK_FILTER_BICUBIC has been added which is summarized below.
+
+    Filter Mode QCOM_CLK_FILTER_BICUBIC
+
+    When filter mode is QCOM_CLK_FILTER_BICUBIC, a 4x4 square of image elements for a 2D image is selected. This 4x4 square
+    is obtained as follows.
+
+    Let
+
+    x0 = (int) floor(x - 1.5f);
+    x1 = x0 + 1;
+    x2 = x1 + 1;
+    x3 = x2 + 1;
+    y0 = (int) floor(y - 1.5f);
+    y1 = y0 + 1;
+    y2 = y1 + 1;
+    y3 = y2 + 1;
+    a = frac(x - 0.5f);
+    b = frac(y - 0.5f);
+
+    w_u0 =      - 0.5f * a + 1.0f * (a * a) - 0.5f * (a * a * a);
+    w_u1 = 1.0f            - 2.5f * (a * a) + 1.5f * (a * a * a);
+    w_u2 =        0.5f * a + 2.0f * (a * a) - 1.5f * (a * a * a);
+    w_u3 =                 - 0.5f * (a * a) + 0.5f * (a * a * a);
+
+    w_v0 =      - 0.5f * b + 1.0f * (b * b) - 0.5f * (b * b * b);
+    w_v1 = 1.0f            - 2.5f * (b * b) + 1.5f * (b * b * b);
+    w_v2 =        0.5f * b + 2.0f * (b * b) - 1.5f * (b * b * b);
+    w_v3 =                 - 0.5f * (b * b) + 0.5f * (b * b * b);
+
+    where frac(x) denotes the fractional part of x and is computed as x - floor(x).
+
+    The image element value is found as:
+
+    refOut = ((t00*w_v0 + t01*w_v1+ t02*w_v2 + t03*w_v3) * w_u0 +
+              (t10*w_v0 + t11*w_v1+ t12*w_v2 + t13*w_v3) * w_u1 +
+              (t20*w_v0 + t21*w_v1+ t22*w_v2 + t23*w_v3) * w_u2 +
+              (t30*w_v0 + t31*w_v1+ t32*w_v2 + t33*w_v3) * w_u3);
+
+    where txy is the image element at location (x, y) in the 2D image.
+
+    If any of the selected txy in the above equations refers to a location outside the image, the
+    border color is used as the color value for txy.
+
+Sample Code
+
+    1) Samplers declared in kernel source
+
+        __kernel void scale_image(
+           __read_only image2d_t input_mem,
+           __write_only image2d_t output_mem)
+        {
+            const sampler_t sampler = CLK_NORMALIZED_COORDS_TRUE |
+                                      CLK_ADDRESS_CLAMP          |
+                                      QCOM_CLK_FILTER_BICUBIC;
+
+            int w = get_image_width(output_mem);
+            int h = get_image_height(output_mem);
+
+            int outX = get_global_id(0);
+            int outY = get_global_id(1);
+            int2 posOut = {outX, outY};
+
+            float inX = outX / (float) w;
+            float inY = outY / (float) h;
+            float2 posIn = (float2) (inX, inY);
+
+            float4 pixel = read_imagef(input_mem, sampler, posIn);
+            write_imagef(output_mem, posOut, pixel);
+        }
+
+    2) Sampler passed in as kernel argument
+
+        __kernel void scale_image(
+           __read_only image2d_t input_mem,
+           __write_only image2d_t output_mem,
+           sampler_t sampler)
+        {
+
+            int w = get_image_width(output_mem);
+            int h = get_image_height(output_mem);
+
+            int outX = get_global_id(0);
+            int outY = get_global_id(1);
+            int2 posOut = {outX, outY};
+
+            float inX = outX / (float) w;
+            float inY = outY / (float) h;
+            float2 posIn = (float2) (inX, inY);
+
+            float4 pixel = read_imagef(input_mem, sampler, posIn);
+            write_imagef(output_mem, posOut, pixel);
+        }
+
+        cl_sampler sampler = clCreateSampler(clContext, true, CL_ADDRESS_CLAMP, CL_FILTER_BICUBIC_QCOM, &nErr);
+
+        // Build program, create kernel, set arguments including sampler using clSetKernelArg and enqueue kernel
+
+Revision History
+
+    Revision 1,     2021/07/26: Initial version.

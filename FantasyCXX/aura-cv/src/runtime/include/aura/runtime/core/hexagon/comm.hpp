@@ -1,0 +1,7 @@
+#ifndef AURA_RUNTIME_CORE_HEXAGON_COMM_HPP__
+#define AURA_RUNTIME_CORE_HEXAGON_COMM_HPP__
+
+#define AURA_HVLEN                128
+#define AURA_HALF_HVLEN           64
+
+#endif // AURA_RUNTIME_CORE_HEXAGON_COMM_HPP__

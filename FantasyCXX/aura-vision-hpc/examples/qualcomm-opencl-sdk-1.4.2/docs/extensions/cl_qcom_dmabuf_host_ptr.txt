@@ -1,0 +1,207 @@
+Name Strings
+
+    cl_qcom_dmabuf_host_ptr
+
+Contributors
+
+    Sreelakshmi Haridas Maruthur, Qualcomm Innovation Center, Inc.
+    Balaji Calidas, Qualcomm Technologies, Inc.
+
+Contact
+
+    bcalidas at qti dot qualcomm dot com
+
+Version
+
+    Version 1.0.0, 2021/10/04
+
+Status
+
+    Shipping
+
+Extension Type
+
+    OpenCL device extension
+
+Dependencies
+
+    OpenCL 2.0 is required.
+    cl_qcom_ext_host_ptr is required.
+    cl_qcom_ext_host_ptr_iocoherent is required.
+
+    This extension is written against the OpenCL 3.0 specification. This
+    extension provides functionality to create OpenCL buffers and images
+    from DMA-BUF heap allocations.
+
+    If present, cl_qcom_protected_context extends the functionality
+    of this extension.
+
+Overview
+
+    This extension extends the functionality provided by clCreateBuffer
+    and clCreateImage. It allows applications to pass a DMA-BUF
+    heap allocation to these functions so that it can be mapped to the
+    device's address space and thus avoid having to copy data back and forth
+    between the host and the device.
+
+    If cl_qcom_protected_context is supported, this extension further allows
+    applications to pass DMA-BUF allocations from secure heaps into clCreateBuffer
+    and clCreateImage to create protected memory objects in OpenCL.
+
+Header File
+
+    cl_ext_qcom.h
+
+New Tokens
+
+    Accepted by the <host_ptr> argument of clCreateBuffer and clCreateImage:
+
+        typedef struct _cl_mem_dmabuf_host_ptr
+        {
+            // Type of external memory allocation.
+            // Must be CL_MEM_DMABUF_HOST_PTR_PROTECTED_QCOM if this is a secure
+            // DMA-BUF allocation and CL_MEM_DMABUF_HOST_PTR_QCOM for all other
+            // DMA-BUF allocations
+            cl_mem_ext_host_ptr   ext_host_ptr;
+
+            // dmabuf file descriptor
+            int                   dmabuf_filedesc;
+
+            // Host pointer to the DMA-BUF allocated memory
+            void*                 dmabuf_hostptr;
+
+        } cl_mem_dmabuf_host_ptr;
+
+    Used together with CL_MEM_EXT_HOST_PTR_QCOM:
+
+        CL_MEM_DMABUF_HOST_PTR_QCOM                   0x411D
+        CL_MEM_DMABUF_HOST_PTR_PROTECTED_QCOM         0x411E
+
+
+Additions to Chapter 5.2.1 of the OpenCL 3.0 Specification
+
+    (Creating Buffer Objects)
+
+    When CL_MEM_EXT_HOST_PTR_QCOM is enabled in the <flags> argument, then
+    <host_ptr> is interpreted as a pointer to cl_mem_ext_host_ptr. When
+    <host_ptr>->allocation_type is equal to CL_MEM_DMABUF_HOST_PTR_QCOM or
+    CL_MEM_DMABUF_HOST_PTR_PROTECTED_QCOM then <host_ptr> can additionally be
+    interpreted as a pointer to cl_mem_dmabuf_host_ptr.
+
+    In addition to that, the application must also initialize the following
+    struct fields:
+
+    * <host_ptr>->host_cache_policy should be set as follows - If
+      <host_ptr>->allocation_type is set to CL_MEM_DMABUF_HOST_PTR_PROTECTED_QCOM,
+      <host_ptr>->host_cache_policy must be set to CL_MEM_HOST_UNCACHED_QCOM.
+      For all other DMA-BUF allocations it must be set to CL_MEM_HOST_IOCOHERENT_QCOM.
+
+    * <host_ptr>->dmabuf_filedesc must be the file descriptor of the DMA-BUF memory
+      allocation that the application wants to use as storage for the
+      memory object.
+
+    * <host_ptr>->dmabuf_hostptr must be the host virtual pointer associated with
+      the DMA-BUF memory allocation if the application wishes to make host
+      access calls on the created CL memory object. If the application does not
+      need to map the newly created cl memory object for host access, it can set
+      <host_ptr>->dmabuf_hostptr to NULL, in which case calls to host access
+      functions such as clEnqueueMapBuffer will fail out and return an
+      errorcode of CL_INVALID_OPERATION.
+
+    Memory specified this way must be aligned to the device's page size. The
+    application can query the device's page size by using
+    clGetDeviceInfo(..., CL_DEVICE_PAGE_SIZE_QCOM, ...).
+
+Sample Code
+
+    1) Querying device parameters needed to determine
+       padding needed for DMA-BUF allocation
+
+       size_t                  ext_mem_padding_in_bytes    = 0;
+
+       // Query the the amount of padding necessary at the end of the
+       // DMA-BUF allocation
+
+       clGetDeviceInfo(device, CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM,
+                       sizeof(ext_mem_padding_in_bytes), &ext_mem_padding_in_bytes,
+                       NULL);
+
+    2) Using the extension for CL buffer objects
+
+        cl_mem                  buffer_object               = NULL;
+        size_t                  buffer_size_in_bytes        = 0;
+        size_t                  buffer_size_with_padding    = 0;
+        cl_mem_dmabuf_host_ptr  mydmabufmem                 = {0};
+
+
+        // Compute the desired size for the data in the buffer.
+
+        buffer_size_in_bytes = foobar();
+
+        // Compute amount of memory that needs to be allocated for the buffer
+        // including padding.
+
+        buffer_size_with_padding = buffer_size_in_bytes +
+            ext_mem_padding_in_bytes;
+
+        // Make a DMA-BUF memory allocation of size buffer_size_with_padding here.
+        // Assume parameters of the allocation are stored in a struct named dmabuf_info
+        // that we will use below.
+
+        // Create an OpenCL buffer object that uses dmabuf_info as its data store.
+
+        mydmabufmem.ext_host_ptr.allocation_type    = CL_MEM_DMABUF_HOST_PTR_QCOM;
+        mydmabufmem.ext_host_ptr.host_cache_policy  = CL_MEM_HOST_IOCOHERENT_QCOM;
+
+        // file descriptor for DMA-BUF
+        mydmabufmem.dmabuf_filedesc                 = dmabuf_info.file_descriptor;
+
+        // hostptr returned by DMA-BUF mmap
+        mydmabufmem.dmabuf_hostptr                  = dmabuf_info.host_virtual_address;
+
+        buffer_object = clCreateBuffer(context,
+                                       CL_MEM_USE_HOST_PTR | CL_MEM_EXT_HOST_PTR_QCOM,
+                                       buffer_size_in_bytes, &mydmabufmem, &errcode);
+
+    3) Using the extension for CL image objects
+
+        cl_mem                      image_object             = NULL;
+        cl_mem_dmabuf_host_ptr      mydmabufmem              = {0};
+
+        // Compute the amount of memory that needs to be allocated for the image using
+        // OpenCL API / Extension calls as needed
+
+        image_size_in_bytes = compute_image_size();
+
+        // Add padding to the computed size
+        // including padding.
+
+        image_size_with_padding = image_size_in_bytes +
+            ext_mem_padding_in_bytes;
+
+        // Make a DMA-BUF memory allocation of size buffer_size_with_padding here.
+        // Assume parameters of the allocation are stored in a struct named dmabuf_info
+        // that we will use below.
+
+        // Create an OpenCL image object that uses dmabuf_info as its data store.
+
+        mydmabufmem.ext_host_ptr.allocation_type    = CL_MEM_DMABUF_HOST_PTR_QCOM;
+        mydmabufmem.ext_host_ptr.host_cache_policy  = CL_MEM_HOST_IOCOHERENT_QCOM;
+
+        // file descriptor for DMA-BUF
+        mydmabufmem.dmabuf_filedesc                 = dmabuf_info.file_descriptor;
+        // hostptr returned by DMA-BUF
+        mydmabufmem.dmabuf_hostptr                  = dmabuf_info.host_virtual_address;
+
+        // App must define image_desc and image_format
+        // cl_image_desc   image_desc   = {};
+        // cl_image_format image_format = {};
+
+        image_object = clCreateImage(context,
+            CL_MEM_USE_HOST_PTR | CL_MEM_EXT_HOST_PTR_QCOM, &image_format, &image_desc,
+            &mydmabufmem, &errcode);
+
+
+Revision History
+
+    Revision 1, 2021/10/11: Initial version.

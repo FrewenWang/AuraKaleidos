@@ -1,0 +1,18 @@
+{
+  "name": "myspider",
+  "version": "1.0.0",
+  "description": "myspider",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "frewen",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "cheerio": "^0.22.0",
+    "progress": "^1.1.8",
+    "request": "^2.74.0",
+    "superagent": "^2.2.0"
+  }
+}

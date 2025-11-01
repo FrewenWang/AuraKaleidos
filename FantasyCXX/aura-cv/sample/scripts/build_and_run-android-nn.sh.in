@@ -1,0 +1,49 @@
+#!/bin/bash
+
+build()
+{
+    # the install path of aura, you can change it to your own path
+    Aura_DIR="${PWD}/../.."
+
+    if [ ! -d ${Aura_DIR} ]; then
+        echo "Please check the install path of aura"
+        exit 0
+    fi
+
+    if [ -z ${ANDROID_NDK_ROOT} ]; then
+        echo "Please set ANDROID_NDK_ROOT"
+        exit 0
+    fi
+
+    mkdir build; cd build
+
+    cmake -DAura_DIR=${Aura_DIR}/cmake \
+          -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake \
+          -DANDROID_ABI=@ANDROID_ABI@ \
+          -DANDROID_PLATFORM=@ANDROID_PLATFORM@ \
+          -DANDROID_STL=@ANDROID_STL@ \
+          .. && make -j8 install
+
+    cd ..
+}
+
+run()
+{
+    device_path=/data/local/tmp/aura
+
+    adb shell mkdir -p ${device_path}
+
+    adb push --sync $ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so ${device_path}
+    adb push --sync ../../3rdparty/mnn/mnn2.7.1/cpu+gpu/libmnn_wrapper.so   ${device_path}
+    @AURA_PUSH_LIBRARIES@
+    adb push --sync data                                                    ${device_path}
+    adb push --sync build/install/nn/sample_nn                              ${device_path}
+
+    adb shell "cd ${device_path}; export LD_LIBRARY_PATH=./:/vendor/lib64/egl:$LD_LIBRARY_PATH; chmod +x sample_nn; ./sample_nn minn_mnn"
+}
+
+script_dir=$(cd "$(dirname "$0")"; pwd)
+cd "${script_dir}"
+
+build
+run

@@ -1,0 +1,161 @@
+Name Strings
+
+    cl_qcom_android_ahardwarebuffer_host_ptr
+
+Contributors
+
+    Joshua Kelly, Qualcomm Technologies, Inc.
+    Balaji Calidas, Qualcomm Technologies, Inc.
+
+Contact
+
+    bcalidas at qti dot qualcomm dot com
+
+Version
+
+    Version 1, 2020/06/15
+
+Number
+
+    OpenCL Extension #TBD
+
+Status
+
+    Shipping
+
+Extension Type
+
+    OpenCL device extension
+
+Dependencies
+
+    OpenCL 1.1 or later is required.
+    cl_qcom_ext_host_ptr is required.
+    Android OS is required.
+
+    This extension is written against the OpenCL 1.1 specification. This
+    extension provides functionality, beyond and above the cl_qcom_ion_host_ptr
+    extension, to create buffers and images directly from Android native
+    buffers.
+
+    If present, cl_qcom_ext_host_ptr_iocoherent extends the functionality
+    of this extension.
+
+Overview
+
+    This extension extends the functionality provided by clCreateBuffer,
+    clCreateImage2D, and clCreateImage. It allows applications to pass an
+    Android AHardwareBuffer (AHB), aka hardware buffer, that is based on
+    ION memory allocator to these functions so that it can be mapped to the
+    device's address space. This extension allows the application to create
+    OpenCL buffers and images on top of AHardwareBuffers.
+
+Header File
+
+    cl_ext.h
+
+New Tokens
+
+    Accepted by the <host_ptr> argument of clCreateBuffer, clCreateImage2D, 
+    and clCreateImage:
+
+        typedef struct _cl_mem_android_ahardwarebuffer_host_ptr
+        {
+            // Type of external memory allocation.
+            // Must be CL_MEM_AHB_HOST_PTR_QCOM for AHardware Buffers.
+            cl_mem_ext_host_ptr   ext_host_ptr;
+
+            // Host pointer to the AHardwareBuffer (AHardwareBuffer*)
+            void*                 ahb_ptr;
+
+        } cl_mem_android_ahardwarebuffer_host_ptr;
+
+    Used together with CL_MEM_EXT_HOST_PTR_QCOM:
+
+        CL_MEM_ANDROID_AHARDWAREBUFFER_HOST_PTR_QCOM                   0x4119
+
+Additions to Chapter 5.2.1 of the OpenCL 1.1 Specification
+(Creating Buffer Objects)
+
+        When CL_MEM_EXT_HOST_PTR_QCOM is enabled in the <flags> argument, then
+        <host_ptr> is interpreted as a pointer to cl_mem_ext_host_ptr. When
+        <host_ptr>->allocation_type is equal to
+        CL_MEM_ANDROID_AHARDWAREBUFFER_HOST_PTR_QCOM then <host_ptr> can also be
+        interpreted as a pointer to cl_mem_android_ahardwarebuffer_host_ptr.
+
+        In addition to that, the application must also initialize the following
+        struct fields:
+
+        * <host_ptr>->host_cache_policy should be set as follows - If the
+          Graphic Buffer was created as cached and
+          cl_mem_ext_host_ptr_iocoherent is present,
+          <host_ptr>->host_cache_policy can be set to either
+          CL_MEM_HOST_WRITEBACK_QCOM or CL_MEM_HOST_IOCOHERENT_QCOM. If the
+          Graphic Buffer was created as cached and the
+          cl_mem_ext_host_ptr_iocoherent extension is not present,
+          <host_ptr>->host_cache_policy should be set to
+          CL_MEM_HOST_WRITEBACK_QCOM. It must be equal to
+          CL_MEM_HOST_UNCACHED_QCOM otherwise.
+
+        * <host_ptr>->ahb_ptr must be the host virtual pointer associated with
+          the AHardwareBuffer.
+
+        Incorrectly setting ext_host_ptr.host_cache_policy will result in
+        undefined behavior.
+
+        The application is responsible for selecting the appropriate image
+        attributes such as format, width and height. Also, if an
+        OpenCL buffer is created from a hardware buffer, the application is
+        responsible for making sure that the size of the buffer matches the
+        actual linear size of the native buffer; creating a buffer with a size
+        different than the passed-in native buffer will result in undefined
+        behavior.
+
+        The application is responsible for ensuring that the underlying native
+        hardware buffer is not released while the cl object is in use. Proper
+        synchronization between different APIs that share the underlying buffer
+        is to be handled by the application.
+
+        <size> passed to clCreateBuffer may be 0, which will instruct OpenCL to
+        calculate the size of the backing AHardwareBuffer memory.  The buffer size
+        may be queried with clGetMemObjectInfo.
+
+Sample Code
+
+    1) Using the extension for CL buffer objects
+
+        cl_mem                                buffer_object        = NULL;
+        cl_mem_ahardwarebuffer_host_ptr       myAHBmem             = {0};
+
+        // Create an OpenCL buffer object that uses myAHBmem as its data store.
+        myAHBmem.ext_host_ptr.allocation_type =
+            CL_MEM_ANDROID_AHARDWAREBUFFER_HOST_PTR_QCOM;
+        myAHBmem.ext_host_ptr.host_cache_policy = CL_MEM_HOST_WRITEBACK_QCOM;
+        // ahb_external_ptr from some a call to AHardwareBuffer_allocate (not shown)
+        myAHBmem.ahb_ptr = (AHardwareBuffer *)ahb_external_ptr;
+
+        buffer_object = clCreateBuffer(context,
+            CL_MEM_USE_HOST_PTR | CL_MEM_EXT_HOST_PTR_QCOM,
+            0, &myAHBmem, &errcode);    // Passing in 0 for buffer size will tell OpenCL to calculate the size
+
+    2) Using the extension for CL image objects
+
+        cl_mem                                image_object = NULL;
+        cl_mem_android_native_buffer_host_ptr myAHBmem     = {0};
+
+        // Create an OpenCL image object that uses myAHBmem as its data store.
+        myAHBmem.ext_host_ptr.allocation_type = CL_MEM_ANDROID_AHARDWAREBUFFER_HOST_PTR_QCOM;
+        myAHBmem.ext_host_ptr.host_cache_policy = CL_MEM_HOST_WRITEBACK_QCOM;
+        // ahb_external_ptr from some a call to AHardwareBuffer_allocate (not shown)
+        myAHBmem.ahb_ptr = (AHardwareBuffer *)ahb_external_ptr;
+
+        cl_image_desc   image_desc = {}; // App must define image_desc
+        cl_image_format image_format = {CL_RGBA, CL_UNSIGNED_INT8};
+
+        image_object = clCreateImage(context,
+            CL_MEM_USE_HOST_PTR|CL_MEM_EXT_HOST_PTR_QCOM, &image_format, &image_desc, &myAHBmem, &errcode);
+
+Revision History
+
+    Revision 1, 2020/06/15: Initial version.
+

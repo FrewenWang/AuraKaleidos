@@ -1,0 +1,719 @@
+WARNING: 06-08 16:00:01:375: afs_shell * 10399 --------------------------------------------------------------- open log.wf ------------
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 06-08 16:00:01:376: afs_shell * 10399 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 06-08 16:00:01:394: afs_shell * 10426 --------------------------------------------------------------- open log_r.1650980608.wf ------------
+WARNING: 06-08 16:00:01:799: afs_shell * 10420 --------------------------------------------------------------- open log_r.1701336832.wf ------------
+WARNING: 06-08 16:00:01:801: afs_shell * 10426 [ds:adaptor_tracker.cpp:551] gethostbyname szwg-wuge-afs-httpserver0.szwg01 failed, ret:1
+WARNING: 06-08 16:00:01:856: afs_shell * 10399 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 06-08 16:00:01:856: afs_shell * 10399 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 06-08 16:00:01:856: afs_shell * 10399 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 06-08 16:00:01:988: afs_shell * 10420 [ds:afs_client.cpp:5723] could not refresh monitor addr
+WARNING: 06-10 10:17:33:832: afs_shell * 26424 --------------------------------------------------------------- open log.wf ------------
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 06-10 10:17:33:833: afs_shell * 26424 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 06-10 10:17:33:852: afs_shell * 26436 --------------------------------------------------------------- open log_r.2801153792.wf ------------
+WARNING: 06-10 10:17:34:230: afs_shell * 26436 [ds:adaptor_tracker.cpp:551] gethostbyname szwg-wuge-afs-httpserver0.szwg01 failed, ret:1
+WARNING: 06-10 10:17:34:257: afs_shell * 26430 --------------------------------------------------------------- open log_r.2851510016.wf ------------
+WARNING: 06-10 10:17:34:399: afs_shell * 26424 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 06-10 10:17:34:399: afs_shell * 26424 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 06-10 10:17:34:399: afs_shell * 26424 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 06-10 10:17:34:521: afs_shell * 26430 [ds:afs_client.cpp:5723] could not refresh monitor addr
+WARNING: 06-13 19:18:29:656: afs_shell * 24244 --------------------------------------------------------------- open log.wf ------------
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 06-13 19:18:29:657: afs_shell * 24244 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 06-13 19:18:29:675: afs_shell * 24256 --------------------------------------------------------------- open log_r.2185815808.wf ------------
+WARNING: 06-13 19:18:30:028: afs_shell * 24256 [ds:adaptor_tracker.cpp:551] gethostbyname szwg-wuge-afs-httpserver0.szwg01 failed, ret:1
+WARNING: 06-13 19:18:30:118: afs_shell * 24250 --------------------------------------------------------------- open log_r.2236172032.wf ------------
+WARNING: 06-13 19:18:30:157: afs_shell * 24244 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 06-13 19:18:30:157: afs_shell * 24244 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 06-13 19:18:30:157: afs_shell * 24244 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 06-13 19:18:30:281: afs_shell * 24250 [ds:afs_client.cpp:5723] could not refresh monitor addr
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 --------------------------------------------------------------- open log.wf ------------
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 06-14 19:19:21:178: afs_shell * 7491 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 06-14 19:19:21:179: afs_shell * 7491 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 06-14 19:19:21:198: afs_shell * 7503 --------------------------------------------------------------- open log_r.2914424576.wf ------------
+WARNING: 06-14 19:19:21:565: afs_shell * 7503 [ds:adaptor_tracker.cpp:551] gethostbyname szwg-wuge-afs-httpserver0.szwg01 failed, ret:1
+WARNING: 06-14 19:19:21:604: afs_shell * 7497 --------------------------------------------------------------- open log_r.2964780800.wf ------------
+WARNING: 06-14 19:19:21:644: afs_shell * 7491 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 06-14 19:19:21:644: afs_shell * 7491 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 06-14 19:19:21:644: afs_shell * 7491 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 06-14 19:19:21:755: afs_shell * 7497 [ds:afs_client.cpp:5723] could not refresh monitor addr
+WARNING: 06-14 19:27:26:134: afs_shell * 8569 --------------------------------------------------------------- open log.wf ------------
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 06-14 19:27:26:135: afs_shell * 8569 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 06-14 19:27:26:136: afs_shell * 8569 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 06-14 19:27:26:136: afs_shell * 8569 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 06-14 19:27:26:136: afs_shell * 8569 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 06-14 19:27:26:136: afs_shell * 8569 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 06-14 19:27:26:154: afs_shell * 8581 --------------------------------------------------------------- open log_r.3581470464.wf ------------
+WARNING: 06-14 19:27:26:528: afs_shell * 8581 [ds:adaptor_tracker.cpp:551] gethostbyname szwg-wuge-afs-httpserver0.szwg01 failed, ret:1
+WARNING: 06-14 19:27:26:560: afs_shell * 8575 --------------------------------------------------------------- open log_r.3631826688.wf ------------
+WARNING: 06-14 19:27:26:601: afs_shell * 8569 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 06-14 19:27:26:601: afs_shell * 8569 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 06-14 19:27:26:601: afs_shell * 8569 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 06-14 19:27:26:703: afs_shell * 8575 [ds:afs_client.cpp:5723] could not refresh monitor addr
+WARNING: 06-17 11:28:02:426: afs_shell * 9283 --------------------------------------------------------------- open log.wf ------------
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 06-17 11:28:02:427: afs_shell * 9283 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 06-17 11:28:02:444: afs_shell * 9295 --------------------------------------------------------------- open log_r.100456192.wf ------------
+WARNING: 06-17 11:28:02:814: afs_shell * 9295 [ds:adaptor_tracker.cpp:551] gethostbyname szwg-wuge-afs-httpserver0.szwg01 failed, ret:1
+WARNING: 06-17 11:28:02:849: afs_shell * 9289 --------------------------------------------------------------- open log_r.150812416.wf ------------
+WARNING: 06-17 11:28:02:876: afs_shell * 9283 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 06-17 11:28:02:876: afs_shell * 9283 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 06-17 11:28:02:876: afs_shell * 9283 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 06-17 11:28:03:019: afs_shell * 9289 [ds:afs_client.cpp:5723] could not refresh monitor addr
+WARNING: 06-17 16:35:45:105: afs_shell * 8480 --------------------------------------------------------------- open log.wf ------------
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 06-17 16:35:45:106: afs_shell * 8480 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 06-17 16:35:45:124: afs_shell * 8492 --------------------------------------------------------------- open log_r.1671800576.wf ------------
+WARNING: 06-17 16:35:45:478: afs_shell * 8492 [ds:adaptor_tracker.cpp:551] gethostbyname szwg-wuge-afs-httpserver0.szwg01 failed, ret:1
+WARNING: 06-17 16:35:45:529: afs_shell * 8486 --------------------------------------------------------------- open log_r.1722156800.wf ------------
+WARNING: 06-17 16:35:45:586: afs_shell * 8480 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 06-17 16:35:45:586: afs_shell * 8480 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 06-17 16:35:45:586: afs_shell * 8480 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 06-17 16:35:45:719: afs_shell * 8486 [ds:afs_client.cpp:5723] could not refresh monitor addr
+WARNING: 07-25 19:22:15:576: afs_shell * 4732 --------------------------------------------------------------- open log.wf ------------
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 07-25 19:22:15:577: afs_shell * 4732 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 07-25 19:22:15:595: afs_shell * 4744 --------------------------------------------------------------- open log_r.1283725056.wf ------------
+WARNING: 07-25 19:22:16:000: afs_shell * 4738 --------------------------------------------------------------- open log_r.1334081280.wf ------------
+WARNING: 07-25 19:22:16:040: afs_shell * 4732 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 07-25 19:22:16:040: afs_shell * 4732 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 07-25 19:22:16:040: afs_shell * 4732 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 --------------------------------------------------------------- open log.wf ------------
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 07-25 19:22:29:389: afs_shell * 4795 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 07-25 19:22:29:390: afs_shell * 4795 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 07-25 19:22:29:390: afs_shell * 4795 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 07-25 19:22:29:390: afs_shell * 4795 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 07-25 19:22:29:390: afs_shell * 4795 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 07-25 19:22:29:390: afs_shell * 4795 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 07-25 19:22:29:390: afs_shell * 4795 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 07-25 19:22:29:390: afs_shell * 4795 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 07-25 19:22:29:406: afs_shell * 4807 --------------------------------------------------------------- open log_r.1648039680.wf ------------
+WARNING: 07-25 19:22:29:811: afs_shell * 4801 --------------------------------------------------------------- open log_r.1698395904.wf ------------
+WARNING: 07-25 19:22:29:831: afs_shell * 4795 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 07-25 19:22:29:831: afs_shell * 4795 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 07-25 19:22:29:831: afs_shell * 4795 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 07-25 19:22:58:229: afs_shell * 4882 --------------------------------------------------------------- open log.wf ------------
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 07-25 19:22:58:230: afs_shell * 4882 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 07-25 19:22:58:248: afs_shell * 4894 --------------------------------------------------------------- open log_r.1849403136.wf ------------
+WARNING: 07-25 19:22:58:653: afs_shell * 4888 --------------------------------------------------------------- open log_r.1899759360.wf ------------
+WARNING: 07-25 19:22:58:693: afs_shell * 4882 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 07-25 19:22:58:693: afs_shell * 4882 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 07-25 19:22:58:693: afs_shell * 4882 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 07-25 19:27:12:735: afs_shell * 5231 --------------------------------------------------------------- open log.wf ------------
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 07-25 19:27:12:736: afs_shell * 5231 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 07-25 19:27:12:752: afs_shell * 5243 --------------------------------------------------------------- open log_r.2547189504.wf ------------
+WARNING: 07-25 19:27:13:157: afs_shell * 5237 --------------------------------------------------------------- open log_r.2597545728.wf ------------
+WARNING: 07-25 19:27:13:201: afs_shell * 5231 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 07-25 19:27:13:201: afs_shell * 5231 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 07-25 19:27:13:201: afs_shell * 5231 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 07-25 19:27:26:751: afs_shell * 5299 --------------------------------------------------------------- open log.wf ------------
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 07-25 19:27:26:752: afs_shell * 5299 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 07-25 19:27:26:769: afs_shell * 5311 --------------------------------------------------------------- open log_r.622962432.wf ------------
+WARNING: 07-25 19:27:27:175: afs_shell * 5305 --------------------------------------------------------------- open log_r.673318656.wf ------------
+WARNING: 07-25 19:27:27:195: afs_shell * 5299 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 07-25 19:27:27:195: afs_shell * 5299 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 07-25 19:27:27:195: afs_shell * 5299 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 07-25 19:27:33:447: afs_shell * 5353 --------------------------------------------------------------- open log.wf ------------
+WARNING: 07-25 19:27:33:447: afs_shell * 5353 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 07-25 19:27:33:447: afs_shell * 5353 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 07-25 19:27:33:447: afs_shell * 5353 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 07-25 19:27:33:447: afs_shell * 5353 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 07-25 19:27:33:447: afs_shell * 5353 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 07-25 19:27:33:447: afs_shell * 5353 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 07-25 19:27:33:447: afs_shell * 5353 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 07-25 19:27:33:447: afs_shell * 5353 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 07-25 19:27:33:448: afs_shell * 5353 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 07-25 19:27:33:464: afs_shell * 5365 --------------------------------------------------------------- open log_r.3743573760.wf ------------
+WARNING: 07-25 19:27:33:869: afs_shell * 5359 --------------------------------------------------------------- open log_r.3793929984.wf ------------
+WARNING: 07-25 19:27:33:909: afs_shell * 5353 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 07-25 19:27:33:909: afs_shell * 5353 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 07-25 19:27:33:909: afs_shell * 5353 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 07-25 19:27:43:431: afs_shell * 5422 --------------------------------------------------------------- open log.wf ------------
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 07-25 19:27:43:432: afs_shell * 5422 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 07-25 19:27:43:449: afs_shell * 5434 --------------------------------------------------------------- open log_r.301455104.wf ------------
+WARNING: 07-25 19:27:43:854: afs_shell * 5428 --------------------------------------------------------------- open log_r.351811328.wf ------------
+WARNING: 07-25 19:27:43:895: afs_shell * 5422 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 07-25 19:27:43:895: afs_shell * 5422 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 07-25 19:27:43:895: afs_shell * 5422 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used
+WARNING: 07-25 19:28:13:999: afs_shell * 5507 --------------------------------------------------------------- open log.wf ------------
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:86] Config [SeparateAfsLog] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:96] Config [AdaptorTrackerInterval] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:97] Config [ClientThreads] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:98] Config [AsyncWorkerThreads] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:100] Config [UserReportInterval] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:101] Config [BvarWindowSize] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:102] Config [DirInfoCacheTimeout] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:103] Config [PrintKylinLog] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:104] Config [InodeCacheCapacity] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:105] Config [InodeCacheExpireTime] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:106] Config [ReadUncommitted] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:107] Config [UseBvar] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:108] Config [OpenAuditLog] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:109] Config [AuditCheckInterval] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:110] Config [AuditMaxPendingReqs] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:111] Config [AuditSplitSize] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:112] Config [AuditSplitTimeout] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:113] Config [AuditStopTimeout] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:114] Config [AuditRetryTimeout] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:115] Config [BatchGetLocsToken] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:118] ==================load ESP config========================
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:config.cpp:135] Config [Interface] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:config.cpp:136] Config [Interfaces] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:config.cpp:145] Config [PortType] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:config.cpp:152] Config [MaxFlowMB] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:config.cpp:154] Config [IPTOS] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:config.cpp:155] Config [EnableBlockClose] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:config.cpp:156] Config [DataPercent] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:config.cpp:157] Config [ControlPercent] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:config.cpp:159] Config [IoThreads] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:121] ==================load BlockService config========================
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:55] Config [AvotonActiveTime] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:56] Config [PrintPacketChecksum] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:60] Config [RecoveryWait] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:66] Config [ChooseLocal] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:67] Config [ReadPacketSize] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:68] Config [WriteSpeed] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:69] Config [ReadSpeed] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:73] Config [MaxSealCount] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:74] Config [SealCountPeriod] not exist, default value is used
+WARNING: 07-25 19:28:14:000: afs_shell * 5507 [ds:client_config.cpp:75] Config [SealPercent] not exist, default value is used
+WARNING: 07-25 19:28:14:017: afs_shell * 5519 --------------------------------------------------------------- open log_r.380094208.wf ------------
+WARNING: 07-25 19:28:14:422: afs_shell * 5513 --------------------------------------------------------------- open log_r.430450432.wf ------------
+WARNING: 07-25 19:28:14:463: afs_shell * 5507 [ds:afs_shell.cpp:199] ==================load Create config========================
+WARNING: 07-25 19:28:14:463: afs_shell * 5507 [ds:afs_shell.cpp:200] ==================load Write config========================
+WARNING: 07-25 19:28:14:463: afs_shell * 5507 [ds:config.cpp:210] Config [NumMemoryReplica] not exist, default value is used

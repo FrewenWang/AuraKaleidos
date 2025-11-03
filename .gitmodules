@@ -1,0 +1,4 @@
+[submodule "FantasyCXX/3rdparty"]
+	path = FantasyCXX/3rdparty
+	url = git@github.com:FrewenWang/3rdparty.git
+	branch = main

@@ -143,54 +143,54 @@ buildTarget(){
         cmake    -D TARGET_OS=android \
                  -D TARGET_ARCH=armeabi-v7a \
                  -D ANDROID_ABI=armeabi-v7a \
-                 -D ANDROID_PLATFORM=$ANDROID_PLATFORM \
+                 -D ANDROID_PLATFORM="$ANDROID_PLATFORM" \
                  -D ANDROID_ARM_NEON=ON \
                  -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
-                 -D PRODUCTION=$BUILD_PRODUCTION \
-                 -D SOC_VENDOR=$BUILD_SOC_VENDOR \
-                 -D CMAKE_TOOLCHAIN_FILE=$TARGET_TOOLCHAIN \
+                 -D PRODUCTION="$BUILD_PRODUCTION" \
+                 -D SOC_VENDOR="$BUILD_SOC_VENDOR" \
+                 -D CMAKE_TOOLCHAIN_FILE="$TARGET_TOOLCHAIN" \
                  -D CMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
-                 $BUILD_CMAKE_ARGS \
+                 "$BUILD_CMAKE_ARGS" \
                  ../..
     elif [ "$TARGET" = "android-arm64-v8a" ]; then
          cmake   -D TARGET_OS=android \
                  -D TARGET_ARCH=arm64-v8a \
                  -D ANDROID_ABI=arm64-v8a \
-                 -D ANDROID_PLATFORM=$ANDROID_PLATFORM \
+                 -D ANDROID_PLATFORM="$ANDROID_PLATFORM" \
                  -D ANDROID_ARM_NEON=ON \
                  -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
-                 -D PRODUCTION=$BUILD_PRODUCTION \
-                 -D SOC_VENDOR=$BUILD_SOC_VENDOR \
-                 -D CMAKE_TOOLCHAIN_FILE=$TARGET_TOOLCHAIN \
+                 -D PRODUCTION="$BUILD_PRODUCTION" \
+                 -D SOC_VENDOR="$BUILD_SOC_VENDOR" \
+                 -D CMAKE_TOOLCHAIN_FILE="$TARGET_TOOLCHAIN" \
                  -D CMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
-                 $BUILD_CMAKE_ARGS \
+                 "$BUILD_CMAKE_ARGS" \
                  ../..
     elif [ "$TARGET" = "windows-x86_64" ]; then
          cmake   -D TARGET_OS=osx \
                  -D TARGET_ARCH=x86_64 \
                  -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
-                 -D PRODUCTION=$BUILD_PRODUCTION \
-                 -D SOC_VENDOR=$BUILD_SOC_VENDOR \
+                 -D PRODUCTION="$BUILD_PRODUCTION" \
+                 -D SOC_VENDOR="$BUILD_SOC_VENDOR" \
                  -D CMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
-                 $BUILD_CMAKE_ARGS \
+                 "$BUILD_CMAKE_ARGS" \
                  ../..
     elif [ "$TARGET" = "linux-x86_64" ]; then
          cmake   -D TARGET_OS=linux \
                  -D TARGET_ARCH=x86_64 \
                  -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
-                 -D PRODUCTION=$BUILD_PRODUCTION \
-                 -D SOC_VENDOR=$BUILD_SOC_VENDOR \
+                 -D PRODUCTION="$BUILD_PRODUCTION" \
+                 -D SOC_VENDOR="$BUILD_SOC_VENDOR" \
                  -D CMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
-                 $BUILD_CMAKE_ARGS \
+                 "$BUILD_CMAKE_ARGS" \
                  ../..
     elif [ "$TARGET" = "mac-x86_64" ]; then
          cmake   -D TARGET_OS=mac \
                  -D TARGET_ARCH=x86_64 \
                  -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
-                 -D PRODUCTION=$BUILD_PRODUCTION \
-                 -D SOC_VENDOR=$BUILD_SOC_VENDOR \
-                 -D CMAKE_TOOLCHAIN_FILE=$TARGET_TOOLCHAIN \
-                 $BUILD_CMAKE_ARGS \
+                 -D PRODUCTION="$BUILD_PRODUCTION" \
+                 -D SOC_VENDOR="$BUILD_SOC_VENDOR" \
+                 -D CMAKE_TOOLCHAIN_FILE="$TARGET_TOOLCHAIN" \
+                 "$BUILD_CMAKE_ARGS" \
                  ../..
     fi
 

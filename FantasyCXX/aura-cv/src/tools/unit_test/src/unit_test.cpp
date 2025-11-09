@@ -80,7 +80,7 @@ UnitTest* UnitTest::GetInstance()
 }
 
 Status UnitTest::Initialize(Context *ctx, const std::string &data_path, const std::string &dump_path, const std::string &report_type,
-                            const std::string &report_name, MI_S32 stress_count, MI_S32 enable_mem_profiling)
+                            const std::string &report_name, DT_S32 stress_count, DT_S32 enable_mem_profiling)
 {
     m_ctx = ctx;
     m_data_path = data_path;
@@ -102,7 +102,7 @@ Status UnitTest::Initialize(Context *ctx, const std::string &data_path, const st
 
     m_stress_count         = stress_count;
     m_enable_mem_profiling = enable_mem_profiling;
-    m_initialized          = MI_TRUE;
+    m_initialized          = DT_TRUE;
 
     return Status::OK;
 }
@@ -120,22 +120,22 @@ std::shared_ptr<UnitTestReport> UnitTest::GetReport()
 std::shared_ptr<TestCase> UnitTest::RegisterTestCase(std::shared_ptr<TestCase> test_case, const std::string &module,
                                                      const std::string &interface, const std::string &impl)
 {
-    if (MI_NULL == test_case)
+    if (DT_NULL == test_case)
     {
         AURA_LOGE(m_ctx, AURA_TAG, "RegisterTestCase failed: test_case is nullptr.\n", module.c_str(), interface.c_str(), impl.c_str());
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (module.empty() && interface.empty() && impl.empty())
     {
         AURA_LOGE(m_ctx, AURA_TAG, "UnitTest::RegisterTestCase failed: module interface impl all empty.\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (this->m_case_map.count(test_case->GetName()) > 0)
     {
         AURA_LOGE(m_ctx, AURA_TAG, "UnitTest::RegisterTestCase failed: duplicate case_name[%s].\n", test_case->GetName().c_str());
-        return MI_NULL;
+        return DT_NULL;
     }
     else
     {
@@ -195,7 +195,7 @@ std::vector<std::string> UnitTest::GetTestCases(const std::vector<std::string> &
 
     std::vector<std::string> all_names = this->GetTestCases();
 
-    std::unordered_map<std::string, MI_S32> cases_map;
+    std::unordered_map<std::string, DT_S32> cases_map;
 
     for (const auto &it : all_names)
     {
@@ -220,7 +220,7 @@ std::vector<std::string> UnitTest::GetTestCases(const std::vector<std::string> &
 
     for (const auto &name : cases_map)
     {
-        if (static_cast<MI_S32>(keywords.size()) == name.second)
+        if (static_cast<DT_S32>(keywords.size()) == name.second)
         {
             result.push_back(name.first);
         }
@@ -273,7 +273,7 @@ Status UnitTest::Run(const std::vector<std::string> &case_names)
 
 Status UnitTest::Record(const std::string &info)
 {
-    if (!this->m_initialized || !this->m_ctx || MI_NULL == this->m_report)
+    if (!this->m_initialized || !this->m_ctx || DT_NULL == this->m_report)
     {
         return Status::ERROR;
     }
@@ -293,7 +293,7 @@ Status UnitTest::Record(const std::string &info)
 
 Status UnitTest::PrintReportBrief() const
 {
-    if (MI_NULL == this->m_report)
+    if (DT_NULL == this->m_report)
     {
         return Status::ERROR;
     }
@@ -306,7 +306,7 @@ Status UnitTest::PrintReportBrief() const
 
 Status UnitTest::PrintReportVerbose() const
 {
-    if (MI_NULL == this->m_report)
+    if (DT_NULL == this->m_report)
     {
         return Status::ERROR;
     }
@@ -334,7 +334,7 @@ Status UnitTest::Report(const std::string &destination)
     }
 }
 
-AURA_VOID UnitTestReport::Record(const std::string &info, std::shared_ptr<TestCase> test_case)
+DT_VOID UnitTestReport::Record(const std::string &info, std::shared_ptr<TestCase> test_case)
 {
     std::string round_info = info.empty() ? "" : info;
 
@@ -357,7 +357,7 @@ AURA_VOID UnitTestReport::Record(const std::string &info, std::shared_ptr<TestCa
     }
 }
 
-AURA_VOID UnitTestReport::Clear()
+DT_VOID UnitTestReport::Clear()
 {
     this->m_result.clear();
 }
@@ -375,9 +375,9 @@ std::string UnitTestReport::GetBriefString() const
     sstream << GetTestModeString();
     for (const auto &unit_test_result : this->m_result)
     {
-        MI_S32 num_tested = 0;
-        MI_S32 num_passed = 0;
-        MI_S32 num_failed = 0;
+        DT_S32 num_tested = 0;
+        DT_S32 num_passed = 0;
+        DT_S32 num_failed = 0;
 
         for (const auto &case_result : unit_test_result.second)
         {
@@ -406,14 +406,14 @@ std::string UnitTestReport::GetBriefString() const
     return sstream.str();
 }
 
-AURA_VOID UnitTestReport::PrintBrief() const
+DT_VOID UnitTestReport::PrintBrief() const
 {
     std::cout << GetBriefString() << std::endl;
 }
 
-std::string UnitTestReportText::GetReportString(MI_BOOL with_color)
+std::string UnitTestReportText::GetReportString(DT_BOOL with_color)
 {
-    const MI_S32 default_line_width = 86;
+    const DT_S32 default_line_width = 86;
 
     std::stringstream report_stream;
 
@@ -441,9 +441,9 @@ std::string UnitTestReportText::GetReportString(MI_BOOL with_color)
         }
 
         /// Used for brief report
-        MI_S32 num_tested = 0;
-        MI_S32 num_passed = 0;
-        MI_S32 num_failed = 0;
+        DT_S32 num_tested = 0;
+        DT_S32 num_passed = 0;
+        DT_S32 num_failed = 0;
         std::stringstream brief_stream;
         brief_stream << std::setiosflags(std::ios::left);
 
@@ -603,9 +603,9 @@ Status UnitTestReportText::Report(const std::string &destination)
     return Status::OK;
 }
 
-AURA_VOID UnitTestReportText::PrintVerbose()
+DT_VOID UnitTestReportText::PrintVerbose()
 {
-    std::cout << this->GetReportString(MI_TRUE) << std::endl;
+    std::cout << this->GetReportString(DT_TRUE) << std::endl;
 }
 
 Status UnitTestReportJson::Report(const std::string &destination)
@@ -684,7 +684,7 @@ Status UnitTestReportJson::Report(const std::string &destination)
     return Status::OK;
 }
 
-AURA_VOID UnitTestReportJson::PrintVerbose()
+DT_VOID UnitTestReportJson::PrintVerbose()
 {
     return;
 }

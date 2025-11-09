@@ -68,7 +68,7 @@ namespace aura
 namespace xtensa
 {
 
-using TileManager = AURA_VOID*;
+using TileManager = DT_VOID*;
 
 /**
  * @brief Enumeration representing different border types.
@@ -145,7 +145,7 @@ enum class ElemType
  *         If a writing error occurs, the error indicator (ferror) is set and a negative number is returned.
  *
  */
-MI_S32 Print(const MI_CHAR *format, ...);
+DT_S32 Print(const DT_CHAR *format, ...);
 
 /**
  * @brief Invalidates the cache lines in the specified memory region.
@@ -153,7 +153,7 @@ MI_S32 Print(const MI_CHAR *format, ...);
  * @param addr  Pointer to the start of the memory region.
  * @param size  The size of the memory region in bytes.
  */
-AURA_VOID DCacheInvalidate(const AURA_VOID *addr, MI_U32 size);
+DT_VOID DCacheInvalidate(const DT_VOID *addr, DT_U32 size);
 
 /**
  * @brief Writes back the cache lines in the specified region.
@@ -161,7 +161,7 @@ AURA_VOID DCacheInvalidate(const AURA_VOID *addr, MI_U32 size);
  * @param addr  Pointer to the start of the memory region.
  * @param size  The size of the memory region in bytes.
  */
-AURA_VOID DCacheWriteback(const AURA_VOID *addr, MI_U32 size);
+DT_VOID DCacheWriteback(const DT_VOID *addr, DT_U32 size);
 
 /**
  *
@@ -174,7 +174,7 @@ AURA_VOID DCacheWriteback(const AURA_VOID *addr, MI_U32 size);
  *         If the function failed to allocate the requested block of memory, a null pointer is returned.
  *
  */
-AURA_VOID* Malloc(size_t size);
+DT_VOID* Malloc(size_t size);
 
 /**
  *
@@ -183,10 +183,10 @@ AURA_VOID* Malloc(size_t size);
  *
  * @param tile_num Pointer to a memory block previously allocated with malloc, calloc or realloc.
  *
- * @return AURA_VOID.
+ * @return DT_VOID.
  *
  */
-AURA_VOID Free(AURA_VOID *data);
+DT_VOID Free(DT_VOID *data);
 
 /**
  *
@@ -200,7 +200,7 @@ AURA_VOID Free(AURA_VOID *data);
  * @return dst is returned.
  *
  */
-AURA_VOID* Memcpy(AURA_VOID *dst, const AURA_VOID *src, size_t size);
+DT_VOID* Memcpy(DT_VOID *dst, const DT_VOID *src, size_t size);
 
 /**
  *
@@ -215,7 +215,7 @@ AURA_VOID* Memcpy(AURA_VOID *dst, const AURA_VOID *src, size_t size);
  * @return data is returned.
  *
  */
-AURA_VOID* Memset(AURA_VOID *data, MI_S32 value, size_t size);
+DT_VOID* Memset(DT_VOID *data, DT_S32 value, size_t size);
 
 /**
  *
@@ -229,7 +229,7 @@ AURA_VOID* Memset(AURA_VOID *data, MI_S32 value, size_t size);
  * @return destination is returned.
  *
  */
-AURA_VOID* Memmove(AURA_VOID *dst, const AURA_VOID *src, size_t size);
+DT_VOID* Memmove(DT_VOID *dst, const DT_VOID *src, size_t size);
 
 /**
  *
@@ -244,7 +244,7 @@ AURA_VOID* Memmove(AURA_VOID *dst, const AURA_VOID *src, size_t size);
  *         |  >0  | the first character that does not match has a greater value in str1 than in str2    |
  *
  */
-MI_S32 Strcmp(const MI_CHAR *str1, const MI_CHAR *str2);
+DT_S32 Strcmp(const DT_CHAR *str1, const DT_CHAR *str2);
 
 /**
  *
@@ -255,7 +255,7 @@ MI_S32 Strcmp(const MI_CHAR *str1, const MI_CHAR *str2);
  * @return The length of string.
  *
  */
-size_t Strlen(const MI_CHAR *str);
+size_t Strlen(const DT_CHAR *str);
 
 /**
  *
@@ -268,7 +268,7 @@ size_t Strlen(const MI_CHAR *str);
  * @return destination is returned.
  *
  */
-MI_CHAR* Strcpy(MI_CHAR *dst, const MI_CHAR *src);
+DT_CHAR* Strcpy(DT_CHAR *dst, const DT_CHAR *src);
 
 
 /**
@@ -283,7 +283,7 @@ MI_CHAR* Strcpy(MI_CHAR *dst, const MI_CHAR *src);
  *         or a null pointer if the sequence is not present in src1.
  *
  */
-const MI_CHAR* Strstr(const MI_CHAR *str1, const MI_CHAR *str2);
+const DT_CHAR* Strstr(const DT_CHAR *str1, const DT_CHAR *str2);
 
 } // namespace xtensa
 } // namespace aura

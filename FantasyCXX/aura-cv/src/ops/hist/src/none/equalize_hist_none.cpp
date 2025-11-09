@@ -5,20 +5,20 @@
 namespace aura
 {
 
-static Status EqualizeHistCalcHistNoneImpl(const Mat &src, MI_S32 *hist, std::mutex &hist_mutex, MI_S32 start_row, MI_S32 end_row)
+static Status EqualizeHistCalcHistNoneImpl(const Mat &src, DT_S32 *hist, std::mutex &hist_mutex, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 local_hist[256] = {0};
-    MI_S32 width           = src.GetSizes().m_width;
-    MI_S32 width_align     = width & (-4);
+    DT_S32 local_hist[256] = {0};
+    DT_S32 width           = src.GetSizes().m_width;
+    DT_S32 width_align     = width & (-4);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += 4)
         {
-            MI_U8 val0, val1, val2, val3;
+            DT_U8 val0, val1, val2, val3;
 
             val0 = src_row[x];
             val1 = src_row[x + 1];
@@ -38,7 +38,7 @@ static Status EqualizeHistCalcHistNoneImpl(const Mat &src, MI_S32 *hist, std::mu
     }
 
     std::lock_guard<std::mutex> guard(hist_mutex);
-    for (MI_S32 i = 0; i < 256; i++)
+    for (DT_S32 i = 0; i < 256; i++)
     {
         hist[i] += local_hist[i];
     }
@@ -46,20 +46,20 @@ static Status EqualizeHistCalcHistNoneImpl(const Mat &src, MI_S32 *hist, std::mu
     return Status::OK;
 }
 
-static Status EqualizeHistLutNoneImpl(const Mat &src, Mat &dst, MI_U8 *lut, MI_S32 start_row, MI_S32 end_row)
+static Status EqualizeHistLutNoneImpl(const Mat &src, Mat &dst, DT_U8 *lut, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width       = src.GetSizes().m_width;
-    MI_S32 width_align = width & (-4);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_S32 width       = src.GetSizes().m_width;
+    DT_S32 width_align = width & (-4);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8 *dst_row       = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8 *dst_row       = dst.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += 4)
         {
-            MI_U8 val0, val1, val2, val3;
-            MI_U8 lut0, lut1, lut2, lut3;
+            DT_U8 val0, val1, val2, val3;
+            DT_U8 lut0, lut1, lut2, lut3;
 
             val0 = src_row[x];
             val1 = src_row[x + 1];
@@ -115,30 +115,30 @@ Status EqualizeHistNone::Run()
     const Mat *src = dynamic_cast<const Mat *>(m_src);
     Mat *dst = dynamic_cast<Mat *>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return ret;
     }
 
-    MI_S32 height = src->GetSizes().m_height;
-    MI_S32 width  = src->GetSizes().m_width;
-    MI_S32 total  = height * width;
+    DT_S32 height = src->GetSizes().m_height;
+    DT_S32 width  = src->GetSizes().m_width;
+    DT_S32 total  = height * width;
 
-    MI_S32 hist[256] = {0};
-    MI_U8 lut[256]   = {0};
+    DT_S32 hist[256] = {0};
+    DT_U8 lut[256]   = {0};
 
     std::mutex hist_mutex;
     if (m_target.m_data.none.enable_mt)
     {
         WorkerPool *wp = m_ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetWorkerPool failed");
             return ret;
         }
 
-        if (wp->ParallelFor(static_cast<MI_S32>(0), height, EqualizeHistCalcHistNoneImpl, std::cref(*src), hist, std::ref(hist_mutex)) != Status::OK)
+        if (wp->ParallelFor(static_cast<DT_S32>(0), height, EqualizeHistCalcHistNoneImpl, std::cref(*src), hist, std::ref(hist_mutex)) != Status::OK)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "ParallelFor run EqualizeHistCalcHist failed");
             return ret;
@@ -146,7 +146,7 @@ Status EqualizeHistNone::Run()
     }
     else
     {
-        if (EqualizeHistCalcHistNoneImpl(*src, hist, hist_mutex, static_cast<MI_S32>(0), height) != Status::OK)
+        if (EqualizeHistCalcHistNoneImpl(*src, hist, hist_mutex, static_cast<DT_S32>(0), height) != Status::OK)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "ParallelFor run EqualizeHistCalcHist failed");
             return ret;
@@ -154,7 +154,7 @@ Status EqualizeHistNone::Run()
     }
 
 
-    MI_S32 idx = 0;
+    DT_S32 idx = 0;
     while (!hist[idx])
     {
         idx++;
@@ -166,24 +166,24 @@ Status EqualizeHistNone::Run()
         return Status::OK;
     }
 
-    MI_F32 scale = (256 - 1.f) / (total - hist[idx]);
-    MI_S32 sum   = 0;
+    DT_F32 scale = (256 - 1.f) / (total - hist[idx]);
+    DT_S32 sum   = 0;
     for (lut[idx++] = 0; idx < 256; idx++)
     {
         sum     += hist[idx];
-        lut[idx] = SaturateCast<MI_U8>(sum * scale);
+        lut[idx] = SaturateCast<DT_U8>(sum * scale);
     }
 
     if (m_target.m_data.none.enable_mt)
     {
         WorkerPool *wp = m_ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetWorkerPool failed");
             return ret;
         }
 
-        if (wp->ParallelFor(static_cast<MI_S32>(0), height, EqualizeHistLutNoneImpl, std::cref(*src), std::ref(*dst), lut) != Status::OK)
+        if (wp->ParallelFor(static_cast<DT_S32>(0), height, EqualizeHistLutNoneImpl, std::cref(*src), std::ref(*dst), lut) != Status::OK)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "ParallelFor run EqualizeHistLutNoneImpl failed");
             return ret;
@@ -191,7 +191,7 @@ Status EqualizeHistNone::Run()
     }
     else
     {
-        if (EqualizeHistLutNoneImpl(*src, *dst, lut, static_cast<MI_S32>(0), height) != Status::OK)
+        if (EqualizeHistLutNoneImpl(*src, *dst, lut, static_cast<DT_S32>(0), height) != Status::OK)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "EqualizeHistLutNoneImpl run failed");
             return ret;

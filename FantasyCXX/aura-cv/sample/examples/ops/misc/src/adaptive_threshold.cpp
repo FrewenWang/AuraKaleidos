@@ -26,10 +26,10 @@ aura::Status AdaptiveThresholdSampleTest(aura::Context *ctx, aura::TargetType ty
     }
 
     // set interface parameters
-    MI_F32 max_val     = 255.0f;
-    MI_S32 thresh_type = AURA_THRESH_BINARY;
-    MI_S32 blocksize   = 3;
-    MI_F32 delta       = 5.0f;
+    DT_F32 max_val     = 255.0f;
+    DT_S32 thresh_type = AURA_THRESH_BINARY;
+    DT_S32 blocksize   = 3;
+    DT_F32 delta       = 5.0f;
     auto method        = aura::AdaptiveThresholdMethod::ADAPTIVE_THRESH_MEAN_C;
 
     // ---------------------

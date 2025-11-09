@@ -48,12 +48,12 @@ Integral::Integral(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Integral::SetArgs(const Array *src, Array *dst, Array *dst_sq)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -81,14 +81,14 @@ Status Integral::SetArgs(const Array *src, Array *dst, Array *dst_sq)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateIntegralImpl(m_ctx, impl_target);
     }
 
     // run initialize
     IntegralImpl *integral_impl = dynamic_cast<IntegralImpl *>(m_impl.get());
-    if (MI_NULL == integral_impl)
+    if (DT_NULL == integral_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "integral_impl is null ptr");
         return Status::ERROR;
@@ -108,30 +108,30 @@ AURA_EXPORTS Status IIntegral(Context *ctx, const Mat &src, Mat &dst, Mat &dst_s
     else if (dst.IsValid())
     {
         Integral integral(ctx, target);
-        return OpCall(ctx, integral, &src, &dst, MI_NULL);
+        return OpCall(ctx, integral, &src, &dst, DT_NULL);
     }
     else if (dst_sq.IsValid())
     {
         Integral integral(ctx, target);
-        return OpCall(ctx, integral, &src, MI_NULL, &dst_sq);
+        return OpCall(ctx, integral, &src, DT_NULL, &dst_sq);
     }
 
     return Status::ERROR;
 }
 
 IntegralImpl::IntegralImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Integral", target),
-                                                                   m_src(MI_NULL), m_dst(MI_NULL),
-                                                                   m_dst_sq(MI_NULL)
+                                                                   m_src(DT_NULL), m_dst(DT_NULL),
+                                                                   m_dst_sq(DT_NULL)
 {}
 
 Status IntegralImpl::SetArgs(const Array *src, Array *dst, Array *dst_sq)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -155,7 +155,7 @@ Status IntegralImpl::SetArgs(const Array *src, Array *dst, Array *dst_sq)
         return Status::ERROR;
     }
 
-    if (MI_NULL == dst && MI_NULL == dst_sq)
+    if (DT_NULL == dst && DT_NULL == dst_sq)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "both dst and dst_sq are null");
         return Status::ERROR;
@@ -181,15 +181,15 @@ std::vector<const Array*> IntegralImpl::GetInputArrays() const
 
 std::vector<const Array*> IntegralImpl::GetOutputArrays() const
 {
-    if ((m_dst != MI_NULL) && (MI_NULL == m_dst_sq))
+    if ((m_dst != DT_NULL) && (DT_NULL == m_dst_sq))
     {
         return {m_dst};
     }
-    else if ((NULL == m_dst) && (m_dst_sq != MI_NULL))
+    else if ((NULL == m_dst) && (m_dst_sq != DT_NULL))
     {
         return {m_dst_sq};
     }
-    else if ((m_dst != MI_NULL) && (m_dst_sq != MI_NULL))
+    else if ((m_dst != DT_NULL) && (m_dst_sq != DT_NULL))
     {
         return {m_dst, m_dst_sq};
     }
@@ -209,7 +209,7 @@ std::string IntegralImpl::ToString() const
     return str;
 }
 
-AURA_VOID IntegralImpl::Dump(const std::string &prefix) const
+DT_VOID IntegralImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

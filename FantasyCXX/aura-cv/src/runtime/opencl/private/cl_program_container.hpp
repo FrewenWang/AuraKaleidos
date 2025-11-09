@@ -48,17 +48,17 @@ private:
     std::string                     m_aura_version;
     std::string                     m_external_version;
 
-    std::unordered_map<MI_U32, std::shared_ptr<CLProgram>> m_cl_programs_list;
-    MI_BOOL    m_cache_header_valid;
-    MI_BOOL    m_is_update_cache;
+    std::unordered_map<DT_U32, std::shared_ptr<CLProgram>> m_cl_programs_list;
+    DT_BOOL    m_cache_header_valid;
+    DT_BOOL    m_is_update_cache;
     std::mutex m_container_mutex;
 
 private:
     std::shared_ptr<cl::Program> BuildProgramFromSource(const std::string &name,
                                                         const std::string &source,
                                                         const CLProgramType type,
-                                                        MI_U32 hash_value,
-                                                        MI_U32 crc_value,
+                                                        DT_U32 hash_value,
+                                                        DT_U32 crc_value,
                                                         const std::string &build_options = std::string());
     Status Initialize();
 
@@ -69,10 +69,10 @@ private:
 
     Status EncodeBinaryCLProgram(std::string &output, EncodeProgramsType encode_type);
 
-    Status WriteBinaryFile(const std::string &fname, const std::string &str, MI_BOOL is_append_flag);
+    Status WriteBinaryFile(const std::string &fname, const std::string &str, DT_BOOL is_append_flag);
     Status WriteHppFile(const std::string &fname, const std::string &str);
 
-    MI_U32 GetHash(const std::string &str);
+    DT_U32 GetHash(const std::string &str);
 };
 
 } // namespace aura

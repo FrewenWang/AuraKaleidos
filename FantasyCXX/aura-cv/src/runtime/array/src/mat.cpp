@@ -17,11 +17,11 @@ struct BitMapFileHeader
     BitMapFileHeader() : type(0), size(0), reserved1(0), reserved2(0), offset(0)
     {}
 
-    MI_U16 type;      /* File type, must be 'BM' (0x4D42).*/
-    MI_U32 size;      /* File size in bytes. */
-    MI_U16 reserved1; /* Reserved, must be 0. */
-    MI_U16 reserved2; /* Reserved, must be 0. */
-    MI_U32 offset;    /* Offset from the beginning of the file to the bitmap data. */
+    DT_U16 type;      /* File type, must be 'BM' (0x4D42).*/
+    DT_U32 size;      /* File size in bytes. */
+    DT_U16 reserved1; /* Reserved, must be 0. */
+    DT_U16 reserved2; /* Reserved, must be 0. */
+    DT_U32 offset;    /* Offset from the beginning of the file to the bitmap data. */
 };
 
 /*
@@ -33,17 +33,17 @@ struct BitMapInfoHeader
                         data_sz(0), pixels_x(0), pixels_y(0), colors(0), imp_colors(0)
     {}
 
-    MI_U32 header_sz;   /* Size of this header in bytes (40 bytes). */
-    MI_S32 width;       /* Width of the bitmap in pixels. */
-    MI_S32 height;      /* Height of the bitmap in pixels. */
-    MI_U16 planes;      /* Number of color planes, must be 1. */
-    MI_U16 pixels;      /* Number of bits per pixel (1, 4, 8, 16, 24, or 32). */
-    MI_U32 compression; /* Compression method (0 = BI_RGB, no compression). */
-    MI_U32 data_sz;     /* Size of the raw bitmap data (including padding). */
-    MI_S32 pixels_x;    /* Horizontal resolution (pixels per meter). */
-    MI_S32 pixels_y;    /* Vertical resolution (pixels per meter). */
-    MI_U32 colors;      /* Number of colors in the color palette (0 = all colors). */
-    MI_U32 imp_colors;  /* Number of important colors (0 = all colors are important). */
+    DT_U32 header_sz;   /* Size of this header in bytes (40 bytes). */
+    DT_S32 width;       /* Width of the bitmap in pixels. */
+    DT_S32 height;      /* Height of the bitmap in pixels. */
+    DT_U16 planes;      /* Number of color planes, must be 1. */
+    DT_U16 pixels;      /* Number of bits per pixel (1, 4, 8, 16, 24, or 32). */
+    DT_U32 compression; /* Compression method (0 = BI_RGB, no compression). */
+    DT_U32 data_sz;     /* Size of the raw bitmap data (including padding). */
+    DT_S32 pixels_x;    /* Horizontal resolution (pixels per meter). */
+    DT_S32 pixels_y;    /* Vertical resolution (pixels per meter). */
+    DT_U32 colors;      /* Number of colors in the color palette (0 = all colors). */
+    DT_U32 imp_colors;  /* Number of important colors (0 = all colors are important). */
 };
 
 struct Pixel32
@@ -51,10 +51,10 @@ struct Pixel32
     Pixel32() : blue(0), green(0), red(0), alpha(0)
     {}
 
-    MI_U8 blue;  /* Blue color component (0-255) */
-    MI_U8 green; /* Green color component (0-255) */
-    MI_U8 red;   /* Red color component (0-255) */
-    MI_U8 alpha; /* Alpha (transparency) component (0-255); 0 means fully transparent, 255 means fully opaque */
+    DT_U8 blue;  /* Blue color component (0-255) */
+    DT_U8 green; /* Green color component (0-255) */
+    DT_U8 red;   /* Red color component (0-255) */
+    DT_U8 alpha; /* Alpha (transparency) component (0-255); 0 means fully transparent, 255 means fully opaque */
 };
 
 #pragma pack(pop)
@@ -64,7 +64,7 @@ Mat::Mat()
     m_array_type = ArrayType::MAT;
 }
 
-Mat::Mat(Context *ctx, ElemType elem_type, const Sizes3 &sizes, MI_S32 mem_type, const Sizes &strides)
+Mat::Mat(Context *ctx, ElemType elem_type, const Sizes3 &sizes, DT_S32 mem_type, const Sizes &strides)
          : Array(ctx, elem_type, sizes, strides)
 {
     m_array_type = ArrayType::MAT;
@@ -150,7 +150,7 @@ Mat::Mat(const Mat &mat, const Rect &roi)
     {
         AddRefCount(1);
 
-        MI_S32 ptr_offset = (roi.m_y * mat.m_strides.m_width) + ElemTypeSize(m_elem_type) * roi.m_x * mat.m_sizes.m_channel;
+        DT_S32 ptr_offset = (roi.m_y * mat.m_strides.m_width) + ElemTypeSize(m_elem_type) * roi.m_x * mat.m_sizes.m_channel;
 
         m_sizes.m_channel = mat.m_sizes.m_channel;
         m_sizes.m_width   = (0 == m_sizes.m_width ) ? (mat.m_sizes.m_width  - roi.m_x) : m_sizes.m_width;
@@ -180,9 +180,9 @@ Mat::~Mat()
     Release();
 }
 
-AURA_VOID Mat::Release()
+DT_VOID Mat::Release()
 {
-    if (m_refcount != MI_NULL)
+    if (m_refcount != DT_NULL)
     {
         if (AddRefCount(-1) == 0)
         {
@@ -217,12 +217,12 @@ Mat Mat::Roi(const Rect &roi) const
     return Mat(*this, roi);
 }
 
-Mat Mat::RowRange(MI_S32 start, MI_S32 end) const
+Mat Mat::RowRange(DT_S32 start, DT_S32 end) const
 {
     return Mat(*this, Rect(0, start, m_sizes.m_width, end - start));
 }
 
-Mat Mat::ColRange(MI_S32 start, MI_S32 end) const
+Mat Mat::ColRange(DT_S32 start, DT_S32 end) const
 {
     return Mat(*this, Rect(start, 0, end - start, m_sizes.m_height));
 }
@@ -253,11 +253,11 @@ Mat Mat::Clone(const Rect &roi, const Sizes &strides) const
     Mat mat(m_ctx, m_elem_type, Sizes3(roi.Size(), m_sizes.m_channel), m_buffer.m_type, strides);
     if (mat.IsValid())
     {
-        const MI_S32 copy_bytes = ElemTypeSize(m_elem_type) * roi.m_width * m_sizes.m_channel;
-        const MI_S32 col_off    = ElemTypeSize(m_elem_type) * roi.m_x * m_sizes.m_channel;
-        for (MI_S32 h = 0; h < roi.m_height; ++h)
+        const DT_S32 copy_bytes = ElemTypeSize(m_elem_type) * roi.m_width * m_sizes.m_channel;
+        const DT_S32 col_off    = ElemTypeSize(m_elem_type) * roi.m_x * m_sizes.m_channel;
+        for (DT_S32 h = 0; h < roi.m_height; ++h)
         {
-            memcpy(mat.Ptr<AURA_VOID>(h), &(Ptr<MI_U8>(roi.m_y + h)[col_off]), copy_bytes);
+            memcpy(mat.Ptr<DT_VOID>(h), &(Ptr<DT_U8>(roi.m_y + h)[col_off]), copy_bytes);
         }
     }
 
@@ -281,10 +281,10 @@ Status Mat::CopyTo(Mat &mat) const
 
     if (IsEqual(mat))
     {
-        const MI_S32 copy_bytes = ElemTypeSize(m_elem_type) * m_sizes.m_width * m_sizes.m_channel;
-        for (MI_S32 h = 0; h < m_sizes.m_height; ++h)
+        const DT_S32 copy_bytes = ElemTypeSize(m_elem_type) * m_sizes.m_width * m_sizes.m_channel;
+        for (DT_S32 h = 0; h < m_sizes.m_height; ++h)
         {
-            memcpy(mat.Ptr<AURA_VOID>(h), Ptr<MI_U8>(h), copy_bytes);
+            memcpy(mat.Ptr<DT_VOID>(h), Ptr<DT_U8>(h), copy_bytes);
         }
         ret = Status::OK;
     }
@@ -292,32 +292,32 @@ Status Mat::CopyTo(Mat &mat) const
     return ret;
 }
 
-AURA_VOID* Mat::GetData()
+DT_VOID* Mat::GetData()
 {
     return m_buffer.m_data;
 }
 
-const AURA_VOID* Mat::GetData() const
+const DT_VOID* Mat::GetData() const
 {
     return m_buffer.m_data;
 }
 
-MI_BOOL Mat::IsValid() const
+DT_BOOL Mat::IsValid() const
 {
     return (Array::IsValid() && m_buffer.IsValid() && ArrayType::MAT == m_array_type);
 }
 
-MI_BOOL Mat::IsContinuous() const
+DT_BOOL Mat::IsContinuous() const
 {
     return (IsValid() && (m_strides.m_width == m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type)));
 }
 
-AURA_VOID Mat::Clear()
+DT_VOID Mat::Clear()
 {
     Array::Clear();
 }
 
-AURA_VOID Mat::Show() const
+DT_VOID Mat::Show() const
 {
     if (m_ctx)
     {
@@ -328,11 +328,11 @@ AURA_VOID Mat::Show() const
 }
 
 template<typename Tp>
-static Status PrintHelper(Context *ctx, const Mat &mat, MI_S32 mode, const Rect &roi, FILE *fp)
+static Status PrintHelper(Context *ctx, const Mat &mat, DT_S32 mode, const Rect &roi, FILE *fp)
 {
     Status ret = Status::ERROR;
 
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return ret;
     }
@@ -353,23 +353,23 @@ static Status PrintHelper(Context *ctx, const Mat &mat, MI_S32 mode, const Rect 
         return ret;
     }
 
-    MI_S32 start_h = roi.m_y;
-    MI_S32 start_w = roi.m_x;
-    MI_S32 len_h   = (roi.m_height <= 0) ? msize.m_height : roi.m_height;
-    MI_S32 len_w   = (roi.m_width <= 0) ? msize.m_width : roi.m_width;
-    MI_S32 cn      = msize.m_channel;
+    DT_S32 start_h = roi.m_y;
+    DT_S32 start_w = roi.m_x;
+    DT_S32 len_h   = (roi.m_height <= 0) ? msize.m_height : roi.m_height;
+    DT_S32 len_w   = (roi.m_width <= 0) ? msize.m_width : roi.m_width;
+    DT_S32 cn      = msize.m_channel;
 
-    MI_CHAR fmt[16] = {0};
+    DT_CHAR fmt[16] = {0};
     if (16 == mode)
     {
-        if ((std::is_same<Tp, MI_U8>::value) || (std::is_same<Tp, MI_U16>::value) ||
-            (std::is_same<Tp, MI_U32>::value) || (std::is_same<Tp, MI_F32>::value) ||
-            (std::is_same<Tp, MI_F64>::value))
+        if ((std::is_same<Tp, DT_U8>::value) || (std::is_same<Tp, DT_U16>::value) ||
+            (std::is_same<Tp, DT_U32>::value) || (std::is_same<Tp, DT_F32>::value) ||
+            (std::is_same<Tp, DT_F64>::value))
         {
 #if defined(AURA_BUILD_HOST)
-            snprintf(fmt, sizeof(fmt), "0x%%0%dx ", static_cast<MI_S32>(sizeof(Tp) << 1));
+            snprintf(fmt, sizeof(fmt), "0x%%0%dx ", static_cast<DT_S32>(sizeof(Tp) << 1));
 #elif defined(AURA_BUILD_HEXAGON)
-            snprintf(fmt, sizeof(fmt), "0x%%0%ldx ", static_cast<MI_S32>(sizeof(Tp) << 1));
+            snprintf(fmt, sizeof(fmt), "0x%%0%ldx ", static_cast<DT_S32>(sizeof(Tp) << 1));
 #endif
         }
         else
@@ -379,27 +379,27 @@ static Status PrintHelper(Context *ctx, const Mat &mat, MI_S32 mode, const Rect 
     }
     else if (10 == mode)
     {
-        if (std::is_same<Tp, MI_F32>::value)
+        if (std::is_same<Tp, DT_F32>::value)
         {
             snprintf(fmt, sizeof(fmt), "%%.6f ");
         }
-        else if (std::is_same<Tp, MI_F64>::value)
+        else if (std::is_same<Tp, DT_F64>::value)
         {
             snprintf(fmt, sizeof(fmt), "%%.8lf ");
         }
-        else if (std::is_same<Tp, MI_U8>::value)
+        else if (std::is_same<Tp, DT_U8>::value)
         {
             snprintf(fmt, sizeof(fmt), "%%3d ");
         }
-        else if (std::is_same<Tp, MI_S8>::value)
+        else if (std::is_same<Tp, DT_S8>::value)
         {
             snprintf(fmt, sizeof(fmt), "%%4d ");
         }
-        else if (std::is_same<Tp, MI_U16>::value)
+        else if (std::is_same<Tp, DT_U16>::value)
         {
             snprintf(fmt, sizeof(fmt), "%%5d ");
         }
-        else if (std::is_same<Tp, MI_S16>::value)
+        else if (std::is_same<Tp, DT_S16>::value)
         {
             snprintf(fmt, sizeof(fmt), "%%6d ");
         }
@@ -409,15 +409,15 @@ static Status PrintHelper(Context *ctx, const Mat &mat, MI_S32 mode, const Rect 
         }
     }
 
-    MI_CHAR str[64];
-    for (MI_S32 h = start_h; h < (start_h + len_h); ++h)
+    DT_CHAR str[64];
+    for (DT_S32 h = start_h; h < (start_h + len_h); ++h)
     {
         std::string show_str = std::string();
         const Tp *src = mat.Ptr<Tp>(h);
-        for (MI_S32 w = start_w; w < (start_w + len_w); ++w)
+        for (DT_S32 w = start_w; w < (start_w + len_w); ++w)
         {
             show_str += "[";
-            for (MI_S32 c = 0; c < cn; ++c)
+            for (DT_S32 c = 0; c < cn; ++c)
             {
                 snprintf(str, sizeof(str), fmt, src[w * cn + c]);
                 show_str += str;
@@ -439,9 +439,9 @@ static Status PrintHelper(Context *ctx, const Mat &mat, MI_S32 mode, const Rect 
     return Status::OK;
 }
 
-AURA_VOID Mat::Print(MI_S32 mode, const Rect &roi, const std::string &fname) const
+DT_VOID Mat::Print(DT_S32 mode, const Rect &roi, const std::string &fname) const
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return;
     }
@@ -454,11 +454,11 @@ AURA_VOID Mat::Print(MI_S32 mode, const Rect &roi, const std::string &fname) con
 
     Status ret = Status::ERROR;
 
-    FILE *fp = MI_NULL;
+    FILE *fp = DT_NULL;
     if (!fname.empty())
     {
         fp = fopen(fname.c_str(), "wt");
-        if (MI_NULL == fp)
+        if (DT_NULL == fp)
         {
             AURA_LOGE(m_ctx, AURA_TAG, "fname %s fopen failed\n", fname.c_str());
             return;
@@ -469,49 +469,49 @@ AURA_VOID Mat::Print(MI_S32 mode, const Rect &roi, const std::string &fname) con
     {
         case ElemType::U8:
         {
-            ret = PrintHelper<MI_U8>(m_ctx, *this, mode, roi, fp);
+            ret = PrintHelper<DT_U8>(m_ctx, *this, mode, roi, fp);
             break;
         }
 
         case ElemType::S8:
         {
-            ret = PrintHelper<MI_S8>(m_ctx, *this, mode, roi, fp);
+            ret = PrintHelper<DT_S8>(m_ctx, *this, mode, roi, fp);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = PrintHelper<MI_U16>(m_ctx, *this, mode, roi, fp);
+            ret = PrintHelper<DT_U16>(m_ctx, *this, mode, roi, fp);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = PrintHelper<MI_S16>(m_ctx, *this, mode, roi, fp);
+            ret = PrintHelper<DT_S16>(m_ctx, *this, mode, roi, fp);
             break;
         }
 
         case ElemType::U32:
         {
-            ret = PrintHelper<MI_U32>(m_ctx, *this, mode, roi, fp);
+            ret = PrintHelper<DT_U32>(m_ctx, *this, mode, roi, fp);
             break;
         }
 
         case ElemType::S32:
         {
-            ret = PrintHelper<MI_S32>(m_ctx, *this, mode, roi, fp);
+            ret = PrintHelper<DT_S32>(m_ctx, *this, mode, roi, fp);
             break;
         }
 
         case ElemType::F32:
         {
-            ret = PrintHelper<MI_F32>(m_ctx, *this, mode, roi, fp);
+            ret = PrintHelper<DT_F32>(m_ctx, *this, mode, roi, fp);
             break;
         }
 
         case ElemType::F64:
         {
-            ret = PrintHelper<MI_F64>(m_ctx, *this, mode, roi, fp);
+            ret = PrintHelper<DT_F64>(m_ctx, *this, mode, roi, fp);
             break;
         }
         default:
@@ -532,7 +532,7 @@ AURA_VOID Mat::Print(MI_S32 mode, const Rect &roi, const std::string &fname) con
     }
 }
 
-AURA_VOID Mat::Dump(const std::string &fname) const
+DT_VOID Mat::Dump(const std::string &fname) const
 {
     if (fname.empty())
     {
@@ -541,18 +541,18 @@ AURA_VOID Mat::Dump(const std::string &fname) const
     }
 
     FILE *fp = fopen(fname.c_str(), "wb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open " + fname + " failed";
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
         return;
     }
 
-    MI_S32 row_bytes = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
-    for (MI_S32 i = 0; i < m_sizes.m_height; i++)
+    DT_S32 row_bytes = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
+    for (DT_S32 i = 0; i < m_sizes.m_height; i++)
     {
-        size_t bytes = fwrite(Ptr<MI_CHAR>(i), 1, row_bytes, fp);
-        if (static_cast<MI_S32>(bytes) != row_bytes)
+        size_t bytes = fwrite(Ptr<DT_CHAR>(i), 1, row_bytes, fp);
+        if (static_cast<DT_S32>(bytes) != row_bytes)
         {
             std::string info = "fwrite size(" + std::to_string(bytes) + "," + std::to_string(row_bytes) + ") not match";
             AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -578,13 +578,13 @@ Status Mat::Load(const std::string &fname)
         return ret;
     }
 
-    MI_S32 row_bytes         = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
-    MI_S32 buffer_valid_size = m_sizes.m_height * row_bytes;
-    FILE *fp                 = MI_NULL;
-    MI_S32 file_length       = 0;
+    DT_S32 row_bytes         = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
+    DT_S32 buffer_valid_size = m_sizes.m_height * row_bytes;
+    FILE *fp                 = DT_NULL;
+    DT_S32 file_length       = 0;
 
     fp = fopen(fname.c_str(), "rb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open " + fname + " failed";
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -603,10 +603,10 @@ Status Mat::Load(const std::string &fname)
 
     fseek(fp, 0, SEEK_SET);
 
-    for (MI_S32 i = 0; i < m_sizes.m_height; i++)
+    for (DT_S32 i = 0; i < m_sizes.m_height; i++)
     {
-        size_t bytes = fread(Ptr<MI_CHAR>(i), 1, row_bytes, fp);
-        if (static_cast<MI_S32>(bytes) != row_bytes)
+        size_t bytes = fread(Ptr<DT_CHAR>(i), 1, row_bytes, fp);
+        if (static_cast<DT_S32>(bytes) != row_bytes)
         {
             std::string info = "file fread size(" + std::to_string(bytes) + "," + std::to_string(row_bytes) + ") not match";
             AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -687,7 +687,7 @@ Status GetIauraFormatSize(IauraFormat fmt, Sizes img_sizes, const Sizes &img_str
             mat_sizes.reserve(1);
             mat_strides.reserve(1);
 
-            MI_S32 pitch = img_sizes.m_width * ElemTypeSize(ElemType::U8);
+            DT_S32 pitch = img_sizes.m_width * ElemTypeSize(ElemType::U8);
             Sizes strides = img_strides.Max(Sizes(img_sizes.m_height, pitch));
 
             mat_strides.emplace_back(strides);
@@ -700,9 +700,9 @@ Status GetIauraFormatSize(IauraFormat fmt, Sizes img_sizes, const Sizes &img_str
             mat_sizes.reserve(1);
             mat_strides.reserve(1);
 
-            MI_S32 cn = 3;
+            DT_S32 cn = 3;
 
-            MI_S32 pitch = img_sizes.m_width * cn * ElemTypeSize(ElemType::U8);
+            DT_S32 pitch = img_sizes.m_width * cn * ElemTypeSize(ElemType::U8);
             Sizes strides = img_strides.Max(Sizes(img_sizes.m_height, pitch));
 
             mat_strides.emplace_back(strides);
@@ -715,9 +715,9 @@ Status GetIauraFormatSize(IauraFormat fmt, Sizes img_sizes, const Sizes &img_str
             mat_sizes.reserve(1);
             mat_strides.reserve(1);
 
-            MI_S32 cn = 4;
+            DT_S32 cn = 4;
 
-            MI_S32 pitch = img_sizes.m_width * cn * ElemTypeSize(ElemType::U8);
+            DT_S32 pitch = img_sizes.m_width * cn * ElemTypeSize(ElemType::U8);
             Sizes strides = img_strides.Max(Sizes(img_sizes.m_height, pitch));
 
             mat_strides.emplace_back(strides);
@@ -789,7 +789,7 @@ Status GetIauraFormatSize(IauraFormat fmt, Sizes img_sizes, const Sizes &img_str
             mat_sizes.reserve(2);
             mat_strides.reserve(2);
 
-            Sizes strides = img_strides.Max(Sizes(img_sizes.m_height, img_sizes.m_width * sizeof(MI_U16)));
+            Sizes strides = img_strides.Max(Sizes(img_sizes.m_height, img_sizes.m_width * sizeof(DT_U16)));
 
             mat_strides.emplace_back(strides);
             mat_strides.emplace_back(Sizes(strides.m_height / 2, strides.m_width));
@@ -880,9 +880,9 @@ Status GetIauraFormatRoi(IauraFormat fmt, const Rect &img_roi, std::vector<Rect>
     return ret;
 }
 
-Mat ReadBmp(Context *ctx, const std::string &fname, MI_S32 mem_type, const Sizes &strides)
+Mat ReadBmp(Context *ctx, const std::string &fname, DT_S32 mem_type, const Sizes &strides)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Mat();
     }
@@ -890,10 +890,10 @@ Mat ReadBmp(Context *ctx, const std::string &fname, MI_S32 mem_type, const Sizes
     BitMapFileHeader file_header;
     BitMapInfoHeader info_header;
 
-    MI_S32 buffer_valid_size = sizeof(BitMapFileHeader) + sizeof(BitMapInfoHeader);
+    DT_S32 buffer_valid_size = sizeof(BitMapFileHeader) + sizeof(BitMapInfoHeader);
 
     FILE *fp = fopen(fname.c_str(), "rb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open " + fname + " failed";
         AURA_ADD_ERROR_STRING(ctx, info.c_str());
@@ -901,7 +901,7 @@ Mat ReadBmp(Context *ctx, const std::string &fname, MI_S32 mem_type, const Sizes
     }
 
     fseek(fp, 0, SEEK_END);
-    MI_S32 file_length = ftell(fp);
+    DT_S32 file_length = ftell(fp);
 
     if (file_length < buffer_valid_size)
     {
@@ -938,9 +938,9 @@ Mat ReadBmp(Context *ctx, const std::string &fname, MI_S32 mem_type, const Sizes
         return Mat();
     }
 
-    MI_S32 height  = Abs(info_header.height);
-    MI_S32 width   = info_header.width;
-    MI_S32 channel = info_header.pixels / 8;
+    DT_S32 height  = Abs(info_header.height);
+    DT_S32 width   = info_header.width;
+    DT_S32 channel = info_header.pixels / 8;
 
     Mat mat(ctx, ElemType::U8, Sizes3(height, width, channel), mem_type, strides);
     if (!mat.IsValid())
@@ -950,8 +950,8 @@ Mat ReadBmp(Context *ctx, const std::string &fname, MI_S32 mem_type, const Sizes
         return Mat();
     }
 
-    MI_S32 row_bytes = (width * channel + 3) & (-4); // Number of pixel data bytes per row, 4-byte aligned.
-    MI_S32 offset    = file_header.offset;
+    DT_S32 row_bytes = (width * channel + 3) & (-4); // Number of pixel data bytes per row, 4-byte aligned.
+    DT_S32 offset    = file_header.offset;
 
     buffer_valid_size = offset + row_bytes * height;
     if (file_length < buffer_valid_size)
@@ -964,11 +964,11 @@ Mat ReadBmp(Context *ctx, const std::string &fname, MI_S32 mem_type, const Sizes
 
     if (info_header.height > 0)
     {
-        for (MI_S32 h = (height - 1); h >= 0; h--)
+        for (DT_S32 h = (height - 1); h >= 0; h--)
         {
             fseek(fp, offset, SEEK_SET);
-            bytes = fread(mat.Ptr<MI_CHAR>(h), 1, width * channel, fp);
-            if (static_cast<MI_S32>(bytes) != width * channel)
+            bytes = fread(mat.Ptr<DT_CHAR>(h), 1, width * channel, fp);
+            if (static_cast<DT_S32>(bytes) != width * channel)
             {
                 std::string info = "fread size(" + std::to_string(bytes) + "," + std::to_string(width * channel) + ") not match";
                 AURA_ADD_ERROR_STRING(ctx, info.c_str());
@@ -980,11 +980,11 @@ Mat ReadBmp(Context *ctx, const std::string &fname, MI_S32 mem_type, const Sizes
     }
     else
     {
-        for (MI_S32 h = 0; h < height; h++)
+        for (DT_S32 h = 0; h < height; h++)
         {
             fseek(fp, offset, SEEK_SET);
-            bytes = fread(mat.Ptr<MI_CHAR>(h), 1, width * channel, fp);
-            if (static_cast<MI_S32>(bytes) != width * channel)
+            bytes = fread(mat.Ptr<DT_CHAR>(h), 1, width * channel, fp);
+            if (static_cast<DT_S32>(bytes) != width * channel)
             {
                 std::string info = "fread size(" + std::to_string(bytes) + "," + std::to_string(width * channel) + ") not match";
                 AURA_ADD_ERROR_STRING(ctx, info.c_str());
@@ -1004,7 +1004,7 @@ Mat ReadBmp(Context *ctx, const std::string &fname, MI_S32 mem_type, const Sizes
 
 Status WriteBmp(Context *ctx, const Mat &mat, const std::string &fname)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -1030,15 +1030,15 @@ Status WriteBmp(Context *ctx, const Mat &mat, const std::string &fname)
     BitMapFileHeader file_header;
     BitMapInfoHeader info_header;
 
-    MI_S32 height  = mat.GetSizes().m_height;
-    MI_S32 width   = mat.GetSizes().m_width;
-    MI_S32 channel = mat.GetSizes().m_channel;
-    MI_S32 pixels  = channel * 8;
+    DT_S32 height  = mat.GetSizes().m_height;
+    DT_S32 width   = mat.GetSizes().m_width;
+    DT_S32 channel = mat.GetSizes().m_channel;
+    DT_S32 pixels  = channel * 8;
 
-    MI_BOOL is_8bit   = (8 == pixels) ? MI_TRUE : MI_FALSE;  // Is pixels equal to 8 bits ?
-    MI_S32  row_bytes = (width * channel + 3) & (-4);        // Number of pixel data bytes per row, 4-byte aligned.
-    MI_S32  data_size = row_bytes * height;                  // Iaura data size after padding
-    MI_S32  pal_size  = is_8bit ? 256 * sizeof(Pixel32) : 0; // Palette vector size
+    DT_BOOL is_8bit   = (8 == pixels) ? DT_TRUE : DT_FALSE;  // Is pixels equal to 8 bits ?
+    DT_S32  row_bytes = (width * channel + 3) & (-4);        // Number of pixel data bytes per row, 4-byte aligned.
+    DT_S32  data_size = row_bytes * height;                  // Iaura data size after padding
+    DT_S32  pal_size  = is_8bit ? 256 * sizeof(Pixel32) : 0; // Palette vector size
 
     file_header.type        = 0x4D42; // 'BM'
     file_header.offset      = sizeof(BitMapFileHeader) + sizeof(BitMapInfoHeader) + pal_size;
@@ -1056,7 +1056,7 @@ Status WriteBmp(Context *ctx, const Mat &mat, const std::string &fname)
     info_header.imp_colors  = is_8bit ? 256 : 0;
 
     FILE *fp = fopen(fname.c_str(), "wb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open " + fname + " failed";
         AURA_ADD_ERROR_STRING(ctx, info.c_str());
@@ -1069,7 +1069,7 @@ Status WriteBmp(Context *ctx, const Mat &mat, const std::string &fname)
     {
         // Create a color palette (256 colors, simple gray palette)
         std::vector<Pixel32> palette(256);
-        for (MI_S32 i = 0; i < 256; ++i)
+        for (DT_S32 i = 0; i < 256; ++i)
         {
             palette[i].blue  = i;
             palette[i].green = i;
@@ -1080,10 +1080,10 @@ Status WriteBmp(Context *ctx, const Mat &mat, const std::string &fname)
     }
 
     // Write pixel data, process row padding
-    MI_CHAR padding[3] = {0, 0, 0}; // Up to 3 bytes of padding
-    for (MI_S32 h = (height - 1); h >= 0; --h)
+    DT_CHAR padding[3] = {0, 0, 0}; // Up to 3 bytes of padding
+    for (DT_S32 h = (height - 1); h >= 0; --h)
     {
-        fwrite(mat.Ptr<MI_CHAR>(h), 1, width * channel, fp);
+        fwrite(mat.Ptr<DT_CHAR>(h), 1, width * channel, fp);
         if (row_bytes > width * channel)
         {
             fwrite(padding, 1, row_bytes - width * channel, fp);
@@ -1124,9 +1124,9 @@ static ElemType GetYuvFormatElemType(IauraFormat fmt)
     return ElemType::INVALID;
 }
 
-std::vector<Mat> ReadYuv(Context *ctx, const std::string &fname, IauraFormat fmt, const Sizes &sizes, MI_S32 mem_type, const Sizes &strides)
+std::vector<Mat> ReadYuv(Context *ctx, const std::string &fname, IauraFormat fmt, const Sizes &sizes, DT_S32 mem_type, const Sizes &strides)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return {};
     }
@@ -1158,15 +1158,15 @@ std::vector<Mat> ReadYuv(Context *ctx, const std::string &fname, IauraFormat fmt
         mats.emplace_back(mat);
     }
 
-    MI_S32 buffer_valid_size = 0;
+    DT_S32 buffer_valid_size = 0;
     for (size_t i = 0; i < mats.size(); i++)
     {
-        MI_S32 row_bytes = mats[i].GetSizes().m_width * mats[i].GetSizes().m_channel * ElemTypeSize(mats[i].GetElemType());
+        DT_S32 row_bytes = mats[i].GetSizes().m_width * mats[i].GetSizes().m_channel * ElemTypeSize(mats[i].GetElemType());
         buffer_valid_size += mats[i].GetSizes().m_height * row_bytes;
     }
 
     FILE *fp = fopen(fname.c_str(), "rb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open " + fname + " failed";
         AURA_ADD_ERROR_STRING(ctx, info.c_str());
@@ -1174,7 +1174,7 @@ std::vector<Mat> ReadYuv(Context *ctx, const std::string &fname, IauraFormat fmt
     }
 
     fseek(fp, 0, SEEK_END);
-    MI_S32 file_length = ftell(fp);
+    DT_S32 file_length = ftell(fp);
 
     if (file_length < buffer_valid_size)
     {
@@ -1188,11 +1188,11 @@ std::vector<Mat> ReadYuv(Context *ctx, const std::string &fname, IauraFormat fmt
 
     for (size_t i = 0; i < mats.size(); i++)
     {
-        MI_S32 row_bytes = mats[i].GetSizes().m_width * mats[i].GetSizes().m_channel * ElemTypeSize(mats[i].GetElemType());
-        for (MI_S32 h = 0; h < mats[i].GetSizes().m_height; h++)
+        DT_S32 row_bytes = mats[i].GetSizes().m_width * mats[i].GetSizes().m_channel * ElemTypeSize(mats[i].GetElemType());
+        for (DT_S32 h = 0; h < mats[i].GetSizes().m_height; h++)
         {
-            size_t bytes = fread(mats[i].Ptr<MI_CHAR>(h), 1, row_bytes, fp);
-            if (static_cast<MI_S32>(bytes) != row_bytes)
+            size_t bytes = fread(mats[i].Ptr<DT_CHAR>(h), 1, row_bytes, fp);
+            if (static_cast<DT_S32>(bytes) != row_bytes)
             {
                 std::string info = "fread size(" + std::to_string(bytes) + "," + std::to_string(row_bytes) + ") not match";
                 AURA_ADD_ERROR_STRING(ctx, info.c_str());
@@ -1213,7 +1213,7 @@ static Status CheckMatsNum(Context *ctx, const std::vector<Mat> &mats, IauraForm
 {
     Status ret = Status::ERROR;
 
-    MI_S32 len = mats.size();
+    DT_S32 len = mats.size();
     switch (format)
     {
         case IauraFormat::NV12:
@@ -1248,8 +1248,8 @@ static Status CheckMatsParam(Context *ctx, const std::vector<Mat> &mats, IauraFo
 {
     Status ret = Status::ERROR;
 
-    MI_S32 len = mats.size();
-    for (MI_S32 i = 0; i < len; i++)
+    DT_S32 len = mats.size();
+    for (DT_S32 i = 0; i < len; i++)
     {
         if (!(mats[i].IsValid()))
         {
@@ -1259,7 +1259,7 @@ static Status CheckMatsParam(Context *ctx, const std::vector<Mat> &mats, IauraFo
     }
 
 #define CHECK_MATS_ELEM_TYPE(type)                                     \
-    for (MI_S32 i = 0; i < len; i++)                                   \
+    for (DT_S32 i = 0; i < len; i++)                                   \
     {                                                                  \
         if (mats[i].GetElemType() != type)                             \
         {                                                              \
@@ -1354,7 +1354,7 @@ Status WriteYuv(Context *ctx, const std::vector<Mat> &mats, IauraFormat fmt, con
 {
     Status ret = Status::ERROR;
 
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return ret;
     }
@@ -1372,7 +1372,7 @@ Status WriteYuv(Context *ctx, const std::vector<Mat> &mats, IauraFormat fmt, con
     }
 
     FILE *fp = fopen(fname.c_str(), "wb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open " + fname + " failed";
         AURA_ADD_ERROR_STRING(ctx, info.c_str());
@@ -1381,11 +1381,11 @@ Status WriteYuv(Context *ctx, const std::vector<Mat> &mats, IauraFormat fmt, con
 
     for (size_t i = 0; i < mats.size(); i++)
     {
-        MI_S32 row_bytes = mats[i].GetSizes().m_width * mats[i].GetSizes().m_channel * ElemTypeSize(mats[i].GetElemType());
-        for (MI_S32 h = 0; h < mats[i].GetSizes().m_height; h++)
+        DT_S32 row_bytes = mats[i].GetSizes().m_width * mats[i].GetSizes().m_channel * ElemTypeSize(mats[i].GetElemType());
+        for (DT_S32 h = 0; h < mats[i].GetSizes().m_height; h++)
         {
-            size_t bytes = fwrite(mats[i].Ptr<MI_CHAR>(h), 1, row_bytes, fp);
-            if (static_cast<MI_S32>(bytes) != row_bytes)
+            size_t bytes = fwrite(mats[i].Ptr<DT_CHAR>(h), 1, row_bytes, fp);
+            if (static_cast<DT_S32>(bytes) != row_bytes)
             {
                 std::string info = "fwrite size(" + std::to_string(bytes) + "," + std::to_string(row_bytes) + ") not match";
                 AURA_ADD_ERROR_STRING(ctx, info.c_str());
@@ -1403,16 +1403,16 @@ EXIT:
     return ret;
 }
 
-std::vector<Mat> GetYuvIaura(Context *ctx, const Mat &mat, IauraFormat fmt, MI_BOOL is_deep_copy)
+std::vector<Mat> GetYuvIaura(Context *ctx, const Mat &mat, IauraFormat fmt, DT_BOOL is_deep_copy)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return {};
     }
 
-    MI_S32 height  = mat.GetSizes().m_height;
-    MI_S32 width   = mat.GetSizes().m_width;
-    MI_S32 channel = mat.GetSizes().m_channel;
+    DT_S32 height  = mat.GetSizes().m_height;
+    DT_S32 width   = mat.GetSizes().m_width;
+    DT_S32 channel = mat.GetSizes().m_channel;
 
     if (channel != 1)
     {
@@ -1587,7 +1587,7 @@ std::vector<Mat> GetYuvIaura(Context *ctx, const Mat &mat, IauraFormat fmt, MI_B
 
     if (is_deep_copy)
     {
-        for (MI_U32 i = 0; i < mats.size(); i++)
+        for (DT_U32 i = 0; i < mats.size(); i++)
         {
             mats[i] = mats[i].Clone();
         }

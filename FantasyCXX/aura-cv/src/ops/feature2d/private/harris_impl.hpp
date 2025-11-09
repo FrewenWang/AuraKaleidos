@@ -17,7 +17,7 @@ class HarrisImpl : public OpImpl
 public:
     HarrisImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+    virtual Status SetArgs(const Array *src, Array *dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                            BorderType border_type = BorderType::REFLECT_101,
                            const Scalar &border_value = Scalar());
 
@@ -27,12 +27,12 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    MI_S32     m_block_size;
-    MI_S32     m_ksize;
-    MI_F64     m_k;
+    DT_S32     m_block_size;
+    DT_S32     m_ksize;
+    DT_F64     m_k;
     BorderType m_border_type;
     Scalar     m_border_value;
 
@@ -45,7 +45,7 @@ class HarrisNone : public HarrisImpl
 public:
     HarrisNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -55,8 +55,8 @@ private:
     std::string m_profiling_string;
 };
 
-Status CornerEigenValsVecsNone(Context *ctx, const Mat &src, Mat &dst, MI_S32 block_size, MI_S32 aperture_size, MI_BOOL use_harris,
-                               MI_F64 k, BorderType border_type, const Scalar &border_value, const OpTarget &target);
+Status CornerEigenValsVecsNone(Context *ctx, const Mat &src, Mat &dst, DT_S32 block_size, DT_S32 aperture_size, DT_BOOL use_harris,
+                               DT_F64 k, BorderType border_type, const Scalar &border_value, const OpTarget &target);
 
 #if defined(AURA_ENABLE_NEON)
 class HarrisNeon : public HarrisImpl
@@ -64,15 +64,15 @@ class HarrisNeon : public HarrisImpl
 public:
     HarrisNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
     Status Run() override;
 };
 
-Status CornerEigenValsVecsNeon(Context *ctx, const Mat &src, Mat &dst, MI_S32 block_size, MI_S32 aperture_size,
-                               MI_BOOL use_harris, MI_F64 k, BorderType border_type, const Scalar &border_value, const OpTarget &target);
+Status CornerEigenValsVecsNeon(Context *ctx, const Mat &src, Mat &dst, DT_S32 block_size, DT_S32 aperture_size,
+                               DT_BOOL use_harris, DT_F64 k, BorderType border_type, const Scalar &border_value, const OpTarget &target);
 #endif
 
 } // namespace aura

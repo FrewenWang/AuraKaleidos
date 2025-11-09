@@ -41,10 +41,10 @@ class HexagonRpcParam;
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
-template <typename Tp, typename std::enable_if<std::is_arithmetic<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_arithmetic<Tp>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &val)
 {
-    MI_S32 size = sizeof(val);
+    DT_S32 size = sizeof(val);
     if (rpc_param->m_rpc_param.m_size + size > rpc_param->m_rpc_param.m_capacity)
     {
         AURA_ADD_ERROR_STRING(ctx, "buffer overflow");
@@ -57,7 +57,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &val)
 #else // AURA_BUILD_HEXAGON
     AuraMemCopy(rpc_param->m_rpc_param.m_data, &val, size);
 #endif
-    rpc_param->m_rpc_param.m_data = static_cast<MI_U8*>(rpc_param->m_rpc_param.m_data) + size;
+    rpc_param->m_rpc_param.m_data = static_cast<DT_U8*>(rpc_param->m_rpc_param.m_data) + size;
     rpc_param->m_rpc_param.m_size += size;
     return Status::OK;
 }
@@ -76,10 +76,10 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &val)
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
-template <typename Tp, typename std::enable_if<std::is_arithmetic<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_arithmetic<Tp>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &val)
 {
-    MI_S32 size = sizeof(val);
+    DT_S32 size = sizeof(val);
     if (rpc_param->m_rpc_param.m_size + size > rpc_param->m_rpc_param.m_capacity)
     {
         AURA_ADD_ERROR_STRING(ctx, "buffer overflow");
@@ -91,23 +91,23 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &val)
 #else // AURA_BUILD_HEXAGON
     AuraMemCopy(&val, rpc_param->m_rpc_param.m_data, size);
 #endif
-    rpc_param->m_rpc_param.m_data = static_cast<MI_U8*>(rpc_param->m_rpc_param.m_data) + size;
+    rpc_param->m_rpc_param.m_data = static_cast<DT_U8*>(rpc_param->m_rpc_param.m_data) + size;
     rpc_param->m_rpc_param.m_size += size;
     return Status::OK;
 }
 
-template <typename Tp, typename std::enable_if<std::is_enum<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_enum<Tp>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &val)
 {
-    MI_S32 tmp = static_cast<MI_S32>(val);
+    DT_S32 tmp = static_cast<DT_S32>(val);
     Status ret = Serialize(ctx, rpc_param, tmp);
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_enum<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_enum<Tp>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &val)
 {
-    MI_S32 tmp = 0;
+    DT_S32 tmp = 0;
     Status ret = Deserialize(ctx, rpc_param, tmp);
     val = static_cast<Tp>(tmp);
     AURA_RETURN(ctx, ret);
@@ -126,7 +126,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &val)
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
-template <typename Tp, typename std::enable_if<std::is_pod<Tp>::value && !std::is_pointer<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_pod<Tp>::value && !std::is_pointer<Tp>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Sequence<Tp> &seq)
 {
     Status ret = rpc_param->Set(seq.len);
@@ -141,13 +141,13 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Sequence<Tp> &s
         return Status::OK;
     }
 
-    if (MI_NULL == seq.data)
+    if (DT_NULL == seq.data)
     {
         AURA_ADD_ERROR_STRING(ctx, "bad data");
         return Status::ERROR;
     }
 
-    MI_S32 size = sizeof(Tp) * seq.len;
+    DT_S32 size = sizeof(Tp) * seq.len;
     if (rpc_param->m_rpc_param.m_size + size > rpc_param->m_rpc_param.m_capacity)
     {
         AURA_ADD_ERROR_STRING(ctx, "buffer overflow");
@@ -159,7 +159,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Sequence<Tp> &s
 #else // AURA_BUILD_HEXAGON
     AuraMemCopy(rpc_param->m_rpc_param.m_data, seq.data, size);
 #endif
-    rpc_param->m_rpc_param.m_data = static_cast<MI_U8*>(rpc_param->m_rpc_param.m_data) + size;
+    rpc_param->m_rpc_param.m_data = static_cast<DT_U8*>(rpc_param->m_rpc_param.m_data) + size;
     rpc_param->m_rpc_param.m_size += size;
 
     return Status::OK;
@@ -178,7 +178,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Sequence<Tp> &s
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
-template <typename Tp, typename std::enable_if<!std::is_pod<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<!std::is_pod<Tp>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Sequence<Tp> &seq)
 {
     Status ret = rpc_param->Set(seq.len);
@@ -193,13 +193,13 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Sequence<Tp> &s
         return Status::OK;
     }
 
-    if (MI_NULL == seq.data)
+    if (DT_NULL == seq.data)
     {
         AURA_ADD_ERROR_STRING(ctx, "bad data");
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 0; i < seq.len; i++)
+    for (DT_S32 i = 0; i < seq.len; i++)
     {
         ret |= rpc_param->Set(seq.data[i]);
     }
@@ -220,7 +220,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Sequence<Tp> &s
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
-template <typename Tp, typename std::enable_if<std::is_pod<Tp>::value && !std::is_pointer<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_pod<Tp>::value && !std::is_pointer<Tp>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Sequence<Tp> &seq)
 {
     Status ret = rpc_param->Get(seq.len);
@@ -235,13 +235,13 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Sequence<Tp> &seq)
         return Status::OK;
     }
 
-    if (MI_NULL == seq.data)
+    if (DT_NULL == seq.data)
     {
         AURA_ADD_ERROR_STRING(ctx, "bad data");
         return Status::ERROR;
     }
 
-    MI_S32 size = sizeof(Tp) * seq.len;
+    DT_S32 size = sizeof(Tp) * seq.len;
     if (rpc_param->m_rpc_param.m_size + size > rpc_param->m_rpc_param.m_capacity)
     {
         AURA_ADD_ERROR_STRING(ctx, "buffer overflow");
@@ -253,7 +253,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Sequence<Tp> &seq)
 #else // AURA_BUILD_HEXAGON
     AuraMemCopy(seq.data, rpc_param->m_rpc_param.m_data, size);
 #endif
-    rpc_param->m_rpc_param.m_data = static_cast<MI_U8*>(rpc_param->m_rpc_param.m_data) + size;
+    rpc_param->m_rpc_param.m_data = static_cast<DT_U8*>(rpc_param->m_rpc_param.m_data) + size;
     rpc_param->m_rpc_param.m_size += size;
 
     return Status::OK;
@@ -272,7 +272,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Sequence<Tp> &seq)
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
-template <typename Tp, typename std::enable_if<!std::is_pod<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<!std::is_pod<Tp>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Sequence<Tp> &seq)
 {
     Status ret = rpc_param->Get(seq.len);
@@ -287,13 +287,13 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Sequence<Tp> &seq)
         return Status::OK;
     }
 
-    if (MI_NULL == seq.data)
+    if (DT_NULL == seq.data)
     {
         AURA_ADD_ERROR_STRING(ctx, "bad data");
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 0; i < seq.len; i++)
+    for (DT_S32 i = 0; i < seq.len; i++)
     {
         ret |= rpc_param->Get(seq.data[i]);
     }
@@ -302,18 +302,18 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Sequence<Tp> &seq)
 }
 
 #if defined(AURA_BUILD_HOST)
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Buffer>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Buffer>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &buffer)
 {
     Status ret = Status::ERROR;
 
     if (!buffer.IsValid())
     {
-        ret = rpc_param->Set(buffer.m_type, buffer.m_size, buffer.m_property, static_cast<MI_U64>(0), static_cast<MI_S32>(-1));
+        ret = rpc_param->Set(buffer.m_type, buffer.m_size, buffer.m_property, static_cast<DT_U64>(0), static_cast<DT_S32>(-1));
     }
     else
     {
-        MI_U64 offset = reinterpret_cast<MI_U64>(buffer.m_data) - reinterpret_cast<MI_U64>(buffer.m_origin);
+        DT_U64 offset = reinterpret_cast<DT_U64>(buffer.m_data) - reinterpret_cast<DT_U64>(buffer.m_origin);
         ret = rpc_param->Set(buffer.m_type, buffer.m_size, buffer.m_property, offset);
         if (ret != Status::OK)
         {
@@ -321,41 +321,41 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &buffer)
             return Status::ERROR;
         }
 
-        MI_BOOL find_flag = MI_FALSE;
+        DT_BOOL find_flag = DT_FALSE;
         for (size_t i = 0; i < rpc_param->m_rpc_mem.size(); i++)
         {
             if (rpc_param->m_rpc_mem[i].mem == buffer.m_origin)
             {
-                ret = rpc_param->Set(static_cast<MI_S32>(i));
-                find_flag = MI_TRUE;
+                ret = rpc_param->Set(static_cast<DT_S32>(i));
+                find_flag = DT_TRUE;
                 break;
             }
         }
         if (!find_flag)
         {
-            ret = rpc_param->Set(static_cast<MI_S32>(rpc_param->m_rpc_mem.size()));
-            rpc_param->m_rpc_mem.push_back({static_cast<MI_U8*>(buffer.m_origin), static_cast<MI_S32>(buffer.m_capacity)});
+            ret = rpc_param->Set(static_cast<DT_S32>(rpc_param->m_rpc_mem.size()));
+            rpc_param->m_rpc_mem.push_back({static_cast<DT_U8*>(buffer.m_origin), static_cast<DT_S32>(buffer.m_capacity)});
         }
     }
 
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Mat>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Mat>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &mat)
 {
     Status ret = rpc_param->Set(mat.GetElemType(), mat.GetSizes(), mat.GetStrides(), mat.GetBuffer());
     AURA_RETURN(ctx, ret);
 }
 #else
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Buffer>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Buffer>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &buffer)
 {
-    MI_S32 type;
-    MI_S64 size;
-    MI_S32 property;
-    MI_U64 offset;
-    MI_S32 idx;
+    DT_S32 type;
+    DT_S64 size;
+    DT_S32 property;
+    DT_U64 offset;
+    DT_S32 idx;
 
     Status ret = rpc_param->Get(type, size, property, offset, idx);
     if (ret != Status::OK)
@@ -370,9 +370,9 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &buffer)
     }
     else
     {
-        AURA_VOID *data   = static_cast<MI_U8*>(rpc_param->m_rpc_mem[idx].mem) + offset;
-        AURA_VOID *origin = rpc_param->m_rpc_mem[idx].mem;
-        MI_S64 capacity = rpc_param->m_rpc_mem[idx].memLen;
+        DT_VOID *data   = static_cast<DT_U8*>(rpc_param->m_rpc_mem[idx].mem) + offset;
+        DT_VOID *origin = rpc_param->m_rpc_mem[idx].mem;
+        DT_S64 capacity = rpc_param->m_rpc_mem[idx].memLen;
 
         buffer = Buffer(type, capacity, size, data, origin, property);
         if (!buffer.IsValid())
@@ -385,7 +385,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &buffer)
     return Status::OK;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Mat>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Mat>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &mat)
 {
     ElemType elem_type;
@@ -689,10 +689,10 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Sizes3_<Tp> &sizes3
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, std::string>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, std::string>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &str)
 {
-    MI_S32 size = str.size();
+    DT_S32 size = str.size();
     Status ret = rpc_param->Set(size);
     if (ret != Status::OK)
     {
@@ -705,16 +705,16 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &str)
         return Status::OK;
     }
 
-    Sequence<MI_CHAR> seq = {const_cast<MI_CHAR*>(str.c_str()), size};
+    Sequence<DT_CHAR> seq = {const_cast<DT_CHAR*>(str.c_str()), size};
     ret |= rpc_param->Set(seq);
 
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, std::string>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, std::string>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &str)
 {
-    MI_S32 size = 0;
+    DT_S32 size = 0;
     Status ret = rpc_param->Get(size);
     if (ret != Status::OK)
     {
@@ -729,7 +729,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &str)
     }
 
     str.resize(size);
-    Sequence<MI_CHAR> seq = {const_cast<MI_CHAR*>(str.c_str()), size};
+    Sequence<DT_CHAR> seq = {const_cast<DT_CHAR*>(str.c_str()), size};
     ret |= rpc_param->Get(seq);
 
     AURA_RETURN(ctx, ret);
@@ -751,7 +751,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &str)
 template <typename Tp>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const std::vector<Tp> &vec)
 {
-    MI_S32 size = vec.size();
+    DT_S32 size = vec.size();
     Status ret = rpc_param->Set(size);
     if (ret != Status::OK)
     {
@@ -786,7 +786,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const std::vector<Tp>
 template <typename Tp>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, std::vector<Tp> &vec)
 {
-    MI_S32 size = 0;
+    DT_S32 size = 0;
     Status ret = rpc_param->Get(size);
     if (ret != Status::OK)
     {
@@ -823,7 +823,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, std::vector<Tp> &ve
 template <typename Tp>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const std::unordered_map<std::string, Tp> &map)
 {
-    MI_S32 size = map.size();
+    DT_S32 size = map.size();
     Status ret = rpc_param->Set(size);
     if (ret != Status::OK)
     {
@@ -860,7 +860,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const std::unordered_
 template <typename Tp>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, std::unordered_map<std::string, Tp> &map)
 {
-    MI_S32 size = 0;
+    DT_S32 size = 0;
     Status ret = rpc_param->Get(size);
     if (ret != Status::OK)
     {
@@ -868,7 +868,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, std::unordered_map<
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 0; i < size; i++)
+    for (DT_S32 i = 0; i < size; i++)
     {
         std::string key;
         Tp val;
@@ -884,14 +884,14 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, std::unordered_map<
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Time>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Time>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &time)
 {
     Status ret = rpc_param->Set(time.sec, time.ms, time.us);
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Time>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Time>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &time)
 {
     Status ret = rpc_param->Get(time.sec, time.ms, time.us);

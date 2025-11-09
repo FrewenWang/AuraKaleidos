@@ -18,13 +18,13 @@
 namespace aura
 {
 
-static MI_S32 GetEffectiveNumThreads()
+static DT_S32 GetEffectiveNumThreads()
 {
-    MI_S32 hvx_units = (qurt_hvx_get_units() >> 8) & 0xFF;
-    return Max(hvx_units, (MI_S32)1);
+    DT_S32 hvx_units = (qurt_hvx_get_units() >> 8) & 0xFF;
+    return Max(hvx_units, (DT_S32)1);
 }
 
-static Status HTPSetPower(Context *ctx, MI_BOOL flag)
+static Status HTPSetPower(Context *ctx, DT_BOOL flag)
 {
 #if (__HEXAGON_ARCH__ < 68)
     HAP_power_request_t request;
@@ -46,18 +46,18 @@ static Status HTPSetPower(Context *ctx, MI_BOOL flag)
     return Status::OK;
 }
 
-AURA_VOID ThreadRun(AURA_VOID *instance)
+DT_VOID ThreadRun(DT_VOID *instance)
 {
-    if (MI_NULL == instance)
+    if (DT_NULL == instance)
     {
         return;
     }
 
     WorkerPool *wp = reinterpret_cast<WorkerPool *>(instance);
 
-    while (MI_TRUE)
+    while (DT_TRUE)
     {
-        std::function<AURA_VOID()> task;
+        std::function<DT_VOID()> task;
 
         {
             std::unique_lock<std::mutex> lock(wp->m_mutex);
@@ -78,21 +78,21 @@ AURA_VOID ThreadRun(AURA_VOID *instance)
     }
 }
 
-WorkerPool::WorkerPool(Context *ctx, MI_S32 stack_sz, const std::string &tag) : m_ctx(ctx), m_stopped(MI_FALSE), m_tag(tag), m_stack(MI_NULL)
+WorkerPool::WorkerPool(Context *ctx, DT_S32 stack_sz, const std::string &tag) : m_ctx(ctx), m_stopped(DT_FALSE), m_tag(tag), m_stack(DT_NULL)
 {
-    if (HTPSetPower(ctx, MI_TRUE) != Status::OK)
+    if (HTPSetPower(ctx, DT_TRUE) != Status::OK)
     {
         AURA_LOGE(ctx, AURA_TAG, "HTPSetPower on failed.\n");
     }
 
-    MI_S32 thread_count = GetEffectiveNumThreads();
+    DT_S32 thread_count = GetEffectiveNumThreads();
 
     m_threads.reserve(thread_count);
 
     stack_sz = Max(stack_sz, 4096l);
     // stack pointer must aligned to 8 bytes
     stack_sz = AURA_ALIGN(stack_sz, 8);
-    m_stack = static_cast<MI_U8*>(AURA_ALLOC(ctx, stack_sz * thread_count));
+    m_stack = static_cast<DT_U8*>(AURA_ALLOC(ctx, stack_sz * thread_count));
 
     if (!m_stack)
     {
@@ -100,18 +100,18 @@ WorkerPool::WorkerPool(Context *ctx, MI_S32 stack_sz, const std::string &tag) : 
     }
     else
     {
-        MI_CHAR name_buffer[128] = {0};
+        DT_CHAR name_buffer[128] = {0};
         qurt_thread_attr_t attr;
         qurt_thread_attr_init(&attr);
 
-        for (MI_S32 n = 0; n < thread_count; ++n)
+        for (DT_S32 n = 0; n < thread_count; ++n)
         {
             snprintf(name_buffer, 128, "%sC%02ld", m_tag.c_str(), n);
             qurt_thread_attr_set_stack_addr(&attr, m_stack + n * stack_sz);
             qurt_thread_attr_set_stack_size(&attr, stack_sz);
             qurt_thread_attr_set_name(&attr, name_buffer);
 
-            MI_S32 priority = qurt_thread_get_priority(qurt_thread_get_id());
+            DT_S32 priority = qurt_thread_get_priority(qurt_thread_get_id());
 
             if (priority < 1)
             {
@@ -148,19 +148,19 @@ WorkerPool::~WorkerPool()
     {
         if (m_threads[n] != 0)
         {
-            qurt_thread_join(m_threads[n], MI_NULL);
+            qurt_thread_join(m_threads[n], DT_NULL);
         }
     }
 
     AURA_FREE(m_ctx, m_stack);
 
-    if (HTPSetPower(m_ctx, MI_FALSE) != Status::OK)
+    if (HTPSetPower(m_ctx, DT_FALSE) != Status::OK)
     {
         AURA_LOGE(m_ctx, AURA_TAG, "HTPSetPower off failed.\n");
     }
 }
 
-AURA_VOID WorkerPool::Stop()
+DT_VOID WorkerPool::Stop()
 {
     if (m_stopped)
     {
@@ -168,10 +168,10 @@ AURA_VOID WorkerPool::Stop()
         return;
     }
 
-    m_stopped = MI_TRUE;
+    m_stopped = DT_TRUE;
 
     {
-        std::queue<std::function<AURA_VOID()>> empty_queue;
+        std::queue<std::function<DT_VOID()>> empty_queue;
         std::unique_lock<std::mutex> lock(m_mutex);
         m_task_queue.swap(empty_queue);
     }

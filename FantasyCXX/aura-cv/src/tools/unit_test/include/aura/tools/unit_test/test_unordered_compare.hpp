@@ -29,7 +29,7 @@ template <typename Tp>
 struct UnorderedCmpPos
 {
     Tp val[3];      /*!< Array representing values (src, ref, diff). */
-    MI_S32 pos[2];  /*!< Array representing positions (src_pos, dst_pos). */
+    DT_S32 pos[2];  /*!< Array representing positions (src_pos, dst_pos). */
 
     /**
      * @brief Default constructor for UnorderedCmpPos.
@@ -46,7 +46,7 @@ struct UnorderedCmpPos
      * @param src_pos Source position.
      * @param dst_pos Destination position.
      */
-    UnorderedCmpPos(Tp src, Tp ref, Tp diff, MI_S32 src_pos, MI_S32 dst_pos) : val{src, ref, diff}, pos{src_pos, dst_pos}
+    UnorderedCmpPos(Tp src, Tp ref, Tp diff, DT_S32 src_pos, DT_S32 dst_pos) : val{src, ref, diff}, pos{src_pos, dst_pos}
     {}
 
     /**
@@ -78,18 +78,18 @@ struct UnorderedCmpPos
 template <typename Tp>
 struct UnorderedCmpResult
 {
-    MI_BOOL status;                                     /*!< Status of the comparison. */
-    MI_BOOL detail;                                     /*!< Detail of the comparison. */
-    MI_F32 precision;                                   /*!< Precision of the comparison. */
-    MI_F32 recall;                                      /*!< Recall of the comparison. */
-    MI_F32 f1_score;                                    /*!< F1 score of the comparison. */
+    DT_BOOL status;                                     /*!< Status of the comparison. */
+    DT_BOOL detail;                                     /*!< Detail of the comparison. */
+    DT_F32 precision;                                   /*!< Precision of the comparison. */
+    DT_F32 recall;                                      /*!< Recall of the comparison. */
+    DT_F32 f1_score;                                    /*!< F1 score of the comparison. */
     std::vector<UnorderedCmpPos<Tp>> matched_detail;    /*!< Vector of matched details. */
     std::vector<Tp> unmatched_detail[2];                /*!< Array of unmatched details for source and reference. */
 
     /**
      * @brief Default constructor for UnorderedCmpResult.
      */
-    UnorderedCmpResult() : status(MI_FALSE), detail(MI_FALSE), precision(0.f), recall(0.f), f1_score(0.f)
+    UnorderedCmpResult() : status(DT_FALSE), detail(DT_FALSE), precision(0.f), recall(0.f), f1_score(0.f)
     {}
 
     /**
@@ -97,7 +97,7 @@ struct UnorderedCmpResult
      */
     friend std::ostream& operator<<(std::ostream &os, const UnorderedCmpResult &result)
     {
-        MI_CHAR buffer[1024] = {0};
+        DT_CHAR buffer[1024] = {0};
 
         snprintf(buffer, sizeof(buffer), "precision(%.4f%%) recall(%.4f%%) f1_score(%.4f%%)", 100.f * result.precision, 100.f * result.recall, 100.f * result.f1_score);
 
@@ -128,10 +128,10 @@ template<typename Tp> struct Tolerate;
 #define KEYPOINT_TOLERATE(Tp, initial_value)                                                        \
 template<> struct Tolerate<Tp>                                                                      \
 {                                                                                                   \
-    MI_F64   t_ratio;                                                                               \
+    DT_F64   t_ratio;                                                                               \
     Tp t_thres;                                                                                     \
                                                                                                     \
-    Tolerate(MI_F32 t_ratio = 1.0f, const Tp &kp = initial_value)                                   \
+    Tolerate(DT_F32 t_ratio = 1.0f, const Tp &kp = initial_value)                                   \
              : t_ratio{t_ratio}, t_thres{kp}                                                        \
     {}                                                                                              \
                                                                                                     \
@@ -151,7 +151,7 @@ template<> struct Tolerate<Tp>                                                  
         return t_thres;                                                                             \
     }                                                                                               \
                                                                                                     \
-    MI_BOOL operator<=(const Tolerate &t)                                                         \
+    DT_BOOL operator<=(const Tolerate &t)                                                         \
     {                                                                                               \
         if (t_thres.m_pt.m_x <= t.t_thres.m_pt.m_x &&                                               \
             t_thres.m_pt.m_y <= t.t_thres.m_pt.m_y &&                                               \
@@ -161,9 +161,9 @@ template<> struct Tolerate<Tp>                                                  
             t_thres.m_octave <= t.t_thres.m_octave &&                                               \
             t_thres.m_class_id <= t.t_thres.m_class_id)                                             \
         {                                                                                           \
-            return MI_TRUE;                                                                         \
+            return DT_TRUE;                                                                         \
         }                                                                                           \
-        return MI_FALSE;                                                                            \
+        return DT_FALSE;                                                                            \
     }                                                                                               \
 };
 
@@ -177,10 +177,10 @@ template<> struct Tolerate<Tp>                                                  
 #define SCALAR_TOLERATE(Tp, initial_value)                                                          \
 template<> struct Tolerate<Tp>                                                                      \
 {                                                                                                   \
-    MI_F64 t_ratio;                                                                                 \
+    DT_F64 t_ratio;                                                                                 \
     Tp t_thres;                                                                                     \
                                                                                                     \
-    Tolerate(MI_F32 t_ratio = 1.0f, const Tp &t_thres = initial_value)                              \
+    Tolerate(DT_F32 t_ratio = 1.0f, const Tp &t_thres = initial_value)                              \
              : t_ratio{t_ratio}, t_thres{t_thres}                                                   \
     {}                                                                                              \
                                                                                                     \
@@ -197,14 +197,14 @@ template<> struct Tolerate<Tp>                                                  
         return t_thres;                                                                             \
     }                                                                                               \
                                                                                                     \
-    MI_BOOL operator<=(const Tolerate &t)                                                         \
+    DT_BOOL operator<=(const Tolerate &t)                                                         \
     {                                                                                               \
         if (t_thres.m_val[0] <= t.t_thres.m_val[0] && t_thres.m_val[1] <= t.t_thres.m_val[1]        \
             && t_thres.m_val[2] <= t.t_thres.m_val[2] && t_thres.m_val[3] <= t.t_thres.m_val[3])    \
         {                                                                                           \
-            return MI_TRUE;                                                                         \
+            return DT_TRUE;                                                                         \
         }                                                                                           \
-        return MI_FALSE;                                                                            \
+        return DT_FALSE;                                                                            \
     }                                                                                               \
 };
 
@@ -238,7 +238,7 @@ SCALAR_TOLERATE(Scalari, Scalari(0, 0, 0, 0))
  * 
  * @return L1 distance between source and reference values.
  */
-template <typename Tp, typename std::enable_if<std::is_same<KeyPoint, Tp>::value || std::is_same<KeyPointi, Tp>::value>::type * = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<KeyPoint, Tp>::value || std::is_same<KeyPointi, Tp>::value>::type * = DT_NULL>
 struct KeyPointL1Dis
 {
     /**
@@ -249,9 +249,9 @@ struct KeyPointL1Dis
      * 
      * @return L1 distance between source and reference KeyPoint values.
      */
-    MI_F64 operator()(const Tp &src, const Tp &ref) const
+    DT_F64 operator()(const Tp &src, const Tp &ref) const
     {
-        return Abs(static_cast<MI_F64>(src.m_pt.m_x - ref.m_pt.m_x)) + Abs(static_cast<MI_F64>(src.m_pt.m_y - ref.m_pt.m_y));
+        return Abs(static_cast<DT_F64>(src.m_pt.m_x - ref.m_pt.m_x)) + Abs(static_cast<DT_F64>(src.m_pt.m_y - ref.m_pt.m_y));
     }
 
     /**
@@ -268,7 +268,7 @@ struct KeyPointL1Dis
  * 
  * @tparam Tp The type of elements for L2 distance calculation.
  */
-template <typename Tp, typename std::enable_if<std::is_same<KeyPoint, Tp>::value || std::is_same<KeyPointi, Tp>::value>::type * = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<KeyPoint, Tp>::value || std::is_same<KeyPointi, Tp>::value>::type * = DT_NULL>
 struct KeyPointL2Dis
 {
     /**
@@ -279,9 +279,9 @@ struct KeyPointL2Dis
      * 
      * @return L2 distance between source and reference KeyPoint values.
      */
-    MI_F64 operator()(const Tp &src, const Tp &ref) const
+    DT_F64 operator()(const Tp &src, const Tp &ref) const
     {
-        return Pow(static_cast<MI_F64>(src.m_pt.m_x - ref.m_pt.m_x), 2) + Pow(static_cast<MI_F64>(src.m_pt.m_y - ref.m_pt.m_y), 2);
+        return Pow(static_cast<DT_F64>(src.m_pt.m_x - ref.m_pt.m_x), 2) + Pow(static_cast<DT_F64>(src.m_pt.m_y - ref.m_pt.m_y), 2);
     }
 
     /**
@@ -298,7 +298,7 @@ struct KeyPointL2Dis
  * 
  * @tparam Tp The type of elements for L1 distance calculation.
  */
-template <typename Tp, typename std::enable_if<std::is_same<Scalar, Tp>::value || std::is_same<Scalari, Tp>::value>::type * = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Scalar, Tp>::value || std::is_same<Scalari, Tp>::value>::type * = DT_NULL>
 struct ScalarL1Dis
 {
     /**
@@ -309,10 +309,10 @@ struct ScalarL1Dis
      * 
      * @return L1 distance between source and reference Scalar values.
      */
-    MI_F64 operator()(const Tp &src, const Tp &ref) const
+    DT_F64 operator()(const Tp &src, const Tp &ref) const
     {
-        return Abs(static_cast<MI_F64>(src.m_val[0] - ref.m_val[0])) + Abs(static_cast<MI_F64>(src.m_val[1] - ref.m_val[1]))
-               + Abs(static_cast<MI_F64>(src.m_val[2] - ref.m_val[2])) + Abs(static_cast<MI_F64>(src.m_val[3] - ref.m_val[3]));
+        return Abs(static_cast<DT_F64>(src.m_val[0] - ref.m_val[0])) + Abs(static_cast<DT_F64>(src.m_val[1] - ref.m_val[1]))
+               + Abs(static_cast<DT_F64>(src.m_val[2] - ref.m_val[2])) + Abs(static_cast<DT_F64>(src.m_val[3] - ref.m_val[3]));
     }
 
     /**
@@ -329,7 +329,7 @@ struct ScalarL1Dis
  * 
  * @tparam Tp The type of elements for L2 distance calculation.
  */
-template <typename Tp, typename std::enable_if<std::is_same<Scalar, Tp>::value || std::is_same<Scalari, Tp>::value>::type * = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Scalar, Tp>::value || std::is_same<Scalari, Tp>::value>::type * = DT_NULL>
 struct ScalarL2Dis
 {
     /**
@@ -340,10 +340,10 @@ struct ScalarL2Dis
      * 
      * @return L2 distance between source and reference Scalar values.
      */
-    MI_F64 operator()(const Tp &src, const Tp &ref) const
+    DT_F64 operator()(const Tp &src, const Tp &ref) const
     {
-        return Pow(static_cast<MI_F64>(src.m_val[0] - ref.m_val[0]), 2) + Pow(static_cast<MI_F64>(src.m_val[1] - ref.m_val[1]), 2)
-               + Pow(static_cast<MI_F64>(src.m_val[2] - ref.m_val[2]), 2) + Pow(static_cast<MI_F64>(src.m_val[3] - ref.m_val[3]), 2);
+        return Pow(static_cast<DT_F64>(src.m_val[0] - ref.m_val[0]), 2) + Pow(static_cast<DT_F64>(src.m_val[1] - ref.m_val[1]), 2)
+               + Pow(static_cast<DT_F64>(src.m_val[2] - ref.m_val[2]), 2) + Pow(static_cast<DT_F64>(src.m_val[3] - ref.m_val[3]), 2);
     }
 
     /**
@@ -433,22 +433,22 @@ template <typename Tp, typename Tag = L2NormTag>
 Status UnorderedCompare(Context *ctx, const std::vector<Tp> &src, const std::vector<Tp> &ref,
                         UnorderedCmpResult<Tp> &result, const Tolerate<Tp> &tolerate = Tolerate<Tp>())
 {
-    result.status = MI_FALSE;
+    result.status = DT_FALSE;
 
     using DisFunc = typename DisFunctorTraits<Tp, Tag>::type;
     DisFunc dis_func;
 
-    auto copy_func = [](const std::vector<Tp> &input, std::vector<std::pair<Tp, MI_BOOL>> &output)
+    auto copy_func = [](const std::vector<Tp> &input, std::vector<std::pair<Tp, DT_BOOL>> &output)
     {
-        output = std::vector<std::pair<Tp, MI_BOOL>>(input.size());
+        output = std::vector<std::pair<Tp, DT_BOOL>>(input.size());
         for (size_t i = 0; i < output.size(); ++i)
         {
             output[i].first  = input[i];
-            output[i].second = MI_TRUE;
+            output[i].second = DT_TRUE;
         }
     };
 
-    auto copy_func_inv = [&](const std::vector<std::pair<Tp, MI_BOOL>> &input, MI_S32 cp_id)
+    auto copy_func_inv = [&](const std::vector<std::pair<Tp, DT_BOOL>> &input, DT_S32 cp_id)
     {
         for (size_t i = 0; i < input.size(); ++i)
         {
@@ -459,18 +459,18 @@ Status UnorderedCompare(Context *ctx, const std::vector<Tp> &src, const std::vec
         }
     };
 
-    std::vector<std::pair<Tp, MI_BOOL>> srcs, refs;
+    std::vector<std::pair<Tp, DT_BOOL>> srcs, refs;
     copy_func(src, srcs);
     copy_func(ref, refs);
 
-    MI_S32 matched_num = 0;
-    MI_S32 src_pos = 0, ref_pos = 0;
-    while (MI_TRUE)
+    DT_S32 matched_num = 0;
+    DT_S32 src_pos = 0, ref_pos = 0;
+    while (DT_TRUE)
     {
-        MI_S32 i = 0, j = 0;
-        std::pair<Tp, MI_BOOL> *pt_src = MI_NULL;
-        std::pair<Tp, MI_BOOL> *pt_ref = MI_NULL;
-        MI_F64 min_dis = std::numeric_limits<MI_F64>::max();
+        DT_S32 i = 0, j = 0;
+        std::pair<Tp, DT_BOOL> *pt_src = DT_NULL;
+        std::pair<Tp, DT_BOOL> *pt_ref = DT_NULL;
+        DT_F64 min_dis = std::numeric_limits<DT_F64>::max();
 
         for (auto it_src = srcs.begin(); it_src != srcs.end(); ++it_src, i++)
         {
@@ -488,7 +488,7 @@ Status UnorderedCompare(Context *ctx, const std::vector<Tp> &src, const std::vec
                     continue;
                 }
 
-                MI_F64 tmp_dis = dis_func(it_src->first, it_ref->first);
+                DT_F64 tmp_dis = dis_func(it_src->first, it_ref->first);
 
                 if (tmp_dis < min_dis)
                 {
@@ -501,7 +501,7 @@ Status UnorderedCompare(Context *ctx, const std::vector<Tp> &src, const std::vec
             }
         }
 
-        if (std::numeric_limits<MI_F64>::max() == min_dis)
+        if (std::numeric_limits<DT_F64>::max() == min_dis)
         {
             break;
         }
@@ -514,8 +514,8 @@ Status UnorderedCompare(Context *ctx, const std::vector<Tp> &src, const std::vec
                 result.matched_detail.emplace_back(pt_src->first, pt_ref->first, kpt_tmp, src_pos, ref_pos);
             }
             ++matched_num;
-            pt_src->second = MI_FALSE;
-            pt_ref->second = MI_FALSE;
+            pt_src->second = DT_FALSE;
+            pt_ref->second = DT_FALSE;
         }
         else
         {
@@ -529,22 +529,22 @@ Status UnorderedCompare(Context *ctx, const std::vector<Tp> &src, const std::vec
         copy_func_inv(refs, 1);
     }
 
-    result.precision = static_cast<MI_F32>(matched_num + 1e-6f) / (src.size() + 1e-6f);
-    result.recall    = static_cast<MI_F32>(matched_num + 1e-6f) / (ref.size() + 1e-6f);
+    result.precision = static_cast<DT_F32>(matched_num + 1e-6f) / (src.size() + 1e-6f);
+    result.recall    = static_cast<DT_F32>(matched_num + 1e-6f) / (ref.size() + 1e-6f);
     result.f1_score  = 2 * (result.precision * result.recall) / (result.precision + result.recall);
 
     if (result.f1_score < tolerate.t_ratio)
     {
-        result.status = MI_FALSE;
+        result.status = DT_FALSE;
     }
     else
     {
-        result.status = MI_TRUE;
+        result.status = DT_TRUE;
     }
 
-    MI_S32 num_tp = matched_num;
-    MI_S32 num_fp = src.size() - matched_num;
-    MI_S32 num_fn = ref.size() - matched_num;
+    DT_S32 num_tp = matched_num;
+    DT_S32 num_fp = src.size() - matched_num;
+    DT_S32 num_fn = ref.size() - matched_num;
     AURA_LOGI(ctx, AURA_TAG, "**********Compare error distribution:**********\n");
     AURA_LOGI(ctx, AURA_TAG, "total num: src: %lu ref: %lu\n", src.size(), ref.size());
     AURA_LOGI(ctx, AURA_TAG, "true positive num: %d, false positive num: %d, false negtive num: %d\n", num_tp, num_fp, num_fn);

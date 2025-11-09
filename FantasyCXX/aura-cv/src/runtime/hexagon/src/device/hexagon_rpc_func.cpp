@@ -12,7 +12,7 @@ namespace aura
 
 Status InitContextRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -40,14 +40,14 @@ Status InitContextRpc(Context *ctx, HexagonRpcParam &rpc_param)
 
 Status SetPowerRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
     HexagonPowerLevel target_level;
-    MI_BOOL enable_dcvs;
-    MI_U32 client_id;
+    DT_BOOL enable_dcvs;
+    DT_U32 client_id;
 
     SetPowerInParam in_param(ctx, rpc_param);
     Status ret = in_param.Get(target_level, enable_dcvs, client_id);
@@ -64,7 +64,7 @@ Status SetPowerRpc(Context *ctx, HexagonRpcParam &rpc_param)
 
 Status GetVersionRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -77,18 +77,18 @@ Status GetVersionRpc(Context *ctx, HexagonRpcParam &rpc_param)
 
 Status GetBacktraceRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
-    MI_S32 max_str_size = rpc_param.m_rpc_param.m_size - sizeof(MI_S32);
+    DT_S32 max_str_size = rpc_param.m_rpc_param.m_size - sizeof(DT_S32);
     std::string backtrace = ctx->GetLogger()->GetErrorString();
     if (!backtrace.empty())
     {
         backtrace.pop_back();
     }
-    if (static_cast<MI_S32>(backtrace.size()) > max_str_size)
+    if (static_cast<DT_S32>(backtrace.size()) > max_str_size)
     {
         backtrace = backtrace.substr(0, max_str_size);
     }
@@ -101,18 +101,18 @@ Status GetBacktraceRpc(Context *ctx, HexagonRpcParam &rpc_param)
 
 Status QueryHWInfoRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
     QueryHWInfoOutParam out_param(ctx, rpc_param);
 
-    MI_S32 num_hvx_units = 0;
-    MI_S32 total_vtcm_size = 0;
-    MI_S32 num_vtcm_pages = 0;
-    MI_S32 vtcm_page_sizes[16] = {0};
-    MI_S32 vtcm_page_count[16] = {0};
+    DT_S32 num_hvx_units = 0;
+    DT_S32 total_vtcm_size = 0;
+    DT_S32 num_vtcm_pages = 0;
+    DT_S32 vtcm_page_sizes[16] = {0};
+    DT_S32 vtcm_page_count[16] = {0};
 
     Status ret = Status::OK;
 
@@ -149,15 +149,15 @@ Status QueryHWInfoRpc(Context *ctx, HexagonRpcParam &rpc_param)
         total_vtcm_size = total_blk_size / 1024;
         num_vtcm_pages  = total_blk_layout.page_list_len + avail_blk_layout.page_list_len;
 
-        MI_U32 idx = 0;
-        for (MI_U32 i = 0; i < total_blk_layout.page_list_len; ++i)
+        DT_U32 idx = 0;
+        for (DT_U32 i = 0; i < total_blk_layout.page_list_len; ++i)
         {
             vtcm_page_sizes[idx] = total_blk_layout.page_list[i].page_size / 1024;
             vtcm_page_count[idx] = 1;
             idx++;
         }
 
-        for (MI_U32 i = 0; i < avail_blk_layout.page_list_len; ++i)
+        for (DT_U32 i = 0; i < avail_blk_layout.page_list_len; ++i)
         {
             vtcm_page_sizes[idx] = avail_blk_layout.page_list[i].page_size / 1024;
             vtcm_page_count[idx] = 1;
@@ -186,8 +186,8 @@ Status QueryHWInfoRpc(Context *ctx, HexagonRpcParam &rpc_param)
     }
 #endif // __HEXAGON_ARCH__ >= 66
 
-    Sequence<MI_S32> seq_page_sizes{vtcm_page_sizes, 16};
-    Sequence<MI_S32> seq_page_count{vtcm_page_count, 16};
+    Sequence<DT_S32> seq_page_sizes{vtcm_page_sizes, 16};
+    Sequence<DT_S32> seq_page_count{vtcm_page_count, 16};
 
     ret |= out_param.Set(num_hvx_units, total_vtcm_size, num_vtcm_pages, seq_page_sizes, seq_page_count);
 
@@ -211,7 +211,7 @@ Status QueryRTInfoRpc(Context *ctx, HexagonRpcParam &rpc_param)
     {
         QueryRTInfoFreqOutParam out_param(ctx, rpc_param);
 
-        MI_S32 context_id = 0;
+        DT_S32 context_id = 0;
         HAP_power_response_t response;
         response.type = HAP_power_get_clk_Freq;
 
@@ -227,17 +227,17 @@ Status QueryRTInfoRpc(Context *ctx, HexagonRpcParam &rpc_param)
     }
     else if("VtcmInfo" == param_key)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
         QueryRTInfoVtcmOutParam out_param(ctx, rpc_param);
 
-        MI_S32 avail_vtcm_size = 0;
-        MI_S32 num_vtcm_pages = 0;
-        MI_S32 vtcm_page_sizes[16] = {0};
-        MI_S32 vtcm_page_count[16] = {0};
+        DT_S32 avail_vtcm_size = 0;
+        DT_S32 num_vtcm_pages = 0;
+        DT_S32 vtcm_page_sizes[16] = {0};
+        DT_S32 vtcm_page_count[16] = {0};
 
 #if __HEXAGON_ARCH__ >= 66
         unsigned int total_blk_size = 0;
@@ -255,7 +255,7 @@ Status QueryRTInfoRpc(Context *ctx, HexagonRpcParam &rpc_param)
             avail_vtcm_size = total_blk_size / 1024;
             num_vtcm_pages  = avail_blk_layout.page_list_len;
 
-            for (MI_U32 i = 0; i < avail_blk_layout.page_list_len; ++i)
+            for (DT_U32 i = 0; i < avail_blk_layout.page_list_len; ++i)
             {
                 vtcm_page_sizes[i] = avail_blk_layout.page_list[i].page_size / 1024;
                 vtcm_page_count[i] = avail_blk_layout.page_list[i].num_pages;
@@ -279,8 +279,8 @@ Status QueryRTInfoRpc(Context *ctx, HexagonRpcParam &rpc_param)
         }
 #endif // __HEXAGON_ARCH__ >= 66
 
-        Sequence<MI_S32> seq_page_sizes{vtcm_page_sizes, 16};
-        Sequence<MI_S32> seq_page_count{vtcm_page_count, 16};
+        Sequence<DT_S32> seq_page_sizes{vtcm_page_sizes, 16};
+        Sequence<DT_S32> seq_page_count{vtcm_page_count, 16};
         ret |= out_param.Set(avail_vtcm_size, num_vtcm_pages, seq_page_sizes, seq_page_count);
     }
     AURA_RETURN(ctx, ret);

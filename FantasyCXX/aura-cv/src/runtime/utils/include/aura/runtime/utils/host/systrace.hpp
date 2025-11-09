@@ -99,7 +99,7 @@ public:
      *
      * @param enable_trace Flag indicating whether system tracing is enabled.
      */
-    Systrace(MI_BOOL enable_trace);
+    Systrace(DT_BOOL enable_trace);
 
     /**
      * @brief Destructor for Systrace.
@@ -111,14 +111,14 @@ public:
      *
      * @param tag The tag for the system trace event.
      */
-    AURA_VOID Begin(const MI_CHAR *tag);
+    DT_VOID Begin(const DT_CHAR *tag);
 
     /**
      * @brief Ends a synchronous system trace event.
      *
      * @param tag The tag for the system trace event.
      */
-    AURA_VOID End(const MI_CHAR *tag);
+    DT_VOID End(const DT_CHAR *tag);
 
     /**
      * @brief Begins an asynchronous system trace event.
@@ -126,7 +126,7 @@ public:
      * @param tag The tag for the asynchronous system trace event.
      * @param cookie A unique identifier for the asynchronous event.
      */
-    AURA_VOID AsyncBegin(const MI_CHAR *tag, MI_S32 cookie);
+    DT_VOID AsyncBegin(const DT_CHAR *tag, DT_S32 cookie);
 
     /**
      * @brief Ends an asynchronous system trace event.
@@ -134,7 +134,7 @@ public:
      * @param tag The tag for the asynchronous system trace event.
      * @param cookie A unique identifier for the asynchronous event.
      */
-    AURA_VOID AsyncEnd(const MI_CHAR *tag, MI_S32 cookie);
+    DT_VOID AsyncEnd(const DT_CHAR *tag, DT_S32 cookie);
 
     /**
      * @brief Disable copy and assignment constructor operations.
@@ -143,7 +143,7 @@ public:
 
 private:
     std::mutex m_handle_lock;   /*!< Mutex for thread safety. */
-    MI_S32 m_handle;            /*!< Handle for system trace events. */
+    DT_S32 m_handle;            /*!< Handle for system trace events. */
 };
 
 } // namespace aura

@@ -29,7 +29,7 @@ Status ResizeNeon::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;

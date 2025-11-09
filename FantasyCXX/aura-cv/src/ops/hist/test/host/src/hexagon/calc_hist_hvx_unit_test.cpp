@@ -13,8 +13,8 @@ static CalcHistParam::TupleTable g_hist_table_hvx
 
     // param : elem type | channel | hist size | range | accumulate | use mask
     {
-        {ElemType::U8 , 0, 256, {0, 256}, MI_FALSE, MI_FALSE},
-        {ElemType::U8 , 0, 242, {2, 244}, MI_FALSE, MI_TRUE},
+        {ElemType::U8 , 0, 256, {0, 256}, DT_FALSE, DT_FALSE},
+        {ElemType::U8 , 0, 242, {2, 244}, DT_FALSE, DT_TRUE},
     },
 
     // target
@@ -26,10 +26,10 @@ static CalcHistParam::TupleTable g_hist_table_hvx
 NEW_TESTCASE(hist, calchist, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     CalcHistTest test(UnitTest::GetInstance()->GetContext(), g_hist_table_hvx);
     test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

@@ -53,7 +53,7 @@ public:
      *
      * @param end The end of the range.
      */
-    Range(MI_S32 end) : m_start(0), m_end(end)
+    Range(DT_S32 end) : m_start(0), m_end(end)
     {}
 
     /**
@@ -62,7 +62,7 @@ public:
      * @param start The start of the range.
      * @param end The end of the range.
      */
-    Range(MI_S32 start, MI_S32 end)
+    Range(DT_S32 start, DT_S32 end)
                 : m_start(start), m_end(end)
     {}
 
@@ -99,7 +99,7 @@ public:
      *
      * @return The size of the range (difference between end and start).
      */
-    MI_S32 Size() const
+    DT_S32 Size() const
     {
         return m_end - m_start;
     }
@@ -109,7 +109,7 @@ public:
      *
      * @return Returns 1 if the range is empty (start equals end), otherwise 0.
      */
-    MI_S32 Empty() const
+    DT_S32 Empty() const
     {
         return m_end == m_start;
     }
@@ -121,7 +121,7 @@ public:
      *
      * @return Returns true if both Range objects are equal, otherwise false.
      */
-    MI_BOOL operator==(const Range &r) const
+    DT_BOOL operator==(const Range &r) const
     {
         return (m_start == r.m_start) && (m_end == r.m_end);
     }
@@ -131,9 +131,9 @@ public:
      *
      * @param r The Range object to compare with.
      *
-     * @return MI_BOOL Returns true if both Range objects are not equal, otherwise false.
+     * @return DT_BOOL Returns true if both Range objects are not equal, otherwise false.
      */
-    MI_BOOL operator!=(const Range &r) const
+    DT_BOOL operator!=(const Range &r) const
     {
         return (m_start != r.m_start) || (m_end != r.m_end);
     }
@@ -165,8 +165,8 @@ public:
         return *this;
     }
 
-    MI_S32 m_start; /*!< The start of the range. */
-    MI_S32 m_end;   /*!< The end of the range. */
+    DT_S32 m_start; /*!< The start of the range. */
+    DT_S32 m_end;   /*!< The end of the range. */
 };
 
 /**
@@ -177,7 +177,7 @@ public:
  *
  * @return The new Range with start and end values increased by the delta.
  */
-AURA_INLINE Range operator+(const Range &r, MI_S32 delta)
+AURA_INLINE Range operator+(const Range &r, DT_S32 delta)
 {
     return Range(r.m_start + delta, r.m_end + delta);
 }
@@ -190,7 +190,7 @@ AURA_INLINE Range operator+(const Range &r, MI_S32 delta)
  *
  * @return The new Range with start and end values increased by the delta.
  */
-AURA_INLINE Range operator+(MI_S32 delta, const Range &r)
+AURA_INLINE Range operator+(DT_S32 delta, const Range &r)
 {
     return Range(r.m_start + delta, r.m_end + delta);
 }
@@ -203,7 +203,7 @@ AURA_INLINE Range operator+(MI_S32 delta, const Range &r)
  *
  * @return Range The new Range with start and end values decreased by the delta.
  */
-AURA_INLINE Range operator-(const Range &r, MI_S32 delta)
+AURA_INLINE Range operator-(const Range &r, DT_S32 delta)
 {
     return Range(r.m_start - delta, r.m_end - delta);
 }

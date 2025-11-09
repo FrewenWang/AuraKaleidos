@@ -10,49 +10,49 @@ namespace aura
 
 struct ResizeBnVtcmBuffer
 {
-    MI_U8 *xofs;
-    MI_U8 *yofs;
-    MI_U8 *alpha;
-    MI_U8 *beta;
-    MI_U8 *src_buffer;
-    MI_U8 *gather_buffer;
+    DT_U8 *xofs;
+    DT_U8 *yofs;
+    DT_U8 *alpha;
+    DT_U8 *beta;
+    DT_U8 *src_buffer;
+    DT_U8 *gather_buffer;
 };
 
 template<typename Tp>
-static Status GetResizeBnCommOffset(ResizeBnVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 iheight, MI_S32 oheight, MI_BOOL is_area)
+static Status GetResizeBnCommOffset(ResizeBnVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 iheight, DT_S32 oheight, DT_BOOL is_area)
 {
-    if (MI_NULL == vtcm_buffer)
+    if (DT_NULL == vtcm_buffer)
     {
         return Status::ERROR;
     }
 
-    MI_F64 scale_x = static_cast<MI_F64>(iwidth) / owidth;
-    MI_F64 scale_y = static_cast<MI_F64>(iheight) / oheight;
-    MI_S32 fixed_coef = (1 == sizeof(Tp)) ? 2048 : 32768;
+    DT_F64 scale_x = static_cast<DT_F64>(iwidth) / owidth;
+    DT_F64 scale_y = static_cast<DT_F64>(iheight) / oheight;
+    DT_S32 fixed_coef = (1 == sizeof(Tp)) ? 2048 : 32768;
 
-    MI_U16 *xofs  = reinterpret_cast<MI_U16 *>(vtcm_buffer->xofs);
-    MI_U16 *yofs  = reinterpret_cast<MI_U16 *>(vtcm_buffer->yofs);
-    MI_U16 *alpha = reinterpret_cast<MI_U16 *>(vtcm_buffer->alpha);
-    MI_U16 *beta  = reinterpret_cast<MI_U16 *>(vtcm_buffer->beta);
+    DT_U16 *xofs  = reinterpret_cast<DT_U16 *>(vtcm_buffer->xofs);
+    DT_U16 *yofs  = reinterpret_cast<DT_U16 *>(vtcm_buffer->yofs);
+    DT_U16 *alpha = reinterpret_cast<DT_U16 *>(vtcm_buffer->alpha);
+    DT_U16 *beta  = reinterpret_cast<DT_U16 *>(vtcm_buffer->beta);
 
-    for (MI_S32 x = 0; x < owidth; x++)
+    for (DT_S32 x = 0; x < owidth; x++)
     {
-        MI_F32 fx;
-        MI_S32 sx;
+        DT_F32 fx;
+        DT_S32 sx;
         if (!is_area)
         {
-            fx = static_cast<MI_F32>((x + 0.5) * scale_x - 0.5);
-            sx = static_cast<MI_S32>(Floor(fx));
+            fx = static_cast<DT_F32>((x + 0.5) * scale_x - 0.5);
+            sx = static_cast<DT_S32>(Floor(fx));
             fx -= sx;
         }
         else
         {
-            sx = static_cast<MI_S32>(Floor(x * scale_x));
-            fx = static_cast<MI_F32>((x + 1) - (sx + 1) / scale_x);
+            sx = static_cast<DT_S32>(Floor(x * scale_x));
+            fx = static_cast<DT_F32>((x + 1) - (sx + 1) / scale_x);
             fx = fx <= 0 ? 0.f : fx - Floor(fx);
         }
 
-        MI_U32 tx = SaturateCast<MI_U32>(fx * fixed_coef);
+        DT_U32 tx = SaturateCast<DT_U32>(fx * fixed_coef);
 
         if (sx < 0)
         {
@@ -70,24 +70,24 @@ static Status GetResizeBnCommOffset(ResizeBnVtcmBuffer *vtcm_buffer, MI_S32 iwid
         alpha[x] = fixed_coef - tx;
     }
 
-    for (MI_S32 y = 0; y < oheight; y++)
+    for (DT_S32 y = 0; y < oheight; y++)
     {
-        MI_F32 fy;
-        MI_S32 sy;
+        DT_F32 fy;
+        DT_S32 sy;
         if (!is_area)
         {
-            fy = static_cast<MI_F32>((y + 0.5) * scale_y - 0.5);
-            sy = static_cast<MI_S32>(Floor(fy));
+            fy = static_cast<DT_F32>((y + 0.5) * scale_y - 0.5);
+            sy = static_cast<DT_S32>(Floor(fy));
             fy -= sy;
         }
         else
         {
-            sy = static_cast<MI_S32>(Floor(y * scale_y));
-            fy = static_cast<MI_F32>((y + 1) - (sy + 1) / scale_y);
+            sy = static_cast<DT_S32>(Floor(y * scale_y));
+            fy = static_cast<DT_F32>((y + 1) - (sy + 1) / scale_y);
             fy = fy <= 0 ? 0.f : fy - Floor(fy);
         }
 
-        MI_U32 ty = SaturateCast<MI_U32>(fy * fixed_coef);
+        DT_U32 ty = SaturateCast<DT_U32>(fy * fixed_coef);
 
         if (sy < 0)
         {
@@ -108,21 +108,21 @@ static Status GetResizeBnCommOffset(ResizeBnVtcmBuffer *vtcm_buffer, MI_S32 iwid
     return Status::OK;
 }
 
-// Tp = MI_U8
-template<typename Tp, typename Vt, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value, AURA_VOID>::type
-ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, MI_U16 *xofs, Tp *dst,
-                MI_U16 beta, MI_U16 *alpha, MI_S32 iwidth, MI_S32 istep, MI_S32 ostep)
+// Tp = DT_U8
+template<typename Tp, typename Vt, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value, DT_VOID>::type
+ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, DT_U16 *xofs, Tp *dst,
+                DT_U16 beta, DT_U16 *alpha, DT_S32 iwidth, DT_S32 istep, DT_S32 ostep)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_U16 *row  = reinterpret_cast<MI_U16 *>(row_base);
-    constexpr MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    constexpr MI_S32 elem_counts_channel = elem_counts / C;
-    MI_S32 iwidth_align = istep / elem_counts * elem_counts;
+    DT_U16 *row  = reinterpret_cast<DT_U16 *>(row_base);
+    constexpr DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    constexpr DT_S32 elem_counts_channel = elem_counts / C;
+    DT_S32 iwidth_align = istep / elem_counts * elem_counts;
 
     HVX_Vector v_beta0 = Q6_Vh_vsplat_R(beta);
     HVX_Vector v_beta1 = Q6_Vh_vsplat_R(2048 - beta);
-    MI_S32 i = 0, j = 0;
+    DT_S32 i = 0, j = 0;
 
     // part1: calculate the median and save to vtcm
     for (; i < iwidth_align; i += elem_counts, j += elem_counts_channel)
@@ -131,7 +131,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         vload(src_c + i, mv_c_src);
         vload(src_n0 + i, mv_n0_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_c_src   = Q6_Wuh_vzxt_Vub(mv_c_src.val[ch]);
             HVX_VectorPair w_n0_src  = Q6_Wuh_vzxt_Vub(mv_n0_src.val[ch]);
@@ -160,9 +160,9 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         vload(src_c + i, mv_c_src);
         vload(src_n0 + i, mv_n0_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            MI_U16 *row_tmp         = row + j + ch * AURA_ALIGN(iwidth, HALF_AURA_HVLEN);
+            DT_U16 *row_tmp         = row + j + ch * AURA_ALIGN(iwidth, HALF_AURA_HVLEN);
             HVX_VectorPair w_c_src  = Q6_Wuh_vzxt_Vub(mv_c_src.val[ch]);
             HVX_VectorPair w_n0_src = Q6_Wuh_vzxt_Vub(mv_n0_src.val[ch]);
 
@@ -182,8 +182,8 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     }
 
     // part2: load vtcm and calculate dst
-    MI_U16 *vtcm = reinterpret_cast<MI_U16 *>(vtcm_base);
-    MI_S32 owidth_align = ostep / elem_counts * elem_counts;
+    DT_U16 *vtcm = reinterpret_cast<DT_U16 *>(vtcm_base);
+    DT_S32 owidth_align = ostep / elem_counts * elem_counts;
 
     HVX_Vector *v_ofs   = (HVX_Vector *)xofs;
     HVX_Vector *v_alpha = (HVX_Vector *)alpha;
@@ -196,7 +196,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     HVX_Vector *r0_gather_hi[C];
     HVX_Vector *r1_gather_lo[C];
     HVX_Vector *r1_gather_hi[C];
-    MI_U16 *row_ch[C];
+    DT_U16 *row_ch[C];
 
     {
         HVX_Vector v_offset_c       = *v_ofs++;
@@ -204,9 +204,9 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         HVX_Vector v_offset_add1_c  = Q6_Vuh_vadd_VuhVuh_sat(v_offset_c, Q6_Vh_vsplat_R(2));
         HVX_Vector v_offset_add1_r0 = Q6_Vuh_vadd_VuhVuh_sat(v_offset_r0, Q6_Vh_vsplat_R(2));
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            MI_U16 *vtcm_gather = vtcm + ch * HALF_AURA_HVLEN * 8;
+            DT_U16 *vtcm_gather = vtcm + ch * HALF_AURA_HVLEN * 8;
 
             row_ch[ch]       = row + ch * AURA_ALIGN(iwidth, HALF_AURA_HVLEN);
             l1_gather_lo[ch] = (HVX_Vector *)(vtcm_gather);
@@ -218,10 +218,10 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
             r1_gather_lo[ch] = (HVX_Vector *)(vtcm_gather + HALF_AURA_HVLEN * 6);
             r1_gather_hi[ch] = (HVX_Vector *)(vtcm_gather + HALF_AURA_HVLEN * 7);
 
-            Q6_vgather_ARMVh(l1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
-            Q6_vgather_ARMVh(l0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVh(l1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
-            Q6_vgather_ARMVh(l0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVh(l1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
+            Q6_vgather_ARMVh(l0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVh(l1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
+            Q6_vgather_ARMVh(l0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
         }
     }
 
@@ -238,13 +238,13 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         HVX_Vector v_alpha1_r0      = Q6_Vuh_vsub_VuhVuh_sat(Q6_Vh_vsplat_R(2048), v_alpha_r0);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector *v_tmp[4];
-            Q6_vgather_ARMVh(r0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
-            Q6_vgather_ARMVh(r1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVh(r0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
-            Q6_vgather_ARMVh(r1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVh(r0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
+            Q6_vgather_ARMVh(r1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVh(r0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
+            Q6_vgather_ARMVh(r1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
 
             HVX_VectorPair w_result0 = Q6_Wuw_vmpy_VuhVuh(*l1_gather_lo[ch], v_alpha_c);
             HVX_VectorPair w_result1 = Q6_Wuw_vmpy_VuhVuh(*l1_gather_hi[ch], v_alpha_r0);
@@ -286,7 +286,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         HVX_Vector v_alpha1_c  = Q6_Vuh_vsub_VuhVuh_sat(Q6_Vh_vsplat_R(2048), v_alpha_c);
         HVX_Vector v_alpha1_r0 = Q6_Vuh_vsub_VuhVuh_sat(Q6_Vh_vsplat_R(2048), v_alpha_r0);
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_result0 = Q6_Wuw_vmpy_VuhVuh(*l1_gather_lo[ch], v_alpha_c);
             HVX_VectorPair w_result1 = Q6_Wuw_vmpy_VuhVuh(*l1_gather_hi[ch], v_alpha_r0);
@@ -321,12 +321,12 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         HVX_Vector v_alpha1_r0      = Q6_Vuh_vsub_VuhVuh_sat(Q6_Vh_vsplat_R(2048), v_alpha_r0);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            Q6_vgather_ARMVh(l1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
-            Q6_vgather_ARMVh(l0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVh(l1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
-            Q6_vgather_ARMVh(l0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVh(l1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
+            Q6_vgather_ARMVh(l0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVh(l1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
+            Q6_vgather_ARMVh(l0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
 
             HVX_VectorPair w_result0 = Q6_Wuw_vmpy_VuhVuh(*l1_gather_lo[ch], v_alpha_c);
             HVX_VectorPair w_result1 = Q6_Wuw_vmpy_VuhVuh(*l1_gather_hi[ch], v_alpha_r0);
@@ -347,21 +347,21 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     }
 }
 
-// Tp = MI_S8
-template<typename Tp, typename Vt, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_S8, Tp>::value, AURA_VOID>::type
-ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, MI_U16 *xofs, Tp *dst,
-                MI_U16 beta, MI_U16 *alpha, MI_S32 iwidth, MI_S32 istep, MI_S32 ostep)
+// Tp = DT_S8
+template<typename Tp, typename Vt, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_S8, Tp>::value, DT_VOID>::type
+ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, DT_U16 *xofs, Tp *dst,
+                DT_U16 beta, DT_U16 *alpha, DT_S32 iwidth, DT_S32 istep, DT_S32 ostep)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_U16 *row  = reinterpret_cast<MI_U16 *>(row_base);
-    constexpr MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    constexpr MI_S32 elem_counts_channel = elem_counts / C;
-    MI_S32 iwidth_align = istep / elem_counts * elem_counts;
+    DT_U16 *row  = reinterpret_cast<DT_U16 *>(row_base);
+    constexpr DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    constexpr DT_S32 elem_counts_channel = elem_counts / C;
+    DT_S32 iwidth_align = istep / elem_counts * elem_counts;
 
     HVX_Vector v_beta0 = Q6_Vh_vsplat_R(beta);
     HVX_Vector v_beta1 = Q6_Vh_vsplat_R(2048 - beta);
-    MI_S32 i = 0, j = 0;
+    DT_S32 i = 0, j = 0;
 
     // part1: calculate the median and save to vtcm
     for (; i < iwidth_align; i += elem_counts, j += elem_counts_channel)
@@ -370,7 +370,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         vload(src_c + i, mv_c_src);
         vload(src_n0 + i, mv_n0_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_c_src   = Q6_Wh_vsxt_Vb(mv_c_src.val[ch]);
             HVX_VectorPair w_n0_src  = Q6_Wh_vsxt_Vb(mv_n0_src.val[ch]);
@@ -400,9 +400,9 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         vload(src_c + i, mv_c_src);
         vload(src_n0 + i, mv_n0_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            MI_U16 *row_tmp = row + j + ch * AURA_ALIGN(iwidth, HALF_AURA_HVLEN);
+            DT_U16 *row_tmp = row + j + ch * AURA_ALIGN(iwidth, HALF_AURA_HVLEN);
             HVX_VectorPair w_c_src  = Q6_Wh_vsxt_Vb(mv_c_src.val[ch]);
             HVX_VectorPair w_n0_src = Q6_Wh_vsxt_Vb(mv_n0_src.val[ch]);
 
@@ -422,8 +422,8 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     }
 
     // part2: load vtcm and calculate dst
-    MI_U16 *vtcm = reinterpret_cast<MI_U16 *>(vtcm_base);
-    MI_S32 owidth_align = ostep / elem_counts * elem_counts;
+    DT_U16 *vtcm = reinterpret_cast<DT_U16 *>(vtcm_base);
+    DT_S32 owidth_align = ostep / elem_counts * elem_counts;
 
     HVX_Vector *v_ofs   = (HVX_Vector *)xofs;
     HVX_Vector *v_alpha = (HVX_Vector *)alpha;
@@ -436,7 +436,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     HVX_Vector *r0_gather_hi[C];
     HVX_Vector *r1_gather_lo[C];
     HVX_Vector *r1_gather_hi[C];
-    MI_U16 *row_ch[C];
+    DT_U16 *row_ch[C];
 
     {
         HVX_Vector v_offset_c       = *v_ofs++;
@@ -444,9 +444,9 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         HVX_Vector v_offset_add1_c  = Q6_Vuh_vadd_VuhVuh_sat(v_offset_c, Q6_Vh_vsplat_R(2));
         HVX_Vector v_offset_add1_r0 = Q6_Vuh_vadd_VuhVuh_sat(v_offset_r0, Q6_Vh_vsplat_R(2));
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            MI_U16 *vtcm_gather = vtcm + ch * HALF_AURA_HVLEN * 8;
+            DT_U16 *vtcm_gather = vtcm + ch * HALF_AURA_HVLEN * 8;
             row_ch[ch]       = row + ch * AURA_ALIGN(iwidth, HALF_AURA_HVLEN);
             l1_gather_lo[ch] = (HVX_Vector *)vtcm_gather;
             l1_gather_hi[ch] = (HVX_Vector *)(vtcm_gather + HALF_AURA_HVLEN);
@@ -457,10 +457,10 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
             r1_gather_lo[ch] = (HVX_Vector *)(vtcm_gather + HALF_AURA_HVLEN * 6);
             r1_gather_hi[ch] = (HVX_Vector *)(vtcm_gather + HALF_AURA_HVLEN * 7);
 
-            Q6_vgather_ARMVh(l1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
-            Q6_vgather_ARMVh(l0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVh(l1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
-            Q6_vgather_ARMVh(l0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVh(l1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
+            Q6_vgather_ARMVh(l0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVh(l1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
+            Q6_vgather_ARMVh(l0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
         }
     }
 
@@ -477,13 +477,13 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         HVX_Vector v_alpha1_r0      = Q6_Vuh_vsub_VuhVuh_sat(Q6_Vh_vsplat_R(2048), v_alpha_r0);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector *v_tmp[4];
-            Q6_vgather_ARMVh(r0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
-            Q6_vgather_ARMVh(r1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVh(r0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
-            Q6_vgather_ARMVh(r1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVh(r0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
+            Q6_vgather_ARMVh(r1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVh(r0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
+            Q6_vgather_ARMVh(r1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
 
             HVX_VectorPair w_result0 = Q6_Ww_vmpy_VhVh(*l1_gather_lo[ch], v_alpha_c);
             HVX_VectorPair w_result1 = Q6_Ww_vmpy_VhVh(*l1_gather_hi[ch], v_alpha_r0);
@@ -525,7 +525,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         HVX_Vector v_alpha1_c  = Q6_Vuh_vsub_VuhVuh_sat(Q6_Vh_vsplat_R(2048), v_alpha_c);
         HVX_Vector v_alpha1_r0 = Q6_Vuh_vsub_VuhVuh_sat(Q6_Vh_vsplat_R(2048), v_alpha_r0);
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_result0 = Q6_Ww_vmpy_VhVh(*l1_gather_lo[ch], v_alpha_c);
             HVX_VectorPair w_result1 = Q6_Ww_vmpy_VhVh(*l1_gather_hi[ch], v_alpha_r0);
@@ -560,12 +560,12 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         HVX_Vector v_alpha1_r0      = Q6_Vuh_vsub_VuhVuh_sat(Q6_Vh_vsplat_R(2048), v_alpha_r0);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            Q6_vgather_ARMVh(l1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
-            Q6_vgather_ARMVh(l0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVh(l1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
-            Q6_vgather_ARMVh(l0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVh(l1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_c);
+            Q6_vgather_ARMVh(l0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVh(l1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_r0);
+            Q6_vgather_ARMVh(l0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 1) - 1, v_offset_add1_r0);
 
             HVX_VectorPair w_result0 = Q6_Ww_vmpy_VhVh(*l1_gather_lo[ch], v_alpha_c);
             HVX_VectorPair w_result1 = Q6_Ww_vmpy_VhVh(*l1_gather_hi[ch], v_alpha_r0);
@@ -585,21 +585,21 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     }
 }
 
-// Tp = MI_U16
-template<typename Tp, typename Vt, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value, AURA_VOID>::type
-ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, MI_U16 *xofs, Tp *dst,
-                MI_U16 beta, MI_U16 *alpha, MI_S32 iwidth, MI_S32 istep, MI_S32 ostep)
+// Tp = DT_U16
+template<typename Tp, typename Vt, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value, DT_VOID>::type
+ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, DT_U16 *xofs, Tp *dst,
+                DT_U16 beta, DT_U16 *alpha, DT_S32 iwidth, DT_S32 istep, DT_S32 ostep)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 *row  = reinterpret_cast<MI_S32 *>(row_base);
-    constexpr MI_S32 elem_counts         = AURA_HVLEN * C / sizeof(Tp);
-    constexpr MI_S32 elem_counts_channel = elem_counts / C;
-    MI_S32 iwidth_align = istep / elem_counts * elem_counts;
+    DT_S32 *row  = reinterpret_cast<DT_S32 *>(row_base);
+    constexpr DT_S32 elem_counts         = AURA_HVLEN * C / sizeof(Tp);
+    constexpr DT_S32 elem_counts_channel = elem_counts / C;
+    DT_S32 iwidth_align = istep / elem_counts * elem_counts;
 
     HVX_Vector v_beta0 = Q6_Vh_vsplat_R(beta);
     HVX_Vector v_beta1 = Q6_Vh_vsplat_R(32768 - beta);
-    MI_S32 i = 0, j = 0;
+    DT_S32 i = 0, j = 0;
 
     // part1: calculate the median and save to vtcm
     for (; i < iwidth_align; i += elem_counts, j += elem_counts_channel)
@@ -608,7 +608,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         vload(src_c + i, mv_c_src);
         vload(src_n0 + i, mv_n0_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_c_src.val[ch]  = Q6_Vh_vshuff_Vh(mv_c_src.val[ch]);
             mv_n0_src.val[ch] = Q6_Vh_vshuff_Vh(mv_n0_src.val[ch]);
@@ -630,9 +630,9 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         vload(src_c + i, mv_c_src);
         vload(src_n0 + i, mv_n0_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            MI_S32 *row_tmp   = row + j + ch * AURA_ALIGN(iwidth, QUAR_AURA_HVLEN);
+            DT_S32 *row_tmp   = row + j + ch * AURA_ALIGN(iwidth, QUAR_AURA_HVLEN);
             mv_c_src.val[ch]  = Q6_Vh_vshuff_Vh(mv_c_src.val[ch]);
             mv_n0_src.val[ch] = Q6_Vh_vshuff_Vh(mv_n0_src.val[ch]);
             HVX_VectorPair w_result = Q6_Wuw_vmpy_VuhVuh(mv_c_src.val[ch], v_beta0);
@@ -644,8 +644,8 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     }
 
     // part2: load vtcm and calculate dst
-    MI_S32 *vtcm = reinterpret_cast<MI_S32 *>(vtcm_base);
-    MI_S32 owidth_align = ostep / elem_counts * elem_counts;
+    DT_S32 *vtcm = reinterpret_cast<DT_S32 *>(vtcm_base);
+    DT_S32 owidth_align = ostep / elem_counts * elem_counts;
 
     HVX_Vector *v_ofs   = (HVX_Vector *)xofs;
     HVX_Vector *v_alpha = (HVX_Vector *)alpha;
@@ -658,7 +658,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     HVX_Vector *r0_gather_hi[C];
     HVX_Vector *r1_gather_lo[C];
     HVX_Vector *r1_gather_hi[C];
-    MI_S32 *row_ch[C];
+    DT_S32 *row_ch[C];
 
     {
         HVX_Vector v_offset_c        = *v_ofs++;
@@ -670,9 +670,9 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         v_offset_c                   = Q6_V_lo_W(w_offset);
         v_offset_add1_c              = Q6_V_lo_W(w_offset_add1);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            MI_S32 *vtcm_gather = vtcm + ch * QUAR_AURA_HVLEN * 8;
+            DT_S32 *vtcm_gather = vtcm + ch * QUAR_AURA_HVLEN * 8;
             row_ch[ch]          = row + ch * AURA_ALIGN(iwidth, QUAR_AURA_HVLEN);
             l1_gather_lo[ch]    = (HVX_Vector *)(vtcm_gather);
             l1_gather_hi[ch]    = (HVX_Vector *)(vtcm_gather + QUAR_AURA_HVLEN);
@@ -683,10 +683,10 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
             r1_gather_lo[ch]    = (HVX_Vector *)(vtcm_gather + QUAR_AURA_HVLEN * 6);
             r1_gather_hi[ch]    = (HVX_Vector *)(vtcm_gather + QUAR_AURA_HVLEN * 7);
 
-            Q6_vgather_ARMVw(l1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
-            Q6_vgather_ARMVw(l0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVw(l1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
-            Q6_vgather_ARMVw(l0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVw(l1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
+            Q6_vgather_ARMVw(l0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVw(l1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
+            Q6_vgather_ARMVw(l0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
         }
     }
 
@@ -712,13 +712,13 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         v_alpha1_c             = Q6_V_lo_W(w_tmp1);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector *v_tmp[4];
-            Q6_vgather_ARMVw(r0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
-            Q6_vgather_ARMVw(r1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVw(r0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
-            Q6_vgather_ARMVw(r1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVw(r0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
+            Q6_vgather_ARMVw(r1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVw(r0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
+            Q6_vgather_ARMVw(r1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
 
             HVX_Vector v_result0 = Q6_Vuw_vmul32xlo16lsr16_VuwVuw(*l1_gather_lo[ch], v_alpha_c);
             HVX_Vector v_result1 = Q6_Vuw_vmul32xlo16lsr16_VuwVuw(*l1_gather_hi[ch], v_alpha_r0);
@@ -761,7 +761,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         v_alpha1_c             = Q6_V_lo_W(w_tmp1);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_result0 = Q6_Vuw_vmul32xlo16lsr16_VuwVuw(*l1_gather_lo[ch], v_alpha_c);
             HVX_Vector v_result1 = Q6_Vuw_vmul32xlo16lsr16_VuwVuw(*l1_gather_hi[ch], v_alpha_r0);
@@ -803,12 +803,12 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         v_alpha1_c             = Q6_V_lo_W(w_tmp1);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            Q6_vgather_ARMVw(l1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
-            Q6_vgather_ARMVw(l0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVw(l1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
-            Q6_vgather_ARMVw(l0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVw(l1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
+            Q6_vgather_ARMVw(l0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVw(l1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
+            Q6_vgather_ARMVw(l0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
 
             HVX_Vector v_result0 = Q6_Vuw_vmul32xlo16lsr16_VuwVuw(*l1_gather_lo[ch], v_alpha_c);
             HVX_Vector v_result1 = Q6_Vuw_vmul32xlo16lsr16_VuwVuw(*l1_gather_hi[ch], v_alpha_r0);
@@ -826,21 +826,21 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     }
 }
 
-// Tp = MI_S16
-template<typename Tp, typename Vt, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_S16, Tp>::value, AURA_VOID>::type
-ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, MI_U16 *xofs, Tp *dst,
-                MI_U16 beta, MI_U16 *alpha, MI_S32 iwidth, MI_S32 istep, MI_S32 ostep)
+// Tp = DT_S16
+template<typename Tp, typename Vt, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_S16, Tp>::value, DT_VOID>::type
+ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, DT_U16 *xofs, Tp *dst,
+                DT_U16 beta, DT_U16 *alpha, DT_S32 iwidth, DT_S32 istep, DT_S32 ostep)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 *row  = reinterpret_cast<MI_S32 *>(row_base);
-    constexpr MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    constexpr MI_S32 elem_counts_channel = elem_counts / C;
-    MI_S32 iwidth_align = istep / elem_counts * elem_counts;
+    DT_S32 *row  = reinterpret_cast<DT_S32 *>(row_base);
+    constexpr DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    constexpr DT_S32 elem_counts_channel = elem_counts / C;
+    DT_S32 iwidth_align = istep / elem_counts * elem_counts;
 
     HVX_Vector v_beta0 = Q6_Vh_vsplat_R(beta);
     HVX_Vector v_beta1 = Q6_Vh_vsplat_R(32768 - beta);
-    MI_S32 i = 0, j = 0;
+    DT_S32 i = 0, j = 0;
 
     // part1: calculate the median and save to vtcm
     for (; i < iwidth_align; i += elem_counts, j += elem_counts_channel)
@@ -849,7 +849,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         vload(src_c + i, mv_c_src);
         vload(src_n0 + i, mv_n0_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_c_src.val[ch] = Q6_Vh_vshuff_Vh(mv_c_src.val[ch]);
             mv_n0_src.val[ch] = Q6_Vh_vshuff_Vh(mv_n0_src.val[ch]);
@@ -871,9 +871,9 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         vload(src_c + i, mv_c_src);
         vload(src_n0 + i, mv_n0_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            MI_S32 *row_tmp = row + j + ch * AURA_ALIGN(iwidth, QUAR_AURA_HVLEN);
+            DT_S32 *row_tmp = row + j + ch * AURA_ALIGN(iwidth, QUAR_AURA_HVLEN);
             mv_c_src.val[ch] = Q6_Vh_vshuff_Vh(mv_c_src.val[ch]);
             mv_n0_src.val[ch] = Q6_Vh_vshuff_Vh(mv_n0_src.val[ch]);
             HVX_VectorPair w_result = Q6_Ww_vmpy_VhVuh(mv_c_src.val[ch], v_beta0);
@@ -885,8 +885,8 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     }
 
     // part2: load vtcm and calculate dst
-    MI_S32 *vtcm = reinterpret_cast<MI_S32 *>(vtcm_base);
-    MI_S32 owidth_align = ostep / elem_counts * elem_counts;
+    DT_S32 *vtcm = reinterpret_cast<DT_S32 *>(vtcm_base);
+    DT_S32 owidth_align = ostep / elem_counts * elem_counts;
 
     HVX_Vector *v_ofs   = (HVX_Vector *)xofs;
     HVX_Vector *v_alpha = (HVX_Vector *)alpha;
@@ -899,7 +899,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     HVX_Vector *r0_gather_hi[C];
     HVX_Vector *r1_gather_lo[C];
     HVX_Vector *r1_gather_hi[C];
-    MI_S32 *row_ch[C];
+    DT_S32 *row_ch[C];
 
     {
         HVX_Vector v_offset_c        = *v_ofs++;
@@ -911,9 +911,9 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         v_offset_c                   = Q6_V_lo_W(w_offset);
         v_offset_add1_c              = Q6_V_lo_W(w_offset_add1);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            MI_S32 *vtcm_gather = vtcm + ch * QUAR_AURA_HVLEN * 8;
+            DT_S32 *vtcm_gather = vtcm + ch * QUAR_AURA_HVLEN * 8;
             row_ch[ch]          = row + ch * AURA_ALIGN(iwidth, QUAR_AURA_HVLEN);
             
             l1_gather_lo[ch] = (HVX_Vector *)(vtcm_gather);
@@ -925,10 +925,10 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
             r1_gather_lo[ch] = (HVX_Vector *)(vtcm_gather + QUAR_AURA_HVLEN * 6);
             r1_gather_hi[ch] = (HVX_Vector *)(vtcm_gather + QUAR_AURA_HVLEN * 7);
 
-            Q6_vgather_ARMVw(l1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
-            Q6_vgather_ARMVw(l0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVw(l1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
-            Q6_vgather_ARMVw(l0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVw(l1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
+            Q6_vgather_ARMVw(l0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVw(l1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
+            Q6_vgather_ARMVw(l0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
         }
     }
 
@@ -954,13 +954,13 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         v_alpha1_c             = Q6_V_lo_W(w_tmp1);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector *v_tmp[4];
-            Q6_vgather_ARMVw(r0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
-            Q6_vgather_ARMVw(r1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVw(r0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
-            Q6_vgather_ARMVw(r1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVw(r0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
+            Q6_vgather_ARMVw(r1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVw(r0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
+            Q6_vgather_ARMVw(r1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
 
             HVX_Vector v_result0 = Q6_Vw_vmul32xlo16lsr16_VwVuw(*l1_gather_lo[ch], v_alpha_c);
             HVX_Vector v_result1 = Q6_Vw_vmul32xlo16lsr16_VwVuw(*l1_gather_hi[ch], v_alpha_r0);
@@ -1003,7 +1003,7 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         v_alpha1_c             = Q6_V_lo_W(w_tmp1);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_result0 = Q6_Vw_vmul32xlo16lsr16_VwVuw(*l1_gather_lo[ch], v_alpha_c);
             HVX_Vector v_result1 = Q6_Vw_vmul32xlo16lsr16_VwVuw(*l1_gather_hi[ch], v_alpha_r0);
@@ -1044,12 +1044,12 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
         v_alpha1_c             = Q6_V_lo_W(w_tmp1);
 
         MVType mv_result;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
-            Q6_vgather_ARMVw(l1_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
-            Q6_vgather_ARMVw(l0_gather_lo[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
-            Q6_vgather_ARMVw(l1_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
-            Q6_vgather_ARMVw(l0_gather_hi[ch], (MI_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
+            Q6_vgather_ARMVw(l1_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_c);
+            Q6_vgather_ARMVw(l0_gather_lo[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_c);
+            Q6_vgather_ARMVw(l1_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_r0);
+            Q6_vgather_ARMVw(l0_gather_hi[ch], (DT_U32)(row_ch[ch]), (iwidth << 2) - 1, v_offset_add1_r0);
 
             HVX_Vector v_result0 = Q6_Vw_vmul32xlo16lsr16_VwVuw(*l1_gather_lo[ch], v_alpha_c);
             HVX_Vector v_result1 = Q6_Vw_vmul32xlo16lsr16_VwVuw(*l1_gather_hi[ch], v_alpha_r0);
@@ -1067,30 +1067,30 @@ ResizeBnCommRow(const Tp *src_c, const Tp *src_n0, Vt *row_base, Vt *vtcm_base, 
     }
 }
 
-template<typename Tp, typename Vt, MI_S32 C>
-static Status ResizeBnCommHvxImpl(const Mat &src, Mat &dst, ResizeBnVtcmBuffer *vtcm_buffer, MI_S32 thread_num, MI_S32 start_height, MI_S32 end_height)
+template<typename Tp, typename Vt, DT_S32 C>
+static Status ResizeBnCommHvxImpl(const Mat &src, Mat &dst, ResizeBnVtcmBuffer *vtcm_buffer, DT_S32 thread_num, DT_S32 start_height, DT_S32 end_height)
 {
-    MI_S32 iwidth    = src.GetSizes().m_width;
-    MI_S32 istride   = src.GetStrides().m_width;
-    MI_S32 owidth    = dst.GetSizes().m_width;
-    MI_S32 oheight   = dst.GetSizes().m_height;
-    MI_S32 istep     = iwidth * C;
-    MI_S32 ostep     = owidth * C;
-    MI_S32 thread_id = SaturateCast<MI_S32>(static_cast<MI_F32>(start_height) * thread_num / oheight);
+    DT_S32 iwidth    = src.GetSizes().m_width;
+    DT_S32 istride   = src.GetStrides().m_width;
+    DT_S32 owidth    = dst.GetSizes().m_width;
+    DT_S32 oheight   = dst.GetSizes().m_height;
+    DT_S32 istep     = iwidth * C;
+    DT_S32 ostep     = owidth * C;
+    DT_S32 thread_id = SaturateCast<DT_S32>(static_cast<DT_F32>(start_height) * thread_num / oheight);
 
-    MI_U16 *xofs  = reinterpret_cast<MI_U16 *>(vtcm_buffer->xofs);
-    MI_U16 *yofs  = reinterpret_cast<MI_U16 *>(vtcm_buffer->yofs);
-    MI_U16 *alpha = reinterpret_cast<MI_U16 *>(vtcm_buffer->alpha);
-    MI_U16 *beta  = reinterpret_cast<MI_U16 *>(vtcm_buffer->beta);
+    DT_U16 *xofs  = reinterpret_cast<DT_U16 *>(vtcm_buffer->xofs);
+    DT_U16 *yofs  = reinterpret_cast<DT_U16 *>(vtcm_buffer->yofs);
+    DT_U16 *alpha = reinterpret_cast<DT_U16 *>(vtcm_buffer->alpha);
+    DT_U16 *beta  = reinterpret_cast<DT_U16 *>(vtcm_buffer->beta);
     Vt *row_base  = reinterpret_cast<Vt *>(vtcm_buffer->src_buffer + AURA_ALIGN(iwidth * sizeof(Vt), AURA_HVLEN) * C * thread_id);
     Vt *vtcm_base = reinterpret_cast<Vt *>(vtcm_buffer->gather_buffer + (AURA_HVLEN * 8) * C * thread_id);
-    MI_U64 l2fetch_param = L2PfParam(istride, iwidth * sizeof(Tp) * C, 2, 0);
+    DT_U64 l2fetch_param = L2PfParam(istride, iwidth * sizeof(Tp) * C, 2, 0);
 
-    for (MI_S32 y = start_height; y < end_height; y++)
+    for (DT_S32 y = start_height; y < end_height; y++)
     {
         if (y + 1 < end_height)
         {
-            L2Fetch(reinterpret_cast<MI_U64>(src.Ptr<Tp>(yofs[y + 1])), l2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U64>(src.Ptr<Tp>(yofs[y + 1])), l2fetch_param);
         }
 
         const Tp *src_c  = src.Ptr<Tp>(yofs[y]);
@@ -1103,33 +1103,33 @@ static Status ResizeBnCommHvxImpl(const Mat &src, Mat &dst, ResizeBnVtcmBuffer *
 }
 
 template<typename Tp, typename Vt>
-static Status ResizeBnCommHvxHelper(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area)
+static Status ResizeBnCommHvxHelper(Context *ctx, const Mat &src, Mat &dst, DT_BOOL is_area)
 {
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool fail");
         return Status::ERROR;
     }
 
     Status ret        = Status::ERROR;
-    MI_S32 iwidth     = src.GetSizes().m_width;
-    MI_S32 iheight    = src.GetSizes().m_height;
-    MI_S32 channel    = src.GetSizes().m_channel;
-    MI_S32 owidth     = dst.GetSizes().m_width;
-    MI_S32 oheight    = dst.GetSizes().m_height;
-    MI_S32 thread_num = wp->GetComputeThreadNum();
+    DT_S32 iwidth     = src.GetSizes().m_width;
+    DT_S32 iheight    = src.GetSizes().m_height;
+    DT_S32 channel    = src.GetSizes().m_channel;
+    DT_S32 owidth     = dst.GetSizes().m_width;
+    DT_S32 oheight    = dst.GetSizes().m_height;
+    DT_S32 thread_num = wp->GetComputeThreadNum();
 
-    MI_S32 xofs_size          = AURA_ALIGN(owidth  * sizeof(MI_U16), AURA_HVLEN);
-    MI_S32 yofs_size          = AURA_ALIGN(oheight * sizeof(MI_U16), AURA_HVLEN);
-    MI_S32 alpha_size         = AURA_ALIGN(owidth  * sizeof(MI_U16), AURA_HVLEN);
-    MI_S32 beta_size          = AURA_ALIGN(oheight * sizeof(MI_U16), AURA_HVLEN);
-    MI_S32 src_buffer_size    = AURA_ALIGN(iwidth  * sizeof(Vt), AURA_HVLEN) * channel * thread_num;
-    MI_S32 gather_buffer_size = (AURA_HVLEN * 8) * channel * thread_num;
-    MI_S32 total_buffer_size  = xofs_size + yofs_size + alpha_size + beta_size + src_buffer_size + gather_buffer_size;
+    DT_S32 xofs_size          = AURA_ALIGN(owidth  * sizeof(DT_U16), AURA_HVLEN);
+    DT_S32 yofs_size          = AURA_ALIGN(oheight * sizeof(DT_U16), AURA_HVLEN);
+    DT_S32 alpha_size         = AURA_ALIGN(owidth  * sizeof(DT_U16), AURA_HVLEN);
+    DT_S32 beta_size          = AURA_ALIGN(oheight * sizeof(DT_U16), AURA_HVLEN);
+    DT_S32 src_buffer_size    = AURA_ALIGN(iwidth  * sizeof(Vt), AURA_HVLEN) * channel * thread_num;
+    DT_S32 gather_buffer_size = (AURA_HVLEN * 8) * channel * thread_num;
+    DT_S32 total_buffer_size  = xofs_size + yofs_size + alpha_size + beta_size + src_buffer_size + gather_buffer_size;
 
-    MI_U8 *vtcm_mem = static_cast<MI_U8*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_VTCM, total_buffer_size, AURA_HVLEN));
-    if (MI_NULL == vtcm_mem)
+    DT_U8 *vtcm_mem = static_cast<DT_U8*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_VTCM, total_buffer_size, AURA_HVLEN));
+    if (DT_NULL == vtcm_mem)
     {
         AURA_ADD_ERROR_STRING(ctx, "alloc vtcm memory failed");
         AURA_FREE(ctx, vtcm_mem);
@@ -1156,7 +1156,7 @@ static Status ResizeBnCommHvxHelper(Context *ctx, const Mat &src, Mat &dst, MI_B
     {
         case 1:
         {
-            ret = wp->ParallelFor((MI_S32)0, oheight, ResizeBnCommHvxImpl<Tp, Vt, 1>, std::cref(src), std::ref(dst), &vtcm_buffer, thread_num);
+            ret = wp->ParallelFor((DT_S32)0, oheight, ResizeBnCommHvxImpl<Tp, Vt, 1>, std::cref(src), std::ref(dst), &vtcm_buffer, thread_num);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(ctx, "ParallelFor for ResizeBnCommHvxImpl of c1 failed");
@@ -1166,7 +1166,7 @@ static Status ResizeBnCommHvxHelper(Context *ctx, const Mat &src, Mat &dst, MI_B
 
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, oheight, ResizeBnCommHvxImpl<Tp, Vt, 2>, std::cref(src), std::ref(dst), &vtcm_buffer, thread_num);
+            ret = wp->ParallelFor((DT_S32)0, oheight, ResizeBnCommHvxImpl<Tp, Vt, 2>, std::cref(src), std::ref(dst), &vtcm_buffer, thread_num);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(ctx, "ParallelFor for ResizeBnCommHvxImpl of c2 failed");
@@ -1176,7 +1176,7 @@ static Status ResizeBnCommHvxHelper(Context *ctx, const Mat &src, Mat &dst, MI_B
 
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, oheight, ResizeBnCommHvxImpl<Tp, Vt, 3>, std::cref(src), std::ref(dst), &vtcm_buffer, thread_num);
+            ret = wp->ParallelFor((DT_S32)0, oheight, ResizeBnCommHvxImpl<Tp, Vt, 3>, std::cref(src), std::ref(dst), &vtcm_buffer, thread_num);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(ctx, "ParallelFor for ResizeBnCommHvxImpl of c3 failed");
@@ -1195,7 +1195,7 @@ static Status ResizeBnCommHvxHelper(Context *ctx, const Mat &src, Mat &dst, MI_B
     AURA_RETURN(ctx, ret);
 }
 
-Status ResizeBnCommHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area)
+Status ResizeBnCommHvx(Context *ctx, const Mat &src, Mat &dst, DT_BOOL is_area)
 {
     Status ret = Status::ERROR;
 
@@ -1203,40 +1203,40 @@ Status ResizeBnCommHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area)
     {
         case ElemType::U8:
         {
-            ret = ResizeBnCommHvxHelper<MI_U8, MI_U16>(ctx, src, dst, is_area);
+            ret = ResizeBnCommHvxHelper<DT_U8, DT_U16>(ctx, src, dst, is_area);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommHvxHelper run failed, type: MI_U8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommHvxHelper run failed, type: DT_U8");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            ret = ResizeBnCommHvxHelper<MI_S8, MI_U16>(ctx, src, dst, is_area);
+            ret = ResizeBnCommHvxHelper<DT_S8, DT_U16>(ctx, src, dst, is_area);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommHvxHelper run failed, type: MI_S8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommHvxHelper run failed, type: DT_S8");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = ResizeBnCommHvxHelper<MI_U16, MI_S32>(ctx, src, dst, is_area);
+            ret = ResizeBnCommHvxHelper<DT_U16, DT_S32>(ctx, src, dst, is_area);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommHvxHelper run failed, type: MI_U16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommHvxHelper run failed, type: DT_U16");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = ResizeBnCommHvxHelper<MI_S16, MI_S32>(ctx, src, dst, is_area);
+            ret = ResizeBnCommHvxHelper<DT_S16, DT_S32>(ctx, src, dst, is_area);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommHvxHelper run failed, type: MI_S16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommHvxHelper run failed, type: DT_S16");
             }
             break;
         }

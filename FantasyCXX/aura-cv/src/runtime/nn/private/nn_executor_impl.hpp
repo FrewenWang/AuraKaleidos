@@ -41,7 +41,7 @@ enum class NNLogLevel
     LOG_DEBUG             /*!< DEBUG log level*/
 };
 
-AURA_INLINE AURA_VOID NNStringToLower(std::string &str)
+AURA_INLINE DT_VOID NNStringToLower(std::string &str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
@@ -208,9 +208,9 @@ AURA_INLINE NNBackend GetNNBackend(const NNConfig &config)
     return backend;
 }
 
-AURA_INLINE MI_S32 GetHtpMemStepSize(const NNConfig &config)
+AURA_INLINE DT_S32 GetHtpMemStepSize(const NNConfig &config)
 {
-    MI_S32 mem_step_size = 0;
+    DT_S32 mem_step_size = 0;
 
     if (config.count("htp_mem_step_size"))
     {
@@ -222,9 +222,9 @@ AURA_INLINE MI_S32 GetHtpMemStepSize(const NNConfig &config)
     return mem_step_size;
 }
 
-AURA_INLINE MI_BOOL GetHtpAsyncCall(const NNConfig &config)
+AURA_INLINE DT_BOOL GetHtpAsyncCall(const NNConfig &config)
 {
-    MI_BOOL htp_async_call_flag = MI_TRUE;
+    DT_BOOL htp_async_call_flag = DT_TRUE;
 
     if (config.count("htp_async_call"))
     {
@@ -234,7 +234,7 @@ AURA_INLINE MI_BOOL GetHtpAsyncCall(const NNConfig &config)
 
         if (value == std::string("false"))
         {
-            htp_async_call_flag = MI_FALSE;
+            htp_async_call_flag = DT_FALSE;
         }
     }
 
@@ -404,13 +404,13 @@ public:
         return instance;
     }
 
-    AURA_VOID AddRefCount()
+    DT_VOID AddRefCount()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_ref_count++;
     }
 
-    AURA_VOID AddNNLibrary(NNLibrary *library)
+    DT_VOID AddNNLibrary(NNLibrary *library)
     {
         if (library)
         {
@@ -418,7 +418,7 @@ public:
         }
     }
 
-    AURA_VOID Destroy()
+    DT_VOID Destroy()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_ref_count--;
@@ -444,14 +444,14 @@ private:
     AURA_DISABLE_COPY_AND_ASSIGN(NNLibraryManager);
 private:
     std::vector<NNLibrary*> m_librarys;
-    MI_S32 m_ref_count;
+    DT_S32 m_ref_count;
     std::mutex m_mutex;
 };
 
 class NNExecutorImpl : public NNExecutor
 {
 public:
-    NNExecutorImpl(Context *ctx) : NNExecutor(ctx), m_is_valid(MI_FALSE)
+    NNExecutorImpl(Context *ctx) : NNExecutor(ctx), m_is_valid(DT_FALSE)
     {
 #if defined(AURA_BUILD_HOST)
         m_wp.reset(new WorkerPool(ctx, AURA_TAG, CpuAffinity::ALL, CpuAffinity::ALL, 0, 1));
@@ -466,7 +466,7 @@ public:
     }
 
 protected:
-    MI_BOOL                     m_is_valid;
+    DT_BOOL                     m_is_valid;
     std::future<Status>         m_token;
     std::shared_ptr<WorkerPool> m_wp;
 };
@@ -474,7 +474,7 @@ protected:
 class NNExecutorInterface : public NNExecutor
 {
 public:
-    NNExecutorInterface(Context *ctx) : NNExecutor(ctx), m_ready(MI_FALSE)
+    NNExecutorInterface(Context *ctx) : NNExecutor(ctx), m_ready(DT_FALSE)
     {}
 
     Status Initialize() override
@@ -482,12 +482,12 @@ public:
         Status ret = Status::ERROR;
         if (m_ctx && m_impl)
         {
-            if (MI_FALSE == m_ready)
+            if (DT_FALSE == m_ready)
             {
                 ret = m_impl->Initialize();
                 if (Status::OK == ret)
                 {
-                    m_ready = MI_TRUE;
+                    m_ready = DT_TRUE;
                 }
             }
             else
@@ -503,7 +503,7 @@ public:
         Status ret = Status::ERROR;
         if (m_ctx && m_impl)
         {
-            if (MI_TRUE == m_ready)
+            if (DT_TRUE == m_ready)
             {
                 ret = m_impl->Update(name, params);
             }
@@ -511,12 +511,12 @@ public:
         return ret;
     }
 
-    Status Forward(const MatMap &input, MatMap &output, MI_S32 graph_id) override
+    Status Forward(const MatMap &input, MatMap &output, DT_S32 graph_id) override
     {
         Status ret = Status::ERROR;
         if (m_ctx && m_impl)
         {
-            if (MI_TRUE == m_ready)
+            if (DT_TRUE == m_ready)
             {
                 ret = m_impl->Forward(input, output, graph_id);
             }
@@ -528,7 +528,7 @@ public:
     {
         if (m_ctx && m_impl)
         {
-            if (MI_TRUE == m_ready)
+            if (DT_TRUE == m_ready)
             {
                 return m_impl->GetInputs();
             }
@@ -540,7 +540,7 @@ public:
     {
         if (m_ctx && m_impl)
         {
-            if (MI_TRUE == m_ready)
+            if (DT_TRUE == m_ready)
             {
                 return m_impl->GetOutputs();
             }
@@ -561,7 +561,7 @@ public:
     }
 
 protected:
-    MI_BOOL                         m_ready;
+    DT_BOOL                         m_ready;
     std::shared_ptr<NNExecutorImpl> m_impl;
 };
 

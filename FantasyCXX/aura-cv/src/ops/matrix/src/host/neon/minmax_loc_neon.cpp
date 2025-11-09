@@ -5,41 +5,41 @@
 namespace aura
 {
 
-constexpr static MI_S32 g_block_size = 16384;
+constexpr static DT_S32 g_block_size = 16384;
 
 template <typename Tp>
 struct MinMaxLocInfo
 {
     Tp min;
     Tp max;
-    MI_S32 idx_min_x;
-    MI_S32 idx_min_y;
-    MI_S32 idx_max_x;
-    MI_S32 idx_max_y;
+    DT_S32 idx_min_x;
+    DT_S32 idx_min_y;
+    DT_S32 idx_max_x;
+    DT_S32 idx_max_y;
 };
 
 template <typename Tp>
-static Status MinMaxLocNeonImpl(const Mat &mat, std::vector<MinMaxLocInfo<Tp>> &result, MI_S32 start_row, MI_S32 end_row)
+static Status MinMaxLocNeonImpl(const Mat &mat, std::vector<MinMaxLocInfo<Tp>> &result, DT_S32 start_row, DT_S32 end_row)
 {
     using VType = typename neon::QVector<Tp>::VType;  // vector type of Tp (128 bits)
-    constexpr MI_S32 VEC_SIZE = 16 / sizeof(Tp);      // vector length, can be 16/8/4 according to different element type
+    constexpr DT_S32 VEC_SIZE = 16 / sizeof(Tp);      // vector length, can be 16/8/4 according to different element type
 
-    const MI_S32 width   = mat.GetSizes().m_width;
-    const MI_S32 channel = mat.GetSizes().m_channel;
-    const MI_S32 num_per_row = width * channel;
+    const DT_S32 width   = mat.GetSizes().m_width;
+    const DT_S32 channel = mat.GetSizes().m_channel;
+    const DT_S32 num_per_row = width * channel;
 
     Tp min = std::numeric_limits<Tp>::max();    // min value from start row to end row
     Tp max = std::numeric_limits<Tp>::lowest(); // max value from start row to end row
-    MI_S32 idx_min_x = 0; // block idx in x-axis of min value
-    MI_S32 idx_min_y = 0; // row idx for min value
-    MI_S32 idx_max_x = 0; // block idx in x-axis of max value
-    MI_S32 idx_max_y = 0; // row idx for max value
+    DT_S32 idx_min_x = 0; // block idx in x-axis of min value
+    DT_S32 idx_min_y = 0; // row idx for min value
+    DT_S32 idx_max_x = 0; // block idx in x-axis of max value
+    DT_S32 idx_max_y = 0; // row idx for max value
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         const Tp *src_row = mat.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < num_per_row; x += g_block_size)
+        for (DT_S32 x = 0; x < num_per_row; x += g_block_size)
         {
             // init
             VType vq_min;
@@ -47,9 +47,9 @@ static Status MinMaxLocNeonImpl(const Mat &mat, std::vector<MinMaxLocInfo<Tp>> &
             VType vq_max;
             neon::vdup(vq_max, std::numeric_limits<Tp>::lowest()); // init max val vector
 
-            const MI_S32 x_size = Min(num_per_row - x, g_block_size);
-            const MI_S32 x_size_align = x_size & (-VEC_SIZE);
-            MI_S32 ix = 0;
+            const DT_S32 x_size = Min(num_per_row - x, g_block_size);
+            const DT_S32 x_size_align = x_size & (-VEC_SIZE);
+            DT_S32 ix = 0;
             for (; ix < x_size_align; ix += VEC_SIZE)
             {
                 VType vq_cur = neon::vload1q(src_row + x + ix);
@@ -73,14 +73,14 @@ static Status MinMaxLocNeonImpl(const Mat &mat, std::vector<MinMaxLocInfo<Tp>> &
             Tp min_block = arr_min_val[0];
             Tp max_block = arr_max_val[0];
 
-            for (MI_S32 i = 1; i < VEC_SIZE; i++)
+            for (DT_S32 i = 1; i < VEC_SIZE; i++)
             {
                 if (arr_min_val[i] < min_block)
                 {
                     min_block = arr_min_val[i];
                 }
             }
-            for (MI_S32 i = 1; i < VEC_SIZE; i++)
+            for (DT_S32 i = 1; i < VEC_SIZE; i++)
             {
                 if (arr_max_val[i] > max_block)
                 {
@@ -110,7 +110,7 @@ static Status MinMaxLocNeonImpl(const Mat &mat, std::vector<MinMaxLocInfo<Tp>> &
     } // y loop
 
     // store result
-    MI_S32 idx = start_row;
+    DT_S32 idx = start_row;
     result[idx].min = min;
     result[idx].max = max;
     result[idx].idx_min_x = idx_min_x;
@@ -122,21 +122,21 @@ static Status MinMaxLocNeonImpl(const Mat &mat, std::vector<MinMaxLocInfo<Tp>> &
 }
 
 template <typename Tp>
-static Status MinMaxLocNeonHelper(Context *ctx, const Mat &mat, MI_F64 *min_val, MI_F64 *max_val,
+static Status MinMaxLocNeonHelper(Context *ctx, const Mat &mat, DT_F64 *min_val, DT_F64 *max_val,
                                   Point3i *min_pos, Point3i *max_pos, const OpTarget &target)
 {
     AURA_UNUSED(target);
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
-    const MI_S32 height  = mat.GetSizes().m_height;
-    const MI_S32 width   = mat.GetSizes().m_width;
-    const MI_S32 channel = mat.GetSizes().m_channel;
-    const MI_S32 num_per_row = width * channel;
+    const DT_S32 height  = mat.GetSizes().m_height;
+    const DT_S32 width   = mat.GetSizes().m_width;
+    const DT_S32 channel = mat.GetSizes().m_channel;
+    const DT_S32 num_per_row = width * channel;
 
     std::vector<MinMaxLocInfo<Tp>> result(height);
 
@@ -150,12 +150,12 @@ static Status MinMaxLocNeonHelper(Context *ctx, const Mat &mat, MI_F64 *min_val,
     // init
     Tp min = result[0].min;
     Tp max = result[0].max;
-    MI_S32 idx_min_x = result[0].idx_min_x;
-    MI_S32 idx_min_y = result[0].idx_min_y;
-    MI_S32 idx_max_x = result[0].idx_max_x;
-    MI_S32 idx_max_y = result[0].idx_max_y;
+    DT_S32 idx_min_x = result[0].idx_min_x;
+    DT_S32 idx_min_y = result[0].idx_min_y;
+    DT_S32 idx_max_x = result[0].idx_max_x;
+    DT_S32 idx_max_y = result[0].idx_max_y;
 
-    for (MI_S32 i = 1; i < height; i++)
+    for (DT_S32 i = 1; i < height; i++)
     {
         if (result[i].min < min)
         {
@@ -173,9 +173,9 @@ static Status MinMaxLocNeonHelper(Context *ctx, const Mat &mat, MI_F64 *min_val,
 
     // firstly locate min value
     const Tp *min_data_row = mat.Ptr<Tp>(idx_min_y);
-    MI_S32 min_pos_x = -1;
-    MI_S32 pos_min_end = Min((idx_min_x + 1) * g_block_size, num_per_row);
-    for (MI_S32 i = idx_min_x * g_block_size; i < pos_min_end; i++)
+    DT_S32 min_pos_x = -1;
+    DT_S32 pos_min_end = Min((idx_min_x + 1) * g_block_size, num_per_row);
+    for (DT_S32 i = idx_min_x * g_block_size; i < pos_min_end; i++)
     {
         if (min_data_row[i] == min)
         {
@@ -192,9 +192,9 @@ static Status MinMaxLocNeonHelper(Context *ctx, const Mat &mat, MI_F64 *min_val,
 
     // secondly locate max value
     const Tp *max_data_row = mat.Ptr<Tp>(idx_max_y);
-    MI_S32 max_pos_x = -1;
-    MI_S32 pos_max_end = Min((idx_max_x + 1) * g_block_size, num_per_row);
-    for (MI_S32 i = idx_max_x * g_block_size; i < pos_max_end; i++)
+    DT_S32 max_pos_x = -1;
+    DT_S32 pos_max_end = Min((idx_max_x + 1) * g_block_size, num_per_row);
+    for (DT_S32 i = idx_max_x * g_block_size; i < pos_max_end; i++)
     {
         if (max_data_row[i] == max)
         {
@@ -209,8 +209,8 @@ static Status MinMaxLocNeonHelper(Context *ctx, const Mat &mat, MI_F64 *min_val,
         return Status::ERROR;
     }
 
-    *min_val = static_cast<MI_F64>(min);
-    *max_val = static_cast<MI_F64>(max);
+    *min_val = static_cast<DT_F64>(min);
+    *max_val = static_cast<DT_F64>(max);
     *min_pos = Point3i(min_pos_x / channel, idx_min_y, min_pos_x % channel);
     *max_pos = Point3i(max_pos_x / channel, idx_max_y, max_pos_x % channel);
 
@@ -220,7 +220,7 @@ static Status MinMaxLocNeonHelper(Context *ctx, const Mat &mat, MI_F64 *min_val,
 MinMaxLocNeon::MinMaxLocNeon(Context *ctx, const OpTarget &target) : MinMaxLocImpl(ctx, target)
 {}
 
-Status MinMaxLocNeon::SetArgs(const Array *src, MI_F64 *min_val, MI_F64 *max_val, Point3i *min_pos, Point3i *max_pos)
+Status MinMaxLocNeon::SetArgs(const Array *src, DT_F64 *min_val, DT_F64 *max_val, Point3i *min_pos, Point3i *max_pos)
 {
     if (MinMaxLocImpl::SetArgs(src, min_val, max_val, min_pos, max_pos) != Status::OK)
     {
@@ -241,7 +241,7 @@ Status MinMaxLocNeon::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;
@@ -253,55 +253,55 @@ Status MinMaxLocNeon::Run()
     {
         case ElemType::U8:
         {
-            ret = MinMaxLocNeonHelper<MI_U8>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
+            ret = MinMaxLocNeonHelper<DT_U8>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<DT_U8> failed.");
             }
             break;
         }
         case ElemType::S8:
         {
-            ret = MinMaxLocNeonHelper<MI_S8>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
+            ret = MinMaxLocNeonHelper<DT_S8>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<MI_S8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<DT_S8> failed.");
             }
             break;
         }
         case ElemType::U16:
         {
-            ret = MinMaxLocNeonHelper<MI_U16>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
+            ret = MinMaxLocNeonHelper<DT_U16>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<DT_U16> failed.");
             }
             break;
         }
         case ElemType::S16:
         {
-            ret = MinMaxLocNeonHelper<MI_S16>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
+            ret = MinMaxLocNeonHelper<DT_S16>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<MI_S16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<DT_S16> failed.");
             }
             break;
         }
         case ElemType::U32:
         {
-            ret = MinMaxLocNeonHelper<MI_U32>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
+            ret = MinMaxLocNeonHelper<DT_U32>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<MI_U32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<DT_U32> failed.");
             }
             break;
         }
         case ElemType::S32:
         {
-            ret = MinMaxLocNeonHelper<MI_S32>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
+            ret = MinMaxLocNeonHelper<DT_S32>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<MI_S32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<DT_S32> failed.");
             }
             break;
         }
@@ -318,10 +318,10 @@ Status MinMaxLocNeon::Run()
 #endif
         case ElemType::F32:
         {
-            ret = MinMaxLocNeonHelper<MI_F32>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
+            ret = MinMaxLocNeonHelper<DT_F32>(m_ctx, *src, m_min_val, m_max_val, m_min_pos, m_max_pos, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<MI_F32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MinMaxLocNeonHelper<DT_F32> failed.");
             }
             break;
         }

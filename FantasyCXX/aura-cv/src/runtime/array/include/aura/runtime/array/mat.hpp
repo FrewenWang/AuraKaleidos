@@ -116,7 +116,7 @@ public:
      *
      * @note On the Android platform, AURA_MEM_DEFAULT is equivalent to AURA_MEM_DMA_BUF_HEAP, while on other platforms, it is equivalent to AURA_MEM_HEAP.
      */
-    Mat(Context *ctx, ElemType elem_type, const Sizes3 &sizes, MI_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
+    Mat(Context *ctx, ElemType elem_type, const Sizes3 &sizes, DT_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
 
     /**
      * @brief Constructor for creating a matrix with specified properties and existing buffer.
@@ -158,7 +158,7 @@ public:
     /**
      * @brief Release function for deallocating matrix data and resetting properties.
      */
-    AURA_VOID Release() override;
+    DT_VOID Release() override;
 
     /**
      * @brief Assignment operator for performing a shallow copy from another matrix.
@@ -194,7 +194,7 @@ public:
     *
     * @return A new matrix from specified row span without copying data.
     */
-    Mat RowRange(MI_S32 start, MI_S32 end) const;
+    Mat RowRange(DT_S32 start, DT_S32 end) const;
 
     /**
     * @brief Creates a matrix for the specified column span without copying data.
@@ -206,7 +206,7 @@ public:
     *
     * @return A new matrix from specified column span without copying data.
     */
-    Mat ColRange(MI_S32 start, MI_S32 end) const;
+    Mat ColRange(DT_S32 start, DT_S32 end) const;
 
     /**
      * @brief Create a deep copy of the current matrix.
@@ -239,21 +239,21 @@ public:
      *
      * @return Pointer to the raw data of the matrix.
      */
-    AURA_VOID* GetData();
+    DT_VOID* GetData();
 
     /**
      * @brief Get a const pointer to the raw data of the matrix.
      *
      * @return Const pointer to the raw data of the matrix.
      */
-    const AURA_VOID* GetData() const;
+    const DT_VOID* GetData() const;
 
     /**
      * @brief Check if the matrix is valid (i.e., allocated and properly initialized).
      *
      * @return True if the matrix is valid, false otherwise.
      */
-    MI_BOOL IsValid() const override;
+    DT_BOOL IsValid() const override;
 
     /**
      * @brief Check if the data memory is continuous
@@ -265,7 +265,7 @@ public:
      *
      * @return True if the data memory is continuous, false otherwise.
      */
-    MI_BOOL IsContinuous() const;
+    DT_BOOL IsContinuous() const;
 
     /**
      * @brief Get a pointer to the specified row of the matrix.
@@ -277,7 +277,7 @@ public:
      * @return Pointer to the specified row of the matrix.
      */
     template<typename Tp>
-    Tp* Ptr(MI_S32 row);
+    Tp* Ptr(DT_S32 row);
 
     /**
      * @brief Get a const pointer to the specified row of the matrix.
@@ -289,7 +289,7 @@ public:
      * @return Const pointer to the specified row of the matrix.
      */
     template<typename Tp>
-    const Tp* Ptr(MI_S32 row) const;
+    const Tp* Ptr(DT_S32 row) const;
 
     /**
      * @brief Get a pointer to the specified row of the matrix with border handling.
@@ -303,7 +303,7 @@ public:
      * @return Pointer to the specified row of the matrix with border handling.
      */
     template<typename Tp>
-    Tp* Ptr(MI_S32 row, BorderType border_type, const Tp *border_value = MI_NULL);
+    Tp* Ptr(DT_S32 row, BorderType border_type, const Tp *border_value = DT_NULL);
 
     /**
      * @brief Accesses the raw data pointer for a specified row in the matrix for a specified border type.
@@ -321,16 +321,16 @@ public:
      * @return A pointer to the raw data in the specified row.
      */
     template<typename Tp, BorderType BORDER_TYPE,
-             typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE, Tp>::type* = MI_NULL>
-    Tp* Ptr(MI_S32 row, const Tp *border_value = MI_NULL);
+             typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE, Tp>::type* = DT_NULL>
+    Tp* Ptr(DT_S32 row, const Tp *border_value = DT_NULL);
 
     template<typename Tp, BorderType BORDER_TYPE,
-             typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE, Tp>::type* = MI_NULL>
-    Tp* Ptr(MI_S32 row, const Tp *border_value = MI_NULL);
+             typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE, Tp>::type* = DT_NULL>
+    Tp* Ptr(DT_S32 row, const Tp *border_value = DT_NULL);
 
     template<typename Tp, BorderType BORDER_TYPE,
-             typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE, Tp>::type* = MI_NULL>
-    Tp* Ptr(MI_S32 row, const Tp *border_value = MI_NULL);
+             typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE, Tp>::type* = DT_NULL>
+    Tp* Ptr(DT_S32 row, const Tp *border_value = DT_NULL);
 
     /**
      * @brief Get a constant pointer to the specified row of the matrix with border handling.
@@ -344,7 +344,7 @@ public:
      * @return Pointer to the specified row of the matrix with border handling.
      */
     template<typename Tp>
-    const Tp* Ptr(MI_S32 row, BorderType border_type, const Tp *border_value = MI_NULL) const;
+    const Tp* Ptr(DT_S32 row, BorderType border_type, const Tp *border_value = DT_NULL) const;
 
     /**
      * @brief Accesses the constant raw data pointer for a specified row in the matrix for a specified border type.
@@ -362,16 +362,16 @@ public:
      * @return A pointer to the raw data in the specified row.
      */
     template<typename Tp, BorderType BORDER_TYPE,
-             typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE, Tp>::type* = MI_NULL>
-    const Tp* Ptr(MI_S32 row, const Tp *border_value = MI_NULL) const;
+             typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE, Tp>::type* = DT_NULL>
+    const Tp* Ptr(DT_S32 row, const Tp *border_value = DT_NULL) const;
 
     template<typename Tp, BorderType BORDER_TYPE,
-             typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE, Tp>::type* = MI_NULL>
-    const Tp* Ptr(MI_S32 row, const Tp *border_value = MI_NULL) const;
+             typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE, Tp>::type* = DT_NULL>
+    const Tp* Ptr(DT_S32 row, const Tp *border_value = DT_NULL) const;
 
     template<typename Tp, BorderType BORDER_TYPE,
-             typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE, Tp>::type* = MI_NULL>
-    const Tp* Ptr(MI_S32 row, const Tp *border_value = MI_NULL) const;
+             typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE, Tp>::type* = DT_NULL>
+    const Tp* Ptr(DT_S32 row, const Tp *border_value = DT_NULL) const;
 
     /**
     * @brief Accesses the raw data for a specified element in the matrix.
@@ -387,7 +387,7 @@ public:
     * @return A reference to the specified element in the matrix.
     */
     template<typename Tp>
-    Tp& At(MI_S32 h, MI_S32 w, MI_S32 c = 0);
+    Tp& At(DT_S32 h, DT_S32 w, DT_S32 c = 0);
 
     /**
     * @brief Accesses the constant raw data for a specified element in the matrix.
@@ -403,14 +403,14 @@ public:
     * @return A reference to the specified element in the matrix.
     */
     template<typename Tp>
-    const Tp& At(MI_S32 h, MI_S32 w, MI_S32 c = 0) const;
+    const Tp& At(DT_S32 h, DT_S32 w, DT_S32 c = 0) const;
 
     /**
     * @brief Displays the matrix contents.
     *
     * This method prints the matrix contents to the standard output.
     */
-    AURA_VOID Show() const override;
+    DT_VOID Show() const override;
 
     /**
     * @brief Prints the matrix contents to a specified file in decimal or hexadecimal format.
@@ -421,7 +421,7 @@ public:
     * @param roi The rectangular region of interest to print (default is the entire matrix).
     * @param fname The name of the file to write the output (default is an empty string).
     */
-    AURA_VOID Print(MI_S32 mode = 10, const Rect &roi = Rect(), const std::string &fname = std::string()) const;
+    DT_VOID Print(DT_S32 mode = 10, const Rect &roi = Rect(), const std::string &fname = std::string()) const;
 
     /**
     * @brief Dumps the matrix contents to a file in binary format.
@@ -430,7 +430,7 @@ public:
     *
     * @param fname The name of the file to write the matrix dump.
     */
-    AURA_VOID Dump(const std::string &fname) const override;
+    DT_VOID Dump(const std::string &fname) const override;
 
     /**
     * @brief Load the matrix contents from a file in binary format.
@@ -456,35 +456,35 @@ private:
     *
     * This method is used to reset properties of member vaiables.
     */
-    AURA_VOID Clear();
+    DT_VOID Clear();
 };
 
 template<typename Tp>
-Tp* Mat::Ptr(MI_S32 row)
+Tp* Mat::Ptr(DT_S32 row)
 {
-    const MI_S32 off = row * m_strides.m_width;
+    const DT_S32 off = row * m_strides.m_width;
     if (off < m_total_bytes)
     {
         return m_buffer.GetData<Tp*>(off);
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 template<typename Tp>
-const Tp* Mat::Ptr(MI_S32 row) const
+const Tp* Mat::Ptr(DT_S32 row) const
 {
-    const MI_S32 off = m_strides.m_width * row;
+    const DT_S32 off = m_strides.m_width * row;
     if (off < m_total_bytes)
     {
         return (const Tp*)(m_buffer.GetData<Tp*>(off));
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 template<typename Tp>
-Tp* Mat::Ptr(MI_S32 row, BorderType border_type, const Tp *border_value)
+Tp* Mat::Ptr(DT_S32 row, BorderType border_type, const Tp *border_value)
 {
-    MI_S32 height = m_sizes.m_height;
+    DT_S32 height = m_sizes.m_height;
 
     switch (border_type)
     {
@@ -495,7 +495,7 @@ Tp* Mat::Ptr(MI_S32 row, BorderType border_type, const Tp *border_value)
 
         case BorderType::REPLICATE:
         {
-            row = Clamp(row, static_cast<MI_S32>(0), height - 1);
+            row = Clamp(row, static_cast<DT_S32>(0), height - 1);
             return Ptr<Tp>(row);
         }
 
@@ -509,46 +509,46 @@ Tp* Mat::Ptr(MI_S32 row, BorderType border_type, const Tp *border_value)
             do
             {
                 row = (row < 0) ? Abs(row) : ((height - 1) << 1) - row;
-            } while ((MI_U32)row >= (MI_U32)height);
+            } while ((DT_U32)row >= (DT_U32)height);
 
             return Ptr<Tp>(row);
         }
 
         default:
         {
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 }
 
 template<typename Tp, BorderType BORDER_TYPE,
          typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE, Tp>::type*>
-Tp* Mat::Ptr(MI_S32 row, const Tp *border_value)
+Tp* Mat::Ptr(DT_S32 row, const Tp *border_value)
 {
-    MI_S32 height = m_sizes.m_height;
+    DT_S32 height = m_sizes.m_height;
 
     return (row < 0 || row > height - 1) ? border_value : Ptr<Tp>(row);
 }
 
 template<typename Tp, BorderType BORDER_TYPE,
          typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE, Tp>::type*>
-Tp* Mat::Ptr(MI_S32 row, const Tp *border_value)
+Tp* Mat::Ptr(DT_S32 row, const Tp *border_value)
 {
     AURA_UNUSED(border_value);
 
-    MI_S32 height = m_sizes.m_height;
+    DT_S32 height = m_sizes.m_height;
 
-    row = Clamp(row, static_cast<MI_S32>(0), height - 1);
+    row = Clamp(row, static_cast<DT_S32>(0), height - 1);
     return Ptr<Tp>(row);
 }
 
 template<typename Tp, BorderType BORDER_TYPE,
          typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE, Tp>::type*>
-Tp* Mat::Ptr(MI_S32 row, const Tp *border_value)
+Tp* Mat::Ptr(DT_S32 row, const Tp *border_value)
 {
     AURA_UNUSED(border_value);
 
-    MI_S32 height = m_sizes.m_height;
+    DT_S32 height = m_sizes.m_height;
 
     if (1 == height)
     {
@@ -558,15 +558,15 @@ Tp* Mat::Ptr(MI_S32 row, const Tp *border_value)
     do
     {
         row = (row < 0) ? Abs(row) : ((height - 1) << 1) - row;
-    } while ((MI_U32)row >= (MI_U32)height);
+    } while ((DT_U32)row >= (DT_U32)height);
 
     return Ptr<Tp>(row);
 }
 
 template<typename Tp>
-const Tp* Mat::Ptr(MI_S32 row, BorderType border_type, const Tp *border_value) const
+const Tp* Mat::Ptr(DT_S32 row, BorderType border_type, const Tp *border_value) const
 {
-    MI_S32 height = m_sizes.m_height;
+    DT_S32 height = m_sizes.m_height;
 
     switch (border_type)
     {
@@ -577,7 +577,7 @@ const Tp* Mat::Ptr(MI_S32 row, BorderType border_type, const Tp *border_value) c
 
         case BorderType::REPLICATE:
         {
-            row = Clamp(row, static_cast<MI_S32>(0), height - 1);
+            row = Clamp(row, static_cast<DT_S32>(0), height - 1);
             return Ptr<Tp>(row);
         }
 
@@ -591,46 +591,46 @@ const Tp* Mat::Ptr(MI_S32 row, BorderType border_type, const Tp *border_value) c
             do
             {
                 row = (row < 0) ? Abs(row) : ((height - 1) << 1) - row;
-            } while ((MI_U32)row >= (MI_U32)height);
+            } while ((DT_U32)row >= (DT_U32)height);
 
             return Ptr<Tp>(row);
         }
 
         default:
         {
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 }
 
 
 template<typename Tp, BorderType BORDER_TYPE,typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE, Tp>::type*>
-const Tp* Mat::Ptr(MI_S32 row, const Tp *border_value) const
+const Tp* Mat::Ptr(DT_S32 row, const Tp *border_value) const
 {
-    MI_S32 height = m_sizes.m_height;
+    DT_S32 height = m_sizes.m_height;
 
     return (row < 0 || row > height - 1) ? border_value : Ptr<Tp>(row);
 }
 
 template<typename Tp, BorderType BORDER_TYPE,
          typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE, Tp>::type*>
-const Tp* Mat::Ptr(MI_S32 row, const Tp *border_value) const
+const Tp* Mat::Ptr(DT_S32 row, const Tp *border_value) const
 {
     AURA_UNUSED(border_value);
 
-    MI_S32 height = m_sizes.m_height;
+    DT_S32 height = m_sizes.m_height;
 
-    row = Clamp(row, static_cast<MI_S32>(0), height - 1);
+    row = Clamp(row, static_cast<DT_S32>(0), height - 1);
     return Ptr<Tp>(row);
 }
 
 template<typename Tp, BorderType BORDER_TYPE,
          typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE, Tp>::type*>
-const Tp* Mat::Ptr(MI_S32 row, const Tp *border_value) const
+const Tp* Mat::Ptr(DT_S32 row, const Tp *border_value) const
 {
     AURA_UNUSED(border_value);
 
-    MI_S32 height = m_sizes.m_height;
+    DT_S32 height = m_sizes.m_height;
 
     if (1 == height)
     {
@@ -640,19 +640,19 @@ const Tp* Mat::Ptr(MI_S32 row, const Tp *border_value) const
     do
     {
         row = (row < 0) ? Abs(row) : ((height - 1) << 1) - row;
-    } while ((MI_U32)row >= (MI_U32)height);
+    } while ((DT_U32)row >= (DT_U32)height);
 
     return Ptr<Tp>(row);
 }
 
 template<typename Tp>
-Tp& Mat::At(MI_S32 h, MI_S32 w, MI_S32 c)
+Tp& Mat::At(DT_S32 h, DT_S32 w, DT_S32 c)
 {
     return Ptr<Tp>(h)[w * m_sizes.m_channel + c];
 }
 
 template<typename Tp>
-const Tp& Mat::At(MI_S32 h, MI_S32 w, MI_S32 c) const
+const Tp& Mat::At(DT_S32 h, DT_S32 w, DT_S32 c) const
 {
     return Ptr<Tp>(h)[w * m_sizes.m_channel + c];
 }
@@ -822,7 +822,7 @@ AURA_EXPORTS Status GetIauraFormatRoi(IauraFormat fmt, const Rect &img_roi, std:
  *
  * @return A Mat object containing the iaura data. An empty Mat will be returned if error occurs.
  */
-AURA_EXPORTS Mat ReadBmp(Context *ctx, const std::string &fname, MI_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
+AURA_EXPORTS Mat ReadBmp(Context *ctx, const std::string &fname, DT_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
 
 /**
  * @brief Write a BMP iaura to a file.
@@ -854,7 +854,7 @@ AURA_EXPORTS Status WriteBmp(Context *ctx, const Mat &mat, const std::string &fn
  * @note Supported IauraFormat: NV12/NV21/YU12/YV12/P010/P016/I422/I444.
  */
 AURA_EXPORTS std::vector<Mat> ReadYuv(Context *ctx, const std::string &fname, IauraFormat fmt, const Sizes &sizes,
-                                      MI_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
+                                      DT_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
 
 /**
  * @brief Write a YUV iaura to a file.
@@ -880,13 +880,13 @@ AURA_EXPORTS Status WriteYuv(Context *ctx, const std::vector<Mat> &mats, IauraFo
  * @param ctx          The pointer to the Context object.
  * @param mat          A Mat objects containing the yuv iaura data, memory must continuous, channel must be 1
  * @param fmt          The iaura format describing the YUV format.
- * @param is_deep_copy identification of return mats deep copy, MI_TRUE means deep copy, MI_FALSE means shallow copy.
+ * @param is_deep_copy identification of return mats deep copy, DT_TRUE means deep copy, DT_FALSE means shallow copy.
  *
  * @return vector of Mat objects which store yuv iaura different plane.
  *
  * @note Supported IauraFormat: NV12/NV21/YU12/YV12/P010/P016/I422/I444.
  */
-AURA_EXPORTS std::vector<Mat> GetYuvIaura(Context *ctx, const Mat &mat, IauraFormat fmt, MI_BOOL is_deep_copy = MI_FALSE);
+AURA_EXPORTS std::vector<Mat> GetYuvIaura(Context *ctx, const Mat &mat, IauraFormat fmt, DT_BOOL is_deep_copy = DT_FALSE);
 
 /**
  * @}

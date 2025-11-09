@@ -17,25 +17,25 @@
 namespace aura
 {
 
-template <MI_U8 IS_INVERSE>
-AURA_ALWAYS_INLINE AURA_VOID GetDctExpTable(std::complex<MI_F32> *exp_table, MI_S32 n)
+template <DT_U8 IS_INVERSE>
+AURA_ALWAYS_INLINE DT_VOID GetDctExpTable(std::complex<DT_F32> *exp_table, DT_S32 n)
 {
-    MI_F32 pi_pe = AURA_PI / (n * 2);
+    DT_F32 pi_pe = AURA_PI / (n * 2);
 
     if (!IS_INVERSE)
     {
-        for (MI_S32 i = 0; i < n; ++i)
+        for (DT_S32 i = 0; i < n; ++i)
         {
-            MI_F32 theta = pi_pe * i;
+            DT_F32 theta = pi_pe * i;
             exp_table[i].real(Cos(theta));
             exp_table[i].imag(Sin(theta));
         }
     }
     else
     {
-        for (MI_S32 i = 0; i < n; ++i)
+        for (DT_S32 i = 0; i < n; ++i)
         {
-            MI_F32 theta = pi_pe * i;
+            DT_F32 theta = pi_pe * i;
             exp_table[i].real(Cos(theta));
             exp_table[i].imag(-Sin(theta));
         }
@@ -55,7 +55,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src;
@@ -101,7 +101,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src;

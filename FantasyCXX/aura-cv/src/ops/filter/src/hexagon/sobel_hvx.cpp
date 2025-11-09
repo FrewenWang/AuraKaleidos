@@ -9,7 +9,7 @@ namespace aura
 SobelHvx::SobelHvx(Context *ctx, const OpTarget &target) : SobelImpl(ctx, target)
 {}
 
-Status SobelHvx::SetArgs(const Array *src, Array *dst, MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_F32 scale,
+Status SobelHvx::SetArgs(const Array *src, Array *dst, DT_S32 dx, DT_S32 dy, DT_S32 ksize, DT_F32 scale,
                          BorderType border_type, const Scalar &border_value)
 {
     if (SobelImpl::SetArgs(src, dst, dx, dy, ksize, scale, border_type, border_value) != Status::OK)
@@ -44,7 +44,7 @@ Status SobelHvx::SetArgs(const Array *src, Array *dst, MI_S32 dx, MI_S32 dy, MI_
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
 
     if (ch != 1 && ch != 2 && ch != 3)
     {
@@ -60,7 +60,7 @@ Status SobelHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat       *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
@@ -104,10 +104,10 @@ Status SobelRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
     Mat src;
     Mat dst;
-    MI_S32 dx;
-    MI_S32 dy;
-    MI_S32 ksize;
-    MI_F32 scale;
+    DT_S32 dx;
+    DT_S32 dy;
+    DT_S32 ksize;
+    DT_F32 scale;
     BorderType border_type;
     Scalar border_value;
 

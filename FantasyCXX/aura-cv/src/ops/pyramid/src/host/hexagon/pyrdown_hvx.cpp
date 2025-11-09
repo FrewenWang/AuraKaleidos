@@ -7,7 +7,7 @@ namespace aura
 PyrDownHvx::PyrDownHvx(Context *ctx, const OpTarget &target) : PyrDownImpl(ctx, target)
 {}
 
-Status PyrDownHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+Status PyrDownHvx::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                               BorderType border_type)
 {
     if (PyrDownImpl::SetArgs(src, dst, ksize, sigma, border_type) != Status::OK)
@@ -37,7 +37,7 @@ Status PyrDownHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -59,7 +59,7 @@ Status PyrDownHvx::Run()
     ret = engine->Run(AURA_OPS_PYRAMID_PACKAGE_NAME, AURA_OPS_PYRAMID_PYRDOWN_OP_NAME, rpc_param,
                       &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }

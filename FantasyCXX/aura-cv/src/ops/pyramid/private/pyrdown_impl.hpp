@@ -24,13 +24,13 @@ namespace aura
 template <typename Tp>
 struct PyrDownTraits
 {
-    static_assert(std::is_same<Tp, MI_U8>::value || std::is_same<Tp, MI_S16>::value || std::is_same<Tp, MI_U16>::value,
-                  "Tp must be one of MI_U8/MI_S16/MI_U16");
+    static_assert(std::is_same<Tp, DT_U8>::value || std::is_same<Tp, DT_S16>::value || std::is_same<Tp, DT_U16>::value,
+                  "Tp must be one of DT_U8/DT_S16/DT_U16");
 
-    // Tp = MI_U8 MI_U16 MI_S16
+    // Tp = DT_U8 DT_U16 DT_S16
     using KernelType = typename Promote<Tp>::Type;
-    // Tp = MI_U8 MI_U16 MI_S16
-    static constexpr MI_U32 Q = std::is_same<Tp, MI_U8>::value ? 8 : 14;
+    // Tp = DT_U8 DT_U16 DT_S16
+    static constexpr DT_U32 Q = std::is_same<Tp, DT_U8>::value ? 8 : 14;
 };
 
 class PyrDownImpl : public OpImpl
@@ -38,7 +38,7 @@ class PyrDownImpl : public OpImpl
 public:
     PyrDownImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    virtual Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                            BorderType border_type = BorderType::REFLECT_101);
 
     Status Initialize() override;
@@ -51,14 +51,14 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 private:
     Status PrepareKmat();
 
 protected:
-    MI_S32      m_ksize;
-    MI_F32      m_sigma;
+    DT_S32      m_ksize;
+    DT_F32      m_sigma;
     BorderType  m_border_type;
     const Array *m_src;
     Array       *m_dst;
@@ -70,7 +70,7 @@ class PyrDownNone : public PyrDownImpl
 public:
     PyrDownNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101) override;
 
     Status Run() override;
@@ -84,7 +84,7 @@ class PyrDownNeon : public PyrDownImpl
 public:
     PyrDownNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101) override;
 
     Status Run() override;
@@ -100,7 +100,7 @@ class PyrDownCL : public PyrDownImpl
 public:
     PyrDownCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101) override;
 
     Status Initialize() override;
@@ -111,7 +111,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type);
 private:
     std::vector<CLKernel> m_cl_kernels;
     CLMem       m_cl_src;
@@ -127,7 +127,7 @@ class PyrDownHvx : public PyrDownImpl
 public:
     PyrDownHvx(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101) override;
 
     Status Run() override;
@@ -143,7 +143,7 @@ Status PyrDown5x5Hvx(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat,
                      BorderType border_type = BorderType::REFLECT_101);
 #  endif // AURA_BUILD_HEXAGON
 
-using PyrDownInParam = HexagonRpcParamType<Mat, Mat, MI_S32, MI_F32, BorderType>;
+using PyrDownInParam = HexagonRpcParamType<Mat, Mat, DT_S32, DT_F32, BorderType>;
 #  define AURA_OPS_PYRAMID_PYRDOWN_OP_NAME          "PyrDown"
 
 #endif // (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))

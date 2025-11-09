@@ -4,13 +4,13 @@
 namespace aura
 {
 
-static MI_BOOL g_callback_registered = MI_FALSE;
-static MI_S32 g_htp_status = -1;
+static DT_BOOL g_callback_registered = DT_FALSE;
+static DT_S32 g_htp_status = -1;
 
 // FIXME: The current 4.2 SDK doesn't support rpc_status feature in remote.h, and aura2.0's solution for handling restarts has not yet been finalized.
 // So first comment and save it here xulei21@xiaomi.com
 
-// static MI_S32 FastRpcNotifyFunction(AURA_VOID *context, MI_S32 domains, MI_S32 session, MI_S32 status)
+// static DT_S32 FastRpcNotifyFunction(DT_VOID *context, DT_S32 domains, DT_S32 session, DT_S32 status)
 // {
 //     AURA_UNUSED(context);
 //     AURA_UNUSED(domains);
@@ -24,7 +24,7 @@ static MI_S32 g_htp_status = -1;
 //     return 0;
 // }
 
-// static Status RegisterCallback(Context *ctx, AURA_VOID *callback_context)
+// static Status RegisterCallback(Context *ctx, DT_VOID *callback_context)
 // {
 //     Status ret = Status::OK;
 
@@ -53,7 +53,7 @@ static MI_S32 g_htp_status = -1;
 //             }
 //             else
 //             {
-//                 g_callback_registered = MI_TRUE;
+//                 g_callback_registered = DT_TRUE;
 //                 ret = Status::OK;
 //             }
 //         }
@@ -91,8 +91,8 @@ static Status QueryHardwareInfo(Context *ctx, HardwareInfo &info)
     QueryHWInfoOutParam out_param(ctx, rpc_param);
     ret |= ctx->GetHexagonEngine()->Run(AURA_RUNTIME_PACKAGE_NAME, AURA_RUNTIME_QUERY_HW_INFO_OP_NAME, rpc_param);
 
-    Sequence<MI_S32> seq_page_sizes{info.vtcm_layout.page_sizes, 16};
-    Sequence<MI_S32> seq_page_count{info.vtcm_layout.page_count, 16};
+    Sequence<DT_S32> seq_page_sizes{info.vtcm_layout.page_sizes, 16};
+    Sequence<DT_S32> seq_page_count{info.vtcm_layout.page_count, 16};
 
     ret |= out_param.Get(info.num_hvx_units, info.vtcm_layout.total_vtcm_size, info.vtcm_layout.page_list_count, seq_page_sizes, seq_page_count);
 
@@ -120,8 +120,8 @@ static Status QueryRealTimeInfo(Context *ctx, HexagonRTQueryType type, RealTimeI
         case HexagonRTQueryType::VTCM_INFO:
         {
             QueryRTInfoVtcmOutParam out_param(ctx, rpc_param);
-            Sequence<MI_S32> seq_page_sizes{info.vtcm_layout.page_sizes, 16};
-            Sequence<MI_S32> seq_page_count{info.vtcm_layout.page_count, 16};
+            Sequence<DT_S32> seq_page_sizes{info.vtcm_layout.page_sizes, 16};
+            Sequence<DT_S32> seq_page_count{info.vtcm_layout.page_count, 16};
             ret = in_param.Set("VtcmInfo");
             ret |= ctx->GetHexagonEngine()->Run(AURA_RUNTIME_PACKAGE_NAME, AURA_RUNTIME_QUERY_RT_INFO_OP_NAME, rpc_param);
             ret |= out_param.Get(info.vtcm_layout.total_vtcm_size, info.vtcm_layout.page_list_count, seq_page_sizes, seq_page_count);
@@ -158,13 +158,13 @@ static Status QueryRealTimeInfo(Context *ctx, HexagonRTQueryType type, RealTimeI
     AURA_RETURN(ctx, ret);
 }
 
-HexagonEngine::Impl::Impl(Context *ctx, MI_BOOL enable_hexagon, MI_BOOL unsigned_pd, const std::string &lib_prefix,
-                          MI_BOOL async_call, LogOutput ouput, LogLevel level, const std::string &file)
-                          : m_ctx(ctx), m_flag(MI_FALSE), m_async_call(async_call), m_handle(0)
+HexagonEngine::Impl::Impl(Context *ctx, DT_BOOL enable_hexagon, DT_BOOL unsigned_pd, const std::string &lib_prefix,
+                          DT_BOOL async_call, LogOutput ouput, LogLevel level, const std::string &file)
+                          : m_ctx(ctx), m_flag(DT_FALSE), m_async_call(async_call), m_handle(0)
 {
     if (enable_hexagon)
     {
-        // if (RegisterCallback(m_ctx, static_cast<AURA_VOID*>(m_ctx)) != Status::OK)
+        // if (RegisterCallback(m_ctx, static_cast<DT_VOID*>(m_ctx)) != Status::OK)
         // {
         //     // callback_context is poniter to a data buffer for callback info.
         //     AURA_LOGE(m_ctx, AURA_TAG, "RegisterCallback failed.\n");
@@ -177,10 +177,10 @@ HexagonEngine::Impl::Impl(Context *ctx, MI_BOOL enable_hexagon, MI_BOOL unsigned
             remote_dsp_capability data;
             data.domain = CDSP_DOMAIN_ID;
             data.attribute_ID = ARCH_VER;
-            MI_S32 ret = remote_handle_control(DSPRPC_GET_DSP_INFO, &data, sizeof(data));
+            DT_S32 ret = remote_handle_control(DSPRPC_GET_DSP_INFO, &data, sizeof(data));
             if (0 == ret)
             {
-                MI_S32 cdsp_version = data.capability & 0xff;
+                DT_S32 cdsp_version = data.capability & 0xff;
                 if (cdsp_version >= 0x69) //0x69:8450
                 {
                     remote_rpc_thread_params th_data;
@@ -196,7 +196,7 @@ HexagonEngine::Impl::Impl(Context *ctx, MI_BOOL enable_hexagon, MI_BOOL unsigned
                 }
             }
 
-            if (MI_TRUE == unsigned_pd)
+            if (DT_TRUE == unsigned_pd)
             {
                 remote_rpc_control_unsigned_module data;
                 data.enable = 1;
@@ -233,7 +233,7 @@ HexagonEngine::Impl::Impl(Context *ctx, MI_BOOL enable_hexagon, MI_BOOL unsigned
             ////
             ret = aura_hexagon_call(m_handle, full_name.c_str(), full_name.size(),
                                     reinterpret_cast<RpcMem*>(rpc_param.m_rpc_mem.data()), rpc_param.m_rpc_mem.size(),
-                                    static_cast<MI_U8*>(rpc_param.m_rpc_param.m_origin), rpc_param.m_rpc_param.m_size, &profiling);
+                                    static_cast<DT_U8*>(rpc_param.m_rpc_param.m_origin), rpc_param.m_rpc_param.m_size, &profiling);
 
             if (UnregisterIonMem(rpc_param) != Status::OK)
             {
@@ -251,7 +251,7 @@ HexagonEngine::Impl::Impl(Context *ctx, MI_BOOL enable_hexagon, MI_BOOL unsigned
                 return Status::ERROR;
             }
             //// HVX 进行正常初始化完成之后，我们将这个变量设置为true
-            m_flag = MI_TRUE;
+            m_flag = DT_TRUE;
             return Status::OK;
         };
 
@@ -277,7 +277,7 @@ HexagonEngine::Impl::~Impl()
     if (m_flag)
     {
         aura_hexagon_close(m_handle);
-        m_flag = MI_FALSE;
+        m_flag = DT_FALSE;
         m_handle = 0;
     }
 }
@@ -317,8 +317,8 @@ Status HexagonEngine::Impl::Run(const std::string &package, const std::string &m
         /// m_handle 是HVX运行处理的回调句柄。
         /// 传入的高斯滤波相关的数据
         /// TODO 所以这个aura_hexagon_call就是我们最重要的核心算法。这个函数的具体实现：在hexagon_core.cpp文件中
-        MI_S32 ret = aura_hexagon_call(m_handle, full_name.c_str(), full_name.size(), reinterpret_cast<RpcMem*>(rpc_param.m_rpc_mem.data()), rpc_param.m_rpc_mem.size(),
-                                       static_cast<MI_U8*>(rpc_param.m_rpc_param.m_origin), rpc_param.m_rpc_param.m_capacity, &rpc_prof);
+        DT_S32 ret = aura_hexagon_call(m_handle, full_name.c_str(), full_name.size(), reinterpret_cast<RpcMem*>(rpc_param.m_rpc_mem.data()), rpc_param.m_rpc_mem.size(),
+                                       static_cast<DT_U8*>(rpc_param.m_rpc_param.m_origin), rpc_param.m_rpc_param.m_capacity, &rpc_prof);
         Status ret_status = static_cast<Status>(rpc_prof.status);
         if (ret != 0)
         {
@@ -327,7 +327,7 @@ Status HexagonEngine::Impl::Run(const std::string &package, const std::string &m
             AURA_ADD_ERROR_STRING(m_ctx, "aura_hexagon_call run failed");
             return Status::ERROR;
         }
-        else if (profiling != MI_NULL && Status::OK == ret_status)
+        else if (profiling != DT_NULL && Status::OK == ret_status)
         {
             memset(profiling, 0, sizeof(HexagonProfiling));
             profiling->skel_time = rpc_prof.skel_time;
@@ -359,7 +359,7 @@ Status HexagonEngine::Impl::Run(const std::string &package, const std::string &m
     }
 
     Time exe_time = Time::Now() - start_time;
-    if (Status::OK == ret && profiling != MI_NULL)
+    if (Status::OK == ret && profiling != DT_NULL)
     {
         profiling->rpc_time = exe_time.AsMicroSec() - profiling->skel_time;
     }
@@ -376,7 +376,7 @@ Status HexagonEngine::Impl::Run(const std::string &package, const std::string &m
     AURA_RETURN(m_ctx, ret);
 }
 
-Status HexagonEngine::Impl::SetPower(HexagonPowerLevel target_level, MI_BOOL enable_dcvs, MI_U32 client_id)
+Status HexagonEngine::Impl::SetPower(HexagonPowerLevel target_level, DT_BOOL enable_dcvs, DT_U32 client_id)
 {
     Status ret = Status::OK;
 
@@ -388,7 +388,7 @@ Status HexagonEngine::Impl::SetPower(HexagonPowerLevel target_level, MI_BOOL ena
         AURA_ADD_ERROR_STRING(m_ctx, "Set failed");
         return ret;
     }
-    ret |= Run(AURA_RUNTIME_PACKAGE_NAME, AURA_RUNTIME_SET_POWER_OP_NAME, rpc_param, MI_NULL);
+    ret |= Run(AURA_RUNTIME_PACKAGE_NAME, AURA_RUNTIME_SET_POWER_OP_NAME, rpc_param, DT_NULL);
 
     AURA_RETURN(m_ctx, ret);
 }
@@ -396,7 +396,7 @@ Status HexagonEngine::Impl::SetPower(HexagonPowerLevel target_level, MI_BOOL ena
 std::string HexagonEngine::Impl::GetVersion() const
 {
     HexagonRpcParam rpc_param(m_ctx, 4096);
-    Status ret = Run(AURA_RUNTIME_PACKAGE_NAME, AURA_RUNTIME_GET_VERSION_OP_NAME, rpc_param, MI_NULL);
+    Status ret = Run(AURA_RUNTIME_PACKAGE_NAME, AURA_RUNTIME_GET_VERSION_OP_NAME, rpc_param, DT_NULL);
     if (ret != Status::OK)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "Run failed");
@@ -416,7 +416,7 @@ std::string HexagonEngine::Impl::GetVersion() const
 
 Status HexagonEngine::Impl::QueryHWInfo(HardwareInfo &info)
 {
-    static MI_BOOL call_once_flag = MI_FALSE;
+    static DT_BOOL call_once_flag = DT_FALSE;
 
     Status ret = Status::OK;
 
@@ -429,7 +429,7 @@ Status HexagonEngine::Impl::QueryHWInfo(HardwareInfo &info)
 
         ret = QueryHardwareInfo(m_ctx, m_hw_info);
 
-        call_once_flag = MI_TRUE;
+        call_once_flag = DT_TRUE;
     }
 
     info = m_hw_info;
@@ -464,8 +464,8 @@ std::string HexagonEngine::Impl::GetBacktrace() const
         return std::string();
     }
 
-    MI_S32 ret = aura_hexagon_call(m_handle, full_name.c_str(), full_name.size(), reinterpret_cast<RpcMem*>(rpc_param.m_rpc_mem.data()), rpc_param.m_rpc_mem.size(),
-                                   static_cast<MI_U8*>(rpc_param.m_rpc_param.m_origin), rpc_param.m_rpc_param.m_capacity, &rpc_prof);
+    DT_S32 ret = aura_hexagon_call(m_handle, full_name.c_str(), full_name.size(), reinterpret_cast<RpcMem*>(rpc_param.m_rpc_mem.data()), rpc_param.m_rpc_mem.size(),
+                                   static_cast<DT_U8*>(rpc_param.m_rpc_param.m_origin), rpc_param.m_rpc_param.m_capacity, &rpc_prof);
 
     if (UnregisterIonMem(rpc_param) != Status::OK)
     {
@@ -480,7 +480,7 @@ std::string HexagonEngine::Impl::GetBacktrace() const
     }
 
     GetBacktraceOutParam out_param(m_ctx, rpc_param);
-    Status ret_status = out_param.Get(backtrace, MI_TRUE);
+    Status ret_status = out_param.Get(backtrace, DT_TRUE);
     if (ret_status != Status::OK)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "Get failed");
@@ -556,8 +556,8 @@ Status HexagonEngine::Impl::UnregisterIonMem(HexagonRpcParam &rpc_param) const
     return Status::OK;
 }
 
-HexagonEngine::HexagonEngine(Context *ctx, MI_BOOL enable_hexagon, MI_BOOL unsigned_pd, const std::string &lib_prefix,
-                             MI_BOOL async_call, LogOutput ouput, LogLevel level, const std::string &file)
+HexagonEngine::HexagonEngine(Context *ctx, DT_BOOL enable_hexagon, DT_BOOL unsigned_pd, const std::string &lib_prefix,
+                             DT_BOOL async_call, LogOutput ouput, LogLevel level, const std::string &file)
 {
     m_impl.reset(new HexagonEngine::Impl(ctx, enable_hexagon, unsigned_pd, lib_prefix, async_call, ouput, level, file));
     if (!m_impl)
@@ -570,7 +570,7 @@ HexagonEngine::~HexagonEngine()
 {
 }
 
-Status HexagonEngine::SetPower(HexagonPowerLevel target_level, MI_BOOL enable_dcvs, MI_U32 client_id)
+Status HexagonEngine::SetPower(HexagonPowerLevel target_level, DT_BOOL enable_dcvs, DT_U32 client_id)
 {
     if (m_impl)
     {

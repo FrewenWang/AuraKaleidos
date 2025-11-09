@@ -7,20 +7,20 @@ using namespace aura;
 
 struct BufferMembers
 {
-    BufferMembers(MI_BOOL valid, MI_S32 type,
-                  MI_S64 capacity, MI_S64 size)
+    BufferMembers(DT_BOOL valid, DT_S32 type,
+                  DT_S64 capacity, DT_S64 size)
                   : valid(valid), type(type),
                     capacity(capacity), size(size)
     {}
 
-    MI_BOOL valid;
-    MI_S32  type;
-    MI_S64  capacity;
-    MI_S64  size;
+    DT_BOOL valid;
+    DT_S32  type;
+    DT_S64  capacity;
+    DT_S64  size;
 };
 
 static Status CheckBuffer(Context *ctx, const Buffer &src, const BufferMembers &buffer_members,
-                          const MI_CHAR *file, const MI_CHAR *func, MI_S32 line)
+                          const DT_CHAR *file, const DT_CHAR *func, DT_S32 line)
 {
     Status ret = Status::OK;
     ret |= TestCheckEQ(ctx, src.IsValid(), buffer_members.valid, "check Buffer::IsValid() failed\n", file, func, line);
@@ -39,53 +39,53 @@ NEW_TESTCASE(runtime_mem_pool_allocate_test)
 
     MemPool *mp = ctx->GetMemPool();
 
-    AURA_VOID *ptr = mp->Allocate(AURA_MEM_INVALID, 100, 128, __FILE__, __FUNCTION__, __LINE__);
+    DT_VOID *ptr = mp->Allocate(AURA_MEM_INVALID, 100, 128, __FILE__, __FUNCTION__, __LINE__);
     auto buffer = mp->GetBuffer(ptr);
-    ret |= AURA_CHECK_EQ(ctx, buffer.IsValid(), MI_FALSE, "check Buffer::IsValid() failed\n");
+    ret |= AURA_CHECK_EQ(ctx, buffer.IsValid(), DT_FALSE, "check Buffer::IsValid() failed\n");
     mp->Free(ptr);
 
     ptr = mp->Allocate(AURA_MEM_HEAP, 100, 0, __FILE__, __FUNCTION__, __LINE__);
     buffer = mp->GetBuffer(ptr);
-    ret |= CHECK_BUFFER(ctx, buffer, BufferMembers(MI_TRUE, AURA_MEM_HEAP, 100, 100));
+    ret |= CHECK_BUFFER(ctx, buffer, BufferMembers(DT_TRUE, AURA_MEM_HEAP, 100, 100));
     mp->Free(ptr);
 
     ptr = mp->Allocate(AURA_MEM_HEAP, 0, 0, __FILE__, __FUNCTION__, __LINE__);
     buffer = mp->GetBuffer(ptr);
-    ret |= AURA_CHECK_EQ(ctx, buffer.IsValid(), MI_FALSE, "check Buffer::IsValid() failed\n");
+    ret |= AURA_CHECK_EQ(ctx, buffer.IsValid(), DT_FALSE, "check Buffer::IsValid() failed\n");
     mp->Free(ptr);
 
 #if defined(AURA_BUILD_HEXAGON)
     ptr = mp->Allocate(AURA_MEM_VTCM, 128, 128, __FILE__, __FUNCTION__, __LINE__);
     buffer = mp->GetBuffer(ptr);
-    ret |= CHECK_BUFFER(ctx, buffer, BufferMembers(MI_TRUE, AURA_MEM_VTCM, 128, 128));
+    ret |= CHECK_BUFFER(ctx, buffer, BufferMembers(DT_TRUE, AURA_MEM_VTCM, 128, 128));
     mp->Free(ptr);
 #endif // AURA_BUILD_HEXAGON
 
 #if defined(AURA_BUILD_ANDROID)
     ptr = mp->Allocate(AURA_MEM_DMA_BUF_HEAP, 100, 128, __FILE__, __FUNCTION__, __LINE__);
     buffer = mp->GetBuffer(ptr);
-    ret |= CHECK_BUFFER(ctx, buffer, BufferMembers(MI_TRUE, AURA_MEM_DMA_BUF_HEAP, 100, 100));
+    ret |= CHECK_BUFFER(ctx, buffer, BufferMembers(DT_TRUE, AURA_MEM_DMA_BUF_HEAP, 100, 100));
     mp->Free(ptr);
 #endif // AURA_BUILD_ANDROID
 
 #if defined(AURA_ENABLE_OPENCL)
     ptr = mp->Allocate(AURA_MEM_SVM, 100, 128, __FILE__, __FUNCTION__, __LINE__);
     buffer = mp->GetBuffer(ptr);
-    ret |= CHECK_BUFFER(ctx, buffer, BufferMembers(MI_TRUE, AURA_MEM_SVM, 100, 100));
+    ret |= CHECK_BUFFER(ctx, buffer, BufferMembers(DT_TRUE, AURA_MEM_SVM, 100, 100));
     mp->Free(ptr);
 #endif // AURA_ENABLE_OPENCL
 
-    AURA_VOID *ptr0 = AURA_ALLOC(ctx, 100);
-    AURA_VOID *ptr1 = AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, 100, 128);
+    DT_VOID *ptr0 = AURA_ALLOC(ctx, 100);
+    DT_VOID *ptr1 = AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, 100, 128);
     Buffer buffer0 = ctx->GetMemPool()->GetBuffer(ptr0);
     Buffer buffer1 = ctx->GetMemPool()->GetBuffer(ptr1);
 #if defined(AURA_BUILD_ANDROID)
-    MI_S32 type = AURA_MEM_DMA_BUF_HEAP;
+    DT_S32 type = AURA_MEM_DMA_BUF_HEAP;
 #else // AURA_BUILD_ANDROID
-    MI_S32 type = AURA_MEM_HEAP;
+    DT_S32 type = AURA_MEM_HEAP;
 #endif // AURA_BUILD_ANDROID
-    ret |= CHECK_BUFFER(ctx, buffer0, BufferMembers(MI_TRUE, type, 100, 100));
-    ret |= CHECK_BUFFER(ctx, buffer1, BufferMembers(MI_TRUE, AURA_MEM_HEAP, 100, 100));
+    ret |= CHECK_BUFFER(ctx, buffer0, BufferMembers(DT_TRUE, type, 100, 100));
+    ret |= CHECK_BUFFER(ctx, buffer1, BufferMembers(DT_TRUE, AURA_MEM_HEAP, 100, 100));
     ret |= AURA_CHECK_EQ(ctx, AURA_FREE(ctx, ptr0), Status::OK, "check AURA_FREE() failed\n");
     ret |= AURA_CHECK_EQ(ctx, AURA_FREE(ctx, ptr1), Status::OK, "check AURA_FREE() failed\n");
     ret |= AURA_CHECK_EQ(ctx, AURA_FREE(ctx, ptr1), Status::ERROR, "check AURA_FREE() failed\n");
@@ -104,7 +104,7 @@ NEW_TESTCASE(runtime_mem_pool_map_test)
     ret |= AURA_CHECK_EQ(ctx, mp->Map(buffer), Status::ERROR, "check MemPool::Map() failed\n");
     ret |= AURA_CHECK_EQ(ctx, mp->Unmap(buffer), Status::ERROR, "check MemPool::Unmap() failed\n");
 
-    AURA_VOID *ptr = mp->Allocate(AURA_MEM_HEAP, 100, 128, __FILE__, __FUNCTION__, __LINE__);
+    DT_VOID *ptr = mp->Allocate(AURA_MEM_HEAP, 100, 128, __FILE__, __FUNCTION__, __LINE__);
     buffer = mp->GetBuffer(ptr);
     ret |= AURA_CHECK_EQ(ctx, mp->Map(buffer), Status::OK, "check MemPool::Map() failed\n");
     ret |= AURA_CHECK_EQ(ctx, mp->Unmap(buffer), Status::OK, "check MemPool::Unmap() failed\n");
@@ -120,7 +120,7 @@ NEW_TESTCASE(runtime_mem_pool_map_test)
 class TestOp
 {
 public:
-    TestOp(Context* ctx, MI_S32 a, MI_F32 b) : m_ctx(ctx), m_a(a), m_b(b)
+    TestOp(Context* ctx, DT_S32 a, DT_F32 b) : m_ctx(ctx), m_a(a), m_b(b)
     {
         AURA_LOGD(m_ctx, AURA_TAG, "TestOp Constructor with %d, %f\n", a, b);
     }
@@ -131,8 +131,8 @@ public:
     }
 
     Context *m_ctx;
-    MI_S32 m_a;
-    MI_F32 m_b;
+    DT_S32 m_a;
+    DT_F32 m_b;
 };
 
 NEW_TESTCASE(create_op_test)
@@ -146,7 +146,7 @@ NEW_TESTCASE(create_op_test)
 NEW_TESTCASE(runtime_mem_pool_mem_stat_in_order)
 {
     Context *ctx = UnitTest::GetInstance()->GetContext();
-    ctx->GetMemPool()->MemTraceSet(MI_TRUE);
+    ctx->GetMemPool()->MemTraceSet(DT_TRUE);
     ctx->GetMemPool()->MemTraceBegin("SampleAlgo");
     ctx->GetMemPool()->MemTraceBegin("SectionA");
     {
@@ -174,10 +174,10 @@ NEW_TESTCASE(runtime_mem_pool_mem_stat_in_order)
 
     ctx->GetMemPool()->MemTraceEnd("SampleAlgo");
     std::cout << ctx->GetMemPool()->MemTraceReport() << std::endl;
-    ctx->GetMemPool()->MemTraceSet(MI_FALSE);
+    ctx->GetMemPool()->MemTraceSet(DT_FALSE);
 }
 
-AURA_VOID FuncA(Context *ctx)
+DT_VOID FuncA(Context *ctx)
 {
     ctx->GetMemPool()->MemTraceBegin("FuncA");
     auto ptr1 = AURA_ALLOC(ctx, 1024);
@@ -186,7 +186,7 @@ AURA_VOID FuncA(Context *ctx)
     ctx->GetMemPool()->MemTraceEnd("FuncA");
 }
 
-AURA_VOID FuncB(Context *ctx)
+DT_VOID FuncB(Context *ctx)
 {
     ctx->GetMemPool()->MemTraceBegin("FuncB");
     auto ptr1 = AURA_ALLOC(ctx, 4096);
@@ -195,7 +195,7 @@ AURA_VOID FuncB(Context *ctx)
     ctx->GetMemPool()->MemTraceEnd("FuncB");
 }
 
-AURA_VOID FuncC(Context *ctx)
+DT_VOID FuncC(Context *ctx)
 {
     ctx->GetMemPool()->MemTraceBegin("FuncC");
     auto ptr1 = AURA_ALLOC(ctx, 2048);
@@ -206,7 +206,7 @@ AURA_VOID FuncC(Context *ctx)
     ctx->GetMemPool()->MemTraceEnd("FuncC");
 }
 
-AURA_VOID FuncD(Context *ctx)
+DT_VOID FuncD(Context *ctx)
 {
     ctx->GetMemPool()->MemTraceBegin("FuncD");
     auto ptr1 = AURA_ALLOC(ctx, 2048);
@@ -218,7 +218,7 @@ AURA_VOID FuncD(Context *ctx)
 NEW_TESTCASE(runtime_mem_pool_mem_stat_recursive)
 {
     Context *ctx = UnitTest::GetInstance()->GetContext();
-    ctx->GetMemPool()->MemTraceSet(MI_TRUE);
+    ctx->GetMemPool()->MemTraceSet(DT_TRUE);
 
     ctx->GetMemPool()->MemTraceBegin("Algorithm");
 
@@ -249,7 +249,7 @@ NEW_TESTCASE(runtime_mem_pool_mem_stat_recursive)
     ctx->GetMemPool()->MemTraceEnd("Algorithm");
 
     std::cout << ctx->GetMemPool()->MemTraceReport() << std::endl;
-    ctx->GetMemPool()->MemTraceSet(MI_FALSE);
+    ctx->GetMemPool()->MemTraceSet(DT_FALSE);
 
     AddTestResult(AURA_GET_TEST_STATUS(Status::OK));
 }
@@ -257,7 +257,7 @@ NEW_TESTCASE(runtime_mem_pool_mem_stat_recursive)
 NEW_TESTCASE(runtime_mem_pool_mem_stat_halfway)
 {
     Context *ctx = UnitTest::GetInstance()->GetContext();
-    ctx->GetMemPool()->MemTraceSet(MI_TRUE);
+    ctx->GetMemPool()->MemTraceSet(DT_TRUE);
 
     ctx->GetMemPool()->MemTraceBegin("Algorithm");
 
@@ -271,14 +271,14 @@ NEW_TESTCASE(runtime_mem_pool_mem_stat_halfway)
     ctx->GetMemPool()->MemTraceEnd("Algorithm");
     std::cout << ctx->GetMemPool()->MemTraceReport() << std::endl;
 
-    ctx->GetMemPool()->MemTraceSet(MI_FALSE);
+    ctx->GetMemPool()->MemTraceSet(DT_FALSE);
     AddTestResult(AURA_GET_TEST_STATUS(Status::OK));
 }
 
 NEW_TESTCASE(runtime_mem_pool_mem_stat_dismatch)
 {
     Context *ctx = UnitTest::GetInstance()->GetContext();
-    ctx->GetMemPool()->MemTraceSet(MI_TRUE);
+    ctx->GetMemPool()->MemTraceSet(DT_TRUE);
 
     ctx->GetMemPool()->MemTraceBegin("ModuleB");
         FuncD(ctx);
@@ -289,14 +289,14 @@ NEW_TESTCASE(runtime_mem_pool_mem_stat_dismatch)
 
     std::cout << ctx->GetMemPool()->MemTraceReport() << std::endl;
 
-    ctx->GetMemPool()->MemTraceSet(MI_FALSE);
+    ctx->GetMemPool()->MemTraceSet(DT_FALSE);
     AddTestResult(AURA_GET_TEST_STATUS(Status::OK));
 }
 
 NEW_TESTCASE(runtime_mem_pool_mem_stat_reset)
 {
     Context *ctx = UnitTest::GetInstance()->GetContext();
-    ctx->GetMemPool()->MemTraceSet(MI_TRUE);
+    ctx->GetMemPool()->MemTraceSet(DT_TRUE);
 
     ctx->GetMemPool()->MemTraceBegin("ModuleB");
         FuncD(ctx);
@@ -311,27 +311,27 @@ NEW_TESTCASE(runtime_mem_pool_mem_stat_reset)
     ctx->GetMemPool()->MemTraceEnd("ModuleA");
     std::cout << ctx->GetMemPool()->MemTraceReport() << std::endl;
 
-    ctx->GetMemPool()->MemTraceSet(MI_FALSE);
+    ctx->GetMemPool()->MemTraceSet(DT_FALSE);
     AddTestResult(AURA_GET_TEST_STATUS(Status::OK));
 }
 
 NEW_TESTCASE(runtime_mem_pool_mem_stat_empty)
 {
     Context *ctx = UnitTest::GetInstance()->GetContext();
-    ctx->GetMemPool()->MemTraceSet(MI_TRUE);
+    ctx->GetMemPool()->MemTraceSet(DT_TRUE);
 
     ctx->GetMemPool()->MemTraceBegin("ModuleA");
 
     std::cout << ctx->GetMemPool()->MemTraceReport() << std::endl;
 
-    ctx->GetMemPool()->MemTraceSet(MI_FALSE);
+    ctx->GetMemPool()->MemTraceSet(DT_FALSE);
     AddTestResult(AURA_GET_TEST_STATUS(Status::OK));
 }
 
 NEW_TESTCASE(runtime_mem_pool_mem_stat_duplicate)
 {
     Context *ctx = UnitTest::GetInstance()->GetContext();
-    ctx->GetMemPool()->MemTraceSet(MI_TRUE);
+    ctx->GetMemPool()->MemTraceSet(DT_TRUE);
 
     ctx->GetMemPool()->MemTraceBegin("ModuleA");
         FuncC(ctx);
@@ -345,6 +345,6 @@ NEW_TESTCASE(runtime_mem_pool_mem_stat_duplicate)
 
     std::cout << ctx->GetMemPool()->MemTraceReport() << std::endl;
 
-    ctx->GetMemPool()->MemTraceSet(MI_FALSE);
+    ctx->GetMemPool()->MemTraceSet(DT_FALSE);
     AddTestResult(AURA_GET_TEST_STATUS(Status::OK));
 }

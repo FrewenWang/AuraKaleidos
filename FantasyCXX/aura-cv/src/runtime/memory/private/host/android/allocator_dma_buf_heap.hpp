@@ -16,13 +16,13 @@ public:
     AllocatorDMABufHeap();
     ~AllocatorDMABufHeap();
 
-    Buffer Allocate(MI_S64 size, MI_S32 align = 0) override;
-    AURA_VOID Free(Buffer &buffer) override;
+    Buffer Allocate(DT_S64 size, DT_S32 align = 0) override;
+    DT_VOID Free(Buffer &buffer) override;
 
     Status Map(const Buffer &buffer) override;
     Status Unmap(const Buffer &buffer) override;
 
-    MI_BOOL IsValid() const;
+    DT_BOOL IsValid() const;
 
 private:
     using InitFunc      = BufferAllocator* (*)();
@@ -32,8 +32,8 @@ private:
     using SyncStartFunc = int (*)(BufferAllocator*, unsigned int, SyncType, int (*legacy_ion_cpu_sync)(int, int, void *), void *);
     using SyncEndFunc   = int (*)(BufferAllocator*, unsigned int, SyncType, int (*legacy_ion_cpu_sync)(int, int, void *), void *);
 
-    MI_BOOL         m_is_valid;
-    AURA_VOID         *m_dl_handle;
+    DT_BOOL         m_is_valid;
+    DT_VOID         *m_dl_handle;
     BufferAllocator *m_buffer_allocator;
 
     InitFunc      m_create_func;
@@ -50,22 +50,22 @@ public:
     AllocatorIonQualcomm();
     ~AllocatorIonQualcomm();
 
-    Buffer Allocate(MI_S64 size, MI_S32 align = 0) override;
-    AURA_VOID Free(Buffer &buffer) override;
+    Buffer Allocate(DT_S64 size, DT_S32 align = 0) override;
+    DT_VOID Free(Buffer &buffer) override;
 
     Status Map(const Buffer &buffer) override;
     Status Unmap(const Buffer &buffer) override;
 
-    MI_BOOL IsValid() const;
+    DT_BOOL IsValid() const;
 
 private:
     using IonOpenFunc  = int (*)();
     using IonCloseFunc = int (*)(int);
     using IonAllocFunc = int (*)(int, size_t, size_t, unsigned int, unsigned int, int*);
 
-    MI_BOOL      m_is_valid;
-    AURA_VOID      *m_dl_handle;
-    MI_S32       m_ion_fd;
+    DT_BOOL      m_is_valid;
+    DT_VOID      *m_dl_handle;
+    DT_S32       m_ion_fd;
 
     IonOpenFunc  m_ion_open_func;
     IonCloseFunc m_ion_close_func;
@@ -78,13 +78,13 @@ public:
     AllocatorIonMTK();
     ~AllocatorIonMTK();
 
-    Buffer Allocate(MI_S64 size, MI_S32 align = 0) override;
-    AURA_VOID Free(Buffer &buffer) override;
+    Buffer Allocate(DT_S64 size, DT_S32 align = 0) override;
+    DT_VOID Free(Buffer &buffer) override;
 
     Status Map(const Buffer &buffer) override;
     Status Unmap(const Buffer &buffer) override;
 
-    MI_BOOL IsValid() const;
+    DT_BOOL IsValid() const;
 
 private:
     // libion_mtk/ion.h
@@ -104,10 +104,10 @@ private:
     using IonShareFunc = int (*)(int fd, ion_user_handle_t handle, int *share_fd);
     using IonFreeFunc  = int (*)(int fd, ion_user_handle_t handle);
 
-    MI_BOOL            m_is_valid;
-    AURA_VOID            *m_dl_handle;
-    AURA_VOID            *m_mtk_dl_handle;
-    MI_S32             m_ion_fd;
+    DT_BOOL            m_is_valid;
+    DT_VOID            *m_dl_handle;
+    DT_VOID            *m_mtk_dl_handle;
+    DT_S32             m_ion_fd;
 
     MtIonOpenFunc      m_mt_ion_open_func;
     IonAllocMmFunc     m_ion_alloc_mm_func;

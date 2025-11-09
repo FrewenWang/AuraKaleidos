@@ -6,13 +6,13 @@ endif()
 
 project(sample)
 
-if(Aura_DIR)
-    find_package(Aura REQUIRED)
-    if(NOT Aura_FOUND)
-        message(FATAL_ERROR "failed to find aura")
+if(AuraCV_DIR)
+    find_package(AuraCV REQUIRED)
+    if(NOT AuraCV_FOUND)
+        message(FATAL_ERROR "failed to find AuraCV")
     endif()
 else()
-    message(FATAL_ERROR "aura path is empty")
+    message(FATAL_ERROR "AuraCV path is empty")
 endif()
 
 include_directories(include)

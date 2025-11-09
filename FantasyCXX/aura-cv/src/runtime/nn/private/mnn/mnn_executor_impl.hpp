@@ -7,9 +7,9 @@
 namespace aura
 {
 
-AURA_INLINE MI_S32 GetMnnDumplayer(const NNConfig &config)
+AURA_INLINE DT_S32 GetMnnDumplayer(const NNConfig &config)
 {
-    MI_S32 mnn_dump_layers = MI_FALSE;
+    DT_S32 mnn_dump_layers = DT_FALSE;
 
     if (config.count("mnn_dump_layers"))
     {
@@ -19,7 +19,7 @@ AURA_INLINE MI_S32 GetMnnDumplayer(const NNConfig &config)
 
         if (value == std::string("true"))
         {
-            mnn_dump_layers = MI_TRUE;
+            mnn_dump_layers = DT_TRUE;
         }
     }
 
@@ -146,7 +146,7 @@ struct MnnExecutorConfig
 {
     MnnExecutorConfig(const NNConfig &config) : backend(NNBackend::CPU),
                                                 profiling_path(std::string()),
-                                                dump_layers(MI_FALSE),
+                                                dump_layers(DT_FALSE),
                                                 precision(MnnPrecision::PRECISION_NORMAL),
                                                 memory(MnnMemory::MEMORY_NORMAL),
                                                 tuning(MnnTuning::GPU_TUNING_NONE),
@@ -168,7 +168,7 @@ struct MnnExecutorConfig
 
     NNBackend backend;
     std::string profiling_path;
-    MI_S32 dump_layers;
+    DT_S32 dump_layers;
     MnnPrecision precision;
     MnnMemory memory;
     MnnTuning tuning;
@@ -195,7 +195,7 @@ protected:
 
 using MnnExecutorImplCreator = MnnExecutorImpl*(*)(Context*, const std::shared_ptr<MnnModel>&, const NNConfig&);
 
-template<typename Tp, typename std::enable_if<std::is_base_of<MnnExecutorImpl, Tp>::value>::type* = MI_NULL>
+template<typename Tp, typename std::enable_if<std::is_base_of<MnnExecutorImpl, Tp>::value>::type* = DT_NULL>
 MnnExecutorImpl* MnnExecutorImplHelper(Context *ctx, const std::shared_ptr<MnnModel> &model, const NNConfig &config)
 {
     return new Tp(ctx, model, config);

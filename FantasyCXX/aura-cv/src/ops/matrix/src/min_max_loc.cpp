@@ -38,20 +38,20 @@ static std::shared_ptr<MinMaxLocImpl> CreateMinMaxLocImpl(Context *ctx, const Op
 MinMaxLoc::MinMaxLoc(Context *ctx, const OpTarget &target) : Op(ctx,target)
 {}
 
-Status MinMaxLoc::SetArgs(const Array *src, MI_F64 *min_val, MI_F64 *max_val, Point3i *min_pos, Point3i *max_pos)
+Status MinMaxLoc::SetArgs(const Array *src, DT_F64 *min_val, DT_F64 *max_val, Point3i *min_pos, Point3i *max_pos)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
     }
 
-    if ((MI_NULL == min_val) || (MI_NULL == max_val) || (MI_NULL == min_pos) || (MI_NULL == max_pos))
+    if ((DT_NULL == min_val) || (DT_NULL == max_val) || (DT_NULL == min_pos) || (DT_NULL == max_pos))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "output pointer is null ptr");
         return Status::ERROR;
@@ -80,14 +80,14 @@ Status MinMaxLoc::SetArgs(const Array *src, MI_F64 *min_val, MI_F64 *max_val, Po
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateMinMaxLocImpl(m_ctx, impl_target);
     }
 
     // run initialize
     MinMaxLocImpl *min_max_loc_impl = dynamic_cast<MinMaxLocImpl*>(m_impl.get());
-    if (MI_NULL == min_max_loc_impl)
+    if (DT_NULL == min_max_loc_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "min_max_loc_impl is null ptr");
         return Status::ERROR;
@@ -98,25 +98,25 @@ Status MinMaxLoc::SetArgs(const Array *src, MI_F64 *min_val, MI_F64 *max_val, Po
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status IMinMaxLoc(Context *ctx, const Mat &src, MI_F64 *min_val, MI_F64 *max_val, Point3i *min_pos, Point3i *max_pos, const OpTarget &target)
+AURA_EXPORTS Status IMinMaxLoc(Context *ctx, const Mat &src, DT_F64 *min_val, DT_F64 *max_val, Point3i *min_pos, Point3i *max_pos, const OpTarget &target)
 {
     MinMaxLoc min_max_loc(ctx, target);
 
     return OpCall(ctx, min_max_loc, &src, min_val, max_val, min_pos, max_pos);
 }
 
-MinMaxLocImpl::MinMaxLocImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "MinMaxLoc", target), m_src(MI_NULL), m_min_val(MI_NULL), 
-                                                                     m_max_val(MI_NULL), m_min_pos(MI_NULL), m_max_pos(MI_NULL)
+MinMaxLocImpl::MinMaxLocImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "MinMaxLoc", target), m_src(DT_NULL), m_min_val(DT_NULL), 
+                                                                     m_max_val(DT_NULL), m_min_pos(DT_NULL), m_max_pos(DT_NULL)
 {}
 
-Status MinMaxLocImpl::SetArgs(const Array *src, MI_F64 *min_val, MI_F64 *max_val, Point3i *min_pos, Point3i *max_pos)
+Status MinMaxLocImpl::SetArgs(const Array *src, DT_F64 *min_val, DT_F64 *max_val, Point3i *min_pos, Point3i *max_pos)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -151,7 +151,7 @@ std::string MinMaxLocImpl::ToString() const
     return str;
 }
 
-AURA_VOID MinMaxLocImpl::Dump(const std::string &prefix) const
+DT_VOID MinMaxLocImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

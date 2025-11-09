@@ -9,7 +9,7 @@ namespace aura
 namespace neon
 {
 /************************************ u8 vdvin ************************************/
-template <MI_U8 DENOM, typename std::enable_if<DENOM == 3>::type* = MI_NULL>
+template <DT_U8 DENOM, typename std::enable_if<DENOM == 3>::type* = DT_NULL>
 inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
 {
     const static uint8x8_t vdu8_171 = vdup_n_u8(171);
@@ -21,7 +21,7 @@ inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
     return vdu8_result;
 }
 
-template <MI_U8 DENOM, typename std::enable_if<DENOM == 5>::type* = MI_NULL>
+template <DT_U8 DENOM, typename std::enable_if<DENOM == 5>::type* = DT_NULL>
 inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
 {
     const static uint8x8_t vdu8_205 = vdup_n_u8(205);
@@ -33,7 +33,7 @@ inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
     return vdu8_result;
 }
 
-template <MI_U8 DENOM, typename std::enable_if<DENOM == 7>::type* = MI_NULL>
+template <DT_U8 DENOM, typename std::enable_if<DENOM == 7>::type* = DT_NULL>
 inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
 {
     const static uint8x8_t vdu8_37 = vdup_n_u8(37);
@@ -46,7 +46,7 @@ inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
     return vdu8_result;
 }
 
-template <MI_U8 DENOM, typename std::enable_if<DENOM == 9>::type* = MI_NULL>
+template <DT_U8 DENOM, typename std::enable_if<DENOM == 9>::type* = DT_NULL>
 inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
 {
     const static uint8x8_t vdu8_57 = vdup_n_u8(57);
@@ -58,7 +58,7 @@ inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
     return vdu8_result;
 }
 
-template <MI_U8 DENOM, typename std::enable_if<DENOM == 25>::type* = MI_NULL>
+template <DT_U8 DENOM, typename std::enable_if<DENOM == 25>::type* = DT_NULL>
 inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
 {
     const static uint8x8_t vdu8_41 = vdup_n_u8(41);
@@ -70,7 +70,7 @@ inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
     return vdu8_result;
 }
 
-template <MI_U8 DENOM, typename std::enable_if<DENOM == 49>::type* = MI_NULL>
+template <DT_U8 DENOM, typename std::enable_if<DENOM == 49>::type* = DT_NULL>
 inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
 {
     const static uint8x8_t vdu8_79 = vdup_n_u8(79);
@@ -83,16 +83,16 @@ inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
     return vdu8_result;
 }
 
-template <MI_U8 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                               (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+template <DT_U8 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
+                                               (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
 {
-    constexpr MI_U8 LENGTH = 32 - __builtin_clz(DENOM - 1);
-    constexpr MI_U8 MUL    = (0 == DENOM) ? 0 : ((MI_U16)256 * ((1 << LENGTH) - DENOM)) / DENOM + 1;
+    constexpr DT_U8 LENGTH = 32 - __builtin_clz(DENOM - 1);
+    constexpr DT_U8 MUL    = (0 == DENOM) ? 0 : ((DT_U16)256 * ((1 << LENGTH) - DENOM)) / DENOM + 1;
 
     const static uint8x8_t vdu8_mul    = vdup_n_u8(MUL);
-    const static int8x8_t  vds8_shift0 = vdup_n_s8((MI_S8)(-(Min<MI_U8>(LENGTH, (MI_U8)1))));
-    const static int8x8_t  vds8_shift1 = vdup_n_s8((MI_S8)(-(Max<MI_S8>((MI_S8)LENGTH - 1, (MI_S8)0))));
+    const static int8x8_t  vds8_shift0 = vdup_n_s8((DT_S8)(-(Min<DT_U8>(LENGTH, (DT_U8)1))));
+    const static int8x8_t  vds8_shift1 = vdup_n_s8((DT_S8)(-(Max<DT_S8>((DT_S8)LENGTH - 1, (DT_S8)0))));
 
     uint16x8_t vqu16_mul   = vmull_u8(vdu8_src, vdu8_mul);
     uint8x8_t  vdu8_shr    = vshrn_n_u16(vqu16_mul, 8);
@@ -102,7 +102,7 @@ inline uint8x8_t vdiv_n(const uint8x8_t &vdu8_src)
     return vdu8_result;
 }
 
-template <MI_U8 DENOM>
+template <DT_U8 DENOM>
 inline uint8x16_t vdiv_n(const uint8x16_t &vqu8_src)
 {
     uint8x8_t vdu8_result_lo = vdiv_n<DENOM>(vget_low_u8(vqu8_src));
@@ -112,7 +112,7 @@ inline uint8x16_t vdiv_n(const uint8x16_t &vqu8_src)
 }
 
 /************************************ s8 vdvin ************************************/
-template <MI_S8 DENOM, typename std::enable_if<DENOM == 3>::type* = MI_NULL>
+template <DT_S8 DENOM, typename std::enable_if<DENOM == 3>::type* = DT_NULL>
 inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
 {
     const static int16x8_t vqs16_511 = vdupq_n_s16(-511);
@@ -125,7 +125,7 @@ inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
     return vds8_result;
 }
 
-template <MI_S8 DENOM, typename std::enable_if<DENOM == 5>::type* = MI_NULL>
+template <DT_S8 DENOM, typename std::enable_if<DENOM == 5>::type* = DT_NULL>
 inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
 {
     const static int16x8_t vqs16_1023 = vdupq_n_s16(-1023);
@@ -138,7 +138,7 @@ inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
     return vds8_result;
 }
 
-template <MI_S8 DENOM, typename std::enable_if<DENOM == 7>::type* = MI_NULL>
+template <DT_S8 DENOM, typename std::enable_if<DENOM == 7>::type* = DT_NULL>
 inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
 {
     const static int16x8_t vqs16_1023 = vdupq_n_s16(-1023);
@@ -151,7 +151,7 @@ inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
     return vds8_result;
 }
 
-template <MI_S8 DENOM, typename std::enable_if<DENOM == 9>::type* = MI_NULL>
+template <DT_S8 DENOM, typename std::enable_if<DENOM == 9>::type* = DT_NULL>
 inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
 {
     const static int16x8_t vqs16_511 = vdupq_n_s16(-511);
@@ -164,7 +164,7 @@ inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
     return vds8_result;
 }
 
-template <MI_S8 DENOM, typename std::enable_if<DENOM == 25>::type* = MI_NULL>
+template <DT_S8 DENOM, typename std::enable_if<DENOM == 25>::type* = DT_NULL>
 inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
 {
     const static int16x8_t vqs16_1023 = vdupq_n_s16(-1023);
@@ -177,7 +177,7 @@ inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
     return vds8_result;
 }
 
-template <MI_S8 DENOM, typename std::enable_if<DENOM == 49>::type* = MI_NULL>
+template <DT_S8 DENOM, typename std::enable_if<DENOM == 49>::type* = DT_NULL>
 inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
 {
     const static int16x8_t vqs16_2047 = vdupq_n_s16(-2047);
@@ -190,14 +190,14 @@ inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
     return vds8_result;
 }
 
-template <MI_S8 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                               (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+template <DT_S8 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
+                                               (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
 {
-    constexpr MI_U8  ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
-    constexpr MI_S8  BITS   = static_cast<MI_S8>(32 - __builtin_clz(ABS_D - 1));
-    constexpr MI_S8  LENGTH = (BITS > 1) ? BITS : 1;
-    constexpr MI_S16 MUL    = (0 == DENOM) ? 0 : 1 + ((MI_U16(1)) << (8 + LENGTH - 1)) / ABS_D - ((MI_U16)256);
+    constexpr DT_U8  ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
+    constexpr DT_S8  BITS   = static_cast<DT_S8>(32 - __builtin_clz(ABS_D - 1));
+    constexpr DT_S8  LENGTH = (BITS > 1) ? BITS : 1;
+    constexpr DT_S16 MUL    = (0 == DENOM) ? 0 : 1 + ((DT_U16(1)) << (8 + LENGTH - 1)) / ABS_D - ((DT_U16)256);
 
     const static int8x8_t vds8_mul   = vdup_n_s8(MUL);
     const static int8x8_t vds8_sign  = vdup_n_s8(DENOM >> 7);
@@ -212,7 +212,7 @@ inline int8x8_t vdiv_n(const int8x8_t &vds8_src)
     return vds8_result;
 }
 
-template <MI_S8 DENOM>
+template <DT_S8 DENOM>
 inline int8x16_t vdiv_n(const int8x16_t &vqs8_src)
 {
     int8x8_t vds8_result_lo = vdiv_n<DENOM>(vget_low_s8(vqs8_src));
@@ -222,7 +222,7 @@ inline int8x16_t vdiv_n(const int8x16_t &vqs8_src)
 }
 
 /************************************ u16 vdvin ************************************/
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 3>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 3>::type* = DT_NULL>
 inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
 {
     const static uint16x4_t vdu16_43691 = vdup_n_u16(43691);
@@ -234,7 +234,7 @@ inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
     return vdu16_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 3>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 3>::type* = DT_NULL>
 inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
 {
     const static uint16x4_t vdu16_43691 = vdup_n_u16(43691);
@@ -247,7 +247,7 @@ inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
     return vdu8_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 5>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 5>::type* = DT_NULL>
 inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
 {
     const static uint16x4_t vdu16_52429 = vdup_n_u16(52429);
@@ -259,7 +259,7 @@ inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
     return vdu16_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 5>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 5>::type* = DT_NULL>
 inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
 {
     const static uint16x4_t vdu16_52429 = vdup_n_u16(52429);
@@ -272,7 +272,7 @@ inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
     return vdu8_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 7>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 7>::type* = DT_NULL>
 inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
 {
     const static uint16x4_t vdu16_9363 = vdup_n_u16(9363);
@@ -285,7 +285,7 @@ inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
     return vdu16_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 7>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 7>::type* = DT_NULL>
 inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
 {
     const static uint16x4_t vdu16_9363 = vdup_n_u16(9363);
@@ -307,7 +307,7 @@ inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
     return vdu8_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 9>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 9>::type* = DT_NULL>
 inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
 {
     const static uint16x4_t vdu16_58255 = vdup_n_u16(58255);
@@ -319,7 +319,7 @@ inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
     return vdu16_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 9>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 9>::type* = DT_NULL>
 inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
 {
     const static uint16x4_t vdu16_58255 = vdup_n_u16(58255);
@@ -333,7 +333,7 @@ inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
     return vdu8_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 25>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 25>::type* = DT_NULL>
 inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
 {
     const static uint16x4_t vdu16_18351 = vdup_n_u16(18351);
@@ -344,7 +344,7 @@ inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
     return vdu16_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 25>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 25>::type* = DT_NULL>
 inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
 {
     const static uint16x4_t vdu16_18351 = vdup_n_u16(18351);
@@ -359,7 +359,7 @@ inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
     return vdu8_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 49>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 49>::type* = DT_NULL>
 inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
 {
     const static uint16x4_t vdu16_20063 = vdup_n_u16(20063);
@@ -372,7 +372,7 @@ inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
     return vdu16_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<DENOM == 49>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<DENOM == 49>::type* = DT_NULL>
 inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
 {
     const static uint16x4_t vdu16_20063 = vdup_n_u16(20063);
@@ -387,16 +387,16 @@ inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
     return vdu8_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
+                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
 {
-    constexpr MI_U16 LENGTH = 32 - __builtin_clz(DENOM - 1);
-    constexpr MI_U16 MUL    = (0 == DENOM) ? 0 : ((65536) * ((1 << LENGTH) - DENOM)) / DENOM + 1;
+    constexpr DT_U16 LENGTH = 32 - __builtin_clz(DENOM - 1);
+    constexpr DT_U16 MUL    = (0 == DENOM) ? 0 : ((65536) * ((1 << LENGTH) - DENOM)) / DENOM + 1;
 
     const static uint16x4_t vdu16_mul    = vdup_n_u16(MUL);
-    const static int16x4_t  vds16_shift0 = vdup_n_s16((MI_S16)(-(Min<MI_U16>(LENGTH, (MI_U16)1))));
-    const static int16x4_t  vds16_shift1 = vdup_n_s16((MI_S16)(-(Max<MI_S16>((MI_S16)LENGTH - 1, (MI_S16)0))));
+    const static int16x4_t  vds16_shift0 = vdup_n_s16((DT_S16)(-(Min<DT_U16>(LENGTH, (DT_U16)1))));
+    const static int16x4_t  vds16_shift1 = vdup_n_s16((DT_S16)(-(Max<DT_S16>((DT_S16)LENGTH - 1, (DT_S16)0))));
 
     uint32x4_t vqu32_mul    = vmull_u16(vdu16_src, vdu16_mul);
     uint16x4_t vdu16_h      = vshrn_n_u32(vqu32_mul, 16);
@@ -408,16 +408,16 @@ inline uint16x4_t vdiv_n(const uint16x4_t &vdu16_src)
     return vdu16_result;
 }
 
-template <MI_U16 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+template <DT_U16 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
+                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
 {
-    constexpr MI_U16 LENGTH = 32 - __builtin_clz(DENOM - 1);
-    constexpr MI_U16 MUL    = (0 == DENOM) ? 0 : ((65536) * ((1 << LENGTH) - DENOM)) / DENOM + 1;
+    constexpr DT_U16 LENGTH = 32 - __builtin_clz(DENOM - 1);
+    constexpr DT_U16 MUL    = (0 == DENOM) ? 0 : ((65536) * ((1 << LENGTH) - DENOM)) / DENOM + 1;
 
     const static uint16x4_t vdu16_mul    = vdup_n_u16(MUL);
-    const static int16x8_t  vqs16_shift0 = vdupq_n_s16((MI_S16)(-(Min<MI_U16>(LENGTH, (MI_U16)1))));
-    const static int16x8_t  vqs16_shift1 = vdupq_n_s16((MI_S16)(-(Max<MI_S16>((MI_S16)LENGTH - 1, (MI_S16)0))));
+    const static int16x8_t  vqs16_shift0 = vdupq_n_s16((DT_S16)(-(Min<DT_U16>(LENGTH, (DT_U16)1))));
+    const static int16x8_t  vqs16_shift1 = vdupq_n_s16((DT_S16)(-(Max<DT_S16>((DT_S16)LENGTH - 1, (DT_S16)0))));
 
     uint32x4_t vqu32_mul_lo = vmull_u16(vget_low_u16(vqu16_src), vdu16_mul);
     uint32x4_t vqu32_mul_hi = vmull_u16(vget_high_u16(vqu16_src), vdu16_mul);
@@ -431,7 +431,7 @@ inline uint8x8_t vqdivn_n(const uint16x8_t &vqu16_src)
     return vdu8_result;
 }
 
-template <MI_U16 DENOM>
+template <DT_U16 DENOM>
 inline uint16x8_t vdiv_n(const uint16x8_t &vqu16_src)
 {
     uint16x4_t vdu16_result_lo = vdiv_n<DENOM>(vget_low_u16(vqu16_src));
@@ -441,7 +441,7 @@ inline uint16x8_t vdiv_n(const uint16x8_t &vqu16_src)
 }
 /************************************ s16 vdvin ************************************/
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 3>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 3>::type* = DT_NULL>
 inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
 {
     const static int32x4_t vqs32_131071 = vdupq_n_s32(-131071);
@@ -454,7 +454,7 @@ inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
     return vds16_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 3>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 3>::type* = DT_NULL>
 inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
 {
     const static int32x4_t vqs32_131071 = vdupq_n_s32(-131071);
@@ -474,7 +474,7 @@ inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
     return vds8_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 5>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 5>::type* = DT_NULL>
 inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
 {
     const static int32x4_t vqs32_262143 = vdupq_n_s32(-262143);
@@ -487,7 +487,7 @@ inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
     return vds16_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 5>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 5>::type* = DT_NULL>
 inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
 {
     const static int32x4_t vqs32_262143 = vdupq_n_s32(-262143);
@@ -507,7 +507,7 @@ inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
     return vds8_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 7>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 7>::type* = DT_NULL>
 inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
 {
     const static int32x4_t vqs32_131071 = vdupq_n_s32(-131071);
@@ -520,7 +520,7 @@ inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
     return vds16_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 7>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 7>::type* = DT_NULL>
 inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
 {
     const static int32x4_t vqs32_131071 = vdupq_n_s32(-131071);
@@ -540,7 +540,7 @@ inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
     return vds8_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 9>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 9>::type* = DT_NULL>
 inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
 {
     const static int32x4_t vqs32_524287 = vdupq_n_s32(-524287);
@@ -553,7 +553,7 @@ inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
     return vds16_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 9>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 9>::type* = DT_NULL>
 inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
 {
     const static int32x4_t vqs32_524287 = vdupq_n_s32(-524287);
@@ -573,7 +573,7 @@ inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
     return vds8_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 25>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 25>::type* = DT_NULL>
 inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
 {
     const static int32x4_t vqs32_524287 = vdupq_n_s32(-524287);
@@ -586,7 +586,7 @@ inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
     return vds16_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 25>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 25>::type* = DT_NULL>
 inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
 {
     const static int32x4_t vqs32_524287 = vdupq_n_s32(-524287);
@@ -606,7 +606,7 @@ inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
     return vds8_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 49>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 49>::type* = DT_NULL>
 inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
 {
     const static int32x4_t vqs32_131071 = vdupq_n_s32(-131071);
@@ -619,7 +619,7 @@ inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
     return vds16_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<DENOM == 49>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<DENOM == 49>::type* = DT_NULL>
 inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
 {
     const static int32x4_t vqs32_131071 = vdupq_n_s32(-131071);
@@ -639,14 +639,14 @@ inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
     return vds8_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
+                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
 {
-    constexpr MI_U16 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
-    constexpr MI_S16 BITS   = static_cast<MI_S16>(32 - __builtin_clz(ABS_D - 1));
-    constexpr MI_S16 LENGTH = (BITS > 1) ? BITS : 1;
-    constexpr MI_S32 MUL    = (0 == DENOM) ? 0 : 1 + ((MI_U32(1)) << (16 + LENGTH - 1)) / ABS_D - (65536);
+    constexpr DT_U16 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
+    constexpr DT_S16 BITS   = static_cast<DT_S16>(32 - __builtin_clz(ABS_D - 1));
+    constexpr DT_S16 LENGTH = (BITS > 1) ? BITS : 1;
+    constexpr DT_S32 MUL    = (0 == DENOM) ? 0 : 1 + ((DT_U32(1)) << (16 + LENGTH - 1)) / ABS_D - (65536);
 
     const static int16x4_t vds16_mul   = vdup_n_s16(MUL);
     const static int16x4_t vds16_sign  = vdup_n_s16(DENOM >> 15);
@@ -661,14 +661,14 @@ inline int16x4_t vdiv_n(const int16x4_t &vds16_src)
     return vds16_result;
 }
 
-template <MI_S16 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+template <DT_S16 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
+                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
 {
-    constexpr MI_U16 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
-    constexpr MI_S16 BITS   = static_cast<MI_S16>(32 - __builtin_clz(ABS_D - 1));
-    constexpr MI_S16 LENGTH = (BITS > 1) ? BITS : 1;
-    constexpr MI_S32 MUL    = (0 == DENOM) ? 0 : 1 + ((MI_U32(1)) << (16 + LENGTH - 1)) / ABS_D - (65536);
+    constexpr DT_U16 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
+    constexpr DT_S16 BITS   = static_cast<DT_S16>(32 - __builtin_clz(ABS_D - 1));
+    constexpr DT_S16 LENGTH = (BITS > 1) ? BITS : 1;
+    constexpr DT_S32 MUL    = (0 == DENOM) ? 0 : 1 + ((DT_U32(1)) << (16 + LENGTH - 1)) / ABS_D - (65536);
 
     const static int16x4_t vds16_mul   = vdup_n_s16(MUL);
     const static int16x8_t vqs16_sign  = vdupq_n_s16(DENOM >> 15);
@@ -689,7 +689,7 @@ inline int8x8_t vqdivn_n(const int16x8_t &vqs16_src)
     return vds8_result;
 }
 
-template <MI_S16 DENOM>
+template <DT_S16 DENOM>
 inline int16x8_t vdiv_n(const int16x8_t &vqs16_src)
 {
     int16x4_t vds16_result_lo = vdiv_n<DENOM>(vget_low_s16(vqs16_src));
@@ -699,7 +699,7 @@ inline int16x8_t vdiv_n(const int16x8_t &vqs16_src)
 }
 
 /************************************ u32 vdvin ************************************/
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 3>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 3>::type* = DT_NULL>
 inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
 {
     uint32x2_t vdu32_shr    = vshrn_n_u64(vmull_n_u32(vdu32_src, 2863311531), 32);
@@ -708,7 +708,7 @@ inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
     return vdu32_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 3>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 3>::type* = DT_NULL>
 inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
 {
     uint32x2_t vdu32_shr_lo = vshrn_n_u64(vmull_n_u32(vget_low_u16(vqu32_src),  2863311531), 32);
@@ -720,7 +720,7 @@ inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
     return vdu16_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 5>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 5>::type* = DT_NULL>
 inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
 {
     uint32x2_t vdu32_shr    = vshrn_n_u64(vmull_n_u32(vdu32_src, 3435973837), 32);
@@ -729,7 +729,7 @@ inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
     return vdu32_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 5>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 5>::type* = DT_NULL>
 inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
 {
     uint32x2_t vdu32_shr_lo = vshrn_n_u64(vmull_n_u32(vget_low_u16(vqu32_src),  3435973837), 32);
@@ -741,7 +741,7 @@ inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
     return vdu16_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 7>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 7>::type* = DT_NULL>
 inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
 {
     uint32x2_t vdu32_shr    = vshrn_n_u64(vmull_n_u32(vdu32_src, 613566757), 32);
@@ -750,7 +750,7 @@ inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
     return vdu32_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 7>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 7>::type* = DT_NULL>
 inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
 {
     uint32x2_t vqu32_shrn_lo = vshrn_n_u64(vmull_n_u32(vget_low_u16(vqu32_src),  613566757), 32);
@@ -764,7 +764,7 @@ inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
     return vdu16_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 9>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 9>::type* = DT_NULL>
 inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
 {
     uint32x2_t vdu32_shr    = vshrn_n_u64(vmull_n_u32(vdu32_src, 1908874354), 32);
@@ -773,7 +773,7 @@ inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
     return vdu32_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 9>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 9>::type* = DT_NULL>
 inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
 {
     uint32x2_t vdu32_shr_lo = vshrn_n_u64(vmull_n_u32(vget_low_u32(vqu32_src),  1908874354), 32);
@@ -785,7 +785,7 @@ inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
     return vdu16_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 25>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 25>::type* = DT_NULL>
 inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
 {
     uint32x2_t vdu32_shr    = vshrn_n_u64(vmull_n_u32(vdu32_src, 1374389535), 32);
@@ -794,7 +794,7 @@ inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
     return vdu32_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 25>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 25>::type* = DT_NULL>
 inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
 {
     uint32x2_t vdu32_shr_lo = vshrn_n_u64(vmull_n_u32(vget_low_u32(vqu32_src),  1374389535), 32);
@@ -806,7 +806,7 @@ inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
     return vdu16_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 49>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 49>::type* = DT_NULL>
 inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
 {
     uint32x2_t vdu32_shr    = vshrn_n_u64(vmull_n_u32(vdu32_src, 1402438301), 32);
@@ -815,7 +815,7 @@ inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
     return vdu32_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<DENOM == 49>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<DENOM == 49>::type* = DT_NULL>
 inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
 {
     uint32x2_t vdu32_shr_lo = vshrn_n_u64(vmull_n_u32(vget_low_u32(vqu32_src),  1402438301), 32);
@@ -827,16 +827,16 @@ inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
     return vdu16_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
+                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
 {
-    constexpr MI_U32 LENGTH = 32 - __builtin_clz(DENOM - 1);
-    constexpr MI_U32 MUL    = (0 == DENOM) ? 0 : (MI_U64)(4294967296) * (((MI_U64)1 << LENGTH) - (MI_U64)DENOM) / DENOM + 1;
+    constexpr DT_U32 LENGTH = 32 - __builtin_clz(DENOM - 1);
+    constexpr DT_U32 MUL    = (0 == DENOM) ? 0 : (DT_U64)(4294967296) * (((DT_U64)1 << LENGTH) - (DT_U64)DENOM) / DENOM + 1;
 
     const static uint32x2_t vdu32_mul    = vdup_n_u32(MUL);
-    const static int32x2_t  vds32_shift0 = vdup_n_s32(-(Min<MI_U32>(LENGTH, (MI_U32)1)));
-    const static int32x2_t  vds32_shift1 = vdup_n_s32(-(Max<MI_S32>((MI_S32)LENGTH - 1, (MI_S32)0)));
+    const static int32x2_t  vds32_shift0 = vdup_n_s32(-(Min<DT_U32>(LENGTH, (DT_U32)1)));
+    const static int32x2_t  vds32_shift1 = vdup_n_s32(-(Max<DT_S32>((DT_S32)LENGTH - 1, (DT_S32)0)));
 
     uint32x2_t vdu32_shr    = vshrn_n_u64(vmull_u32(vdu32_src, vdu32_mul), 32);
     uint32x2_t vdu32_sls    = vshl_u32(vsub_u32(vdu32_src, vdu32_shr), vds32_shift0);
@@ -845,16 +845,16 @@ inline uint32x2_t vdiv_n(const uint32x2_t &vdu32_src)
     return vdu32_result;
 }
 
-template <MI_U32 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+template <DT_U32 DENOM, typename std::enable_if<(DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
+                                                (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
 {
-    constexpr MI_U32 LENGTH = 32 - __builtin_clz(DENOM - 1);
-    constexpr MI_U32 MUL    = (0 == DENOM) ? 0 : (MI_U64)(4294967296) * (((MI_U64)1 << LENGTH) - (MI_U64)DENOM) / DENOM + 1;
+    constexpr DT_U32 LENGTH = 32 - __builtin_clz(DENOM - 1);
+    constexpr DT_U32 MUL    = (0 == DENOM) ? 0 : (DT_U64)(4294967296) * (((DT_U64)1 << LENGTH) - (DT_U64)DENOM) / DENOM + 1;
 
     const static uint32x2_t vdu32_mul    = vdup_n_u32(MUL);
-    const static int32x4_t  vqs32_shift0 = vdupq_n_s32(-(Min<MI_U32>(LENGTH, (MI_U32)1)));
-    const static int32x4_t  vqs32_shift1 = vdupq_n_s32(-(Max<MI_S32>((MI_S32)LENGTH - 1, (MI_S32)0)));
+    const static int32x4_t  vqs32_shift0 = vdupq_n_s32(-(Min<DT_U32>(LENGTH, (DT_U32)1)));
+    const static int32x4_t  vqs32_shift1 = vdupq_n_s32(-(Max<DT_S32>((DT_S32)LENGTH - 1, (DT_S32)0)));
 
     uint32x2_t vdu32_shr_lo = vshrn_n_u64(vmull_u32(vget_low_u16(vqu32_src),  vdu32_mul), 32);
     uint32x2_t vdu32_shr_hi = vshrn_n_u64(vmull_u32(vget_high_u16(vqu32_src), vdu32_mul), 32);
@@ -867,7 +867,7 @@ inline uint16x4_t vqdivn_n(const uint32x4_t &vqu32_src)
     return vdu16_result;
 }
 
-template <MI_U32 DENOM>
+template <DT_U32 DENOM>
 inline uint32x4_t vdiv_n(const uint32x4_t &vqu32_src)
 {
     uint32x2_t vdu32_result_lo = vdiv_n<DENOM>(vget_low_u32(vqu32_src));
@@ -877,13 +877,13 @@ inline uint32x4_t vdiv_n(const uint32x4_t &vqu32_src)
 }
 
 /************************************ s32 vdvin ************************************/
-template <MI_S32 DENOM>
+template <DT_S32 DENOM>
 inline int32x2_t vdiv_n(const int32x2_t &vds32_src)
 {
-    constexpr MI_U32 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
-    constexpr MI_S32 BITS   = 32 - __builtin_clz(ABS_D - 1);
-    constexpr MI_S32 LENGTH = (BITS > 1) ? BITS : 1;
-    constexpr MI_S64 MUL    = (0 == DENOM) ? 0 : 1 + ((MI_U64(1)) << (32 + LENGTH - 1)) / ABS_D - (4294967296);
+    constexpr DT_U32 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
+    constexpr DT_S32 BITS   = 32 - __builtin_clz(ABS_D - 1);
+    constexpr DT_S32 LENGTH = (BITS > 1) ? BITS : 1;
+    constexpr DT_S64 MUL    = (0 == DENOM) ? 0 : 1 + ((DT_U64(1)) << (32 + LENGTH - 1)) / ABS_D - (4294967296);
 
     const static int32x2_t vds32_mul   = vdup_n_s32(MUL);
     const static int32x2_t vds32_sign  = vdup_n_s32(DENOM >> 31);
@@ -898,13 +898,13 @@ inline int32x2_t vdiv_n(const int32x2_t &vds32_src)
     return vds32_result;
 }
 
-template <MI_S32 DENOM>
+template <DT_S32 DENOM>
 inline int16x4_t vqdivn_n(const int32x4_t &vqs32_src)
 {
-    constexpr MI_U32 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
-    constexpr MI_S32 BITS   = 32 - __builtin_clz(ABS_D - 1);
-    constexpr MI_S32 LENGTH = (BITS > 1) ? BITS : 1;
-    constexpr MI_S64 MUL    = (0 == DENOM) ? 0 : 1 + ((MI_U64(1)) << (32 + LENGTH - 1)) / ABS_D - (4294967296);
+    constexpr DT_U32 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
+    constexpr DT_S32 BITS   = 32 - __builtin_clz(ABS_D - 1);
+    constexpr DT_S32 LENGTH = (BITS > 1) ? BITS : 1;
+    constexpr DT_S64 MUL    = (0 == DENOM) ? 0 : 1 + ((DT_U64(1)) << (32 + LENGTH - 1)) / ABS_D - (4294967296);
 
     const static int32x2_t vds32_mul    = vdup_n_s32(MUL);
     const static int32x4_t vqs32_sign  = vdupq_n_s32(DENOM >> 31);
@@ -923,7 +923,7 @@ inline int16x4_t vqdivn_n(const int32x4_t &vqs32_src)
     return vds16_result;
 }
 
-template <MI_S32 DENOM>
+template <DT_S32 DENOM>
 inline int32x4_t vdiv_n(const int32x4_t &vqs32_src)
 {
     int32x2_t vds32_result_lo = vdiv_n<DENOM>(vget_low_s32(vqs32_src));
@@ -934,20 +934,20 @@ inline int32x4_t vdiv_n(const int32x4_t &vqs32_src)
 
 #if defined(__aarch64__)
 /************************************ u64 vdvin ************************************/
-template <MI_U64 DENOM>
+template <DT_U64 DENOM>
 inline uint64x1_t vdiv_n(const uint64x1_t &vdu64_src)
 {
-    MI_U64 u64_src[1], u64_result[1];
+    DT_U64 u64_src[1], u64_result[1];
     vst1_u64(u64_src, vdu64_src);
     u64_result[0] = u64_src[0] / DENOM;
 
     return vld1_u64(u64_result);
 }
 
-template <MI_U64 DENOM>
+template <DT_U64 DENOM>
 inline uint64x2_t vdiv_n(const uint64x2_t &vqu64_src)
 {
-    MI_U64 u64_src[2], u64_result[2];
+    DT_U64 u64_src[2], u64_result[2];
     vst1q_u64(u64_src, vqu64_src);
 
     u64_result[0] = u64_src[0] / DENOM;
@@ -957,20 +957,20 @@ inline uint64x2_t vdiv_n(const uint64x2_t &vqu64_src)
 }
 
 /************************************ s64 vdvin ************************************/
-template <MI_S64 DENOM>
+template <DT_S64 DENOM>
 inline int64x1_t vdiv_n(const int64x1_t &vds64_src)
 {
-    MI_S64 s64_src[1], s64_result[1];
+    DT_S64 s64_src[1], s64_result[1];
     vst1_s64(s64_src, vds64_src);
     s64_result[0] = s64_src[0] / DENOM;
 
     return vld1_s64(s64_result);
 }
 
-template <MI_S64 DENOM>
+template <DT_S64 DENOM>
 inline int64x2_t vdiv_n(const int64x2_t &vqs64_src)
 {
-    MI_S64 s64_src[2], s64_result[2];
+    DT_S64 s64_src[2], s64_result[2];
     vst1q_s64(s64_src, vqs64_src);
 
     s64_result[0] = s64_src[0] / DENOM;
@@ -993,16 +993,16 @@ template <typename Tp> class VdivNHelper{};
 template <typename Tp> class VqdivnNHelper{};
 
 template <>
-class VdivNHelper<MI_U8>
+class VdivNHelper<DT_U8>
 {
 public:
-    explicit VdivNHelper(MI_U8 denom) : m_denom(denom)
+    explicit VdivNHelper(DT_U8 denom) : m_denom(denom)
     {
-        MI_U8 length = 32 - __builtin_clz(m_denom - 1);
+        DT_U8 length = 32 - __builtin_clz(m_denom - 1);
 
-        m_vdu8_mul    = vdup_n_u8(((MI_U16)256 * ((1 << length) - m_denom)) / m_denom + 1);
-        m_vds8_shift0 = vdup_n_s8((MI_S8)(-(Min<MI_U8>(length, (MI_U8)1))));
-        m_vds8_shift1 = vdup_n_s8((MI_S8)(-(Max<MI_S8>((MI_S8)length - 1, (MI_S8)0))));
+        m_vdu8_mul    = vdup_n_u8(((DT_U16)256 * ((1 << length) - m_denom)) / m_denom + 1);
+        m_vds8_shift0 = vdup_n_s8((DT_S8)(-(Min<DT_U8>(length, (DT_U8)1))));
+        m_vds8_shift1 = vdup_n_s8((DT_S8)(-(Max<DT_S8>((DT_S8)length - 1, (DT_S8)0))));
     }
 
     uint8x8_t operator()(const uint8x8_t &vdu8_src)
@@ -1017,23 +1017,23 @@ public:
     VQ_VDIVN_COMM(uint8x8_t, uint8x16_t);
 
 private:
-    MI_U8     m_denom;
+    DT_U8     m_denom;
     uint8x8_t m_vdu8_mul;
     int8x8_t  m_vds8_shift0;
     int8x8_t  m_vds8_shift1;
 };
 
 template <>
-class VdivNHelper<MI_S8>
+class VdivNHelper<DT_S8>
 {
 public:
-    explicit VdivNHelper(MI_S8 denom) : m_denom(denom)
+    explicit VdivNHelper(DT_S8 denom) : m_denom(denom)
     {
-        MI_U8 abs_d  = Abs(m_denom);
-        MI_S8 length = 32 - __builtin_clz(abs_d - 1);
-        length       = Max<MI_U8>(length, (MI_S8)1);
-        MI_S16 mul   = 1 + ((MI_U16(1)) << (8 + length - 1)) / abs_d;
-        mul          = mul - ((MI_U16)256);
+        DT_U8 abs_d  = Abs(m_denom);
+        DT_S8 length = 32 - __builtin_clz(abs_d - 1);
+        length       = Max<DT_U8>(length, (DT_S8)1);
+        DT_S16 mul   = 1 + ((DT_U16(1)) << (8 + length - 1)) / abs_d;
+        mul          = mul - ((DT_U16)256);
         mul          = (0 == m_denom) ? 0 : mul;
 
         m_vds8_mul    = vdup_n_s8(mul);
@@ -1054,23 +1054,23 @@ public:
     VQ_VDIVN_COMM(int8x8_t, int8x16_t);
 
 private:
-    MI_S8    m_denom;
+    DT_S8    m_denom;
     int8x8_t m_vds8_mul;
     int8x8_t m_vds8_sign;
     int8x8_t m_vds8_shift;
 };
 
 template <>
-class VdivNHelper<MI_U16>
+class VdivNHelper<DT_U16>
 {
 public:
-    explicit VdivNHelper(MI_U16 denom) : m_denom(denom)
+    explicit VdivNHelper(DT_U16 denom) : m_denom(denom)
     {
-        MI_U16 length = 32 - __builtin_clz(m_denom - 1);
+        DT_U16 length = 32 - __builtin_clz(m_denom - 1);
 
         m_vdu16_mul    = vdup_n_u16(((65536) * ((1 << length) - m_denom)) / m_denom + 1);
-        m_vds16_shift0 = vdup_n_s16((MI_S16)(-(Min<MI_U16>(length, (MI_U16)1))));
-        m_vds16_shift1 = vdup_n_s16((MI_S16)(-(Max<MI_S16>((MI_S16)length - 1, (MI_S16)0))));
+        m_vds16_shift0 = vdup_n_s16((DT_S16)(-(Min<DT_U16>(length, (DT_U16)1))));
+        m_vds16_shift1 = vdup_n_s16((DT_S16)(-(Max<DT_S16>((DT_S16)length - 1, (DT_S16)0))));
     }
 
     uint16x4_t operator()(const uint16x4_t &vdu16_src)
@@ -1085,23 +1085,23 @@ public:
     VQ_VDIVN_COMM(uint16x4_t, uint16x8_t);
 
 private:
-    MI_U16     m_denom;
+    DT_U16     m_denom;
     uint16x4_t m_vdu16_mul;
     int16x4_t  m_vds16_shift0;
     int16x4_t  m_vds16_shift1;
 };
 
 template <>
-class VqdivnNHelper<MI_U16>
+class VqdivnNHelper<DT_U16>
 {
     public:
-    explicit VqdivnNHelper(MI_U16 denom) : m_denom(denom)
+    explicit VqdivnNHelper(DT_U16 denom) : m_denom(denom)
     {
-        MI_U16 length  = 32 - __builtin_clz(m_denom - 1);
+        DT_U16 length  = 32 - __builtin_clz(m_denom - 1);
 
         m_vdu16_mul     = vdup_n_u16(((65536) * ((1 << length) - m_denom)) / m_denom + 1);
-        m_vqs16_shift0 = vdupq_n_s16((MI_S16)(-(Min<MI_U16>(length, (MI_U16)1))));
-        m_vqs16_shift1 = vdupq_n_s16((MI_S16)(-(Max<MI_S16>((MI_S16)length - 1, (MI_S16)0))));
+        m_vqs16_shift0 = vdupq_n_s16((DT_S16)(-(Min<DT_U16>(length, (DT_U16)1))));
+        m_vqs16_shift1 = vdupq_n_s16((DT_S16)(-(Max<DT_S16>((DT_S16)length - 1, (DT_S16)0))));
     }
 
     uint8x8_t operator()(const uint16x8_t &vqu16_src)
@@ -1118,22 +1118,22 @@ class VqdivnNHelper<MI_U16>
     }
 
 private:
-    MI_U16     m_denom;
+    DT_U16     m_denom;
     uint16x4_t m_vdu16_mul;
     int16x8_t  m_vqs16_shift0;
     int16x8_t  m_vqs16_shift1;
 };
 
 template <>
-class VdivNHelper<MI_S16>
+class VdivNHelper<DT_S16>
 {
 public:
-    explicit VdivNHelper(MI_S16 denom) : m_denom(denom)
+    explicit VdivNHelper(DT_S16 denom) : m_denom(denom)
     {
-        MI_U16 abs_d  = Abs(m_denom);
-        MI_S16 length = 32 - __builtin_clz(abs_d - 1);
-               length = Max<MI_U16>(length, (MI_S16)1);
-        MI_S32 mul    = 1 + ((MI_U32(1)) << (16 + length - 1)) / abs_d;
+        DT_U16 abs_d  = Abs(m_denom);
+        DT_S16 length = 32 - __builtin_clz(abs_d - 1);
+               length = Max<DT_U16>(length, (DT_S16)1);
+        DT_S32 mul    = 1 + ((DT_U32(1)) << (16 + length - 1)) / abs_d;
                mul    = mul - (65536);
                mul    = (0 == m_denom) ? 0 : mul;
 
@@ -1155,22 +1155,22 @@ public:
     VQ_VDIVN_COMM(int16x4_t, int16x8_t);
 
 private:
-    MI_S16    m_denom;
+    DT_S16    m_denom;
     int16x4_t m_vds16_mul;
     int16x4_t m_vds16_sign;
     int16x4_t m_vds16_shift;
 };
 
 template <>
-class VqdivnNHelper<MI_S16>
+class VqdivnNHelper<DT_S16>
 {
 public:
-    explicit VqdivnNHelper(MI_S16 denom) : m_denom(denom)
+    explicit VqdivnNHelper(DT_S16 denom) : m_denom(denom)
     {
-        MI_U16 abs_d  = Abs(m_denom);
-        MI_S16 length = 32 - __builtin_clz(abs_d - 1);
-               length = Max<MI_U16>(length, (MI_S16)1);
-        MI_S32 mul    = 1 + ((MI_U32(1)) << (16 + length - 1)) / abs_d;
+        DT_U16 abs_d  = Abs(m_denom);
+        DT_S16 length = 32 - __builtin_clz(abs_d - 1);
+               length = Max<DT_U16>(length, (DT_S16)1);
+        DT_S32 mul    = 1 + ((DT_U32(1)) << (16 + length - 1)) / abs_d;
                mul    = mul - (65536);
                mul    = (0 == m_denom) ? 0 : mul;
 
@@ -1194,24 +1194,24 @@ public:
     }
 
 private:
-    MI_S16    m_denom;
+    DT_S16    m_denom;
     int16x4_t m_vds16_mul;
     int16x8_t m_vqs16_sign;
     int16x8_t m_vqs16_shift;
 };
 
 template <>
-class VdivNHelper<MI_U32>
+class VdivNHelper<DT_U32>
 {
 public:
-    explicit VdivNHelper(MI_U32 denom) : m_denom(denom)
+    explicit VdivNHelper(DT_U32 denom) : m_denom(denom)
     {
-        MI_U32 length = 32 - __builtin_clz(m_denom - 1);
-        m_mul         = (MI_U64)(4294967296) * (((MI_U64)1 << length) - (MI_U64)m_denom) / m_denom + 1;
+        DT_U32 length = 32 - __builtin_clz(m_denom - 1);
+        m_mul         = (DT_U64)(4294967296) * (((DT_U64)1 << length) - (DT_U64)m_denom) / m_denom + 1;
 
         m_vdu32_mul    = vdup_n_u32(m_mul);
-        m_vds32_shift0 = vdup_n_s32(-(Min<MI_U32>(length, (MI_U32)1)));
-        m_vds32_shift1 = vdup_n_s32(-(Max<MI_S32>((MI_S32)length - 1, (MI_S32)0)));
+        m_vds32_shift0 = vdup_n_s32(-(Min<DT_U32>(length, (DT_U32)1)));
+        m_vds32_shift1 = vdup_n_s32(-(Max<DT_S32>((DT_S32)length - 1, (DT_S32)0)));
     }
 
     uint32x2_t operator()(const uint32x2_t &vdu32_src)
@@ -1226,25 +1226,25 @@ public:
     VQ_VDIVN_COMM(uint32x2_t, uint32x4_t);
 
 private:
-    MI_U32     m_denom;
-    MI_U32     m_mul;
+    DT_U32     m_denom;
+    DT_U32     m_mul;
     uint32x2_t m_vdu32_mul;
     int32x2_t  m_vds32_shift0;
     int32x2_t  m_vds32_shift1;
 };
 
 template <>
-class VqdivnNHelper<MI_U32>
+class VqdivnNHelper<DT_U32>
 {
 public:
-    explicit VqdivnNHelper(MI_U32 denom) : m_denom(denom)
+    explicit VqdivnNHelper(DT_U32 denom) : m_denom(denom)
     {
-        MI_U32 length = 32 - __builtin_clz(m_denom - 1);
-        m_mul         = (MI_U64)(4294967296) * (((MI_U64)1 << length) - (MI_U64)m_denom) / m_denom + 1;
+        DT_U32 length = 32 - __builtin_clz(m_denom - 1);
+        m_mul         = (DT_U64)(4294967296) * (((DT_U64)1 << length) - (DT_U64)m_denom) / m_denom + 1;
 
         m_vdu32_mul    = vdup_n_u32(m_mul);
-        m_vqs32_shift0 = vdupq_n_s32(-(Min<MI_U32>(length, (MI_U32)1)));
-        m_vqs32_shift1 = vdupq_n_s32(-(Max<MI_S32>((MI_S32)length - 1, (MI_S32)0)));
+        m_vqs32_shift0 = vdupq_n_s32(-(Min<DT_U32>(length, (DT_U32)1)));
+        m_vqs32_shift1 = vdupq_n_s32(-(Max<DT_S32>((DT_S32)length - 1, (DT_S32)0)));
     }
 
     uint16x4_t operator()(const uint32x4_t &vqu32_src)
@@ -1261,24 +1261,24 @@ public:
     }
 
 private:
-    MI_U32     m_denom;
-    MI_U32     m_mul;
+    DT_U32     m_denom;
+    DT_U32     m_mul;
     uint32x2_t m_vdu32_mul;
     int32x4_t  m_vqs32_shift0;
     int32x4_t  m_vqs32_shift1;
 };
 
 template <>
-class VdivNHelper<MI_S32>
+class VdivNHelper<DT_S32>
 {
 public:
-    explicit VdivNHelper(MI_S32 denom) : m_denom(denom)
+    explicit VdivNHelper(DT_S32 denom) : m_denom(denom)
     {
-        MI_U32 abs_d  = Abs(m_denom);
-        MI_S32 length = 32 - __builtin_clz(abs_d - 1);
-               length = Max<MI_U32>(length, (MI_S32)1);
+        DT_U32 abs_d  = Abs(m_denom);
+        DT_S32 length = 32 - __builtin_clz(abs_d - 1);
+               length = Max<DT_U32>(length, (DT_S32)1);
 
-        MI_S64 mul = 1 + ((MI_U64(1)) << (32 + length - 1)) / abs_d;
+        DT_S64 mul = 1 + ((DT_U64(1)) << (32 + length - 1)) / abs_d;
                mul = mul - (4294967296);
                mul = (0 == m_denom) ? 0 : mul;
 
@@ -1300,23 +1300,23 @@ public:
     VQ_VDIVN_COMM(int32x2_t, int32x4_t);
 
 private:
-    MI_S32    m_denom;
+    DT_S32    m_denom;
     int32x2_t m_vds32_mul;
     int32x2_t m_vds32_sign;
     int32x2_t m_vds32_shift;
 };
 
 template <>
-class VqdivnNHelper<MI_S32>
+class VqdivnNHelper<DT_S32>
 {
 public:
-    explicit VqdivnNHelper(MI_S32 denom) : m_denom(denom)
+    explicit VqdivnNHelper(DT_S32 denom) : m_denom(denom)
     {
-        MI_U32 abs_d  = Abs(m_denom);
-        MI_S32 length = 32 - __builtin_clz(abs_d - 1);
-               length = Max<MI_U32>(length, (MI_S32)1);
+        DT_U32 abs_d  = Abs(m_denom);
+        DT_S32 length = 32 - __builtin_clz(abs_d - 1);
+               length = Max<DT_U32>(length, (DT_S32)1);
 
-        MI_S64 mul = 1 + ((MI_U64(1)) << (32 + length - 1)) / abs_d;
+        DT_S64 mul = 1 + ((DT_U64(1)) << (32 + length - 1)) / abs_d;
                mul = mul - (4294967296);
                mul = (0 == m_denom) ? 0 : mul;
 
@@ -1340,7 +1340,7 @@ public:
     }
 
 private:
-    MI_S32    m_denom;
+    DT_S32    m_denom;
     int32x2_t m_vds32_mul;
     int32x4_t m_vqs32_sign;
     int32x4_t m_vqs32_shift;
@@ -1348,15 +1348,15 @@ private:
 
 #if defined(__aarch64__)
 template <>
-class VdivNHelper<MI_U64>
+class VdivNHelper<DT_U64>
 {
 public:
-    explicit VdivNHelper(MI_U64 denom) : m_denom(denom)
+    explicit VdivNHelper(DT_U64 denom) : m_denom(denom)
     {}
 
     uint64x1_t operator()(const uint64x1_t &vdu64_src)
     {
-        MI_U64 u64_src[1], u64_result[1];
+        DT_U64 u64_src[1], u64_result[1];
         vst1_u64(u64_src, vdu64_src);
         u64_result[0] = u64_src[0] / m_denom;
 
@@ -1365,7 +1365,7 @@ public:
 
     uint64x2_t operator()(const uint64x2_t &vqu64_src)
     {
-        MI_U64 u64_src[2], u64_result[2];
+        DT_U64 u64_src[2], u64_result[2];
         vst1q_u64(u64_src, vqu64_src);
 
         u64_result[0] = u64_src[0] / m_denom;
@@ -1375,19 +1375,19 @@ public:
     }
 
 private:
-    MI_U64 m_denom;
+    DT_U64 m_denom;
 };
 
 template <>
-class VdivNHelper<MI_S64>
+class VdivNHelper<DT_S64>
 {
 public:
-    explicit VdivNHelper(MI_S64 denom) : m_denom(denom)
+    explicit VdivNHelper(DT_S64 denom) : m_denom(denom)
     {}
 
     int64x1_t operator()(const int64x1_t &vs64_src)
     {
-        MI_S64 s64_src[1], s64_result[1];
+        DT_S64 s64_src[1], s64_result[1];
         vst1_s64(s64_src, vs64_src);
         s64_result[0] = s64_src[0] / m_denom;
 
@@ -1396,7 +1396,7 @@ public:
 
     int64x2_t operator()(const int64x2_t &vqs64_src)
     {
-        MI_S64 s64_src[2], s64_result[2];
+        DT_S64 s64_src[2], s64_result[2];
         vst1q_s64(s64_src, vqs64_src);
 
         s64_result[0] = s64_src[0] / m_denom;
@@ -1406,7 +1406,7 @@ public:
     }
 
 private:
-    MI_S64 m_denom;
+    DT_S64 m_denom;
 };
 #endif // defined(__aarch64__)
 

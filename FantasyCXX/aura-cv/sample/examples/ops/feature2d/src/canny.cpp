@@ -26,9 +26,9 @@ aura::Status CannySampleTest(aura::Context *ctx, aura::TargetType type)
     }
 
     // set interface parameters
-    MI_F32 low_thresh    = 60;
-    MI_F32 high_thresh   = 100;
-    MI_S32 aperture_size = 5;
+    DT_F32 low_thresh    = 60;
+    DT_F32 high_thresh   = 100;
+    DT_S32 aperture_size = 5;
 
     // ---------------------
     //     run interface
@@ -41,7 +41,7 @@ aura::Status CannySampleTest(aura::Context *ctx, aura::TargetType type)
 
     // run and time
     aura::Time start_time = aura::Time::Now();
-    status = ICanny(ctx, src, dst, low_thresh, high_thresh, aperture_size, MI_FALSE, aura::OpTarget(type));
+    status = ICanny(ctx, src, dst, low_thresh, high_thresh, aperture_size, DT_FALSE, aura::OpTarget(type));
     aura::Time end_time = aura::Time::Now();
 
     // ---------------------

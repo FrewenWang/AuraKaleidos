@@ -68,8 +68,8 @@ AURA_JSON_SERIALIZE_ENUM(WarpType, {
     {WarpType::PERSPECTIVE, "Perspective"},
 })
 
-AURA_VOID InverseMatrix2x3(const Mat &src, MI_F64 dst[6]);
-AURA_VOID InverseMatrix3x3(const Mat &src, MI_F64 dst[9]);
+DT_VOID InverseMatrix2x3(const Mat &src, DT_F64 dst[6]);
+DT_VOID InverseMatrix3x3(const Mat &src, DT_F64 dst[9]);
 
 class WarpImpl : public OpImpl
 {
@@ -85,7 +85,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     Status InitMapOffset(Context *ctx, const Mat &matrix, Mat &map_x, Mat &map_y, WarpType warp_type);
@@ -158,7 +158,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel,
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel,
                                               BorderType border_type, WarpType warp_type, InterpType interp_type);
 private:
     std::vector<CLKernel> m_cl_kernels;
@@ -168,8 +168,8 @@ private:
     CLMem    m_cl_dst;
     CLMem    m_cl_map_x;
     CLMem    m_cl_map_y;
-    MI_S32   m_elem_counts;
-    MI_S32   m_elem_height;
+    DT_S32   m_elem_counts;
+    DT_S32   m_elem_height;
 
     std::string m_profiling_string;
 };
@@ -192,7 +192,7 @@ private:
     std::string m_profiling_string;
 };
 
-Status InitMapGrid(Context *ctx, const Mat &matrix, Mat &grid, MI_S32 grid_pitch);
+Status InitMapGrid(Context *ctx, const Mat &matrix, Mat &grid, DT_S32 grid_pitch);
 
 #  if defined(AURA_BUILD_HEXAGON)
 Status WarpAffineHvx(Context *ctx, const Mat &src, const Mat &grid, Mat &dst, InterpType interp_type,

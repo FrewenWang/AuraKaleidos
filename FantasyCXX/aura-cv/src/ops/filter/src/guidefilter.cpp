@@ -54,15 +54,15 @@ static std::shared_ptr<GuideFilterImpl> CreateGuideFilterImpl(Context *ctx, cons
 GuideFilter::GuideFilter(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status GuideFilter::SetArgs(const Array *src0, const Array *src1, Array *dst, MI_S32 ksize, MI_F32 eps,
+Status GuideFilter::SetArgs(const Array *src0, const Array *src1, Array *dst, DT_S32 ksize, DT_F32 eps,
                             GuideFilterType type, BorderType border_type, const Scalar &border_value)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -91,14 +91,14 @@ Status GuideFilter::SetArgs(const Array *src0, const Array *src1, Array *dst, MI
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateGuideFilterImpl(m_ctx, impl_target);
     }
 
     // run initialize
     GuideFilterImpl *guidefilter_impl = dynamic_cast<GuideFilterImpl *>(m_impl.get());
-    if (MI_NULL == guidefilter_impl)
+    if (DT_NULL == guidefilter_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "guidefilter_impl is null ptr");
         return Status::ERROR;
@@ -109,7 +109,7 @@ Status GuideFilter::SetArgs(const Array *src0, const Array *src1, Array *dst, MI
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status IGuideFilter(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, MI_S32 ksize, MI_F32 eps,
+AURA_EXPORTS Status IGuideFilter(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, DT_S32 ksize, DT_F32 eps,
                                  GuideFilterType type, BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     GuideFilter guidefilter(ctx, target);
@@ -119,14 +119,14 @@ AURA_EXPORTS Status IGuideFilter(Context *ctx, const Mat &src0, const Mat &src1,
 
 GuideFilterImpl::GuideFilterImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, AURA_OPS_FILTER_GUIDEFILTER_OP_NAME, target),
                                                                          m_ksize(0), m_eps(0.0f), m_type(GuideFilterType::NORMAL),
-                                                                         m_border_type(BorderType::REFLECT_101), m_src0(MI_NULL),
-                                                                         m_src1(MI_NULL), m_dst(MI_NULL)
+                                                                         m_border_type(BorderType::REFLECT_101), m_src0(DT_NULL),
+                                                                         m_src1(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status GuideFilterImpl::SetArgs(const Array *src0, const Array *src1, Array *dst, MI_S32 ksize, MI_F32 eps,
+Status GuideFilterImpl::SetArgs(const Array *src0, const Array *src1, Array *dst, DT_S32 ksize, DT_F32 eps,
                                 GuideFilterType type, BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -181,7 +181,7 @@ std::string GuideFilterImpl::ToString() const
 {
     std::string str;
 
-    MI_CHAR eps_str[20];
+    DT_CHAR eps_str[20];
     snprintf(eps_str, sizeof(eps_str), "%.4f", m_eps);
 
     str = "op(GuideFilter)";
@@ -195,7 +195,7 @@ std::string GuideFilterImpl::ToString() const
     return str;
 }
 
-AURA_VOID GuideFilterImpl::Dump(const std::string &prefix) const
+DT_VOID GuideFilterImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

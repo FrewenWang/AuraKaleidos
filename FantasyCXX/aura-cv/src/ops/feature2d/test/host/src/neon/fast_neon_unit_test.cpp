@@ -22,7 +22,7 @@ static FastParam::TupleTable g_fast_table_neon
 
     // nonmax suppresion
     {
-        MI_TRUE,
+        DT_TRUE,
     },
 
     // type

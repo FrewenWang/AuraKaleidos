@@ -15,15 +15,15 @@
 namespace aura
 {
 
-XtensaEngine::Impl::Impl(Context *ctx, MI_BOOL enable_xtensa, const std::string &pil_name, XtensaPriorityLevel priority)
-                         : m_ctx(ctx), m_flag(MI_FALSE), m_pil_name(pil_name), m_priority(priority)
+XtensaEngine::Impl::Impl(Context *ctx, DT_BOOL enable_xtensa, const std::string &pil_name, XtensaPriorityLevel priority)
+                         : m_ctx(ctx), m_flag(DT_FALSE), m_pil_name(pil_name), m_priority(priority)
 {
     if (enable_xtensa)
     {
 #if defined(AURA_BUILD_XPLORER)
         AURA_UNUSED(m_priority);
 #else
-        m_handle = MI_NULL;
+        m_handle = DT_NULL;
         m_wp.reset(new WorkerPool(ctx, AURA_TAG, CpuAffinity::ALL, CpuAffinity::ALL, 0, 1));
 
         auto init_func = [this]() -> Status
@@ -34,7 +34,7 @@ XtensaEngine::Impl::Impl(Context *ctx, MI_BOOL enable_xtensa, const std::string 
                 return Status::ERROR;
             }
 
-            m_flag = MI_TRUE;
+            m_flag = DT_TRUE;
 
             return Status::OK;
         };
@@ -68,15 +68,15 @@ XtensaEngine::Impl::~Impl()
         {
             AURA_LOGD(m_ctx, AURA_TAG, "****************** Unmap Blk info *******************\n");
 
-            MI_S32 counter = 0;
-            MI_S32 unmap_mem_size = 0;
+            DT_S32 counter = 0;
+            DT_S32 unmap_mem_size = 0;
 
             for (auto iter = m_mblk_map.begin(); iter != m_mblk_map.end(); ++iter)
             {
-                MI_S32 type = iter->second.m_host_buffer.m_type;
-                MI_S64 size = iter->second.m_host_buffer.m_size;
+                DT_S32 type = iter->second.m_host_buffer.m_type;
+                DT_S64 size = iter->second.m_host_buffer.m_size;
 
-                AURA_LOGD(m_ctx, AURA_TAG, "* blk [%zu] - %p\n", counter, reinterpret_cast<AURA_VOID*>(iter->first));
+                AURA_LOGD(m_ctx, AURA_TAG, "* blk [%zu] - %p\n", counter, reinterpret_cast<DT_VOID*>(iter->first));
                 AURA_LOGD(m_ctx, AURA_TAG, "*   fd: %zu\n", iter->second.m_host_buffer.m_property);
                 AURA_LOGD(m_ctx, AURA_TAG, "*   mem type: %s\n", MemTypeToString(type).c_str());
                 AURA_LOGD(m_ctx, AURA_TAG, "*   size: %zu byte\n", size);
@@ -107,7 +107,7 @@ XtensaEngine::Impl::~Impl()
         }
 #endif // AURA_BUILD_XPLORER
 
-        m_flag = MI_FALSE;
+        m_flag = DT_FALSE;
     }
 }
 
@@ -209,7 +209,7 @@ application_symbol_tray& XtensaEngine::Impl::GetSymbolTray()
 
 Status XtensaEngine::Impl::RegisterRpcFunc(PilRpcFunc rpc_func)
 {
-    if (MI_NULL == rpc_func)
+    if (DT_NULL == rpc_func)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "rpc_func null");
         return Status::ERROR;
@@ -227,8 +227,8 @@ Status XtensaEngine::Impl::LoadPil()
 {
     Status ret = Status::ERROR;
 
-    MI_S32 fd = 0;
-    AURA_VOID *addr = MI_NULL;
+    DT_S32 fd = 0;
+    DT_VOID *addr = DT_NULL;
 
     struct stat fstat;
     vdsp_init_para param;
@@ -247,7 +247,7 @@ Status XtensaEngine::Impl::LoadPil()
         goto EXIT;
     }
 
-    if (MAP_FAILED == (addr = mmap(MI_NULL, fstat.st_size, PROT_READ, MAP_SHARED, fd, 0)))
+    if (MAP_FAILED == (addr = mmap(DT_NULL, fstat.st_size, PROT_READ, MAP_SHARED, fd, 0)))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "mmap failed");
         goto EXIT;
@@ -257,7 +257,7 @@ Status XtensaEngine::Impl::LoadPil()
     memset(&response, 0, sizeof(response));
 
     param.log_close                      = 1;
-    param.priority                       = static_cast<MI_U32>(m_priority);
+    param.priority                       = static_cast<DT_U32>(m_priority);
     param.time_out                       = 1800000;
     param.profiling                      = 1;
     param.is_custom                      = 1;
@@ -283,7 +283,7 @@ EXIT:
         UnloadPil();
     }
 
-    if (addr != MI_NULL)
+    if (addr != DT_NULL)
     {
         munmap(addr, fstat.st_size);
     }
@@ -298,7 +298,7 @@ EXIT:
 
 Status XtensaEngine::Impl::UnloadPil()
 {
-    if (m_handle != MI_NULL)
+    if (m_handle != DT_NULL)
     {
         if (vdsp_release(m_handle) != 0)
         {
@@ -306,7 +306,7 @@ Status XtensaEngine::Impl::UnloadPil()
             return Status::ERROR;
         }
 
-        m_handle = MI_NULL;
+        m_handle = DT_NULL;
     }
 
     return Status::OK;
@@ -337,7 +337,7 @@ Status XtensaEngine::Impl::Run(const std::string &package, const std::string &mo
 Status XtensaEngine::Impl::Run(const std::string &package, const std::string &module, XtensaRpcParam &rpc_param)
 {
     PilRpcFunc func = m_func;
-    if (MI_NULL == func)
+    if (DT_NULL == func)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "function null");
         return Status::ERROR;
@@ -346,7 +346,7 @@ Status XtensaEngine::Impl::Run(const std::string &package, const std::string &mo
     Status ret = Status::ERROR;
 
     std::string full_name = package + "." + module;
-    MI_S32 ret_func = func(full_name.c_str(), static_cast<MI_U8*>(rpc_param.m_rpc_param.m_origin), rpc_param.m_rpc_param.m_capacity);
+    DT_S32 ret_func = func(full_name.c_str(), static_cast<DT_U8*>(rpc_param.m_rpc_param.m_origin), rpc_param.m_rpc_param.m_capacity);
     if (ret_func != 0)
     {
         ret = Status::ERROR;
@@ -362,7 +362,7 @@ Status XtensaEngine::Impl::Run(const std::string &package, const std::string &mo
 }
 #endif // AURA_BUILD_XPLORER
 
-Status XtensaEngine::Impl::CacheStart(MI_S32 fd)
+Status XtensaEngine::Impl::CacheStart(DT_S32 fd)
 {
 #if defined(AURA_BUILD_XPLORER)
     AURA_UNUSED(fd);
@@ -379,7 +379,7 @@ Status XtensaEngine::Impl::CacheStart(MI_S32 fd)
 #endif
 }
 
-Status XtensaEngine::Impl::CacheEnd(MI_S32 fd)
+Status XtensaEngine::Impl::CacheEnd(DT_S32 fd)
 {
 #if defined(AURA_BUILD_XPLORER)
     AURA_UNUSED(fd);
@@ -413,12 +413,12 @@ Status XtensaEngine::Impl::MapBuffer(const Buffer &buffer)
 
 #if !defined(AURA_BUILD_XPLORER)
     std::lock_guard<std::mutex> guard(m_lock);
-    MI_UPTR_T host_addr = reinterpret_cast<MI_UPTR_T>(buffer.m_origin);
-    MI_U32 device_addr = 0;
+    DT_UPTR_T host_addr = reinterpret_cast<DT_UPTR_T>(buffer.m_origin);
+    DT_U32 device_addr = 0;
 
     if (!m_mblk_map.count(host_addr))
     {
-        if (vdsp_map_buffer(m_handle, buffer.m_property, buffer.m_capacity, MI_FALSE, &device_addr) != 0)
+        if (vdsp_map_buffer(m_handle, buffer.m_property, buffer.m_capacity, DT_FALSE, &device_addr) != 0)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "vdsp_map_buffer failed");
             return Status::ERROR;
@@ -448,7 +448,7 @@ Status XtensaEngine::Impl::UnmapBuffer(const Buffer &buffer)
 
 #if !defined(AURA_BUILD_XPLORER)
     std::lock_guard<std::mutex> guard(m_lock);
-    MI_UPTR_T host_addr = reinterpret_cast<MI_UPTR_T>(buffer.m_origin);
+    DT_UPTR_T host_addr = reinterpret_cast<DT_UPTR_T>(buffer.m_origin);
 
     if (m_mblk_map.count(host_addr))
     {
@@ -464,7 +464,7 @@ Status XtensaEngine::Impl::UnmapBuffer(const Buffer &buffer)
     return Status::OK;
 }
 
-MI_U32 XtensaEngine::Impl::GetDeviceAddr(const Buffer &buffer)
+DT_U32 XtensaEngine::Impl::GetDeviceAddr(const Buffer &buffer)
 {
     if (!buffer.IsValid())
     {
@@ -473,14 +473,14 @@ MI_U32 XtensaEngine::Impl::GetDeviceAddr(const Buffer &buffer)
 
 #if !defined(AURA_BUILD_XPLORER)
     std::lock_guard<std::mutex> guard(m_lock);
-    MI_UPTR_T host_addr = reinterpret_cast<MI_UPTR_T>(buffer.m_origin);
+    DT_UPTR_T host_addr = reinterpret_cast<DT_UPTR_T>(buffer.m_origin);
 
     if (m_mblk_map.count(host_addr))
     {
         return m_mblk_map.at(host_addr).m_device_addr;
     }
 #else
-    return reinterpret_cast<MI_U32>(buffer.m_origin);
+    return reinterpret_cast<DT_U32>(buffer.m_origin);
 #endif // AURA_BUILD_XPLORER
 
     return 0;
@@ -502,7 +502,7 @@ Status XtensaEngine::Impl::SetPower(XtensaPowerLevel level)
         return Status::ERROR;
     }
 
-    MI_U32 power_level = static_cast<MI_U32>(level);
+    DT_U32 power_level = static_cast<DT_U32>(level);
 
     if (vdsp_set_power(m_handle, &power_level) != 0)
     {
@@ -513,7 +513,7 @@ Status XtensaEngine::Impl::SetPower(XtensaPowerLevel level)
     return Status::OK;
 }
 
-XtensaEngine::XtensaEngine(Context *ctx, MI_BOOL enable_xtensa, const std::string &pil_name, XtensaPriorityLevel priority)
+XtensaEngine::XtensaEngine(Context *ctx, DT_BOOL enable_xtensa, const std::string &pil_name, XtensaPriorityLevel priority)
 {
     m_impl.reset(new XtensaEngine::Impl(ctx, enable_xtensa, pil_name, priority));
     if (!m_impl)
@@ -534,7 +534,7 @@ Status XtensaEngine::Run(const std::string &package, const std::string &module, 
     return Status::ERROR;
 }
 
-Status XtensaEngine::CacheStart(MI_S32 fd)
+Status XtensaEngine::CacheStart(DT_S32 fd)
 {
     if (m_impl)
     {
@@ -543,7 +543,7 @@ Status XtensaEngine::CacheStart(MI_S32 fd)
     return Status::ERROR;
 }
 
-Status XtensaEngine::CacheEnd(MI_S32 fd)
+Status XtensaEngine::CacheEnd(DT_S32 fd)
 {
     if (m_impl)
     {
@@ -570,7 +570,7 @@ Status XtensaEngine::UnmapBuffer(const Buffer &buffer)
     return Status::ERROR;
 }
 
-MI_U32 XtensaEngine::GetDeviceAddr(const Buffer &buffer)
+DT_U32 XtensaEngine::GetDeviceAddr(const Buffer &buffer)
 {
     if (m_impl)
     {

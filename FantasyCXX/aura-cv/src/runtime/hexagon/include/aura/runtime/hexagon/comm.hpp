@@ -25,8 +25,8 @@ namespace aura
  */
 struct AURA_EXPORTS HexagonRpcMem
 {
-    MI_U8 *mem;    /*!< Pointer to the memory. */
-    MI_S32 memLen; /*!< Length of the memory in bytes. */
+    DT_U8 *mem;    /*!< Pointer to the memory. */
+    DT_S32 memLen; /*!< Length of the memory in bytes. */
 };
 
 /**

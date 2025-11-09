@@ -18,9 +18,9 @@ NEW_TESTCASE(runtime_context_constructor_test)
         return;
     }
 
-    AURA_CHECK_IEQ(ctx.get(), ctx->GetLogger(),     static_cast<Logger*>(MI_NULL),     "check Context::GetLogger() failed\n");
-    AURA_CHECK_IEQ(ctx.get(), ctx->GetMemPool(),    static_cast<MemPool*>(MI_NULL),    "check Context::GetMemPool() failed\n");
-    AURA_CHECK_IEQ(ctx.get(), ctx->GetWorkerPool(), static_cast<WorkerPool*>(MI_NULL), "check Context::GetWorkerPool() failed\n");
+    AURA_CHECK_IEQ(ctx.get(), ctx->GetLogger(),     static_cast<Logger*>(DT_NULL),     "check Context::GetLogger() failed\n");
+    AURA_CHECK_IEQ(ctx.get(), ctx->GetMemPool(),    static_cast<MemPool*>(DT_NULL),    "check Context::GetMemPool() failed\n");
+    AURA_CHECK_IEQ(ctx.get(), ctx->GetWorkerPool(), static_cast<WorkerPool*>(DT_NULL), "check Context::GetWorkerPool() failed\n");
 
     AURA_LOGI(ctx.get(), AURA_TAG, "aura version : %s\n", ctx->GetVersion().c_str());
 

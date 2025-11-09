@@ -6,7 +6,7 @@ namespace aura
 {
 
 template <typename Tp>
-AURA_ALWAYS_INLINE AURA_VOID Median5x5Core(HVX_Vector &v_src_p1x0, HVX_Vector &v_src_p1x1, HVX_Vector &v_src_p1x2,
+AURA_ALWAYS_INLINE DT_VOID Median5x5Core(HVX_Vector &v_src_p1x0, HVX_Vector &v_src_p1x1, HVX_Vector &v_src_p1x2,
                                          HVX_Vector &v_src_p0x0, HVX_Vector &v_src_p0x1, HVX_Vector &v_src_p0x2,
                                          HVX_Vector &v_src_c0x0, HVX_Vector &v_src_c0x1, HVX_Vector &v_src_c0x2,
                                          HVX_Vector &v_src_c1x0, HVX_Vector &v_src_c1x1, HVX_Vector &v_src_c1x2,
@@ -236,14 +236,14 @@ AURA_ALWAYS_INLINE AURA_VOID Median5x5Core(HVX_Vector &v_src_p1x0, HVX_Vector &v
     VectorMinMax<Tp>(v_result1, v_border_result);
 }
 
-template <typename Tp, MI_S32 C>
-static AURA_VOID Median5x5TwoRow(const Tp *src_p1, const Tp *src_p0, const Tp *src_c0, const Tp *src_c1, const Tp *src_n0,
-                               const Tp *src_n1, Tp *dst_c0, Tp *dst_c1, MI_S32 width)
+template <typename Tp, DT_S32 C>
+static DT_VOID Median5x5TwoRow(const Tp *src_p1, const Tp *src_p0, const Tp *src_c0, const Tp *src_c1, const Tp *src_n0,
+                               const Tp *src_n1, Tp *dst_c0, Tp *dst_c1, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN / sizeof(Tp);
-    MI_S32 back_offset = width - elem_counts;
+    DT_S32 elem_counts = AURA_HVLEN / sizeof(Tp);
+    DT_S32 back_offset = width - elem_counts;
 
     MVType mv_src_p1x0, mv_src_p1x1, mv_src_p1x2;
     MVType mv_src_p0x0, mv_src_p0x1, mv_src_p0x2;
@@ -264,7 +264,7 @@ static AURA_VOID Median5x5TwoRow(const Tp *src_p1, const Tp *src_p0, const Tp *s
         vload(src_n1, mv_src_n1x1);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p1x0.val[ch] = GetBorderVector<Tp, BorderType::REPLICATE, BorderArea::LEFT>(mv_src_p1x1.val[ch], src_p1[ch], 2);
             mv_src_p0x0.val[ch] = GetBorderVector<Tp, BorderType::REPLICATE, BorderArea::LEFT>(mv_src_p0x1.val[ch], src_p0[ch], 2);
@@ -276,7 +276,7 @@ static AURA_VOID Median5x5TwoRow(const Tp *src_p1, const Tp *src_p0, const Tp *s
     }
 
     // middle
-    for (MI_S32 x = elem_counts; x <= back_offset; x += elem_counts)
+    for (DT_S32 x = elem_counts; x <= back_offset; x += elem_counts)
     {
         vload(src_p1 + C * x, mv_src_p1x2);
         vload(src_p0 + C * x, mv_src_p0x2);
@@ -286,7 +286,7 @@ static AURA_VOID Median5x5TwoRow(const Tp *src_p1, const Tp *src_p0, const Tp *s
         vload(src_n1 + C * x, mv_src_n1x2);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             Median5x5Core<Tp>(mv_src_p1x0.val[ch], mv_src_p1x1.val[ch], mv_src_p1x2.val[ch],
                               mv_src_p0x0.val[ch], mv_src_p0x1.val[ch], mv_src_p0x2.val[ch],
@@ -315,8 +315,8 @@ static AURA_VOID Median5x5TwoRow(const Tp *src_p1, const Tp *src_p0, const Tp *s
 
     // right
     {
-        MI_S32 last = (width - 1) * C;
-        MI_S32 rest = width % elem_counts;
+        DT_S32 last = (width - 1) * C;
+        DT_S32 rest = width % elem_counts;
         MVType mv_last_result0, mv_last_result1;
 
         vload(src_p1 + C * back_offset, mv_src_p1x2);
@@ -327,7 +327,7 @@ static AURA_VOID Median5x5TwoRow(const Tp *src_p1, const Tp *src_p0, const Tp *s
         vload(src_n1 + C * back_offset, mv_src_n1x2);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p1 = GetBorderVector<Tp, BorderType::REPLICATE, BorderArea::RIGHT>(mv_src_p1x2.val[ch], src_p1[last + ch], 1);
             HVX_Vector v_border_p0 = GetBorderVector<Tp, BorderType::REPLICATE, BorderArea::RIGHT>(mv_src_p0x2.val[ch], src_p0[last + ch], 1);
@@ -373,12 +373,12 @@ static AURA_VOID Median5x5TwoRow(const Tp *src_p1, const Tp *src_p0, const Tp *s
     }
 }
 
-template <typename Tp, MI_S32 C>
-static Status Median5x5HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, DT_S32 C>
+static Status Median5x5HvxImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width   = src.GetSizes().m_width;
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 width   = src.GetSizes().m_width;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
 
     const Tp *src_p1 = src.Ptr<Tp, BorderType::REPLICATE>(start_row - 2);
     const Tp *src_p0 = src.Ptr<Tp, BorderType::REPLICATE>(start_row - 1);
@@ -387,13 +387,13 @@ static Status Median5x5HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S3
     const Tp *src_n0 = src.Ptr<Tp, BorderType::REPLICATE>(start_row + 2);
     const Tp *src_n1 = src.Ptr<Tp, BorderType::REPLICATE>(start_row + 3);
 
-    MI_U64 L2fetch_param = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 2, 0);
-    MI_S32 y;
+    DT_U64 L2fetch_param = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 2, 0);
+    DT_S32 y;
     for (y = start_row; y < end_row - 1; y += 2)
     {
         if (y + 3 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 3)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 3)), L2fetch_param);
         }
 
         Tp *dst_c0 = dst.Ptr<Tp>(y);
@@ -432,32 +432,32 @@ static Status Median5x5HvxHelper(Context *ctx, const Mat &src, Mat &dst)
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
         case 1:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Median5x5HvxImpl<Tp, 1>, src, dst);
+            ret = wp->ParallelFor((DT_S32)0, height, Median5x5HvxImpl<Tp, 1>, src, dst);
             break;
         }
 
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Median5x5HvxImpl<Tp, 2>, src, dst);
+            ret = wp->ParallelFor((DT_S32)0, height, Median5x5HvxImpl<Tp, 2>, src, dst);
             break;
         }
 
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Median5x5HvxImpl<Tp, 3>, src, dst);
+            ret = wp->ParallelFor((DT_S32)0, height, Median5x5HvxImpl<Tp, 3>, src, dst);
             break;
         }
 
@@ -479,25 +479,25 @@ Status Median5x5Hvx(Context *ctx, const Mat &src, Mat &dst)
     {
         case ElemType::U8:
         {
-            ret = Median5x5HvxHelper<MI_U8>(ctx, src, dst);
+            ret = Median5x5HvxHelper<DT_U8>(ctx, src, dst);
             break;
         }
 
         case ElemType::S8:
         {
-            ret = Median5x5HvxHelper<MI_S8>(ctx, src, dst);
+            ret = Median5x5HvxHelper<DT_S8>(ctx, src, dst);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = Median5x5HvxHelper<MI_U16>(ctx, src, dst);
+            ret = Median5x5HvxHelper<DT_U16>(ctx, src, dst);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = Median5x5HvxHelper<MI_S16>(ctx, src, dst);
+            ret = Median5x5HvxHelper<DT_S16>(ctx, src, dst);
             break;
         }
 

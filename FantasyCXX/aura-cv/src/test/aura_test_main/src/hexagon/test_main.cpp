@@ -8,7 +8,7 @@ using namespace aura;
 static std::vector<std::string> ParseParamString(const std::string &param_str)
 {
     std::vector<std::string> params;
-    const MI_CHAR *cmd_str = param_str.data();
+    const DT_CHAR *cmd_str = param_str.data();
 
     size_t last_pos = 0;
     for (size_t pos = 0; pos < param_str.size(); pos++)

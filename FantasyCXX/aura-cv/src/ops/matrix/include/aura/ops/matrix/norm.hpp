@@ -134,7 +134,7 @@ public:
      * should be aligned to a stride, which is obtained through the `GetCLLengthAlignSize` function and is
      * platform-dependent.
      */
-    Status SetArgs(const Array *src, MI_F64 *result, NormType type);
+    Status SetArgs(const Array *src, DT_F64 *result, NormType type);
 
     /**
      * @brief Generate norm opencl precompiled cache.
@@ -171,7 +171,7 @@ public:
  * @note 1.N is positive integer. <br>
  *       2.The above implementations supported NormType(NORM_INF/NORM_L1/NORM_L2/NORM_L2SQR).
  */
-AURA_EXPORTS Status INorm(Context *ctx, const Mat &src, MI_F64 *result, NormType type, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status INorm(Context *ctx, const Mat &src, DT_F64 *result, NormType type, const OpTarget &target = OpTarget::Default());
 
 /**
  * @}

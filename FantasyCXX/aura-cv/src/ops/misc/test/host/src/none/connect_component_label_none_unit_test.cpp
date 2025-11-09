@@ -39,8 +39,8 @@ static MiscConnectComponentLabelParam::TupleTable g_connect_component_table_none
 
     // taret
     {
-        aura::OpTarget::None(MI_TRUE),
-        aura::OpTarget::None(MI_FALSE),
+        aura::OpTarget::None(DT_TRUE),
+        aura::OpTarget::None(DT_FALSE),
     },
 };
 
@@ -95,8 +95,8 @@ static MiscConnectComponentLabelParam::TupleTable g_connect_component_table_none
 
     // taret
     {
-        aura::OpTarget::None(MI_TRUE),
-        aura::OpTarget::None(MI_FALSE),
+        aura::OpTarget::None(DT_TRUE),
+        aura::OpTarget::None(DT_FALSE),
     },
 };
 

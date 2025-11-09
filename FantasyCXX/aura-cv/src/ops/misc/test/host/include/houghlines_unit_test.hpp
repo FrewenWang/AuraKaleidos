@@ -23,8 +23,8 @@ struct HoughLinesTestParam
     HoughLinesTestParam()
     {}
 
-    HoughLinesTestParam(LinesType line_type, MI_F64 rho, MI_F64 theta, MI_S32 threshold, MI_F64 srn,
-                        MI_F64 stn, MI_F64 min_theta, MI_F64 max_theta)
+    HoughLinesTestParam(LinesType line_type, DT_F64 rho, DT_F64 theta, DT_S32 threshold, DT_F64 srn,
+                        DT_F64 stn, DT_F64 min_theta, DT_F64 max_theta)
                         : line_type(line_type), rho(rho), theta(theta), threshold(threshold), srn(srn), stn(stn),
                         min_theta(min_theta), max_theta(max_theta)
     {}
@@ -45,13 +45,13 @@ struct HoughLinesTestParam
     }
 
     LinesType line_type;
-    MI_F64 rho;
-    MI_F64 theta;
-    MI_S32 threshold;
-    MI_F64 srn;
-    MI_F64 stn;
-    MI_F64 min_theta;
-    MI_F64 max_theta;
+    DT_F64 rho;
+    DT_F64 theta;
+    DT_S32 threshold;
+    DT_F64 srn;
+    DT_F64 stn;
+    DT_F64 min_theta;
+    DT_F64 max_theta;
 };
 
 AURA_TEST_PARAM(HoughLinesParam,
@@ -73,9 +73,9 @@ static Status CvHoughLines(Context *ctx, Mat &mat, std::vector<Scalar> &lines, H
 
     lines.clear();
 
-    MI_S32 mat_cv_type = ElemTypeToOpencv(mat.GetElemType(), mat.GetSizes().m_channel);
-    MI_S32 mat_cn = mat.GetSizes().m_channel;
-    MI_S32 cv_type = 0;
+    DT_S32 mat_cv_type = ElemTypeToOpencv(mat.GetElemType(), mat.GetSizes().m_channel);
+    DT_S32 mat_cn = mat.GetSizes().m_channel;
+    DT_S32 cv_type = 0;
 
     if (CV_8UC(mat_cn) != mat_cv_type)
     {
@@ -92,7 +92,7 @@ static Status CvHoughLines(Context *ctx, Mat &mat, std::vector<Scalar> &lines, H
             lines.reserve(1024);
 
             cv::HoughLines(mat_src, lines_cv, param.rho, param.theta, param.threshold, param.srn, param.stn, param.min_theta, param.max_theta);
-            MI_S32 size = lines_cv.size();
+            DT_S32 size = lines_cv.size();
 
             if (size > 0)
             {
@@ -102,7 +102,7 @@ static Status CvHoughLines(Context *ctx, Mat &mat, std::vector<Scalar> &lines, H
                 }
             }
 
-            for (MI_S32 i = 0; i < size; i++)
+            for (DT_S32 i = 0; i < size; i++)
             {
                 lines.emplace_back(lines_cv[i][0], lines_cv[i][1], 0.f, 0.f);
             }
@@ -113,7 +113,7 @@ static Status CvHoughLines(Context *ctx, Mat &mat, std::vector<Scalar> &lines, H
             lines_cv.reserve(1024);
 
             cv::HoughLines(mat_src, lines_cv, param.rho, param.theta, param.threshold, param.srn, param.stn, param.min_theta, param.max_theta);
-            MI_S32 size = lines_cv.size();
+            DT_S32 size = lines_cv.size();
 
             if (size > 0)
             {
@@ -123,7 +123,7 @@ static Status CvHoughLines(Context *ctx, Mat &mat, std::vector<Scalar> &lines, H
                 }
             }
 
-            for (MI_S32 i = 0; i < size; i++)
+            for (DT_S32 i = 0; i < size; i++)
             {
                 lines.emplace_back(lines_cv[i][0], lines_cv[i][1], lines_cv[i][2], 0.f);
             }
@@ -144,7 +144,7 @@ static Status CvHoughLines(Context *ctx, Mat &mat, std::vector<Scalar> &lines, H
     return ret;
 }
 
-static AURA_VOID HoughLinesConvert(const std::vector<Scalar> &lines, std::vector<Scalar> &cvt_lines)
+static DT_VOID HoughLinesConvert(const std::vector<Scalar> &lines, std::vector<Scalar> &cvt_lines)
 {
     for (auto it = lines.begin(); it != lines.end(); ++it)
     {
@@ -168,7 +168,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         HoughLinesParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -189,7 +189,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         HoughLinesParam run_param(GetParam((index)));
@@ -207,7 +207,7 @@ public:
         cvt_lines_dst.reserve(1024);
         cvt_lines_ref.reserve(1024);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         UnorderedCmpResult<Scalar> cmp_result;
@@ -293,7 +293,7 @@ struct HoughLinesPTestParam
     HoughLinesPTestParam()
     {}
 
-    HoughLinesPTestParam(MI_F64 rho, MI_F64 theta, MI_S32 threshold, MI_F64 min_line_length, MI_F64 max_gap)
+    HoughLinesPTestParam(DT_F64 rho, DT_F64 theta, DT_S32 threshold, DT_F64 min_line_length, DT_F64 max_gap)
                          : rho(rho), theta(theta), threshold(threshold), min_line_length(min_line_length), max_gap(max_gap)
     {}
 
@@ -312,11 +312,11 @@ struct HoughLinesPTestParam
         return sstream.str();
     }
 
-    MI_F64 rho;
-    MI_F64 theta;
-    MI_S32 threshold;
-    MI_F64 min_line_length;
-    MI_F64 max_gap;
+    DT_F64 rho;
+    DT_F64 theta;
+    DT_S32 threshold;
+    DT_F64 min_line_length;
+    DT_F64 max_gap;
 };
 
 AURA_TEST_PARAM(HoughLinesPParam,
@@ -338,9 +338,9 @@ static Status CvHoughLinesP(Context *ctx, Mat &mat, std::vector<Scalari> &lines,
 
     lines.clear();
 
-    MI_S32 mat_cv_type = ElemTypeToOpencv(mat.GetElemType(), mat.GetSizes().m_channel);
-    MI_S32 mat_cn = mat.GetSizes().m_channel;
-    MI_S32 cv_type = 0;
+    DT_S32 mat_cv_type = ElemTypeToOpencv(mat.GetElemType(), mat.GetSizes().m_channel);
+    DT_S32 mat_cn = mat.GetSizes().m_channel;
+    DT_S32 cv_type = 0;
 
     if (CV_8UC(mat_cn) != mat_cv_type)
     {
@@ -355,7 +355,7 @@ static Status CvHoughLinesP(Context *ctx, Mat &mat, std::vector<Scalari> &lines,
 
         cv::HoughLinesP(mat_src, lines_cv, param.rho, param.theta, param.threshold, param.min_line_length, param.max_gap);
 
-        for (MI_U64 i = 0; i < lines_cv.size(); i++)
+        for (DT_U64 i = 0; i < lines_cv.size(); i++)
         {
             lines.emplace_back(lines_cv[i][0], lines_cv[i][1], lines_cv[i][2], lines_cv[i][3]);
         }
@@ -391,7 +391,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         HoughLinesPParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -412,7 +412,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         HoughLinesPParam run_param(GetParam((index)));
@@ -425,7 +425,7 @@ public:
         lines_dst.reserve(1024);
         lines_ref.reserve(1024);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         UnorderedCmpResult<Scalari> cmp_result;

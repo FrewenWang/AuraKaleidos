@@ -12,7 +12,7 @@ namespace aura
 class ErrorString
 {
 public:
-    ErrorString(const MI_CHAR *file, const MI_CHAR *func, MI_S32 line, const MI_CHAR *info)
+    ErrorString(const DT_CHAR *file, const DT_CHAR *func, DT_S32 line, const DT_CHAR *info)
                : m_file(file), m_func(func), m_line(line), m_info(info)
     {
         m_time_stamp = TimeStamp::Now();
@@ -40,19 +40,19 @@ public:
     TimeStamp   m_time_stamp;
     std::string m_file;
     std::string m_func;
-    MI_S32      m_line;
+    DT_S32      m_line;
     std::string m_info;
 };
 
 class Logger::Impl
 {
 public:
-    Impl(LogOutput output, LogLevel level, const std::string &file, MI_S32 max_num_error_string = 128);
+    Impl(LogOutput output, LogLevel level, const std::string &file, DT_S32 max_num_error_string = 128);
 
     ~Impl();
 
-    AURA_VOID Log(const MI_CHAR *tag, LogLevel level, const MI_CHAR *buffer);
-    AURA_VOID AddErrorString(ErrorString &error_string);
+    DT_VOID Log(const DT_CHAR *tag, LogLevel level, const DT_CHAR *buffer);
+    DT_VOID AddErrorString(ErrorString &error_string);
     std::string GetErrorString();
 
 private:
@@ -61,7 +61,7 @@ private:
     std::string m_file;
     std::mutex  m_mutex;
 
-    MI_S32 m_max_num_error_string;
+    DT_S32 m_max_num_error_string;
     std::list<ErrorString> m_error_string_list;
     FILE *m_fp;
 };

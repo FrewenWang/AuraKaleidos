@@ -63,7 +63,7 @@ static const std::unordered_map<std::string, ModelFileInfo> g_model_map =
     }
 };
 
-static aura::Status InputParser(MI_S32 argc, MI_CHAR *argv[], std::string &framework)
+static aura::Status InputParser(DT_S32 argc, DT_CHAR *argv[], std::string &framework)
 {
     if (argc != 2)
     {
@@ -87,18 +87,18 @@ static aura::Status InputParser(MI_S32 argc, MI_CHAR *argv[], std::string &frame
 static std::shared_ptr<aura::Context> CreateNNContext()
 {
     aura::Config config;
-    config.SetNNConf(MI_TRUE);                                  // enbale nn module
+    config.SetNNConf(DT_TRUE);                                  // enbale nn module
 
     std::shared_ptr<aura::Context> ctx = std::make_shared<aura::Context>(config); // create context object
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (ctx->Initialize() != aura::Status::OK)                  // initialize context
     {
         AURA_LOGE(ctx, NN_TAG, "failed to initialize context\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return ctx;
@@ -111,12 +111,12 @@ static aura::Status Validate(aura::Context *ctx, const aura::Mat &mat)
         AURA_LOGE(ctx, NN_TAG, "invalid mat\n");
         return aura::Status::ERROR;
     }
-    MI_S32 id    = 0;                                           // retrive label id
-    MI_F32 max_p = mat.Ptr<MI_F32>(0)[0];                       // probability of first class
+    DT_S32 id    = 0;                                           // retrive label id
+    DT_F32 max_p = mat.Ptr<DT_F32>(0)[0];                       // probability of first class
 
-    for (MI_S32 i = 1; i < mat.GetSizes().m_width; i++)
+    for (DT_S32 i = 1; i < mat.GetSizes().m_width; i++)
     {
-        MI_F32 p = mat.Ptr<MI_F32>(0)[i];
+        DT_F32 p = mat.Ptr<DT_F32>(0)[i];
         if (p > max_p)
         {
             max_p = p;
@@ -149,7 +149,7 @@ static aura::Status Sample(aura::Context *ctx, const std::string &model_type)
         return aura::Status::ERROR;
     }
 
-    std::shared_ptr<aura::NNExecutor> nn_executor = MI_NULL;
+    std::shared_ptr<aura::NNExecutor> nn_executor = DT_NULL;
 
     if (model_type.find("minb") != std::string::npos)
     {
@@ -206,7 +206,7 @@ static aura::Status Sample(aura::Context *ctx, const std::string &model_type)
     return aura::Status::OK;
 }
 
-MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
+DT_S32 main(DT_S32 argc, DT_CHAR *argv[])
 {
     if (!aura::Context::IsPlatformSupported())
     {
@@ -214,7 +214,7 @@ MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
     }
 
     std::shared_ptr<aura::Context> ctx = CreateNNContext();       // create context for sample
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return -1;
     }

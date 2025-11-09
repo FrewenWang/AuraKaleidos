@@ -39,10 +39,10 @@ struct AURA_EXPORTS Time
     * @param millisec The millisecond component of the time (default is 0).
     * @param microsec The microsecond component of the time (default is 0).
     */
-    Time(MI_S64 second = 0, MI_S32 millisec = 0, MI_S32 microsec = 0)
+    Time(DT_S64 second = 0, DT_S32 millisec = 0, DT_S32 microsec = 0)
     {
-        MI_S32 ms_carry  = 0;
-        MI_S32 sec_carry = 0;
+        DT_S32 ms_carry  = 0;
+        DT_S32 sec_carry = 0;
 
         ms_carry = microsec / 1000;
         us = microsec % 1000;
@@ -68,12 +68,12 @@ struct AURA_EXPORTS Time
     /**
      * @brief Update the Time object with the current time.
      */
-    AURA_VOID Update()
+    DT_VOID Update()
     {
         auto now = std::chrono::steady_clock::now().time_since_epoch();
         std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds>(now);
-        sec = static_cast<MI_S64>(seconds.count());
-        MI_S32 microseconds = static_cast<MI_S32>(std::chrono::duration_cast<std::chrono::microseconds>(now - seconds).count());
+        sec = static_cast<DT_S64>(seconds.count());
+        DT_S32 microseconds = static_cast<DT_S32>(std::chrono::duration_cast<std::chrono::microseconds>(now - seconds).count());
         ms = microseconds / 1000;
         us = microseconds - ms * 1000;
     }
@@ -83,7 +83,7 @@ struct AURA_EXPORTS Time
      *
      * @return The time in seconds as a floating-point number.
      */
-    MI_F64 AsSec()
+    DT_F64 AsSec()
     {
         return sec + ms / 1000.0 + us / 1000000.0;
     }
@@ -93,7 +93,7 @@ struct AURA_EXPORTS Time
      *
      * @return The time in milliseconds as a floating-point number.
      */
-    MI_F64 AsMilliSec()
+    DT_F64 AsMilliSec()
     {
         return sec * 1000 + ms + us / 1000.0;
     }
@@ -103,7 +103,7 @@ struct AURA_EXPORTS Time
      *
      * @return The time in microseconds as a 64-bit integer.
      */
-    MI_S64 AsMicroSec()
+    DT_S64 AsMicroSec()
     {
         return sec * 1000000 + ms * 1000 + us;
     }
@@ -153,9 +153,9 @@ struct AURA_EXPORTS Time
         return ss.str();
     }
 
-    MI_S64 sec;  /*!< The second component of the time. */
-    MI_S32 ms;   /*!< The millisecond component of the time. */
-    MI_S32 us;   /*!< The microsecond component of the time. */
+    DT_S64 sec;  /*!< The second component of the time. */
+    DT_S32 ms;   /*!< The millisecond component of the time. */
+    DT_S32 us;   /*!< The microsecond component of the time. */
 };
 
 /**
@@ -166,14 +166,14 @@ struct AURA_EXPORTS Time
  *
  * @return `true` if the Time objects are equal, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator==(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator==(const Time &t0, const Time &t1)
 {
     if (t0.sec == t1.sec && t0.ms == t1.ms && t0.us == t1.us)
     {
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
-    return MI_FALSE;
+    return DT_FALSE;
 }
 
 /**
@@ -184,7 +184,7 @@ AURA_INLINE MI_BOOL operator==(const Time &t0, const Time &t1)
  *
  * @return `true` if the Time objects are not equal, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator!=(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator!=(const Time &t0, const Time &t1)
 {
     return !(t0 == t1);
 }
@@ -197,19 +197,19 @@ AURA_INLINE MI_BOOL operator!=(const Time &t0, const Time &t1)
  *
  * @return `true` if t0 is greater than t1, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator>(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator>(const Time &t0, const Time &t1)
 {
     if (t0.sec != t1.sec)
     {
-        return (t0.sec > t1.sec) ? MI_TRUE : MI_FALSE;
+        return (t0.sec > t1.sec) ? DT_TRUE : DT_FALSE;
     }
 
     if (t0.ms != t1.ms)
     {
-        return (t0.ms > t1.ms) ? MI_TRUE : MI_FALSE;
+        return (t0.ms > t1.ms) ? DT_TRUE : DT_FALSE;
     }
 
-    return (t0.us > t1.us) ? MI_TRUE : MI_FALSE;
+    return (t0.us > t1.us) ? DT_TRUE : DT_FALSE;
 }
 
 /**
@@ -220,7 +220,7 @@ AURA_INLINE MI_BOOL operator>(const Time &t0, const Time &t1)
  *
  * @return `true` if t0 is greater than or equal to t1, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator>=(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator>=(const Time &t0, const Time &t1)
 {
     return (t0 > t1 || t0 == t1);
 }
@@ -233,7 +233,7 @@ AURA_INLINE MI_BOOL operator>=(const Time &t0, const Time &t1)
  *
  * @return `true` if t0 is less than t1, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator<(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator<(const Time &t0, const Time &t1)
 {
     return !(t0 >= t1);
 }
@@ -246,7 +246,7 @@ AURA_INLINE MI_BOOL operator<(const Time &t0, const Time &t1)
  *
  * @return `true` if t0 is less than or equal to t1, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator<=(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator<=(const Time &t0, const Time &t1)
 {
     return !(t0 > t1);
 }
@@ -315,11 +315,11 @@ AURA_INLINE Time operator+(const Time &t0, const Time &t1)
 {
     Time sum;
 
-    MI_S32 ms_carry  = 0;
-    MI_S32 sec_carry = 0;
+    DT_S32 ms_carry  = 0;
+    DT_S32 sec_carry = 0;
 
     // us
-    MI_S64 sum_us = t0.us + t1.us;
+    DT_S64 sum_us = t0.us + t1.us;
     if (sum_us >= 1000)
     {
         sum.us = sum_us - 1000;
@@ -331,7 +331,7 @@ AURA_INLINE Time operator+(const Time &t0, const Time &t1)
     }
 
     // ms
-    MI_S64 sum_ms = t0.ms + t1.ms + ms_carry;
+    DT_S64 sum_ms = t0.ms + t1.ms + ms_carry;
     if (sum_ms >= 1000)
     {
         sum.ms = sum_ms - 1000;
@@ -365,7 +365,7 @@ public:
      * @param ms The millisecond (0 ~ 999).
      * @param us The microsecond (0 ~ 999).
      */
-    TimeStamp( MI_S8 mon = 0, MI_S8 day = 0, MI_S8 hour = 0, MI_S8 min = 0, MI_S8 sec = 0, MI_S16 ms = 0, MI_S16 us = 0)
+    TimeStamp( DT_S8 mon = 0, DT_S8 day = 0, DT_S8 hour = 0, DT_S8 min = 0, DT_S8 sec = 0, DT_S16 ms = 0, DT_S16 us = 0)
              : m_mon(mon), m_day(day), m_hour(hour), m_min(min), m_sec(sec), m_ms(ms), m_us(us)
     {}
 
@@ -374,7 +374,7 @@ public:
      *
      * This function updates the timestamp based on the current system time.
      */
-    AURA_VOID Update()
+    DT_VOID Update()
     {
 #if defined(AURA_BUILD_HEXAGON)
         // TODO: add cdsp time stamp
@@ -382,11 +382,11 @@ public:
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
 
-        m_mon  = static_cast<MI_S8>(tm->tm_mon + 1);
-        m_day  = static_cast<MI_S8>(tm->tm_mday);
-        m_hour = static_cast<MI_S8>(tm->tm_hour);
-        m_min  = static_cast<MI_S8>(tm->tm_min);
-        m_sec  = static_cast<MI_S8>(tm->tm_sec);
+        m_mon  = static_cast<DT_S8>(tm->tm_mon + 1);
+        m_day  = static_cast<DT_S8>(tm->tm_mday);
+        m_hour = static_cast<DT_S8>(tm->tm_hour);
+        m_min  = static_cast<DT_S8>(tm->tm_min);
+        m_sec  = static_cast<DT_S8>(tm->tm_sec);
 #endif
 
         Time now = Time::Now();
@@ -416,12 +416,12 @@ public:
      */
     AURA_EXPORTS friend std::ostream& operator<<(std::ostream& os, const TimeStamp &time_stamp)
     {
-        os        << std::setfill('0') << std::setw(2) << (MI_S32)(time_stamp.m_mon);
-        os << "-" << std::setfill('0') << std::setw(2) << (MI_S32)(time_stamp.m_day);
-        os << " " << std::setfill('0') << std::setw(2) << (MI_S32)(time_stamp.m_hour);
-        os << ":" << std::setfill('0') << std::setw(2) << (MI_S32)(time_stamp.m_min);
-        os << ":" << std::setfill('0') << std::setw(2) << (MI_S32)(time_stamp.m_sec);
-        os << "." << std::setfill('0') << std::setw(3) << (MI_S32)(time_stamp.m_ms);
+        os        << std::setfill('0') << std::setw(2) << (DT_S32)(time_stamp.m_mon);
+        os << "-" << std::setfill('0') << std::setw(2) << (DT_S32)(time_stamp.m_day);
+        os << " " << std::setfill('0') << std::setw(2) << (DT_S32)(time_stamp.m_hour);
+        os << ":" << std::setfill('0') << std::setw(2) << (DT_S32)(time_stamp.m_min);
+        os << ":" << std::setfill('0') << std::setw(2) << (DT_S32)(time_stamp.m_sec);
+        os << "." << std::setfill('0') << std::setw(3) << (DT_S32)(time_stamp.m_ms);
 
         return os;
     }
@@ -439,13 +439,13 @@ public:
     }
 
 private:
-    MI_S8  m_mon;  /*!< Month (1 ~ 12). */
-    MI_S8  m_day;  /*!< Day (1 ~ 31). */
-    MI_S8  m_hour; /*!< Hour (0 ~ 23). */
-    MI_S8  m_min;  /*!< Minute (0 ~ 59). */
-    MI_S8  m_sec;  /*!< Second (0 ~ 59). */
-    MI_S16 m_ms;   /*!< Millisecond (0 ~ 999). */
-    MI_S16 m_us;   /*!< Microsecond (0 ~ 999). */
+    DT_S8  m_mon;  /*!< Month (1 ~ 12). */
+    DT_S8  m_day;  /*!< Day (1 ~ 31). */
+    DT_S8  m_hour; /*!< Hour (0 ~ 23). */
+    DT_S8  m_min;  /*!< Minute (0 ~ 59). */
+    DT_S8  m_sec;  /*!< Second (0 ~ 59). */
+    DT_S16 m_ms;   /*!< Millisecond (0 ~ 999). */
+    DT_S16 m_us;   /*!< Microsecond (0 ~ 999). */
 };
 
 /**

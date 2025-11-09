@@ -49,9 +49,9 @@ struct RefTileWrapper
      * @param reserved_size   The reserved size for tile impl.
      *
      */
-    RefTileWrapper(MI_U32 tile_num, const Point2i &pt, const Sizes3 size, const ElemType elem_type, MI_U32 reserved_size)
+    RefTileWrapper(DT_U32 tile_num, const Point2i &pt, const Sizes3 size, const ElemType elem_type, DT_U32 reserved_size)
     {
-        MI_U32 tile_bytes  = (AURA_VDSP_LOCAL_MEM_SIZE - reserved_size) / (tile_num << 1);
+        DT_U32 tile_bytes  = (AURA_VDSP_LOCAL_MEM_SIZE - reserved_size) / (tile_num << 1);
         tile_height = (tile_bytes << 10) / (size.m_width * size.m_channel * ElemTypeSize(elem_type));
 
         x            = pt.m_x;
@@ -74,9 +74,9 @@ struct RefTileWrapper
      * @param reserved_size   The reserved size of local buffer.
      *
      */
-    RefTileWrapper(MI_U32 tile_num, MI_S32 elem_count, const Point2i &pt, const Sizes3 size, const ElemType elem_type, MI_U32 reserved_size)
+    RefTileWrapper(DT_U32 tile_num, DT_S32 elem_count, const Point2i &pt, const Sizes3 size, const ElemType elem_type, DT_U32 reserved_size)
     {
-        MI_U32 tile_bytes  = (AURA_VDSP_LOCAL_MEM_SIZE - reserved_size) / (tile_num << 1);
+        DT_U32 tile_bytes  = (AURA_VDSP_LOCAL_MEM_SIZE - reserved_size) / (tile_num << 1);
         elem_count = elem_count < size.m_width ? elem_count : size.m_width;
         tile_height = (tile_bytes << 10) / (elem_count * size.m_channel * ElemTypeSize(elem_type));
 
@@ -102,12 +102,12 @@ struct RefTileWrapper
      * @param reserved_size   The reserved size of local buffer.
      *
      */
-    RefTileWrapper(MI_U32 src_tile_num, MI_U32 dst_tile_num, const Point2i &pt, const Sizes3 src_size, const Sizes3 dst_size,
-                   const ElemType src_elem_type, const ElemType dst_elem_type, MI_U32 reserved_size)
+    RefTileWrapper(DT_U32 src_tile_num, DT_U32 dst_tile_num, const Point2i &pt, const Sizes3 src_size, const Sizes3 dst_size,
+                   const ElemType src_elem_type, const ElemType dst_elem_type, DT_U32 reserved_size)
     {
-        MI_U32 tile_bytes  = (AURA_VDSP_LOCAL_MEM_SIZE - reserved_size);
-        MI_U32 src_tile_bytes = src_size.m_width * src_size.m_channel * ElemTypeSize(src_elem_type) * (src_tile_num << 1);
-        MI_U32 dst_tile_bytes = dst_size.m_width * dst_size.m_channel * ElemTypeSize(dst_elem_type) * (dst_tile_num << 1);
+        DT_U32 tile_bytes  = (AURA_VDSP_LOCAL_MEM_SIZE - reserved_size);
+        DT_U32 src_tile_bytes = src_size.m_width * src_size.m_channel * ElemTypeSize(src_elem_type) * (src_tile_num << 1);
+        DT_U32 dst_tile_bytes = dst_size.m_width * dst_size.m_channel * ElemTypeSize(dst_elem_type) * (dst_tile_num << 1);
         tile_height = (tile_bytes << 10) / (src_tile_bytes + dst_tile_bytes);
 
         x            = pt.m_x;
@@ -142,17 +142,17 @@ struct RefTileWrapper
      *
      * @return True if the RefTile is valid; otherwise, false.
      */
-    MI_BOOL IsValid() const
+    DT_BOOL IsValid() const
     {
         return (x >= 0 && y >= 0 && tile_width > 0 && tile_height > 0 && iaura_width > 0 && iaura_height > 0);
     }
 
-    MI_S32 iaura_width;  /*!< The width of iaura. */
-    MI_S32 iaura_height; /*!< The height of iaura. */
-    MI_S32 tile_width;   /*!< The width of tile. */
-    MI_U16 tile_height;  /*!< The height of tile. */
-    MI_S32 x;            /*!< The x of upper left point. */
-    MI_S32 y;            /*!< The y of upper left point. */
+    DT_S32 iaura_width;  /*!< The width of iaura. */
+    DT_S32 iaura_height; /*!< The height of iaura. */
+    DT_S32 tile_width;   /*!< The width of tile. */
+    DT_U16 tile_height;  /*!< The height of tile. */
+    DT_S32 x;            /*!< The x of upper left point. */
+    DT_S32 y;            /*!< The y of upper left point. */
 };
 
 /**

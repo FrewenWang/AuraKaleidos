@@ -42,16 +42,16 @@ DECLFUN(float16x8_t, float16x8_t, vmulq, f16)
         return prefix##_##postfix(v, u);             \
     }
 
-DECLFUN(MI_U16,  uint16x4_t,  vmul_n,  u16)
-DECLFUN(MI_U16,  uint16x8_t,  vmulq_n, u16)
-DECLFUN(MI_S16,  int16x4_t,   vmul_n,  s16)
-DECLFUN(MI_S16,  int16x8_t,   vmulq_n, s16)
-DECLFUN(MI_U32,  uint32x2_t,  vmul_n,  u32)
-DECLFUN(MI_U32,  uint32x4_t,  vmulq_n, u32)
-DECLFUN(MI_S32,  int32x2_t,   vmul_n,  s32)
-DECLFUN(MI_S32,  int32x4_t,   vmulq_n, s32)
-DECLFUN(MI_F32,  float32x2_t, vmul_n,  f32)
-DECLFUN(MI_F32,  float32x4_t, vmulq_n, f32)
+DECLFUN(DT_U16,  uint16x4_t,  vmul_n,  u16)
+DECLFUN(DT_U16,  uint16x8_t,  vmulq_n, u16)
+DECLFUN(DT_S16,  int16x4_t,   vmul_n,  s16)
+DECLFUN(DT_S16,  int16x8_t,   vmulq_n, s16)
+DECLFUN(DT_U32,  uint32x2_t,  vmul_n,  u32)
+DECLFUN(DT_U32,  uint32x4_t,  vmulq_n, u32)
+DECLFUN(DT_S32,  int32x2_t,   vmul_n,  s32)
+DECLFUN(DT_S32,  int32x4_t,   vmulq_n, s32)
+DECLFUN(DT_F32,  float32x2_t, vmul_n,  f32)
+DECLFUN(DT_F32,  float32x4_t, vmulq_n, f32)
 
 #  if defined(AURA_ENABLE_NEON_FP16)
 DECLFUN(float16_t, float16x4_t, vmul_n, f16)
@@ -79,10 +79,10 @@ DECLFUN(int64x2_t,  int32x2_t,  vmull, s32)
         return prefix##_##postfix(v, u);               \
     }
 
-DECLFUN(uint32x4_t, MI_U16, uint16x4_t, vmull_n, u16)
-DECLFUN(int32x4_t,  MI_S16, int16x4_t,  vmull_n, s16)
-DECLFUN(uint64x2_t, MI_U32, uint32x2_t, vmull_n, u32)
-DECLFUN(int64x2_t,  MI_S32, int32x2_t,  vmull_n, s32)
+DECLFUN(uint32x4_t, DT_U16, uint16x4_t, vmull_n, u16)
+DECLFUN(int32x4_t,  DT_S16, int16x4_t,  vmull_n, s16)
+DECLFUN(uint64x2_t, DT_U32, uint32x2_t, vmull_n, u32)
+DECLFUN(int64x2_t,  DT_S32, int32x2_t,  vmull_n, s32)
 #undef DECLFUN
 
 #define DECLFUN(dtype, vtype, prefix, postfix)              \

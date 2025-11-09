@@ -26,9 +26,9 @@ aura::Status ThresholdSampleTest(aura::Context *ctx, aura::TargetType type)
     }
 
     // set interface parameters
-    MI_F32 thresh      = 28.5f;
-    MI_F32 max_val     = 255.0f;
-    MI_S32 thresh_type = AURA_THRESH_BINARY;
+    DT_F32 thresh      = 28.5f;
+    DT_F32 max_val     = 255.0f;
+    DT_S32 thresh_type = AURA_THRESH_BINARY;
 
     // ---------------------
     //     run interface

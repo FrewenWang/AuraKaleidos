@@ -52,8 +52,8 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent. 
      */
-    Status SetArgs(const Array *src, Array *dst, MI_F64 low_thresh, MI_F64 high_thresh,
-                   MI_S32 aperture_size = 3, MI_BOOL l2_gradient = MI_FALSE);
+    Status SetArgs(const Array *src, Array *dst, DT_F64 low_thresh, DT_F64 high_thresh,
+                   DT_S32 aperture_size = 3, DT_BOOL l2_gradient = DT_FALSE);
 
     /**
      * @brief Set the arguments for the Canny operation.
@@ -63,8 +63,8 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent. 
      */
-    Status SetArgs(const Array *dx, const Array *dy, Array *dst, MI_F64 low_thresh,
-                   MI_F64 high_thresh, MI_BOOL l2_gradient = MI_FALSE);
+    Status SetArgs(const Array *dx, const Array *dy, Array *dst, DT_F64 low_thresh,
+                   DT_F64 high_thresh, DT_BOOL l2_gradient = DT_FALSE);
 };
 
 /**
@@ -79,7 +79,7 @@ public:
  * @param low_thresh The lower threshold for the hysteresis procedure.
  * @param high_thresh The upper threshold for the hysteresis procedure.
  * @param aperture_size The aperture size for the Sobel operator (default is 3).
- * @param l2_gradient Flag indicating whether to use the L2 norm for gradient magnitude (default is MI_FALSE).
+ * @param l2_gradient Flag indicating whether to use the L2 norm for gradient magnitude (default is DT_FALSE).
  * @param target The platform on which this function runs.
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
@@ -92,8 +92,8 @@ public:
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status ICanny(Context *ctx, const Mat &src, Mat &dst, MI_F64 low_thresh, MI_F64 high_thresh,
-                           MI_S32 aperture_size = 3, MI_BOOL l2_gradient = MI_FALSE, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status ICanny(Context *ctx, const Mat &src, Mat &dst, DT_F64 low_thresh, DT_F64 high_thresh,
+                           DT_S32 aperture_size = 3, DT_BOOL l2_gradient = DT_FALSE, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Performs Canny edge detection with separate x and y gradients.
@@ -107,7 +107,7 @@ AURA_EXPORTS Status ICanny(Context *ctx, const Mat &src, Mat &dst, MI_F64 low_th
  * @param dst Reference to the destination Mat object. And see the below for the supported data types.
  * @param low_thresh The lower threshold for the hysteresis procedure.
  * @param high_thresh The upper threshold for the hysteresis procedure.
- * @param l2_gradient Flag indicating whether to use the L2 norm for gradient magnitude (default is MI_FALSE).
+ * @param l2_gradient Flag indicating whether to use the L2 norm for gradient magnitude (default is DT_FALSE).
  * @param target The platform on which this function runs.
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
@@ -120,8 +120,8 @@ AURA_EXPORTS Status ICanny(Context *ctx, const Mat &src, Mat &dst, MI_F64 low_th
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status ICanny(Context *ctx, const Mat &dx, const Mat &dy, Mat &dst, MI_F64 low_thresh,
-                           MI_F64 high_thresh, MI_BOOL l2_gradient = MI_FALSE, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status ICanny(Context *ctx, const Mat &dx, const Mat &dy, Mat &dst, DT_F64 low_thresh,
+                           DT_F64 high_thresh, DT_BOOL l2_gradient = DT_FALSE, const OpTarget &target = OpTarget::Default());
 /**
  * @}
 */

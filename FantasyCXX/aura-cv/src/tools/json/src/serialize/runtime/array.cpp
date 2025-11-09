@@ -6,7 +6,7 @@
 namespace aura
 {
 
-AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const Mat &mat)
+AURA_EXPORTS DT_VOID to_json(aura_json::json &json, const Mat &mat)
 {
     if (!mat.IsValid())
     {
@@ -24,7 +24,7 @@ AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const Mat &mat)
     }
 }
 
-AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, Mat &mat)
+AURA_EXPORTS DT_VOID from_json(const aura_json::json &json, Mat &mat)
 {
     Sizes3      sizes;
     Sizes       strides;
@@ -37,7 +37,7 @@ AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, Mat &mat)
     json.at("path").get_to(path);
 
     Context *ctx = JsonHelper::GetInstance().GetContext();
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return;
     }
@@ -57,9 +57,9 @@ AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, Mat &mat)
     }
 }
 
-AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const Mat *mat)
+AURA_EXPORTS DT_VOID to_json(aura_json::json &json, const Mat *mat)
 {
-    if (MI_NULL == mat)
+    if (DT_NULL == mat)
     {
         to_json(json, Mat());
     }
@@ -69,7 +69,7 @@ AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const Mat *mat)
     }
 }
 
-AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, Mat *&mat)
+AURA_EXPORTS DT_VOID from_json(const aura_json::json &json, Mat *&mat)
 {
     Sizes3      sizes;
     Sizes       strides;
@@ -82,13 +82,13 @@ AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, Mat *&mat)
     json.at("path").get_to(path);
 
     Context *ctx = JsonHelper::GetInstance().GetContext();
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return;
     }
 
     mat = Create<Mat>(ctx, elem_type, sizes, AURA_MEM_DEFAULT, strides);
-    if ((MI_NULL == mat) || (!mat->IsValid()))
+    if ((DT_NULL == mat) || (!mat->IsValid()))
     {
         Delete<Mat>(ctx, &mat);
         return;
@@ -103,7 +103,7 @@ AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, Mat *&mat)
 }
 
 #if defined(AURA_ENABLE_OPENCL)
-AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const CLMem &cl_mem)
+AURA_EXPORTS DT_VOID to_json(aura_json::json &json, const CLMem &cl_mem)
 {
     if (!cl_mem.IsValid())
     {
@@ -121,7 +121,7 @@ AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const CLMem &cl_mem)
     }
 }
 
-AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, CLMem &cl_mem)
+AURA_EXPORTS DT_VOID from_json(const aura_json::json &json, CLMem &cl_mem)
 {
     Sizes3      sizes;
     Sizes       strides;
@@ -134,7 +134,7 @@ AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, CLMem &cl_mem)
     json.at("path").get_to(path);
 
     Context *ctx = JsonHelper::GetInstance().GetContext();
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return;
     }
@@ -154,9 +154,9 @@ AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, CLMem &cl_mem)
     }
 }
 
-AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const CLMem *cl_mem)
+AURA_EXPORTS DT_VOID to_json(aura_json::json &json, const CLMem *cl_mem)
 {
-    if (MI_NULL == cl_mem)
+    if (DT_NULL == cl_mem)
     {
         to_json(json, CLMem());
     }
@@ -166,7 +166,7 @@ AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const CLMem *cl_mem)
     }
 }
 
-AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, CLMem *&cl_mem)
+AURA_EXPORTS DT_VOID from_json(const aura_json::json &json, CLMem *&cl_mem)
 {
     Sizes3      sizes;
     Sizes       strides;
@@ -179,13 +179,13 @@ AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, CLMem *&cl_mem)
     json.at("path").get_to(path);
 
     Context *ctx = JsonHelper::GetInstance().GetContext();
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return;
     }
 
     cl_mem = Create<CLMem>(ctx, CLMemParam(CL_MEM_READ_WRITE), elem_type, sizes, strides);
-    if ((MI_NULL == cl_mem) || (!cl_mem->IsValid()))
+    if ((DT_NULL == cl_mem) || (!cl_mem->IsValid()))
     {
         Delete<CLMem>(ctx, &cl_mem);
         return;

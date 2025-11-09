@@ -90,10 +90,10 @@ private:
 
     AURA_DISABLE_COPY_AND_ASSIGN(HexagonLibrary);
 
-    AURA_VOID* LoadSymbols(const std::string &path);
+    DT_VOID* LoadSymbols(const std::string &path);
 
 private:
-    AURA_VOID    *m_handle;
+    DT_VOID    *m_handle;
 };
 
 } // namespace aura

@@ -14,7 +14,7 @@ AURA_TEST_PARAM(PsnrParam,
                 MatSize,   mat_size,
                 OpTarget,  target);
 
-AURA_INLINE Status CvPSNR(Mat &src0, Mat &src1, MI_F64 &result)
+AURA_INLINE Status CvPSNR(Mat &src0, Mat &src1, DT_F64 &result)
 {
 #if !defined(AURA_BUILD_XPLORER)
     cv::Mat cv_src0 = MatToOpencv(src0);
@@ -35,7 +35,7 @@ public:
     PsnrTest(Context *ctx, PsnrParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         PsnrParam run_param(GetParam((index)));
@@ -53,14 +53,14 @@ public:
         TestTime cv_time;
         TestResult result;
         result.input  = mat_size.ToString() + " " + ElemTypesToString(elem_type);
-        result.output = "MI_F64";
+        result.output = "DT_F64";
 
         // Execute result variables
         Status ret = Status::OK;
-        MI_F64 res_psnr = 0.0;
-        MI_F64 ref_psnr = 0.0;
+        DT_F64 res_psnr = 0.0;
+        DT_F64 ref_psnr = 0.0;
         // Run interface
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
         ret = Executor(loop_count, 2, time_perf, IPsnr, m_ctx, src_mat0, src_mat1, 255.0, &res_psnr, run_param.target);
 
         if (Status::OK == ret)
@@ -91,7 +91,7 @@ public:
 
         // Compare
         {
-            MI_F64 relative_diff = Abs(res_psnr - ref_psnr) / Max(Abs(res_psnr), Abs(ref_psnr));
+            DT_F64 relative_diff = Abs(res_psnr - ref_psnr) / Max(Abs(res_psnr), Abs(ref_psnr));
             result.accu_result = std::string("dst psnr: ") + std::to_string(res_psnr) + std::string(" ref norm: ") + std::to_string(ref_psnr);
             result.accu_status = (relative_diff < 1E-5) ? TestStatus::PASSED : TestStatus::FAILED;
             if (TestStatus::FAILED == result.accu_status)

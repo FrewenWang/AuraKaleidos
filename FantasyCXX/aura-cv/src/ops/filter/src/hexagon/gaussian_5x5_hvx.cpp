@@ -5,30 +5,30 @@
 namespace aura
 {
 
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(HVX_Vector &vu8_src_p1, HVX_Vector &vu8_src_p0, HVX_Vector &vu8_src_c,
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5VCore(HVX_Vector &vu8_src_p1, HVX_Vector &vu8_src_p0, HVX_Vector &vu8_src_c,
                                             HVX_Vector &vu8_src_n0, HVX_Vector &vu8_src_n1,
-                                            HVX_VectorPair &wu16_sum, const MI_U16 *kernel)
+                                            HVX_VectorPair &wu16_sum, const DT_U16 *kernel)
 {
-    MI_U32 k0k0k0k0 = Q6_R_vsplatb_R(kernel[0]);
-    MI_U32 k1k1k1k1 = Q6_R_vsplatb_R(kernel[1]);
-    MI_U32 k2k2k2k2 = Q6_R_vsplatb_R(kernel[2]);
+    DT_U32 k0k0k0k0 = Q6_R_vsplatb_R(kernel[0]);
+    DT_U32 k1k1k1k1 = Q6_R_vsplatb_R(kernel[1]);
+    DT_U32 k2k2k2k2 = Q6_R_vsplatb_R(kernel[2]);
 
     wu16_sum = Q6_Wh_vmpa_WubRub(Q6_W_vcombine_VV(vu8_src_p1, vu8_src_n1), k0k0k0k0);
     wu16_sum = Q6_Wh_vmpaacc_WhWubRub(wu16_sum, Q6_W_vcombine_VV(vu8_src_p0, vu8_src_n0), k1k1k1k1);
     wu16_sum = Q6_Wuh_vmpyacc_WuhVubRub(wu16_sum, vu8_src_c, k2k2k2k2);
 }
 
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &wu16_sum_x0, HVX_VectorPair &wu16_sum_x1,
-                                            HVX_VectorPair &wu16_sum_x2, HVX_Vector &vu8_result, const MI_U16 *kernel)
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(HVX_VectorPair &wu16_sum_x0, HVX_VectorPair &wu16_sum_x1,
+                                            HVX_VectorPair &wu16_sum_x2, HVX_Vector &vu8_result, const DT_U16 *kernel)
 {
-    MI_U32 k0k0k0k0   = Q6_R_vsplatb_R(kernel[0]);
-    MI_U32 k1k1k1k1   = Q6_R_vsplatb_R(kernel[1]);
-    MI_U32 k2k2       = (kernel[2] << 16) | kernel[2];
-    MI_S32 align_size = sizeof(MI_U16);
+    DT_U32 k0k0k0k0   = Q6_R_vsplatb_R(kernel[0]);
+    DT_U32 k1k1k1k1   = Q6_R_vsplatb_R(kernel[1]);
+    DT_U32 k2k2       = (kernel[2] << 16) | kernel[2];
+    DT_S32 align_size = sizeof(DT_U16);
 
     HVX_Vector vu16_sum_x1_lo = Q6_V_lo_W(wu16_sum_x1);
     HVX_Vector vu16_sum_x1_hi = Q6_V_hi_W(wu16_sum_x1);
@@ -55,15 +55,15 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &wu16_sum_x0, HVX_V
     vu8_result = Q6_Vub_vsat_VhVh(vu16_result_hi, vu16_result_lo);
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(HVX_Vector &vu16_src_p1, HVX_Vector &vu16_src_p0, HVX_Vector &vu16_src_c,
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5VCore(HVX_Vector &vu16_src_p1, HVX_Vector &vu16_src_p0, HVX_Vector &vu16_src_c,
                                             HVX_Vector &vu16_src_n0, HVX_Vector &vu16_src_n1,
-                                            HVX_VectorPair &wu32_sum, const MI_U32 *kernel)
+                                            HVX_VectorPair &wu32_sum, const DT_U32 *kernel)
 {
-    MI_U32 k0k0 = (kernel[0] << 16) | kernel[0];
-    MI_U32 k1k1 = (kernel[1] << 16) | kernel[1];
-    MI_U32 k2k2 = (kernel[2] << 16) | kernel[2];
+    DT_U32 k0k0 = (kernel[0] << 16) | kernel[0];
+    DT_U32 k1k1 = (kernel[1] << 16) | kernel[1];
+    DT_U32 k2k2 = (kernel[2] << 16) | kernel[2];
 
     wu32_sum = Q6_Wuw_vmpy_VuhRuh(vu16_src_p1, k0k0);
     wu32_sum = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum, vu16_src_p0, k1k1);
@@ -72,15 +72,15 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(HVX_Vector &vu16_src_p1, HVX_Vecto
     wu32_sum = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum, vu16_src_n1, k0k0);
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &wu32_sum_x0, HVX_VectorPair &wu32_sum_x1,
-                                            HVX_VectorPair &wu32_sum_x2, HVX_Vector &vu16_result, const MI_U32 *kernel)
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(HVX_VectorPair &wu32_sum_x0, HVX_VectorPair &wu32_sum_x1,
+                                            HVX_VectorPair &wu32_sum_x2, HVX_Vector &vu16_result, const DT_U32 *kernel)
 {
     HVX_Vector vu32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vu32_k1 = Q6_V_vsplat_R(kernel[1]);
     HVX_Vector vu32_k2 = Q6_V_vsplat_R(kernel[2]);
-    MI_S32 align_size  = sizeof(MI_U32);
+    DT_S32 align_size  = sizeof(DT_U32);
 
     HVX_Vector vu32_sum_x1_lo = Q6_V_lo_W(wu32_sum_x1);
     HVX_Vector vu32_sum_x1_hi = Q6_V_hi_W(wu32_sum_x1);
@@ -113,15 +113,15 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &wu32_sum_x0, HVX_V
     vu16_result = Q6_Vuh_vsat_VuwVuw(vu32_sum_hi, vu32_sum_lo);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(HVX_Vector &vs16_src_p1, HVX_Vector &vs16_src_p0, HVX_Vector &vs16_src_c,
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5VCore(HVX_Vector &vs16_src_p1, HVX_Vector &vs16_src_p0, HVX_Vector &vs16_src_c,
                                             HVX_Vector &vs16_src_n0, HVX_Vector &vs16_src_n1,
-                                            HVX_VectorPair &ws32_sum, const MI_S32 *kernel)
+                                            HVX_VectorPair &ws32_sum, const DT_S32 *kernel)
 {
-    MI_S32 k0k0 = (kernel[0] << 16) | kernel[0];
-    MI_S32 k1k1 = (kernel[1] << 16) | kernel[1];
-    MI_S32 k2k2 = (kernel[2] << 16) | kernel[2];
+    DT_S32 k0k0 = (kernel[0] << 16) | kernel[0];
+    DT_S32 k1k1 = (kernel[1] << 16) | kernel[1];
+    DT_S32 k2k2 = (kernel[2] << 16) | kernel[2];
 
     ws32_sum = Q6_Ww_vmpy_VhRh(vs16_src_p1, k0k0);
     ws32_sum = Q6_Ww_vmpyacc_WwVhRh(ws32_sum, vs16_src_p0, k1k1);
@@ -130,15 +130,15 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(HVX_Vector &vs16_src_p1, HVX_Vecto
     ws32_sum = Q6_Ww_vmpyacc_WwVhRh(ws32_sum, vs16_src_n1, k0k0);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &ws32_sum_x0, HVX_VectorPair &ws32_sum_x1,
-                                            HVX_VectorPair &ws32_sum_x2, HVX_Vector &vs16_result, const MI_S32 *kernel)
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(HVX_VectorPair &ws32_sum_x0, HVX_VectorPair &ws32_sum_x1,
+                                            HVX_VectorPair &ws32_sum_x2, HVX_Vector &vs16_result, const DT_S32 *kernel)
 {
     HVX_Vector vs32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vs32_k1 = Q6_V_vsplat_R(kernel[1]);
     HVX_Vector vs32_k2 = Q6_V_vsplat_R(kernel[2]);
-    MI_S32 align_size  = sizeof(MI_S32);
+    DT_S32 align_size  = sizeof(DT_S32);
 
     HVX_Vector vs32_sum_x1_lo = Q6_V_lo_W(ws32_sum_x1);
     HVX_Vector vs32_sum_x1_hi = Q6_V_hi_W(ws32_sum_x1);
@@ -171,11 +171,11 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &ws32_sum_x0, HVX_V
     vs16_result = Q6_Vh_vsat_VwVw(vs32_sum_hi, vs32_sum_lo);
 }
 
-// using Tp = MI_U32
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U32>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(HVX_Vector &vu32_src_p1, HVX_Vector &vu32_src_p0, HVX_Vector &vu32_src_c,
+// using Tp = DT_U32
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U32>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5VCore(HVX_Vector &vu32_src_p1, HVX_Vector &vu32_src_p0, HVX_Vector &vu32_src_c,
                                             HVX_Vector &vu32_src_n0, HVX_Vector &vu32_src_n1,
-                                            HVX_VectorPair &wu64_sum, const MI_U32 *kernel)
+                                            HVX_VectorPair &wu64_sum, const DT_U32 *kernel)
 {
     HVX_Vector vu32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vu32_k1 = Q6_V_vsplat_R(kernel[1]);
@@ -188,15 +188,15 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(HVX_Vector &vu32_src_p1, HVX_Vecto
     wu64_sum = Q6_Wud_vadd_WudWud(wu64_sum, Q6_Wud_vmul32xlo16_VuwVuw(vu32_src_n1, vu32_k0));
 }
 
-// using Tp = MI_U32 MI_S32
-template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) == 4>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &wd64_sum_x0, HVX_VectorPair &wd64_sum_x1,
+// using Tp = DT_U32 DT_S32
+template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) == 4>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(HVX_VectorPair &wd64_sum_x0, HVX_VectorPair &wd64_sum_x1,
                                             HVX_VectorPair &wd64_sum_x2, HVX_Vector &vd32_result, const Kt *kernel)
 {
     HVX_Vector vu32_k0   = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vu32_k1   = Q6_V_vsplat_R(kernel[1]);
     HVX_Vector vu32_k2   = Q6_V_vsplat_R(kernel[2]);
-    MI_S32 align_size    = sizeof(MI_U32);
+    DT_S32 align_size    = sizeof(DT_U32);
     HVX_Vector vu32_half = Q6_V_vsplat_R(1 << 27);
 
     HVX_Vector vd32_sum_x1_lo = Q6_V_lo_W(wd64_sum_x1);
@@ -243,11 +243,11 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &wd64_sum_x0, HVX_V
     vd32_result = Q6_Vw_vadd_VwVw(vd32_sum_hi, vd32_sum_lo);
 }
 
-// using Tp = MI_S32
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S32>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(HVX_Vector &vs32_src_p1, HVX_Vector &vs32_src_p0, HVX_Vector &vs32_src_c,
+// using Tp = DT_S32
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S32>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5VCore(HVX_Vector &vs32_src_p1, HVX_Vector &vs32_src_p0, HVX_Vector &vs32_src_c,
                                             HVX_Vector &vs32_src_n0, HVX_Vector &vs32_src_n1,
-                                            HVX_VectorPair &ws64_sum, const MI_S32 *kernel)
+                                            HVX_VectorPair &ws64_sum, const DT_S32 *kernel)
 {
     HVX_Vector vs32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vs32_k1 = Q6_V_vsplat_R(kernel[1]);
@@ -260,10 +260,10 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(HVX_Vector &vs32_src_p1, HVX_Vecto
     ws64_sum = Q6_Wd_vmulacc_WdVwVw(ws64_sum, vs32_src_n1, vs32_k0);
 }
 
-// Tp = MI_U8 MI_U16 MI_S16
-template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) != 4>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &w_sum_x0, HVX_VectorPair &w_sum_x1, HVX_VectorPair &w_sum_x2, HVX_VectorPair &w_sum_x3,
-                                            HVX_Vector &v_x0_result, HVX_Vector &v_x1_result, const Kt *kernel, MI_S32 rest)
+// Tp = DT_U8 DT_U16 DT_S16
+template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) != 4>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(HVX_VectorPair &w_sum_x0, HVX_VectorPair &w_sum_x1, HVX_VectorPair &w_sum_x2, HVX_VectorPair &w_sum_x3,
+                                            HVX_Vector &v_x0_result, HVX_Vector &v_x1_result, const Kt *kernel, DT_S32 rest)
 {
     HVX_Vector v_sum_x0_lo = Q6_V_lo_W(w_sum_x0);
     HVX_Vector v_sum_x0_hi = Q6_V_hi_W(w_sum_x0);
@@ -277,8 +277,8 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &w_sum_x0, HVX_Vect
     HVX_Vector v_sum_l0_lo, v_sum_l0_hi, v_sum_r0_lo, v_sum_r0_hi;
     if (rest & 1)
     {
-        MI_S32 align_size0 = (rest / 2) * sizeof(Kt);
-        MI_S32 align_size1 = align_size0 + sizeof(Kt);
+        DT_S32 align_size0 = (rest / 2) * sizeof(Kt);
+        DT_S32 align_size1 = align_size0 + sizeof(Kt);
         v_sum_r0_lo = Q6_V_vlalign_safe_VVR(v_sum_x3_hi, v_sum_x2_hi, align_size1);
         v_sum_r0_hi = Q6_V_vlalign_safe_VVR(v_sum_x3_lo, v_sum_x2_lo, align_size0);
         v_sum_l0_lo = Q6_V_valign_safe_VVR(v_sum_x1_hi, v_sum_x0_hi, align_size0);
@@ -286,7 +286,7 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &w_sum_x0, HVX_Vect
     }
     else
     {
-        MI_S32 align_size = (rest / 2) * sizeof(Kt);
+        DT_S32 align_size = (rest / 2) * sizeof(Kt);
         v_sum_r0_lo = Q6_V_vlalign_safe_VVR(v_sum_x3_lo, v_sum_x2_lo, align_size);
         v_sum_r0_hi = Q6_V_vlalign_safe_VVR(v_sum_x3_hi, v_sum_x2_hi, align_size);
         v_sum_l0_lo = Q6_V_valign_safe_VVR(v_sum_x1_lo, v_sum_x0_lo, align_size);
@@ -300,12 +300,12 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &w_sum_x0, HVX_Vect
     Gaussian5x5HCore<Tp>(w_sum_l0, w_sum_x2, w_sum_x3, v_x1_result, kernel);
 }
 
-// Tp = MI_U32 MI_S32
-template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) == 4>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &wd64_sum_x0, HVX_VectorPair &wd64_sum_x1, HVX_VectorPair &wd64_sum_x2, HVX_VectorPair &wd64_sum_x3,
-                                            HVX_Vector &vd32_result_x0, HVX_Vector &vd32_result_x1, const Kt *kernel, MI_S32 rest)
+// Tp = DT_U32 DT_S32
+template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) == 4>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(HVX_VectorPair &wd64_sum_x0, HVX_VectorPair &wd64_sum_x1, HVX_VectorPair &wd64_sum_x2, HVX_VectorPair &wd64_sum_x3,
+                                            HVX_Vector &vd32_result_x0, HVX_Vector &vd32_result_x1, const Kt *kernel, DT_S32 rest)
 {
-    MI_S32 align_size = rest * sizeof(Kt);
+    DT_S32 align_size = rest * sizeof(Kt);
 
     HVX_Vector vd32_sum_x0_lo = Q6_V_lo_W(wd64_sum_x0);
     HVX_Vector vd32_sum_x0_hi = Q6_V_hi_W(wd64_sum_x0);
@@ -328,15 +328,15 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(HVX_VectorPair &wd64_sum_x0, HVX_V
     Gaussian5x5HCore<Tp>(wd64_sum_l0, wd64_sum_x2, wd64_sum_x3, vd32_result_x1, kernel);
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C, typename Kt>
-AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0, const Tp *src_n1, Tp *dst,
-                       const Kt *kernel, const std::vector<Tp> &border_value, MI_S32 width)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C, typename Kt>
+DT_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0, const Tp *src_n1, Tp *dst,
+                       const Kt *kernel, const std::vector<Tp> &border_value, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
     using MWType = typename MWHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN / sizeof(Tp);
-    MI_S32 back_offset = width - elem_counts;
+    DT_S32 elem_counts = AURA_HVLEN / sizeof(Tp);
+    DT_S32 back_offset = width - elem_counts;
 
     MVType mv_src_p1, mv_src_p0, mv_src_c, mv_src_n0, mv_src_n1;
     MWType mw_sum_x0, mw_sum_x1, mw_sum_x2;
@@ -351,7 +351,7 @@ AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, co
         vload(src_n1, mv_src_n1);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p1 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_p1.val[ch], src_p1[ch], border_value[ch]);
             HVX_Vector v_border_p0 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_p0.val[ch], src_p0[ch], border_value[ch]);
@@ -366,7 +366,7 @@ AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, co
 
     // main(0 ~ n-2)
     {
-        for (MI_S32 x = elem_counts; x <= back_offset; x += elem_counts)
+        for (DT_S32 x = elem_counts; x <= back_offset; x += elem_counts)
         {
             vload(src_p1 + C * x, mv_src_p1);
             vload(src_p0 + C * x, mv_src_p0);
@@ -375,7 +375,7 @@ AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, co
             vload(src_n1 + C * x, mv_src_n1);
 
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Gaussian5x5VCore<Tp>(mv_src_p1.val[ch], mv_src_p0.val[ch], mv_src_c.val[ch], mv_src_n0.val[ch], mv_src_n1.val[ch], mw_sum_x2.val[ch], kernel);
                 Gaussian5x5HCore<Tp>(mw_sum_x0.val[ch], mw_sum_x1.val[ch], mw_sum_x2.val[ch], mv_result.val[ch], kernel);
@@ -389,8 +389,8 @@ AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, co
 
     // remain
     {
-        MI_S32 last = C * (width - 1);
-        MI_S32 rest = width % elem_counts;
+        DT_S32 last = C * (width - 1);
+        DT_S32 rest = width % elem_counts;
         MVType mv_last;
 
         vload(src_p1 + C * back_offset, mv_src_p1);
@@ -400,7 +400,7 @@ AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, co
         vload(src_n1 + C * back_offset, mv_src_n1);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p1 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_p1.val[ch], src_p1[last + ch], border_value[ch]);
             HVX_Vector v_border_p0 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_p0.val[ch], src_p0[last + ch], border_value[ch]);
@@ -420,15 +420,15 @@ AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, co
     }
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C>
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C>
 static Status Gaussian5x5HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, const std::vector<Tp> &border_value,
-                                 const Tp *border_buffer, MI_S32 start_row, MI_S32 end_row)
+                                 const Tp *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     using Kt = typename std::conditional<sizeof(Tp) == 4, Tp, typename Promote<Tp>::Type>::type;
 
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 height = src.GetSizes().m_height;
-    MI_S32 stride = src.GetStrides().m_width;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 height = src.GetSizes().m_height;
+    DT_S32 stride = src.GetStrides().m_width;
 
     const Kt *kernel = kmat.Ptr<Kt>(0);
 
@@ -438,12 +438,12 @@ static Status Gaussian5x5HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, cons
     const Tp *src_n0 = src.Ptr<Tp, BORDER_TYPE>(start_row + 1, border_buffer);
     const Tp *src_n1 = src.Ptr<Tp, BORDER_TYPE>(start_row + 2, border_buffer);
 
-    MI_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 3 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 3)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 3)), L2fetch_param);
         }
 
         Tp *dst_row  = dst.Ptr<Tp>(y);
@@ -466,34 +466,34 @@ static Status Gaussian5x5HvxHelper(Context *ctx, const Mat &src, Mat &dst, const
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
         case 1:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Gaussian5x5HvxImpl<Tp, BORDER_TYPE, 1>,
+            ret = wp->ParallelFor((DT_S32)0, height, Gaussian5x5HvxImpl<Tp, BORDER_TYPE, 1>,
                                   std::cref(src), std::ref(dst), std::cref(kmat), std::cref(border_value), border_buffer);
             break;
         }
 
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Gaussian5x5HvxImpl<Tp, BORDER_TYPE, 2>,
+            ret = wp->ParallelFor((DT_S32)0, height, Gaussian5x5HvxImpl<Tp, BORDER_TYPE, 2>,
                                   std::cref(src), std::ref(dst), std::cref(kmat), std::cref(border_value), border_buffer);
             break;
         }
 
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Gaussian5x5HvxImpl<Tp, BORDER_TYPE, 3>,
+            ret = wp->ParallelFor((DT_S32)0, height, Gaussian5x5HvxImpl<Tp, BORDER_TYPE, 3>,
                                   std::cref(src), std::ref(dst), std::cref(kmat), std::cref(border_value), border_buffer);
             break;
         }
@@ -514,18 +514,18 @@ static Status Gaussian5x5HvxHelper(Context *ctx, const Mat &src, Mat &dst, const
 {
     Status ret = Status::ERROR;
 
-    Tp *border_buffer = MI_NULL;
+    Tp *border_buffer = DT_NULL;
     std::vector<Tp> vec_border_value = border_value.ToVector<Tp>();
 
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (border_type)
     {
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -568,31 +568,31 @@ Status Gaussian5x5Hvx(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat,
     {
         case ElemType::U8:
         {
-            ret = Gaussian5x5HvxHelper<MI_U8>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian5x5HvxHelper<DT_U8>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = Gaussian5x5HvxHelper<MI_U16>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian5x5HvxHelper<DT_U16>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = Gaussian5x5HvxHelper<MI_S16>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian5x5HvxHelper<DT_S16>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 
         case ElemType::U32:
         {
-            ret = Gaussian5x5HvxHelper<MI_U32>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian5x5HvxHelper<DT_U32>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 
         case ElemType::S32:
         {
-            ret = Gaussian5x5HvxHelper<MI_S32>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian5x5HvxHelper<DT_S32>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 

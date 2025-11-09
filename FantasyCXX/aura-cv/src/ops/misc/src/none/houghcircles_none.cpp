@@ -10,8 +10,8 @@ namespace aura
 
 struct HoughAccumParam
 {
-    MI_S32 index;
-    MI_S32 value;
+    DT_S32 index;
+    DT_S32 value;
 };
 
 struct CircleParam
@@ -19,34 +19,34 @@ struct CircleParam
     CircleParam() : x(0), y(0), r(0), accum(0)
     {}
 
-    CircleParam(MI_F32 x, MI_F32 y, MI_F32 r, MI_F32 accum) : x(x), y(y), r(r), accum(accum)
+    CircleParam(DT_F32 x, DT_F32 y, DT_F32 r, DT_F32 accum) : x(x), y(y), r(r), accum(accum)
     {}
 
-    MI_F32 x;
-    MI_F32 y;
-    MI_F32 r;
-    MI_F32 accum;
+    DT_F32 x;
+    DT_F32 y;
+    DT_F32 r;
+    DT_F32 accum;
 };
 
-static Status HoughCirclesAccum(Context *ctx, const Mat &edges, const Mat &dx, const Mat &dy, Mat &accum, Mat &nz, MI_S32 min_radius,
-                                MI_S32 max_radius, MI_F32 idp, volatile MI_S32 *nz_size, ThreadBuffer &thread_buffer, std::mutex &mutex,
-                                MI_S32 start_blk, MI_S32 end_blk)
+static Status HoughCirclesAccum(Context *ctx, const Mat &edges, const Mat &dx, const Mat &dy, Mat &accum, Mat &nz, DT_S32 min_radius,
+                                DT_S32 max_radius, DT_F32 idp, volatile DT_S32 *nz_size, ThreadBuffer &thread_buffer, std::mutex &mutex,
+                                DT_S32 start_blk, DT_S32 end_blk)
 {
-    MI_S32 awidth  = accum.GetSizes().m_width;
-    MI_S32 aheight = accum.GetSizes().m_height;
+    DT_S32 awidth  = accum.GetSizes().m_width;
+    DT_S32 aheight = accum.GetSizes().m_height;
 
-    MI_S32 start_row = start_blk << 4;
-    MI_S32 end_row   = Min(end_blk << 4, edges.GetSizes().m_height);
+    DT_S32 start_row = start_blk << 4;
+    DT_S32 end_row   = Min(end_blk << 4, edges.GetSizes().m_height);
 
-    MI_S32 nz_size_tmp    = 0;
-    MI_S32 iwidth         = edges.GetSizes().m_width;
-    MI_S32 process_height = end_row - start_row;
+    DT_S32 nz_size_tmp    = 0;
+    DT_S32 iwidth         = edges.GetSizes().m_width;
+    DT_S32 process_height = end_row - start_row;
 
-    MI_S32 acols = awidth  - 2;
-    MI_S32 arows = aheight - 2;
-    MI_S32 astep = awidth;
+    DT_S32 acols = awidth  - 2;
+    DT_S32 arows = aheight - 2;
+    DT_S32 astep = awidth;
 
-    MI_U8 *data_buffer = thread_buffer.GetThreadData<MI_U8>();
+    DT_U8 *data_buffer = thread_buffer.GetThreadData<DT_U8>();
 
     if (!data_buffer)
     {
@@ -54,38 +54,38 @@ static Status HoughCirclesAccum(Context *ctx, const Mat &edges, const Mat &dx, c
         return Status::ERROR;
     }
 
-    memset(data_buffer, 0, aheight * awidth * sizeof(MI_S32) + iwidth * process_height * sizeof(MI_U8));
+    memset(data_buffer, 0, aheight * awidth * sizeof(DT_S32) + iwidth * process_height * sizeof(DT_U8));
 
-    MI_S32 *accum_data = reinterpret_cast<MI_S32*>(data_buffer + iwidth * process_height);
+    DT_S32 *accum_data = reinterpret_cast<DT_S32*>(data_buffer + iwidth * process_height);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U8 *edges_data = edges.Ptr<MI_U8>(y);
-        const MI_S16 *dx_data = dx.Ptr<MI_S16>(y);
-        const MI_S16 *dy_data = dy.Ptr<MI_S16>(y);
-        MI_U8 *nz_data = data_buffer + (y - start_row) * iwidth;
+        const DT_U8 *edges_data = edges.Ptr<DT_U8>(y);
+        const DT_S16 *dx_data = dx.Ptr<DT_S16>(y);
+        const DT_S16 *dy_data = dy.Ptr<DT_S16>(y);
+        DT_U8 *nz_data = data_buffer + (y - start_row) * iwidth;
 
-        for (MI_S32 x = 0; x < iwidth; x++)
+        for (DT_S32 x = 0; x < iwidth; x++)
         {
             if (!edges_data[x])
             {
                 continue;
             }
 
-            MI_F32 vx = dx_data[x];
-            MI_F32 vy = dy_data[x];
+            DT_F32 vx = dx_data[x];
+            DT_F32 vy = dy_data[x];
             if (0 == vx && 0 == vy)
             {
                 continue;
             }
 
-            MI_F64 mag = Sqrt(vx * vx + vy * vy);
+            DT_F64 mag = Sqrt(vx * vx + vy * vy);
             if (mag < 1.0f)
             {
                 continue;
             }
 
-            MI_S32 sx, sy, x0, y0, x1, y1;
+            DT_S32 sx, sy, x0, y0, x1, y1;
             nz_data[x] = 1;
             ++nz_size_tmp;
 
@@ -95,16 +95,16 @@ static Status HoughCirclesAccum(Context *ctx, const Mat &edges, const Mat &dx, c
             x0 = Round(x * idp * 1024);
             y0 = Round(y * idp * 1024);
 
-            for (MI_S32 k = 0; k < 2; k++)
+            for (DT_S32 k = 0; k < 2; k++)
             {
                 x1 = x0 + min_radius * sx;
                 y1 = y0 + min_radius * sy;
 
-                for (MI_S32 r = min_radius; r <= max_radius; x1 += sx, y1 += sy, r++)
+                for (DT_S32 r = min_radius; r <= max_radius; x1 += sx, y1 += sy, r++)
                 {
-                    MI_S32 x2 = x1 >> 10, y2 = y1 >> 10;
-                    if (static_cast<MI_U32>(x2) >= static_cast<MI_U32>(acols) ||
-                        static_cast<MI_U32>(y2) >= static_cast<MI_U32>(arows))
+                    DT_S32 x2 = x1 >> 10, y2 = y1 >> 10;
+                    if (static_cast<DT_U32>(x2) >= static_cast<DT_U32>(acols) ||
+                        static_cast<DT_U32>(y2) >= static_cast<DT_U32>(arows))
                     {
                         break;
                     }
@@ -120,14 +120,14 @@ static Status HoughCirclesAccum(Context *ctx, const Mat &edges, const Mat &dx, c
 
     std::lock_guard<std::mutex> guard(mutex);
     *nz_size += nz_size_tmp;
-    std::memcpy(nz.Ptr<MI_U8>(start_row), data_buffer, process_height * iwidth);
+    std::memcpy(nz.Ptr<DT_U8>(start_row), data_buffer, process_height * iwidth);
 
-    for (MI_S32 y = 0; y < aheight; y++)
+    for (DT_S32 y = 0; y < aheight; y++)
     {
-        MI_S32 *accum_data_tmp = accum_data + y * awidth;
-        MI_S32 *accum_data_rst = accum.Ptr<MI_S32>(y);
+        DT_S32 *accum_data_tmp = accum_data + y * awidth;
+        DT_S32 *accum_data_rst = accum.Ptr<DT_S32>(y);
 
-        for (MI_S32 x = 0; x < awidth; x++)
+        for (DT_S32 x = 0; x < awidth; x++)
         {
             accum_data_rst[x] += accum_data_tmp[x];
         }
@@ -136,23 +136,23 @@ static Status HoughCirclesAccum(Context *ctx, const Mat &edges, const Mat &dx, c
     return Status::OK;
 }
 
-static Status HoughCirclesFindCenters(Context *ctx, const Mat &accum, HoughAccumParam *centers, MI_S32 acc_thresh, MI_S32 &size)
+static Status HoughCirclesFindCenters(Context *ctx, const Mat &accum, HoughAccumParam *centers, DT_S32 acc_thresh, DT_S32 &size)
 {
-    if (MI_NULL == centers)
+    if (DT_NULL == centers)
     {
         AURA_ADD_ERROR_STRING(ctx, "null ptr");
         return Status::ERROR;
     }
 
     size = 0;
-    MI_S32 iwidth = accum.GetSizes().m_width;
-    MI_S32 iheight = accum.GetSizes().m_height;
-    const MI_S32 *accum_data = accum.Ptr<MI_S32>(0);
+    DT_S32 iwidth = accum.GetSizes().m_width;
+    DT_S32 iheight = accum.GetSizes().m_height;
+    const DT_S32 *accum_data = accum.Ptr<DT_S32>(0);
 
-    for (MI_S32 y = 1; y < iheight - 1; y++)
+    for (DT_S32 y = 1; y < iheight - 1; y++)
     {
-        MI_S32 x = 1;
-        MI_S32 base = y * iwidth + x;
+        DT_S32 x = 1;
+        DT_S32 base = y * iwidth + x;
         for (; x < iwidth - 1; x++, base++)
         {
             if (accum_data[base] > acc_thresh &&
@@ -169,53 +169,53 @@ static Status HoughCirclesFindCenters(Context *ctx, const Mat &accum, HoughAccum
     return Status::OK;
 }
 
-static MI_BOOL HoughAccumParamCmpGt(HoughAccumParam &a, HoughAccumParam &b)
+static DT_BOOL HoughAccumParamCmpGt(HoughAccumParam &a, HoughAccumParam &b)
 {
     if (a.value > b.value || (a.value == b.value && a.index < b.index))
     {
-        return MI_TRUE;
+        return DT_TRUE;
     }
     else
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
 }
 
-static MI_BOOL CheckDistance(std::vector<CircleParam> &lst, MI_S32 end_idx, CircleParam &circle, MI_F32 min_dist2)
+static DT_BOOL CheckDistance(std::vector<CircleParam> &lst, DT_S32 end_idx, CircleParam &circle, DT_F32 min_dist2)
 {
-    for (MI_S32 i = 0; i < end_idx; ++i)
+    for (DT_S32 i = 0; i < end_idx; ++i)
     {
         CircleParam pt = lst[i];
-        MI_F32 dist_x = circle.x - pt.x;
-        MI_F32 dist_y = circle.y - pt.y;
+        DT_F32 dist_x = circle.x - pt.x;
+        DT_F32 dist_y = circle.y - pt.y;
         if (dist_x * dist_x + dist_y * dist_y < min_dist2)
         {
-            return MI_FALSE;
+            return DT_FALSE;
         }
     }
 
-    return MI_TRUE;
+    return DT_TRUE;
 }
 
-static Status GetCircleCenters(Context *ctx, HoughAccumParam *centers, MI_S32 center_count, std::vector<CircleParam> &lst,
-                               MI_S32 w, MI_F32 min_dist, MI_F32 dp)
+static Status GetCircleCenters(Context *ctx, HoughAccumParam *centers, DT_S32 center_count, std::vector<CircleParam> &lst,
+                               DT_S32 w, DT_F32 min_dist, DT_F32 dp)
 {
-    if (MI_NULL == centers)
+    if (DT_NULL == centers)
     {
         AURA_ADD_ERROR_STRING(ctx, "null ptr");
         return Status::ERROR;
     }
 
-    MI_F32 min_dist2 = min_dist * min_dist;
+    DT_F32 min_dist2 = min_dist * min_dist;
 
-    for (MI_S32 i = 0; i < center_count; i++)
+    for (DT_S32 i = 0; i < center_count; i++)
     {
-        MI_S32 center = centers[i].index;
-        MI_S32 y = center / w;
-        MI_S32 x = center - y * w;
-        CircleParam circle((x + 0.5f) * dp, (y + 0.5f) * dp, 0, static_cast<MI_F32>(center));
+        DT_S32 center = centers[i].index;
+        DT_S32 y = center / w;
+        DT_S32 x = center - y * w;
+        CircleParam circle((x + 0.5f) * dp, (y + 0.5f) * dp, 0, static_cast<DT_F32>(center));
 
-        MI_BOOL good_point = CheckDistance(lst, lst.size(), circle, min_dist2);
+        DT_BOOL good_point = CheckDistance(lst, lst.size(), circle, min_dist2);
         if (good_point)
         {
             lst.emplace_back(circle);
@@ -225,27 +225,27 @@ static Status GetCircleCenters(Context *ctx, HoughAccumParam *centers, MI_S32 ce
     return Status::OK;
 }
 
-static MI_S32 FilterCirclesMat(Point2f &cur_center, MI_F32 *data, const Mat &nz, MI_S32 max_radius, MI_F32 min_radius2, MI_F32 max_radius2)
+static DT_S32 FilterCirclesMat(Point2f &cur_center, DT_F32 *data, const Mat &nz, DT_S32 max_radius, DT_F32 min_radius2, DT_F32 max_radius2)
 {
-    MI_S32 nz_count = 0;
+    DT_S32 nz_count = 0;
 
-    const MI_S32 r_outer = max_radius + 1;
-    MI_S32 x_start = Max(static_cast<MI_S32>(cur_center.m_x - r_outer), static_cast<MI_S32>(0));
-    MI_S32 x_end   = Min(static_cast<MI_S32>(cur_center.m_x + r_outer), nz.GetSizes().m_width);
-    MI_S32 y_start = Max(static_cast<MI_S32>(cur_center.m_y - r_outer), static_cast<MI_S32>(0));
-    MI_S32 y_end   = Min(static_cast<MI_S32>(cur_center.m_y + r_outer), nz.GetSizes().m_height);
+    const DT_S32 r_outer = max_radius + 1;
+    DT_S32 x_start = Max(static_cast<DT_S32>(cur_center.m_x - r_outer), static_cast<DT_S32>(0));
+    DT_S32 x_end   = Min(static_cast<DT_S32>(cur_center.m_x + r_outer), nz.GetSizes().m_width);
+    DT_S32 y_start = Max(static_cast<DT_S32>(cur_center.m_y - r_outer), static_cast<DT_S32>(0));
+    DT_S32 y_end   = Min(static_cast<DT_S32>(cur_center.m_y + r_outer), nz.GetSizes().m_height);
 
-    for (MI_S32 y = y_start; y < y_end; y++)
+    for (DT_S32 y = y_start; y < y_end; y++)
     {
-        const MI_U8 *nz_data = nz.Ptr<MI_U8>(y);
-        MI_F32 dy = cur_center.m_y - y;
-        MI_F32 dy2 = dy * dy;
-        for (MI_S32 x = x_start; x < x_end; x++)
+        const DT_U8 *nz_data = nz.Ptr<DT_U8>(y);
+        DT_F32 dy = cur_center.m_y - y;
+        DT_F32 dy2 = dy * dy;
+        for (DT_S32 x = x_start; x < x_end; x++)
         {
             if (nz_data[x])
             {
-                MI_F32 dx = cur_center.m_x - x;
-                MI_F32 r2 = dx * dx + dy2;
+                DT_F32 dx = cur_center.m_x - x;
+                DT_F32 r2 = dx * dx + dy2;
                 if (r2 >= min_radius2 && r2 <= max_radius2)
                 {
                     data[nz_count] = r2;
@@ -258,24 +258,24 @@ static MI_S32 FilterCirclesMat(Point2f &cur_center, MI_F32 *data, const Mat &nz,
     return nz_count;
 }
 
-static Status HoughCirclesEstimateRadius(Context *ctx, const Mat &nz, MI_S32 nz_size, HoughAccumParam *centers,
-                                         std::vector<CircleParam> &lst, MI_S32 width, MI_S32 acc_thresh, MI_S32 min_radius,
-                                         MI_S32 max_radius, MI_F32 dp, ThreadBuffer &thread_buffer, std::mutex &mutex,
-                                         MI_S32 start_count, MI_S32 end_count)
+static Status HoughCirclesEstimateRadius(Context *ctx, const Mat &nz, DT_S32 nz_size, HoughAccumParam *centers,
+                                         std::vector<CircleParam> &lst, DT_S32 width, DT_S32 acc_thresh, DT_S32 min_radius,
+                                         DT_S32 max_radius, DT_F32 dp, ThreadBuffer &thread_buffer, std::mutex &mutex,
+                                         DT_S32 start_count, DT_S32 end_count)
 {
-    if (MI_NULL == centers)
+    if (DT_NULL == centers)
     {
         AURA_ADD_ERROR_STRING(ctx, "null ptr");
         return Status::ERROR;
     }
 
-    MI_F32 min_radius2 = static_cast<MI_F32>(min_radius * min_radius);
-    MI_F32 max_radius2 = static_cast<MI_F32>(max_radius * max_radius);
+    DT_F32 min_radius2 = static_cast<DT_F32>(min_radius * min_radius);
+    DT_F32 max_radius2 = static_cast<DT_F32>(max_radius * max_radius);
 
-    const MI_S32 nbins_per_dr = 10;
-    MI_S32 nbins = Round((max_radius - min_radius) / dp * nbins_per_dr);
+    const DT_S32 nbins_per_dr = 10;
+    DT_S32 nbins = Round((max_radius - min_radius) / dp * nbins_per_dr);
 
-    MI_S32 *buffer    = thread_buffer.GetThreadData<MI_S32>();
+    DT_S32 *buffer    = thread_buffer.GetThreadData<DT_S32>();
 
     if (!buffer)
     {
@@ -283,50 +283,50 @@ static Status HoughCirclesEstimateRadius(Context *ctx, const Mat &nz, MI_S32 nz_
         return Status::ERROR;
     }
 
-    MI_S32 *bins = buffer;
-    MI_F32 *dist = reinterpret_cast<MI_F32*>(buffer + nbins);
-    MI_F32 *dist_sqrt = dist + nz_size;
+    DT_S32 *bins = buffer;
+    DT_F32 *dist = reinterpret_cast<DT_F32*>(buffer + nbins);
+    DT_F32 *dist_sqrt = dist + nz_size;
 
     std::vector<CircleParam> lst_tmp;
     lst_tmp.reserve(128);
 
-    for (MI_S32 i = start_count; i < end_count; i++)
+    for (DT_S32 i = start_count; i < end_count; i++)
     {
-        MI_S32 offset = centers[i].index;
-        MI_S32 y = offset / width;
-        MI_S32 x = offset % width;
+        DT_S32 offset = centers[i].index;
+        DT_S32 y = offset / width;
+        DT_S32 x = offset % width;
 
         Point2f cur_center = Point2f((x + 0.5f) * dp, (y + 0.5f) * dp);
-        MI_S32 nz_count = FilterCirclesMat(cur_center, dist, nz, max_radius, min_radius2, max_radius2);
+        DT_S32 nz_count = FilterCirclesMat(cur_center, dist, nz, max_radius, min_radius2, max_radius2);
 
-        MI_S32 max_count = 0;
-        MI_F32 r_best = 0;
+        DT_S32 max_count = 0;
+        DT_F32 r_best = 0;
         if (nz_count)
         {
-            for (MI_S32 j = 0; j < nz_count; ++j)
+            for (DT_S32 j = 0; j < nz_count; ++j)
             {
                 dist_sqrt[j] = Sqrt(dist[j]);
             }
 
-            memset(bins, 0, nbins * sizeof(MI_S32));
-            for (MI_S32 k = 0; k < nz_count; ++k)
+            memset(bins, 0, nbins * sizeof(DT_S32));
+            for (DT_S32 k = 0; k < nz_count; ++k)
             {
-                MI_S32 bin = Max(static_cast<MI_S32>(0), Min(nbins - 1, Round((dist_sqrt[k] - min_radius) / dp * nbins_per_dr)));
+                DT_S32 bin = Max(static_cast<DT_S32>(0), Min(nbins - 1, Round((dist_sqrt[k] - min_radius) / dp * nbins_per_dr)));
                 bins[bin]++;
             }
 
-            for (MI_S32 j = nbins - 1; j > 0; j--)
+            for (DT_S32 j = nbins - 1; j > 0; j--)
             {
                 if (bins[j])
                 {
-                    MI_S32 upbin = j;
-                    MI_S32 cur_count = 0;
+                    DT_S32 upbin = j;
+                    DT_S32 cur_count = 0;
                     for (; j > upbin - nbins_per_dr && j >= 0; j--)
                     {
                         cur_count += bins[j];
                     }
 
-                    MI_F32 r_cur = (upbin + j) / 2.f / nbins_per_dr * dp + min_radius;
+                    DT_F32 r_cur = (upbin + j) / 2.f / nbins_per_dr * dp + min_radius;
                     if ((cur_count * r_best >= max_count * r_cur) || (r_best < FLT_EPSILON && cur_count >= max_count))
                     {
                         r_best = r_cur;
@@ -338,7 +338,7 @@ static Status HoughCirclesEstimateRadius(Context *ctx, const Mat &nz, MI_S32 nz_
 
         if (max_count > acc_thresh)
         {
-            lst_tmp.emplace_back(cur_center.m_x, cur_center.m_y, r_best, static_cast<MI_F32>(max_count));
+            lst_tmp.emplace_back(cur_center.m_x, cur_center.m_y, r_best, static_cast<DT_F32>(max_count));
         }
     }
 
@@ -348,58 +348,58 @@ static Status HoughCirclesEstimateRadius(Context *ctx, const Mat &nz, MI_S32 nz_
     return Status::OK;
 }
 
-static MI_BOOL CmpAccum(const CircleParam &a, const CircleParam &b)
+static DT_BOOL CmpAccum(const CircleParam &a, const CircleParam &b)
 {
     // Compare everything so the order is completely deterministic
     // Larger accum first
     if (a.accum > b.accum)
     {
-        return MI_TRUE;
+        return DT_TRUE;
     }
     else if (a.accum < b.accum)
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
     // Larger radius first
     else if (a.r > b.r)
     {
-        return MI_TRUE;
+        return DT_TRUE;
     }
     else if (a.r < b.r)
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
     // Smaller X
     else if (a.x < b.x)
     {
-        return MI_TRUE;
+        return DT_TRUE;
     }
     else if (a.x > b.x)
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
     // Smaller Y
     else if (a.y < b.y)
     {
-        return MI_TRUE;
+        return DT_TRUE;
     }
     else if (a.y > b.y)
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
     // Identical - neither object is less than the other
     else
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
 }
 
-static AURA_VOID RemoveOverlaps(std::vector<CircleParam> &lst, MI_F32 min_dist)
+static DT_VOID RemoveOverlaps(std::vector<CircleParam> &lst, DT_F32 min_dist)
 {
-    MI_F32 min_dist2 = min_dist * min_dist;
-    MI_S32 end_idx = 1;
+    DT_F32 min_dist2 = min_dist * min_dist;
+    DT_S32 end_idx = 1;
 
-    for (MI_U64 i = 1; i < lst.size(); i++)
+    for (DT_U64 i = 1; i < lst.size(); i++)
     {
         CircleParam circle = lst[i];
         if (CheckDistance(lst, end_idx, circle, min_dist2))
@@ -412,21 +412,21 @@ static AURA_VOID RemoveOverlaps(std::vector<CircleParam> &lst, MI_F32 min_dist)
 }
 
 static Status HoughCirclesGradient(Context *ctx, const Mat &dx, const Mat &dy, const Mat &edges, Mat &nz, Mat &accum,
-                                   std::vector<Scalar> &circles, MI_F32 dp, MI_F32 min_dist, MI_S32 min_radius, MI_S32 max_radius,
-                                   MI_S32 acc_thresh, MI_S32 centers_only, const OpTarget &target)
+                                   std::vector<Scalar> &circles, DT_F32 dp, DT_F32 min_dist, DT_S32 min_radius, DT_S32 max_radius,
+                                   DT_S32 acc_thresh, DT_S32 centers_only, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
-    MI_F32 idp = 1.f / dp;
-    MI_S32 nz_size = 0;
-    MI_S32 centers_count = 0;
+    DT_F32 idp = 1.f / dp;
+    DT_S32 nz_size = 0;
+    DT_S32 centers_count = 0;
 
-    MI_S32 sizes_h = accum.GetSizes().m_height;
-    MI_S32 sizes_w = accum.GetSizes().m_width;
-    MI_S32 iwidth  = edges.GetSizes().m_width;
-    MI_S32 iheight = edges.GetSizes().m_height;
+    DT_S32 sizes_h = accum.GetSizes().m_height;
+    DT_S32 sizes_w = accum.GetSizes().m_width;
+    DT_S32 iwidth  = edges.GetSizes().m_width;
+    DT_S32 iheight = edges.GetSizes().m_height;
     HoughAccumParam *centers = static_cast<HoughAccumParam*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, (sizes_h - 2) * (sizes_w - 2) * sizeof(HoughAccumParam), 0));
-    if (MI_NULL == centers)
+    if (DT_NULL == centers)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
         return ret;
@@ -440,21 +440,21 @@ static Status HoughCirclesGradient(Context *ctx, const Mat &dx, const Mat &dy, c
     if (target.m_data.none.enable_mt)
     {
         WorkerPool *wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "null workerpool ptr");
             return ret;
         }
 
-        ThreadBuffer thread_buffer(ctx, sizes_h * sizes_w * sizeof(MI_S32) + iwidth * 16 * sizeof(MI_U8));
+        ThreadBuffer thread_buffer(ctx, sizes_h * sizes_w * sizeof(DT_S32) + iwidth * 16 * sizeof(DT_U8));
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), AURA_ALIGN(iheight, 16) / 16, HoughCirclesAccum, ctx,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), AURA_ALIGN(iheight, 16) / 16, HoughCirclesAccum, ctx,
                               std::cref(edges), std::cref(dx), std::cref(dy), std::ref(accum), std::ref(nz),
                               min_radius, max_radius, idp, &nz_size, std::ref(thread_buffer), std::ref(mutex));
     }
     else
     {
-        ThreadBuffer thread_buffer(ctx, sizes_h * sizes_w * sizeof(MI_S32) + iwidth * iheight * sizeof(MI_U8));
+        ThreadBuffer thread_buffer(ctx, sizes_h * sizes_w * sizeof(DT_S32) + iwidth * iheight * sizeof(DT_U8));
 
         ret = HoughCirclesAccum(ctx, edges, dx, dy, accum, nz, min_radius, max_radius, idp, &nz_size, thread_buffer, mutex,
                                 0, AURA_ALIGN(iheight, 16) / 16);
@@ -500,28 +500,28 @@ static Status HoughCirclesGradient(Context *ctx, const Mat &dx, const Mat &dy, c
     }
     else
     {
-        const MI_S32 nbins_per_dr = 10;
-        MI_S32 nbins = Round((max_radius - min_radius) * idp * nbins_per_dr);
+        const DT_S32 nbins_per_dr = 10;
+        DT_S32 nbins = Round((max_radius - min_radius) * idp * nbins_per_dr);
         if (target.m_data.none.enable_mt)
         {
             WorkerPool *wp = ctx->GetWorkerPool();
-            if (MI_NULL == wp)
+            if (DT_NULL == wp)
             {
                 AURA_ADD_ERROR_STRING(ctx, "null workerpool ptr");
                 return ret;
             }
 
-            ThreadBuffer thread_buffer_radius(ctx, nbins * sizeof(MI_S32) + nz_size * 2 * sizeof(MI_F32));
+            ThreadBuffer thread_buffer_radius(ctx, nbins * sizeof(DT_S32) + nz_size * 2 * sizeof(DT_F32));
 
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), centers_count, HoughCirclesEstimateRadius, ctx, std::cref(nz), nz_size, centers, std::ref(lst),
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), centers_count, HoughCirclesEstimateRadius, ctx, std::cref(nz), nz_size, centers, std::ref(lst),
                                   sizes_w, acc_thresh, min_radius, max_radius, dp, std::ref(thread_buffer_radius), std::ref(mutex));
         }
         else
         {
-            ThreadBuffer thread_buffer_radius(ctx, nbins * sizeof(MI_S32) + nz_size * 2 * sizeof(MI_F32));
+            ThreadBuffer thread_buffer_radius(ctx, nbins * sizeof(DT_S32) + nz_size * 2 * sizeof(DT_F32));
 
             ret = HoughCirclesEstimateRadius(ctx, nz, nz_size, centers, lst, sizes_w, acc_thresh, min_radius, max_radius, dp, thread_buffer_radius, mutex,
-                                             static_cast<MI_S32>(0), centers_count);
+                                             static_cast<DT_S32>(0), centers_count);
         }
         if (ret != Status::OK)
         {
@@ -534,7 +534,7 @@ static Status HoughCirclesGradient(Context *ctx, const Mat &dx, const Mat &dy, c
         RemoveOverlaps(lst, min_dist);
     }
 
-    for (MI_U64 idx = 0; idx < lst.size(); idx++)
+    for (DT_U64 idx = 0; idx < lst.size(); idx++)
     {
         circles.emplace_back(lst[idx].x, lst[idx].y, lst[idx].r, lst[idx].accum);
     }
@@ -549,8 +549,8 @@ EXIT:
 HoughCirclesNone::HoughCirclesNone(Context *ctx, const OpTarget &target) : HoughCirclesImpl(ctx, target)
 {}
 
-Status HoughCirclesNone::SetArgs(const Array *src, std::vector<Scalar> &circles, HoughCirclesMethod method, MI_F64 dp,
-                                 MI_F64 min_dist, MI_F64 canny_thresh, MI_F64 acc_thresh, MI_S32 min_radius, MI_S32 max_radius)
+Status HoughCirclesNone::SetArgs(const Array *src, std::vector<Scalar> &circles, HoughCirclesMethod method, DT_F64 dp,
+                                 DT_F64 min_dist, DT_F64 canny_thresh, DT_F64 acc_thresh, DT_S32 min_radius, DT_S32 max_radius)
 {
     if (HoughCirclesImpl::SetArgs(src, circles, method, dp, min_dist, canny_thresh, acc_thresh, min_radius, max_radius) != Status::OK)
     {
@@ -571,7 +571,7 @@ Status HoughCirclesNone::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
 
-    if ((MI_NULL == src))
+    if ((DT_NULL == src))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;
@@ -580,10 +580,10 @@ Status HoughCirclesNone::Run()
     Status ret = Status::ERROR;
     m_circles->clear();
 
-    MI_F32 dp_f             = Max(static_cast<MI_F32>(m_dp), 1.f);
-    MI_F32 idp              = 1.f / dp_f;
-    MI_S32 canny_thresh_s32 = Round(m_canny_thresh);
-    MI_S32 kernel_size      = 3;
+    DT_F32 dp_f             = Max(static_cast<DT_F32>(m_dp), 1.f);
+    DT_F32 idp              = 1.f / dp_f;
+    DT_S32 canny_thresh_s32 = Round(m_canny_thresh);
+    DT_S32 kernel_size      = 3;
 
     Sizes3 sz = src->GetSizes();
     Sizes3 sz_acc;
@@ -616,19 +616,19 @@ Status HoughCirclesNone::Run()
         return Status::ERROR;
     }
 
-    ret = ICanny(m_ctx, dx, dy, edges, Max((MI_S32)1, canny_thresh_s32 / 2), canny_thresh_s32, 0, m_target);
+    ret = ICanny(m_ctx, dx, dy, edges, Max((DT_S32)1, canny_thresh_s32 / 2), canny_thresh_s32, 0, m_target);
     if (ret != Status::OK)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "Canny failed");
         return Status::ERROR;
     }
 
-    MI_S32 width  = src->GetSizes().m_width;
-    MI_S32 height = src->GetSizes().m_height;
+    DT_S32 width  = src->GetSizes().m_width;
+    DT_S32 height = src->GetSizes().m_height;
 
-    MI_S32 acc_thresh_s32 = Round(m_acc_thresh);
-    m_min_radius = Max(m_min_radius, static_cast<MI_S32>(0));
-    MI_S32 centers_only = (m_max_radius < 0);
+    DT_S32 acc_thresh_s32 = Round(m_acc_thresh);
+    m_min_radius = Max(m_min_radius, static_cast<DT_S32>(0));
+    DT_S32 centers_only = (m_max_radius < 0);
 
     if (m_max_radius <= 0)
     {
@@ -639,8 +639,8 @@ Status HoughCirclesNone::Run()
         m_max_radius = m_min_radius + 2;
     }
 
-    MI_U8 *nz_data = nz.Ptr<MI_U8>(0);
-    MI_S32 *accum_data = accum.Ptr<MI_S32>(0);
+    DT_U8 *nz_data = nz.Ptr<DT_U8>(0);
+    DT_S32 *accum_data = accum.Ptr<DT_S32>(0);
     memset(nz_data, 0, nz.GetTotalBytes());
     memset(accum_data, 0, accum.GetTotalBytes());
 

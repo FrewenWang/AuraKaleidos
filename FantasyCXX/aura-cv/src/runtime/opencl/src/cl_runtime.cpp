@@ -377,10 +377,10 @@ AURA_EXPORTS std::string GetCLProfilingInfo(const std::string &kernel_name, cl::
 {
     std::string str;
 
-    MI_F64 t0 = cl_event.getProfilingInfo<CL_PROFILING_COMMAND_QUEUED>();
-    MI_F64 t1 = cl_event.getProfilingInfo<CL_PROFILING_COMMAND_SUBMIT>();
-    MI_F64 t2 = cl_event.getProfilingInfo<CL_PROFILING_COMMAND_START>();
-    MI_F64 t3 = cl_event.getProfilingInfo<CL_PROFILING_COMMAND_END>();
+    DT_F64 t0 = cl_event.getProfilingInfo<CL_PROFILING_COMMAND_QUEUED>();
+    DT_F64 t1 = cl_event.getProfilingInfo<CL_PROFILING_COMMAND_SUBMIT>();
+    DT_F64 t2 = cl_event.getProfilingInfo<CL_PROFILING_COMMAND_START>();
+    DT_F64 t3 = cl_event.getProfilingInfo<CL_PROFILING_COMMAND_END>();
 
     str = kernel_name + " profiling\n    queued->submit : " + std::to_string((t1 - t0) * 1e-6) +
           "ms\n    submit->start : " + std::to_string((t2 - t1) * 1e-6) +
@@ -399,7 +399,7 @@ CLRuntime::~CLRuntime()
 
 AllocatorSVM::AllocatorSVM(CLRuntime *cl_rt)
                            : Allocator(AURA_MEM_SVM, "svm"),
-                             m_valid(MI_FALSE), m_fine_grain(MI_FALSE)
+                             m_valid(DT_FALSE), m_fine_grain(DT_FALSE)
 {
     if (cl_rt && cl_rt->IsValid())
     {
@@ -408,13 +408,13 @@ AllocatorSVM::AllocatorSVM(CLRuntime *cl_rt)
 
         if (cl_cap & CL_DEVICE_SVM_FINE_GRAIN_BUFFER)
         {
-            m_valid      = MI_TRUE;
-            m_fine_grain = MI_TRUE;
+            m_valid      = DT_TRUE;
+            m_fine_grain = DT_TRUE;
         }
         else if (cl_cap & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER)
         {
-            m_valid      = MI_TRUE;
-            m_fine_grain = MI_FALSE;
+            m_valid      = DT_TRUE;
+            m_fine_grain = DT_FALSE;
         }
 
         if (m_valid)
@@ -425,18 +425,18 @@ AllocatorSVM::AllocatorSVM(CLRuntime *cl_rt)
     }
 }
 
-AllocatorSVM::~AllocatorSVM(AURA_VOID)
+AllocatorSVM::~AllocatorSVM(DT_VOID)
 {
-    m_valid      = MI_FALSE;
-    m_fine_grain = MI_FALSE;
+    m_valid      = DT_FALSE;
+    m_fine_grain = DT_FALSE;
 }
 
-Buffer AllocatorSVM::Allocate(MI_S64 size, MI_S32 align)
+Buffer AllocatorSVM::Allocate(DT_S64 size, DT_S32 align)
 {
     if (size > 0 && IsValid())
     {
         cl_svm_mem_flags cl_flags = (m_fine_grain) ? (CL_MEM_SVM_FINE_GRAIN_BUFFER) : (0);
-        AURA_VOID *svm_ptr = ::clSVMAlloc((*m_cl_context)(), cl_flags | CL_MEM_READ_WRITE, size, align);
+        DT_VOID *svm_ptr = ::clSVMAlloc((*m_cl_context)(), cl_flags | CL_MEM_READ_WRITE, size, align);
 
         if (svm_ptr)
         {
@@ -447,9 +447,9 @@ Buffer AllocatorSVM::Allocate(MI_S64 size, MI_S32 align)
     return Buffer();
 }
 
-AURA_VOID AllocatorSVM::Free(Buffer &buffer)
+DT_VOID AllocatorSVM::Free(Buffer &buffer)
 {
-    if (AURA_MEM_SVM == buffer.m_type && buffer.m_origin != MI_NULL && IsValid())
+    if (AURA_MEM_SVM == buffer.m_type && buffer.m_origin != DT_NULL && IsValid())
     {
         ::clSVMFree((*m_cl_context)(), buffer.m_origin);
         buffer.Clear();
@@ -458,7 +458,7 @@ AURA_VOID AllocatorSVM::Free(Buffer &buffer)
 
 Status AllocatorSVM::Map(const Buffer &buffer)
 {
-    if (AURA_MEM_SVM == buffer.m_type && buffer.m_origin != MI_NULL && IsValid())
+    if (AURA_MEM_SVM == buffer.m_type && buffer.m_origin != DT_NULL && IsValid())
     {
         if (m_fine_grain)
         {
@@ -478,7 +478,7 @@ Status AllocatorSVM::Map(const Buffer &buffer)
 
 Status AllocatorSVM::Unmap(const Buffer &buffer)
 {
-    if (AURA_MEM_SVM == buffer.m_type && buffer.m_origin != MI_NULL && IsValid())
+    if (AURA_MEM_SVM == buffer.m_type && buffer.m_origin != DT_NULL && IsValid())
     {
         if (m_fine_grain)
         {
@@ -495,7 +495,7 @@ Status AllocatorSVM::Unmap(const Buffer &buffer)
     return Status::ERROR;
 }
 
-MI_BOOL AllocatorSVM::IsValid() const
+DT_BOOL AllocatorSVM::IsValid() const
 {
     return m_valid;
 }
@@ -506,11 +506,11 @@ MobileCLRuntime::MobileCLRuntime(Context *m_ctx,
                                  std::shared_ptr<cl::Platform> &cl_platform,
                                  std::shared_ptr<cl::Device> &cl_device,
                                  const CLEngineConfig &cl_conf)
-                                 : m_valid(MI_FALSE), m_ctx(m_ctx),
+                                 : m_valid(DT_FALSE), m_ctx(m_ctx),
                                    m_cl_conf(std::make_shared<CLEngineConfig>(cl_conf)),
                                    m_cl_platform(cl_platform), m_cl_device(cl_device), m_cl_membk()
 {
-    m_is_fine_grain = MI_FALSE;
+    m_is_fine_grain = DT_FALSE;
 
     //get cl version
     std::string driver_version = m_cl_device->getInfo<CL_DRIVER_VERSION>();
@@ -526,7 +526,7 @@ MobileCLRuntime::MobileCLRuntime(Context *m_ctx,
     if (m_cl_version >= 2.0f)
     {
         cl_device_svm_capabilities cl_cap = m_cl_device->getInfo<CL_DEVICE_SVM_CAPABILITIES>();
-        m_is_fine_grain = (cl_cap & CL_DEVICE_SVM_FINE_GRAIN_BUFFER) ? MI_TRUE : MI_FALSE;
+        m_is_fine_grain = (cl_cap & CL_DEVICE_SVM_FINE_GRAIN_BUFFER) ? DT_TRUE : DT_FALSE;
     }
 #endif
 
@@ -593,12 +593,12 @@ MobileCLRuntime::~MobileCLRuntime()
         AURA_LOGD(m_ctx, AURA_TAG, "****************** GPU Mem Leak *******************\n");
         AURA_LOGD(m_ctx, AURA_TAG, "****************** GPU Blk info *******************\n");
 
-        MI_S32 counter = 0;
-        MI_S32 leak_mem_size = 0;
+        DT_S32 counter = 0;
+        DT_S32 leak_mem_size = 0;
 
         for (auto iter = m_cl_membk.begin(); iter != m_cl_membk.end(); ++iter)
         {
-            AURA_LOGD(m_ctx, AURA_TAG, "* blk [%zu] - %p\n", counter, reinterpret_cast<AURA_VOID*>(iter->first));
+            AURA_LOGD(m_ctx, AURA_TAG, "* blk [%zu] - %p\n", counter, reinterpret_cast<DT_VOID*>(iter->first));
             AURA_LOGD(m_ctx, AURA_TAG, "*   size: %zu byte\n", iter->second);
             AURA_LOGD(m_ctx, AURA_TAG, "*\n");
 
@@ -624,7 +624,7 @@ Status MobileCLRuntime::Initialize()
         ret = Status::OK;
         cl_int cl_err = CL_SUCCESS;
         //create cl context
-        m_cl_context = std::make_shared<cl::Context>(*m_cl_device, MI_NULL, MI_NULL, MI_NULL, &cl_err);
+        m_cl_context = std::make_shared<cl::Context>(*m_cl_device, DT_NULL, DT_NULL, DT_NULL, &cl_err);
 
         if (CL_SUCCESS != cl_err)
         {
@@ -645,7 +645,7 @@ Status MobileCLRuntime::Initialize()
         ret = CreateCLProgram(m_cl_conf->m_external_version);
     }
 
-    m_valid = MI_TRUE;
+    m_valid = DT_TRUE;
 
     //svm register
     RegisterSvmAllocator();
@@ -661,12 +661,12 @@ std::shared_ptr<cl::Program> MobileCLRuntime::GetCLProgram(const std::string &pr
     {
         return m_cl_program_container->GetCLProgram(program_name, source, build_options);
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
-AURA_VOID MobileCLRuntime::DeleteCLMem(AURA_VOID **ptr)
+DT_VOID MobileCLRuntime::DeleteCLMem(DT_VOID **ptr)
 {
-    if ((MI_NULL == ptr) || (MI_NULL == *ptr))
+    if ((DT_NULL == ptr) || (DT_NULL == *ptr))
     {
         return;
     }
@@ -675,12 +675,12 @@ AURA_VOID MobileCLRuntime::DeleteCLMem(AURA_VOID **ptr)
 
     if (!m_cl_membk.empty())
     {
-        MI_UPTR_T addr = reinterpret_cast<MI_UPTR_T>(*ptr);
+        DT_UPTR_T addr = reinterpret_cast<DT_UPTR_T>(*ptr);
 
         if (m_cl_membk.count(addr))
         {
             delete reinterpret_cast<cl::Memory*>(*ptr);
-            *ptr = MI_NULL;
+            *ptr = DT_NULL;
             m_cl_membk.erase(addr);
         }
     }
@@ -724,23 +724,23 @@ std::shared_ptr<cl::CommandQueue> MobileCLRuntime::GetCommandQueue()
     return m_cl_command_queue;
 }
 
-MI_BOOL MobileCLRuntime::IsValid() const
+DT_BOOL MobileCLRuntime::IsValid() const
 {
     return m_valid;
 }
 
-MI_BOOL MobileCLRuntime::IsNonUniformWorkgroupsSupported() const
+DT_BOOL MobileCLRuntime::IsNonUniformWorkgroupsSupported() const
 {
     return m_is_support_non_uniform_workgroups;
 }
 
-MI_S32 MobileCLRuntime::GetCLAddrAlignSize() const
+DT_S32 MobileCLRuntime::GetCLAddrAlignSize() const
 {
-    MI_S32 addr_align_size = 1024;
+    DT_S32 addr_align_size = 1024;
 
     if (m_ctx && m_cl_device)
     {
-        MI_S32 ret = m_cl_device->getInfo(CL_DEVICE_MEM_BASE_ADDR_ALIGN, &addr_align_size);
+        DT_S32 ret = m_cl_device->getInfo(CL_DEVICE_MEM_BASE_ADDR_ALIGN, &addr_align_size);
         if (CL_SUCCESS != ret)
         {
             std::string info = "get CL_DEVICE_MEM_BASE_ADDR_ALIGN info failed Error: " + GetCLErrorInfo(ret) + "\n";
@@ -751,17 +751,17 @@ MI_S32 MobileCLRuntime::GetCLAddrAlignSize() const
     return addr_align_size;
 }
 
-MI_BOOL MobileCLRuntime::IsMemShareSupported() const
+DT_BOOL MobileCLRuntime::IsMemShareSupported() const
 {
-    return MI_FALSE;
+    return DT_FALSE;
 }
 
-MI_S32 MobileCLRuntime::GetCLLengthAlignSize() const
+DT_S32 MobileCLRuntime::GetCLLengthAlignSize() const
 {
     return m_iaura_pitch_align;
 }
 
-MI_S32 MobileCLRuntime::GetCLSliceAlignSize(const cl_iaura_format &cl_fmt, size_t width, size_t height) const
+DT_S32 MobileCLRuntime::GetCLSliceAlignSize(const cl_iaura_format &cl_fmt, size_t width, size_t height) const
 {
     AURA_UNUSED(cl_fmt);
     AURA_UNUSED(width);
@@ -770,17 +770,17 @@ MI_S32 MobileCLRuntime::GetCLSliceAlignSize(const cl_iaura_format &cl_fmt, size_
     return 1;
 }
 
-std::string MobileCLRuntime::GetCLMaxConstantSizeString(MI_S32 n)
+std::string MobileCLRuntime::GetCLMaxConstantSizeString(DT_S32 n)
 {
     AURA_UNUSED(n);
 
     return std::string();
 }
 
-cl::NDRange MobileCLRuntime::GetCLDefaultLocalSize(MI_U32 max_group_size, cl::NDRange &cl_global_size)
+cl::NDRange MobileCLRuntime::GetCLDefaultLocalSize(DT_U32 max_group_size, cl::NDRange &cl_global_size)
 {
-    MI_U32 item_sizes = 1;
-    for (MI_S32 idx = 0; idx < (MI_S32)(cl_global_size.dimensions()); idx++)
+    DT_U32 item_sizes = 1;
+    for (DT_S32 idx = 0; idx < (DT_S32)(cl_global_size.dimensions()); idx++)
     {
         item_sizes *= cl_global_size.get()[idx];
     }
@@ -858,11 +858,11 @@ cl::Buffer* MobileCLRuntime::CreateCLBuffer(cl_mem_flags cl_flags, size_t size)
     if (0 == size)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "size must greater 0");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     cl_int cl_err = CL_SUCCESS;
-    cl::Buffer *cl_buffer = new cl::Buffer(*m_cl_context, cl_flags, size, MI_NULL, &cl_err);
+    cl::Buffer *cl_buffer = new cl::Buffer(*m_cl_context, cl_flags, size, DT_NULL, &cl_err);
     if (cl_err != CL_SUCCESS)
     {
         std::string info = "create buffer failed, Error: " + GetCLErrorInfo(cl_err);
@@ -870,13 +870,13 @@ cl::Buffer* MobileCLRuntime::CreateCLBuffer(cl_mem_flags cl_flags, size_t size)
         if (cl_buffer)
         {
             delete cl_buffer;
-            cl_buffer = MI_NULL;
+            cl_buffer = DT_NULL;
         }
-        return MI_NULL;
+        return DT_NULL;
     }
 
     std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
-    m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_buffer), size);
+    m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_buffer), size);
 
     return cl_buffer;
 }
@@ -886,14 +886,14 @@ cl::Iaura2D* MobileCLRuntime::CreateCLIaura2D(cl_mem_flags cl_flags, const cl_ia
     if (width < 1 || height < 1)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "iaura2d iaura width height must greater 0");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     cl_int cl_err = CL_SUCCESS;
     cl::Iaura2D *cl_iaura2d = new cl::Iaura2D(*m_cl_context, cl_flags,
                                               cl::IauraFormat(cl_fmt.iaura_channel_order,
                                                               cl_fmt.iaura_channel_data_type),
-                                              width, height, 0, MI_NULL, &cl_err);
+                                              width, height, 0, DT_NULL, &cl_err);
     if (cl_err != CL_SUCCESS)
     {
         std::string info = "create iaura2d failed, Error: " + GetCLErrorInfo(cl_err);
@@ -901,15 +901,15 @@ cl::Iaura2D* MobileCLRuntime::CreateCLIaura2D(cl_mem_flags cl_flags, const cl_ia
         if (cl_iaura2d)
         {
             delete cl_iaura2d;
-            cl_iaura2d = MI_NULL;
+            cl_iaura2d = DT_NULL;
         }
 
-        return MI_NULL;
+        return DT_NULL;
     }
 
     std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
     size_t row_pitch = cl_iaura2d->getIauraInfo<CL_IAURA_ROW_PITCH>();
-    m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_iaura2d), row_pitch * height);
+    m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_iaura2d), row_pitch * height);
 
     return cl_iaura2d;
 }
@@ -919,14 +919,14 @@ cl::Iaura3D* MobileCLRuntime::CreateCLIaura3D(cl_mem_flags cl_flags, const cl_ia
     if (depth < 2 || width < 1 || height < 1)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "iaura3d iaura width height must greater 0 and depth must greater 1");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     cl_int cl_err = CL_SUCCESS;
     cl::Iaura3D *cl_iaura3d = new cl::Iaura3D(*m_cl_context, cl_flags,
                                               cl::IauraFormat(cl_fmt.iaura_channel_order,
                                                               cl_fmt.iaura_channel_data_type),
-                                              width, height, depth, 0, 0, MI_NULL, &cl_err);
+                                              width, height, depth, 0, 0, DT_NULL, &cl_err);
     if (cl_err != CL_SUCCESS)
     {
         std::string info = "create iaura3d failed, Error: " + GetCLErrorInfo(cl_err);
@@ -934,15 +934,15 @@ cl::Iaura3D* MobileCLRuntime::CreateCLIaura3D(cl_mem_flags cl_flags, const cl_ia
         if (cl_iaura3d)
         {
             delete cl_iaura3d;
-            cl_iaura3d = MI_NULL;
+            cl_iaura3d = DT_NULL;
         }
 
-        return MI_NULL;
+        return DT_NULL;
     }
 
     std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
     size_t slice_pitch = cl_iaura3d->getIauraInfo<CL_IAURA_SLICE_PITCH>();
-    m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_iaura3d), (depth * slice_pitch));
+    m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_iaura3d), (depth * slice_pitch));
 
     return cl_iaura3d;
 }
@@ -952,10 +952,10 @@ cl::Buffer* MobileCLRuntime::InitCLBufferWithSvm(const Buffer &buffer, cl_mem_fl
 {
     if ((!buffer.IsValid()) || (buffer.m_type != AURA_MEM_SVM))
     {
-        return MI_NULL;
+        return DT_NULL;
     }
 
-    cl::Buffer *cl_buffer = MI_NULL;
+    cl::Buffer *cl_buffer = DT_NULL;
     cl_int cl_err = CL_SUCCESS;
 
     cl_mem cl_mem_buffer = clCreateBuffer(m_cl_context->get(), cl_flags | CL_MEM_USE_HOST_PTR, buffer.m_capacity, buffer.m_origin, &cl_err);
@@ -968,8 +968,8 @@ cl::Buffer* MobileCLRuntime::InitCLBufferWithSvm(const Buffer &buffer, cl_mem_fl
         return cl_buffer;
     }
 
-    MI_S32 offset = buffer.GetOffset();
-    MI_S32 addr_align_size = GetCLAddrAlignSize();
+    DT_S32 offset = buffer.GetOffset();
+    DT_S32 addr_align_size = GetCLAddrAlignSize();
 
     if (0 == offset)
     {
@@ -1005,7 +1005,7 @@ cl::Buffer* MobileCLRuntime::InitCLBufferWithSvm(const Buffer &buffer, cl_mem_fl
     cl_sync_method = m_is_fine_grain ? CLMemSyncMethod::AUTO : CLMemSyncMethod::FLUSH;
 
     std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
-    m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_buffer), sizeof(cl::Buffer));
+    m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_buffer), sizeof(cl::Buffer));
 
     return cl_buffer;
 }
@@ -1015,7 +1015,7 @@ cl::Iaura2D* MobileCLRuntime::InitCLIaura2DWithSvm(const Buffer &buffer, cl_mem_
 {
     if ((!buffer.IsValid()) || (buffer.m_type != AURA_MEM_SVM) || (buffer.GetOffset() != 0) || (pitch % m_iaura_pitch_align != 0))
     {
-        return MI_NULL;
+        return DT_NULL;
     }
 
     cl_int cl_err = CL_SUCCESS;
@@ -1024,7 +1024,7 @@ cl::Iaura2D* MobileCLRuntime::InitCLIaura2DWithSvm(const Buffer &buffer, cl_mem_
     if (cl_err != CL_SUCCESS)
     {
         clReleaseMemObject(cl_buffer);
-        return MI_NULL;
+        return DT_NULL;
     }
 
     cl_iaura_format img_fmt;
@@ -1043,7 +1043,7 @@ cl::Iaura2D* MobileCLRuntime::InitCLIaura2DWithSvm(const Buffer &buffer, cl_mem_
     img_desc.iaura_height = height;
     img_desc.mem_object   = cl_buffer;
 
-    cl_mem iaura = clCreateIaura(m_cl_context->get(), cl_flags, &img_fmt, &img_desc, MI_NULL, &cl_err);
+    cl_mem iaura = clCreateIaura(m_cl_context->get(), cl_flags, &img_fmt, &img_desc, DT_NULL, &cl_err);
 
     cl::Iaura2D *cl_iaura2d = new cl::Iaura2D(iaura);
 
@@ -1054,14 +1054,14 @@ cl::Iaura2D* MobileCLRuntime::InitCLIaura2DWithSvm(const Buffer &buffer, cl_mem_
     if (CL_SUCCESS == cl_err)
     {
         std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
-        m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_iaura2d), sizeof(cl::Iaura2D));
+        m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_iaura2d), sizeof(cl::Iaura2D));
     }
 
     return cl_iaura2d;
 }
 #endif
 
-AURA_VOID MobileCLRuntime::RegisterSvmAllocator()
+DT_VOID MobileCLRuntime::RegisterSvmAllocator()
 {
 #if defined(CL_VERSION_2_0)
     //register svm memory
@@ -1077,13 +1077,13 @@ AURA_VOID MobileCLRuntime::RegisterSvmAllocator()
 #endif
 }
 
-static std::unordered_map<std::string, std::pair<const MI_CHAR*, std::vector<std::string>>>& GetProgramStringMap()
+static std::unordered_map<std::string, std::pair<const DT_CHAR*, std::vector<std::string>>>& GetProgramStringMap()
 {
-    static std::unordered_map<std::string, std::pair<const MI_CHAR*, std::vector<std::string>>> program_string_map;
+    static std::unordered_map<std::string, std::pair<const DT_CHAR*, std::vector<std::string>>> program_string_map;
     return program_string_map;
 }
 
-CLProgramString::CLProgramString(const std::string &name, const MI_CHAR *source, const std::vector<std::string> &incs)
+CLProgramString::CLProgramString(const std::string &name, const DT_CHAR *source, const std::vector<std::string> &incs)
 {
     auto &program_string_map = GetProgramStringMap();
     program_string_map[name] = {source, incs};

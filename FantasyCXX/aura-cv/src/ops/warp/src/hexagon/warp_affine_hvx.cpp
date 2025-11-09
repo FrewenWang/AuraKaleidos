@@ -16,23 +16,23 @@ struct PosInterpCoeffs
 
 struct InterpGatherParam
 {
-    MI_S32 x_limit;
-    MI_S32 y_limit;
-    MI_S32 xy_limit;
-    MI_S32 xy_mul;
+    DT_S32 x_limit;
+    DT_S32 y_limit;
+    DT_S32 xy_limit;
+    DT_S32 xy_mul;
 
     HVX_Vector  *gather_vec;
-    const MI_U8 *gather_base;
-    MI_S32       gather_limit;
+    const DT_U8 *gather_base;
+    DT_S32       gather_limit;
 
-    MI_U8 border_val;
+    DT_U8 border_val;
 };
 
-AURA_ALWAYS_INLINE PosInterpCoeffs LoadPosInterpCoeffs8Tile(const MI_S32 *grid_data, MI_S32 grid_step)
+AURA_ALWAYS_INLINE PosInterpCoeffs LoadPosInterpCoeffs8Tile(const DT_S32 *grid_data, DT_S32 grid_step)
 {
     HVX_Vector vs32_up_l, vs32_dn_l;
-    vload((const MI_U8 *)(grid_data), vs32_up_l);
-    vload((const MI_U8 *)(grid_data + grid_step), vs32_dn_l);
+    vload((const DT_U8 *)(grid_data), vs32_up_l);
+    vload((const DT_U8 *)(grid_data + grid_step), vs32_dn_l);
 
     HVX_Vector vs32_up_r = Q6_V_vror_VR(vs32_up_l, 8);
     HVX_Vector vs32_dn_r = Q6_V_vror_VR(vs32_dn_l, 8);
@@ -64,10 +64,10 @@ AURA_ALWAYS_INLINE PosInterpCoeffs LoadPosInterpCoeffs8Tile(const MI_S32 *grid_d
     return coeffs;
 }
 
-AURA_ALWAYS_INLINE HVX_VectorPair DoInterpForLuma(PosInterpCoeffs &coeffs, MI_S32 h, MI_S32 w)
+AURA_ALWAYS_INLINE HVX_VectorPair DoInterpForLuma(PosInterpCoeffs &coeffs, DT_S32 h, DT_S32 w)
 {
-    MI_S32 hh = Q6_R_combine_RlRl(h, h);
-    MI_S32 ww = Q6_R_combine_RlRl(w, w);
+    DT_S32 hh = Q6_R_combine_RlRl(h, h);
+    DT_S32 ww = Q6_R_combine_RlRl(w, w);
 
     HVX_Vector vs32_dyh_lo = Q6_Vw_vmpyiacc_VwVwRh(Q6_V_vsplat_R(8), Q6_V_lo_W(coeffs.ws32_dy), hh);
     HVX_Vector vs32_dyh_hi = Q6_Vw_vmpyiacc_VwVwRh(Q6_V_vsplat_R(8), Q6_V_hi_W(coeffs.ws32_dy), hh);
@@ -81,7 +81,7 @@ AURA_ALWAYS_INLINE HVX_VectorPair DoInterpForLuma(PosInterpCoeffs &coeffs, MI_S3
     return Q6_Ww_vadd_WwWw(coeffs.ws32_base, Q6_Ww_vadd_WwWw(ws32_dxw, ws32_dyh));
 }
 
-AURA_ALWAYS_INLINE HVX_VectorPred ClampXYPos(HVX_VectorX2 &v2s16_xypos, MI_S32 x_limit, MI_S32 y_limit)
+AURA_ALWAYS_INLINE HVX_VectorPred ClampXYPos(HVX_VectorX2 &v2s16_xypos, DT_S32 x_limit, DT_S32 y_limit)
 {
     HVX_VectorPair ws16_xypos = Q6_Wh_vshuffoe_VhVh(v2s16_xypos.val[1], v2s16_xypos.val[0]);
 
@@ -91,7 +91,7 @@ AURA_ALWAYS_INLINE HVX_VectorPred ClampXYPos(HVX_VectorX2 &v2s16_xypos, MI_S32 x
     return Q6_Q_or_QQ(q_limit_x, q_limit_y);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID LimitXYPos(HVX_VectorX2 &v2s16_xypos, MI_S32 xy_limit)
+AURA_ALWAYS_INLINE DT_VOID LimitXYPos(HVX_VectorX2 &v2s16_xypos, DT_S32 xy_limit)
 {
     v2s16_xypos.val[0] = Q6_Vh_vmax_VhVh(v2s16_xypos.val[0], Q6_V_vzero());
     v2s16_xypos.val[1] = Q6_Vh_vmax_VhVh(v2s16_xypos.val[1], Q6_V_vzero());
@@ -100,7 +100,7 @@ AURA_ALWAYS_INLINE AURA_VOID LimitXYPos(HVX_VectorX2 &v2s16_xypos, MI_S32 xy_lim
     v2s16_xypos.val[1] = Q6_Vh_vmin_VhVh(v2s16_xypos.val[1], Q6_V_vsplat_R(xy_limit));
 }
 
-AURA_ALWAYS_INLINE AURA_VOID NearestGatherForPos(InterpGatherParam &gather_param, HVX_VectorX2 &v2s16_xypos)
+AURA_ALWAYS_INLINE DT_VOID NearestGatherForPos(InterpGatherParam &gather_param, HVX_VectorX2 &v2s16_xypos)
 {
     LimitXYPos(v2s16_xypos, gather_param.xy_limit);
 
@@ -108,12 +108,12 @@ AURA_ALWAYS_INLINE AURA_VOID NearestGatherForPos(InterpGatherParam &gather_param
     HVX_Vector vs32_pos_lo = Q6_Vw_vdmpy_VhRh_sat(v2s16_xypos.val[0], gather_param.xy_mul);
     HVX_Vector vs32_pos_hi = Q6_Vw_vdmpy_VhRh_sat(v2s16_xypos.val[1], gather_param.xy_mul);
 
-    Q6_vgather_ARMVw(gather_param.gather_vec + 0, (MI_S32)gather_param.gather_base, gather_param.gather_limit, vs32_pos_lo);
-    Q6_vgather_ARMVw(gather_param.gather_vec + 1, (MI_S32)gather_param.gather_base, gather_param.gather_limit, vs32_pos_hi);
+    Q6_vgather_ARMVw(gather_param.gather_vec + 0, (DT_S32)gather_param.gather_base, gather_param.gather_limit, vs32_pos_lo);
+    Q6_vgather_ARMVw(gather_param.gather_vec + 1, (DT_S32)gather_param.gather_base, gather_param.gather_limit, vs32_pos_hi);
 }
 
-template <BorderType BORDER_TYPE, typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE>::type * = MI_NULL>
-AURA_INLINE AURA_VOID NearestGatherForPos(InterpGatherParam &gather_param, HVX_VectorX2 &v2s16_xypos, HVX_Vector &vu16_sum64)
+template <BorderType BORDER_TYPE, typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE>::type * = DT_NULL>
+AURA_INLINE DT_VOID NearestGatherForPos(InterpGatherParam &gather_param, HVX_VectorX2 &v2s16_xypos, HVX_Vector &vu16_sum64)
 {
     HVX_VectorPred q_limit = ClampXYPos(v2s16_xypos, gather_param.x_limit, gather_param.y_limit);
 
@@ -123,18 +123,18 @@ AURA_INLINE AURA_VOID NearestGatherForPos(InterpGatherParam &gather_param, HVX_V
     vu16_sum64 = Q6_V_vmux_QVV(q_limit, Q6_Vh_vsplat_R(gather_param.border_val), vu16_sum64);
 }
 
-template <BorderType BORDER_TYPE, typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE>::type * = MI_NULL>
-AURA_INLINE AURA_VOID NearestGatherForPos(InterpGatherParam &gather_param, HVX_VectorX2 &v2s16_xypos, HVX_Vector &vu16_sum64)
+template <BorderType BORDER_TYPE, typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE>::type * = DT_NULL>
+AURA_INLINE DT_VOID NearestGatherForPos(InterpGatherParam &gather_param, HVX_VectorX2 &v2s16_xypos, HVX_Vector &vu16_sum64)
 {
     NearestGatherForPos(gather_param, v2s16_xypos);
     vu16_sum64 = Q6_Vh_vshuffe_VhVh(gather_param.gather_vec[1], gather_param.gather_vec[0]);
 }
 
-template <InterpType INTERP_TYPE, BorderType BORDER_TYPE, typename std::enable_if<InterpType::NEAREST == INTERP_TYPE>::type * = MI_NULL>
-AURA_INLINE AURA_VOID InterpGatherForPos(MI_S32 irow, PosInterpCoeffs &coeffs, InterpGatherParam &gather_param, HVX_VectorX2 &v2u8_out)
+template <InterpType INTERP_TYPE, BorderType BORDER_TYPE, typename std::enable_if<InterpType::NEAREST == INTERP_TYPE>::type * = DT_NULL>
+AURA_INLINE DT_VOID InterpGatherForPos(DT_S32 irow, PosInterpCoeffs &coeffs, InterpGatherParam &gather_param, HVX_VectorX2 &v2u8_out)
 {
     HVX_VectorX4 v4u16_sum64;
-    for (MI_S32 icol = 0; icol < 4; icol++)
+    for (DT_S32 icol = 0; icol < 4; icol++)
     {
         HVX_VectorPair ws32_xypos_lo = DoInterpForLuma(coeffs, irow, icol);     // 0,2,1,3
         HVX_VectorPair ws32_xypos_hi = DoInterpForLuma(coeffs, irow, icol + 4); // 4,6,5,7
@@ -150,32 +150,32 @@ AURA_INLINE AURA_VOID InterpGatherForPos(MI_S32 irow, PosInterpCoeffs &coeffs, I
     v2u8_out.val[1] = Q6_Vb_vshuffe_VbVb(v4u16_sum64.val[3], v4u16_sum64.val[1]);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID LinearGatherForPos(InterpGatherParam &gather_param, MI_S32 idx, HVX_VectorX2 &v2s16_xypos, HVX_Vector &vu8_pixels)
+AURA_ALWAYS_INLINE DT_VOID LinearGatherForPos(InterpGatherParam &gather_param, DT_S32 idx, HVX_VectorX2 &v2s16_xypos, HVX_Vector &vu8_pixels)
 {
     HVX_Vector vs32_pos_lo = Q6_Vw_vdmpy_VhRh_sat(v2s16_xypos.val[0], gather_param.xy_mul);
     HVX_Vector vs32_pos_hi = Q6_Vw_vdmpy_VhRh_sat(v2s16_xypos.val[1], gather_param.xy_mul);
 
-    Q6_vgather_ARMVw(gather_param.gather_vec + (idx + 0), (MI_S32)gather_param.gather_base, gather_param.gather_limit, vs32_pos_lo);
-    Q6_vgather_ARMVw(gather_param.gather_vec + (idx + 1), (MI_S32)gather_param.gather_base, gather_param.gather_limit, vs32_pos_hi);
+    Q6_vgather_ARMVw(gather_param.gather_vec + (idx + 0), (DT_S32)gather_param.gather_base, gather_param.gather_limit, vs32_pos_lo);
+    Q6_vgather_ARMVw(gather_param.gather_vec + (idx + 1), (DT_S32)gather_param.gather_base, gather_param.gather_limit, vs32_pos_hi);
 
     vu8_pixels = Q6_Vh_vshuffe_VhVh(gather_param.gather_vec[idx + 1], gather_param.gather_vec[idx]);
 }
 
-template <BorderType BORDER_TYPE, typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE>::type * = MI_NULL>
-AURA_INLINE AURA_VOID LinearLimitPixels(HVX_VectorPred &q_limit, HVX_Vector &vu8_pixels, MI_S32 border_val)
+template <BorderType BORDER_TYPE, typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE>::type * = DT_NULL>
+AURA_INLINE DT_VOID LinearLimitPixels(HVX_VectorPred &q_limit, HVX_Vector &vu8_pixels, DT_S32 border_val)
 {
     vu8_pixels = Q6_V_vmux_QVV(q_limit, Q6_Vb_vsplat_R(border_val), vu8_pixels);
 }
 
-template <BorderType BORDER_TYPE, typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE>::type * = MI_NULL>
-AURA_INLINE AURA_VOID LinearLimitPixels(HVX_VectorPred &q_limit, HVX_Vector &vu8_pixels, MI_S32 border_val)
+template <BorderType BORDER_TYPE, typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE>::type * = DT_NULL>
+AURA_INLINE DT_VOID LinearLimitPixels(HVX_VectorPred &q_limit, HVX_Vector &vu8_pixels, DT_S32 border_val)
 {
     AURA_UNUSED(q_limit);
     AURA_UNUSED(vu8_pixels);
     AURA_UNUSED(border_val);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID LinearInterpolation(HVX_VectorX2 &v2s16_xyfrac, HVX_VectorX2 &v2u8_pixels, HVX_Vector &vu16_sum64)
+AURA_ALWAYS_INLINE DT_VOID LinearInterpolation(HVX_VectorX2 &v2s16_xyfrac, HVX_VectorX2 &v2u8_pixels, HVX_Vector &vu16_sum64)
 {
     HVX_Vector vu16_xyfrac1_lo = Q6_V_vand_VV(v2s16_xyfrac.val[0], Q6_Vh_vsplat_R(0x03ff));
     HVX_Vector vu16_xyfrac1_hi = Q6_V_vand_VV(v2s16_xyfrac.val[1], Q6_Vh_vsplat_R(0x03ff));
@@ -204,11 +204,11 @@ AURA_ALWAYS_INLINE AURA_VOID LinearInterpolation(HVX_VectorX2 &v2s16_xyfrac, HVX
     vu16_sum64 = Q6_Vh_vasr_VwVwR(vu32_sum32_hi, vu32_sum32_lo, 15);
 }
 
-template <InterpType INTERP_TYPE, BorderType BORDER_TYPE, typename std::enable_if<InterpType::LINEAR == INTERP_TYPE>::type * = MI_NULL>
-AURA_INLINE AURA_VOID InterpGatherForPos(MI_S32 irow, PosInterpCoeffs &coeffs, InterpGatherParam &gather_param, HVX_VectorX2 &v2u8_out)
+template <InterpType INTERP_TYPE, BorderType BORDER_TYPE, typename std::enable_if<InterpType::LINEAR == INTERP_TYPE>::type * = DT_NULL>
+AURA_INLINE DT_VOID InterpGatherForPos(DT_S32 irow, PosInterpCoeffs &coeffs, InterpGatherParam &gather_param, HVX_VectorX2 &v2u8_out)
 {
     HVX_VectorX4 v4u16_sum64;
-    for (MI_S32 icol = 0; icol < 4; icol++)
+    for (DT_S32 icol = 0; icol < 4; icol++)
     {
         HVX_VectorPair ws32_xypos_lo = DoInterpForLuma(coeffs, irow, icol);
         HVX_VectorPair ws32_xypos_hi = DoInterpForLuma(coeffs, irow, icol + 4);
@@ -244,21 +244,21 @@ AURA_INLINE AURA_VOID InterpGatherForPos(MI_S32 irow, PosInterpCoeffs &coeffs, I
 }
 
 template <InterpType INTERP_TYPE, BorderType BORDER_TYPE>
-Status WarpAffineU8C1Impl(const Mat &src, const Mat &grid, Mat &dst, Scalar &border_value, MI_U8 *vtcm_buffer,
-                          MI_S32 length, MI_S32 start_row, MI_S32 end_row)
+Status WarpAffineU8C1Impl(const Mat &src, const Mat &grid, Mat &dst, Scalar &border_value, DT_U8 *vtcm_buffer,
+                          DT_S32 length, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 oheight      = dst.GetSizes().m_height;
-    MI_S32 owidth       = dst.GetSizes().m_width;
-    MI_S32 ostride      = dst.GetStrides().m_width;
+    DT_S32 oheight      = dst.GetSizes().m_height;
+    DT_S32 owidth       = dst.GetSizes().m_width;
+    DT_S32 ostride      = dst.GetStrides().m_width;
 
-    MI_S32 width_align  = owidth & (-AURA_HVLEN);
-    MI_S32 width_remain = owidth - width_align;
+    DT_S32 width_align  = owidth & (-AURA_HVLEN);
+    DT_S32 width_remain = owidth - width_align;
 
-    MI_S32 iheight      = src.GetSizes().m_height;
-    MI_S32 iwidth       = src.GetSizes().m_width;
-    MI_S32 istride      = src.GetStrides().m_width;
+    DT_S32 iheight      = src.GetSizes().m_height;
+    DT_S32 iwidth       = src.GetSizes().m_width;
+    DT_S32 istride      = src.GetStrides().m_width;
 
-    MI_S32 grid_step    = grid.GetStrides().m_width / sizeof(MI_S32);
+    DT_S32 grid_step    = grid.GetStrides().m_width / sizeof(DT_S32);
 
     InterpGatherParam gather_param;
     gather_param.gather_vec   = (HVX_Vector*)(vtcm_buffer + (start_row / length) * AURA_WARP_AFFINE_VTCM_VGATHER_SZ);
@@ -270,19 +270,19 @@ Status WarpAffineU8C1Impl(const Mat &src, const Mat &grid, Mat &dst, Scalar &bor
     gather_param.xy_mul       = Q6_R_combine_RlRl(istride, 1);
     gather_param.border_val   = border_value.m_val[0];
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 max_row = Min(oheight - (y << 4), (MI_S32)16);
-        MI_S32 cal_row = Min(max_row, (MI_S32)8);
+        DT_S32 max_row = Min(oheight - (y << 4), (DT_S32)16);
+        DT_S32 cal_row = Min(max_row, (DT_S32)8);
 
-        for (MI_S32 x = 0; x < owidth; x += AURA_HVLEN)
+        for (DT_S32 x = 0; x < owidth; x += AURA_HVLEN)
         {
-            const MI_S32 *grid_data  = grid.Ptr<MI_S32>(y) + (x >> 3);
-            MI_U8        *out_buffer = dst.Ptr<MI_U8>(y << 4) + x;
+            const DT_S32 *grid_data  = grid.Ptr<DT_S32>(y) + (x >> 3);
+            DT_U8        *out_buffer = dst.Ptr<DT_U8>(y << 4) + x;
 
             PosInterpCoeffs coeffs = LoadPosInterpCoeffs8Tile(grid_data, grid_step);
 
-            for (MI_S32 irow = 0; irow < cal_row; irow++)
+            for (DT_S32 irow = 0; irow < cal_row; irow++)
             {
                 HVX_VectorX2 v2u8_out;
                 InterpGatherForPos<INTERP_TYPE, BORDER_TYPE>(irow, coeffs, gather_param, v2u8_out);
@@ -298,7 +298,7 @@ Status WarpAffineU8C1Impl(const Mat &src, const Mat &grid, Mat &dst, Scalar &bor
                 }
                 else
                 {
-                    MI_S32 back_offset = width_remain - AURA_HVLEN;
+                    DT_S32 back_offset = width_remain - AURA_HVLEN;
 
                     HVX_Vector vu8_out_pre;
                     vload(out_buffer - AURA_HVLEN, vu8_out_pre);
@@ -309,7 +309,7 @@ Status WarpAffineU8C1Impl(const Mat &src, const Mat &grid, Mat &dst, Scalar &bor
                     vstore(out_buffer + back_offset, vu8_out);
                     if (irow + 8 < max_row)
                     {
-                        MI_U8 *out_line_8 = out_buffer + 8 * ostride;
+                        DT_U8 *out_line_8 = out_buffer + 8 * ostride;
                         vload(out_line_8 - AURA_HVLEN, vu8_out_pre);
 
                         vu8_out = Q6_V_valign_VVR(Q6_V_hi_W(wu8_out), vu8_out_pre, width_remain);
@@ -327,15 +327,15 @@ Status WarpAffineU8C1Impl(const Mat &src, const Mat &grid, Mat &dst, Scalar &bor
 
 static Status WarpAffineU8C1Hvx(Context *ctx, const Mat &src, const Mat &grid, Mat &dst, InterpType interp_type, BorderType border_type, Scalar &border_value)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
-    MI_S32 vtcm_size = src.GetTotalBytes() + AURA_WARP_AFFINE_VTCM_VGATHER_TOTAL_SZ;
+    DT_S32 vtcm_size = src.GetTotalBytes() + AURA_WARP_AFFINE_VTCM_VGATHER_TOTAL_SZ;
 
-    MI_U8 *vtcm_buffer = (MI_U8 *)AURA_ALLOC_PARAM(ctx, AURA_MEM_VTCM, vtcm_size, 1);
-    if (MI_NULL == vtcm_buffer)
+    DT_U8 *vtcm_buffer = (DT_U8 *)AURA_ALLOC_PARAM(ctx, AURA_MEM_VTCM, vtcm_size, 1);
+    if (DT_NULL == vtcm_buffer)
     {
         AURA_ADD_ERROR_STRING(ctx, "Could not allocate VTCM.");
         return Status::ABORT;
@@ -344,7 +344,7 @@ static Status WarpAffineU8C1Hvx(Context *ctx, const Mat &src, const Mat &grid, M
     AuraMemCopy(vtcm_buffer + AURA_WARP_AFFINE_VTCM_VGATHER_TOTAL_SZ, src.GetData(), src.GetTotalBytes());
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         AURA_FREE(ctx, vtcm_buffer);
@@ -353,32 +353,32 @@ static Status WarpAffineU8C1Hvx(Context *ctx, const Mat &src, const Mat &grid, M
 
     Status ret = Status::ERROR;
 
-    MI_S32 length  = ((grid.GetSizes().m_height - 1) + (wp->GetComputeThreadNum() - 1)) / wp->GetComputeThreadNum();
-    MI_S32 pattern = AURA_MAKE_PATTERN(interp_type, border_type);
+    DT_S32 length  = ((grid.GetSizes().m_height - 1) + (wp->GetComputeThreadNum() - 1)) / wp->GetComputeThreadNum();
+    DT_S32 pattern = AURA_MAKE_PATTERN(interp_type, border_type);
 
     switch (pattern)
     {
         case AURA_MAKE_PATTERN(InterpType::NEAREST, BorderType::CONSTANT):
         {
-            ret = wp->ParallelFor((MI_S32)0, grid.GetSizes().m_height - 1, WarpAffineU8C1Impl<InterpType::NEAREST, BorderType::CONSTANT>,
+            ret = wp->ParallelFor((DT_S32)0, grid.GetSizes().m_height - 1, WarpAffineU8C1Impl<InterpType::NEAREST, BorderType::CONSTANT>,
                                   std::cref(src), std::cref(grid), std::ref(dst), border_value, vtcm_buffer, length);
             break;
         }
         case AURA_MAKE_PATTERN(InterpType::NEAREST, BorderType::REPLICATE):
         {
-            ret = wp->ParallelFor((MI_S32)0, grid.GetSizes().m_height - 1, WarpAffineU8C1Impl<InterpType::NEAREST, BorderType::REPLICATE>,
+            ret = wp->ParallelFor((DT_S32)0, grid.GetSizes().m_height - 1, WarpAffineU8C1Impl<InterpType::NEAREST, BorderType::REPLICATE>,
                                   std::cref(src), std::cref(grid), std::ref(dst), border_value, vtcm_buffer, length);
             break;
         }
         case AURA_MAKE_PATTERN(InterpType::LINEAR, BorderType::CONSTANT):
         {
-            ret = wp->ParallelFor((MI_S32)0, grid.GetSizes().m_height - 1, WarpAffineU8C1Impl<InterpType::LINEAR, BorderType::CONSTANT>,
+            ret = wp->ParallelFor((DT_S32)0, grid.GetSizes().m_height - 1, WarpAffineU8C1Impl<InterpType::LINEAR, BorderType::CONSTANT>,
                                   std::cref(src), std::cref(grid), std::ref(dst), border_value, vtcm_buffer, length);
             break;
         }
         case AURA_MAKE_PATTERN(InterpType::LINEAR, BorderType::REPLICATE):
         {
-            ret = wp->ParallelFor((MI_S32)0, grid.GetSizes().m_height - 1, WarpAffineU8C1Impl<InterpType::LINEAR, BorderType::REPLICATE>,
+            ret = wp->ParallelFor((DT_S32)0, grid.GetSizes().m_height - 1, WarpAffineU8C1Impl<InterpType::LINEAR, BorderType::REPLICATE>,
                                   std::cref(src), std::cref(grid), std::ref(dst), border_value, vtcm_buffer, length);
             break;
         }
@@ -395,7 +395,7 @@ static Status WarpAffineU8C1Hvx(Context *ctx, const Mat &src, const Mat &grid, M
 
 Status WarpAffineHvx(Context *ctx, const Mat &src, const Mat &matrix, Mat &dst, InterpType interp_type, BorderType border_type, Scalar &border_value)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -406,9 +406,9 @@ Status WarpAffineHvx(Context *ctx, const Mat &src, const Mat &matrix, Mat &dst, 
 
     if (2 == matrix.GetSizes().m_height && 3 == matrix.GetSizes().m_width)
     {
-        MI_S32 mesh_h = (dst.GetSizes().m_height + 15) / 16 + 1;
-        MI_S32 mesh_w = (dst.GetSizes().m_width  + 15) / 16 + 1;
-        MI_S32 stride = (mesh_w * 2 * ElemTypeSize(ElemType::S32) + 128) & (-64);
+        DT_S32 mesh_h = (dst.GetSizes().m_height + 15) / 16 + 1;
+        DT_S32 mesh_w = (dst.GetSizes().m_width  + 15) / 16 + 1;
+        DT_S32 stride = (mesh_w * 2 * ElemTypeSize(ElemType::S32) + 128) & (-64);
 
         grid = Mat(ctx, ElemType::S32, aura::Sizes3(mesh_h, mesh_w, 2), AURA_MEM_HEAP, aura::Sizes(mesh_h, stride));
         if (!grid.IsValid())
@@ -425,7 +425,7 @@ Status WarpAffineHvx(Context *ctx, const Mat &src, const Mat &matrix, Mat &dst, 
         }
     }
 
-    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetSizes().m_channel, src.GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(src.GetSizes().m_channel, src.GetElemType());
 
     switch (pattern)
     {
@@ -445,7 +445,7 @@ Status WarpAffineHvx(Context *ctx, const Mat &src, const Mat &matrix, Mat &dst, 
     AURA_RETURN(ctx, ret);
 }
 
-AURA_ALWAYS_INLINE HVX_VectorPairX4 Q6_Wx4_vshuff_Wx4R(HVX_VectorPairX4 &w4x4_in, MI_S32 rt)
+AURA_ALWAYS_INLINE HVX_VectorPairX4 Q6_Wx4_vshuff_Wx4R(HVX_VectorPairX4 &w4x4_in, DT_S32 rt)
 {
     HVX_VectorPairX4 w4x4_out;
     w4x4_out.val[0] = Q6_W_vshuff_VVR(Q6_V_lo_W(w4x4_in.val[2]), Q6_V_lo_W(w4x4_in.val[0]), rt);
@@ -456,29 +456,29 @@ AURA_ALWAYS_INLINE HVX_VectorPairX4 Q6_Wx4_vshuff_Wx4R(HVX_VectorPairX4 &w4x4_in
     return w4x4_out;
 }
 
-Status WarpAffineCoordImpl(const Mat &grid, Mat &coord, MI_S32 start_row, MI_S32 end_row)
+Status WarpAffineCoordImpl(const Mat &grid, Mat &coord, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 coord_height = coord.GetSizes().m_height;
-    MI_S32 coord_width  = coord.GetSizes().m_width;
-    MI_S32 coord_stride = coord.GetStrides().m_width;
-    MI_S32 grid_step    = grid.GetStrides().m_width / sizeof(MI_S32);
+    DT_S32 coord_height = coord.GetSizes().m_height;
+    DT_S32 coord_width  = coord.GetSizes().m_width;
+    DT_S32 coord_stride = coord.GetStrides().m_width;
+    DT_S32 grid_step    = grid.GetStrides().m_width / sizeof(DT_S32);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 max_row = Min(coord_height - (y << 4), (MI_S32)16);
-        MI_S32 cal_row = Min(max_row, (MI_S32)8);
+        DT_S32 max_row = Min(coord_height - (y << 4), (DT_S32)16);
+        DT_S32 cal_row = Min(max_row, (DT_S32)8);
 
-        for (MI_S32 x = 0; x < coord_width; x += AURA_HVLEN)
+        for (DT_S32 x = 0; x < coord_width; x += AURA_HVLEN)
         {
-            const MI_S32 *grid_data    = grid.Ptr<MI_S32>(y) + (x >> 3);
-            MI_U8        *coord_buffer = coord.Ptr<MI_U8>(y << 4) + (x * 4);
+            const DT_S32 *grid_data    = grid.Ptr<DT_S32>(y) + (x >> 3);
+            DT_U8        *coord_buffer = coord.Ptr<DT_U8>(y << 4) + (x * 4);
 
             PosInterpCoeffs coeffs = LoadPosInterpCoeffs8Tile(grid_data, grid_step);
 
-            for (MI_S32 irow = 0; irow < cal_row; irow++)
+            for (DT_S32 irow = 0; irow < cal_row; irow++)
             {
                 HVX_VectorPairX4 w4s32_xy_c, w4s32_xy_n;
-                for (MI_S32 icol = 0; icol < 4; icol++)
+                for (DT_S32 icol = 0; icol < 4; icol++)
                 {
                     HVX_VectorPair ws32_xypos_lo = DoInterpForLuma(coeffs, irow, icol);
                     HVX_VectorPair ws32_xypos_hi = DoInterpForLuma(coeffs, irow, icol + 4);
@@ -498,7 +498,7 @@ Status WarpAffineCoordImpl(const Mat &grid, Mat &coord, MI_S32 start_row, MI_S32
 
                 if (irow + 8 < max_row)
                 {
-                    MI_U8 *coord_line_8 = coord_buffer + 8 * coord_stride;
+                    DT_U8 *coord_line_8 = coord_buffer + 8 * coord_stride;
                     vstore(coord_line_8, w4s32_xy_n.val[2]);
                     vstore(coord_line_8 + AURA_HVLEN * 2, w4s32_xy_n.val[3]);
                 }
@@ -513,21 +513,21 @@ Status WarpAffineCoordImpl(const Mat &grid, Mat &coord, MI_S32 start_row, MI_S32
 
 Status WarpAffineCoordHvx(Context *ctx, const Mat &grid, Mat &coord)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
-    MI_S32 rows = grid.GetSizes().m_height - 1;
+    DT_S32 rows = grid.GetSizes().m_height - 1;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
-    if (wp->ParallelFor((MI_S32)0, rows, WarpAffineCoordImpl, grid, coord) != Status::OK)
+    if (wp->ParallelFor((DT_S32)0, rows, WarpAffineCoordImpl, grid, coord) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "ParallelFor run failed");
         return Status::ERROR;

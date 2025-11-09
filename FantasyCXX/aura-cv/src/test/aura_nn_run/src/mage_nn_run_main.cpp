@@ -115,19 +115,19 @@ Example usage:
 
 using namespace aura;
 
-AURA_INLINE AURA_VOID PrintSplitLine()
+AURA_INLINE DT_VOID PrintSplitLine()
 {
     std::cout << std::string(86, '=') << std::endl;
 }
 
-AURA_INLINE AURA_VOID PrintHeading(const std::string &heading)
+AURA_INLINE DT_VOID PrintHeading(const std::string &heading)
 {
     std::cout << std::endl << std::string(86, '=') << std::endl;
     std::cout << heading << std::endl;
     std::cout << std::string(86, '=') << std::endl;
 }
 
-AURA_INLINE AURA_VOID PrintHelpInfo()
+AURA_INLINE DT_VOID PrintHelpInfo()
 {
     std::cout << g_logo_str << std::endl;
     PrintHeading("Aura nn run Help Info");
@@ -135,7 +135,7 @@ AURA_INLINE AURA_VOID PrintHelpInfo()
     PrintSplitLine();
 }
 
-MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
+DT_S32 main(DT_S32 argc, DT_CHAR *argv[])
 {
     // judge the number of command parameters
     if (1 == argc)

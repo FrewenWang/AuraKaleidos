@@ -24,13 +24,13 @@ Time Timer::Now() const
 }
 
 #if defined(AURA_BUILD_HOST)
-AURA_VOID Timer::SetTimeout(MI_S32 timeout_ms)
+DT_VOID Timer::SetTimeout(DT_S32 timeout_ms)
 {
     m_end_time = Time::Now() + Time(0, timeout_ms);
 }
 #endif // AURA_BUILD_HOST
 
-MI_BOOL Timer::IsTimedOut() const
+DT_BOOL Timer::IsTimedOut() const
 {
     return Now() >= m_end_time;
 }

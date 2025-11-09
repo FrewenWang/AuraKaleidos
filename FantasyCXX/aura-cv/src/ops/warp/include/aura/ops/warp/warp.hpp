@@ -68,7 +68,7 @@ public:
      * @param border_type The border type for handling border pixels.
      * @param interp_type The interpolation method.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, BorderType border_type, InterpType interp_type);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, BorderType border_type, InterpType interp_type);
 };
 
 /**
@@ -171,7 +171,7 @@ public:
      * @param border_type The border type for handling border pixels.
      * @param interp_type The interpolation method.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, BorderType border_type, InterpType interp_type);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, BorderType border_type, InterpType interp_type);
 };
 
 /**
@@ -237,7 +237,7 @@ AURA_EXPORTS Mat GetPerspectiveTransform(Context *ctx, const std::vector<Point2>
  *
  * @return The rotation matrix(2x3).
  */
-AURA_EXPORTS Mat GetRotationMatrix2D(Context *ctx, const Point2 &center, MI_F64 angle, MI_F64 scale);
+AURA_EXPORTS Mat GetRotationMatrix2D(Context *ctx, const Point2 &center, DT_F64 angle, DT_F64 scale);
 
 /**
  * @}

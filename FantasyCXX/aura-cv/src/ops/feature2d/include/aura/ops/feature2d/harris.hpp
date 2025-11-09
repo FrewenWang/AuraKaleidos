@@ -52,7 +52,7 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent. 
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar());
 };
@@ -83,7 +83,7 @@ public:
  *
  * @note The above implementations supported all BorderType(CONSTANT/REPLICATE/REFLECT_101).
  */
-AURA_EXPORTS Status IHarris(Context *ctx, const Mat &src, Mat &dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+AURA_EXPORTS Status IHarris(Context *ctx, const Mat &src, Mat &dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                             BorderType border_type = BorderType::REFLECT_101, const Scalar &border_value = Scalar(),
                             const OpTarget &target = OpTarget::Default());
 /**

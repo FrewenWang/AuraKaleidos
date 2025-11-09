@@ -40,8 +40,8 @@ static Status ResizeCuFastNeon(Context *ctx, const Mat &src, Mat &dst, const OpT
 
 Status ResizeCuNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target)
 {
-    MI_F32 scale_x = static_cast<MI_F64>(src.GetSizes().m_width) / dst.GetSizes().m_width;
-    MI_F32 scale_y = static_cast<MI_F64>(src.GetSizes().m_height) / dst.GetSizes().m_height;
+    DT_F32 scale_x = static_cast<DT_F64>(src.GetSizes().m_width) / dst.GetSizes().m_width;
+    DT_F32 scale_y = static_cast<DT_F64>(src.GetSizes().m_height) / dst.GetSizes().m_height;
 
     Status ret = Status::ERROR;
 

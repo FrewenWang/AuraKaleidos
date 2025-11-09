@@ -145,16 +145,16 @@ public:
     AURA_API_DEF(XNNPredictor_create) = XNNPredictor_Error_t (*)(XNN_PredictorHandle_t*, XNN_MobileConfig*);
     AURA_API_PTR(XNNPredictor_create);
 
-    AURA_API_DEF(XNNPredictor_getInput) = XNN_TensorHandle_t (*)(XNN_PredictorHandle_t, MI_S32);
+    AURA_API_DEF(XNNPredictor_getInput) = XNN_TensorHandle_t (*)(XNN_PredictorHandle_t, DT_S32);
     AURA_API_PTR(XNNPredictor_getInput);
 
-    AURA_API_DEF(XNNPredictor_getOutput) = XNN_TensorHandle_t (*)(XNN_PredictorHandle_t, MI_S32);
+    AURA_API_DEF(XNNPredictor_getOutput) = XNN_TensorHandle_t (*)(XNN_PredictorHandle_t, DT_S32);
     AURA_API_PTR(XNNPredictor_getOutput);
 
-    AURA_API_DEF(XNNPredictor_getInputCount) = MI_U32 (*)(XNN_PredictorHandle_t);
+    AURA_API_DEF(XNNPredictor_getInputCount) = DT_U32 (*)(XNN_PredictorHandle_t);
     AURA_API_PTR(XNNPredictor_getInputCount);
 
-    AURA_API_DEF(XNNPredictor_getOutputCount) = MI_U32 (*)(XNN_PredictorHandle_t);
+    AURA_API_DEF(XNNPredictor_getOutputCount) = DT_U32 (*)(XNN_PredictorHandle_t);
     AURA_API_PTR(XNNPredictor_getOutputCount);
 
     AURA_API_DEF(XNNPredictor_getInputInfo) = XNNPredictor_Error_t (*)(XNN_PredictorHandle_t, XnnIOInfo*);
@@ -166,23 +166,23 @@ public:
     AURA_API_DEF(XNNPredictor_run) = XNNPredictor_Error_t (*)(XNN_PredictorHandle_t);
     AURA_API_PTR(XNNPredictor_run);
 
-    AURA_API_DEF(XNN_getVersion) = XNN_Error_t (*)(MI_CHAR*);
+    AURA_API_DEF(XNN_getVersion) = XNN_Error_t (*)(DT_CHAR*);
     AURA_API_PTR(XNN_getVersion);
 
     AURA_API_DEF(XNNPredictor_free) = XNNPredictor_Error_t (*)(XNN_PredictorHandle_t);
     AURA_API_PTR(XNNPredictor_free);
 
-    AURA_API_DEF(XNNTensor_shareExternalMemoryWithOffset) = XNNTensor_Error_t (*)(XNN_TensorHandle_t, XnnTargetType, MI_U32, MI_U8*, MI_S32, MI_U32, MI_U32);
+    AURA_API_DEF(XNNTensor_shareExternalMemoryWithOffset) = XNNTensor_Error_t (*)(XNN_TensorHandle_t, XnnTargetType, DT_U32, DT_U8*, DT_S32, DT_U32, DT_U32);
     AURA_API_PTR(XNNTensor_shareExternalMemoryWithOffset);
 
-    AURA_API_DEF(XNNTensor_unmapShareMemory) = XNNTensor_Error_t (*)(XNN_TensorHandle_t, MI_S32);
+    AURA_API_DEF(XNNTensor_unmapShareMemory) = XNNTensor_Error_t (*)(XNN_TensorHandle_t, DT_S32);
     AURA_API_PTR(XNNTensor_unmapShareMemory);
 
     AURA_API_DEF(XNNTensor_cacheEnd) = XNNTensor_Error_t (*)(XNN_TensorHandle_t);
     AURA_API_PTR(XNNTensor_cacheEnd);
 
 private:
-    XnnLibrary() : NNLibrary(), m_handle(MI_NULL)
+    XnnLibrary() : NNLibrary(), m_handle(DT_NULL)
     {
         Load();
     }
@@ -200,7 +200,7 @@ private:
 
         dlerror();
         m_handle = dlopen(g_xnn_lib_name.c_str(), RTLD_LAZY | RTLD_LOCAL);
-        if (MI_NULL == m_handle)
+        if (DT_NULL == m_handle)
         {
             std::string info = "dlopen libxnn.so failed, err : " + std::string(dlerror());
             AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
@@ -242,14 +242,14 @@ private:
                 AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
                 ret = Status::ERROR;
             }
-            m_handle = MI_NULL;
+            m_handle = DT_NULL;
         }
 
         return ret;
     }
 
 private:
-    AURA_VOID *m_handle;
+    DT_VOID *m_handle;
 };
 
 static XNNPredictor_Error_t XNNPredictor_create(Context *ctx, XNN_PredictorHandle_t *predictor_handle, XNN_MobileConfig *config)
@@ -266,7 +266,7 @@ static XNNPredictor_Error_t XNNPredictor_create(Context *ctx, XNN_PredictorHandl
     }
 }
 
-static XNN_TensorHandle_t XNNPredictor_getInput(Context *ctx, XNN_PredictorHandle_t predictor_handle, MI_S32 i)
+static XNN_TensorHandle_t XNNPredictor_getInput(Context *ctx, XNN_PredictorHandle_t predictor_handle, DT_S32 i)
 {
     auto func = XnnLibrary::Get().XNNPredictor_getInput;
     if (func)
@@ -276,11 +276,11 @@ static XNN_TensorHandle_t XNNPredictor_getInput(Context *ctx, XNN_PredictorHandl
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "XNNPredictor_getInput is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
-static XNN_TensorHandle_t XNNPredictor_getOutput(Context *ctx, XNN_PredictorHandle_t predictor_handle, MI_S32 i)
+static XNN_TensorHandle_t XNNPredictor_getOutput(Context *ctx, XNN_PredictorHandle_t predictor_handle, DT_S32 i)
 {
     auto func = XnnLibrary::Get().XNNPredictor_getOutput;
     if (func)
@@ -290,13 +290,13 @@ static XNN_TensorHandle_t XNNPredictor_getOutput(Context *ctx, XNN_PredictorHand
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "XNNPredictor_getOutput is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
-static MI_U32 XNNPredictor_getInputCount(Context *ctx, XNN_PredictorHandle_t predictor_handle)
+static DT_U32 XNNPredictor_getInputCount(Context *ctx, XNN_PredictorHandle_t predictor_handle)
 {
-    MI_U32 count = 0;
+    DT_U32 count = 0;
     auto func = XnnLibrary::Get().XNNPredictor_getInputCount;
     if (func)
     {
@@ -309,9 +309,9 @@ static MI_U32 XNNPredictor_getInputCount(Context *ctx, XNN_PredictorHandle_t pre
     return count;
 }
 
-static MI_U32 XNNPredictor_getOutputCount(Context *ctx, XNN_PredictorHandle_t predictor_handle)
+static DT_U32 XNNPredictor_getOutputCount(Context *ctx, XNN_PredictorHandle_t predictor_handle)
 {
-    MI_U32 count = 0;
+    DT_U32 count = 0;
     auto func = XnnLibrary::Get().XNNPredictor_getOutputCount;
     if (func)
     {
@@ -366,7 +366,7 @@ static XNNPredictor_Error_t XNNPredictor_run(Context *ctx, XNN_PredictorHandle_t
     }
 }
 
-static XNN_Error_t XNN_getVersion(Context *ctx, MI_CHAR *version)
+static XNN_Error_t XNN_getVersion(Context *ctx, DT_CHAR *version)
 {
     auto func = XnnLibrary::Get().XNN_getVersion;
     if (func)
@@ -395,8 +395,8 @@ static XNNPredictor_Error_t XNNPredictor_free(Context *ctx, XNN_PredictorHandle_
 }
 
 static XNNTensor_Error_t XNNTensor_shareExternalMemoryWithOffset(Context *ctx, XNN_TensorHandle_t tensor_handle,
-                                                                 XnnTargetType target, MI_U32 size, MI_U8 *addr,
-                                                                 MI_U64 mem_handle, MI_U32 offset, MI_U32 io_size)
+                                                                 XnnTargetType target, DT_U32 size, DT_U8 *addr,
+                                                                 DT_U64 mem_handle, DT_U32 offset, DT_U32 io_size)
 {
     auto func = XnnLibrary::Get().XNNTensor_shareExternalMemoryWithOffset;
     if (func)
@@ -410,7 +410,7 @@ static XNNTensor_Error_t XNNTensor_shareExternalMemoryWithOffset(Context *ctx, X
     }
 }
 
-static XNNTensor_Error_t XNNTensor_unmapShareMemory(Context *ctx, XNN_TensorHandle_t tensor_handle, MI_U64 mem_handle)
+static XNNTensor_Error_t XNNTensor_unmapShareMemory(Context *ctx, XNN_TensorHandle_t tensor_handle, DT_U64 mem_handle)
 {
     auto func = XnnLibrary::Get().XNNTensor_unmapShareMemory;
     if (func)
@@ -443,12 +443,12 @@ class XnnUtils
 public:
     static std::string GetLibraryVersion(Context *ctx)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return std::string();
         }
 
-        MI_CHAR version[512];
+        DT_CHAR version[512];
         memset(version, 0, sizeof(version));
 
         XNN_Error_t ret = XNN_getVersion(ctx, version);
@@ -461,20 +461,20 @@ public:
         return "v" + std::string(version);
     }
 
-    static TensorDescMap GetTensorDescMap(Context *ctx, XNN_PredictorHandle_t xnn_handle, MI_BOOL is_input)
+    static TensorDescMap GetTensorDescMap(Context *ctx, XNN_PredictorHandle_t xnn_handle, DT_BOOL is_input)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return TensorDescMap();
         }
 
-        if (MI_NULL == xnn_handle)
+        if (DT_NULL == xnn_handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "null ptr");
             return TensorDescMap();
         }
 
-        MI_U32 tensor_num = is_input ? XNNPredictor_getInputCount(ctx, xnn_handle)
+        DT_U32 tensor_num = is_input ? XNNPredictor_getInputCount(ctx, xnn_handle)
                                      : XNNPredictor_getOutputCount(ctx, xnn_handle);
         if (tensor_num <= 0)
         {
@@ -494,10 +494,10 @@ public:
         }
 
         TensorDescMap tensor_desc_map;
-        for (MI_U32 i = 0; i < tensor_num; i++)
+        for (DT_U32 i = 0; i < tensor_num; i++)
         {
             TensorDesc desc;
-            for (MI_U32 j = tensor_desc[i].dim_count; j > 0; j--)
+            for (DT_U32 j = tensor_desc[i].dim_count; j > 0; j--)
             {
                 desc.sizes.push_back(tensor_desc[i].dim_size[j - 1]);
             }
@@ -514,12 +514,12 @@ public:
 class XnnIOBufferMap
 {
 public:
-    XnnIOBufferMap(Context *ctx, AURA_VOID *xnn_handle, MI_BOOL is_input)
-                   : m_ctx(ctx), m_is_valid(MI_FALSE), m_is_input(is_input)
+    XnnIOBufferMap(Context *ctx, DT_VOID *xnn_handle, DT_BOOL is_input)
+                   : m_ctx(ctx), m_is_valid(DT_FALSE), m_is_input(is_input)
     {
         do
         {
-            if ((MI_NULL == m_ctx) || (MI_NULL == xnn_handle))
+            if ((DT_NULL == m_ctx) || (DT_NULL == xnn_handle))
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
                 break;
@@ -527,7 +527,7 @@ public:
 
             if (m_is_input)
             {
-                MI_U32 num = XNNPredictor_getInputCount(m_ctx, xnn_handle);
+                DT_U32 num = XNNPredictor_getInputCount(m_ctx, xnn_handle);
                 if (num <= 0)
                 {
                     std::string info = "XNNPredictor_getInputCount failed, input num : " + std::to_string(num);
@@ -536,10 +536,10 @@ public:
                 }
 
                 m_tensor_handle.resize(num);
-                for (MI_U32 i = 0; i < num; i++)
+                for (DT_U32 i = 0; i < num; i++)
                 {
                     XNN_TensorHandle_t input_tensor = XNNPredictor_getInput(m_ctx, xnn_handle, i);
-                    if (MI_NULL == input_tensor)
+                    if (DT_NULL == input_tensor)
                     {
                         std::string info = "XNNPredictor_getInput failed, index : " + std::to_string(i);
                         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -558,7 +558,7 @@ public:
             }
             else
             {
-                MI_U32 num = XNNPredictor_getOutputCount(m_ctx, xnn_handle);
+                DT_U32 num = XNNPredictor_getOutputCount(m_ctx, xnn_handle);
                 if (num <= 0)
                 {
                     std::string info = "XNNPredictor_getOutputCount failed, output num : " + std::to_string(num);
@@ -567,10 +567,10 @@ public:
                 }
 
                 m_tensor_handle.resize(num);
-                for (MI_U32 i = 0; i < num; i++)
+                for (DT_U32 i = 0; i < num; i++)
                 {
                     XNN_TensorHandle_t output_tensor = XNNPredictor_getOutput(m_ctx, xnn_handle, i);
-                    if (MI_NULL == output_tensor)
+                    if (DT_NULL == output_tensor)
                     {
                         std::string info = "XNNPredictor_getOutput failed, index : " + std::to_string(i);
                         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -588,7 +588,7 @@ public:
                 }
             }
 
-            m_is_valid = MI_TRUE;
+            m_is_valid = DT_TRUE;
         } while (0);
     }
 
@@ -605,7 +605,7 @@ public:
             return Status::ERROR;
         }
 
-        if ((MI_NULL == mat_map) || (mat_map->size() != m_io_info.size()))
+        if ((DT_NULL == mat_map) || (mat_map->size() != m_io_info.size()))
         {
             AURA_ADD_ERROR_STRING(m_ctx, "size match error");
             return Status::ERROR;
@@ -662,8 +662,8 @@ public:
 
             if (m_quant_map.count(name))
             {
-                MI_S32 zero_point = m_io_info[i].zero_point;
-                MI_F32 scale = m_io_info[i].scale;
+                DT_S32 zero_point = m_io_info[i].zero_point;
+                DT_F32 scale = m_io_info[i].scale;
 
                 Status ret = NNQuantize(m_ctx, *(m_mat_map[name]), *(m_quant_map[name]), zero_point, scale);
                 if (ret != Status::OK)
@@ -690,8 +690,8 @@ public:
 
             if (m_quant_map.count(name))
             {
-                MI_S32 zero_point = m_io_info[i].zero_point;
-                MI_F32 scale = m_io_info[i].scale;
+                DT_S32 zero_point = m_io_info[i].zero_point;
+                DT_F32 scale = m_io_info[i].scale;
 
                 Status ret = NNDeQuantize(m_ctx, *(m_quant_map[name]), *(m_mat_map[name]), zero_point, scale);
                 if (ret != Status::OK)
@@ -722,16 +722,16 @@ public:
                 return Status::ERROR;
             }
 
-            MI_U8 *data       = reinterpret_cast<MI_U8*>(m_register_map[name]->GetData());
-            MI_U64 fd         = m_register_map[name]->GetBuffer().m_property;
-            MI_U32 total_size = m_register_map[name]->GetBuffer().m_capacity;
-            MI_U32 offset     = m_register_map[name]->GetBuffer().GetOffset();
+            DT_U8 *data       = reinterpret_cast<DT_U8*>(m_register_map[name]->GetData());
+            DT_U64 fd         = m_register_map[name]->GetBuffer().m_property;
+            DT_U32 total_size = m_register_map[name]->GetBuffer().m_capacity;
+            DT_U32 offset     = m_register_map[name]->GetBuffer().GetOffset();
 
             // TODO: note the `total_size` should be the capacity of the buffer.
             //       xnn ask `io_size` aligned to 64B, and `total_size > offset + io_size`,
             //       consider the dmabufheap is aligned to 4K, we remove stride check.
             //       this is a bug of xnn, we should fix it on F3.
-            total_size = Max(total_size, static_cast<MI_U32>(m_io_info[i].size));
+            total_size = Max(total_size, static_cast<DT_U32>(m_io_info[i].size));
             XNNTensor_Error_t err = XNNTensor_shareExternalMemoryWithOffset(m_ctx, m_tensor_handle[i], XNN_NPU,
                                                                             total_size, data, fd, offset,
                                                                             m_io_info[i].size);
@@ -758,7 +758,7 @@ public:
                 return Status::ERROR;
             }
 
-            MI_U64 fd = m_register_map[name]->GetBuffer().m_property;
+            DT_U64 fd = m_register_map[name]->GetBuffer().m_property;
 
             XNNTensor_Error_t err = XNNTensor_unmapShareMemory(m_ctx, m_tensor_handle[i], fd);
             if (err != XNN_TENSOR_NO_ERROR)
@@ -792,12 +792,12 @@ public:
     }
 
 private:
-    Status InitXnnTensor(MI_S32 id, const std::string &tensor_name)
+    Status InitXnnTensor(DT_S32 id, const std::string &tensor_name)
     {
         XnnIOInfo io_info = m_io_info[id];
         Mat *mat = m_mat_map[tensor_name];
 
-        MI_BOOL is_quant = MI_FALSE;
+        DT_BOOL is_quant = DT_FALSE;
         ElemType src_elem_type = mat->GetElemType();
         ElemType dst_elem_type = GetElemType(io_info.data_format);
         if ((src_elem_type != ElemType::INVALID) && (src_elem_type == dst_elem_type))
@@ -814,7 +814,7 @@ private:
                                                       (ElemType::S16 == dst_elem_type) ||
                                                       (ElemType::S32 == dst_elem_type)))
         {
-            is_quant = MI_TRUE;
+            is_quant = DT_TRUE;
         }
         else
         {
@@ -838,17 +838,17 @@ private:
             mat = m_quant_map[tensor_name];
         }
 
-        auto get_elem_counts_func = [](const XnnIOInfo &info) -> MI_S32
+        auto get_elem_counts_func = [](const XnnIOInfo &info) -> DT_S32
         {
-            MI_S32 elem_counts = 1;
-            for (MI_U32 i = 0; i < info.dim_count; i++)
+            DT_S32 elem_counts = 1;
+            for (DT_U32 i = 0; i < info.dim_count; i++)
             {
                 elem_counts *= info.dim_size[i];
             }
             return elem_counts;
         };
 
-        MI_S32 elem_counts = get_elem_counts_func(io_info);
+        DT_S32 elem_counts = get_elem_counts_func(io_info);
         if (elem_counts != mat->GetSizes().Total())
         {
             std::string info = "tensor " + std::string(tensor_name) + ": expected " + std::to_string(elem_counts) + " bytes, "
@@ -867,8 +867,8 @@ private:
     MatMap  m_mat_map;
     MatMap  m_quant_map;
     MatMap  m_register_map;
-    MI_BOOL m_is_valid;
-    MI_BOOL m_is_input;
+    DT_BOOL m_is_valid;
+    DT_BOOL m_is_input;
     std::vector<XNN_TensorHandle_t> m_tensor_handle;
     std::vector<XnnIOInfo> m_io_info;
     std::vector<Mat> m_register_mat;
@@ -878,7 +878,7 @@ class XnnExecutorImplVx : public XnnExecutorImpl
 {
 public:
     XnnExecutorImplVx(Context *ctx, const std::shared_ptr<XnnModel> &model, const NNConfig &config)
-                      : XnnExecutorImpl(ctx, model, config), m_xnn_handle(MI_NULL)
+                      : XnnExecutorImpl(ctx, model, config), m_xnn_handle(DT_NULL)
     {
         do
         {
@@ -906,7 +906,7 @@ public:
                     return Status::ERROR;
                 }
 
-                m_is_valid = MI_TRUE;
+                m_is_valid = DT_TRUE;
                 return Status::OK;
             };
 
@@ -933,7 +933,7 @@ public:
             AURA_ADD_ERROR_STRING(m_ctx, "DeInitialize failed");
         }
 
-        if (m_xnn_handle != MI_NULL)
+        if (m_xnn_handle != DT_NULL)
         {
             XNNPredictor_Error_t err = XNNPredictor_free(m_ctx, m_xnn_handle);
             if (err != XNN_PREDICTOR_NO_ERROR)
@@ -941,7 +941,7 @@ public:
                 std::string info = "XNNPredictor_free failed, err : " + std::to_string(err);
                 AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
             }
-            m_xnn_handle = MI_NULL;
+            m_xnn_handle = DT_NULL;
         }
     }
 
@@ -959,19 +959,19 @@ public:
         }
 
         // create XnnIOBufferMap
-        m_input_map = std::make_shared<XnnIOBufferMap>(m_ctx, m_xnn_handle, MI_TRUE);
-        m_output_map = std::make_shared<XnnIOBufferMap>(m_ctx, m_xnn_handle, MI_FALSE);
+        m_input_map = std::make_shared<XnnIOBufferMap>(m_ctx, m_xnn_handle, DT_TRUE);
+        m_output_map = std::make_shared<XnnIOBufferMap>(m_ctx, m_xnn_handle, DT_FALSE);
 
         return Status::OK;
     }
 
-    Status Forward(const MatMap &input, MatMap &output, MI_S32 graph_id) override
+    Status Forward(const MatMap &input, MatMap &output, DT_S32 graph_id) override
     {
         AURA_UNUSED(graph_id);
         Status ret = Status::ERROR;
 
-        MatMap input_mapped = m_model->MapMatNames(input, MI_TRUE);
-        MatMap output_mapped = m_model->MapMatNames(output, MI_FALSE);
+        MatMap input_mapped = m_model->MapMatNames(input, DT_TRUE);
+        MatMap output_mapped = m_model->MapMatNames(output, DT_FALSE);
 
         if (input_mapped.empty() || output_mapped.empty())
         {
@@ -1036,7 +1036,7 @@ public:
             return ret;
         }
 
-        MI_S32 err_code = XNNPredictor_run(m_ctx, m_xnn_handle);
+        DT_S32 err_code = XNNPredictor_run(m_ctx, m_xnn_handle);
         if (err_code != XNN_PREDICTOR_NO_ERROR)
         {
             std::string info = "XNNPredictor_run failed, err : " + std::to_string(err_code);
@@ -1072,15 +1072,15 @@ public:
 
     std::vector<TensorDescMap> GetInputs() override
     {
-        TensorDescMap tensor_desc_map = XnnUtils::GetTensorDescMap(m_ctx, m_xnn_handle, MI_TRUE);
-        tensor_desc_map = m_model->MapTensorDescNames(tensor_desc_map, MI_TRUE);
+        TensorDescMap tensor_desc_map = XnnUtils::GetTensorDescMap(m_ctx, m_xnn_handle, DT_TRUE);
+        tensor_desc_map = m_model->MapTensorDescNames(tensor_desc_map, DT_TRUE);
         return {tensor_desc_map};
     }
 
     std::vector<TensorDescMap> GetOutputs() override
     {
-        TensorDescMap tensor_desc_map = XnnUtils::GetTensorDescMap(m_ctx, m_xnn_handle, MI_FALSE);
-        tensor_desc_map = m_model->MapTensorDescNames(tensor_desc_map, MI_FALSE);
+        TensorDescMap tensor_desc_map = XnnUtils::GetTensorDescMap(m_ctx, m_xnn_handle, DT_FALSE);
+        tensor_desc_map = m_model->MapTensorDescNames(tensor_desc_map, DT_FALSE);
         return {tensor_desc_map};
     }
 
@@ -1113,7 +1113,7 @@ private:
     Status CreatePredictor()
     {
         Status ret = Status::ERROR;
-        MI_S32 err_code = XNN_PREDICTOR_NO_ERROR;
+        DT_S32 err_code = XNN_PREDICTOR_NO_ERROR;
         XNN_MobileConfig xnn_config;
 
         std::vector<std::string> model_name = NNSplit(m_model->GetModelName(), '/');
@@ -1128,12 +1128,12 @@ private:
         xnn_config.mPowerMode = GetXnnPerfOption(m_config.perf_level).power_mode;
         xnn_config.mPriority  = GetXnnPerfOption(m_config.perf_level).priority;
         xnn_config.mLogLevel  = GetXnnLogLevel(m_config.log_level);
-        xnn_config.mModelBuf  = reinterpret_cast<MI_CHAR*>(buffer.m_data);
+        xnn_config.mModelBuf  = reinterpret_cast<DT_CHAR*>(buffer.m_data);
         xnn_config.mModelSize = buffer.m_size;
 
         if (model_name.size() > 0)
         {
-            xnn_config.mModelDmaBufName = (MI_CHAR *)model_name[model_name.size() - 1].c_str();
+            xnn_config.mModelDmaBufName = (DT_CHAR *)model_name[model_name.size() - 1].c_str();
         }
 
         if (m_model->GetMinnVersion() == 0x010000)
@@ -1169,9 +1169,9 @@ private:
     {
         RegisterBufferMap *register_buffer_map = NULL;
 
-        auto check_mat_register_func = [](const MatMap &matmap, const std::vector<Mat> &regster_mat) -> MI_BOOL
+        auto check_mat_register_func = [](const MatMap &matmap, const std::vector<Mat> &regster_mat) -> DT_BOOL
         {
-            MI_BOOL is_register = MI_TRUE;
+            DT_BOOL is_register = DT_TRUE;
 
             for (const auto &iter : matmap)
             {
@@ -1181,7 +1181,7 @@ private:
                                                                     });
                 if (match_mat == regster_mat.end())
                 {
-                    is_register = MI_FALSE;
+                    is_register = DT_FALSE;
                     break;
                 }
             }
@@ -1194,8 +1194,8 @@ private:
             std::vector<Mat> *input_register_mat  = iter->input_map->GetRegisterMat();
             std::vector<Mat> *output_register_mat = iter->output_map->GetRegisterMat();
 
-            if ((check_mat_register_func(input,  *input_register_mat)  == MI_TRUE) &&
-                (check_mat_register_func(output, *output_register_mat) == MI_TRUE))
+            if ((check_mat_register_func(input,  *input_register_mat)  == DT_TRUE) &&
+                (check_mat_register_func(output, *output_register_mat) == DT_TRUE))
             {
                 register_buffer_map = iter;
                 break;
@@ -1209,8 +1209,8 @@ private:
     {
         Status ret = Status::ERROR;
 
-        MatMap input_mapped  = m_model->MapMatNames(input,  MI_TRUE);
-        MatMap output_mapped = m_model->MapMatNames(output, MI_FALSE);
+        MatMap input_mapped  = m_model->MapMatNames(input,  DT_TRUE);
+        MatMap output_mapped = m_model->MapMatNames(output, DT_FALSE);
 
         // check wether registed
         if (GetRegisterBufferMap(input_mapped, output_mapped) != NULL)
@@ -1232,7 +1232,7 @@ private:
         // create XnnIOBufferMap
         XnnIOBufferMap *input_map = NULL;
         XnnIOBufferMap *output_map = NULL;
-        input_map = Create<XnnIOBufferMap>(m_ctx, m_xnn_handle, MI_TRUE);
+        input_map = Create<XnnIOBufferMap>(m_ctx, m_xnn_handle, DT_TRUE);
         if (NULL == input_map)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "create XnnIOBufferMap failed");
@@ -1241,7 +1241,7 @@ private:
 
         register_buffer_map->input_map  = input_map;
 
-        output_map = Create<XnnIOBufferMap>(m_ctx, m_xnn_handle, MI_FALSE);
+        output_map = Create<XnnIOBufferMap>(m_ctx, m_xnn_handle, DT_FALSE);
         if (NULL == output_map)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "create XnnIOBufferMap failed");
@@ -1311,8 +1311,8 @@ EXIT:
     {
         Status ret = Status::ERROR;
 
-        MatMap input_mapped  = m_model->MapMatNames(input,  MI_TRUE);
-        MatMap output_mapped = m_model->MapMatNames(output, MI_FALSE);
+        MatMap input_mapped  = m_model->MapMatNames(input,  DT_TRUE);
+        MatMap output_mapped = m_model->MapMatNames(output, DT_FALSE);
 
         // check wether registed
         RegisterBufferMap *register_buffer_map = GetRegisterBufferMap(input_mapped, output_mapped);
@@ -1455,7 +1455,7 @@ EXIT:
 
 private:
     std::string m_version;
-    AURA_VOID *m_xnn_handle;
+    DT_VOID *m_xnn_handle;
     std::shared_ptr<XnnIOBufferMap> m_input_map;
     std::shared_ptr<XnnIOBufferMap> m_output_map;
     std::vector<RegisterBufferMap*> m_register_buffer_map;

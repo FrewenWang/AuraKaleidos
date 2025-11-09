@@ -113,8 +113,8 @@ public:
      *
      * For more details, please refer to @ref adaptivethreshold_details
      */
-    Status SetArgs(const Array *src, Array *dst, MI_F32 max_val, AdaptiveThresholdMethod method,
-                   MI_S32 type, MI_S32 block_size, MI_F32 delta);
+    Status SetArgs(const Array *src, Array *dst, DT_F32 max_val, AdaptiveThresholdMethod method,
+                   DT_S32 type, DT_S32 block_size, DT_F32 delta);
 };
 
 /**
@@ -141,8 +141,8 @@ public:
  * NONE      | U8C1
  *
  */
-AURA_EXPORTS Status IAdaptiveThreshold(Context *ctx, const Mat &src, Mat &dst, MI_F32 max_val, AdaptiveThresholdMethod method,
-                                       MI_S32 type, MI_S32 block_size, MI_F32 delta, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IAdaptiveThreshold(Context *ctx, const Mat &src, Mat &dst, DT_F32 max_val, AdaptiveThresholdMethod method,
+                                       DT_S32 type, DT_S32 block_size, DT_F32 delta, const OpTarget &target = OpTarget::Default());
 
 } // namespace aura
 

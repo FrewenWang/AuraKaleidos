@@ -6,7 +6,7 @@ namespace aura
 GuideFilterNeon::GuideFilterNeon(Context *ctx, const OpTarget &target) : GuideFilterImpl(ctx, target)
 {}
 
-Status GuideFilterNeon::SetArgs(const Array *src0, const Array *src1, Array *dst, MI_S32 ksize, MI_F32 eps,
+Status GuideFilterNeon::SetArgs(const Array *src0, const Array *src1, Array *dst, DT_S32 ksize, DT_F32 eps,
                                 GuideFilterType type, BorderType border_type, const Scalar &border_value)
 {
     if (GuideFilterImpl::SetArgs(src0, src1, dst, ksize, eps, type, border_type, border_value) != Status::OK)
@@ -38,7 +38,7 @@ Status GuideFilterNeon::Run()
     const Mat *src1 = dynamic_cast<const Mat*>(m_src1);
     Mat *dst        = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src0 or src1 or dst is null");
         return Status::ERROR;

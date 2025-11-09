@@ -11,56 +11,56 @@ template <typename Tp>
 static Status DctRadix2SingleRowNeonImpl(Context *ctx, const Mat &src, Mat &dst)
 {
     Sizes3 sz     = src.GetSizes();
-    MI_S32 width  = sz.m_width;
-    MI_S32 half_w = width / 2;
+    DT_S32 width  = sz.m_width;
+    DT_S32 half_w = width / 2;
 
-    MI_U32 idx_bytes   = width * sizeof(MI_U16);
-    MI_U64 total_bytes = 2 * width * sizeof(MI_F32) * 2 + idx_bytes;
-    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<MI_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
-    if (MI_FALSE == param_mat.IsValid())
+    DT_U32 idx_bytes   = width * sizeof(DT_U16);
+    DT_U64 total_bytes = 2 * width * sizeof(DT_F32) * 2 + idx_bytes;
+    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<DT_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
+    if (DT_FALSE == param_mat.IsValid())
     {
         AURA_ADD_ERROR_STRING(ctx, "DctRadix2SingleRowNeonImpl failed to get param_mat");
         return Status::ERROR;
     }
 
-    MI_U16 *idx_table = param_mat.Ptr<MI_U16>(0);
+    DT_U16 *idx_table = param_mat.Ptr<DT_U16>(0);
 
-    std::complex<MI_F32> *buffer            = reinterpret_cast<std::complex<MI_F32> *>(idx_table + width);
-    std::complex<MI_F32> *exp_table         = buffer + width;
-    std::complex<MI_F32> *dft_row_exp_table = exp_table;
-    std::complex<MI_F32> *dct_row_exp_table = dft_row_exp_table + half_w;
+    std::complex<DT_F32> *buffer            = reinterpret_cast<std::complex<DT_F32> *>(idx_table + width);
+    std::complex<DT_F32> *exp_table         = buffer + width;
+    std::complex<DT_F32> *dft_row_exp_table = exp_table;
+    std::complex<DT_F32> *dct_row_exp_table = dft_row_exp_table + half_w;
 
     GetDftExpTable<0>(dft_row_exp_table, width);
     GetDctExpTable<0>(dct_row_exp_table, width);
 
-    MI_F32 coef_x0  = Sqrt(0.5f);
-    MI_F32 coef_row = Sqrt(2.0 / width);
+    DT_F32 coef_x0  = Sqrt(0.5f);
+    DT_F32 coef_row = Sqrt(2.0 / width);
 
     GetReverseIndex(idx_table, width);
 
     const Tp *src_c = src.Ptr<Tp>(0);
-    MI_F32   *dst_c = dst.Ptr<MI_F32>(0);
+    DT_F32   *dst_c = dst.Ptr<DT_F32>(0);
 
-    for (MI_S32 x = 0; x < half_w; ++x)
+    for (DT_S32 x = 0; x < half_w; ++x)
     {
-        MI_S32 idx0 = idx_table[x];
-        MI_S32 idx1 = idx_table[width - x - 1];
+        DT_S32 idx0 = idx_table[x];
+        DT_S32 idx1 = idx_table[width - x - 1];
 
-        buffer[idx0].real(static_cast<MI_F32>(src_c[2 * x]));
+        buffer[idx0].real(static_cast<DT_F32>(src_c[2 * x]));
         buffer[idx0].imag(0.0f);
-        buffer[idx1].real(static_cast<MI_F32>(src_c[2 * x + 1]));
+        buffer[idx1].real(static_cast<DT_F32>(src_c[2 * x + 1]));
         buffer[idx1].imag(0.0f);
     }
 
-    ButterflyTransformNeon(buffer, 2, width, MI_FALSE, dft_row_exp_table);
+    ButterflyTransformNeon(buffer, 2, width, DT_FALSE, dft_row_exp_table);
 
     float32x4_t vqf32_coef_row;
     neon::vdup(vqf32_coef_row, coef_row);
 
-    for (MI_S32 x = 0; x < width; x += 4)
+    for (DT_S32 x = 0; x < width; x += 4)
     {
-        MI_F32 *buf_ptr = reinterpret_cast<MI_F32 *>(&buffer[x]);
-        MI_F32 *w_ptr   = reinterpret_cast<MI_F32 *>(&dct_row_exp_table[x]);
+        DT_F32 *buf_ptr = reinterpret_cast<DT_F32 *>(&buffer[x]);
+        DT_F32 *w_ptr   = reinterpret_cast<DT_F32 *>(&dct_row_exp_table[x]);
 
         float32x4x2_t v2qf32_buf = neon::vload2q(buf_ptr);
         float32x4x2_t v2qf32_w   = neon::vload2q(w_ptr);
@@ -81,64 +81,64 @@ template <typename Tp>
 static Status DctRadix2SingleColNeonImpl(Context *ctx, const Mat &src, Mat &dst)
 {
     Sizes3 sz     = src.GetSizes();
-    MI_S32 height = sz.m_height;
-    MI_S32 half_h = height / 2;
+    DT_S32 height = sz.m_height;
+    DT_S32 half_h = height / 2;
 
-    MI_U32 idx_bytes   = height * sizeof(MI_U16);
-    MI_U64 total_bytes = 2 * height * sizeof(MI_F32) * 2 + idx_bytes;
-    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<MI_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
-    if (MI_FALSE == param_mat.IsValid())
+    DT_U32 idx_bytes   = height * sizeof(DT_U16);
+    DT_U64 total_bytes = 2 * height * sizeof(DT_F32) * 2 + idx_bytes;
+    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<DT_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
+    if (DT_FALSE == param_mat.IsValid())
     {
         AURA_ADD_ERROR_STRING(ctx, "DctRadix2SingleColNeonImpl failed to get param_mat");
         return Status::ERROR;
     }
 
-    MI_U16 *idx_table = param_mat.Ptr<MI_U16>(0);
+    DT_U16 *idx_table = param_mat.Ptr<DT_U16>(0);
 
-    std::complex<MI_F32> *buffer            = reinterpret_cast<std::complex<MI_F32> *>(idx_table + height);
-    std::complex<MI_F32> *exp_table         = buffer + height;
-    std::complex<MI_F32> *dft_col_exp_table = exp_table;
-    std::complex<MI_F32> *dct_col_exp_table = dft_col_exp_table + half_h;
+    std::complex<DT_F32> *buffer            = reinterpret_cast<std::complex<DT_F32> *>(idx_table + height);
+    std::complex<DT_F32> *exp_table         = buffer + height;
+    std::complex<DT_F32> *dft_col_exp_table = exp_table;
+    std::complex<DT_F32> *dct_col_exp_table = dft_col_exp_table + half_h;
 
     GetDftExpTable<0>(dft_col_exp_table, height);
     GetDctExpTable<0>(dct_col_exp_table, height);
 
-    MI_F32 coef_x0  = Sqrt(0.5f);
-    MI_F32 coef_col = Sqrt(2.0 / height);
+    DT_F32 coef_x0  = Sqrt(0.5f);
+    DT_F32 coef_col = Sqrt(2.0 / height);
 
     GetReverseIndex(idx_table, height);
 
     const Tp *src_col0 = src.Ptr<Tp>(0);
     const Tp *src_col1 = src.Ptr<Tp>(0);
 
-    for (MI_S32 x = 0; x < half_h; ++x)
+    for (DT_S32 x = 0; x < half_h; ++x)
     {
-        MI_S32 idx0    = idx_table[x];
-        MI_S32 idx1    = idx_table[height - x - 1];
-        MI_S32 col_idx = x << 1;
+        DT_S32 idx0    = idx_table[x];
+        DT_S32 idx1    = idx_table[height - x - 1];
+        DT_S32 col_idx = x << 1;
 
         src_col0 = src.Ptr<Tp>(col_idx);
         src_col1 = src.Ptr<Tp>(col_idx + 1);
 
-        buffer[idx0].real(static_cast<MI_F32>(src_col0[col_idx]));
+        buffer[idx0].real(static_cast<DT_F32>(src_col0[col_idx]));
         buffer[idx0].imag(0.0f);
-        buffer[idx1].real(static_cast<MI_F32>(src_col1[col_idx + 1]));
+        buffer[idx1].real(static_cast<DT_F32>(src_col1[col_idx + 1]));
         buffer[idx1].imag(0.0f);
     }
 
-    ButterflyTransformNeon(buffer, 2, height, MI_FALSE, dft_col_exp_table);
+    ButterflyTransformNeon(buffer, 2, height, DT_FALSE, dft_col_exp_table);
 
-    MI_F32 *dst_col = NULL;
-    for (MI_S32 x = 0; x < height; ++x)
+    DT_F32 *dst_col = NULL;
+    for (DT_S32 x = 0; x < height; ++x)
     {
-        MI_F32 cos_val = dct_col_exp_table[x].real();
-        MI_F32 sin_val = dct_col_exp_table[x].imag();
+        DT_F32 cos_val = dct_col_exp_table[x].real();
+        DT_F32 sin_val = dct_col_exp_table[x].imag();
 
-        dst_col    = dst.Ptr<MI_F32>(x);
+        dst_col    = dst.Ptr<DT_F32>(x);
         dst_col[0] = (buffer[x].real() * cos_val + buffer[x].imag() * sin_val) * coef_col;
     }
 
-    dst_col     = dst.Ptr<MI_F32>(0);
+    dst_col     = dst.Ptr<DT_F32>(0);
     dst_col[0] *= coef_x0;
 
     return Status::OK;
@@ -150,15 +150,15 @@ static Status DctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &dst, const Op
     AURA_UNUSED(target);
     WorkerPool *wp = ctx->GetWorkerPool();
 
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "Get WorkerPool Failed.");
         return Status::ERROR;
     }
 
     Sizes3 sz     = src.GetSizes();
-    MI_S32 width  = sz.m_width;
-    MI_S32 height = sz.m_height;
+    DT_S32 width  = sz.m_width;
+    DT_S32 height = sz.m_height;
 
     if (1 == height)
     {
@@ -171,43 +171,43 @@ static Status DctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &dst, const Op
         return DctRadix2SingleColNeonImpl<Tp>(ctx, src, dst);
     }
 
-    MI_S32 half_w    = width / 2;
-    MI_S32 half_h    = height / 2;
-    MI_S32 row_pitch = dst.GetRowPitch();
+    DT_S32 half_w    = width / 2;
+    DT_S32 half_h    = height / 2;
+    DT_S32 row_pitch = dst.GetRowPitch();
 
-    MI_U32 max_len     = Max(width, height);
-    MI_U32 idx_bytes   = max_len * sizeof(MI_U16);
-    MI_U64 total_bytes = 3 * max_len * sizeof(MI_F32) * 2 + idx_bytes;
-    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<MI_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
+    DT_U32 max_len     = Max(width, height);
+    DT_U32 idx_bytes   = max_len * sizeof(DT_U16);
+    DT_U64 total_bytes = 3 * max_len * sizeof(DT_F32) * 2 + idx_bytes;
+    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<DT_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
     if (!param_mat.IsValid())
     {
         AURA_ADD_ERROR_STRING(ctx, "DctRadix2NeonImpl failed to get param_mat");
         return Status::ERROR;
     }
 
-    MI_U16 *idx_table = param_mat.Ptr<MI_U16>(0);
+    DT_U16 *idx_table = param_mat.Ptr<DT_U16>(0);
 
-    std::complex<MI_F32> *buffer            = reinterpret_cast<std::complex<MI_F32> *>(idx_table + max_len);
-    std::complex<MI_F32> *dft_row_exp_table = buffer;
-    std::complex<MI_F32> *dft_col_exp_table = dft_row_exp_table + half_w;
-    std::complex<MI_F32> *dct_row_exp_table = dft_col_exp_table + half_h;
-    std::complex<MI_F32> *dct_col_exp_table = dct_row_exp_table + width;
+    std::complex<DT_F32> *buffer            = reinterpret_cast<std::complex<DT_F32> *>(idx_table + max_len);
+    std::complex<DT_F32> *dft_row_exp_table = buffer;
+    std::complex<DT_F32> *dft_col_exp_table = dft_row_exp_table + half_w;
+    std::complex<DT_F32> *dct_row_exp_table = dft_col_exp_table + half_h;
+    std::complex<DT_F32> *dct_col_exp_table = dct_row_exp_table + width;
 
     GetDftExpTable<0>(dft_row_exp_table, width);
     GetDftExpTable<0>(dft_col_exp_table, height);
     GetDctExpTable<0>(dct_row_exp_table, width);
     GetDctExpTable<0>(dct_col_exp_table, height);
 
-    MI_F32 coef_x0  = Sqrt(0.5f);
-    MI_F32 coef_row = Sqrt(2.0 / width);
-    MI_F32 coef_col = Sqrt(2.0 / height);
+    DT_F32 coef_x0  = Sqrt(0.5f);
+    DT_F32 coef_row = Sqrt(2.0 / width);
+    DT_F32 coef_col = Sqrt(2.0 / height);
 
-    MI_S32 buffer_sz = max_len * sizeof(std::complex<MI_F32>);
+    DT_S32 buffer_sz = max_len * sizeof(std::complex<DT_F32>);
     ThreadBuffer thread_buffer(ctx, buffer_sz);
 
-    auto row_process_func = [&](MI_S32 start_row, MI_S32 end_row)->Status
+    auto row_process_func = [&](DT_S32 start_row, DT_S32 end_row)->Status
     {
-        std::complex<MI_F32> *p_buf = thread_buffer.GetThreadData<std::complex<MI_F32>>();
+        std::complex<DT_F32> *p_buf = thread_buffer.GetThreadData<std::complex<DT_F32>>();
 
         if (!p_buf)
         {
@@ -215,31 +215,31 @@ static Status DctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &dst, const Op
             return Status::ERROR;
         }
 
-        for (MI_S32 y = start_row; y < end_row; ++y)
+        for (DT_S32 y = start_row; y < end_row; ++y)
         {
             const Tp *src_row = src.Ptr<Tp>(y);
-            MI_F32   *dst_row = dst.Ptr<MI_F32>(y);
+            DT_F32   *dst_row = dst.Ptr<DT_F32>(y);
 
-            for (MI_S32 x = 0; x < half_w; ++x)
+            for (DT_S32 x = 0; x < half_w; ++x)
             {
-                MI_S32 idx0 = idx_table[x];
-                MI_S32 idx1 = idx_table[width - x - 1];
+                DT_S32 idx0 = idx_table[x];
+                DT_S32 idx1 = idx_table[width - x - 1];
 
-                p_buf[idx0].real(static_cast<MI_F32>(src_row[2 * x]));
+                p_buf[idx0].real(static_cast<DT_F32>(src_row[2 * x]));
                 p_buf[idx0].imag(0.0f);
-                p_buf[idx1].real(static_cast<MI_F32>(src_row[2 * x + 1]));
+                p_buf[idx1].real(static_cast<DT_F32>(src_row[2 * x + 1]));
                 p_buf[idx1].imag(0.0f);
             }
 
-            ButterflyTransformNeon(p_buf, 2, width, MI_FALSE, dft_row_exp_table);
+            ButterflyTransformNeon(p_buf, 2, width, DT_FALSE, dft_row_exp_table);
 
             float32x4_t vqf32_coef_row;
             neon::vdup(vqf32_coef_row, coef_row);
 
-            for (MI_S32 x = 0; x < width; x += 4)
+            for (DT_S32 x = 0; x < width; x += 4)
             {
-                MI_F32 *buf_ptr = reinterpret_cast<MI_F32 *>(&p_buf[x]);
-                MI_F32 *w_ptr   = reinterpret_cast<MI_F32 *>(&dct_row_exp_table[x]);
+                DT_F32 *buf_ptr = reinterpret_cast<DT_F32 *>(&p_buf[x]);
+                DT_F32 *w_ptr   = reinterpret_cast<DT_F32 *>(&dct_row_exp_table[x]);
 
                 float32x4x2_t v2qf32_buf = neon::vload2q(buf_ptr);
                 float32x4x2_t v2qf32_w   = neon::vload2q(w_ptr);
@@ -257,10 +257,10 @@ static Status DctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &dst, const Op
         return Status::OK;
     };
 
-    auto col_process_func = [&](MI_S32 start, MI_S32 end)->Status
+    auto col_process_func = [&](DT_S32 start, DT_S32 end)->Status
     {
 
-        std::complex<MI_F32> *p_buf = thread_buffer.GetThreadData<std::complex<MI_F32>>();
+        std::complex<DT_F32> *p_buf = thread_buffer.GetThreadData<std::complex<DT_F32>>();
 
         if (!p_buf)
         {
@@ -268,13 +268,13 @@ static Status DctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &dst, const Op
             return Status::ERROR;
         }
 
-        for (MI_S32 x = start; x < end; ++x)
+        for (DT_S32 x = start; x < end; ++x)
         {
-            MI_U8 *dst_data = reinterpret_cast<MI_U8*>(dst.GetData());
-            for (MI_S32 y = 0; y < half_h; ++y)
+            DT_U8 *dst_data = reinterpret_cast<DT_U8*>(dst.GetData());
+            for (DT_S32 y = 0; y < half_h; ++y)
             {
-                MI_F32 even_value = reinterpret_cast<MI_F32 *>(dst_data)[x];
-                MI_F32 odd_value  = reinterpret_cast<MI_F32 *>(dst_data + row_pitch)[x];
+                DT_F32 even_value = reinterpret_cast<DT_F32 *>(dst_data)[x];
+                DT_F32 odd_value  = reinterpret_cast<DT_F32 *>(dst_data + row_pitch)[x];
 
                 p_buf[y].real(even_value);
                 p_buf[y].imag(0.0f);
@@ -283,23 +283,23 @@ static Status DctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &dst, const Op
                 dst_data += 2 * row_pitch;
             }
 
-            for (MI_S32 y = 0; y < height; ++y)
+            for (DT_S32 y = 0; y < height; ++y)
             {
-                MI_S32 idx = idx_table[y];
+                DT_S32 idx = idx_table[y];
                 if (idx > y)
                 {
                     Swap(p_buf[y], p_buf[idx]);
                 }
             }
 
-            ButterflyTransformNeon(p_buf, 2, height, MI_FALSE, dft_col_exp_table);
+            ButterflyTransformNeon(p_buf, 2, height, DT_FALSE, dft_col_exp_table);
 
-            dst_data = reinterpret_cast<MI_U8 *>(dst.GetData());
-            for (MI_S32 y = 0; y < height; ++y)
+            dst_data = reinterpret_cast<DT_U8 *>(dst.GetData());
+            for (DT_S32 y = 0; y < height; ++y)
             {
-                MI_F32 *dst_c  = reinterpret_cast<MI_F32 *>(dst_data);
-                MI_F32 cos_val = dct_col_exp_table[y].real();
-                MI_F32 sin_val = dct_col_exp_table[y].imag();
+                DT_F32 *dst_c  = reinterpret_cast<DT_F32 *>(dst_data);
+                DT_F32 cos_val = dct_col_exp_table[y].real();
+                DT_F32 sin_val = dct_col_exp_table[y].imag();
 
                 dst_c[x] = (p_buf[y].real() * cos_val + p_buf[y].imag() * sin_val) * coef_col;
                 dst_data += row_pitch;
@@ -324,8 +324,8 @@ static Status DctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &dst, const Op
         return Status::ERROR;
     }
 
-    MI_F32 *dst_c = dst.Ptr<MI_F32>(0);
-    for (MI_S32 x = 0; x < width; ++x)
+    DT_F32 *dst_c = dst.Ptr<DT_F32>(0);
+    for (DT_S32 x = 0; x < width; ++x)
     {
         dst_c[x] *= coef_x0;
     }
@@ -353,7 +353,7 @@ Status DctNeon::SetArgs(const Array *src, Array *dst)
     ElemType src_type = src->GetElemType();
     if ((ElemType::S32 == src_type) || (ElemType::U32 == src_type) || (ElemType::F64 == src_type))
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "current src does not support MI_S32/MI_U32/MI_F64 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "current src does not support DT_S32/DT_U32/DT_F64 type.");
         return Status::ERROR;
     }
 
@@ -371,7 +371,7 @@ Status DctNeon::Run()
 {
     const Mat *src = dynamic_cast<const Mat *>(m_src);
     Mat *dst = dynamic_cast<Mat *>(m_dst);
-    if ((MI_NULL == src) ||(MI_NULL == dst))
+    if ((DT_NULL == src) ||(DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "input src or dst is null");
     }
@@ -383,22 +383,22 @@ Status DctNeon::Run()
     {
         case ElemType::U8:
         {
-            ret = DctRadix2NeonImpl<MI_U8>(m_ctx, *src, *dst, m_target);
+            ret = DctRadix2NeonImpl<DT_U8>(m_ctx, *src, *dst, m_target);
             break;
         }
         case ElemType::S8:
         {
-            ret = DctRadix2NeonImpl<MI_S8>(m_ctx, *src, *dst, m_target);
+            ret = DctRadix2NeonImpl<DT_S8>(m_ctx, *src, *dst, m_target);
             break;
         }
         case ElemType::U16:
         {
-            ret = DctRadix2NeonImpl<MI_U16>(m_ctx, *src, *dst, m_target);
+            ret = DctRadix2NeonImpl<DT_U16>(m_ctx, *src, *dst, m_target);
             break;
         }
         case ElemType::S16:
         {
-            ret = DctRadix2NeonImpl<MI_S16>(m_ctx, *src, *dst, m_target);
+            ret = DctRadix2NeonImpl<DT_S16>(m_ctx, *src, *dst, m_target);
             break;
         }
 #if defined(AURA_ENABLE_NEON_FP16)
@@ -410,7 +410,7 @@ Status DctNeon::Run()
 #endif // AURA_ENABLE_NEON_FP16
         case ElemType::F32:
         {
-            ret = DctRadix2NeonImpl<MI_F32>(m_ctx, *src, *dst, m_target);
+            ret = DctRadix2NeonImpl<DT_F32>(m_ctx, *src, *dst, m_target);
             break;
         }
         default:
@@ -428,54 +428,54 @@ template<typename Tp>
 static Status IDctRadix2SingleRowNeonImpl(Context *ctx, const Mat &src, Mat &dst)
 {
     Sizes3 sz     = src.GetSizes();
-    MI_S32 width  = sz.m_width;
-    MI_S32 half_w = width / 2;
+    DT_S32 width  = sz.m_width;
+    DT_S32 half_w = width / 2;
 
-    MI_U32 idx_bytes   = width * sizeof(MI_U16);
-    MI_U64 total_bytes = 2 * width * sizeof(MI_F32) * 2 + idx_bytes;
-    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<MI_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
+    DT_U32 idx_bytes   = width * sizeof(DT_U16);
+    DT_U64 total_bytes = 2 * width * sizeof(DT_F32) * 2 + idx_bytes;
+    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<DT_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
     if (!param_mat.IsValid())
     {
         AURA_ADD_ERROR_STRING(ctx, "IDctRadix2SingleRowNeonImpl failed to get param_mat");
         return Status::ERROR;
     }
 
-    MI_U16 *idx_table = param_mat.Ptr<MI_U16>(0);
+    DT_U16 *idx_table = param_mat.Ptr<DT_U16>(0);
 
-    std::complex<MI_F32> *buffer            = reinterpret_cast<std::complex<MI_F32> *>(idx_table + width);
-    std::complex<MI_F32> *exp_table         = buffer + width;
-    std::complex<MI_F32> *dft_row_exp_table = exp_table;
-    std::complex<MI_F32> *dct_row_exp_table = dft_row_exp_table + half_w;
+    std::complex<DT_F32> *buffer            = reinterpret_cast<std::complex<DT_F32> *>(idx_table + width);
+    std::complex<DT_F32> *exp_table         = buffer + width;
+    std::complex<DT_F32> *dft_row_exp_table = exp_table;
+    std::complex<DT_F32> *dct_row_exp_table = dft_row_exp_table + half_w;
 
     GetDftExpTable<0>(dft_row_exp_table, width);
     GetDctExpTable<1>(dct_row_exp_table, width);
 
-    MI_F32 coef_row_x0 = Sqrt(1.0f / width);
-    MI_F32 coef_row    = Sqrt(2.0f / width);
+    DT_F32 coef_row_x0 = Sqrt(1.0f / width);
+    DT_F32 coef_row    = Sqrt(2.0f / width);
 
     GetReverseIndex(idx_table, width);
 
-    const MI_F32 *src_c = src.Ptr<MI_F32>(0);
+    const DT_F32 *src_c = src.Ptr<DT_F32>(0);
 
     buffer[0].real(src_c[0] * coef_row_x0);
     buffer[0].imag(0);
 
-    for (MI_S32 x = 1; x < width; ++x)
+    for (DT_S32 x = 1; x < width; ++x)
     {
-        MI_S32 idx = idx_table[x];
-        MI_F32 cos_val = dct_row_exp_table[x].real();
-        MI_F32 sin_val = dct_row_exp_table[x].imag();
+        DT_S32 idx = idx_table[x];
+        DT_F32 cos_val = dct_row_exp_table[x].real();
+        DT_F32 sin_val = dct_row_exp_table[x].imag();
 
         buffer[idx].real(src_c[x] * coef_row * cos_val);
         buffer[idx].imag(src_c[x] * coef_row * sin_val);
     }
 
-    ButterflyTransformNeon(buffer, 2, width, MI_FALSE, dft_row_exp_table);
+    ButterflyTransformNeon(buffer, 2, width, DT_FALSE, dft_row_exp_table);
 
     Tp *dst_row = dst.Ptr<Tp>(0);
-    for (MI_S32 x = 0; x < half_w; ++x)
+    for (DT_S32 x = 0; x < half_w; ++x)
     {
-        MI_S32 row_idx       = x << 1;
+        DT_S32 row_idx       = x << 1;
         dst_row[row_idx]     = SaturateCast<Tp>(buffer[x].real());
         dst_row[row_idx + 1] = SaturateCast<Tp>(buffer[width - x - 1].real());
     }
@@ -487,57 +487,57 @@ template<typename Tp>
 static Status IDctRadix2SingleColNeonImpl(Context *ctx, const Mat &src, Mat &dst)
 {
     Sizes3 sz     = src.GetSizes();
-    MI_S32 height = sz.m_height;
-    MI_S32 half_h = height / 2;
+    DT_S32 height = sz.m_height;
+    DT_S32 half_h = height / 2;
 
-    MI_U32 idx_bytes   = height * sizeof(MI_U16);
-    MI_U64 total_bytes = 2 * height * sizeof(MI_F32) * 2 + idx_bytes;
-    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<MI_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
+    DT_U32 idx_bytes   = height * sizeof(DT_U16);
+    DT_U64 total_bytes = 2 * height * sizeof(DT_F32) * 2 + idx_bytes;
+    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<DT_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
     if (!param_mat.IsValid())
     {
         AURA_ADD_ERROR_STRING(ctx, "IDctRadix2SingleColNeonImpl failed to get param_mat");
         return Status::ERROR;
     }
 
-    MI_U16 *idx_table = param_mat.Ptr<MI_U16>(0);
+    DT_U16 *idx_table = param_mat.Ptr<DT_U16>(0);
 
-    std::complex<MI_F32> *buffer            = reinterpret_cast<std::complex<MI_F32> *>(idx_table + height);
-    std::complex<MI_F32> *exp_table         = buffer + height;
-    std::complex<MI_F32> *dft_col_exp_table = exp_table;
-    std::complex<MI_F32> *dct_col_exp_table = dft_col_exp_table + half_h;
+    std::complex<DT_F32> *buffer            = reinterpret_cast<std::complex<DT_F32> *>(idx_table + height);
+    std::complex<DT_F32> *exp_table         = buffer + height;
+    std::complex<DT_F32> *dft_col_exp_table = exp_table;
+    std::complex<DT_F32> *dct_col_exp_table = dft_col_exp_table + half_h;
 
     GetDftExpTable<0>(dft_col_exp_table, height);
     GetDctExpTable<1>(dct_col_exp_table, height);
 
-    MI_F32 coef_col_x0 = Sqrt(1.0f / height);
-    MI_F32 coef_col    = Sqrt(2.0 / height);
+    DT_F32 coef_col_x0 = Sqrt(1.0f / height);
+    DT_F32 coef_col    = Sqrt(2.0 / height);
 
     GetReverseIndex(idx_table, height);
 
-    const MI_F32 *src_c = src.Ptr<MI_F32>(0);
+    const DT_F32 *src_c = src.Ptr<DT_F32>(0);
 
     buffer[0].real(src_c[0] * coef_col_x0);
     buffer[0].imag(0);
 
-    for (MI_S32 x = 1; x < height; ++x)
+    for (DT_S32 x = 1; x < height; ++x)
     {
-        MI_S32 idx     = idx_table[x];
-        MI_F32 cos_val = dct_col_exp_table[x].real();
-        MI_F32 sin_val = dct_col_exp_table[x].imag();
+        DT_S32 idx     = idx_table[x];
+        DT_F32 cos_val = dct_col_exp_table[x].real();
+        DT_F32 sin_val = dct_col_exp_table[x].imag();
 
-        src_c = src.Ptr<MI_F32>(x);
+        src_c = src.Ptr<DT_F32>(x);
         buffer[idx].real(src_c[0] * coef_col * cos_val);
         buffer[idx].imag(src_c[0] * coef_col * sin_val);
     }
 
-    ButterflyTransformNeon(buffer, 2, height, MI_FALSE, dft_col_exp_table);
+    ButterflyTransformNeon(buffer, 2, height, DT_FALSE, dft_col_exp_table);
 
     Tp *dst_col0 = dst.Ptr<Tp>(0);
     Tp *dst_col1 = dst.Ptr<Tp>(0);
 
-    for (MI_S32 x = 0; x < half_h; ++x)
+    for (DT_S32 x = 0; x < half_h; ++x)
     {
-        MI_S32 col_idx = x << 1;
+        DT_S32 col_idx = x << 1;
 
         dst_col0    = dst.Ptr<Tp>(col_idx);
         dst_col1    = dst.Ptr<Tp>(col_idx + 1);
@@ -554,15 +554,15 @@ static Status IDctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &mid, Mat &ds
     AURA_UNUSED(target);
     WorkerPool *wp = ctx->GetWorkerPool();
 
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "Get WorkerPool Failed.");
         return Status::ERROR;
     }
 
     Sizes3 sz     = src.GetSizes();
-    MI_S32 width  = sz.m_width;
-    MI_S32 height = sz.m_height;
+    DT_S32 width  = sz.m_width;
+    DT_S32 height = sz.m_height;
 
     if (1 == height)
     {
@@ -574,46 +574,46 @@ static Status IDctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &mid, Mat &ds
         return IDctRadix2SingleColNeonImpl<Tp>(ctx, src, dst);
     }
 
-    MI_S32 half_w        = width / 2;
-    MI_S32 half_h        = height / 2;
-    MI_S32 mid_pitch     = mid.GetRowPitch();
-    MI_S32 dst_row_pitch = dst.GetRowPitch();
+    DT_S32 half_w        = width / 2;
+    DT_S32 half_h        = height / 2;
+    DT_S32 mid_pitch     = mid.GetRowPitch();
+    DT_S32 dst_row_pitch = dst.GetRowPitch();
 
-    MI_U32 max_len     = Max(width, height);
-    MI_U32 idx_bytes   = max_len * sizeof(MI_U16);
-    MI_U64 total_bytes = 3 * max_len * sizeof(MI_F32) * 2 + idx_bytes;
-    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<MI_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
+    DT_U32 max_len     = Max(width, height);
+    DT_U32 idx_bytes   = max_len * sizeof(DT_U16);
+    DT_U64 total_bytes = 3 * max_len * sizeof(DT_F32) * 2 + idx_bytes;
+    Mat param_mat(ctx, ElemType::U8, {1, SaturateCast<DT_S32>(total_bytes), 1}, AURA_MEM_DEFAULT);
     if (!param_mat.IsValid())
     {
         AURA_ADD_ERROR_STRING(ctx, "IDctRadix2NeonImpl failed to get param_mat");
         return Status::ERROR;
     }
 
-    MI_U16 *idx_table = param_mat.Ptr<MI_U16>(0);
+    DT_U16 *idx_table = param_mat.Ptr<DT_U16>(0);
 
-    std::complex<MI_F32> *buffer            = reinterpret_cast<std::complex<MI_F32> *>(idx_table + max_len);
-    std::complex<MI_F32> *dft_row_exp_table = buffer;
-    std::complex<MI_F32> *dft_col_exp_table = dft_row_exp_table + half_w;
-    std::complex<MI_F32> *dct_row_exp_table = dft_col_exp_table + half_h;
-    std::complex<MI_F32> *dct_col_exp_table = dct_row_exp_table + width;
+    std::complex<DT_F32> *buffer            = reinterpret_cast<std::complex<DT_F32> *>(idx_table + max_len);
+    std::complex<DT_F32> *dft_row_exp_table = buffer;
+    std::complex<DT_F32> *dft_col_exp_table = dft_row_exp_table + half_w;
+    std::complex<DT_F32> *dct_row_exp_table = dft_col_exp_table + half_h;
+    std::complex<DT_F32> *dct_col_exp_table = dct_row_exp_table + width;
 
     GetDftExpTable<0>(dft_row_exp_table, width);
     GetDftExpTable<0>(dft_col_exp_table, height);
     GetDctExpTable<1>(dct_row_exp_table, width);
     GetDctExpTable<1>(dct_col_exp_table, height);
 
-    MI_F32 coef_row_x0 = Sqrt(1.0f / width);
-    MI_F32 coef_col_x0 = Sqrt(1.0f / height);
-    MI_F32 coef_row    = Sqrt(2.0 / width);
-    MI_F32 coef_col    = Sqrt(2.0 / height);
+    DT_F32 coef_row_x0 = Sqrt(1.0f / width);
+    DT_F32 coef_col_x0 = Sqrt(1.0f / height);
+    DT_F32 coef_row    = Sqrt(2.0 / width);
+    DT_F32 coef_col    = Sqrt(2.0 / height);
 
-    MI_S32 buffer_sz = max_len * sizeof(std::complex<MI_F32>);
+    DT_S32 buffer_sz = max_len * sizeof(std::complex<DT_F32>);
     ThreadBuffer thread_buffer(ctx, buffer_sz);
 
-    auto row_process_func = [&](MI_S32 start, MI_S32 end)->Status
+    auto row_process_func = [&](DT_S32 start, DT_S32 end)->Status
     {
 
-        std::complex<MI_F32> *p_buf = thread_buffer.GetThreadData<std::complex<MI_F32>>();
+        std::complex<DT_F32> *p_buf = thread_buffer.GetThreadData<std::complex<DT_F32>>();
 
         if (!p_buf)
         {
@@ -621,27 +621,27 @@ static Status IDctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &mid, Mat &ds
             return Status::ERROR;
         }
 
-        for (MI_S32 y = start; y < end; ++y)
+        for (DT_S32 y = start; y < end; ++y)
         {
-            const  MI_F32 *src_row = src.Ptr<MI_F32>(y);
-            MI_F32 *mid_row        = mid.Ptr<MI_F32>(y);
+            const  DT_F32 *src_row = src.Ptr<DT_F32>(y);
+            DT_F32 *mid_row        = mid.Ptr<DT_F32>(y);
 
             p_buf[0].real(src_row[0] * coef_row_x0);
             p_buf[0].imag(0);
 
-            for (MI_S32 x = 1; x < width; ++x)
+            for (DT_S32 x = 1; x < width; ++x)
             {
-                MI_S32 idx     = idx_table[x];
-                MI_F32 cos_val = dct_row_exp_table[x].real();
-                MI_F32 sin_val = dct_row_exp_table[x].imag();
+                DT_S32 idx     = idx_table[x];
+                DT_F32 cos_val = dct_row_exp_table[x].real();
+                DT_F32 sin_val = dct_row_exp_table[x].imag();
 
                 p_buf[idx].real(src_row[x] * coef_row * cos_val);
                 p_buf[idx].imag(src_row[x] * coef_row * sin_val);
             }
 
-            ButterflyTransformNeon(p_buf, 2, width, MI_FALSE, dft_row_exp_table);
+            ButterflyTransformNeon(p_buf, 2, width, DT_FALSE, dft_row_exp_table);
 
-            MI_F32 *buf_head = reinterpret_cast<MI_F32 *>(p_buf);
+            DT_F32 *buf_head = reinterpret_cast<DT_F32 *>(p_buf);
 
             // width size is based radix2, so do specialized process for litter size
             if (2 == width)
@@ -651,7 +651,7 @@ static Status IDctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &mid, Mat &ds
             }
             else if (4 == width)
             {
-                MI_F32 *buf_tail = reinterpret_cast<MI_F32 *>(p_buf + width - 2);
+                DT_F32 *buf_tail = reinterpret_cast<DT_F32 *>(p_buf + width - 2);
                 float32x2x2_t v2f32_res;
                 float32x2x2_t v2f32_head = neon::vload2(buf_head);
                 float32x2x2_t v2f32_tail = neon::vload2(buf_tail);
@@ -663,8 +663,8 @@ static Status IDctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &mid, Mat &ds
             }
             else
             {
-                MI_F32 *buf_tail = reinterpret_cast<MI_F32 *>(p_buf + width - 4);
-                for (MI_S32 x = 0; x < half_w; x += 4)
+                DT_F32 *buf_tail = reinterpret_cast<DT_F32 *>(p_buf + width - 4);
+                for (DT_S32 x = 0; x < half_w; x += 4)
                 {
                     float32x4x2_t v2qf32_res;
                     float32x4x2_t v2qf32_head = neon::vload2q(buf_head);
@@ -684,9 +684,9 @@ static Status IDctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &mid, Mat &ds
         return Status::OK;
     };
 
-    auto col_process_func = [&](MI_S32 start, MI_S32 end)->Status
+    auto col_process_func = [&](DT_S32 start, DT_S32 end)->Status
     {
-        std::complex<MI_F32> *p_buf = thread_buffer.GetThreadData<std::complex<MI_F32>>();
+        std::complex<DT_F32> *p_buf = thread_buffer.GetThreadData<std::complex<DT_F32>>();
 
         if (!p_buf)
         {
@@ -694,40 +694,40 @@ static Status IDctRadix2NeonImpl(Context *ctx, const Mat &src, Mat &mid, Mat &ds
             return Status::ERROR;
         }
 
-        for (MI_S32 x = start; x < end; ++x)
+        for (DT_S32 x = start; x < end; ++x)
         {
-            MI_U8  *mid_data = reinterpret_cast<MI_U8*>(mid.GetData());
-            MI_F32 *mid_row  = reinterpret_cast<MI_F32*>(mid_data);
+            DT_U8  *mid_data = reinterpret_cast<DT_U8*>(mid.GetData());
+            DT_F32 *mid_row  = reinterpret_cast<DT_F32*>(mid_data);
 
             p_buf[0].real(mid_row[x] * coef_col_x0);
             p_buf[0].imag(0.0f);
             mid_data += mid_pitch;
 
-            for (MI_S32 y = 1; y < height; ++y)
+            for (DT_S32 y = 1; y < height; ++y)
             {
-                mid_row  = reinterpret_cast<MI_F32*>(mid_data);
+                mid_row  = reinterpret_cast<DT_F32*>(mid_data);
 
-                MI_F32 cos_val = dct_col_exp_table[y].real();
-                MI_F32 sin_val = dct_col_exp_table[y].imag();
+                DT_F32 cos_val = dct_col_exp_table[y].real();
+                DT_F32 sin_val = dct_col_exp_table[y].imag();
 
                 p_buf[y].real(mid_row[x] * coef_col * cos_val);
                 p_buf[y].imag(mid_row[x] * coef_col * sin_val);
                 mid_data += mid_pitch;
             }
 
-            for (MI_S32 y = 0; y < height; ++y)
+            for (DT_S32 y = 0; y < height; ++y)
             {
-                MI_S32 idx = idx_table[y];
+                DT_S32 idx = idx_table[y];
                 if (idx > y)
                 {
                     Swap(p_buf[y], p_buf[idx]);
                 }
             }
 
-            ButterflyTransformNeon(p_buf, 2, height, MI_FALSE, dft_col_exp_table);
+            ButterflyTransformNeon(p_buf, 2, height, DT_FALSE, dft_col_exp_table);
 
-            MI_U8 *dst_data = reinterpret_cast<MI_U8 *>(dst.GetData());
-            for (MI_S32 y = 0; y < half_h; ++y)
+            DT_U8 *dst_data = reinterpret_cast<DT_U8 *>(dst.GetData());
+            for (DT_S32 y = 0; y < half_h; ++y)
             {
                 Tp *dst_even = reinterpret_cast<Tp *>(dst_data);
                 Tp *dst_odd  = reinterpret_cast<Tp *>(dst_data + dst_row_pitch);
@@ -768,22 +768,22 @@ static Status IDctRadix2NeonHelper(Context *ctx, const Mat &src, Mat &mid, Mat &
     {
         case ElemType::U8:
         {
-            ret = IDctRadix2NeonImpl<MI_U8>(ctx, src, mid, dst, target);
+            ret = IDctRadix2NeonImpl<DT_U8>(ctx, src, mid, dst, target);
             break;
         }
         case ElemType::S8:
         {
-            ret = IDctRadix2NeonImpl<MI_S8>(ctx, src, mid, dst, target);
+            ret = IDctRadix2NeonImpl<DT_S8>(ctx, src, mid, dst, target);
             break;
         }
         case ElemType::U16:
         {
-            ret = IDctRadix2NeonImpl<MI_U16>(ctx, src, mid, dst, target);
+            ret = IDctRadix2NeonImpl<DT_U16>(ctx, src, mid, dst, target);
             break;
         }
         case ElemType::S16:
         {
-            ret = IDctRadix2NeonImpl<MI_S16>(ctx, src, mid, dst, target);
+            ret = IDctRadix2NeonImpl<DT_S16>(ctx, src, mid, dst, target);
             break;
         }
 #if defined(AURA_ENABLE_NEON_FP16)
@@ -795,7 +795,7 @@ static Status IDctRadix2NeonHelper(Context *ctx, const Mat &src, Mat &mid, Mat &
 #endif // AURA_ENABLE_NEON_FP16
         case ElemType::F32:
         {
-            ret = IDctRadix2NeonImpl<MI_F32>(ctx, src, dst, dst, target);
+            ret = IDctRadix2NeonImpl<DT_F32>(ctx, src, dst, dst, target);
             break;
         }
         default:
@@ -830,7 +830,7 @@ Status IDctNeon::SetArgs(const Array *src, Array *dst)
     ElemType dst_type = dst->GetElemType();
     if ((ElemType::S32 == dst_type) || (ElemType::U32 == dst_type) || (ElemType::F64 == dst_type))
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "current dst does not support MI_S32/MI_U32/MI_F64 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "current dst does not support DT_S32/DT_U32/DT_F64 type.");
         return Status::ERROR;
     }
 
@@ -851,7 +851,7 @@ Status IDctNeon::Run()
     const Mat *src = dynamic_cast<const Mat *>(m_src);
     Mat   *dst     = dynamic_cast<Mat *>(m_dst);
     Mat   *mid     = &m_mid;
-    if ((MI_NULL == src) ||(MI_NULL == dst) || (MI_NULL == mid))
+    if ((DT_NULL == src) ||(DT_NULL == dst) || (DT_NULL == mid))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "input src or dst or mid is null");
         return Status::ERROR;

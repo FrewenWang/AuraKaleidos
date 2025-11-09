@@ -14,7 +14,7 @@ struct HarrisTestParam
     HarrisTestParam()
     {}
 
-    HarrisTestParam(MI_S32 block_size, MI_S32 k_size, MI_F64 k) : block_size(block_size), k_size(k_size), k(k)
+    HarrisTestParam(DT_S32 block_size, DT_S32 k_size, DT_F64 k) : block_size(block_size), k_size(k_size), k(k)
     {}
 
     friend std::ostream& operator<<(std::ostream &os, HarrisTestParam harris_test_param)
@@ -30,9 +30,9 @@ struct HarrisTestParam
         return sstream.str();
     }
 
-    MI_S32 block_size;
-    MI_S32 k_size;
-    MI_F64 k;
+    DT_S32 block_size;
+    DT_S32 k_size;
+    DT_F64 k;
 };
 
 AURA_TEST_PARAM(HarrisParam,
@@ -59,9 +59,9 @@ static Status CvCornerHarris(Context *ctx, Mat &src, Mat &dst, const HarrisTestP
         return Status::ERROR;
     }
 
-    MI_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
-    MI_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
-    MI_S32 cv_type = 0;
+    DT_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
+    DT_S32 cv_type = 0;
 
     if ((CV_8UC1 != src_cv_type && CV_32FC1 != src_cv_type) || CV_32FC1 != dst_cv_type)
     {
@@ -73,7 +73,7 @@ static Status CvCornerHarris(Context *ctx, Mat &src, Mat &dst, const HarrisTestP
         cv::Mat cv_src = MatToOpencv(src);
         cv::Mat cv_dst = MatToOpencv(dst);
 
-        MI_S32 cv_border_type = BorderTypeToOpencv(border_type);
+        DT_S32 cv_border_type = BorderTypeToOpencv(border_type);
         cv::cornerHarris(cv_src, cv_dst, param.block_size, param.k_size, param.k, cv_border_type);
     }
     else
@@ -109,7 +109,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         HarrisParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -131,18 +131,18 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         HarrisParam run_param(GetParam((index)));
 
         // creat iauras
-        MI_F32 alpha = run_param.elem_type == ElemType::U8 ? 1.0f : 1 / 255.f;
+        DT_F32 alpha = run_param.elem_type == ElemType::U8 ? 1.0f : 1 / 255.f;
         Mat src = m_factory.GetDerivedMat(alpha, 0.0f, run_param.elem_type, run_param.mat_sizes.m_sizes, AURA_MEM_DEFAULT, run_param.mat_sizes.m_strides);
         Mat dst = m_factory.GetEmptyMat(ElemType::F32, run_param.mat_sizes.m_sizes, AURA_MEM_DEFAULT, run_param.mat_sizes.m_strides);
         Mat ref = m_factory.GetEmptyMat(ElemType::F32, run_param.mat_sizes.m_sizes, AURA_MEM_DEFAULT, run_param.mat_sizes.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;

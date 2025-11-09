@@ -5,7 +5,7 @@
 namespace aura
 {
 
-static Status GetCLKernelParam(WarpType warp_type, InterpType interp_type, MI_S32 channel, MI_S32 &elem_counts, MI_S32 &elem_height)
+static Status GetCLKernelParam(WarpType warp_type, InterpType interp_type, DT_S32 channel, DT_S32 &elem_counts, DT_S32 &elem_height)
 {
     if (WarpType::PERSPECTIVE == warp_type && interp_type != InterpType::LINEAR)
     {
@@ -32,7 +32,7 @@ static Status GetCLKernelParam(WarpType warp_type, InterpType interp_type, MI_S3
 }
 
 static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, std::string &build_opt, WarpType warp_type,
-                                 BorderType border_type, MI_S32 elem_counts, MI_S32 elem_height, MI_S32 channel)
+                                 BorderType border_type, DT_S32 elem_counts, DT_S32 elem_height, DT_S32 channel)
 {
     const std::vector<std::string> tbl =
     {
@@ -118,7 +118,7 @@ static std::string InterpTypeToCLString(InterpType interp_type)
     return std::string();
 }
 
-static Status GetCLName(Context *ctx, MI_S32 channel, InterpType interp_type, std::string &kernel_name, std::string &program_name)
+static Status GetCLName(Context *ctx, DT_S32 channel, InterpType interp_type, std::string &kernel_name, std::string &program_name)
 {
     std::string interp_type_str = InterpTypeToCLString(interp_type);
 
@@ -154,7 +154,7 @@ Status WarpCL::SetArgs(const Array *src, const Array *matrix, Array *dst, Interp
         return Status::ERROR;
     }
 
-    MI_S32 channel = src->GetSizes().m_channel;
+    DT_S32 channel = src->GetSizes().m_channel;
     if (channel != 1 && channel != 2)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2");
@@ -173,15 +173,15 @@ Status WarpCL::Initialize()
     }
 
     const Mat *matrix = dynamic_cast<const Mat*>(m_matrix);
-    if (MI_NULL == matrix)
+    if (DT_NULL == matrix)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "matrix is not mat");
         return Status::ERROR;
     }
 
-    MI_S32 map_height  = m_dst->GetSizes().m_height;
-    MI_S32 map_width   = m_dst->GetSizes().m_width;
-    MI_S32 map_channel = (WarpType::AFFINE == m_warp_type) ? 2 : 3;
+    DT_S32 map_height  = m_dst->GetSizes().m_height;
+    DT_S32 map_width   = m_dst->GetSizes().m_width;
+    DT_S32 map_channel = (WarpType::AFFINE == m_warp_type) ? 2 : 3;
 
     m_map_x = Mat(m_ctx, ElemType::F32, aura::Sizes3(1, map_width, map_channel));
     m_map_y = Mat(m_ctx, ElemType::F32, aura::Sizes3(1, map_height, map_channel));
@@ -192,7 +192,7 @@ Status WarpCL::Initialize()
         return Status::ERROR;
     }
 
-    MI_S32 channel = m_dst->GetSizes().m_channel;
+    DT_S32 channel = m_dst->GetSizes().m_channel;
 
     // 1. init cl_mem
     cl_channel_order cl_ch_order      = (1 == channel) ? CL_R : CL_RG;
@@ -284,12 +284,12 @@ Status WarpCL::DeInitialize()
 
 Status WarpCL::Run()
 {
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 oheight = m_dst->GetSizes().m_height;
-    MI_S32 owidth  = m_dst->GetSizes().m_width;
-    MI_S32 channel = m_dst->GetSizes().m_channel;
-    MI_S32 iheight = m_src->GetSizes().m_height;
-    MI_S32 iwidth  = m_src->GetSizes().m_width;
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 oheight = m_dst->GetSizes().m_height;
+    DT_S32 owidth  = m_dst->GetSizes().m_width;
+    DT_S32 channel = m_dst->GetSizes().m_channel;
+    DT_S32 iheight = m_src->GetSizes().m_height;
+    DT_S32 iwidth  = m_src->GetSizes().m_width;
 
     CLScalar                   cl_border_value = clScalar(m_border_value);
     std::shared_ptr<CLRuntime> cl_rt           = m_ctx->GetCLEngine()->GetCLRuntime();
@@ -303,7 +303,7 @@ Status WarpCL::Run()
     Status    ret_sync = Status::ERROR;
 
     // 3. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Iaura2D, MI_S32, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, cl::Buffer, cl::Buffer, CLScalar>(
+    cl_ret = m_cl_kernels[0].Run<cl::Iaura2D, DT_S32, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, cl::Buffer, cl::Buffer, CLScalar>(
                              m_cl_src.GetCLMemRef<cl::Iaura2D>(), iheight, iwidth,
                              m_cl_dst.GetCLMemRef<cl::Buffer>(), oheight, owidth * channel, ostep,
                              m_cl_map_x.GetCLMemRef<cl::Buffer>(),
@@ -317,7 +317,7 @@ Status WarpCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -326,7 +326,7 @@ Status WarpCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -350,13 +350,13 @@ std::string WarpCL::ToString() const
     return WarpImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> WarpCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel,
+std::vector<CLKernel> WarpCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel,
                                            BorderType border_type, WarpType warp_type, InterpType interp_type)
 {
     std::vector<CLKernel> cl_kernels;
 
     // 2. build option
-    MI_S32 elem_counts = 0, elem_height = 0;
+    DT_S32 elem_counts = 0, elem_height = 0;
     if (GetCLKernelParam(warp_type, interp_type, channel, elem_counts, elem_height) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetCLKernelParam failed");

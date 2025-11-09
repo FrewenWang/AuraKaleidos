@@ -6,34 +6,34 @@ namespace aura
 {
 
 template <typename Tp>
-static Status FlipVerticalInplaceImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status FlipVerticalInplaceImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     const Sizes3 sz        = src.GetSizes();
-    const MI_S32 row_bytes = sizeof(Tp) * sz.m_channel * sz.m_width;
+    const DT_S32 row_bytes = sizeof(Tp) * sz.m_channel * sz.m_width;
 
-    for (MI_S32 dy = start_row; dy < end_row; ++dy)
+    for (DT_S32 dy = start_row; dy < end_row; ++dy)
     {
-        const MI_U8 *src_top = src.Ptr<MI_U8>(dy);
-        const MI_U8 *src_bot = src.Ptr<MI_U8>(sz.m_height - 1 - dy);
+        const DT_U8 *src_top = src.Ptr<DT_U8>(dy);
+        const DT_U8 *src_bot = src.Ptr<DT_U8>(sz.m_height - 1 - dy);
 
-        MI_U8 *dst_top = dst.Ptr<MI_U8>(dy);
-        MI_U8 *dst_bot = dst.Ptr<MI_U8>(sz.m_height - 1 - dy);
+        DT_U8 *dst_top = dst.Ptr<DT_U8>(dy);
+        DT_U8 *dst_bot = dst.Ptr<DT_U8>(sz.m_height - 1 - dy);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
 
-        if (!(reinterpret_cast<MI_UPTR_T>(src_top) & 0x3) && !(reinterpret_cast<MI_UPTR_T>(src_bot) & 0x3) &&
-            !(reinterpret_cast<MI_UPTR_T>(dst_top) & 0x3) && !(reinterpret_cast<MI_UPTR_T>(dst_bot) & 0x3))
+        if (!(reinterpret_cast<DT_UPTR_T>(src_top) & 0x3) && !(reinterpret_cast<DT_UPTR_T>(src_bot) & 0x3) &&
+            !(reinterpret_cast<DT_UPTR_T>(dst_top) & 0x3) && !(reinterpret_cast<DT_UPTR_T>(dst_bot) & 0x3))
         {
             for (; x < row_bytes - 16; x += 16)
             {
-                const MI_S32 *src_top_cur = reinterpret_cast<const MI_S32*>(src_top + x);
-                const MI_S32 *src_bot_cur = reinterpret_cast<const MI_S32*>(src_bot + x);
+                const DT_S32 *src_top_cur = reinterpret_cast<const DT_S32*>(src_top + x);
+                const DT_S32 *src_bot_cur = reinterpret_cast<const DT_S32*>(src_bot + x);
 
-                MI_S32 *dst_top_cur = reinterpret_cast<MI_S32*>(dst_top + x);
-                MI_S32 *dst_bot_cur = reinterpret_cast<MI_S32*>(dst_bot + x);
+                DT_S32 *dst_top_cur = reinterpret_cast<DT_S32*>(dst_top + x);
+                DT_S32 *dst_bot_cur = reinterpret_cast<DT_S32*>(dst_bot + x);
 
-                MI_S32 v0 = src_top_cur[0];
-                MI_S32 v1 = src_bot_cur[0];
+                DT_S32 v0 = src_top_cur[0];
+                DT_S32 v1 = src_bot_cur[0];
 
                 dst_top_cur[0] = v1;
                 dst_bot_cur[0] = v0;
@@ -59,18 +59,18 @@ static Status FlipVerticalInplaceImpl(const Mat &src, Mat &dst, MI_S32 start_row
 
             for (; x <= row_bytes - 4; x +=4)
             {
-                MI_S32 v0 = reinterpret_cast<const MI_S32*>(src_top + x)[0];
-                MI_S32 v1 = reinterpret_cast<const MI_S32*>(src_bot + x)[0];
+                DT_S32 v0 = reinterpret_cast<const DT_S32*>(src_top + x)[0];
+                DT_S32 v1 = reinterpret_cast<const DT_S32*>(src_bot + x)[0];
 
-                reinterpret_cast<MI_S32*>(dst_top + x)[0] = v1;
-                reinterpret_cast<MI_S32*>(dst_bot + x)[0] = v0;
+                reinterpret_cast<DT_S32*>(dst_top + x)[0] = v1;
+                reinterpret_cast<DT_S32*>(dst_bot + x)[0] = v0;
             }
         }
 
         for (; x < row_bytes; ++x)
         {
-            MI_U8 v0 = src_top[x];
-            MI_U8 v1 = src_bot[x];
+            DT_U8 v0 = src_top[x];
+            DT_U8 v1 = src_bot[x];
 
             dst_top[x] = v1;
             dst_bot[x] = v0;
@@ -81,12 +81,12 @@ static Status FlipVerticalInplaceImpl(const Mat &src, Mat &dst, MI_S32 start_row
 }
 
 template <typename Tp>
-static Status FlipVerticalCopyImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status FlipVerticalCopyImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     const Sizes3 sz = src.GetSizes();
-    const MI_S32 row_bytes = sizeof(Tp) * sz.m_channel * sz.m_width;
+    const DT_S32 row_bytes = sizeof(Tp) * sz.m_channel * sz.m_width;
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         memcpy(dst.Ptr<Tp>(sz.m_height - y - 1), src.Ptr<Tp>(y), row_bytes);
     }
@@ -99,25 +99,25 @@ static Status FlipVerticalNoneImpl(Context *ctx, const Mat &src, Mat &dst, OpTar
 {
     Status ret = Status::ERROR;
 
-    const MI_S32 height = src.GetSizes().m_height;
+    const DT_S32 height = src.GetSizes().m_height;
 
     if (src.GetData() == dst.GetData())
     {
         if (target.m_data.none.enable_mt)
         {
             WorkerPool *wp = ctx->GetWorkerPool();
-            if (MI_NULL == wp)
+            if (DT_NULL == wp)
             {
                 AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                 return Status::ERROR;
             }
 
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), (height / 2), FlipVerticalInplaceImpl<Tp>,
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), (height / 2), FlipVerticalInplaceImpl<Tp>,
                                   std::cref(src), std::ref(dst));
         }
         else
         {
-            ret = FlipVerticalInplaceImpl<Tp>(src, dst, static_cast<MI_S32>(0), (height / 2));
+            ret = FlipVerticalInplaceImpl<Tp>(src, dst, static_cast<DT_S32>(0), (height / 2));
         }
     }
     else
@@ -125,17 +125,17 @@ static Status FlipVerticalNoneImpl(Context *ctx, const Mat &src, Mat &dst, OpTar
         if (target.m_data.none.enable_mt)
         {
             WorkerPool *wp = ctx->GetWorkerPool();
-            if (MI_NULL == wp)
+            if (DT_NULL == wp)
             {
                 AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                 return Status::ERROR;
             }
 
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), height, FlipVerticalCopyImpl<Tp>, std::cref(src), std::ref(dst));
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), height, FlipVerticalCopyImpl<Tp>, std::cref(src), std::ref(dst));
         }
         else
         {
-            ret = FlipVerticalCopyImpl<Tp>(src, dst, static_cast<MI_S32>(0), height);
+            ret = FlipVerticalCopyImpl<Tp>(src, dst, static_cast<DT_S32>(0), height);
         }
 
     }
@@ -144,19 +144,19 @@ static Status FlipVerticalNoneImpl(Context *ctx, const Mat &src, Mat &dst, OpTar
 }
 
 template <typename Tp>
-static Status FlipHorizonalNoneCore(const Mat &src, Mat &dst, const std::vector<MI_S32> &idx_table, MI_S32 start_row, MI_S32 end_row)
+static Status FlipHorizonalNoneCore(const Mat &src, Mat &dst, const std::vector<DT_S32> &idx_table, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         const Tp *src_row = src.Ptr<Tp>(y);
         Tp *dst_row       = dst.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < (width + 1) / 2 * channel; ++x)
+        for (DT_S32 x = 0; x < (width + 1) / 2 * channel; ++x)
         {
-            MI_S32 idx = idx_table[x];
+            DT_S32 idx = idx_table[x];
 
             Tp v0 = src_row[x];
             Tp v1 = src_row[idx];
@@ -176,11 +176,11 @@ static Status FlipHorizonalNoneImpl(Context *ctx, const Mat &src, Mat &dst, OpTa
 
     const Sizes3 sz = src.GetSizes();
 
-    std::vector<MI_S32> idx_table((sz.m_width + 1) / 2 * sz.m_channel, 0);
+    std::vector<DT_S32> idx_table((sz.m_width + 1) / 2 * sz.m_channel, 0);
 
-    for (MI_S32 i = 0; i < (sz.m_width + 1) / 2; ++i)
+    for (DT_S32 i = 0; i < (sz.m_width + 1) / 2; ++i)
     {
-        for (MI_S32 j = 0; j < sz.m_channel; ++j)
+        for (DT_S32 j = 0; j < sz.m_channel; ++j)
         {
             idx_table[i * sz.m_channel + j] = (sz.m_width - i - 1) * sz.m_channel + j;
         }
@@ -189,18 +189,18 @@ static Status FlipHorizonalNoneImpl(Context *ctx, const Mat &src, Mat &dst, OpTa
     if (target.m_data.none.enable_mt)
     {
         WorkerPool *wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
             return Status::ERROR;
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), sz.m_height, FlipHorizonalNoneCore<Tp>, std::cref(src),
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), sz.m_height, FlipHorizonalNoneCore<Tp>, std::cref(src),
                               std::ref(dst), std::cref(idx_table));
     }
     else
     {
-        ret = FlipHorizonalNoneCore<Tp>(src, dst, idx_table, static_cast<MI_S32>(0), sz.m_height);
+        ret = FlipHorizonalNoneCore<Tp>(src, dst, idx_table, static_cast<DT_S32>(0), sz.m_height);
     }
 
     AURA_RETURN(ctx, ret);
@@ -264,7 +264,7 @@ Status FlipNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -277,10 +277,10 @@ Status FlipNone::Run()
         case ElemType::U8:
         case ElemType::S8:
         {
-            ret = FlipNoneHelper<MI_U8>(m_ctx, *src, *dst, m_type, m_target);
+            ret = FlipNoneHelper<DT_U8>(m_ctx, *src, *dst, m_type, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "FlipNoneHelper<MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "FlipNoneHelper<DT_U8> failed.");
             }
             break;
         }
@@ -290,10 +290,10 @@ Status FlipNone::Run()
         case ElemType::F16:
 #endif
         {
-            ret = FlipNoneHelper<MI_U16>(m_ctx, *src, *dst, m_type, m_target);
+            ret = FlipNoneHelper<DT_U16>(m_ctx, *src, *dst, m_type, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "FlipNoneHelper<MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "FlipNoneHelper<DT_U16> failed.");
             }
             break;
         }
@@ -303,10 +303,10 @@ Status FlipNone::Run()
         case ElemType::F32:
 #endif
         {
-            ret = FlipNoneHelper<MI_U32>(m_ctx, *src, *dst, m_type, m_target);
+            ret = FlipNoneHelper<DT_U32>(m_ctx, *src, *dst, m_type, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "FlipNoneHelper<MI_U32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "FlipNoneHelper<DT_U32> failed.");
             }
             break;
         }

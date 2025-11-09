@@ -4,11 +4,11 @@
 using namespace aura;
 
 template <typename Tp>
-AURA_VOID PrintTest(MI_S32 id)
+DT_VOID PrintTest(DT_S32 id)
 {
-    constexpr MI_S32 total_num = AURA_HVLEN / sizeof(Tp);
+    constexpr DT_S32 total_num = AURA_HVLEN / sizeof(Tp);
     Tp src[total_num];
-    for (MI_S32 i = 0; i < total_num; i++)
+    for (DT_S32 i = 0; i < total_num; i++)
     {
         src[i] = i;
     }
@@ -21,15 +21,15 @@ NEW_TESTCASE(runtime_hexagon_instructions_print_test)
 {
     Status ret = Status::OK;
 
-    PrintTest<MI_U8>(0);
-    PrintTest<MI_S8>(1);
-    PrintTest<MI_U16>(2);
-    PrintTest<MI_S16>(3);
-    PrintTest<MI_U32>(4);
-    PrintTest<MI_S32>(5);
-    PrintTest<MI_F32>(6);
-    PrintTest<MI_U64>(7);
-    PrintTest<MI_S64>(8);
+    PrintTest<DT_U8>(0);
+    PrintTest<DT_S8>(1);
+    PrintTest<DT_U16>(2);
+    PrintTest<DT_S16>(3);
+    PrintTest<DT_U32>(4);
+    PrintTest<DT_S32>(5);
+    PrintTest<DT_F32>(6);
+    PrintTest<DT_U64>(7);
+    PrintTest<DT_S64>(8);
 
     AddTestResult(AURA_GET_TEST_STATUS(ret));
 }

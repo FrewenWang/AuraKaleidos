@@ -10,29 +10,29 @@ namespace neon
 {
 
 #define DECLFUN(stype, vtype, prefix, postfix)      \
-    inline AURA_VOID vdup(vtype &v, const stype s)    \
+    inline DT_VOID vdup(vtype &v, const stype s)    \
     {                                               \
         v = prefix##_##postfix(s);                  \
     }
 
-DECLFUN(MI_U8,  uint8x8_t,   vdup_n,  u8 )
-DECLFUN(MI_S8,  int8x8_t,    vdup_n,  s8 )
-DECLFUN(MI_U16, uint16x4_t,  vdup_n,  u16)
-DECLFUN(MI_S16, int16x4_t,   vdup_n,  s16)
-DECLFUN(MI_U32, uint32x2_t,  vdup_n,  u32)
-DECLFUN(MI_S32, int32x2_t,   vdup_n,  s32)
-DECLFUN(MI_U64, uint64x1_t,  vdup_n,  u64)
-DECLFUN(MI_S64, int64x1_t,   vdup_n,  s64)
-DECLFUN(MI_F32, float32x2_t, vdup_n,  f32)
-DECLFUN(MI_U8,  uint8x16_t,  vdupq_n, u8 )
-DECLFUN(MI_S8,  int8x16_t,   vdupq_n, s8 )
-DECLFUN(MI_U16, uint16x8_t,  vdupq_n, u16)
-DECLFUN(MI_S16, int16x8_t,   vdupq_n, s16)
-DECLFUN(MI_U32, uint32x4_t,  vdupq_n, u32)
-DECLFUN(MI_S32, int32x4_t,   vdupq_n, s32)
-DECLFUN(MI_U64, uint64x2_t,  vdupq_n, u64)
-DECLFUN(MI_S64, int64x2_t,   vdupq_n, s64)
-DECLFUN(MI_F32, float32x4_t, vdupq_n, f32)
+DECLFUN(DT_U8,  uint8x8_t,   vdup_n,  u8 )
+DECLFUN(DT_S8,  int8x8_t,    vdup_n,  s8 )
+DECLFUN(DT_U16, uint16x4_t,  vdup_n,  u16)
+DECLFUN(DT_S16, int16x4_t,   vdup_n,  s16)
+DECLFUN(DT_U32, uint32x2_t,  vdup_n,  u32)
+DECLFUN(DT_S32, int32x2_t,   vdup_n,  s32)
+DECLFUN(DT_U64, uint64x1_t,  vdup_n,  u64)
+DECLFUN(DT_S64, int64x1_t,   vdup_n,  s64)
+DECLFUN(DT_F32, float32x2_t, vdup_n,  f32)
+DECLFUN(DT_U8,  uint8x16_t,  vdupq_n, u8 )
+DECLFUN(DT_S8,  int8x16_t,   vdupq_n, s8 )
+DECLFUN(DT_U16, uint16x8_t,  vdupq_n, u16)
+DECLFUN(DT_S16, int16x8_t,   vdupq_n, s16)
+DECLFUN(DT_U32, uint32x4_t,  vdupq_n, u32)
+DECLFUN(DT_S32, int32x4_t,   vdupq_n, s32)
+DECLFUN(DT_U64, uint64x2_t,  vdupq_n, u64)
+DECLFUN(DT_S64, int64x2_t,   vdupq_n, s64)
+DECLFUN(DT_F32, float32x4_t, vdupq_n, f32)
 #  if defined(AURA_ENABLE_NEON_FP16)
 DECLFUN(MI_F16, float16x4_t, vdup_n,  f16)
 DECLFUN(MI_F16, float16x8_t, vdupq_n, f16)

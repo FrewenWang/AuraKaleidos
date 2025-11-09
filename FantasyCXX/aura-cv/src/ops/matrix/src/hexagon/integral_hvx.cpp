@@ -7,15 +7,15 @@
 namespace aura
 {
 
-template <typename Tp, typename std::enable_if<(4 == sizeof(Tp))>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID IntegralPostProcess(Tp *addr, const HVX_VectorX1 &mvd32_in)
+template <typename Tp, typename std::enable_if<(4 == sizeof(Tp))>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID IntegralPostProcess(Tp *addr, const HVX_VectorX1 &mvd32_in)
 {
     HVX_Vector *addr_align = (HVX_Vector*)addr;
     *(addr_align) = mvd32_in.val[0];
 }
 
-template <typename Tp, typename std::enable_if<(4 == sizeof(Tp))>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID IntegralPostProcess(Tp *addr, const HVX_VectorX2 &mvd32_in)
+template <typename Tp, typename std::enable_if<(4 == sizeof(Tp))>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID IntegralPostProcess(Tp *addr, const HVX_VectorX2 &mvd32_in)
 {
     HVX_Vector *addr_align = (HVX_Vector*)addr;
     HVX_VectorPair wd32_uv_uv = Q6_W_vshuff_VVR(mvd32_in.val[1], mvd32_in.val[0], -4);
@@ -23,8 +23,8 @@ AURA_ALWAYS_INLINE AURA_VOID IntegralPostProcess(Tp *addr, const HVX_VectorX2 &m
     *(addr_align + 1) = Q6_V_hi_W(wd32_uv_uv);
 }
 
-template <typename Tp, typename std::enable_if<(4 == sizeof(Tp))>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID IntegralPostProcess(Tp *addr, const HVX_VectorX4 &mvd32_in)
+template <typename Tp, typename std::enable_if<(4 == sizeof(Tp))>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID IntegralPostProcess(Tp *addr, const HVX_VectorX4 &mvd32_in)
 {
     HVX_Vector *addr_align = (HVX_Vector*)addr;
     HVX_VectorPair wd32_uv0, wd32_uv1, wd32_uv2, wd32_uv3;
@@ -40,12 +40,12 @@ AURA_ALWAYS_INLINE AURA_VOID IntegralPostProcess(Tp *addr, const HVX_VectorX4 &m
     *(addr_align + 3) = Q6_V_hi_W(wd32_uv3);
 }
 
-// using St = MI_U8
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID IntegralHCore(HVX_Vector &vu8_src, HVX_Vector &vu32_dst0, HVX_Vector &vu32_dst1, HVX_Vector &vu32_dst2,
+// using St = DT_U8
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID IntegralHCore(HVX_Vector &vu8_src, HVX_Vector &vu32_dst0, HVX_Vector &vu32_dst1, HVX_Vector &vu32_dst2,
                                          HVX_Vector &vu32_dst3, HVX_Vector &vd32_rdelta)
 {
-    MI_U32 c1c1c1c1 = 0x01010101;
+    DT_U32 c1c1c1c1 = 0x01010101;
     HVX_Vector vu8_zeros = Q6_V_vzero();
     HVX_Vector vu8_mask = Q6_V_vsplat_R(0x00FF00FF);
 
@@ -86,9 +86,9 @@ AURA_ALWAYS_INLINE AURA_VOID IntegralHCore(HVX_Vector &vu8_src, HVX_Vector &vu32
     vu32_dst3 = Q6_Vw_vadd_VwVw(vu32_rep_last, Q6_V_hi_W(vu32_dst23));
 }
 
-// using St = MI_S8
-template <typename St, typename std::enable_if<std::is_same<St, MI_S8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID IntegralHCore(HVX_Vector &vs8_src, HVX_Vector &vs32_dst0, HVX_Vector &vs32_dst1, HVX_Vector &vs32_dst2,
+// using St = DT_S8
+template <typename St, typename std::enable_if<std::is_same<St, DT_S8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID IntegralHCore(HVX_Vector &vs8_src, HVX_Vector &vs32_dst0, HVX_Vector &vs32_dst1, HVX_Vector &vs32_dst2,
                                          HVX_Vector &vs32_dst3, HVX_Vector &vd32_rdelta)
 {
     HVX_Vector vu8_zeros = Q6_V_vzero();
@@ -132,47 +132,47 @@ AURA_ALWAYS_INLINE AURA_VOID IntegralHCore(HVX_Vector &vs8_src, HVX_Vector &vs32
 }
 
 //if dst address and stride is AURA_HVLEN align, using vmem instead of vmemu
-template <typename St, MI_S32 C, MI_S32 ALIGN, typename std::enable_if<1 == ALIGN>::type* = MI_NULL>
-AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict dst_c, MI_S32 width)
+template <typename St, DT_S32 C, DT_S32 ALIGN, typename std::enable_if<1 == ALIGN>::type* = DT_NULL>
+AURA_NO_INLINE DT_VOID IntegralRowH(const St *restrict src_c, DT_S32 *restrict dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    MI_S32 width_align128 = width & (-AURA_HVLEN);
-    MI_S32 rest = width - width_align128;
+    DT_S32 width_align128 = width & (-AURA_HVLEN);
+    DT_S32 rest = width - width_align128;
 
     HVX_Vector vd32_rdelta = *(HVX_Vector *)(vrdelta_replicate_last_d32);
     MVType mvu8_src, mvd32_dst0, mvd32_dst1, mvd32_dst2, mvd32_dst3;
 
     #pragma unroll(C)
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         mvd32_dst3.val[ch] = Q6_V_vzero();
     }
 
-    for (MI_S32 x = 0; x < width_align128; x += AURA_HVLEN)
+    for (DT_S32 x = 0; x < width_align128; x += AURA_HVLEN)
     {
         vload(src_c + x * C, mvu8_src);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             IntegralHCore<St>(mvu8_src.val[ch], mvd32_dst0.val[ch], mvd32_dst1.val[ch], mvd32_dst2.val[ch], mvd32_dst3.val[ch], vd32_rdelta);
         }
 
         IntegralPostProcess(dst_c + (x * C), mvd32_dst0);
-        IntegralPostProcess(dst_c + (x * C) + (AURA_HVLEN * 1 * C) / sizeof(MI_S32), mvd32_dst1);
-        IntegralPostProcess(dst_c + (x * C) + (AURA_HVLEN * 2 * C) / sizeof(MI_S32), mvd32_dst2);
-        IntegralPostProcess(dst_c + (x * C) + (AURA_HVLEN * 3 * C) / sizeof(MI_S32), mvd32_dst3);
+        IntegralPostProcess(dst_c + (x * C) + (AURA_HVLEN * 1 * C) / sizeof(DT_S32), mvd32_dst1);
+        IntegralPostProcess(dst_c + (x * C) + (AURA_HVLEN * 2 * C) / sizeof(DT_S32), mvd32_dst2);
+        IntegralPostProcess(dst_c + (x * C) + (AURA_HVLEN * 3 * C) / sizeof(DT_S32), mvd32_dst3);
     }
 
     if (rest > 0)
     {
-        MI_S32 shift_cnt = AURA_HVLEN - rest;
-        MI_S32 shift_cnt4 = AURA_HVLEN - (shift_cnt & 31) * sizeof(MI_U32);
+        DT_S32 shift_cnt = AURA_HVLEN - rest;
+        DT_S32 shift_cnt4 = AURA_HVLEN - (shift_cnt & 31) * sizeof(DT_U32);
         if (rest <= 32)
         {
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvd32_dst3.val[ch] = Q6_V_vror_VR(mvd32_dst0.val[ch], shift_cnt4);
             }
@@ -180,7 +180,7 @@ AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict
         else if (rest <= 64)
         {
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvd32_dst3.val[ch] = Q6_V_vror_VR(mvd32_dst1.val[ch], shift_cnt4);
             }
@@ -188,7 +188,7 @@ AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict
         else if (rest <= 96)
         {
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvd32_dst3.val[ch] = Q6_V_vror_VR(mvd32_dst2.val[ch], shift_cnt4);
             }
@@ -196,7 +196,7 @@ AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict
         else
         {
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvd32_dst3.val[ch] = Q6_V_vror_VR(mvd32_dst3.val[ch], shift_cnt4);
             }
@@ -204,60 +204,60 @@ AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict
 
         vload(src_c + (width - AURA_HVLEN) * C, mvu8_src);
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             IntegralHCore<St>(mvu8_src.val[ch], mvd32_dst0.val[ch], mvd32_dst1.val[ch], mvd32_dst2.val[ch], mvd32_dst3.val[ch], vd32_rdelta);
         }
 
         vstore(dst_c + (width - AURA_HVLEN) * C, mvd32_dst0);
-        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 1 * C) / sizeof(MI_S32), mvd32_dst1);
-        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 2 * C) / sizeof(MI_S32), mvd32_dst2);
-        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 3 * C) / sizeof(MI_S32), mvd32_dst3);
+        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 1 * C) / sizeof(DT_S32), mvd32_dst1);
+        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 2 * C) / sizeof(DT_S32), mvd32_dst2);
+        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 3 * C) / sizeof(DT_S32), mvd32_dst3);
     }
 }
 
-template <typename St, MI_S32 C, MI_S32 ALIGN, typename std::enable_if<0 == ALIGN>::type* = MI_NULL>
-AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict dst_c, MI_S32 width)
+template <typename St, DT_S32 C, DT_S32 ALIGN, typename std::enable_if<0 == ALIGN>::type* = DT_NULL>
+AURA_NO_INLINE DT_VOID IntegralRowH(const St *restrict src_c, DT_S32 *restrict dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    MI_S32 width_align128 = width & (-AURA_HVLEN);
-    MI_S32 rest = width - width_align128;
+    DT_S32 width_align128 = width & (-AURA_HVLEN);
+    DT_S32 rest = width - width_align128;
 
     HVX_Vector vd32_rdelta = *(HVX_Vector *)(vrdelta_replicate_last_d32);
     MVType mvu8_src, mvd32_dst0, mvd32_dst1, mvd32_dst2, mvd32_dst3;
 
     #pragma unroll(C)
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         mvd32_dst3.val[ch] = Q6_V_vzero();
     }
 
-    for (MI_S32 x = 0; x < width_align128; x += AURA_HVLEN)
+    for (DT_S32 x = 0; x < width_align128; x += AURA_HVLEN)
     {
         vload(src_c + x * C, mvu8_src);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             IntegralHCore<St>(mvu8_src.val[ch], mvd32_dst0.val[ch], mvd32_dst1.val[ch], mvd32_dst2.val[ch], mvd32_dst3.val[ch], vd32_rdelta);
 
         }
 
         vstore(dst_c + x * C, mvd32_dst0);
-        vstore(dst_c + x * C + (AURA_HVLEN * 1 * C) / sizeof(MI_S32), mvd32_dst1);
-        vstore(dst_c + x * C + (AURA_HVLEN * 2 * C) / sizeof(MI_S32), mvd32_dst2);
-        vstore(dst_c + x * C + (AURA_HVLEN * 3 * C) / sizeof(MI_S32), mvd32_dst3);
+        vstore(dst_c + x * C + (AURA_HVLEN * 1 * C) / sizeof(DT_S32), mvd32_dst1);
+        vstore(dst_c + x * C + (AURA_HVLEN * 2 * C) / sizeof(DT_S32), mvd32_dst2);
+        vstore(dst_c + x * C + (AURA_HVLEN * 3 * C) / sizeof(DT_S32), mvd32_dst3);
     }
 
     if (rest > 0)
     {
-        MI_S32 shift_cnt = AURA_HVLEN - rest;
-        MI_S32 shift_cnt4 = AURA_HVLEN - (shift_cnt & 31) * sizeof(MI_U32);
+        DT_S32 shift_cnt = AURA_HVLEN - rest;
+        DT_S32 shift_cnt4 = AURA_HVLEN - (shift_cnt & 31) * sizeof(DT_U32);
         if (rest <= 32)
         {
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvd32_dst3.val[ch] = Q6_V_vror_VR(mvd32_dst0.val[ch], shift_cnt4);
             }
@@ -265,7 +265,7 @@ AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict
         else if (rest <= 64)
         {
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvd32_dst3.val[ch] = Q6_V_vror_VR(mvd32_dst1.val[ch], shift_cnt4);
             }
@@ -273,7 +273,7 @@ AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict
         else if (rest <= 96)
         {
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvd32_dst3.val[ch] = Q6_V_vror_VR(mvd32_dst2.val[ch], shift_cnt4);
             }
@@ -281,7 +281,7 @@ AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict
         else
         {
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvd32_dst3.val[ch] = Q6_V_vror_VR(mvd32_dst3.val[ch], shift_cnt4);
             }
@@ -289,28 +289,28 @@ AURA_NO_INLINE AURA_VOID IntegralRowH(const St *restrict src_c, MI_S32 *restrict
 
         vload(src_c + (width - AURA_HVLEN) * C, mvu8_src);
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             IntegralHCore<St>(mvu8_src.val[ch], mvd32_dst0.val[ch], mvd32_dst1.val[ch], mvd32_dst2.val[ch], mvd32_dst3.val[ch], vd32_rdelta);
         }
 
         vstore(dst_c + (width - AURA_HVLEN) * C, mvd32_dst0);
-        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 1 * C) / sizeof(MI_S32), mvd32_dst1);
-        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 2 * C) / sizeof(MI_S32), mvd32_dst2);
-        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 3 * C) / sizeof(MI_S32), mvd32_dst3);
+        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 1 * C) / sizeof(DT_S32), mvd32_dst1);
+        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 2 * C) / sizeof(DT_S32), mvd32_dst2);
+        vstore(dst_c + (width - AURA_HVLEN) * C + (AURA_HVLEN * 3 * C) / sizeof(DT_S32), mvd32_dst3);
     }
 }
 
-template <MI_S32 C, MI_S32 ALIGN, typename std::enable_if<(1 == ALIGN)>::type* = MI_NULL>
-static MI_S32 IntegralRow4V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 width)
+template <DT_S32 C, DT_S32 ALIGN, typename std::enable_if<(1 == ALIGN)>::type* = DT_NULL>
+static DT_S32 IntegralRow4V(DT_U8 *dst_prev, DT_U8 *dst, DT_S32 ostride, DT_S32 width)
 {
-    width = width * sizeof(MI_S32) * C;
+    width = width * sizeof(DT_S32) * C;
     ostride >>= 7;
 
     HVX_Vector *dst_p0 = (HVX_Vector*)dst_prev;
     HVX_Vector vs32_p0, vs32_c, vs32_n0, vs32_n1, vs32_n2;
 
-    for (MI_S32 x = 0; x < width; x += AURA_HVLEN)
+    for (DT_S32 x = 0; x < width; x += AURA_HVLEN)
     {
         vs32_p0 = *(dst_p0++);
 
@@ -336,20 +336,20 @@ static MI_S32 IntegralRow4V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 
     return 0;
 }
 
-template <MI_S32 C, MI_S32 ALIGN, typename std::enable_if<(0 == ALIGN)>::type* = MI_NULL>
-static MI_S32 IntegralRow4V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 width)
+template <DT_S32 C, DT_S32 ALIGN, typename std::enable_if<(0 == ALIGN)>::type* = DT_NULL>
+static DT_S32 IntegralRow4V(DT_U8 *dst_prev, DT_U8 *dst, DT_S32 ostride, DT_S32 width)
 {
-    width = width * sizeof(MI_S32) * C;
-    MI_S32 width_align128 = width & (-AURA_HVLEN);
+    width = width * sizeof(DT_S32) * C;
+    DT_S32 width_align128 = width & (-AURA_HVLEN);
     HVX_VectorPred q = Q6_Q_vsetq_R(AURA_HVLEN - width + width_align128);
 
-    MI_U8 *dst_p0 = dst_prev;
+    DT_U8 *dst_p0 = dst_prev;
     HVX_Vector vs32_p0, vs32_c, vs32_n0, vs32_n1, vs32_n2;
 
-    for (MI_S32 x = 0; x < width_align128; x += AURA_HVLEN)
+    for (DT_S32 x = 0; x < width_align128; x += AURA_HVLEN)
     {
         vload(dst_p0 + x, vs32_p0);
-        MI_U8 *ptr_dst_cur = dst + x;
+        DT_U8 *ptr_dst_cur = dst + x;
 
         vload(ptr_dst_cur, vs32_c);
         vs32_c = Q6_Vw_vadd_VwVw(vs32_c, vs32_p0);
@@ -371,7 +371,7 @@ static MI_S32 IntegralRow4V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 
     if (width != width_align128)
     {
         vload(dst_p0 + width - AURA_HVLEN, vs32_p0);
-        MI_U8 *ptr_dst_cur = dst + width - AURA_HVLEN;
+        DT_U8 *ptr_dst_cur = dst + width - AURA_HVLEN;
 
         vload(ptr_dst_cur, vs32_c);
         vs32_p0 = Q6_V_vmux_QVV(q, Q6_V_vzero(), vs32_p0);
@@ -397,21 +397,21 @@ static MI_S32 IntegralRow4V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 
     return 0;
 }
 
-template <MI_S32 C, MI_S32 ALIGN, typename std::enable_if<(1 == ALIGN)>::type* = MI_NULL>
-static MI_S32 IntegralRow1V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 width, MI_S32 height)
+template <DT_S32 C, DT_S32 ALIGN, typename std::enable_if<(1 == ALIGN)>::type* = DT_NULL>
+static DT_S32 IntegralRow1V(DT_U8 *dst_prev, DT_U8 *dst, DT_S32 ostride, DT_S32 width, DT_S32 height)
 {
-    width = width * sizeof(MI_S32) * C;
+    width = width * sizeof(DT_S32) * C;
     ostride >>= 7;
 
     HVX_Vector *dst_p0 = (HVX_Vector*)dst_prev;
     HVX_Vector vs32_p0, vs32_c;
 
-    for (MI_S32 x = 0; x < width; x += AURA_HVLEN)
+    for (DT_S32 x = 0; x < width; x += AURA_HVLEN)
     {
         vs32_p0 = *(dst_p0++);
         HVX_Vector *ptr_dst_cur = (HVX_Vector*)(dst + x);
 
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
             vs32_c = *(ptr_dst_cur);
 
@@ -425,23 +425,23 @@ static MI_S32 IntegralRow1V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 
     return 0;
 }
 
-template <MI_S32 C, MI_S32 ALIGN, typename std::enable_if<(0 == ALIGN)>::type* = MI_NULL>
-static MI_S32 IntegralRow1V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 width, MI_S32 height)
+template <DT_S32 C, DT_S32 ALIGN, typename std::enable_if<(0 == ALIGN)>::type* = DT_NULL>
+static DT_S32 IntegralRow1V(DT_U8 *dst_prev, DT_U8 *dst, DT_S32 ostride, DT_S32 width, DT_S32 height)
 {
-    width = width * sizeof(MI_S32) * C;
-    MI_S32 width_align128 = width & (-AURA_HVLEN);
+    width = width * sizeof(DT_S32) * C;
+    DT_S32 width_align128 = width & (-AURA_HVLEN);
     HVX_VectorPred q = Q6_Q_vsetq_R(AURA_HVLEN - width + width_align128);
 
-    MI_U8 *dst_p0 = dst_prev;
+    DT_U8 *dst_p0 = dst_prev;
     HVX_Vector vs32_p0, vs32_c;
 
-    for (MI_S32 x = 0; x < width_align128; x += AURA_HVLEN)
+    for (DT_S32 x = 0; x < width_align128; x += AURA_HVLEN)
     {
         vload(dst_p0 + x, vs32_p0);
 
-        MI_U8 *ptr_dst_cur = dst + x;
+        DT_U8 *ptr_dst_cur = dst + x;
 
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
             vload(ptr_dst_cur, vs32_c);
 
@@ -455,9 +455,9 @@ static MI_S32 IntegralRow1V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 
     if (width != width_align128)
     {
         vload(dst_prev + width - AURA_HVLEN, vs32_p0);
-        MI_U8 *ptr_dst_cur = dst + width - AURA_HVLEN;
+        DT_U8 *ptr_dst_cur = dst + width - AURA_HVLEN;
 
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
             vload(ptr_dst_cur, vs32_c);
             vs32_p0 = Q6_V_vmux_QVV(q, Q6_V_vzero(), vs32_p0);
@@ -471,42 +471,42 @@ static MI_S32 IntegralRow1V(MI_U8 *dst_prev, MI_U8 *dst, MI_S32 ostride, MI_S32 
     return 0;
 }
 
-template <typename St, typename Dt, MI_S32 C, MI_S32 ALIGN>
+template <typename St, typename Dt, DT_S32 C, DT_S32 ALIGN>
 static Status IntegralHvxImpl(const Mat &src, Mat &dst)
 {
-    static_assert(std::is_same<Dt, MI_S32>::value || std::is_same<Dt, MI_U32>::value,
-                  "IntegralHvxImpl only support MI_S32 and MI_U32");
+    static_assert(std::is_same<Dt, DT_S32>::value || std::is_same<Dt, DT_U32>::value,
+                  "IntegralHvxImpl only support DT_S32 and DT_U32");
 
-    MI_S32 width   = src.GetSizes().m_width;
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
-    MI_S32 ostride = dst.GetStrides().m_width;
-    MI_S32 height_align4 = (height - 1) & (-4);
+    DT_S32 width   = src.GetSizes().m_width;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
+    DT_S32 ostride = dst.GetStrides().m_width;
+    DT_S32 height_align4 = (height - 1) & (-4);
 
     const St *src_c = src.Ptr<St>(0);
-    MI_S32 *dst_c   = dst.Ptr<MI_S32>(0); // set dst pointer as MI_S32*, because addition logic of MI_S32 and MI_U32 is same
+    DT_S32 *dst_c   = dst.Ptr<DT_S32>(0); // set dst pointer as DT_S32*, because addition logic of DT_S32 and DT_U32 is same
 
-    MI_U64 L2fetch_param1 = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 1, 0); //pre_fetch 1 row
-    MI_U64 L2fetch_param4 = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 4, 0); //pre_fetch 4 rows
+    DT_U64 L2fetch_param1 = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 1, 0); //pre_fetch 1 row
+    DT_U64 L2fetch_param4 = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 4, 0); //pre_fetch 4 rows
 
-    L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<St>(0)), L2fetch_param1);
-    L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<St>(1)), L2fetch_param4);
+    L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<St>(0)), L2fetch_param1);
+    L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<St>(1)), L2fetch_param4);
 
     IntegralRowH<St, C, ALIGN>(src_c, dst_c, width);
 
-    MI_S32 y = 1;
+    DT_S32 y = 1;
     for (; y <= height_align4; y += 4)
     {
         if (y + 4 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<St>(y + 4)), L2fetch_param4);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<St>(y + 4)), L2fetch_param4);
         }
 
-        MI_S32 *dst_p1 = dst.Ptr<MI_S32>(y - 1);
-        dst_c = dst.Ptr<MI_S32>(y);
-        MI_S32 *dst_n1 = dst.Ptr<MI_S32>(y + 1);
-        MI_S32 *dst_n2 = dst.Ptr<MI_S32>(y + 2);
-        MI_S32 *dst_n3 = dst.Ptr<MI_S32>(y + 3);
+        DT_S32 *dst_p1 = dst.Ptr<DT_S32>(y - 1);
+        dst_c = dst.Ptr<DT_S32>(y);
+        DT_S32 *dst_n1 = dst.Ptr<DT_S32>(y + 1);
+        DT_S32 *dst_n2 = dst.Ptr<DT_S32>(y + 2);
+        DT_S32 *dst_n3 = dst.Ptr<DT_S32>(y + 3);
 
         src_c = src.Ptr<St>(y);
         const St *src_n1 = src.Ptr<St>(y + 1);
@@ -517,33 +517,33 @@ static Status IntegralHvxImpl(const Mat &src, Mat &dst)
         IntegralRowH<St, C, ALIGN>(src_n2, dst_n2, width);
         IntegralRowH<St, C, ALIGN>(src_n3, dst_n3, width);
 
-        IntegralRow4V<C, ALIGN>(reinterpret_cast<MI_U8*>(&dst_p1[0]), reinterpret_cast<MI_U8*>(&dst_c[0]), ostride, width);
+        IntegralRow4V<C, ALIGN>(reinterpret_cast<DT_U8*>(&dst_p1[0]), reinterpret_cast<DT_U8*>(&dst_c[0]), ostride, width);
     }
 
-    MI_S32 rest = height - y;
+    DT_S32 rest = height - y;
     if (rest > 0)
     {
-        for (MI_S32 i = 0; i < rest; i++)
+        for (DT_S32 i = 0; i < rest; i++)
         {
             src_c = src.Ptr<St>(y + i);
-            dst_c = dst.Ptr<MI_S32>(y + i);
+            dst_c = dst.Ptr<DT_S32>(y + i);
             IntegralRowH<St, C, ALIGN>(src_c, dst_c, width);
         }
-        MI_S32 *dst_p1 = dst.Ptr<MI_S32>(y - 1);
-        dst_c = dst.Ptr<MI_S32>(y);
-        IntegralRow1V<C, ALIGN>(reinterpret_cast<MI_U8*>(&dst_p1[0]), reinterpret_cast<MI_U8*>(&dst_c[0]), ostride, width, rest);
+        DT_S32 *dst_p1 = dst.Ptr<DT_S32>(y - 1);
+        dst_c = dst.Ptr<DT_S32>(y);
+        IntegralRow1V<C, ALIGN>(reinterpret_cast<DT_U8*>(&dst_p1[0]), reinterpret_cast<DT_U8*>(&dst_c[0]), ostride, width, rest);
     }
 
     return Status::OK;
 }
 
-template<typename St, typename Dt, MI_S32 C>
+template<typename St, typename Dt, DT_S32 C>
 static Status IntegralHvxHelper(const Mat &src, Mat &dst)
 {
     Status ret     = Status::ERROR;
-    MI_S32 ostride = dst.GetStrides().m_width;
-    MI_S32 *dst_c  = dst.Ptr<MI_S32>(0);
-    MI_BOOL align  = ((0 == (ostride & (AURA_HVLEN - 1))) && (0 == (reinterpret_cast<MI_U32>(dst_c) & (AURA_HVLEN - 1))));
+    DT_S32 ostride = dst.GetStrides().m_width;
+    DT_S32 *dst_c  = dst.Ptr<DT_S32>(0);
+    DT_BOOL align  = ((0 == (ostride & (AURA_HVLEN - 1))) && (0 == (reinterpret_cast<DT_U32>(dst_c) & (AURA_HVLEN - 1))));
 
     if (align)
     {
@@ -561,7 +561,7 @@ template<typename St, typename Dt>
 static Status IntegralHvxHelper(Context *ctx, const Mat &src, Mat &dst)
 {
     Status ret     = Status::ERROR;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
@@ -595,13 +595,13 @@ Status IntegralHvxHelper(Context *ctx, const Mat &src, Mat &dst)
     {
         case AURA_MAKE_PATTERN(ElemType::U8, ElemType::U32):
         {
-            ret = IntegralHvxHelper<MI_U8, MI_U32>(ctx, src, dst);
+            ret = IntegralHvxHelper<DT_U8, DT_U32>(ctx, src, dst);
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::S8, ElemType::S32):
         {
-            ret = IntegralHvxHelper<MI_S8, MI_S32>(ctx, src, dst);
+            ret = IntegralHvxHelper<DT_S8, DT_S32>(ctx, src, dst);
             break;
         }
 
@@ -633,7 +633,7 @@ Status IntegralHvx::SetArgs(const Array *src, Array *dst, Array *dst_sq)
     }
 
     // dst must be non-null and mat type
-    if (MI_NULL == dst)
+    if (DT_NULL == dst)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dst is nullptr");
         return Status::ERROR;
@@ -652,7 +652,7 @@ Status IntegralHvx::SetArgs(const Array *src, Array *dst, Array *dst_sq)
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1 && ch != 2)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2");
@@ -691,8 +691,8 @@ Status IntegralRpc(Context *ctx, HexagonRpcParam &rpc_param)
         return Status::ERROR;
     }
 
-    Mat *dst0 = dst.IsValid()    ? &dst    : MI_NULL;
-    Mat *dst1 = dst_sq.IsValid() ? &dst_sq : MI_NULL;
+    Mat *dst0 = dst.IsValid()    ? &dst    : DT_NULL;
+    Mat *dst1 = dst_sq.IsValid() ? &dst_sq : DT_NULL;
 
     Integral integral(ctx, OpTarget::Hvx());
 

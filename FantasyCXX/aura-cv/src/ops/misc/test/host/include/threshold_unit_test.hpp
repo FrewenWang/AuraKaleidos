@@ -22,7 +22,7 @@ struct ThresholdTestParam
     ThresholdTestParam()
     {}
 
-    ThresholdTestParam(MI_F32 thresh, MI_F32 max_val, MI_S32 type) : thresh(thresh), max_val(max_val), type(type)
+    ThresholdTestParam(DT_F32 thresh, DT_F32 max_val, DT_S32 type) : thresh(thresh), max_val(max_val), type(type)
     {}
 
     friend std::ostream& operator<<(std::ostream &os, ThresholdTestParam threshold_test_param)
@@ -38,9 +38,9 @@ struct ThresholdTestParam
         return sstream.str();
     }
 
-    MI_F32 thresh;
-    MI_F32 max_val;
-    MI_S32 type;
+    DT_F32 thresh;
+    DT_F32 max_val;
+    DT_S32 type;
 };
 
 AURA_TEST_PARAM(MiscThresholdParam,
@@ -50,9 +50,9 @@ AURA_TEST_PARAM(MiscThresholdParam,
                 aura::OpTarget,     target);
 
 #if !defined(AURA_BUILD_XPLORER)
-static MI_S32 ThresholdTypeToOpencv(MI_S32 method)
+static DT_S32 ThresholdTypeToOpencv(DT_S32 method)
 {
-    MI_S32 cv_type = 0;
+    DT_S32 cv_type = 0;
 
     switch (method & AURA_THRESH_MASK_HIGH)
     {
@@ -117,15 +117,15 @@ static MI_S32 ThresholdTypeToOpencv(MI_S32 method)
 }
 #endif
 
-static aura::Status CvThreshold(aura::Context *ctx, aura::Mat &src, aura::Mat &dst, MI_F32 thresh, MI_S32 max_val, MI_S32 type)
+static aura::Status CvThreshold(aura::Context *ctx, aura::Mat &src, aura::Mat &dst, DT_F32 thresh, DT_S32 max_val, DT_S32 type)
 {
     aura::Status ret = aura::Status::OK;
 
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 cv_method = ThresholdTypeToOpencv(type);
+    DT_S32 cv_method = ThresholdTypeToOpencv(type);
 
-    MI_S32 cv_type = aura::ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
-    MI_S32 cn = src.GetSizes().m_channel;
+    DT_S32 cv_type = aura::ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 cn = src.GetSizes().m_channel;
 
     if (CV_32SC(cn) == cv_type || CV_8SC(cn) == cv_type)
     {
@@ -176,7 +176,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         MiscThresholdParam run_param(GetParam((index)));
         if (aura::UnitTest::GetInstance()->IsStressMode())
@@ -198,12 +198,12 @@ public:
         return aura::Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, aura::TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, aura::TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         MiscThresholdParam run_param(GetParam((index)));
-        MI_F32 thresh = run_param.param.thresh;
-        MI_F32 max_val = run_param.param.max_val;
+        DT_F32 thresh = run_param.param.thresh;
+        DT_F32 max_val = run_param.param.max_val;
 
         // creat iauras
         aura::Mat src = m_factory.GetDerivedMat(1.0f, 0.0f, run_param.elem_type, run_param.mat_sizes.m_sizes, AURA_MEM_DEFAULT, run_param.mat_sizes.m_strides);
@@ -215,7 +215,7 @@ public:
         aura::Mat ref = m_factory.GetEmptyMat(((aura::ElemType::F16 == run_param.elem_type) && (aura::TargetType::NONE == run_param.target.m_type))
                                               ? aura::ElemType::F32 : run_param.elem_type, sz.m_sizes, AURA_MEM_DEFAULT, sz.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         aura::TestTime time_val;
         aura::MatCmpResult cmp_result;

@@ -11,111 +11,111 @@ struct NormAbsTraits
 };
 
 template <>
-struct NormAbsTraits<MI_S8>
+struct NormAbsTraits<DT_S8>
 {
-    using CastType = MI_S16;
+    using CastType = DT_S16;
 };
 
 template <>
-struct NormAbsTraits<MI_S16>
+struct NormAbsTraits<DT_S16>
 {
-    using CastType = MI_S32;
+    using CastType = DT_S32;
 };
 
 template <>
-struct NormAbsTraits<MI_S32>
+struct NormAbsTraits<DT_S32>
 {
-    using CastType = MI_S64;
+    using CastType = DT_S64;
 };
 
 template <typename Tp>
-static MI_F64 NormInfNoneImpl(const Mat &mat)
+static DT_F64 NormInfNoneImpl(const Mat &mat)
 {
     using CastType = typename NormAbsTraits<Tp>::CastType;
 
     Sizes3 sz = mat.GetSizes();
-    MI_S32 row_elem_count = sz.m_width * sz.m_channel;
+    DT_S32 row_elem_count = sz.m_width * sz.m_channel;
 
     CastType result = 0;
 
-    for (MI_S32 y = 0; y < sz.m_height; ++y)
+    for (DT_S32 y = 0; y < sz.m_height; ++y)
     {
         const Tp *src_row = mat.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < row_elem_count; ++x)
+        for (DT_S32 x = 0; x < row_elem_count; ++x)
         {
             CastType value = Abs(SaturateCast<CastType>(src_row[x]));
             result = Max(result, value);
         }
     }
 
-    return SaturateCast<MI_F64>(result);
+    return SaturateCast<DT_F64>(result);
 }
 
 template <typename Tp>
-static MI_F64 NormL1NoneImpl(const Mat &mat)
+static DT_F64 NormL1NoneImpl(const Mat &mat)
 {
     using CastType = typename NormAbsTraits<Tp>::CastType;
-    using ResType  = typename std::conditional<is_floating_point<Tp>::value, MI_F64, MI_U64>::type;
+    using ResType  = typename std::conditional<is_floating_point<Tp>::value, DT_F64, DT_U64>::type;
 
     ResType result = 0;
 
     Sizes3 sz = mat.GetSizes();
-    MI_S32 row_elem_count = sz.m_width * sz.m_channel;
+    DT_S32 row_elem_count = sz.m_width * sz.m_channel;
 
-    for (MI_S32 y = 0; y < sz.m_height; ++y)
+    for (DT_S32 y = 0; y < sz.m_height; ++y)
     {
         const Tp *src_row = mat.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < row_elem_count; ++x)
+        for (DT_S32 x = 0; x < row_elem_count; ++x)
         {
             CastType value = Abs(SaturateCast<CastType>(src_row[x]));
             result += value;
         }
     }
 
-    return SaturateCast<MI_F64>(result);
+    return SaturateCast<DT_F64>(result);
 }
 
 template <typename Tp>
 struct NormL2Traits
 {
-    using ResType  = MI_U64;
-    using CastType = typename std::conditional<is_signed<Tp>::value, MI_S64, MI_U64>::type;
+    using ResType  = DT_U64;
+    using CastType = typename std::conditional<is_signed<Tp>::value, DT_S64, DT_U64>::type;
 };
 
 template <>
-struct NormL2Traits<MI_S32>
+struct NormL2Traits<DT_S32>
 {
-    using ResType  = MI_F64;
-    using CastType = MI_S64;
+    using ResType  = DT_F64;
+    using CastType = DT_S64;
 };
 
 template <>
-struct NormL2Traits<MI_U32>
+struct NormL2Traits<DT_U32>
 {
-    using ResType  = MI_F64;
-    using CastType = MI_U64;
+    using ResType  = DT_F64;
+    using CastType = DT_U64;
 };
 
 #if defined(AURA_BUILD_HOST)
 template <>
 struct NormL2Traits<MI_F16>
 {
-    using ResType  = MI_F64;
-    using CastType = MI_F64;
+    using ResType  = DT_F64;
+    using CastType = DT_F64;
 };
 #endif
 
 template <>
-struct NormL2Traits<MI_F32>
+struct NormL2Traits<DT_F32>
 {
-    using ResType  = MI_F64;
-    using CastType = MI_F64;
+    using ResType  = DT_F64;
+    using CastType = DT_F64;
 };
 
 template <typename Tp>
-static MI_F64 NormL2SQRNoneImpl(const Mat &mat)
+static DT_F64 NormL2SQRNoneImpl(const Mat &mat)
 {
     using ResType  = typename NormL2Traits<Tp>::ResType;
     using CastType = typename NormL2Traits<Tp>::CastType;
@@ -123,31 +123,31 @@ static MI_F64 NormL2SQRNoneImpl(const Mat &mat)
     ResType result = 0;
 
     Sizes3 sz = mat.GetSizes();
-    MI_S32 row_elem_count = sz.m_width * sz.m_channel;
+    DT_S32 row_elem_count = sz.m_width * sz.m_channel;
 
-    for (MI_S32 y = 0; y < sz.m_height; ++y)
+    for (DT_S32 y = 0; y < sz.m_height; ++y)
     {
         const Tp *src_row = mat.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < row_elem_count; ++x)
+        for (DT_S32 x = 0; x < row_elem_count; ++x)
         {
             CastType value = SaturateCast<CastType>(src_row[x]);
             result += value * value;
         }
     }
 
-    return SaturateCast<MI_F64>(result);
+    return SaturateCast<DT_F64>(result);
 }
 
 template <typename Tp>
-static MI_F64 NormL2NoneImpl(const Mat &mat)
+static DT_F64 NormL2NoneImpl(const Mat &mat)
 {
-    MI_F64 result = NormL2SQRNoneImpl<Tp>(mat);
+    DT_F64 result = NormL2SQRNoneImpl<Tp>(mat);
     return Sqrt(result);
 }
 
 template <typename Tp>
-static Status NormNoneHelper(Context *ctx, const Mat &mat, MI_F64 *result, NormType type)
+static Status NormNoneHelper(Context *ctx, const Mat &mat, DT_F64 *result, NormType type)
 {
     Status ret = Status::OK;
 
@@ -193,7 +193,7 @@ static Status NormNoneHelper(Context *ctx, const Mat &mat, MI_F64 *result, NormT
 NormNone::NormNone(Context *ctx, const OpTarget &target) : NormImpl(ctx, target)
 {}
 
-Status NormNone::SetArgs(const Array *src, MI_F64 *result, NormType type)
+Status NormNone::SetArgs(const Array *src, DT_F64 *result, NormType type)
 {
     if (NormImpl::SetArgs(src, result, type) != Status::OK)
     {
@@ -214,7 +214,7 @@ Status NormNone::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;
@@ -226,55 +226,55 @@ Status NormNone::Run()
     {
         case ElemType::U8:
         {
-            ret = NormNoneHelper<MI_U8>(m_ctx, *src, m_result, m_type);
+            ret = NormNoneHelper<DT_U8>(m_ctx, *src, m_result, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<DT_U8> failed.");
             }
             break;
         }
         case ElemType::S8:
         {
-            ret = NormNoneHelper<MI_S8>(m_ctx, *src, m_result, m_type);
+            ret = NormNoneHelper<DT_S8>(m_ctx, *src, m_result, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<MI_S8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<DT_S8> failed.");
             }
             break;
         }
         case ElemType::U16:
         {
-            ret = NormNoneHelper<MI_U16>(m_ctx, *src, m_result, m_type);
+            ret = NormNoneHelper<DT_U16>(m_ctx, *src, m_result, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<DT_U16> failed.");
             }
             break;
         }
         case ElemType::S16:
         {
-            ret = NormNoneHelper<MI_S16>(m_ctx, *src, m_result, m_type);
+            ret = NormNoneHelper<DT_S16>(m_ctx, *src, m_result, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<MI_S16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<DT_S16> failed.");
             }
             break;
         }
         case ElemType::U32:
         {
-            ret = NormNoneHelper<MI_U32>(m_ctx, *src, m_result, m_type);
+            ret = NormNoneHelper<DT_U32>(m_ctx, *src, m_result, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<MI_U32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<DT_U32> failed.");
             }
             break;
         }
         case ElemType::S32:
         {
-            ret = NormNoneHelper<MI_S32>(m_ctx, *src, m_result, m_type);
+            ret = NormNoneHelper<DT_S32>(m_ctx, *src, m_result, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<MI_S32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<DT_S32> failed.");
             }
             break;
         }
@@ -290,10 +290,10 @@ Status NormNone::Run()
         }
         case ElemType::F32:
         {
-            ret = NormNoneHelper<MI_F32>(m_ctx, *src, m_result, m_type);
+            ret = NormNoneHelper<DT_F32>(m_ctx, *src, m_result, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<MI_F32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "NormNoneHelper<DT_F32> failed.");
             }
             break;
         }

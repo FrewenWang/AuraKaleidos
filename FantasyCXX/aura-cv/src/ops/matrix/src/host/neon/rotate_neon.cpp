@@ -5,26 +5,26 @@
 namespace aura
 {
 
-template <typename Tp, RotateType Rt, MI_S32 C> struct RotateBorderNoneFunctor;
+template <typename Tp, RotateType Rt, DT_S32 C> struct RotateBorderNoneFunctor;
 
-template <typename Tp, MI_S32 C>
+template <typename Tp, DT_S32 C>
 struct RotateBorderNoneFunctor<Tp, RotateType::ROTATE_90, C>
 {
     using BLOCK = struct { Tp val[C]; };
 
-    AURA_VOID operator()(const Mat &src, Mat &dst, MI_S32 start_blk, MI_S32 end_blk)
+    DT_VOID operator()(const Mat &src, Mat &dst, DT_S32 start_blk, DT_S32 end_blk)
     {
-        MI_S32 width  = src.GetSizes().m_width;
-        MI_S32 height = src.GetSizes().m_height;
+        DT_S32 width  = src.GetSizes().m_width;
+        DT_S32 height = src.GetSizes().m_height;
 
-        MI_S32 y = Max(0, start_blk);
-        MI_S32 h = Min(height, end_blk);
+        DT_S32 y = Max(0, start_blk);
+        DT_S32 h = Min(height, end_blk);
 
         for (; y < h; y++)
         {
-            MI_S32 dx = height - y - 1;
+            DT_S32 dx = height - y - 1;
             const BLOCK *src_row = src.Ptr<BLOCK>(y);
-            for (MI_S32 x = 0; x < width; x++)
+            for (DT_S32 x = 0; x < width; x++)
             {
                 BLOCK *dst_row = dst.Ptr<BLOCK>(x);
                 dst_row[dx] = src_row[x];
@@ -33,27 +33,27 @@ struct RotateBorderNoneFunctor<Tp, RotateType::ROTATE_90, C>
     }
 };
 
-template <typename Tp, MI_S32 C>
+template <typename Tp, DT_S32 C>
 struct RotateBorderNoneFunctor<Tp, RotateType::ROTATE_180, C>
 {
     using BLOCK = struct { Tp val[C]; };
 
-    AURA_VOID operator()(const Mat &src, Mat &dst, MI_S32 start_blk, MI_S32 end_blk)
+    DT_VOID operator()(const Mat &src, Mat &dst, DT_S32 start_blk, DT_S32 end_blk)
     {
-        MI_S32 width  = src.GetSizes().m_width;
-        MI_S32 height = src.GetSizes().m_height;
+        DT_S32 width  = src.GetSizes().m_width;
+        DT_S32 height = src.GetSizes().m_height;
 
-        MI_S32 y = Max(0, start_blk);
-        MI_S32 h = Min(height, end_blk);
+        DT_S32 y = Max(0, start_blk);
+        DT_S32 h = Min(height, end_blk);
 
         for (; y < h; y++)
         {
             const BLOCK *src_row = src.Ptr<BLOCK>(y);
             BLOCK *dst_row = dst.Ptr<BLOCK>(height - y - 1);
-            MI_S32 x_src = 0;
-            MI_S32 x_dst = width - 1;
+            DT_S32 x_src = 0;
+            DT_S32 x_dst = width - 1;
 
-            for (MI_S32 x = 0; x < width; x++)
+            for (DT_S32 x = 0; x < width; x++)
             {
                 dst_row[x_dst--] = src_row[x_src++];
             }
@@ -61,23 +61,23 @@ struct RotateBorderNoneFunctor<Tp, RotateType::ROTATE_180, C>
     }
 };
 
-template <typename Tp, MI_S32 C>
+template <typename Tp, DT_S32 C>
 struct RotateBorderNoneFunctor<Tp, RotateType::ROTATE_270, C>
 {
     using BLOCK = struct { Tp val[C]; };
 
-    AURA_VOID operator()(const Mat &src, Mat &dst, MI_S32 start_blk, MI_S32 end_blk)
+    DT_VOID operator()(const Mat &src, Mat &dst, DT_S32 start_blk, DT_S32 end_blk)
     {
-        MI_S32 width  = src.GetSizes().m_width;
-        MI_S32 height = src.GetSizes().m_height;
+        DT_S32 width  = src.GetSizes().m_width;
+        DT_S32 height = src.GetSizes().m_height;
 
-        MI_S32 y = Max(0, start_blk);
-        MI_S32 h = Min(height, end_blk);
+        DT_S32 y = Max(0, start_blk);
+        DT_S32 h = Min(height, end_blk);
 
         for (; y < h; y++)
         {
             const BLOCK *src_row = src.Ptr<BLOCK>(y);
-            for (MI_S32 x = 0; x < width; x++)
+            for (DT_S32 x = 0; x < width; x++)
             {
                 BLOCK *dst_row = dst.Ptr<BLOCK>(width - x - 1);
                 dst_row[y] = src_row[x];
@@ -93,14 +93,14 @@ AURA_INLINE Status RotateCommNeonHelper(Context *ctx, const Mat &src, Mat &dst, 
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
-    MI_S32 height  = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 height  = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (channel)
     {
@@ -159,31 +159,31 @@ AURA_INLINE Status RotateCommNeonHelper(Context *ctx, const Mat &src, Mat &dst, 
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, RotateType Rt, MI_S32 C>
-AURA_INLINE Status RotateNeonImpl(const Mat &src, Mat &dst, MI_S32 start_blk, MI_S32 end_blk)
+template <typename Tp, RotateType Rt, DT_S32 C>
+AURA_INLINE Status RotateNeonImpl(const Mat &src, Mat &dst, DT_S32 start_blk, DT_S32 end_blk)
 {
     using Functor = RotateNeonFunctor<Tp, Rt, C>;
     using SType = typename Functor::SType;
-    constexpr MI_S32 BLOCK_SIZE = Functor::BLOCK_SIZE;
+    constexpr DT_S32 BLOCK_SIZE = Functor::BLOCK_SIZE;
     Functor op;
 
     SType *src_data = (SType *)src.GetData();
     SType *dst_data = (SType *)dst.GetData();
 
-    MI_U32 src_step = src.GetRowPitch() / sizeof(SType);
-    MI_U32 dst_step = dst.GetRowPitch() / sizeof(SType);
+    DT_U32 src_step = src.GetRowPitch() / sizeof(SType);
+    DT_U32 dst_step = dst.GetRowPitch() / sizeof(SType);
 
-    MI_S32 w = src.GetSizes().m_width;
-    MI_S32 h = src.GetSizes().m_height;
+    DT_S32 w = src.GetSizes().m_width;
+    DT_S32 h = src.GetSizes().m_height;
 
     start_blk = start_blk * BLOCK_SIZE;
     end_blk   = Min(end_blk * BLOCK_SIZE, h);
 
-    MI_S32 x_align = (w & (-BLOCK_SIZE));
-    MI_S32 y_align = (end_blk & (-BLOCK_SIZE));
+    DT_S32 x_align = (w & (-BLOCK_SIZE));
+    DT_S32 y_align = (end_blk & (-BLOCK_SIZE));
 
-    MI_S32 x = 0;
-    MI_S32 y = Max(0, start_blk);
+    DT_S32 x = 0;
+    DT_S32 y = Max(0, start_blk);
 
     for (; y < y_align; y += BLOCK_SIZE)
     {
@@ -217,22 +217,22 @@ struct RotateParallelNeonFunctor
 };
 
 template <RotateType Rt>
-struct RotateParallelNeonFunctor<MI_U8, Rt>
+struct RotateParallelNeonFunctor<DT_U8, Rt>
 {
-    using Tp = MI_U8;
+    using Tp = DT_U8;
     Status operator()(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target)
     {
         Status ret = Status::ERROR;
 
         WorkerPool *wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
             return Status::ERROR;
         }
 
-        MI_S32 height  = src.GetSizes().m_height;
-        MI_S32 channel = src.GetSizes().m_channel;
+        DT_S32 height  = src.GetSizes().m_height;
+        DT_S32 channel = src.GetSizes().m_channel;
 
         switch (channel)
         {
@@ -296,31 +296,31 @@ struct RotateParallelNeonFunctor<MI_U8, Rt>
 };
 
 template <RotateType Rt>
-struct RotateParallelNeonFunctor<MI_U16, Rt>
+struct RotateParallelNeonFunctor<DT_U16, Rt>
 {
-    using Tp = MI_U16;
+    using Tp = DT_U16;
     Status operator()(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target)
     {
         Status ret = Status::ERROR;
 
         WorkerPool *wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
             return Status::ERROR;
         }
 
-        MI_S32 height  = src.GetSizes().m_height;
-        MI_S32 channel = src.GetSizes().m_channel;
+        DT_S32 height  = src.GetSizes().m_height;
+        DT_S32 channel = src.GetSizes().m_channel;
 
         switch (channel)
         {
             case 1:
             {
                 // process U16C1 as U8C2
-                RotateNeonFunctor<MI_U8, Rt, 2> op;
+                RotateNeonFunctor<DT_U8, Rt, 2> op;
                 ret = wp->ParallelFor(0, AURA_ALIGN(height, op.BLOCK_SIZE) / op.BLOCK_SIZE,
-                                      RotateNeonImpl<MI_U8, Rt, 2>, std::cref(src), std::ref(dst));
+                                      RotateNeonImpl<DT_U8, Rt, 2>, std::cref(src), std::ref(dst));
                 if (ret != Status::OK)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "RotateNeon U16C1 failed.");
@@ -330,9 +330,9 @@ struct RotateParallelNeonFunctor<MI_U16, Rt>
             case 2:
             {
                 // process U16C2 as U8C4
-                RotateNeonFunctor<MI_U8, Rt, 4> op;
+                RotateNeonFunctor<DT_U8, Rt, 4> op;
                 ret = wp->ParallelFor(0, AURA_ALIGN(height, op.BLOCK_SIZE) / op.BLOCK_SIZE,
-                                      RotateNeonImpl<MI_U8, Rt, 4>, std::cref(src), std::ref(dst));
+                                      RotateNeonImpl<DT_U8, Rt, 4>, std::cref(src), std::ref(dst));
                 if (ret != Status::OK)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "RotateNeon U16C1 failed.");
@@ -355,22 +355,22 @@ struct RotateParallelNeonFunctor<MI_U16, Rt>
 };
 
 template <RotateType Rt>
-struct RotateParallelNeonFunctor<MI_U32, Rt>
+struct RotateParallelNeonFunctor<DT_U32, Rt>
 {
-    using Tp = MI_U32;
+    using Tp = DT_U32;
     Status operator()(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target)
     {
         Status ret = Status::ERROR;
 
         WorkerPool *wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
             return Status::ERROR;
         }
 
-        MI_S32 height  = src.GetSizes().m_height;
-        MI_S32 channel = src.GetSizes().m_channel;
+        DT_S32 height  = src.GetSizes().m_height;
+        DT_S32 channel = src.GetSizes().m_channel;
 
         switch (channel)
         {
@@ -378,7 +378,7 @@ struct RotateParallelNeonFunctor<MI_U32, Rt>
             {
                 // process U32C1 as U8C4
                 ret = wp->ParallelFor(0, height,
-                                      RotateNeonImpl<MI_U8, Rt, 4>, std::cref(src), std::ref(dst));
+                                      RotateNeonImpl<DT_U8, Rt, 4>, std::cref(src), std::ref(dst));
                 if (ret != Status::OK)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "RotateNeon U32C1 failed.");
@@ -470,7 +470,7 @@ Status RotateNeon::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -483,7 +483,7 @@ Status RotateNeon::Run()
         case ElemType::U8:
         case ElemType::S8:
         {
-            ret = RotateNeonHelper<MI_U8>(m_ctx, *src, *dst, m_type, m_target);
+            ret = RotateNeonHelper<DT_U8>(m_ctx, *src, *dst, m_type, m_target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "RotateNeon Elem8 failed.");
@@ -496,7 +496,7 @@ Status RotateNeon::Run()
         case ElemType::F16:
 #endif
         {
-            ret = RotateNeonHelper<MI_U16>(m_ctx, *src, *dst, m_type, m_target);
+            ret = RotateNeonHelper<DT_U16>(m_ctx, *src, *dst, m_type, m_target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "RotateNeon Elem16 failed.");
@@ -507,7 +507,7 @@ Status RotateNeon::Run()
         case ElemType::S32:
         case ElemType::F32:
         {
-            ret = RotateNeonHelper<MI_U32>(m_ctx, *src, *dst, m_type, m_target);
+            ret = RotateNeonHelper<DT_U32>(m_ctx, *src, *dst, m_type, m_target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "RotateNeon Elem32 failed.");

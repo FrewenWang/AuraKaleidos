@@ -7,7 +7,7 @@ namespace aura
 MedianNeon::MedianNeon(Context *ctx, const OpTarget &target) : MedianImpl(ctx, target)
 {}
 
-Status MedianNeon::SetArgs(const Array *src, Array *dst, MI_S32 ksize)
+Status MedianNeon::SetArgs(const Array *src, Array *dst, DT_S32 ksize)
 {
     if (MedianImpl::SetArgs(src, dst, ksize) != Status::OK)
     {
@@ -27,7 +27,7 @@ Status MedianNeon::SetArgs(const Array *src, Array *dst, MI_S32 ksize)
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
 
     if (ch != 1 && ch != 2 && ch != 3)
     {
@@ -43,7 +43,7 @@ Status MedianNeon::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;

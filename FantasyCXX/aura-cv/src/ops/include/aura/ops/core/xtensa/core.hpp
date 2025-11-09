@@ -31,7 +31,7 @@ aura::xtensa::Status CLASSNAME##Vdsp::Initialize()                              
         if (aura::xtensa::ExecuteMode::TILE == m_mode)                                          \
         {                                                                                       \
             CLASSNAME##Tile *tile_impl = static_cast<CLASSNAME##Tile*>(m_impl);                 \
-            if (MI_NULL == tile_impl)                                                           \
+            if (DT_NULL == tile_impl)                                                           \
             {                                                                                   \
                 AURA_XTENSA_LOG("tile_impl is null ptr");                                       \
                 return aura::xtensa::Status::ERROR;                                             \
@@ -42,7 +42,7 @@ aura::xtensa::Status CLASSNAME##Vdsp::Initialize()                              
         else if (aura::xtensa::ExecuteMode::FRAME == m_mode)                                    \
         {                                                                                       \
             CLASSNAME##Frame *frame_impl = static_cast<CLASSNAME##Frame*>(m_impl);              \
-            if (MI_NULL == frame_impl)                                                          \
+            if (DT_NULL == frame_impl)                                                          \
             {                                                                                   \
                 AURA_XTENSA_LOG("frame_impl is null ptr");                                      \
                 return aura::xtensa::Status::ERROR;                                             \
@@ -68,7 +68,7 @@ aura::xtensa::Status CLASSNAME##Vdsp::DeInitialize()                            
         if (aura::xtensa::ExecuteMode::TILE == m_mode)                                          \
         {                                                                                       \
             CLASSNAME##Tile *tile_impl = static_cast<CLASSNAME##Tile*>(m_impl);                 \
-            if (MI_NULL == tile_impl)                                                           \
+            if (DT_NULL == tile_impl)                                                           \
             {                                                                                   \
                 AURA_XTENSA_LOG("tile_impl is null ptr");                                       \
                 return aura::xtensa::Status::ERROR;                                             \
@@ -79,7 +79,7 @@ aura::xtensa::Status CLASSNAME##Vdsp::DeInitialize()                            
         else if (aura::xtensa::ExecuteMode::FRAME == m_mode)                                    \
         {                                                                                       \
             CLASSNAME##Frame *frame_impl = static_cast<CLASSNAME##Frame*>(m_impl);              \
-            if (MI_NULL == frame_impl)                                                          \
+            if (DT_NULL == frame_impl)                                                          \
             {                                                                                   \
                 AURA_XTENSA_LOG("frame_impl is null ptr");                                      \
                 return aura::xtensa::Status::ERROR;                                             \
@@ -111,7 +111,7 @@ aura::xtensa::Status CLASSNAME##Vdsp::Run()                                     
         if (aura::xtensa::ExecuteMode::TILE == m_mode)                                          \
         {                                                                                       \
             CLASSNAME##Tile *tile_impl = static_cast<CLASSNAME##Tile*>(m_impl);                 \
-            if (MI_NULL == tile_impl)                                                           \
+            if (DT_NULL == tile_impl)                                                           \
             {                                                                                   \
                 AURA_XTENSA_LOG("tile_impl is null ptr");                                       \
                 return aura::xtensa::Status::ERROR;                                             \
@@ -122,7 +122,7 @@ aura::xtensa::Status CLASSNAME##Vdsp::Run()                                     
         else if (aura::xtensa::ExecuteMode::FRAME == m_mode)                                    \
         {                                                                                       \
             CLASSNAME##Frame *frame_impl = static_cast<CLASSNAME##Frame*>(m_impl);              \
-            if (MI_NULL == frame_impl)                                                          \
+            if (DT_NULL == frame_impl)                                                          \
             {                                                                                   \
                 AURA_XTENSA_LOG("frame_impl is null ptr");                                      \
                 return aura::xtensa::Status::ERROR;                                             \
@@ -151,7 +151,7 @@ Status CLASSNAME##Vdsp::Initialize()                                            
     if (m_impl)                                                                                 \
     {                                                                                           \
         CLASSNAME##Cascade *cascade_impl = static_cast<CLASSNAME##Cascade*>(m_impl);            \
-        if (MI_NULL == cascade_impl)                                                            \
+        if (DT_NULL == cascade_impl)                                                            \
         {                                                                                       \
             AURA_XTENSA_LOG("cascade_impl is null ptr");                                        \
             return aura::xtensa::Status::ERROR;                                                 \
@@ -168,7 +168,7 @@ Status CLASSNAME##Vdsp::DeInitialize()                                          
     if (m_impl)                                                                                 \
     {                                                                                           \
         CLASSNAME##Cascade *cascade_impl = static_cast<CLASSNAME##Cascade*>(m_impl);            \
-        if (MI_NULL == cascade_impl)                                                            \
+        if (DT_NULL == cascade_impl)                                                            \
         {                                                                                       \
             AURA_XTENSA_LOG("cascade_impl is null ptr");                                        \
             return aura::xtensa::Status::ERROR;                                                 \
@@ -193,7 +193,7 @@ Status CLASSNAME##Vdsp::Run()                                                   
     if (m_impl)                                                                                 \
     {                                                                                           \
         CLASSNAME##Cascade *cascade_impl = static_cast<CLASSNAME##Cascade*>(m_impl);            \
-        if (MI_NULL == cascade_impl)                                                            \
+        if (DT_NULL == cascade_impl)                                                            \
         {                                                                                       \
             AURA_XTENSA_LOG("cascade_impl is null ptr");                                        \
             return aura::xtensa::Status::ERROR;                                                 \
@@ -220,7 +220,7 @@ aura::xtensa::Status CLASSNAME##MODE::Run()                                     
     }                                                                                                                                         \
                                                                                                                                               \
     xvTileManager *xv_tm = static_cast<xvTileManager*>(m_tm);                                                                                 \
-    if (MI_NULL == xv_tm)                                                                                                                     \
+    if (DT_NULL == xv_tm)                                                                                                                     \
     {                                                                                                                                         \
         AURA_XTENSA_LOG("xv_tm is null ptr");                                                                                                 \
         return aura::xtensa::Status::ERROR;                                                                                                   \
@@ -233,7 +233,7 @@ aura::xtensa::Status CLASSNAME##MODE::Run()                                     
     }                                                                                                                                         \
                                                                                                                                               \
     RefTile *xv_ref_tile = reinterpret_cast<RefTile*>(&m_ref_tile);                                                                           \
-    if (MI_NULL == xv_ref_tile)                                                                                                               \
+    if (DT_NULL == xv_ref_tile)                                                                                                               \
     {                                                                                                                                         \
         AURA_XTENSA_LOG("xv_ref_tile is null ptr");                                                                                           \
         return aura::xtensa::Status::ERROR;                                                                                                   \
@@ -291,7 +291,7 @@ public:
      *
      * @param tm The pointer to the TileManager object.
      */
-    VdspOpTile(TileManager tm) : m_tm(tm), m_flag(MI_FALSE)
+    VdspOpTile(TileManager tm) : m_tm(tm), m_flag(DT_FALSE)
     {}
 
     /**
@@ -326,7 +326,7 @@ public:
 
 protected:
     TileManager m_tm;         /*!< The pointer to xvTileManager object. */
-    MI_BOOL     m_flag;       /*!< The flag to set args. */
+    DT_BOOL     m_flag;       /*!< The flag to set args. */
 };
 
 /**
@@ -343,7 +343,7 @@ public:
      * @param tm The pointer to the TileManager object.
      * @param tile_num The number of tile.
      */
-    VdspOpFrame(TileManager tm, MI_S32 tile_num) : m_tm(tm), m_tile_num(tile_num)
+    VdspOpFrame(TileManager tm, DT_S32 tile_num) : m_tm(tm), m_tile_num(tile_num)
     {}
 
     /**
@@ -373,17 +373,17 @@ public:
      */
     Status DeInitialize()
     {
-        for (MI_S32 i = 0; i < m_elem_types.size(); i++)
+        for (DT_S32 i = 0; i < m_elem_types.size(); i++)
         {
             m_elem_types[i] = ElemType::INVALID;
         }
 
-        for (MI_S32 i = 0; i < m_channels.size(); i++)
+        for (DT_S32 i = 0; i < m_channels.size(); i++)
         {
             m_channels[i] = 0;
         }
 
-        for (MI_S32 i = 0; i < m_frames.size(); i++)
+        for (DT_S32 i = 0; i < m_frames.size(); i++)
         {
             Memset(&m_frames[i], 0, sizeof(FrameWrapper));
         }
@@ -399,11 +399,11 @@ public:
 
 protected:
     TileManager    m_tm;           /*!< The pointer to tileManager object. */
-    MI_U32         m_tile_num;     /*!< The number of tile. */
+    DT_U32         m_tile_num;     /*!< The number of tile. */
     RefTileWrapper m_ref_tile;     /*!< The refTile object for full iaura exector. */
 
     vector<ElemType>     m_elem_types;
-    vector<MI_S32>       m_channels;
+    vector<DT_S32>       m_channels;
     vector<FrameWrapper> m_frames;
 };
 
@@ -419,7 +419,7 @@ public:
     /**
      * @brief Default constructor for creating a VdspNode object.
      */
-    VdspNode() : m_op(MI_NULL), m_enable_pad(MI_FALSE), m_edge_size(aura::Sizes(0, 0))
+    VdspNode() : m_op(DT_NULL), m_enable_pad(DT_FALSE), m_edge_size(aura::Sizes(0, 0))
     {}
 
     /**
@@ -433,7 +433,7 @@ public:
      */
     ~VdspNode()
     {
-        m_enable_pad   = MI_FALSE;
+        m_enable_pad   = DT_FALSE;
         m_border_type  = BorderType::CONSTANT;
         m_border_value = 0;
         m_extra_size   = aura::Sizes(0, 0);
@@ -465,7 +465,7 @@ public:
 
         if (m_edge_size != aura::Sizes(0, 0))
         {
-            m_enable_pad = MI_TRUE;
+            m_enable_pad = DT_TRUE;
         }
 
         m_edge_size    = edge_size;
@@ -490,7 +490,7 @@ public:
      *
      * @param extra_size Sizes for extra padding.
      */
-    AURA_VOID SetExtraSize(const aura::Sizes &extra_size)
+    DT_VOID SetExtraSize(const aura::Sizes &extra_size)
     {
         m_extra_size = extra_size;
     }
@@ -502,7 +502,7 @@ public:
      * @param dsts The output tiles for padding.
      * 
      */
-    AURA_VOID SetExecuteTiles(vector<TileWrapper> &srcs, vector<TileWrapper> &dsts)
+    DT_VOID SetExecuteTiles(vector<TileWrapper> &srcs, vector<TileWrapper> &dsts)
     {
         for (int i = 0; i < srcs.size(); i++)
         {
@@ -531,7 +531,7 @@ public:
         }
 
         Tp *op = static_cast<Tp*>(m_op);
-        if (MI_NULL == op)
+        if (DT_NULL == op)
         {
             AURA_XTENSA_LOG("null ptr");
             return Status::ERROR;
@@ -622,7 +622,7 @@ public:
         }
 
         Tp *op = static_cast<Tp*>(m_op);
-        if (MI_NULL == op)
+        if (DT_NULL == op)
         {
             AURA_XTENSA_LOG("null ptr");
             return Status::ERROR;
@@ -709,14 +709,14 @@ private:
      * @brief Check if the operation object is valid.
      * @return True if valid, false otherwise.
      */
-    MI_BOOL IsValid() const
+    DT_BOOL IsValid() const
     {
-        return m_op != MI_NULL;
+        return m_op != DT_NULL;
     }
 
 protected:
     VdspOp *m_op;               /*!< Pointer to the Vdsp object. */
-    MI_BOOL m_enable_pad;       /*!< Flag indicating if padding is enabled. */
+    DT_BOOL m_enable_pad;       /*!< Flag indicating if padding is enabled. */
 
     BorderType  m_border_type;  /*!< Type of border padding. */
     Scalar      m_border_value; /*!< Value for border padding. */
@@ -737,7 +737,7 @@ public:
     /**
      * @brief Default constructor for creating a VdspNodeGroup object.
      */
-    VdspNodeGroup(TileManager tm) : m_tm(tm), m_is_valid(MI_TRUE)
+    VdspNodeGroup(TileManager tm) : m_tm(tm), m_is_valid(DT_TRUE)
     {}
 
     /**
@@ -745,8 +745,8 @@ public:
      */
     ~VdspNodeGroup()
     {
-        m_tm       = MI_NULL;
-        m_is_valid = MI_FALSE;
+        m_tm       = DT_NULL;
+        m_is_valid = DT_FALSE;
 
         m_nodes.clear();
     }
@@ -760,11 +760,11 @@ public:
      * @param Tp The type of the operation.
      */
     template <typename Tp>
-    AURA_VOID MakeNode(const string &name)
+    DT_VOID MakeNode(const string &name)
     {
-        AURA_VOID *buffer = MI_NULL;
-        VdspNode *node  = MI_NULL;
-        Tp *op          = MI_NULL;
+        DT_VOID *buffer = DT_NULL;
+        VdspNode *node  = DT_NULL;
+        Tp *op          = DT_NULL;
 
         if (m_nodes.find(name) != m_nodes.end())
         {
@@ -773,28 +773,28 @@ public:
         }
 
         buffer = AllocateBuffer(m_tm, sizeof(Tp), 128);
-        if (MI_NULL == buffer)
+        if (DT_NULL == buffer)
         {
             AURA_XTENSA_LOG("AllocateBuffer error");
             goto EXIT;
         }
 
         op = new(buffer) Tp(m_tm, ExecuteMode::TILE);
-        if (MI_NULL == op)
+        if (DT_NULL == op)
         {
             AURA_XTENSA_LOG("op is null ptr");
             goto EXIT;
         }
 
         buffer = AllocateBuffer(m_tm, sizeof(VdspNode), 128);
-        if (MI_NULL == buffer)
+        if (DT_NULL == buffer)
         {
             AURA_XTENSA_LOG("AllocateBuffer error");
             goto EXIT;
         }
 
         node = new(buffer) VdspNode(op);
-        if (MI_NULL == node)
+        if (DT_NULL == node)
         {
             AURA_XTENSA_LOG("node is null ptr");
             goto EXIT;
@@ -805,7 +805,7 @@ public:
         return;
 
     EXIT:
-        m_is_valid = MI_FALSE;
+        m_is_valid = DT_FALSE;
     }
 
     /**
@@ -813,7 +813,7 @@ public:
      * This function returns true if the object is valid, false otherwise.
      * @return A boolean value indicating the validity of the XtensaGraph object.
      */
-    MI_BOOL IsValid() const
+    DT_BOOL IsValid() const
     {
         return m_is_valid;
     }
@@ -839,7 +839,7 @@ public:
         }
         else
         {
-            if (m_nodes[name] != MI_NULL)
+            if (m_nodes[name] != DT_NULL)
             {
                 return *(m_nodes[name]);
             }
@@ -906,7 +906,7 @@ public:
 
 private:
     TileManager    m_tm;
-    MI_BOOL        m_is_valid;
+    DT_BOOL        m_is_valid;
     aura::Sizes    m_extra_size;
     map<VdspNode*> m_nodes;
     VdspNode       m_dummy_node;
@@ -923,7 +923,7 @@ public:
     /**
      * @brief Constructor for creating a VdspOpCascade  object.
      */
-    VdspOpCascade(TileManager tm, MI_S32 tile_num) : VdspOpFrame(tm, tile_num), m_nodes(tm)
+    VdspOpCascade(TileManager tm, DT_S32 tile_num) : VdspOpFrame(tm, tile_num), m_nodes(tm)
     {}
 
     /**
@@ -972,7 +972,7 @@ public:
      *
      * @param xv_tm The pointer to the TileManager object.
      */
-    VdspOp(TileManager tm, ExecuteMode mode) : m_tm(tm), m_mode(mode), m_idx(0), m_impl(MI_NULL)
+    VdspOp(TileManager tm, ExecuteMode mode) : m_tm(tm), m_mode(mode), m_idx(0), m_impl(DT_NULL)
     {
         m_idx = BufferCheckPointSave(tm);
         if (m_idx < 0)
@@ -1006,8 +1006,8 @@ public:
 protected:
     TileManager m_tm;          /*!< Pointer to TileManager object. */
     ExecuteMode m_mode;        /*!< Enumerated class of xtensa execution mode. */
-    MI_S32      m_idx;         /*!< Pointer to start index of memory queues in local memory. */
-    AURA_VOID     *m_impl;       /*!< Pointer to implementation of operator. */
+    DT_S32      m_idx;         /*!< Pointer to start index of memory queues in local memory. */
+    DT_VOID     *m_impl;       /*!< Pointer to implementation of operator. */
 };
 
 /**

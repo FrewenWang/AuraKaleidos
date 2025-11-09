@@ -5,7 +5,7 @@
 namespace aura
 {
 
-static std::string GetCLBuildOptions(Context *ctx, MI_S32 elem_counts)
+static std::string GetCLBuildOptions(Context *ctx, DT_S32 elem_counts)
 {
     CLBuildOptions cl_build_opt(ctx);
     cl_build_opt.AddOption("ELEM_COUNTS", std::to_string(elem_counts));
@@ -13,20 +13,20 @@ static std::string GetCLBuildOptions(Context *ctx, MI_S32 elem_counts)
     return cl_build_opt.ToString();
 }
 
-static AURA_VOID GetCLSize(Context *ctx, std::vector<CLKernel> &cl_kernels, MI_S32 m, MI_S32 n, MI_S32 elem_counts,
+static DT_VOID GetCLSize(Context *ctx, std::vector<CLKernel> &cl_kernels, DT_S32 m, DT_S32 n, DT_S32 elem_counts,
                          cl::NDRange &cl_global_size, cl::NDRange &cl_local_size)
 {
     std::shared_ptr<CLRuntime> cl_rt      = ctx->GetCLEngine()->GetCLRuntime();
     std::shared_ptr<cl::Device> cl_device = cl_rt->GetDevice();
     size_t preferred_group_size;
     cl_kernels[0].GetClKernel()->getWorkGroupInfo(*cl_device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &preferred_group_size);
-    MI_U32 max_group_size       = cl_kernels[0].GetMaxGroupSize();
-    MI_S32 recommend_group_size = Min((MI_S32)max_group_size, 2 * (MI_S32)preferred_group_size);
-    const MI_S32 local_size_x   = 16;
-    const MI_S32 local_size_y   = recommend_group_size / local_size_x;
+    DT_U32 max_group_size       = cl_kernels[0].GetMaxGroupSize();
+    DT_S32 recommend_group_size = Min((DT_S32)max_group_size, 2 * (DT_S32)preferred_group_size);
+    const DT_S32 local_size_x   = 16;
+    const DT_S32 local_size_y   = recommend_group_size / local_size_x;
 
-    MI_S32 global_size_x = (n + elem_counts - 1) / elem_counts;
-    MI_S32 global_size_y = (m + elem_counts - 1) / elem_counts;
+    DT_S32 global_size_x = (n + elem_counts - 1) / elem_counts;
+    DT_S32 global_size_y = (m + elem_counts - 1) / elem_counts;
 
     cl_global_size = cl::NDRange(global_size_x, global_size_y);
     cl_local_size  = cl::NDRange(local_size_x,  local_size_y);
@@ -112,13 +112,13 @@ Status GemmMaliCL::DeInitialize()
 
 Status GemmMaliCL::Run()
 {
-    MI_S32 m = m_src0->GetSizes().m_height;
-    MI_S32 k = m_src0->GetSizes().m_width;
-    MI_S32 n = m_src1->GetSizes().m_width;
+    DT_S32 m = m_src0->GetSizes().m_height;
+    DT_S32 k = m_src0->GetSizes().m_width;
+    DT_S32 n = m_src1->GetSizes().m_width;
 
-    const MI_S32 istep0 = m_src0->GetRowPitch() / ElemTypeSize(m_src0->GetElemType());
-    const MI_S32 istep1 = m_src1->GetRowPitch() / ElemTypeSize(m_src1->GetElemType());
-    const MI_S32 ostep  =  m_dst->GetRowPitch() / ElemTypeSize( m_dst->GetElemType());
+    const DT_S32 istep0 = m_src0->GetRowPitch() / ElemTypeSize(m_src0->GetElemType());
+    const DT_S32 istep1 = m_src1->GetRowPitch() / ElemTypeSize(m_src1->GetElemType());
+    const DT_S32 ostep  =  m_dst->GetRowPitch() / ElemTypeSize( m_dst->GetElemType());
 
     cl::Event cl_event;
     cl_int cl_ret = CL_SUCCESS;
@@ -130,8 +130,8 @@ Status GemmMaliCL::Run()
     GetCLSize(m_ctx, m_cl_kernels, m, n, m_elem_counts, cl_global_size, cl_local_size);
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32,
-                                 cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32,
+                                 cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src0.GetCLMemRef<cl::Buffer>(), istep0,
                                  m_cl_src1.GetCLMemRef<cl::Buffer>(), istep1,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(),  ostep,
@@ -146,7 +146,7 @@ Status GemmMaliCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -155,7 +155,7 @@ Status GemmMaliCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }

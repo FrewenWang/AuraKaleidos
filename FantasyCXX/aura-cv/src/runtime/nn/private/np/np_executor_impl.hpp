@@ -37,7 +37,7 @@ protected:
 
 using NpExecutorImplCreator = NpExecutorImpl*(*)(Context*, const std::shared_ptr<NpModel>&, const NNConfig&);
 
-template<typename Tp, typename std::enable_if<std::is_base_of<NpExecutorImpl, Tp>::value>::type* = MI_NULL>
+template<typename Tp, typename std::enable_if<std::is_base_of<NpExecutorImpl, Tp>::value>::type* = DT_NULL>
 NpExecutorImpl* NpExecutorImplHelper(Context *ctx, const std::shared_ptr<NpModel> &model, const NNConfig &config)
 {
     return new Tp(ctx, model, config);

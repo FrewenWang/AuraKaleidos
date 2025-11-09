@@ -13,11 +13,11 @@ AURA_TEST_PARAM(ConvertToParam,
                 ElemType,  src_type,
                 ElemType,  dst_type,
                 MatSize,   mat_size,
-                MI_F32,    alpha,
-                MI_F32,    beta,
+                DT_F32,    alpha,
+                DT_F32,    beta,
                 OpTarget,  target);
 
-AURA_INLINE Status CvConvertTo(Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta)
+AURA_INLINE Status CvConvertTo(Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta)
 {
 
 #if !defined(AURA_BUILD_XPLORER)
@@ -25,7 +25,7 @@ AURA_INLINE Status CvConvertTo(Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta)
     cv::Mat cv_dst = MatToOpencv(dst);
 
     const Sizes3 sz = src.GetSizes();
-    MI_S32 dst_type = ElemTypeToOpencv(dst.GetElemType(), sz.m_channel);
+    DT_S32 dst_type = ElemTypeToOpencv(dst.GetElemType(), sz.m_channel);
     cv_src.convertTo(cv_dst, dst_type, alpha, beta);
 #else
     AURA_UNUSED(src);
@@ -43,7 +43,7 @@ public:
     MatrixConvertToTest(Context *ctx, ConvertToParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         ConvertToParam run_param(GetParam((index)));
@@ -57,12 +57,12 @@ public:
 
         AURA_LOGI(m_ctx, AURA_TAG, "Run param: %s\n", run_param.ToString().c_str());
 
-        MI_S32 mem_type = AURA_MEM_DEFAULT;
+        DT_S32 mem_type = AURA_MEM_DEFAULT;
         Mat src = m_factory.GetRandomMat(0, 512, run_param.src_type, run_param.mat_size.m_sizes, mem_type, run_param.mat_size.m_strides);
         Mat dst = m_factory.GetEmptyMat(run_param.dst_type, run_param.mat_size.m_sizes, mem_type, run_param.mat_size.m_strides);
         Mat ref = m_factory.GetEmptyMat(run_param.dst_type, run_param.mat_size.m_sizes, mem_type, run_param.mat_size.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
+        DT_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;

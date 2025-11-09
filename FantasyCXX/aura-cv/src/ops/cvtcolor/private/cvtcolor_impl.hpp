@@ -20,9 +20,9 @@
 namespace aura
 {
 
-AURA_INLINE MI_BOOL SwapBlue(CvtColorType type)
+AURA_INLINE DT_BOOL SwapBlue(CvtColorType type)
 {
-    MI_BOOL is_b = MI_TRUE;
+    DT_BOOL is_b = DT_TRUE;
     switch (type)
     {
         case CvtColorType::BGR2BGRA:
@@ -32,43 +32,43 @@ AURA_INLINE MI_BOOL SwapBlue(CvtColorType type)
         case CvtColorType::BAYERGB2BGR:
         case CvtColorType::BAYERRG2BGR:
         {
-            is_b = MI_FALSE;
+            is_b = DT_FALSE;
             break;
         }
 
         default:
         {
-            is_b = MI_TRUE;
+            is_b = DT_TRUE;
         }
     }
 
     return is_b;
 }
 
-AURA_INLINE MI_BOOL SwapGreen(CvtColorType type)
+AURA_INLINE DT_BOOL SwapGreen(CvtColorType type)
 {
-    MI_BOOL is_g = MI_TRUE;
+    DT_BOOL is_g = DT_TRUE;
     switch (type)
     {
         case CvtColorType::BAYERGB2BGR:
         case CvtColorType::BAYERGR2BGR:
         {
-            is_g = MI_FALSE;
+            is_g = DT_FALSE;
             break;
         }
 
         default:
         {
-            is_g = MI_TRUE;
+            is_g = DT_TRUE;
         }
     }
 
     return is_g;
 }
 
-AURA_INLINE MI_BOOL SwapUv(CvtColorType type)
+AURA_INLINE DT_BOOL SwapUv(CvtColorType type)
 {
-    MI_BOOL is_uv = MI_TRUE;
+    DT_BOOL is_uv = DT_TRUE;
     switch (type)
     {
         case CvtColorType::YUV2RGB_NV12:
@@ -85,13 +85,13 @@ AURA_INLINE MI_BOOL SwapUv(CvtColorType type)
         case CvtColorType::RGB2YUV_YU12_601:
         case CvtColorType::RGB2YUV_NV12_P010:
         {
-            is_uv = MI_FALSE;
+            is_uv = DT_FALSE;
             break;
         }
 
         default:
         {
-            is_uv = MI_TRUE;
+            is_uv = DT_TRUE;
         }
     }
 
@@ -104,12 +104,12 @@ AURA_INLINE MI_BOOL SwapUv(CvtColorType type)
  */
 struct Bgr2GrayParam
 {
-    static constexpr MI_S32 BC = 3735;  // Round(0.114f  * (1 << 15));
-    static constexpr MI_S32 GC = 19235; // Round(0.587f  * (1 << 15));
-    static constexpr MI_S32 RC = 9798;  // Round(0.299f  * (1 << 15));
+    static constexpr DT_S32 BC = 3735;  // Round(0.114f  * (1 << 15));
+    static constexpr DT_S32 GC = 19235; // Round(0.587f  * (1 << 15));
+    static constexpr DT_S32 RC = 9798;  // Round(0.299f  * (1 << 15));
 };
 
-template <MI_U32 MODE> struct Yuv2RgbParamTraits;
+template <DT_U32 MODE> struct Yuv2RgbParamTraits;
 
 /**
  * @brief the formula of YUV -> RGB
@@ -124,11 +124,11 @@ template <MI_U32 MODE> struct Yuv2RgbParamTraits;
 template <>
 struct Yuv2RgbParamTraits<0>
 {
-    static constexpr MI_S32 Y2RGB = 1220542; // Round(1.164f  * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 V2R   = 1673527; // Round(1.596f  * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 V2G   = -852492; // Round(-0.813f * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 U2G   = -409993; // Round(-0.391f * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 U2B   = 2116026; // Round(2.018f  * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 Y2RGB = 1220542; // Round(1.164f  * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 V2R   = 1673527; // Round(1.596f  * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 V2G   = -852492; // Round(-0.813f * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 U2G   = -409993; // Round(-0.391f * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 U2B   = 2116026; // Round(2.018f  * (1 << CVTCOLOR_COEF_BITS));
 };
 
 /**
@@ -144,14 +144,14 @@ struct Yuv2RgbParamTraits<0>
 template <>
 struct Yuv2RgbParamTraits<1>
 {
-    static constexpr MI_S32 Y2RGB = 1048576; // Round(1.000f  * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 V2R   = 1471152; // Round(1.403f  * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 V2G   = -748683; // Round(-0.714f * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 U2G   = -359661; // Round(-0.343f * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 U2B   = 1855979; // Round(1.770f  * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 Y2RGB = 1048576; // Round(1.000f  * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 V2R   = 1471152; // Round(1.403f  * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 V2G   = -748683; // Round(-0.714f * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 U2G   = -359661; // Round(-0.343f * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 U2B   = 1855979; // Round(1.770f  * (1 << CVTCOLOR_COEF_BITS));
 };
 
-template <MI_U32 MODE> struct Rgb2YuvParamTraits;
+template <DT_U32 MODE> struct Rgb2YuvParamTraits;
 
 /**
  * @brief the formula of RGB -> YUV
@@ -162,15 +162,15 @@ template <MI_U32 MODE> struct Rgb2YuvParamTraits;
 template <>
 struct Rgb2YuvParamTraits<0>
 {
-    static constexpr MI_S32 R2Y =  269484;    // Round( 0.257f * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 G2Y =  528482;    // Round( 0.504f * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 B2Y =  102760;    // Round( 0.098f * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 R2U = -155188;    // Round(-0.148f * (1 << CVTCOLOR_COEF_BITS)) + 1;
-    static constexpr MI_S32 G2U = -305135;    // Round(-0.291f * (1 << CVTCOLOR_COEF_BITS)) + 1;
-    static constexpr MI_S32 B2U =  460324;    // Round( 0.439f * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 G2V = -385875;    // Round(-0.368f * (1 << CVTCOLOR_COEF_BITS)) + 1;
-    static constexpr MI_S32 B2V = -74448;     // Round(-0.071f * (1 << CVTCOLOR_COEF_BITS)) + 1;
-    static constexpr MI_S32 YC  =  16777216;  // Round( 16     * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 R2Y =  269484;    // Round( 0.257f * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 G2Y =  528482;    // Round( 0.504f * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 B2Y =  102760;    // Round( 0.098f * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 R2U = -155188;    // Round(-0.148f * (1 << CVTCOLOR_COEF_BITS)) + 1;
+    static constexpr DT_S32 G2U = -305135;    // Round(-0.291f * (1 << CVTCOLOR_COEF_BITS)) + 1;
+    static constexpr DT_S32 B2U =  460324;    // Round( 0.439f * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 G2V = -385875;    // Round(-0.368f * (1 << CVTCOLOR_COEF_BITS)) + 1;
+    static constexpr DT_S32 B2V = -74448;     // Round(-0.071f * (1 << CVTCOLOR_COEF_BITS)) + 1;
+    static constexpr DT_S32 YC  =  16777216;  // Round( 16     * (1 << CVTCOLOR_COEF_BITS));
 };
 
 /**
@@ -187,15 +187,15 @@ struct Rgb2YuvParamTraits<0>
 template <>
 struct Rgb2YuvParamTraits<1>
 {
-    static constexpr MI_S32 R2Y =  313524;  // Round( 0.299  * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 G2Y =  615514;  // Round( 0.587  * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 B2Y =  119538;  // Round( 0.114  * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 R2U = -176895;  // Round(-0.1687 * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 G2U = -347393;  // Round(-0.3313 * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 B2U =  524288;  // Round( 0.5    * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 G2V = -439039;  // Round(-0.4187 * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 B2V = -85249;   // Round(-0.0813 * (1 << CVTCOLOR_COEF_BITS));
-    static constexpr MI_S32 YC  =  0;
+    static constexpr DT_S32 R2Y =  313524;  // Round( 0.299  * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 G2Y =  615514;  // Round( 0.587  * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 B2Y =  119538;  // Round( 0.114  * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 R2U = -176895;  // Round(-0.1687 * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 G2U = -347393;  // Round(-0.3313 * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 B2U =  524288;  // Round( 0.5    * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 G2V = -439039;  // Round(-0.4187 * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 B2V = -85249;   // Round(-0.0813 * (1 << CVTCOLOR_COEF_BITS));
+    static constexpr DT_S32 YC  =  0;
 };
 
 class CvtColorImpl : public OpImpl
@@ -211,7 +211,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     CvtColorType m_type;
@@ -231,24 +231,24 @@ public:
 };
 
 // RGB <-> BGRA
-Status CvtBgr2BgraNone(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, const OpTarget &target);
-Status CvtBgr2GrayNone(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, const OpTarget &target);
+Status CvtBgr2BgraNone(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb, const OpTarget &target);
+Status CvtBgr2GrayNone(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb, const OpTarget &target);
 Status CvtGray2BgrNone(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
 
 // YUV -> RGB
-Status CvtNv2RgbNone(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst, MI_BOOL swapuv, CvtColorType type, const OpTarget &target);
-Status CvtY4202RgbNone(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, MI_BOOL swapuv, CvtColorType type, const OpTarget &target);
-Status CvtY4222RgbNone(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapuv, MI_BOOL swapy, CvtColorType type, const OpTarget &target);
+Status CvtNv2RgbNone(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst, DT_BOOL swapuv, CvtColorType type, const OpTarget &target);
+Status CvtY4202RgbNone(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, DT_BOOL swapuv, CvtColorType type, const OpTarget &target);
+Status CvtY4222RgbNone(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapuv, DT_BOOL swapy, CvtColorType type, const OpTarget &target);
 Status CvtY4442RgbNone(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, CvtColorType type, const OpTarget &target);
 
 // RGB -> YUV
-Status CvtRgb2NvNone(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv, CvtColorType type, const OpTarget &target);
-Status CvtRgb2Y420None(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, MI_BOOL swapuv, CvtColorType type, const OpTarget &target);
+Status CvtRgb2NvNone(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv, CvtColorType type, const OpTarget &target);
+Status CvtRgb2Y420None(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, DT_BOOL swapuv, CvtColorType type, const OpTarget &target);
 Status CvtRgb2Y444None(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, CvtColorType type, const OpTarget &target);
-Status CvtRgb2NvP010None(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv, const OpTarget &target);
+Status CvtRgb2NvP010None(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv, const OpTarget &target);
 
 // BAYER -> BGR
-Status CvtBayer2BgrNone(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, MI_BOOL swapg, const OpTarget &target);
+Status CvtBayer2BgrNone(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb, DT_BOOL swapg, const OpTarget &target);
 
 #if defined(AURA_ENABLE_NEON)
 class CvtColorNeon : public CvtColorImpl
@@ -265,23 +265,23 @@ public:
 Status CvtBgr2BgraNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
 Status CvtBgra2BgrNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
 Status CvtBgr2RgbNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
-Status CvtBgr2GrayNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, const OpTarget &target);
+Status CvtBgr2GrayNeon(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb, const OpTarget &target);
 Status CvtGray2BgrNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
 
 // YUV -> RGB
-Status CvtNv2RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst, MI_BOOL swapuv, CvtColorType type, const OpTarget &target);
-Status CvtY4202RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, MI_BOOL swapuv, CvtColorType type, const OpTarget &target);
-Status CvtY4222RgbNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapuv, MI_BOOL swapy, CvtColorType type, const OpTarget &target);
+Status CvtNv2RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst, DT_BOOL swapuv, CvtColorType type, const OpTarget &target);
+Status CvtY4202RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, DT_BOOL swapuv, CvtColorType type, const OpTarget &target);
+Status CvtY4222RgbNeon(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapuv, DT_BOOL swapy, CvtColorType type, const OpTarget &target);
 Status CvtY4442RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, CvtColorType type, const OpTarget &target);
 
 // RGB -> YUV
-Status CvtRgb2NvNeon(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv, CvtColorType type, const OpTarget &target);
-Status CvtRgb2Y420Neon(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, MI_BOOL swapuv, CvtColorType type, const OpTarget &target);
+Status CvtRgb2NvNeon(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv, CvtColorType type, const OpTarget &target);
+Status CvtRgb2Y420Neon(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, DT_BOOL swapuv, CvtColorType type, const OpTarget &target);
 Status CvtRgb2Y444Neon(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, CvtColorType type, const OpTarget &target);
-Status CvtRgb2NvP010Neon(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv, const OpTarget &target);
+Status CvtRgb2NvP010Neon(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv, const OpTarget &target);
 
 // BAYER -> BGR
-Status CvtBayer2BgrNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, MI_BOOL swapg, const OpTarget &target);
+Status CvtBayer2BgrNeon(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb, DT_BOOL swapg, const OpTarget &target);
 #endif
 
 #if defined(AURA_ENABLE_OPENCL)
@@ -347,24 +347,24 @@ private:
 
 #  if defined(AURA_BUILD_HEXAGON)
 // RGB <-> BGRA
-Status CvtBgr2BgraHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb);
-Status CvtBgr2GrayHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb);
+Status CvtBgr2BgraHvx(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb);
+Status CvtBgr2GrayHvx(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb);
 Status CvtGray2BgrHvx(Context *ctx, const Mat &src, Mat &dst);
 
 // YUV -> RGB
-Status CvtNv2RgbHvx(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst, MI_BOOL swapuv, CvtColorType type);
-Status CvtY4202RgbHvx(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, MI_BOOL swapuv, CvtColorType type);
-Status CvtY4222RgbHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapuv, MI_BOOL swapy, CvtColorType type);
+Status CvtNv2RgbHvx(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst, DT_BOOL swapuv, CvtColorType type);
+Status CvtY4202RgbHvx(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, DT_BOOL swapuv, CvtColorType type);
+Status CvtY4222RgbHvx(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapuv, DT_BOOL swapy, CvtColorType type);
 Status CvtY4442RgbHvx(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, CvtColorType type);
 
 // RGB -> YUV
-Status CvtRgb2NvHvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv, CvtColorType type);
-Status CvtRgb2Y420Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, MI_BOOL swapuv, CvtColorType type);
+Status CvtRgb2NvHvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv, CvtColorType type);
+Status CvtRgb2Y420Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, DT_BOOL swapuv, CvtColorType type);
 Status CvtRgb2Y444Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, CvtColorType type);
-Status CvtRgb2NvP010Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv);
+Status CvtRgb2NvP010Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv);
 
 // BAYER -> BGR
-Status CvtBayer2BgrHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, MI_BOOL swapg);
+Status CvtBayer2BgrHvx(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb, DT_BOOL swapg);
 #  endif // AURA_BUILD_HEXAGON
 
 using CvtColorInParamHvx = HexagonRpcParamType<std::vector<Mat>, std::vector<Mat>, CvtColorType>;

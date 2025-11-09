@@ -4,16 +4,16 @@
 namespace aura
 {
 
-AURA_INLINE AURA_VOID AddDotNeon8x8(MI_S32 k, const MI_F32 *a, MI_S32 lda, const MI_F32 *b, MI_S32 ldb, MI_F32 *c, MI_S32 ldc)
+AURA_INLINE DT_VOID AddDotNeon8x8(DT_S32 k, const DT_F32 *a, DT_S32 lda, const DT_F32 *b, DT_S32 ldb, DT_F32 *c, DT_S32 ldc)
 {
-    const MI_F32 *ptr_a0 = a + lda * 0;
-    const MI_F32 *ptr_a1 = a + lda * 1;
-    const MI_F32 *ptr_a2 = a + lda * 2;
-    const MI_F32 *ptr_a3 = a + lda * 3;
-    const MI_F32 *ptr_a4 = a + lda * 4;
-    const MI_F32 *ptr_a5 = a + lda * 5;
-    const MI_F32 *ptr_a6 = a + lda * 6;
-    const MI_F32 *ptr_a7 = a + lda * 7;
+    const DT_F32 *ptr_a0 = a + lda * 0;
+    const DT_F32 *ptr_a1 = a + lda * 1;
+    const DT_F32 *ptr_a2 = a + lda * 2;
+    const DT_F32 *ptr_a3 = a + lda * 3;
+    const DT_F32 *ptr_a4 = a + lda * 4;
+    const DT_F32 *ptr_a5 = a + lda * 5;
+    const DT_F32 *ptr_a6 = a + lda * 6;
+    const DT_F32 *ptr_a7 = a + lda * 7;
 
     float32x4_t vqf32_sum00; neon::vdup(vqf32_sum00, 0);
     float32x4_t vqf32_sum01; neon::vdup(vqf32_sum01, 0);
@@ -45,18 +45,18 @@ AURA_INLINE AURA_VOID AddDotNeon8x8(MI_S32 k, const MI_F32 *a, MI_S32 lda, const
     float32x4_t vqf32_b0;
     float32x4_t vqf32_b1;
 
-    MI_F32 ta0 = 0;
-    MI_F32 ta1 = 0;
-    MI_F32 ta2 = 0;
-    MI_F32 ta3 = 0;
-    MI_F32 ta4 = 0;
-    MI_F32 ta5 = 0;
-    MI_F32 ta6 = 0;
-    MI_F32 ta7 = 0;
+    DT_F32 ta0 = 0;
+    DT_F32 ta1 = 0;
+    DT_F32 ta2 = 0;
+    DT_F32 ta3 = 0;
+    DT_F32 ta4 = 0;
+    DT_F32 ta5 = 0;
+    DT_F32 ta6 = 0;
+    DT_F32 ta7 = 0;
 
-    MI_S32 k_align4 = (k & (-4));
+    DT_S32 k_align4 = (k & (-4));
 
-    MI_S32 p = 0;
+    DT_S32 p = 0;
 
     for (; p < k_align4; p += 4)
     {
@@ -242,12 +242,12 @@ AURA_INLINE AURA_VOID AddDotNeon8x8(MI_S32 k, const MI_F32 *a, MI_S32 lda, const
     neon::vstore(c + ldc * 7 + 4, vqf32_sum47);
 }
 
-AURA_INLINE AURA_VOID AddDotNeon8x4(MI_S32 k, const MI_F32 *a, MI_S32 lda, const MI_F32 *b, MI_S32 ldb, MI_F32 *c, MI_S32 ldc)
+AURA_INLINE DT_VOID AddDotNeon8x4(DT_S32 k, const DT_F32 *a, DT_S32 lda, const DT_F32 *b, DT_S32 ldb, DT_F32 *c, DT_S32 ldc)
 {
-    const MI_F32 *ptr_a0 = a + lda * 0;
-    const MI_F32 *ptr_a1 = a + lda * 1;
-    const MI_F32 *ptr_a2 = a + lda * 2;
-    const MI_F32 *ptr_a3 = a + lda * 3;
+    const DT_F32 *ptr_a0 = a + lda * 0;
+    const DT_F32 *ptr_a1 = a + lda * 1;
+    const DT_F32 *ptr_a2 = a + lda * 2;
+    const DT_F32 *ptr_a3 = a + lda * 3;
 
     float32x4_t vqf32_sum00; neon::vdup(vqf32_sum00, 0);
     float32x4_t vqf32_sum01; neon::vdup(vqf32_sum01, 0);
@@ -267,14 +267,14 @@ AURA_INLINE AURA_VOID AddDotNeon8x4(MI_S32 k, const MI_F32 *a, MI_S32 lda, const
     float32x4_t vqf32_b0;
     float32x4_t vqf32_b1;
 
-    MI_F32 ta0 = 0;
-    MI_F32 ta1 = 0;
-    MI_F32 ta2 = 0;
-    MI_F32 ta3 = 0;
+    DT_F32 ta0 = 0;
+    DT_F32 ta1 = 0;
+    DT_F32 ta2 = 0;
+    DT_F32 ta3 = 0;
 
-    MI_S32 k_align4 = (k & (-4));
+    DT_S32 k_align4 = (k & (-4));
 
-    MI_S32 p = 0;
+    DT_S32 p = 0;
 
     for (; p < k_align4; p += 4)
     {
@@ -384,16 +384,16 @@ AURA_INLINE AURA_VOID AddDotNeon8x4(MI_S32 k, const MI_F32 *a, MI_S32 lda, const
     neon::vstore(c + ldc * 3 + 4, vqf32_sum43);
 }
 
-AURA_INLINE AURA_VOID AddDotNeon4x8(MI_S32 k, const MI_F32 *a, MI_S32 lda, const MI_F32 *b, MI_S32 ldb, MI_F32 *c, MI_S32 ldc)
+AURA_INLINE DT_VOID AddDotNeon4x8(DT_S32 k, const DT_F32 *a, DT_S32 lda, const DT_F32 *b, DT_S32 ldb, DT_F32 *c, DT_S32 ldc)
 {
-    const MI_F32 *ptr_a0 = a + lda * 0;
-    const MI_F32 *ptr_a1 = a + lda * 1;
-    const MI_F32 *ptr_a2 = a + lda * 2;
-    const MI_F32 *ptr_a3 = a + lda * 3;
-    const MI_F32 *ptr_a4 = a + lda * 4;
-    const MI_F32 *ptr_a5 = a + lda * 5;
-    const MI_F32 *ptr_a6 = a + lda * 6;
-    const MI_F32 *ptr_a7 = a + lda * 7;
+    const DT_F32 *ptr_a0 = a + lda * 0;
+    const DT_F32 *ptr_a1 = a + lda * 1;
+    const DT_F32 *ptr_a2 = a + lda * 2;
+    const DT_F32 *ptr_a3 = a + lda * 3;
+    const DT_F32 *ptr_a4 = a + lda * 4;
+    const DT_F32 *ptr_a5 = a + lda * 5;
+    const DT_F32 *ptr_a6 = a + lda * 6;
+    const DT_F32 *ptr_a7 = a + lda * 7;
 
     float32x4_t vqf32_sum0; neon::vdup(vqf32_sum0, 0);
     float32x4_t vqf32_sum1; neon::vdup(vqf32_sum1, 0);
@@ -415,18 +415,18 @@ AURA_INLINE AURA_VOID AddDotNeon4x8(MI_S32 k, const MI_F32 *a, MI_S32 lda, const
 
     float32x4_t vqf32_b;
 
-    MI_F32 ta0 = 0;
-    MI_F32 ta1 = 0;
-    MI_F32 ta2 = 0;
-    MI_F32 ta3 = 0;
-    MI_F32 ta4 = 0;
-    MI_F32 ta5 = 0;
-    MI_F32 ta6 = 0;
-    MI_F32 ta7 = 0;
+    DT_F32 ta0 = 0;
+    DT_F32 ta1 = 0;
+    DT_F32 ta2 = 0;
+    DT_F32 ta3 = 0;
+    DT_F32 ta4 = 0;
+    DT_F32 ta5 = 0;
+    DT_F32 ta6 = 0;
+    DT_F32 ta7 = 0;
 
-    MI_S32 k_align4 = (k & (-4));
+    DT_S32 k_align4 = (k & (-4));
 
-    MI_S32 p = 0;
+    DT_S32 p = 0;
 
     for (; p < k_align4; p += 4)
     {
@@ -553,12 +553,12 @@ AURA_INLINE AURA_VOID AddDotNeon4x8(MI_S32 k, const MI_F32 *a, MI_S32 lda, const
     neon::vstore(c + ldc * 7, vqf32_sum7);
 }
 
-AURA_INLINE AURA_VOID AddDotNeon4x4(MI_S32 k, const MI_F32 *a, MI_S32 lda, const MI_F32 *b, MI_S32 ldb, MI_F32 *c, MI_S32 ldc)
+AURA_INLINE DT_VOID AddDotNeon4x4(DT_S32 k, const DT_F32 *a, DT_S32 lda, const DT_F32 *b, DT_S32 ldb, DT_F32 *c, DT_S32 ldc)
 {
-    const MI_F32 *ptr_a0 = a + lda * 0;
-    const MI_F32 *ptr_a1 = a + lda * 1;
-    const MI_F32 *ptr_a2 = a + lda * 2;
-    const MI_F32 *ptr_a3 = a + lda * 3;
+    const DT_F32 *ptr_a0 = a + lda * 0;
+    const DT_F32 *ptr_a1 = a + lda * 1;
+    const DT_F32 *ptr_a2 = a + lda * 2;
+    const DT_F32 *ptr_a3 = a + lda * 3;
 
     float32x4_t vqf32_sum0; neon::vdup(vqf32_sum0, 0);
     float32x4_t vqf32_sum1; neon::vdup(vqf32_sum1, 0);
@@ -572,14 +572,14 @@ AURA_INLINE AURA_VOID AddDotNeon4x4(MI_S32 k, const MI_F32 *a, MI_S32 lda, const
 
     float32x4_t vqf32_b;
 
-    MI_F32 ta0 = 0;
-    MI_F32 ta1 = 0;
-    MI_F32 ta2 = 0;
-    MI_F32 ta3 = 0;
+    DT_F32 ta0 = 0;
+    DT_F32 ta1 = 0;
+    DT_F32 ta2 = 0;
+    DT_F32 ta3 = 0;
 
-    MI_S32 k_align4 = (k & (-4));
+    DT_S32 k_align4 = (k & (-4));
 
-    MI_S32 p = 0;
+    DT_S32 p = 0;
 
     for (; p < k_align4; p += 4)
     {
@@ -658,35 +658,35 @@ AURA_INLINE AURA_VOID AddDotNeon4x4(MI_S32 k, const MI_F32 *a, MI_S32 lda, const
     neon::vstore(c + ldc * 3, vqf32_sum3);
 }
 
-static Status GemmNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status GemmNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     // A(src0): k x m
     // B(src1): n x k
     // C(dst) : n x m
-    const MI_S32 m = Min(src0.GetSizes().m_height, end_row);
-    const MI_S32 n = src1.GetSizes().m_width;
-    const MI_S32 k = src0.GetSizes().m_width;
+    const DT_S32 m = Min(src0.GetSizes().m_height, end_row);
+    const DT_S32 n = src1.GetSizes().m_width;
+    const DT_S32 k = src0.GetSizes().m_width;
 
-    const MI_S32 stride_a = src0.GetRowPitch() / sizeof(MI_F32);
-    const MI_S32 stride_b = src1.GetRowPitch() / sizeof(MI_F32);
-    const MI_S32 stride_c = dst.GetRowPitch() / sizeof(MI_F32);
+    const DT_S32 stride_a = src0.GetRowPitch() / sizeof(DT_F32);
+    const DT_S32 stride_b = src1.GetRowPitch() / sizeof(DT_F32);
+    const DT_S32 stride_c = dst.GetRowPitch() / sizeof(DT_F32);
 
-    MI_S32 x = 0;
-    MI_S32 y = Min(0, start_row);
+    DT_S32 x = 0;
+    DT_S32 y = Min(0, start_row);
 
-    MI_S32 m_align4 = (m & (-4));
-    MI_S32 m_align8 = (m & (-8));
-    MI_S32 n_align4 = (n & (-4));
-    MI_S32 n_align8 = (n & (-8));
+    DT_S32 m_align4 = (m & (-4));
+    DT_S32 m_align8 = (m & (-8));
+    DT_S32 n_align4 = (n & (-4));
+    DT_S32 n_align8 = (n & (-8));
 
-    const MI_F32 *data_a = (MI_F32 *)src0.GetData();
-    const MI_F32 *data_b = (MI_F32 *)src1.GetData();
-    MI_F32       *data_c = (MI_F32 *)dst.GetData();
+    const DT_F32 *data_a = (DT_F32 *)src0.GetData();
+    const DT_F32 *data_b = (DT_F32 *)src1.GetData();
+    DT_F32       *data_c = (DT_F32 *)dst.GetData();
 
     for (; y < m_align8; y += 8)
     {
-        const MI_F32 *line_a = data_a + stride_a * y;
-        MI_F32       *line_c = data_c + stride_c * y;
+        const DT_F32 *line_a = data_a + stride_a * y;
+        DT_F32       *line_c = data_c + stride_c * y;
 
         x = 0;
         for (; x < n_align8; x += 8)
@@ -707,8 +707,8 @@ static Status GemmNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, MI_S32 st
 
     for (; y < m_align4; y += 4)
     {
-        const MI_F32 *line_a = data_a + stride_a * y;
-        MI_F32       *line_c = data_c + stride_c * y;
+        const DT_F32 *line_a = data_a + stride_a * y;
+        DT_F32       *line_c = data_c + stride_c * y;
 
         x = 0;
         for (; x < n_align8; x += 8)
@@ -731,8 +731,8 @@ static Status GemmNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, MI_S32 st
     {
         y = m - 4;
 
-        const MI_F32 *line_a = data_a + stride_a * y;
-        MI_F32       *line_c = data_c + stride_c * y;
+        const DT_F32 *line_a = data_a + stride_a * y;
+        DT_F32       *line_c = data_c + stride_c * y;
 
         x = 0;
         for (; x < n_align8; x += 8)

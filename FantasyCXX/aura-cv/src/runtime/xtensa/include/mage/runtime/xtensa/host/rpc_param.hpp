@@ -40,7 +40,7 @@ public:
      * @param ctx The pointer to the Context object.
      * @param size The size of the RPC parameter buffer (default is 1024).
      */
-    XtensaRpcParam(Context *ctx, MI_U32 size = 1024) : m_ctx(ctx)
+    XtensaRpcParam(Context *ctx, DT_U32 size = 1024) : m_ctx(ctx)
     {
         m_rpc_param = m_ctx->GetMemPool()->GetBuffer(AURA_ALLOC_PARAM(m_ctx, AURA_MEM_DEFAULT, size, 0));
     }
@@ -138,7 +138,7 @@ public:
     /**
      * @brief Reset the RPC parameter buffer to its original state.
      */
-    AURA_VOID ResetBuffer()
+    DT_VOID ResetBuffer()
     {
         m_rpc_param.m_data = m_rpc_param.m_origin;
         m_rpc_param.m_size = 0;
@@ -182,7 +182,7 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status Set(const Tp &...params, MI_BOOL reset = MI_TRUE)
+    Status Set(const Tp &...params, DT_BOOL reset = DT_TRUE)
     {
         if (reset)
         {
@@ -202,7 +202,7 @@ public:
      * 
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status Get(Tp &...params, MI_BOOL reset = MI_FALSE)
+    Status Get(Tp &...params, DT_BOOL reset = DT_FALSE)
     {
         if (reset)
         {

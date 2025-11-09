@@ -7,7 +7,7 @@ namespace aura
 {
 
 template <typename MVqType>
-AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Prepare(MVqType *mvq_src_p, MVqType *mvq_src_c, MVqType *mvq_src_n)
+AURA_ALWAYS_INLINE DT_VOID Filter2d3x3Prepare(MVqType *mvq_src_p, MVqType *mvq_src_c, MVqType *mvq_src_n)
 {
     mvq_src_p[0] = mvq_src_p[1];
     mvq_src_c[0] = mvq_src_c[1];
@@ -18,12 +18,12 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Prepare(MVqType *mvq_src_p, MVqType *mvq
     mvq_src_n[1] = mvq_src_n[2];
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(uint8x16_t &vqu8_src_x0, uint8x16_t &vqu8_src_x1, uint8x16_t &vqu8_src_x2,
+AURA_ALWAYS_INLINE DT_VOID Filter2d3x3Core(uint8x16_t &vqu8_src_x0, uint8x16_t &vqu8_src_x1, uint8x16_t &vqu8_src_x2,
                                            float32x4_t &vqf32_result_lo_lo, float32x4_t &vqf32_result_lo_hi,
                                            float32x4_t &vqf32_result_hi_lo, float32x4_t &vqf32_result_hi_hi,
-                                           const std::vector<MI_F32> &kernel, MI_S32 line)
+                                           const std::vector<DT_F32> &kernel, DT_S32 line)
 {
-    const MI_S32 idx = 3 * line;
+    const DT_S32 idx = 3 * line;
 
     uint8x16_t vqu8_src_l0      = neon::vext<15>(vqu8_src_x0, vqu8_src_x1);
     uint8x16_t vqu8_src_r0      = neon::vext<1>(vqu8_src_x1, vqu8_src_x2);
@@ -32,12 +32,12 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(uint8x16_t &vqu8_src_x0, uint8x16_t
     uint16x8_t vqu16_src_c_lo   = neon::vmovl(neon::vgetlow(vqu8_src_x1));
     uint16x8_t vqu16_src_r0_lo  = neon::vmovl(neon::vgetlow(vqu8_src_r0));
 
-    float32x4_t vqf32_src_l0_lo = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqu16_src_l0_lo)));
-    float32x4_t vqf32_src_l0_hi = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqu16_src_l0_lo)));
-    float32x4_t vqf32_src_c_lo  = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqu16_src_c_lo)));
-    float32x4_t vqf32_src_c_hi  = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqu16_src_c_lo)));
-    float32x4_t vqf32_src_r0_lo = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqu16_src_r0_lo)));
-    float32x4_t vqf32_src_r0_hi = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqu16_src_r0_lo)));
+    float32x4_t vqf32_src_l0_lo = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqu16_src_l0_lo)));
+    float32x4_t vqf32_src_l0_hi = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqu16_src_l0_lo)));
+    float32x4_t vqf32_src_c_lo  = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqu16_src_c_lo)));
+    float32x4_t vqf32_src_c_hi  = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqu16_src_c_lo)));
+    float32x4_t vqf32_src_r0_lo = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqu16_src_r0_lo)));
+    float32x4_t vqf32_src_r0_hi = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqu16_src_r0_lo)));
 
     vqf32_result_lo_lo          = neon::vmla(vqf32_result_lo_lo, vqf32_src_l0_lo, kernel[idx + 0]);
     vqf32_result_lo_hi          = neon::vmla(vqf32_result_lo_hi, vqf32_src_l0_hi, kernel[idx + 0]);
@@ -50,12 +50,12 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(uint8x16_t &vqu8_src_x0, uint8x16_t
     uint16x8_t vqu16_src_c_hi   = neon::vmovl(neon::vgethigh(vqu8_src_x1));
     uint16x8_t vqu16_src_r0_hi  = neon::vmovl(neon::vgethigh(vqu8_src_r0));
 
-    vqf32_src_l0_lo             = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqu16_src_l0_hi)));
-    vqf32_src_l0_hi             = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqu16_src_l0_hi)));
-    vqf32_src_c_lo              = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqu16_src_c_hi)));
-    vqf32_src_c_hi              = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqu16_src_c_hi)));
-    vqf32_src_r0_lo             = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqu16_src_r0_hi)));
-    vqf32_src_r0_hi             = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqu16_src_r0_hi)));
+    vqf32_src_l0_lo             = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqu16_src_l0_hi)));
+    vqf32_src_l0_hi             = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqu16_src_l0_hi)));
+    vqf32_src_c_lo              = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqu16_src_c_hi)));
+    vqf32_src_c_hi              = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqu16_src_c_hi)));
+    vqf32_src_r0_lo             = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqu16_src_r0_hi)));
+    vqf32_src_r0_hi             = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqu16_src_r0_hi)));
 
     vqf32_result_hi_lo          = neon::vmla(vqf32_result_hi_lo, vqf32_src_l0_lo, kernel[idx + 0]);
     vqf32_result_hi_hi          = neon::vmla(vqf32_result_hi_hi, vqf32_src_l0_hi, kernel[idx + 0]);
@@ -68,7 +68,7 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(uint8x16_t &vqu8_src_x0, uint8x16_t
 AURA_ALWAYS_INLINE uint8x16_t Filter2d3x3Vector(uint8x16_t &vqu8_src_px0, uint8x16_t &vqu8_src_px1, uint8x16_t &vqu8_src_px2,
                                                 uint8x16_t &vqu8_src_cx0, uint8x16_t &vqu8_src_cx1, uint8x16_t &vqu8_src_cx2,
                                                 uint8x16_t &vqu8_src_nx0, uint8x16_t &vqu8_src_nx1, uint8x16_t &vqu8_src_nx2,
-                                                const std::vector<MI_F32> &kernel)
+                                                const std::vector<DT_F32> &kernel)
 {
     float32x4_t vqf32_result_lo_lo, vqf32_result_lo_hi,  vqf32_result_hi_lo, vqf32_result_hi_hi;
     neon::vdup(vqf32_result_lo_lo, 0.f);
@@ -80,10 +80,10 @@ AURA_ALWAYS_INLINE uint8x16_t Filter2d3x3Vector(uint8x16_t &vqu8_src_px0, uint8x
     Filter2d3x3Core(vqu8_src_cx0, vqu8_src_cx1, vqu8_src_cx2, vqf32_result_lo_lo, vqf32_result_lo_hi, vqf32_result_hi_lo, vqf32_result_hi_hi, kernel, 1);
     Filter2d3x3Core(vqu8_src_nx0, vqu8_src_nx1, vqu8_src_nx2, vqf32_result_lo_lo, vqf32_result_lo_hi, vqf32_result_hi_lo, vqf32_result_hi_hi, kernel, 2);
 
-    uint32x4_t vqu32_result_lo_lo = neon::vcvt<MI_U32>(neon::vrndn(vqf32_result_lo_lo));
-    uint32x4_t vqu32_result_lo_hi = neon::vcvt<MI_U32>(neon::vrndn(vqf32_result_lo_hi));
-    uint32x4_t vqu32_result_hi_lo = neon::vcvt<MI_U32>(neon::vrndn(vqf32_result_hi_lo));
-    uint32x4_t vqu32_result_hi_hi = neon::vcvt<MI_U32>(neon::vrndn(vqf32_result_hi_hi));
+    uint32x4_t vqu32_result_lo_lo = neon::vcvt<DT_U32>(neon::vrndn(vqf32_result_lo_lo));
+    uint32x4_t vqu32_result_lo_hi = neon::vcvt<DT_U32>(neon::vrndn(vqf32_result_lo_hi));
+    uint32x4_t vqu32_result_hi_lo = neon::vcvt<DT_U32>(neon::vrndn(vqf32_result_hi_lo));
+    uint32x4_t vqu32_result_hi_hi = neon::vcvt<DT_U32>(neon::vrndn(vqf32_result_hi_hi));
     uint8x8_t  vdu8_result_lo     = neon::vqmovn(neon::vcombine(neon::vqmovn(vqu32_result_lo_lo), neon::vqmovn(vqu32_result_lo_hi)));
     uint8x8_t  vdu8_result_hi     = neon::vqmovn(neon::vcombine(neon::vqmovn(vqu32_result_hi_lo), neon::vqmovn(vqu32_result_hi_hi)));
 
@@ -91,22 +91,22 @@ AURA_ALWAYS_INLINE uint8x16_t Filter2d3x3Vector(uint8x16_t &vqu8_src_px0, uint8x
 }
 
 template <typename d16x8_t, typename std::enable_if<(std::is_same<d16x8_t, uint16x8_t>::value ||
-                                                     std::is_same<d16x8_t, int16x8_t>::value)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(d16x8_t &vq16_src_x0, d16x8_t &vq16_src_x1, d16x8_t &vq16_src_x2,
+                                                     std::is_same<d16x8_t, int16x8_t>::value)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Filter2d3x3Core(d16x8_t &vq16_src_x0, d16x8_t &vq16_src_x1, d16x8_t &vq16_src_x2,
                                            float32x4_t &vqf32_result_lo, float32x4_t &vqf32_result_hi,
-                                           const std::vector<MI_F32> &kernel, MI_S32 line)
+                                           const std::vector<DT_F32> &kernel, DT_S32 line)
 {
-    const MI_S32 idx = 3 * line;
+    const DT_S32 idx = 3 * line;
 
     d16x8_t vq16_src_l0 = neon::vext<7>(vq16_src_x0, vq16_src_x1);
     d16x8_t vq16_src_r0 = neon::vext<1>(vq16_src_x1, vq16_src_x2);
 
-    float32x4_t vqf32_src_l0_lo = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vq16_src_l0)));
-    float32x4_t vqf32_src_l0_hi = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vq16_src_l0)));
-    float32x4_t vqf32_src_c_lo  = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vq16_src_x1)));
-    float32x4_t vqf32_src_c_hi  = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vq16_src_x1)));
-    float32x4_t vqf32_src_r0_lo = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vq16_src_r0)));
-    float32x4_t vqf32_src_r0_hi = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vq16_src_r0)));
+    float32x4_t vqf32_src_l0_lo = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vq16_src_l0)));
+    float32x4_t vqf32_src_l0_hi = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vq16_src_l0)));
+    float32x4_t vqf32_src_c_lo  = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vq16_src_x1)));
+    float32x4_t vqf32_src_c_hi  = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vq16_src_x1)));
+    float32x4_t vqf32_src_r0_lo = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vq16_src_r0)));
+    float32x4_t vqf32_src_r0_hi = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vq16_src_r0)));
 
     vqf32_result_lo = neon::vmla(vqf32_result_lo, vqf32_src_l0_lo, kernel[idx + 0]);
     vqf32_result_hi = neon::vmla(vqf32_result_hi, vqf32_src_l0_hi, kernel[idx + 0]);
@@ -117,11 +117,11 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(d16x8_t &vq16_src_x0, d16x8_t &vq16
 }
 
 template <typename d16x8_t, typename D16 = typename neon::Scalar<d16x8_t>::SType,
-          typename std::enable_if<(std::is_same<d16x8_t, uint16x8_t>::value || std::is_same<d16x8_t, int16x8_t>::value)>::type* = MI_NULL>
+          typename std::enable_if<(std::is_same<d16x8_t, uint16x8_t>::value || std::is_same<d16x8_t, int16x8_t>::value)>::type* = DT_NULL>
 AURA_ALWAYS_INLINE d16x8_t Filter2d3x3Vector(d16x8_t &vq16_src_px0, d16x8_t &vq16_src_px1, d16x8_t &vq16_src_px2,
                                              d16x8_t &vq16_src_cx0, d16x8_t &vq16_src_cx1, d16x8_t &vq16_src_cx2,
                                              d16x8_t &vq16_src_nx0, d16x8_t &vq16_src_nx1, d16x8_t &vq16_src_nx2,
-                                             const std::vector<MI_F32> &kernel)
+                                             const std::vector<DT_F32> &kernel)
 {
     using D32     = typename Promote<D16>::Type;
     using d32x4_t = typename neon::QVector<D32>::VType;
@@ -142,10 +142,10 @@ AURA_ALWAYS_INLINE d16x8_t Filter2d3x3Vector(d16x8_t &vq16_src_px0, d16x8_t &vq1
     return vq16_result;
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(float32x4_t &vqf32_src_x0, float32x4_t &vqf32_src_x1, float32x4_t &vqf32_src_x2,
-                                           float32x4_t &vqf32_result, const std::vector<MI_F32> &kernel, MI_S32 line)
+AURA_ALWAYS_INLINE DT_VOID Filter2d3x3Core(float32x4_t &vqf32_src_x0, float32x4_t &vqf32_src_x1, float32x4_t &vqf32_src_x2,
+                                           float32x4_t &vqf32_result, const std::vector<DT_F32> &kernel, DT_S32 line)
 {
-    const MI_S32 idx = 3 * line;
+    const DT_S32 idx = 3 * line;
 
     float32x4_t vqf32_src_l0 = neon::vext<3>(vqf32_src_x0, vqf32_src_x1);
     float32x4_t vqf32_src_r0 = neon::vext<1>(vqf32_src_x1, vqf32_src_x2);
@@ -158,7 +158,7 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(float32x4_t &vqf32_src_x0, float32x
 AURA_ALWAYS_INLINE float32x4_t Filter2d3x3Vector(float32x4_t &vqf32_src_px0, float32x4_t &vqf32_src_px1, float32x4_t &vqf32_src_px2,
                                                  float32x4_t &vqf32_src_cx0, float32x4_t &vqf32_src_cx1, float32x4_t &vqf32_src_cx2,
                                                  float32x4_t &vqf32_src_nx0, float32x4_t &vqf32_src_nx1, float32x4_t &vqf32_src_nx2,
-                                                 const std::vector<MI_F32> &kernel)
+                                                 const std::vector<DT_F32> &kernel)
 {
     float32x4_t vqf32_result;
     neon::vdup(vqf32_result, 0.f);
@@ -171,21 +171,21 @@ AURA_ALWAYS_INLINE float32x4_t Filter2d3x3Vector(float32x4_t &vqf32_src_px0, flo
 }
 
 #if defined(AURA_ENABLE_NEON_FP16)
-AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(float16x8_t &vqf16_src_x0, float16x8_t &vqf16_src_x1, float16x8_t &vqf16_src_x2,
+AURA_ALWAYS_INLINE DT_VOID Filter2d3x3Core(float16x8_t &vqf16_src_x0, float16x8_t &vqf16_src_x1, float16x8_t &vqf16_src_x2,
                                            float32x4_t &vqf32_result_lo, float32x4_t &vqf32_result_hi,
-                                           const std::vector<MI_F32> &kernel, MI_S32 line)
+                                           const std::vector<DT_F32> &kernel, DT_S32 line)
 {
-    const MI_S32 idx = 3 * line;
+    const DT_S32 idx = 3 * line;
 
     float16x8_t vqf16_src_l0 = neon::vext<7>(vqf16_src_x0, vqf16_src_x1);
     float16x8_t vqf16_src_r0 = neon::vext<1>(vqf16_src_x1, vqf16_src_x2);
 
-    float32x4_t vqf32_src_l0_lo = neon::vcvt<MI_F32>(neon::vgetlow(vqf16_src_l0));
-    float32x4_t vqf32_src_l0_hi = neon::vcvt<MI_F32>(neon::vgethigh(vqf16_src_l0));
-    float32x4_t vqf32_src_c_lo  = neon::vcvt<MI_F32>(neon::vgetlow(vqf16_src_x1));
-    float32x4_t vqf32_src_c_hi  = neon::vcvt<MI_F32>(neon::vgethigh(vqf16_src_x1));
-    float32x4_t vqf32_src_r0_lo = neon::vcvt<MI_F32>(neon::vgetlow(vqf16_src_r0));
-    float32x4_t vqf32_src_r0_hi = neon::vcvt<MI_F32>(neon::vgethigh(vqf16_src_r0));
+    float32x4_t vqf32_src_l0_lo = neon::vcvt<DT_F32>(neon::vgetlow(vqf16_src_l0));
+    float32x4_t vqf32_src_l0_hi = neon::vcvt<DT_F32>(neon::vgethigh(vqf16_src_l0));
+    float32x4_t vqf32_src_c_lo  = neon::vcvt<DT_F32>(neon::vgetlow(vqf16_src_x1));
+    float32x4_t vqf32_src_c_hi  = neon::vcvt<DT_F32>(neon::vgethigh(vqf16_src_x1));
+    float32x4_t vqf32_src_r0_lo = neon::vcvt<DT_F32>(neon::vgetlow(vqf16_src_r0));
+    float32x4_t vqf32_src_r0_hi = neon::vcvt<DT_F32>(neon::vgethigh(vqf16_src_r0));
 
     vqf32_result_lo = neon::vmla(vqf32_result_lo, vqf32_src_l0_lo, kernel[idx + 0]);
     vqf32_result_hi = neon::vmla(vqf32_result_hi, vqf32_src_l0_hi, kernel[idx + 0]);
@@ -198,7 +198,7 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Core(float16x8_t &vqf16_src_x0, float16x
 AURA_ALWAYS_INLINE float16x8_t Filter2d3x3Vector(float16x8_t vqf16_src_px0, float16x8_t vqf16_src_px1, float16x8_t vqf16_src_px2,
                                                  float16x8_t vqf16_src_cx0, float16x8_t vqf16_src_cx1, float16x8_t vqf16_src_cx2,
                                                  float16x8_t vqf16_src_nx0, float16x8_t vqf16_src_nx1, float16x8_t vqf16_src_nx2,
-                                                 const std::vector<MI_F32> &kernel)
+                                                 const std::vector<DT_F32> &kernel)
 {
     float32x4_t vqf32_result_lo,  vqf32_result_hi;
     neon::vdup(vqf32_result_lo, 0.f);
@@ -217,18 +217,18 @@ AURA_ALWAYS_INLINE float16x8_t Filter2d3x3Vector(float16x8_t vqf16_src_px0, floa
 }
 #endif // AURA_ENABLE_NEON_FP16
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C>
-AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Row(const Tp *src_p, const Tp *src_c, const Tp *src_n, Tp *dst, MI_S32 width,
-                                          const std::vector<MI_F32> &kdata, const std::vector<Tp> &border_value)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C>
+AURA_ALWAYS_INLINE DT_VOID Filter2d3x3Row(const Tp *src_p, const Tp *src_c, const Tp *src_n, Tp *dst, DT_S32 width,
+                                          const std::vector<DT_F32> &kdata, const std::vector<Tp> &border_value)
 {
     using MVqType = typename neon::MQVector<Tp, C>::MVType;
 
     MVqType mvq_src_p[3], mvq_src_c[3], mvq_src_n[3];
     MVqType mvq_result;
 
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(Tp);
-    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
-    const MI_S32 width_align     = (width & -ELEM_COUNTS) * C;
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(Tp);
+    constexpr DT_S32 VOFFSET     = ELEM_COUNTS * C;
+    const DT_S32 width_align     = (width & -ELEM_COUNTS) * C;
 
     // left
     {
@@ -239,7 +239,7 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Row(const Tp *src_p, const Tp *src_c, co
         neon::vload(src_n,           mvq_src_n[1]);
         neon::vload(src_n + VOFFSET, mvq_src_n[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvq_src_p[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mvq_src_p[1].val[ch], src_p[ch], border_value[ch]);
             mvq_src_c[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mvq_src_c[1].val[ch], src_c[ch], border_value[ch]);
@@ -257,13 +257,13 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Row(const Tp *src_p, const Tp *src_c, co
 
     // middle
     {
-        for (MI_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
+        for (DT_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
         {
             neon::vload(src_p + x + VOFFSET, mvq_src_p[2]);
             neon::vload(src_c + x + VOFFSET, mvq_src_c[2]);
             neon::vload(src_n + x + VOFFSET, mvq_src_n[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvq_result.val[ch] = Filter2d3x3Vector(mvq_src_p[0].val[ch], mvq_src_p[1].val[ch], mvq_src_p[2].val[ch],
                                                        mvq_src_c[0].val[ch], mvq_src_c[1].val[ch], mvq_src_c[2].val[ch],
@@ -281,7 +281,7 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Row(const Tp *src_p, const Tp *src_c, co
     {
         if (width_align != width * C)
         {
-            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+            DT_S32 x = (width - (ELEM_COUNTS << 1)) * C;
 
             neon::vload(src_p + x - VOFFSET, mvq_src_p[0]);
             neon::vload(src_p + x,           mvq_src_p[1]);
@@ -293,7 +293,7 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Row(const Tp *src_p, const Tp *src_c, co
             neon::vload(src_n + x,           mvq_src_n[1]);
             neon::vload(src_n + x + VOFFSET, mvq_src_n[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mvq_result.val[ch] = Filter2d3x3Vector(mvq_src_p[0].val[ch], mvq_src_p[1].val[ch], mvq_src_p[2].val[ch],
                                                        mvq_src_c[0].val[ch], mvq_src_c[1].val[ch], mvq_src_c[2].val[ch],
@@ -309,9 +309,9 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Row(const Tp *src_p, const Tp *src_c, co
 
     // right
     {
-        MI_S32 x    = (width - ELEM_COUNTS) * C;
-        MI_S32 last = (width - 1) * C;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        DT_S32 x    = (width - ELEM_COUNTS) * C;
+        DT_S32 last = (width - 1) * C;
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvq_src_p[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mvq_src_p[1].val[ch], src_p[last], border_value[ch]);
             mvq_src_c[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mvq_src_c[1].val[ch], src_c[last], border_value[ch]);
@@ -327,13 +327,13 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d3x3Row(const Tp *src_p, const Tp *src_c, co
     }
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C>
-static Status Filter2d3x3NeonImpl(const Mat &src, Mat &dst, const std::vector<MI_F32> &kdata,
-                                  const std::vector<Tp> &border_value, const Tp *border_buffer, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C>
+static Status Filter2d3x3NeonImpl(const Mat &src, Mat &dst, const std::vector<DT_F32> &kdata,
+                                  const std::vector<Tp> &border_value, const Tp *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width = dst.GetSizes().m_width;
+    DT_S32 width = dst.GetSizes().m_width;
 
-    MI_S32 y = start_row;
+    DT_S32 y = start_row;
 
     const Tp *src_p = src.Ptr<Tp, BORDER_TYPE>(y - 1, border_buffer);
     const Tp *src_c = src.Ptr<Tp>(y);
@@ -353,7 +353,7 @@ static Status Filter2d3x3NeonImpl(const Mat &src, Mat &dst, const std::vector<MI
 }
 
 template <typename Tp, BorderType BORDER_TYPE>
-static Status Filter2d3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_F32> &kdata,
+static Status Filter2d3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_F32> &kdata,
                                     const std::vector<Tp> &border_value, const Tp *border_buffer, const OpTarget &target)
 {
     AURA_UNUSED(target);
@@ -361,13 +361,13 @@ static Status Filter2d3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, cons
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 height  = dst.GetSizes().m_height;
+    DT_S32 height  = dst.GetSizes().m_height;
 
     switch (dst.GetSizes().m_channel)
     {
@@ -403,23 +403,23 @@ static Status Filter2d3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, cons
 }
 
 template <typename Tp>
-static Status Filter2d3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_F32> &kdata,
+static Status Filter2d3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_F32> &kdata,
                                     BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
-    Tp *border_buffer = MI_NULL;
+    Tp *border_buffer = DT_NULL;
     std::vector<Tp> vec_border_value = border_value.ToVector<Tp>();
 
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (border_type)
     {
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -453,29 +453,29 @@ static Status Filter2d3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, cons
     AURA_RETURN(ctx, ret);
 }
 
-Status Filter2d3x3Neon(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_F32> &kdata,
+Status Filter2d3x3Neon(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_F32> &kdata,
                        BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
 
     switch (pattern)
     {
         case AURA_MAKE_PATTERN(ElemType::U8, ElemType::U8):
         {
-            ret = Filter2d3x3NeonHelper<MI_U8>(ctx, src, dst, kdata, border_type, border_value, target);
+            ret = Filter2d3x3NeonHelper<DT_U8>(ctx, src, dst, kdata, border_type, border_value, target);
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::U16, ElemType::U16):
         {
-            ret = Filter2d3x3NeonHelper<MI_U16>(ctx, src, dst, kdata, border_type, border_value, target);
+            ret = Filter2d3x3NeonHelper<DT_U16>(ctx, src, dst, kdata, border_type, border_value, target);
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::S16, ElemType::S16):
         {
-            ret = Filter2d3x3NeonHelper<MI_S16>(ctx, src, dst, kdata, border_type, border_value, target);
+            ret = Filter2d3x3NeonHelper<DT_S16>(ctx, src, dst, kdata, border_type, border_value, target);
             break;
         }
 
@@ -489,7 +489,7 @@ Status Filter2d3x3Neon(Context *ctx, const Mat &src, Mat &dst, const std::vector
 
         case AURA_MAKE_PATTERN(ElemType::F32, ElemType::F32):
         {
-            ret = Filter2d3x3NeonHelper<MI_F32>(ctx, src, dst, kdata, border_type, border_value, target);
+            ret = Filter2d3x3NeonHelper<DT_F32>(ctx, src, dst, kdata, border_type, border_value, target);
             break;
         }
 

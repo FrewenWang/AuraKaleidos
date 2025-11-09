@@ -197,7 +197,7 @@ Status CvtColorCL::Initialize()
 
     // 1. init cl_mem
     m_cl_src.clear();
-    for (MI_U32 i = 0; i < m_src.size(); i++)
+    for (DT_U32 i = 0; i < m_src.size(); i++)
     {
         m_cl_src.push_back(CLMem::FromArray(m_ctx, *(m_src[i]), CLMemParam(CL_MEM_READ_ONLY)));
         if (!m_cl_src[i].IsValid())
@@ -208,7 +208,7 @@ Status CvtColorCL::Initialize()
     }
 
     m_cl_dst.clear();
-    for (MI_U32 i = 0; i < m_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_dst.size(); i++)
     {
         m_cl_dst.push_back(CLMem::FromArray(m_ctx, *(m_dst[i]), CLMemParam(CL_MEM_WRITE_ONLY)));
         if (!m_cl_dst[i].IsValid())
@@ -228,7 +228,7 @@ Status CvtColorCL::Initialize()
     }
 
     // 3. sync start
-    for (MI_U32 i = 0; i < m_src.size(); i++)
+    for (DT_U32 i = 0; i < m_src.size(); i++)
     {
         if (m_cl_src[i].Sync(CLMemSyncType::WRITE) != Status::OK)
         {
@@ -242,17 +242,17 @@ Status CvtColorCL::Initialize()
 
 Status CvtColorCL::DeInitialize()
 {
-    for (MI_U32 i = 0; i < m_cl_src.size(); i++)
+    for (DT_U32 i = 0; i < m_cl_src.size(); i++)
     {
         m_cl_src[i].Release();
     }
 
-    for (MI_U32 i = 0; i < m_cl_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_cl_dst.size(); i++)
     {
         m_cl_dst[i].Release();
     }
 
-    for (MI_U32 i = 0; i < m_cl_kernels.size(); i++)
+    for (DT_U32 i = 0; i < m_cl_kernels.size(); i++)
     {
         m_cl_kernels[i].DeInitialize();
     }
@@ -401,15 +401,15 @@ Status CvtColorCL::CvtBgr2GrayCLImpl()
         return Status::ERROR;
     }
 
-    MI_S32 height = m_cl_src[0].GetSizes().m_height;
-    MI_S32 width  = m_cl_src[0].GetSizes().m_width;
-    MI_S32 istep  = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
-    MI_S32 ostep  = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
+    DT_S32 height = m_cl_src[0].GetSizes().m_height;
+    DT_S32 width  = m_cl_src[0].GetSizes().m_width;
+    DT_S32 istep  = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
+    DT_S32 ostep  = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
 
-    MI_S32 shift   = 15;
-    MI_S32 b_coeff = Bgr2GrayParam::BC;
-    MI_S32 g_coeff = Bgr2GrayParam::GC;
-    MI_S32 r_coeff = Bgr2GrayParam::RC;
+    DT_S32 shift   = 15;
+    DT_S32 b_coeff = Bgr2GrayParam::BC;
+    DT_S32 g_coeff = Bgr2GrayParam::GC;
+    DT_S32 r_coeff = Bgr2GrayParam::RC;
 
     if (SwapBlue(m_type))
     {
@@ -426,12 +426,12 @@ Status CvtColorCL::CvtBgr2GrayCLImpl()
     cl_int    cl_ret = CL_SUCCESS;
     Status    ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src[0].GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep,
                                  width,
-                                 (MI_S32)(cl_global_size.get()[1]),
-                                 (MI_S32)(cl_global_size.get()[0]),
+                                 (DT_S32)(cl_global_size.get()[1]),
+                                 (DT_S32)(cl_global_size.get()[0]),
                                  b_coeff, g_coeff, r_coeff, shift,
                                  cl_global_size, cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size),
                                  &cl_event);
@@ -443,7 +443,7 @@ Status CvtColorCL::CvtBgr2GrayCLImpl()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -452,7 +452,7 @@ Status CvtColorCL::CvtBgr2GrayCLImpl()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -485,11 +485,11 @@ Status CvtColorCL::CvtNv2RgbCLImpl()
         return Status::ERROR;
     }
     ///
-    MI_S32 height = m_cl_src[0].GetSizes().m_height;
-    MI_S32 width  = m_cl_src[0].GetSizes().m_width;
-    MI_S32 istep0 = m_cl_src[0].GetStrides().m_width / ElemTypeSize(m_cl_src[0].GetElemType());
-    MI_S32 istep1 = m_cl_src[1].GetStrides().m_width / ElemTypeSize(m_cl_src[1].GetElemType());
-    MI_S32 ostep  = m_cl_dst[0].GetStrides().m_width / ElemTypeSize(m_cl_dst[0].GetElemType());
+    DT_S32 height = m_cl_src[0].GetSizes().m_height;
+    DT_S32 width  = m_cl_src[0].GetSizes().m_width;
+    DT_S32 istep0 = m_cl_src[0].GetStrides().m_width / ElemTypeSize(m_cl_src[0].GetElemType());
+    DT_S32 istep1 = m_cl_src[1].GetStrides().m_width / ElemTypeSize(m_cl_src[1].GetElemType());
+    DT_S32 ostep  = m_cl_dst[0].GetStrides().m_width / ElemTypeSize(m_cl_dst[0].GetElemType());
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -502,14 +502,14 @@ Status CvtColorCL::CvtNv2RgbCLImpl()
     cl_int    cl_ret = CL_SUCCESS;
     Status    ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_U8>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_U8>(
                                  m_cl_src[0].GetCLMemRef<cl::Buffer>(), istep0,
                                  m_cl_src[1].GetCLMemRef<cl::Buffer>(), istep1,
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep,
                                  width,
-                                 (MI_S32)(cl_global_size.get()[1]),
-                                 (MI_S32)(cl_global_size.get()[0]),
-                                 static_cast<MI_U8>(SwapUv(m_type)),
+                                 (DT_S32)(cl_global_size.get()[1]),
+                                 (DT_S32)(cl_global_size.get()[0]),
+                                 static_cast<DT_U8>(SwapUv(m_type)),
                                  cl_global_size, cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size),
                                  &cl_event);
     if (cl_ret != CL_SUCCESS)
@@ -519,7 +519,7 @@ Status CvtColorCL::CvtNv2RgbCLImpl()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -528,7 +528,7 @@ Status CvtColorCL::CvtNv2RgbCLImpl()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -561,12 +561,12 @@ Status CvtColorCL::CvtY4202RgbCLImpl()
         return Status::ERROR;
     }
 
-    MI_S32 height = m_cl_src[0].GetSizes().m_height;
-    MI_S32 width  = m_cl_src[0].GetSizes().m_width;
-    MI_S32 istep0 = m_cl_src[0].GetStrides().m_width / ElemTypeSize(m_cl_src[0].GetElemType());
-    MI_S32 istep1 = m_cl_src[1].GetStrides().m_width / ElemTypeSize(m_cl_src[1].GetElemType());
-    MI_S32 istep2 = m_cl_src[2].GetStrides().m_width / ElemTypeSize(m_cl_src[2].GetElemType());
-    MI_S32 ostep  = m_cl_dst[0].GetStrides().m_width / ElemTypeSize(m_cl_dst[0].GetElemType());
+    DT_S32 height = m_cl_src[0].GetSizes().m_height;
+    DT_S32 width  = m_cl_src[0].GetSizes().m_width;
+    DT_S32 istep0 = m_cl_src[0].GetStrides().m_width / ElemTypeSize(m_cl_src[0].GetElemType());
+    DT_S32 istep1 = m_cl_src[1].GetStrides().m_width / ElemTypeSize(m_cl_src[1].GetElemType());
+    DT_S32 istep2 = m_cl_src[2].GetStrides().m_width / ElemTypeSize(m_cl_src[2].GetElemType());
+    DT_S32 ostep  = m_cl_dst[0].GetStrides().m_width / ElemTypeSize(m_cl_dst[0].GetElemType());
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -578,15 +578,15 @@ Status CvtColorCL::CvtY4202RgbCLImpl()
     cl_int    cl_ret = CL_SUCCESS;
     Status    ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_U8>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_U8>(
                                  m_cl_src[0].GetCLMemRef<cl::Buffer>(), istep0,
                                  m_cl_src[1].GetCLMemRef<cl::Buffer>(), istep1,
                                  m_cl_src[2].GetCLMemRef<cl::Buffer>(), istep2,
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep,
                                  width,
-                                 (MI_S32)(cl_global_size.get()[1]),
-                                 (MI_S32)(cl_global_size.get()[0]),
-                                 static_cast<MI_U8>(SwapUv(m_type)),
+                                 (DT_S32)(cl_global_size.get()[1]),
+                                 (DT_S32)(cl_global_size.get()[0]),
+                                 static_cast<DT_U8>(SwapUv(m_type)),
                                  cl_global_size, cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size),
                                  &cl_event);
     if (cl_ret != CL_SUCCESS)
@@ -596,7 +596,7 @@ Status CvtColorCL::CvtY4202RgbCLImpl()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -605,7 +605,7 @@ Status CvtColorCL::CvtY4202RgbCLImpl()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -636,11 +636,11 @@ Status CvtColorCL::CvtY4222RgbCLImpl()
         return Status::ERROR;
     }
 
-    MI_S32  height = m_cl_src[0].GetSizes().m_height;
-    MI_S32  width  = m_cl_src[0].GetSizes().m_width;
-    MI_S32  istep  = m_cl_src[0].GetStrides().m_width / ElemTypeSize(m_cl_src[0].GetElemType());
-    MI_S32  ostep  = m_cl_dst[0].GetStrides().m_width / ElemTypeSize(m_cl_dst[0].GetElemType());
-    MI_BOOL swapy  = (CvtColorType::YUV2RGB_Y422 == m_type) || (CvtColorType::YUV2RGB_Y422_601 == m_type);
+    DT_S32  height = m_cl_src[0].GetSizes().m_height;
+    DT_S32  width  = m_cl_src[0].GetSizes().m_width;
+    DT_S32  istep  = m_cl_src[0].GetStrides().m_width / ElemTypeSize(m_cl_src[0].GetElemType());
+    DT_S32  ostep  = m_cl_dst[0].GetStrides().m_width / ElemTypeSize(m_cl_dst[0].GetElemType());
+    DT_BOOL swapy  = (CvtColorType::YUV2RGB_Y422 == m_type) || (CvtColorType::YUV2RGB_Y422_601 == m_type);
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -652,13 +652,13 @@ Status CvtColorCL::CvtY4222RgbCLImpl()
     cl_int    cl_ret = CL_SUCCESS;
     Status    ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_U8, MI_U8>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_U8, DT_U8>(
                                  m_cl_src[0].GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep,
                                  width,
-                                 (MI_S32)(cl_global_size.get()[1]),
-                                 (MI_S32)(cl_global_size.get()[0]),
-                                 static_cast<MI_U8>(SwapUv(m_type)), static_cast<MI_U8>(swapy),
+                                 (DT_S32)(cl_global_size.get()[1]),
+                                 (DT_S32)(cl_global_size.get()[0]),
+                                 static_cast<DT_U8>(SwapUv(m_type)), static_cast<DT_U8>(swapy),
                                  cl_global_size, cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size),
                                  &cl_event);
     if (cl_ret != CL_SUCCESS)
@@ -668,7 +668,7 @@ Status CvtColorCL::CvtY4222RgbCLImpl()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -677,7 +677,7 @@ Status CvtColorCL::CvtY4222RgbCLImpl()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -704,12 +704,12 @@ Status CvtColorCL::CvtY4442RgbCLImpl()
         return Status::ERROR;
     }
 
-    MI_S32 height = m_cl_src[0].GetSizes().m_height;
-    MI_S32 width  = m_cl_src[0].GetSizes().m_width;
-    MI_S32 istep0 = m_cl_src[0].GetStrides().m_width / ElemTypeSize(m_cl_src[0].GetElemType());
-    MI_S32 istep1 = m_cl_src[1].GetStrides().m_width / ElemTypeSize(m_cl_src[1].GetElemType());
-    MI_S32 istep2 = m_cl_src[2].GetStrides().m_width / ElemTypeSize(m_cl_src[2].GetElemType());
-    MI_S32 ostep  = m_cl_dst[0].GetStrides().m_width / ElemTypeSize(m_cl_dst[0].GetElemType());
+    DT_S32 height = m_cl_src[0].GetSizes().m_height;
+    DT_S32 width  = m_cl_src[0].GetSizes().m_width;
+    DT_S32 istep0 = m_cl_src[0].GetStrides().m_width / ElemTypeSize(m_cl_src[0].GetElemType());
+    DT_S32 istep1 = m_cl_src[1].GetStrides().m_width / ElemTypeSize(m_cl_src[1].GetElemType());
+    DT_S32 istep2 = m_cl_src[2].GetStrides().m_width / ElemTypeSize(m_cl_src[2].GetElemType());
+    DT_S32 ostep  = m_cl_dst[0].GetStrides().m_width / ElemTypeSize(m_cl_dst[0].GetElemType());
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -721,14 +721,14 @@ Status CvtColorCL::CvtY4442RgbCLImpl()
     cl_int    cl_ret = CL_SUCCESS;
     Status    ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src[0].GetCLMemRef<cl::Buffer>(), istep0,
                                  m_cl_src[1].GetCLMemRef<cl::Buffer>(), istep1,
                                  m_cl_src[2].GetCLMemRef<cl::Buffer>(), istep2,
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep,
                                  width,
-                                 (MI_S32)(cl_global_size.get()[1]),
-                                 (MI_S32)(cl_global_size.get()[0]),
+                                 (DT_S32)(cl_global_size.get()[1]),
+                                 (DT_S32)(cl_global_size.get()[0]),
                                  cl_global_size, cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size),
                                  &cl_event);
     if (cl_ret != CL_SUCCESS)
@@ -738,7 +738,7 @@ Status CvtColorCL::CvtY4442RgbCLImpl()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -747,7 +747,7 @@ Status CvtColorCL::CvtY4442RgbCLImpl()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -779,12 +779,12 @@ Status CvtColorCL::CvtRgb2NvCLImpl()
         return Status::ERROR;
     }
 
-    MI_S32 height   = m_cl_src[0].GetSizes().m_height;
-    MI_S32 width    = m_cl_src[0].GetSizes().m_width;
-    MI_S32 istep    = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
-    MI_S32 ostep0   = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
-    MI_S32 ostep1   = m_cl_dst[1].GetRowPitch() / ElemTypeSize(m_cl_dst[1].GetElemType());
-    MI_S32 uv_const = (CvtColorType::RGB2YUV_NV12_P010 == m_type || CvtColorType::RGB2YUV_NV21_P010 == m_type)
+    DT_S32 height   = m_cl_src[0].GetSizes().m_height;
+    DT_S32 width    = m_cl_src[0].GetSizes().m_width;
+    DT_S32 istep    = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
+    DT_S32 ostep0   = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
+    DT_S32 ostep1   = m_cl_dst[1].GetRowPitch() / ElemTypeSize(m_cl_dst[1].GetElemType());
+    DT_S32 uv_const = (CvtColorType::RGB2YUV_NV12_P010 == m_type || CvtColorType::RGB2YUV_NV21_P010 == m_type)
                       ? (512 * (1 << CVTCOLOR_COEF_BITS)) : (128 * (1 << CVTCOLOR_COEF_BITS));
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
@@ -797,14 +797,14 @@ Status CvtColorCL::CvtRgb2NvCLImpl()
     cl_int    cl_ret = CL_SUCCESS;
     Status    ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src[0].GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep0,
                                  m_cl_dst[1].GetCLMemRef<cl::Buffer>(), ostep1,
                                  uv_const, width,
-                                 (MI_S32)(cl_global_size.get()[1]),
-                                 (MI_S32)(cl_global_size.get()[0]),
-                                 (MI_S32)(SwapUv(m_type)),
+                                 (DT_S32)(cl_global_size.get()[1]),
+                                 (DT_S32)(cl_global_size.get()[0]),
+                                 (DT_S32)(SwapUv(m_type)),
                                  cl_global_size, cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size),
                                  &cl_event);
     if (cl_ret != CL_SUCCESS)
@@ -814,7 +814,7 @@ Status CvtColorCL::CvtRgb2NvCLImpl()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY) || (m_dst[1]->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY) || (m_dst[1]->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -823,13 +823,13 @@ Status CvtColorCL::CvtRgb2NvCLImpl()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
     }
 
-    for (MI_U32 i = 0; i < m_cl_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_cl_dst.size(); i++)
     {
         ret = m_cl_dst[i].Sync(CLMemSyncType::READ);
         if (ret != Status::OK)
@@ -860,13 +860,13 @@ Status CvtColorCL::CvtRgb2Y420CLImpl()
         return Status::ERROR;
     }
 
-    MI_S32 height   = m_cl_src[0].GetSizes().m_height;
-    MI_S32 width    = m_cl_src[0].GetSizes().m_width;
-    MI_S32 istep    = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
-    MI_S32 ostep0   = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
-    MI_S32 ostep1   = m_cl_dst[1].GetRowPitch() / ElemTypeSize(m_cl_dst[1].GetElemType());
-    MI_S32 ostep2   = m_cl_dst[2].GetRowPitch() / ElemTypeSize(m_cl_dst[2].GetElemType());
-    MI_S32 uv_const = 128 * (1 << CVTCOLOR_COEF_BITS);
+    DT_S32 height   = m_cl_src[0].GetSizes().m_height;
+    DT_S32 width    = m_cl_src[0].GetSizes().m_width;
+    DT_S32 istep    = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
+    DT_S32 ostep0   = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
+    DT_S32 ostep1   = m_cl_dst[1].GetRowPitch() / ElemTypeSize(m_cl_dst[1].GetElemType());
+    DT_S32 ostep2   = m_cl_dst[2].GetRowPitch() / ElemTypeSize(m_cl_dst[2].GetElemType());
+    DT_S32 uv_const = 128 * (1 << CVTCOLOR_COEF_BITS);
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -878,15 +878,15 @@ Status CvtColorCL::CvtRgb2Y420CLImpl()
     cl_int    cl_ret = CL_SUCCESS;
     Status    ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src[0].GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep0,
                                  m_cl_dst[1].GetCLMemRef<cl::Buffer>(), ostep1,
                                  m_cl_dst[2].GetCLMemRef<cl::Buffer>(), ostep2,
                                  uv_const, width,
-                                 (MI_S32)(cl_global_size.get()[1]),
-                                 (MI_S32)(cl_global_size.get()[0]),
-                                 (MI_S32)(SwapUv(m_type)),
+                                 (DT_S32)(cl_global_size.get()[1]),
+                                 (DT_S32)(cl_global_size.get()[0]),
+                                 (DT_S32)(SwapUv(m_type)),
                                  cl_global_size, cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size),
                                  &cl_event);
     if (cl_ret != CL_SUCCESS)
@@ -896,7 +896,7 @@ Status CvtColorCL::CvtRgb2Y420CLImpl()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY) || (m_dst[1]->GetArrayType() != ArrayType::CL_MEMORY) || (m_dst[2]->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY) || (m_dst[1]->GetArrayType() != ArrayType::CL_MEMORY) || (m_dst[2]->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -905,13 +905,13 @@ Status CvtColorCL::CvtRgb2Y420CLImpl()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
     }
 
-    for (MI_U32 i = 0; i < m_cl_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_cl_dst.size(); i++)
     {
         ret = m_cl_dst[i].Sync(CLMemSyncType::READ);
         if (ret != Status::OK)
@@ -936,13 +936,13 @@ Status CvtColorCL::CvtRgb2Y444CLImpl()
         return Status::ERROR;
     }
 
-    MI_S32 height   = m_cl_src[0].GetSizes().m_height;
-    MI_S32 width    = m_cl_src[0].GetSizes().m_width;
-    MI_S32 istep    = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
-    MI_S32 ostep0   = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
-    MI_S32 ostep1   = m_cl_dst[1].GetRowPitch() / ElemTypeSize(m_cl_dst[1].GetElemType());
-    MI_S32 ostep2   = m_cl_dst[2].GetRowPitch() / ElemTypeSize(m_cl_dst[2].GetElemType());
-    MI_S32 uv_const = 128 * (1 << CVTCOLOR_COEF_BITS);
+    DT_S32 height   = m_cl_src[0].GetSizes().m_height;
+    DT_S32 width    = m_cl_src[0].GetSizes().m_width;
+    DT_S32 istep    = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
+    DT_S32 ostep0   = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
+    DT_S32 ostep1   = m_cl_dst[1].GetRowPitch() / ElemTypeSize(m_cl_dst[1].GetElemType());
+    DT_S32 ostep2   = m_cl_dst[2].GetRowPitch() / ElemTypeSize(m_cl_dst[2].GetElemType());
+    DT_S32 uv_const = 128 * (1 << CVTCOLOR_COEF_BITS);
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -954,14 +954,14 @@ Status CvtColorCL::CvtRgb2Y444CLImpl()
     cl_int    cl_ret = CL_SUCCESS;
     Status    ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src[0].GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep0,
                                  m_cl_dst[1].GetCLMemRef<cl::Buffer>(), ostep1,
                                  m_cl_dst[2].GetCLMemRef<cl::Buffer>(), ostep2,
                                  uv_const, width,
-                                 (MI_S32)(cl_global_size.get()[1]),
-                                 (MI_S32)(cl_global_size.get()[0]),
+                                 (DT_S32)(cl_global_size.get()[1]),
+                                 (DT_S32)(cl_global_size.get()[0]),
                                  cl_global_size, cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size),
                                  &cl_event);
     if (cl_ret != CL_SUCCESS)
@@ -971,7 +971,7 @@ Status CvtColorCL::CvtRgb2Y444CLImpl()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY) ||
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY) ||
         (m_dst[1]->GetArrayType() != ArrayType::CL_MEMORY) || (m_dst[2]->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
@@ -981,13 +981,13 @@ Status CvtColorCL::CvtRgb2Y444CLImpl()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
     }
 
-    for (MI_U32 i = 0; i < m_cl_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_cl_dst.size(); i++)
     {
         ret = m_cl_dst[i].Sync(CLMemSyncType::READ);
         if (ret != Status::OK)
@@ -1016,20 +1016,20 @@ Status CvtColorCL::CvtBayer2BgrCLImpl()
         return Status::ERROR;
     }
 
-    MI_S32 height = m_cl_src[0].GetSizes().m_height;
-    MI_S32 width  = m_cl_src[0].GetSizes().m_width;
-    MI_S32 istep  = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
-    MI_S32 ostep  = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
+    DT_S32 height = m_cl_src[0].GetSizes().m_height;
+    DT_S32 width  = m_cl_src[0].GetSizes().m_width;
+    DT_S32 istep  = m_cl_src[0].GetRowPitch() / ElemTypeSize(m_cl_src[0].GetElemType());
+    DT_S32 ostep  = m_cl_dst[0].GetRowPitch() / ElemTypeSize(m_cl_dst[0].GetElemType());
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
     // 1. get center_area and cl_global_size
     cl::NDRange cl_global_size[2];
-    MI_U8       back_flag     = 0;
-    MI_S32      remain_offset = width + ((height - 2) << 1);
+    DT_U8       back_flag     = 0;
+    DT_S32      remain_offset = width + ((height - 2) << 1);
 
-    MI_S32 vec_width   = width - 2;
-    MI_S32 elem_counts = 4;
+    DT_S32 vec_width   = width - 2;
+    DT_S32 elem_counts = 4;
     back_flag          = ((vec_width % elem_counts) != 0);
 
     cl_global_size[0] = cl::NDRange(width >> 2, (height - 2) >> 1); // main global size
@@ -1040,14 +1040,14 @@ Status CvtColorCL::CvtBayer2BgrCLImpl()
     cl_int    cl_ret = CL_SUCCESS;
     Status    ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_U8, MI_U8, MI_U8>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_U8, DT_U8, DT_U8>(
                                  m_cl_src[0].GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep,
                                  width,
-                                 (MI_S32)(cl_global_size[0].get()[1]),
-                                 (MI_S32)(cl_global_size[0].get()[0]),
+                                 (DT_S32)(cl_global_size[0].get()[1]),
+                                 (DT_S32)(cl_global_size[0].get()[0]),
                                  back_flag,
-                                 static_cast<MI_U8>(SwapBlue(m_type)), static_cast<MI_U8>(SwapGreen(m_type)),
+                                 static_cast<DT_U8>(SwapBlue(m_type)), static_cast<DT_U8>(SwapGreen(m_type)),
                                  cl_global_size[0], cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size[0]),
                                  &cl_event[0]);
     if (cl_ret != CL_SUCCESS)
@@ -1056,11 +1056,11 @@ Status CvtColorCL::CvtBayer2BgrCLImpl()
         goto EXIT;
     }
 
-    cl_ret = m_cl_kernels[1].Run<cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[1].Run<cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_dst[0].GetCLMemRef<cl::Buffer>(), ostep,
                                  height, width,
-                                 (MI_S32)(cl_global_size[1].get()[1]),
-                                 (MI_S32)(cl_global_size[1].get()[0]),
+                                 (DT_S32)(cl_global_size[1].get()[1]),
+                                 (DT_S32)(cl_global_size[1].get()[0]),
                                  remain_offset,
                                  cl_global_size[1], cl_rt->GetCLDefaultLocalSize(m_cl_kernels[1].GetMaxGroupSize(), cl_global_size[1]),
                                  &(cl_event[1]), {cl_event[0]});
@@ -1071,7 +1071,7 @@ Status CvtColorCL::CvtBayer2BgrCLImpl()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst[0]->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event[1].wait();
         if (cl_ret != CL_SUCCESS)
@@ -1080,7 +1080,7 @@ Status CvtColorCL::CvtBayer2BgrCLImpl()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event[0]) +
                                        GetCLProfilingInfo(m_cl_kernels[1].GetKernelName(), cl_event[1]);

@@ -56,14 +56,14 @@ static std::shared_ptr<PyrDownImpl> CreatePyrDownImpl(Context *ctx, const OpTarg
 PyrDown::PyrDown(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status PyrDown::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma, BorderType border_type)
+Status PyrDown::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma, BorderType border_type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -113,14 +113,14 @@ Status PyrDown::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreatePyrDownImpl(m_ctx, impl_target);
     }
 
     // run initialize
     PyrDownImpl *pyrdown_impl = dynamic_cast<PyrDownImpl*>(m_impl.get());
-    if (MI_NULL == pyrdown_impl)
+    if (DT_NULL == pyrdown_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "pyrdown_impl is null ptr");
         return Status::ERROR;
@@ -131,10 +131,10 @@ Status PyrDown::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma
     AURA_RETURN(m_ctx, ret);
 }
 
-Status PyrDown::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type)
+Status PyrDown::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -156,7 +156,7 @@ Status PyrDown::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, M
     return Status::OK;
 }
 
-AURA_EXPORTS Status IPyrDown(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MI_F32 sigma, BorderType border_type,
+AURA_EXPORTS Status IPyrDown(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, DT_F32 sigma, BorderType border_type,
                              const OpTarget &target)
 {
     PyrDown pyrdown(ctx, target);
@@ -166,12 +166,12 @@ AURA_EXPORTS Status IPyrDown(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksiz
 
 PyrDownImpl::PyrDownImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "PyrDown", target),
                                                                  m_ksize(0), m_sigma(0.f), m_border_type(BorderType::REFLECT_101),
-                                                                 m_src(MI_NULL), m_dst(MI_NULL)
+                                                                 m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status PyrDownImpl::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma, BorderType border_type)
+Status PyrDownImpl::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma, BorderType border_type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -231,7 +231,7 @@ Status PyrDownImpl::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 s
 
 Status PyrDownImpl::Initialize()
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -272,7 +272,7 @@ std::string PyrDownImpl::ToString() const
 {
     std::string str;
 
-    MI_CHAR sigma_str[20];
+    DT_CHAR sigma_str[20];
     snprintf(sigma_str, sizeof(sigma_str), "%.2f", m_sigma);
 
     str = "op(PyrDown)";
@@ -282,7 +282,7 @@ std::string PyrDownImpl::ToString() const
     return str;
 }
 
-AURA_VOID PyrDownImpl::Dump(const std::string &prefix) const
+DT_VOID PyrDownImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -300,16 +300,16 @@ AURA_VOID PyrDownImpl::Dump(const std::string &prefix) const
 
 Status PyrDownImpl::PrepareKmat()
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    std::vector<MI_F32> kernel = GetGaussianKernel(m_ksize, m_sigma);
+    std::vector<DT_F32> kernel = GetGaussianKernel(m_ksize, m_sigma);
 
 #define GET_PYRDOWN_KMAT(type)                                     \
     using KernelType   = typename PyrDownTraits<type>::KernelType; \
-    constexpr MI_U32 Q = PyrDownTraits<type>::Q;                   \
+    constexpr DT_U32 Q = PyrDownTraits<type>::Q;                   \
                                                                    \
     m_kmat = GetPyrKernelMat<KernelType, Q>(m_ctx, kernel);        \
 
@@ -317,19 +317,19 @@ Status PyrDownImpl::PrepareKmat()
     {
         case ElemType::U8:
         {
-            GET_PYRDOWN_KMAT(MI_U8)
+            GET_PYRDOWN_KMAT(DT_U8)
             break;
         }
 
         case ElemType::U16:
         {
-            GET_PYRDOWN_KMAT(MI_U16)
+            GET_PYRDOWN_KMAT(DT_U16)
             break;
         }
 
         case ElemType::S16:
         {
-            GET_PYRDOWN_KMAT(MI_S16)
+            GET_PYRDOWN_KMAT(DT_S16)
             break;
         }
 

@@ -30,7 +30,7 @@ static AuraMinMaxFunc GetAuraMinMaxFunc(BinaryOpType op)
         }
         default:
         {
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 }
@@ -78,7 +78,7 @@ public:
     MinMaxTest(Context *ctx, MinMaxTestParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         /// get next param set
         MinMaxTestParam run_param(GetParam((index)));
@@ -95,9 +95,9 @@ public:
         AURA_LOGI(m_ctx, AURA_TAG, "\n\n######################### MinMax Test Param: %s\n", run_param.ToString().c_str());
 
         /// Create src mats
-        MI_S32 mem_type = AURA_MEM_DEFAULT;
-        Mat src0 = m_factory.GetRandomMat((MI_F32)INT32_MIN, (MI_F32)INT32_MAX, elem_type, sizes, mem_type, strides);
-        Mat src1 = m_factory.GetRandomMat((MI_F32)INT32_MIN, (MI_F32)INT32_MAX, elem_type, sizes, mem_type, strides);
+        DT_S32 mem_type = AURA_MEM_DEFAULT;
+        Mat src0 = m_factory.GetRandomMat((DT_F32)INT32_MIN, (DT_F32)INT32_MAX, elem_type, sizes, mem_type, strides);
+        Mat src1 = m_factory.GetRandomMat((DT_F32)INT32_MIN, (DT_F32)INT32_MAX, elem_type, sizes, mem_type, strides);
         Mat dst  = m_factory.GetEmptyMat(elem_type, sizes, mem_type, strides);
         Mat ref  = m_factory.GetEmptyMat(elem_type, sizes, mem_type, strides);
 
@@ -110,10 +110,10 @@ public:
         MatCmpResult cmp_result;
         TestTime time_val;
         Status status_exec = Status::ERROR;
-        MI_S32 loop_count = stress_count ? stress_count : 5;
+        DT_S32 loop_count = stress_count ? stress_count : 5;
 
         AuraMinMaxFunc aura_func = GetAuraMinMaxFunc(op);
-        if (MI_NULL == aura_func)
+        if (DT_NULL == aura_func)
         {
             AURA_LOGE(m_ctx, AURA_TAG, "function pointer not found\n");
             result.perf_status = TestStatus::FAILED;

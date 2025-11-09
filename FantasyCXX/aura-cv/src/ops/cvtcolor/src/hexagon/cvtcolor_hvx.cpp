@@ -59,7 +59,7 @@ static Status CvtColorHvxImpl(Context *ctx, const std::vector<const Mat*> &src, 
         case CvtColorType::YUV2RGB_YUYV_601:
         case CvtColorType::YUV2RGB_YVYU_601:
         {
-            MI_BOOL swapy = (CvtColorType::YUV2RGB_Y422 == type) || (CvtColorType::YUV2RGB_Y422_601 == type);
+            DT_BOOL swapy = (CvtColorType::YUV2RGB_Y422 == type) || (CvtColorType::YUV2RGB_Y422_601 == type);
             ret = CvtY4222RgbHvx(ctx, *(src[0]), *(dst[0]), SwapUv(type), swapy, type);
             break;
         }
@@ -132,7 +132,7 @@ Status CvtColorHvx::SetArgs(const std::vector<const Array*> &src, const std::vec
         return Status::ERROR;
     }
 
-    for (MI_U32 i = 0; i < src.size(); i++)
+    for (DT_U32 i = 0; i < src.size(); i++)
     {
         if (src[i]->GetArrayType() != ArrayType::MAT)
         {
@@ -147,7 +147,7 @@ Status CvtColorHvx::SetArgs(const std::vector<const Array*> &src, const std::vec
         }
     }
 
-    for (MI_U32 i = 0; i < dst.size(); i++)
+    for (DT_U32 i = 0; i < dst.size(); i++)
     {
         if (dst[i]->GetArrayType() != ArrayType::MAT)
         {
@@ -171,13 +171,13 @@ Status CvtColorHvx::Run()
     std::vector<const Mat*> src;
     std::vector<Mat*> dst;
 
-    for (MI_U32 i = 0; i < m_src.size(); i++)
+    for (DT_U32 i = 0; i < m_src.size(); i++)
     {
         const Mat *mat = dynamic_cast<const Mat*>(m_src[i]);
         src.push_back(mat);
     }
 
-    for (MI_U32 i = 0; i < m_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_dst.size(); i++)
     {
         Mat *mat = dynamic_cast<Mat*>(m_dst[i]);
         dst.push_back(mat);
@@ -217,13 +217,13 @@ Status CvtColorRpc(Context *ctx, HexagonRpcParam &rpc_param)
     std::vector<const Array*> vec_src;
     std::vector<Array*> vec_dst;
 
-    for (MI_U32 i = 0; i < src.size(); i++)
+    for (DT_U32 i = 0; i < src.size(); i++)
     {
         const Array *p_src = &src[i];
         vec_src.push_back(p_src);
     }
 
-    for (MI_U32 i = 0; i < dst.size(); i++)
+    for (DT_U32 i = 0; i < dst.size(); i++)
     {
         Array *p_dst = &dst[i];
         vec_dst.push_back(p_dst);

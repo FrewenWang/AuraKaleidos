@@ -11,10 +11,10 @@ using namespace aura;
 
 AURA_TEST_PARAM(MulSpectrumsParam,
                 MatSize,  mat_size,
-                MI_BOOL,  conj_src1,
+                DT_BOOL,  conj_src1,
                 OpTarget, target);
 
-AURA_INLINE Status OpenCVMulSpectrums(Mat &src0, Mat &src1, Mat &dst, MI_BOOL conj_src1)
+AURA_INLINE Status OpenCVMulSpectrums(Mat &src0, Mat &src1, Mat &dst, DT_BOOL conj_src1)
 {
 #if !defined(AURA_BUILD_XPLORER)
     cv::Mat cv_src0 = MatToOpencv(src0);
@@ -32,7 +32,7 @@ AURA_INLINE Status OpenCVMulSpectrums(Mat &src0, Mat &src1, Mat &dst, MI_BOOL co
 
 struct MixedDiff
 {
-    MI_F64 operator()(const MI_F64 val0, const MI_F64 val1) const
+    DT_F64 operator()(const DT_F64 val0, const DT_F64 val1) const
     {
         RelativeDiff relative_diff;
         AbsDiff abs_diff;
@@ -52,7 +52,7 @@ public:
     MatrixMulSpectrumsTest(Context *ctx, MulSpectrumsParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         MulSpectrumsParam run_param(GetParam((index)));
@@ -66,7 +66,7 @@ public:
         Mat dst = m_factory.GetEmptyMat(ElemType::F32, run_param.mat_size.m_sizes, AURA_MEM_DEFAULT, run_param.mat_size.m_strides);
         Mat ref = m_factory.GetEmptyMat(ElemType::F32, run_param.mat_size.m_sizes, AURA_MEM_DEFAULT, run_param.mat_size.m_strides);
 
-        MI_BOOL conj_src1 = run_param.conj_src1;
+        DT_BOOL conj_src1 = run_param.conj_src1;
 
         TestTime time_val;
         MatCmpResult cmp_result;
@@ -76,7 +76,7 @@ public:
         result.output = run_param.mat_size.ToString() + " " + ElemTypesToString(ElemType::F32);
 
         // run interface
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
         Status status_exec = Executor(loop_count, 2, time_val, IMulSpectrums, m_ctx, src0, src1, dst, conj_src1, run_param.target);
 
         if (Status::OK == status_exec)

@@ -1,7 +1,7 @@
 #include "aura/runtime/opencl.h"
 #include "aura/tools/unit_test.h"
 
-static MI_CHAR g_cl_precompiled_str[] = 
+static DT_CHAR g_cl_precompiled_str[] = 
 {
     0x10, 0xc0, 0xf3, 0xa5, 0x8c, 0x00, 0x00, 0x00, 0x4f, 0x70, 0x65, 0x6e, 0x43, 0x4c, 0x20, 0x33, 
     0x2e, 0x30, 0x20, 0x51, 0x55, 0x41, 0x4c, 0x43, 0x4f, 0x4d, 0x4d, 0x20, 0x62, 0x75, 0x69, 0x6c, 
@@ -494,29 +494,29 @@ NEW_TESTCASE(runtime_opencl_mem_test)
     Context *ctx = UnitTest::GetInstance()->GetContext();
 
     CLMem cl_mem;
-    ret |= AURA_CHECK_EQ(ctx, cl_mem.IsValid(), MI_FALSE, "check CLMem::IsValid() failed\n");
+    ret |= AURA_CHECK_EQ(ctx, cl_mem.IsValid(), DT_FALSE, "check CLMem::IsValid() failed\n");
 
     cl_mem = CLMem(ctx, CLMemParam(CL_MEM_READ_ONLY), ElemType::INVALID, Sizes3(1, 100), Sizes());
-    ret |= AURA_CHECK_EQ(ctx, cl_mem.IsValid(), MI_FALSE, "check CLMem::IsValid() failed\n");
+    ret |= AURA_CHECK_EQ(ctx, cl_mem.IsValid(), DT_FALSE, "check CLMem::IsValid() failed\n");
     cl_mem.Show();
 
     CLMem cl_mem0 = CLMem(ctx, CLMemParam(CL_MEM_READ_ONLY), ElemType::U32, Sizes3(1, 100), Sizes());
-    ret |= AURA_CHECK_EQ(ctx, cl_mem0.IsValid(), MI_TRUE, "check CLMem::IsValid() failed\n");
+    ret |= AURA_CHECK_EQ(ctx, cl_mem0.IsValid(), DT_TRUE, "check CLMem::IsValid() failed\n");
     cl_mem0.Show();
 
     cl_mem = cl_mem0;
-    ret |= AURA_CHECK_EQ(ctx, cl_mem.IsValid(), MI_TRUE, "check CLMem::IsValid() failed\n");
+    ret |= AURA_CHECK_EQ(ctx, cl_mem.IsValid(), DT_TRUE, "check CLMem::IsValid() failed\n");
 
     CLMem cl_mem_cp(cl_mem);
-    ret |= AURA_CHECK_EQ(ctx, cl_mem_cp.IsValid(), MI_TRUE, "check CLMem::IsValid() failed\n");
+    ret |= AURA_CHECK_EQ(ctx, cl_mem_cp.IsValid(), DT_TRUE, "check CLMem::IsValid() failed\n");
     cl_mem_cp.Show();
 
     CLMem *cl_mem_ptr = Create<CLMem>(ctx, CLMemParam(CL_MEM_READ_ONLY, CL_R), ElemType::U32, Sizes3(9, 6, 3), Sizes());
     cl_mem_ptr->Show();
     Delete<CLMem>(ctx, &cl_mem_ptr);
 
-    MI_U8 *ptr_dma = (MI_U8 *)(AURA_ALLOC_PARAM(ctx, AURA_MEM_DMA_BUF_HEAP, 1024, 128));
-    for (MI_S32 i = 0; i < 1024; i++)
+    DT_U8 *ptr_dma = (DT_U8 *)(AURA_ALLOC_PARAM(ctx, AURA_MEM_DMA_BUF_HEAP, 1024, 128));
+    for (DT_S32 i = 0; i < 1024; i++)
     {
         ptr_dma[i] = 100;
     }
@@ -524,7 +524,7 @@ NEW_TESTCASE(runtime_opencl_mem_test)
     Buffer buffer = ctx->GetMemPool()->GetBuffer(ptr_dma);
     cl_mem = CLMem(ctx, CLMemParam(CL_MEM_READ_ONLY), ElemType::U8, Sizes3(1, 1024), buffer);
     cl_mem.Show();
-    ret |= AURA_CHECK_EQ(ctx, cl_mem.IsValid(), MI_TRUE, "check CLMem::IsValid() failed\n");
+    ret |= AURA_CHECK_EQ(ctx, cl_mem.IsValid(), DT_TRUE, "check CLMem::IsValid() failed\n");
 
     cl_mem.Dump("./cl_mem.dat");
 
@@ -539,10 +539,10 @@ NEW_TESTCASE(runtime_opencl_mem_buffer_test)
     Status ret = Status::OK;
     Context *ctx = UnitTest::GetInstance()->GetContext();
 
-    MI_S32 cn     = 2;
-    MI_S32 width  = 2560;
-    MI_S32 height = 1080;
-    MI_S32 mem_types[] = {AURA_MEM_HEAP, AURA_MEM_DMA_BUF_HEAP, AURA_MEM_SVM};
+    DT_S32 cn     = 2;
+    DT_S32 width  = 2560;
+    DT_S32 height = 1080;
+    DT_S32 mem_types[] = {AURA_MEM_HEAP, AURA_MEM_DMA_BUF_HEAP, AURA_MEM_SVM};
     std::string mem_types_str[] = {"AURA_MEM_HEAP", "AURA_MEM_DMA_BUF_HEAP", "AURA_MEM_SVM"};
 
     CLKernel cl_kernel(ctx, "BufferTest", "buffer_add", {cl_kernel_str}, "");
@@ -558,7 +558,7 @@ NEW_TESTCASE(runtime_opencl_mem_buffer_test)
 
     Mat mat_test(ctx, ElemType::U16, Sizes3(height, width * 2, cn), AURA_MEM_DMA_BUF_HEAP);
 
-    for (MI_S32 m = 0; m < 3; m++)
+    for (DT_S32 m = 0; m < 3; m++)
     {
         Mat mata(ctx, ElemType::U16, Sizes3(height, width, cn), mem_types[m]);
         Mat matb(ctx, ElemType::U16, Sizes3(height, width, cn), mem_types[m]);
@@ -577,12 +577,12 @@ NEW_TESTCASE(runtime_opencl_mem_buffer_test)
             ctx->GetMemPool()->Map(matb.GetBuffer());
         }
 
-        for (MI_S32 i = 0; i < height; i++)
+        for (DT_S32 i = 0; i < height; i++)
         {
-            for (MI_S32 j = 0; j < width; j++)
+            for (DT_S32 j = 0; j < width; j++)
             {
-                mata.Ptr<MI_U16>(i)[j] = (i + j) + 1;
-                matb.Ptr<MI_U16>(i)[j] = (i * 2 + j) + 4;
+                mata.Ptr<DT_U16>(i)[j] = (i + j) + 1;
+                matb.Ptr<DT_U16>(i)[j] = (i * 2 + j) + 4;
             }
         }
 
@@ -596,11 +596,11 @@ NEW_TESTCASE(runtime_opencl_mem_buffer_test)
         Mat matc_roi(mat_test, Rect(0, 0, width - 200, height - 30));
         Mat matr_roi(matr, Rect(0, 0, width - 200, height - 30));
 
-        MI_S32 wid = mata_roi.GetSizes().m_width;
-        MI_S32 hei = mata_roi.GetSizes().m_height;
-        MI_S32 a_step = static_cast<MI_S32>(mata_roi.GetStrides().m_width) / sizeof(MI_U16);
-        MI_S32 b_step = static_cast<MI_S32>(matb_roi.GetStrides().m_width) / sizeof(MI_U16);
-        MI_S32 c_step = static_cast<MI_S32>(matc_roi.GetStrides().m_width) / sizeof(MI_U16);
+        DT_S32 wid = mata_roi.GetSizes().m_width;
+        DT_S32 hei = mata_roi.GetSizes().m_height;
+        DT_S32 a_step = static_cast<DT_S32>(mata_roi.GetStrides().m_width) / sizeof(DT_U16);
+        DT_S32 b_step = static_cast<DT_S32>(matb_roi.GetStrides().m_width) / sizeof(DT_U16);
+        DT_S32 c_step = static_cast<DT_S32>(matc_roi.GetStrides().m_width) / sizeof(DT_U16);
 
         Status ret_status = Status::ERROR;
 
@@ -658,7 +658,7 @@ NEW_TESTCASE(runtime_opencl_mem_buffer_test)
             goto EXIT;
         }
 
-        cl_err = cl_kernel.Run<cl::Buffer, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, cl::Buffer>(
+        cl_err = cl_kernel.Run<cl::Buffer, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, cl::Buffer>(
                             cl_memd.GetCLMemRef<cl::Buffer>(),
                             cl_memb.GetCLMemRef<cl::Buffer>(),
                             wid,
@@ -694,17 +694,17 @@ NEW_TESTCASE(runtime_opencl_mem_buffer_test)
         std::string timer_string = "time consuming " + (end - start).ToString() + "\n";
         AURA_LOGD(ctx, AURA_TAG, timer_string.c_str());
 
-        for (MI_S32 i = 0; i < hei; i++)
+        for (DT_S32 i = 0; i < hei; i++)
         {
-            for (MI_S32 j = 0; j < wid; j++)
+            for (DT_S32 j = 0; j < wid; j++)
             {
-                matr_roi.Ptr<MI_U16>(i)[j] = mata_roi.Ptr<MI_U16>(i)[j] + matb_roi.Ptr<MI_U16>(i)[j];
+                matr_roi.Ptr<DT_U16>(i)[j] = mata_roi.Ptr<DT_U16>(i)[j] + matb_roi.Ptr<DT_U16>(i)[j];
             }
         }
 
         MatCmpResult result;
         MatCompare(ctx, matc_roi, matr_roi, result, 0);
-        ret |= AURA_CHECK_EQ(ctx, result.status, static_cast<MI_S32>(MI_TRUE), "check MatCompare failed\n");
+        ret |= AURA_CHECK_EQ(ctx, result.status, static_cast<DT_S32>(DT_TRUE), "check MatCompare failed\n");
     }
 
     ctx->GetCLEngine()->GetCLRuntime()->CreatePrecompiledCLProgram("./", "aura_test");
@@ -725,7 +725,7 @@ NEW_TESTCASE(runtime_opencl_mem_iaura2d_test)
     config.SetLog(LogOutput::STDOUT, LogLevel::DEBUG);
 
     std::string str_precompiled(g_cl_precompiled_str, sizeof(g_cl_precompiled_str));
-    config.SetCLConf(MI_TRUE, "/data/local/tmp", "aura_test", CLPrecompiledType::STRING, str_precompiled);
+    config.SetCLConf(DT_TRUE, "/data/local/tmp", "aura_test", CLPrecompiledType::STRING, str_precompiled);
 
     std::shared_ptr<Context> context(new Context(config));
     ret |= context->Initialize();
@@ -736,11 +736,11 @@ NEW_TESTCASE(runtime_opencl_mem_iaura2d_test)
     }
     Context *ctx = context.get();
 
-    MI_S32 cn     = 1;
-    MI_S32 width  = 2047;
-    MI_S32 height = 1080;
+    DT_S32 cn     = 1;
+    DT_S32 width  = 2047;
+    DT_S32 height = 1080;
     Status ret_status = Status::OK;
-    MI_S32 mem_types[] = {AURA_MEM_HEAP, AURA_MEM_DMA_BUF_HEAP, AURA_MEM_SVM};
+    DT_S32 mem_types[] = {AURA_MEM_HEAP, AURA_MEM_DMA_BUF_HEAP, AURA_MEM_SVM};
     std::string mem_types_str[] = {"AURA_MEM_HEAP", "AURA_MEM_DMA_BUF_HEAP", "AURA_MEM_SVM"};
 
     std::shared_ptr<CLRuntime> cl_rt = ctx->GetCLEngine()->GetCLRuntime();
@@ -753,7 +753,7 @@ NEW_TESTCASE(runtime_opencl_mem_iaura2d_test)
     Sizes strides;
     strides.m_width = AURA_ALIGN(width * ElemTypeSize(ElemType::U16) * cn, cl_rt->GetCLLengthAlignSize());
 
-    for (MI_S32 m = 0; m < 3; m++)
+    for (DT_S32 m = 0; m < 3; m++)
     {
         Mat mata(ctx, ElemType::U16, Sizes3(height, width, cn), mem_types[m], strides);
         Mat matb(ctx, ElemType::U16, Sizes3(height, width, cn), mem_types[m], strides);
@@ -773,12 +773,12 @@ NEW_TESTCASE(runtime_opencl_mem_iaura2d_test)
             ctx->GetMemPool()->Map(matr.GetBuffer());
         }
 
-        for (MI_S32 i = 0; i < height; i++)
+        for (DT_S32 i = 0; i < height; i++)
         {
-            for (MI_S32 j = 0; j < width; j++)
+            for (DT_S32 j = 0; j < width; j++)
             {
-                mata.At<MI_U16>(i, j) = (i + j);
-                matb.At<MI_U16>(i, j) = (i * 2 + j);
+                mata.At<DT_U16>(i, j) = (i + j);
+                matb.At<DT_U16>(i, j) = (i * 2 + j);
             }
         }
 
@@ -836,7 +836,7 @@ NEW_TESTCASE(runtime_opencl_mem_iaura2d_test)
             goto EXIT;
         }
 
-        cl_err = cl_kernel.Run<cl::Iaura2D, cl::Iaura2D, MI_S32, MI_S32, cl::Iaura2D>(
+        cl_err = cl_kernel.Run<cl::Iaura2D, cl::Iaura2D, DT_S32, DT_S32, cl::Iaura2D>(
                             cl_memd.GetCLMemRef<cl::Iaura2D>(),
                             cl_memb.GetCLMemRef<cl::Iaura2D>(),
                             width,
@@ -861,11 +861,11 @@ NEW_TESTCASE(runtime_opencl_mem_iaura2d_test)
             goto EXIT;
         }
 
-        for (MI_S32 i = 0; i < height; i++)
+        for (DT_S32 i = 0; i < height; i++)
         {
-            for (MI_S32 j = 0; j < width; j++)
+            for (DT_S32 j = 0; j < width; j++)
             {
-                matr.At<MI_U16>(i, j) = mata.At<MI_U16>(i, j) + matb.At<MI_U16>(i, j);
+                matr.At<DT_U16>(i, j) = mata.At<DT_U16>(i, j) + matb.At<DT_U16>(i, j);
             }
         }
 
@@ -877,7 +877,7 @@ NEW_TESTCASE(runtime_opencl_mem_iaura2d_test)
 
         MatCmpResult result;
         MatCompare(ctx, matr, matc, result, 0);
-        ret |= AURA_CHECK_EQ(ctx, result.status, static_cast<MI_S32>(MI_TRUE), "check MatCompare failed\n");
+        ret |= AURA_CHECK_EQ(ctx, result.status, static_cast<DT_S32>(DT_TRUE), "check MatCompare failed\n");
 
         if (ret != Status::OK)
         {
@@ -896,12 +896,12 @@ NEW_TESTCASE(runtime_opencl_mem_iaura3d_test)
     Status ret = Status::OK;
     Context *ctx = UnitTest::GetInstance()->GetContext();
 
-    MI_S32 cn     = 1;
-    MI_S32 width  = 1300;
-    MI_S32 height = 711;
-    MI_S32 depth  = 3;
+    DT_S32 cn     = 1;
+    DT_S32 width  = 1300;
+    DT_S32 height = 711;
+    DT_S32 depth  = 3;
     Status ret_status = Status::OK;
-    MI_S32 mem_types[] = {AURA_MEM_HEAP, AURA_MEM_DMA_BUF_HEAP};
+    DT_S32 mem_types[] = {AURA_MEM_HEAP, AURA_MEM_DMA_BUF_HEAP};
 
     std::shared_ptr<CLRuntime> cl_rt = ctx->GetCLEngine()->GetCLRuntime();
     CLKernel cl_kernel(ctx, "Iaura3DTest", "iaura3d_add", {cl_iaura3d_str}, "");
@@ -921,23 +921,23 @@ NEW_TESTCASE(runtime_opencl_mem_iaura3d_test)
     size_t iaura_width = CLMem::GetCLIauraWidth(sizes.m_width * sizes.m_channel, fmt.iaura_channel_order);
     strides.m_height   = AURA_ALIGN(height, cl_rt->GetCLSliceAlignSize(fmt, iaura_width, height) / cl_rt->GetCLLengthAlignSize()) * depth;
 
-    for (MI_S32 m = 0; m < 2; m++)
+    for (DT_S32 m = 0; m < 2; m++)
     {
         Mat mata(ctx, ElemType::U16, sizes, mem_types[m], strides);
         Mat matb(ctx, ElemType::U16, sizes, mem_types[m], strides);
         Mat matc(ctx, ElemType::U16, sizes, mem_types[m], strides);
         Mat matr(ctx, ElemType::U16, sizes, mem_types[m], strides);
 
-        MI_S32 row_elem_count = strides.m_width / ElemTypeSize(ElemType::U16);
+        DT_S32 row_elem_count = strides.m_width / ElemTypeSize(ElemType::U16);
 
-        for (MI_S32 k = 0; k < depth; k++)
+        for (DT_S32 k = 0; k < depth; k++)
         {
-            MI_U16 *ptr_a = mata.Ptr<MI_U16>(0) + k * strides.m_height / depth * row_elem_count;
-            MI_U16 *ptr_b = matb.Ptr<MI_U16>(0) + k * strides.m_height / depth * row_elem_count;
+            DT_U16 *ptr_a = mata.Ptr<DT_U16>(0) + k * strides.m_height / depth * row_elem_count;
+            DT_U16 *ptr_b = matb.Ptr<DT_U16>(0) + k * strides.m_height / depth * row_elem_count;
 
-            for (MI_S32 i = 0; i < height; i++)
+            for (DT_S32 i = 0; i < height; i++)
             {
-                for (MI_S32 j = 0; j < width; j++)
+                for (DT_S32 j = 0; j < width; j++)
                 {
                     ptr_a[i * row_elem_count + j] = (i + j);
                     ptr_b[i * row_elem_count + j] = (i * 2 + j);
@@ -1001,7 +1001,7 @@ NEW_TESTCASE(runtime_opencl_mem_iaura3d_test)
             goto EXIT;
         }
 
-        cl_err = cl_kernel.Run<cl::Iaura3D, cl::Iaura3D, MI_S32, MI_S32, MI_S32, cl::Iaura3D>(
+        cl_err = cl_kernel.Run<cl::Iaura3D, cl::Iaura3D, DT_S32, DT_S32, DT_S32, cl::Iaura3D>(
                                     cl_memd.GetCLMemRef<cl::Iaura3D>(),
                                     cl_memb.GetCLMemRef<cl::Iaura3D>(),
                                     width,
@@ -1027,15 +1027,15 @@ NEW_TESTCASE(runtime_opencl_mem_iaura3d_test)
             goto EXIT;
         }
 
-        for (MI_S32 k = 0; k < depth; k++)
+        for (DT_S32 k = 0; k < depth; k++)
         {
-            MI_U16 *ptr_a = mata.Ptr<MI_U16>(0) + k * strides.m_height / depth * row_elem_count;
-            MI_U16 *ptr_b = matb.Ptr<MI_U16>(0) + k * strides.m_height / depth * row_elem_count;
-            MI_U16 *ptr_r = matr.Ptr<MI_U16>(0) + k * strides.m_height / depth * row_elem_count;
+            DT_U16 *ptr_a = mata.Ptr<DT_U16>(0) + k * strides.m_height / depth * row_elem_count;
+            DT_U16 *ptr_b = matb.Ptr<DT_U16>(0) + k * strides.m_height / depth * row_elem_count;
+            DT_U16 *ptr_r = matr.Ptr<DT_U16>(0) + k * strides.m_height / depth * row_elem_count;
 
-            for (MI_S32 i = 0; i < height; i++)
+            for (DT_S32 i = 0; i < height; i++)
             {
-                for (MI_S32 j = 0; j < width; j++)
+                for (DT_S32 j = 0; j < width; j++)
                 {
                     ptr_r[i * row_elem_count + j] = ptr_a[i * row_elem_count + j] + ptr_b[i * row_elem_count + j];
                 }
@@ -1044,7 +1044,7 @@ NEW_TESTCASE(runtime_opencl_mem_iaura3d_test)
 
         MatCmpResult result;
         MatCompare(ctx, matr, matc, result, 0);
-        ret |= AURA_CHECK_EQ(ctx, result.status, static_cast<MI_S32>(MI_TRUE), "check MatCompare failed\n");
+        ret |= AURA_CHECK_EQ(ctx, result.status, static_cast<DT_S32>(DT_TRUE), "check MatCompare failed\n");
         if (ret != Status::OK)
         {
             goto EXIT;

@@ -12,11 +12,11 @@ using namespace aura;
 AURA_TEST_PARAM(BoxFilterParam,
                 ElemType,   elem_type,
                 MatSize,    mat_size,
-                MI_S32,     ksize,
+                DT_S32,     ksize,
                 BorderType, border_type,
                 OpTarget,   target);
 
-static Status CvBoxFilter(Context *ctx, Mat &src, Mat &ref, MI_S32 ksize, BorderType border_type)
+static Status CvBoxFilter(Context *ctx, Mat &src, Mat &ref, DT_S32 ksize, BorderType border_type)
 {
     if (src.GetElemType() == ElemType::F16)
     {
@@ -57,7 +57,7 @@ public:
 
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         BoxFilterParam run_param(GetParam((index)));
 
@@ -80,7 +80,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         BoxFilterParam run_param(GetParam((index)));
@@ -118,7 +118,7 @@ public:
         Mat ref = m_factory.GetEmptyMat(((ElemType::F16 == run_param.elem_type) && (TargetType::NONE == run_param.target.m_type))
                                         ? ElemType::F32 : run_param.elem_type, run_param.mat_size.m_sizes);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
         Scalar border_value = Scalar(0, 0, 0, 0);
 
         TestTime time_val;

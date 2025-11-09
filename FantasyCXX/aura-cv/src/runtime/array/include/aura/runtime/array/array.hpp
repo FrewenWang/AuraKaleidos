@@ -45,14 +45,14 @@ enum class ElemType
  * @brief Template specialization for getting the element type.
  */
 template <typename Tp> AURA_NO_STATIC_INLINE ElemType GetElemType()           { return ElemType::INVALID; }
-template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<MI_U8>()    { return ElemType::U8;      }
-template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<MI_S8>()    { return ElemType::S8;      }
-template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<MI_U16>()   { return ElemType::U16;     }
-template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<MI_S16>()   { return ElemType::S16;     }
-template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<MI_U32>()   { return ElemType::U32;     }
-template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<MI_S32>()   { return ElemType::S32;     }
-template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<MI_F32>()   { return ElemType::F32;     }
-template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<MI_F64>()   { return ElemType::F64;     }
+template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<DT_U8>()    { return ElemType::U8;      }
+template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<DT_S8>()    { return ElemType::S8;      }
+template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<DT_U16>()   { return ElemType::U16;     }
+template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<DT_S16>()   { return ElemType::S16;     }
+template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<DT_U32>()   { return ElemType::U32;     }
+template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<DT_S32>()   { return ElemType::S32;     }
+template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<DT_F32>()   { return ElemType::F32;     }
+template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<DT_F64>()   { return ElemType::F64;     }
 #if defined(AURA_BUILD_HOST)
 template <>            AURA_NO_STATIC_INLINE ElemType GetElemType<MI_F16>()   { return ElemType::F16;     }
 #endif
@@ -160,38 +160,38 @@ AURA_INLINE std::string ElemTypesToString(ElemType elem_type)
  * 
  * @return Size of the element type in bytes.
  */
-AURA_INLINE MI_S32 ElemTypeSize(ElemType elem_type)
+AURA_INLINE DT_S32 ElemTypeSize(ElemType elem_type)
 {
-    MI_S32 elem_size = 0;
+    DT_S32 elem_size = 0;
 
     switch (elem_type)
     {
         case ElemType::U8:
         case ElemType::S8:
         {
-            elem_size = sizeof(MI_U8);
+            elem_size = sizeof(DT_U8);
             break;
         }
         case ElemType::U16:
         case ElemType::S16:
         {
-            elem_size = sizeof(MI_U16);
+            elem_size = sizeof(DT_U16);
             break;
         }
         case ElemType::U32:
         case ElemType::S32:
         {
-            elem_size = sizeof(MI_U32);
+            elem_size = sizeof(DT_U32);
             break;
         }
         case ElemType::F32:
         {
-            elem_size = sizeof(MI_F32);
+            elem_size = sizeof(DT_F32);
             break;
         }
         case ElemType::F64:
         {
-            elem_size = sizeof(MI_F64);
+            elem_size = sizeof(DT_F64);
             break;
         }
 #if defined(AURA_BUILD_HOST)
@@ -329,7 +329,7 @@ public:
     /**
      * @brief Pure virtual function to release resources associated with the array.
      */
-    virtual AURA_VOID Release() = 0;
+    virtual DT_VOID Release() = 0;
 
     /**
      * @brief Gets the element type of the array.
@@ -364,28 +364,28 @@ public:
      *
      * @return Total bytes occupied by the array.
      */
-    MI_S64 GetTotalBytes() const;
+    DT_S64 GetTotalBytes() const;
 
     /**
      * @brief Gets the row pitch of the array.
      *
      * @return Row pitch of the array.
      */
-    MI_S32 GetRowPitch() const;
+    DT_S32 GetRowPitch() const;
 
     /**
      * @brief Gets the row step of the array.
      *
      * @return Row step of the array.
      */
-    MI_S32 GetRowStep() const;
+    DT_S32 GetRowStep() const;
 
     /**
      * @brief Gets the reference count of the array.
      *
      * @return Reference count of the array.
      */
-    MI_S32 GetRefCount() const;
+    DT_S32 GetRefCount() const;
 
     /**
      * @brief Gets the buffer containing array data.
@@ -399,14 +399,14 @@ public:
      *
      * @return Memory type of the array.
      */
-    MI_S32 GetMemType() const;
+    DT_S32 GetMemType() const;
 
     /**
      * @brief Checks if the array is valid.
      *
      * @return True if the array is valid, false otherwise.
      */
-    virtual MI_BOOL IsValid() const;
+    virtual DT_BOOL IsValid() const;
 
     /**
      * @brief Checks if the current array is equal to another array.
@@ -415,7 +415,7 @@ public:
      * 
      * @return True if the arrays are equal, false otherwise.
      */
-    MI_BOOL IsEqual(const Array &array) const;
+    DT_BOOL IsEqual(const Array &array) const;
 
     /**
      * @brief Checks if the sizes of the current array are equal to another array.
@@ -424,7 +424,7 @@ public:
      * 
      * @return True if the array sizes are equal, false otherwise.
      */
-    MI_BOOL IsSizesEqual(const Array &array) const;
+    DT_BOOL IsSizesEqual(const Array &array) const;
 
     /**
      * @brief Checks if the channels of the current array are equal to another array.
@@ -433,19 +433,19 @@ public:
      * 
      * @return True if the array channels are equal, false otherwise.
      */
-    MI_BOOL IsChannelEqual(const Array &array) const;
+    DT_BOOL IsChannelEqual(const Array &array) const;
 
     /**
      * @brief Pure virtual function to display information about the array.
      */
-    virtual AURA_VOID Show() const = 0;
+    virtual DT_VOID Show() const = 0;
 
     /**
      * @brief Pure virtual function to dump the array data to a file.
      *
      * @param fname File name for dumping array data.
      */
-    virtual AURA_VOID Dump(const std::string &fname) const = 0;
+    virtual DT_VOID Dump(const std::string &fname) const = 0;
 
 protected:
     /**
@@ -461,14 +461,14 @@ protected:
      * @param num Number to add to the reference count.
      * @return Updated reference count.
      */
-    MI_S32 AddRefCount(MI_S32 num) const;
+    DT_S32 AddRefCount(DT_S32 num) const;
 
     /**
     * @brief Clears the content of the array.
     *
     * This method is used to reset properties of member vaiables.
     */
-    AURA_VOID Clear();
+    DT_VOID Clear();
 
     /**
      * @brief Converts the array information to a string.
@@ -482,8 +482,8 @@ protected:
     ArrayType   m_array_type;       /*!< Type of the array (e.g., Mat or CLMem). */
     Sizes3      m_sizes;            /*!< Sizes of the array in three dimensions. */
     Sizes       m_strides;          /*!< Strides of the array. */
-    MI_S64      m_total_bytes;      /*!< Total number of bytes occupied by the array. */
-    MI_S32      *m_refcount;        /*!< Reference count for managing array's memory. */
+    DT_S64      m_total_bytes;      /*!< Total number of bytes occupied by the array. */
+    DT_S32      *m_refcount;        /*!< Reference count for managing array's memory. */
     Buffer      m_buffer;           /*!< Buffer containing array data. */
 };
 

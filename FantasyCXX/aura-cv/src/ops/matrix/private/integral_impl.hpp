@@ -15,7 +15,7 @@ class IntegralImpl : public OpImpl
 public:
     IntegralImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, Array *dst_sq = MI_NULL);
+    virtual Status SetArgs(const Array *src, Array *dst, Array *dst_sq = DT_NULL);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -23,7 +23,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src;
@@ -36,7 +36,7 @@ class IntegralNone : public IntegralImpl
 public:
     IntegralNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, Array *dst_sq = MI_NULL) override;
+    Status SetArgs(const Array *src, Array *dst, Array *dst_sq = DT_NULL) override;
 
     Status Run() override;
 };
@@ -47,7 +47,7 @@ class IntegralNeon : public IntegralImpl
 public:
     IntegralNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, Array *dst_sq = MI_NULL) override;
+    Status SetArgs(const Array *src, Array *dst, Array *dst_sq = DT_NULL) override;
 
     Status Run() override;
 };
@@ -59,7 +59,7 @@ class IntegralHvx : public IntegralImpl
 public:
     IntegralHvx(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, Array *dst_sq = MI_NULL) override;
+    Status SetArgs(const Array *src, Array *dst, Array *dst_sq = DT_NULL) override;
 
     Status Run() override;
 

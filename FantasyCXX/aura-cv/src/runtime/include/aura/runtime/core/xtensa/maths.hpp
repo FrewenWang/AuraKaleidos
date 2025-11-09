@@ -49,7 +49,7 @@ AURA_INLINE Tp Abs(Tp x)
  * @param y The second variable.
  */
 template<typename Tp>
-AURA_INLINE AURA_VOID Swap(Tp &x, Tp &y)
+AURA_INLINE DT_VOID Swap(Tp &x, Tp &y)
 {
     Tp t = x;
     x = y;
@@ -97,7 +97,7 @@ AURA_INLINE Tp Min(const Tp &x, const Tp &y)
  * @param y The second variable.
  */
 template<typename Tp>
-AURA_INLINE AURA_VOID MinMax(Tp &x, Tp &y)
+AURA_INLINE DT_VOID MinMax(Tp &x, Tp &y)
 {
     if (x > y)
     {
@@ -114,7 +114,7 @@ AURA_INLINE AURA_VOID MinMax(Tp &x, Tp &y)
  * @param y The second variable.
  */
 template<typename Tp>
-AURA_INLINE AURA_VOID MaxMin(Tp &x, Tp &y)
+AURA_INLINE DT_VOID MaxMin(Tp &x, Tp &y)
 {
     if (x < y)
     {
@@ -146,10 +146,10 @@ AURA_INLINE Tp Clamp(const Tp &x, const Tp &min, const Tp &max)
  * 
  * @return The rounded integer value.
  */
-AURA_INLINE MI_S32 Floor(MI_F32 value)
+AURA_INLINE DT_S32 Floor(DT_F32 value)
 {
-    MI_S32 temp = (MI_S32)value;
-    MI_F32 diff = (MI_F32)(value - temp);
+    DT_S32 temp = (DT_S32)value;
+    DT_F32 diff = (DT_F32)(value - temp);
     return temp - (diff < 0);
 }
 
@@ -160,10 +160,10 @@ AURA_INLINE MI_S32 Floor(MI_F32 value)
  * 
  * @return The rounded integer value.
  */
-AURA_INLINE MI_S32 Ceil(MI_F32 value)
+AURA_INLINE DT_S32 Ceil(DT_F32 value)
 {
-    MI_S32 temp = (MI_S32)value;
-    MI_F32 diff = (MI_F32)(value - temp);
+    DT_S32 temp = (DT_S32)value;
+    DT_F32 diff = (DT_F32)(value - temp);
     return temp + (diff > 0);
 }
 
@@ -175,7 +175,7 @@ AURA_INLINE MI_S32 Ceil(MI_F32 value)
  *
  * @return The fractional part of the value.
  */
-MI_F32 Modff(MI_F32 value, MI_F32* iptr);
+DT_F32 Modff(DT_F32 value, DT_F32* iptr);
 
 /**
  * @brief Function to compute the fractional and integral parts of a double precision floating-point value.
@@ -185,7 +185,7 @@ MI_F32 Modff(MI_F32 value, MI_F32* iptr);
  *
  * @return The fractional part of the value.
  */
-MI_F64 Modf(MI_F64 value, MI_F64* iptr);
+DT_F64 Modf(DT_F64 value, DT_F64* iptr);
 
 /**
  * @brief Function to compute the absolute value of a floating-point value.
@@ -194,7 +194,7 @@ MI_F64 Modf(MI_F64 value, MI_F64* iptr);
  *
  * @return The absolute value of the value.
  */
-MI_F32 Fabsf(MI_F32 value);
+DT_F32 Fabsf(DT_F32 value);
 
 /**
  * @brief Function to compute the absolute value of a double precision floating-point value.
@@ -203,7 +203,7 @@ MI_F32 Fabsf(MI_F32 value);
  *
  * @return The absolute value of the value.
  */
-MI_F64 Fabs(MI_F64 value);
+DT_F64 Fabs(DT_F64 value);
 
 /**
  * @brief Function to compute the square root of a floating-point value.
@@ -212,7 +212,7 @@ MI_F64 Fabs(MI_F64 value);
  *
  * @return The square root of the value.
  */
-MI_F32 Sqrtf(MI_F32 value);
+DT_F32 Sqrtf(DT_F32 value);
 
 /**
  * @brief Function to compute the square root of a double precision floating-point value.
@@ -221,7 +221,7 @@ MI_F32 Sqrtf(MI_F32 value);
  *
  * @return The square root of the value.
  */
-MI_F64 Sqrt(MI_F64 value);
+DT_F64 Sqrt(DT_F64 value);
 
 /**
  * @brief Function to compute the base-e exponential of a floating-point value.
@@ -230,7 +230,7 @@ MI_F64 Sqrt(MI_F64 value);
  *
  * @return The base-e exponential of the value.
  */
-MI_F32 Expf(MI_F32 value);
+DT_F32 Expf(DT_F32 value);
 
 /**
  * @brief Function to compute the base-e exponential of a double precision floating-point value.
@@ -239,7 +239,7 @@ MI_F32 Expf(MI_F32 value);
  *
  * @return The base-e exponential of the value.
  */
-MI_F64 Exp(MI_F64 value);
+DT_F64 Exp(DT_F64 value);
 
 /**
  * @brief Function to compute the base-2 exponential of a floating-point value.
@@ -248,7 +248,7 @@ MI_F64 Exp(MI_F64 value);
  *
  * @return The base-2 exponential of the value.
  */
-MI_F32 Exp2f(MI_F32 value);
+DT_F32 Exp2f(DT_F32 value);
 
 /**
  * @brief Function to compute the base-2 exponential of a double precision floating-point value.
@@ -257,7 +257,7 @@ MI_F32 Exp2f(MI_F32 value);
  *
  * @return The base-2 exponential of the value.
  */
-MI_F64 Exp2(MI_F64 value);
+DT_F64 Exp2(DT_F64 value);
 
 /**
  * @brief Function to compute the natural logarithm of a floating-point value.
@@ -266,7 +266,7 @@ MI_F64 Exp2(MI_F64 value);
  *
  * @return The natural logarithm of the value.
  */
-MI_F32 Logf(MI_F32 value);
+DT_F32 Logf(DT_F32 value);
 
 /**
  * @brief Function to compute the natural logarithm of a double precision floating-point value.
@@ -275,7 +275,7 @@ MI_F32 Logf(MI_F32 value);
  *
  * @return The natural logarithm of the value.
  */
-MI_F64 Log(MI_F64 value);
+DT_F64 Log(DT_F64 value);
 
 /**
  * @brief Function to compute the base-2 logarithm of a floating-point value.
@@ -284,7 +284,7 @@ MI_F64 Log(MI_F64 value);
  *
  * @return The base-2 logarithm of the value.
  */
-MI_F32 Log2f(MI_F32 value);
+DT_F32 Log2f(DT_F32 value);
 
 /**
  * @brief Function to compute the base-2 logarithm of a double precision floating-point value.
@@ -293,7 +293,7 @@ MI_F32 Log2f(MI_F32 value);
  *
  * @return The base-2 logarithm of the value.
  */
-MI_F64 Log2(MI_F64 value);
+DT_F64 Log2(DT_F64 value);
 
 /**
  * @brief Function to compute the base-10 logarithm of a floating-point value.
@@ -302,7 +302,7 @@ MI_F64 Log2(MI_F64 value);
  *
  * @return The base-10 logarithm of the value.
  */
-MI_F32 Log10f(MI_F32 value);
+DT_F32 Log10f(DT_F32 value);
 
 /**
  * @brief Function to compute the base-10 logarithm of a double precision floating-point value.
@@ -311,7 +311,7 @@ MI_F32 Log10f(MI_F32 value);
  *
  * @return The base-10 logarithm of the value.
  */
-MI_F64 Log10(MI_F64 value);
+DT_F64 Log10(DT_F64 value);
 
 /**
  * @brief Function to compute the power of a floating-point value.
@@ -321,7 +321,7 @@ MI_F64 Log10(MI_F64 value);
  *
  * @return The base raised to the power of the exponent.
  */
-MI_F32 Powf(MI_F32 base, MI_F32 exponent);
+DT_F32 Powf(DT_F32 base, DT_F32 exponent);
 
 /**
  * @brief Function to compute the power of a double precision floating-point value.
@@ -331,7 +331,7 @@ MI_F32 Powf(MI_F32 base, MI_F32 exponent);
  *
  * @return The base raised to the power of the exponent.
  */
-MI_F64 Pow(MI_F64 base, MI_F64 exponent);
+DT_F64 Pow(DT_F64 base, DT_F64 exponent);
 
 /**
  * @brief Function to compute the sine of a floating-point value.
@@ -340,7 +340,7 @@ MI_F64 Pow(MI_F64 base, MI_F64 exponent);
  *
  * @return The sine of the value.
  */
-MI_F32 Sinf(MI_F32 value);
+DT_F32 Sinf(DT_F32 value);
 
 /**
  * @brief Function to compute the sine of a double precision floating-point value.
@@ -349,7 +349,7 @@ MI_F32 Sinf(MI_F32 value);
  *
  * @return The sine of the value.
  */
-MI_F64 Sin(MI_F64 value);
+DT_F64 Sin(DT_F64 value);
 
 /**
  * @brief Function to compute the cosine of a floating-point value.
@@ -358,7 +358,7 @@ MI_F64 Sin(MI_F64 value);
  *
  * @return The cosine of the value.
  */
-MI_F32 Cosf(MI_F32 value);
+DT_F32 Cosf(DT_F32 value);
 
 /**
  * @brief Function to compute the cosine of a double precision floating-point value.
@@ -367,7 +367,7 @@ MI_F32 Cosf(MI_F32 value);
  *
  * @return The cosine of the value.
  */
-MI_F64 Cos(MI_F64 value);
+DT_F64 Cos(DT_F64 value);
 
 /**
  * @brief Function to compute the tangent of a floating-point value.
@@ -376,7 +376,7 @@ MI_F64 Cos(MI_F64 value);
  *
  * @return The tangent of the value.
  */
-MI_F32 Tanf(MI_F32 value);
+DT_F32 Tanf(DT_F32 value);
 
 /**
  * @brief Function to compute the tangent of a double precision floating-point value.
@@ -385,7 +385,7 @@ MI_F32 Tanf(MI_F32 value);
  *
  * @return The tangent of the value.
  */
-MI_F64 Tan(MI_F64 value);
+DT_F64 Tan(DT_F64 value);
 
 /**
  * @brief Function to compute the arc sine of a floating-point value.
@@ -394,7 +394,7 @@ MI_F64 Tan(MI_F64 value);
  *
  * @return The arc sine of the value.
  */
-MI_F32 Asinf(MI_F32 value);
+DT_F32 Asinf(DT_F32 value);
 
 /**
  * @brief Function to compute the arc sine of a double precision floating-point value.
@@ -403,7 +403,7 @@ MI_F32 Asinf(MI_F32 value);
  *
  * @return The arc sine of the value.
  */
-MI_F64 Asin(MI_F64 value);
+DT_F64 Asin(DT_F64 value);
 
 /**
  * @brief Function to compute the arc cosine of a floating-point value.
@@ -412,7 +412,7 @@ MI_F64 Asin(MI_F64 value);
  *
  * @return The arc cosine of the value.
  */
-MI_F32 Acosf(MI_F32 value);
+DT_F32 Acosf(DT_F32 value);
 
 /**
  * @brief Function to compute the arc cosine of a double precision floating-point value.
@@ -421,7 +421,7 @@ MI_F32 Acosf(MI_F32 value);
  *
  * @return The arc cosine of the value.
  */
-MI_F64 Acos(MI_F64 value);
+DT_F64 Acos(DT_F64 value);
 
 /**
  * @brief Function to compute the arc tangent of a floating-point value.
@@ -430,7 +430,7 @@ MI_F64 Acos(MI_F64 value);
  *
  * @return The arc tangent of the value.
  */
-MI_F32 Atanf(MI_F32 value);
+DT_F32 Atanf(DT_F32 value);
 
 /**
  * @brief Function to compute the arc tangent of a double precision floating-point value.
@@ -439,7 +439,7 @@ MI_F32 Atanf(MI_F32 value);
  *
  * @return The arc tangent of the value.
  */
-MI_F64 Atan(MI_F64 value);
+DT_F64 Atan(DT_F64 value);
 
 /**
  * @brief Function to compute the arc tangent of two floating-point numbers.
@@ -449,7 +449,7 @@ MI_F64 Atan(MI_F64 value);
  *
  * @return The arc tangent of the quotient of the two numbers.
  */
-MI_F32 Atan2f(MI_F32 y, MI_F32 x);
+DT_F32 Atan2f(DT_F32 y, DT_F32 x);
 
 /**
  * @brief Function to compute the arc tangent of two double precision floating-point value.
@@ -459,7 +459,7 @@ MI_F32 Atan2f(MI_F32 y, MI_F32 x);
  *
  * @return The arc tangent of the quotient of the two numbers.
  */
-MI_F64 Atan2(MI_F64 y, MI_F64 x);
+DT_F64 Atan2(DT_F64 y, DT_F64 x);
 
 /**
  * @brief Rounds a float value to the nearest integer(or nearest even). Round to an nearest even number only when the decimal part is exactly 0.5.
@@ -470,17 +470,17 @@ MI_F64 Atan2(MI_F64 y, MI_F64 x);
  * 
  * @return The rounded integer value.
  */
-AURA_INLINE MI_S32 Round(MI_F32 value)
+AURA_INLINE DT_S32 Round(DT_F32 value)
 {
-    MI_F32 intpart, fractpart;
+    DT_F32 intpart, fractpart;
     fractpart = Modff(value, &intpart);
-    if ((Fabsf(fractpart) != 0.5) || ((((MI_S32)intpart) & 1) != 0))
+    if ((Fabsf(fractpart) != 0.5) || ((((DT_S32)intpart) & 1) != 0))
     {
-        return (MI_S32)(value + (value >= 0 ? 0.5 : -0.5));
+        return (DT_S32)(value + (value >= 0 ? 0.5 : -0.5));
     }
     else
     {
-        return (MI_S32)intpart;
+        return (DT_S32)intpart;
     }
 }
 
@@ -491,10 +491,10 @@ AURA_INLINE MI_S32 Round(MI_F32 value)
  * 
  * @return The rounded integer value.
  */
-AURA_INLINE MI_S64 Floor(MI_F64 value)
+AURA_INLINE DT_S64 Floor(DT_F64 value)
 {
-    MI_S64 temp = (MI_S64)value;
-    MI_F64 diff = (MI_F64)(value - temp);
+    DT_S64 temp = (DT_S64)value;
+    DT_F64 diff = (DT_F64)(value - temp);
     return temp - (diff < 0);
 }
 
@@ -505,10 +505,10 @@ AURA_INLINE MI_S64 Floor(MI_F64 value)
  * 
  * @return The rounded integer value.
  */
-AURA_INLINE MI_S64 Ceil(MI_F64 value)
+AURA_INLINE DT_S64 Ceil(DT_F64 value)
 {
-    MI_S64 temp = (MI_S64)value;
-    MI_F64 diff = (MI_F64)(value - temp);
+    DT_S64 temp = (DT_S64)value;
+    DT_F64 diff = (DT_F64)(value - temp);
     return temp + (diff > 0);
 }
 
@@ -523,17 +523,17 @@ AURA_INLINE MI_S64 Ceil(MI_F64 value)
  * 
  * @note The input value should be in the range of int32: [−2147483648, 2147483647]. Otherwise, the undefined behaviors may occur.
  */
-AURA_INLINE MI_S32 Round(MI_F64 value)
+AURA_INLINE DT_S32 Round(DT_F64 value)
 {
-    MI_F64 intpart, fractpart;
+    DT_F64 intpart, fractpart;
     fractpart = Modf(value, &intpart);
-    if ((Fabs(fractpart) != 0.5) || ((((MI_S32)intpart) & 1) != 0))
+    if ((Fabs(fractpart) != 0.5) || ((((DT_S32)intpart) & 1) != 0))
     {
-        return (MI_S32)(value + (value >= 0 ? 0.5 : -0.5));
+        return (DT_S32)(value + (value >= 0 ? 0.5 : -0.5));
     }
     else
     {
-        return (MI_S32)intpart;
+        return (DT_S32)intpart;
     }
 }
 
@@ -545,7 +545,7 @@ AURA_INLINE MI_S32 Round(MI_F64 value)
  * 
  * @return True if the values are nearly equal, false otherwise.
  */
-AURA_INLINE MI_BOOL NearlyEqual(MI_F32 x, MI_F32 y)
+AURA_INLINE DT_BOOL NearlyEqual(DT_F32 x, DT_F32 y)
 {
     return (((x) + 1e-5) > (y)) && (((x) - 1e-5) < (y));
 }
@@ -558,7 +558,7 @@ AURA_INLINE MI_BOOL NearlyEqual(MI_F32 x, MI_F32 y)
  * 
  * @return True if the values are nearly equal, false otherwise.
  */
-AURA_INLINE MI_BOOL NearlyEqual(MI_F64 x, MI_F64 y)
+AURA_INLINE DT_BOOL NearlyEqual(DT_F64 x, DT_F64 y)
 {
     return (((x) + 1e-5) > (y)) && (((x) - 1e-5) < (y));
 }

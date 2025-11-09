@@ -46,20 +46,20 @@ static std::shared_ptr<NormImpl> CreateNormImpl(Context *ctx, const OpTarget &ta
 Norm::Norm(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Norm::SetArgs(const Array *src, MI_F64 *result, NormType type)
+Status Norm::SetArgs(const Array *src, DT_F64 *result, NormType type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
     }
 
-    if (MI_NULL == result)
+    if (DT_NULL == result)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "result is null ptr");
         return Status::ERROR;
@@ -98,14 +98,14 @@ Status Norm::SetArgs(const Array *src, MI_F64 *result, NormType type)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateNormImpl(m_ctx, impl_target);
     }
 
     // run initialize
     NormImpl *norm_impl = dynamic_cast<NormImpl*>(m_impl.get());
-    if (MI_NULL == norm_impl)
+    if (DT_NULL == norm_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "norm_impl is null ptr");
         return Status::ERROR;
@@ -119,7 +119,7 @@ Status Norm::SetArgs(const Array *src, MI_F64 *result, NormType type)
 Status Norm::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, NormType type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -141,31 +141,31 @@ Status Norm::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_ele
     return Status::OK;
 }
 
-AURA_EXPORTS Status INorm(Context *ctx, const Mat &src, MI_F64 *result, NormType type, const OpTarget &target)
+AURA_EXPORTS Status INorm(Context *ctx, const Mat &src, DT_F64 *result, NormType type, const OpTarget &target)
 {
     Norm norm(ctx, target);
 
     return OpCall(ctx, norm, &src, result, type);
 }
 
-NormImpl::NormImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Norm", target), m_src(MI_NULL), 
-                                                           m_result(MI_NULL), m_type(NormType::NORM_INF)
+NormImpl::NormImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Norm", target), m_src(DT_NULL), 
+                                                           m_result(DT_NULL), m_type(NormType::NORM_INF)
 {}
 
-Status NormImpl::SetArgs(const Array *src, MI_F64 *result, NormType type)
+Status NormImpl::SetArgs(const Array *src, DT_F64 *result, NormType type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
     }
 
-    if (MI_NULL == result)
+    if (DT_NULL == result)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "result is null ptr");
         return Status::ERROR;
@@ -198,7 +198,7 @@ std::vector<const Array*> NormImpl::GetInputArrays() const
     return {m_src};
 }
 
-AURA_VOID NormImpl::Dump(const std::string &prefix) const
+DT_VOID NormImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

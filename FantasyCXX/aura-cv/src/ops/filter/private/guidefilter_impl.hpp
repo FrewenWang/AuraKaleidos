@@ -21,7 +21,7 @@
 namespace aura
 {
 
-AURA_INLINE MI_S32 GetFastKsize(MI_S32 ksize)
+AURA_INLINE DT_S32 GetFastKsize(DT_S32 ksize)
 {
     //    Normal ksize    |   Fast ksize
     //    3               |   3
@@ -33,9 +33,9 @@ AURA_INLINE MI_S32 GetFastKsize(MI_S32 ksize)
     //    15              |   7
     //    17              |   9
     //    ...
-    MI_S32 radius     = ksize >> 1;
-    MI_S32 radius_sub = Max((radius >> 1), (MI_S32)1);
-    MI_S32 ksize_fast = (radius_sub << 1) + 1;
+    DT_S32 radius     = ksize >> 1;
+    DT_S32 radius_sub = Max((radius >> 1), (DT_S32)1);
+    DT_S32 ksize_fast = (radius_sub << 1) + 1;
 
     return ksize_fast;
 }
@@ -45,7 +45,7 @@ class GuideFilterImpl : public OpImpl
 public:
     GuideFilterImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src0, const Array *src1, Array *dst, MI_S32 ksize, MI_F32 eps,
+    virtual Status SetArgs(const Array *src0, const Array *src1, Array *dst, DT_S32 ksize, DT_F32 eps,
                            GuideFilterType type = GuideFilterType::NORMAL,
                            BorderType border_type = BorderType::REPLICATE,
                            const Scalar &border_value = Scalar());
@@ -56,11 +56,11 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    MI_S32          m_ksize;
-    MI_F32          m_eps;
+    DT_S32          m_ksize;
+    DT_F32          m_eps;
     GuideFilterType m_type;
     BorderType      m_border_type;
     Scalar          m_border_value;
@@ -75,7 +75,7 @@ class GuideFilterNone : public GuideFilterImpl
 public:
     GuideFilterNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src0, const Array *src1, Array *dst, MI_S32 ksize, MI_F32 eps,
+    Status SetArgs(const Array *src0, const Array *src1, Array *dst, DT_S32 ksize, DT_F32 eps,
                    GuideFilterType type = GuideFilterType::NORMAL,
                    BorderType border_type = BorderType::REPLICATE,
                    const Scalar &border_value = Scalar()) override;
@@ -92,22 +92,22 @@ private:
 };
 
 #if defined(AURA_ENABLE_NEON)
-template <typename Tp, typename SumType, typename SqSumType, MI_S32 C,
-          typename std::enable_if<!is_floating_point<Tp>::value>::type* = MI_NULL>
-static AURA_VOID GuideFilterRowDataAccumulateNeon(Tp        *row_a,  Tp        *row_b,  // original row data
+template <typename Tp, typename SumType, typename SqSumType, DT_S32 C,
+          typename std::enable_if<!is_floating_point<Tp>::value>::type* = DT_NULL>
+static DT_VOID GuideFilterRowDataAccumulateNeon(Tp        *row_a,  Tp        *row_b,  // original row data
                                                 SumType   *row_aa, SumType   *row_ab, // a * a, a * b
                                                 SumType   *sum_a,  SumType   *sum_b,  // sum of a, sum of b
                                                 SqSumType *sum_aa, SqSumType *sum_ab, // sum of a * a, sum of a * b
-                                                MI_S32     width)
+                                                DT_S32     width)
 {
     using VType    = typename neon::DVector<Tp>::VType;
     using VSumType = typename neon::QVector<SumType>::VType;
     using VSqType  = typename neon::QVector<SqSumType>::VType;
 
-    constexpr MI_S32 ELEM_COUNTS = 8 / sizeof(Tp);
-    const MI_S32 width_align = (width * C) & (-ELEM_COUNTS);
+    constexpr DT_S32 ELEM_COUNTS = 8 / sizeof(Tp);
+    const DT_S32 width_align = (width * C) & (-ELEM_COUNTS);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
 
     for (; x < width_align; x += ELEM_COUNTS)
     {
@@ -152,22 +152,22 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(Tp        *row_a,  Tp        *
     }
 }
 
-template <typename Tp, typename SumType, typename SqSumType, MI_S32 C,
-          typename std::enable_if<!is_floating_point<Tp>::value>::type* = MI_NULL>
-static AURA_VOID GuideFilterRowDataAccumulateNeon(Tp        *row_a,   // original row data
+template <typename Tp, typename SumType, typename SqSumType, DT_S32 C,
+          typename std::enable_if<!is_floating_point<Tp>::value>::type* = DT_NULL>
+static DT_VOID GuideFilterRowDataAccumulateNeon(Tp        *row_a,   // original row data
                                                 SumType   *row_aa,  // a * a, a * b
                                                 SumType   *sum_a,   // sum of a, sum of b
                                                 SqSumType *sum_aa,  // sum of a * a, sum of a * b
-                                                MI_S32     width)
+                                                DT_S32     width)
 {
     using VType    = typename neon::DVector<Tp>::VType;
     using VSumType = typename neon::QVector<SumType>::VType;
     using VSqType  = typename neon::QVector<SqSumType>::VType;
 
-    constexpr MI_S32 ELEM_COUNTS = 8 / sizeof(Tp);
-    const MI_S32 width_align = (width * C) & (-ELEM_COUNTS);
+    constexpr DT_S32 ELEM_COUNTS = 8 / sizeof(Tp);
+    const DT_S32 width_align = (width * C) & (-ELEM_COUNTS);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
 
     for (; x < width_align; x += ELEM_COUNTS)
     {
@@ -197,23 +197,23 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(Tp        *row_a,   // origina
     }
 }
 
-template <typename Tp, typename SumType, typename SqSumType, MI_S32 C,
-          typename std::enable_if<std::is_same<Tp, MI_F16>::value>::type* = MI_NULL>
-static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F16 *row_a,  MI_F16 *row_b,  // original row data
-                                                MI_F32 *row_aa, MI_F32 *row_ab, // a * a, a * b
-                                                MI_F32 *sum_a,  MI_F32 *sum_b,  // sum of a, sum of b
-                                                MI_F32 *sum_aa, MI_F32 *sum_ab, // sum of a * a, sum of a * b
-                                                MI_S32  width)
+template <typename Tp, typename SumType, typename SqSumType, DT_S32 C,
+          typename std::enable_if<std::is_same<Tp, MI_F16>::value>::type* = DT_NULL>
+static DT_VOID GuideFilterRowDataAccumulateNeon(MI_F16 *row_a,  MI_F16 *row_b,  // original row data
+                                                DT_F32 *row_aa, DT_F32 *row_ab, // a * a, a * b
+                                                DT_F32 *sum_a,  DT_F32 *sum_b,  // sum of a, sum of b
+                                                DT_F32 *sum_aa, DT_F32 *sum_ab, // sum of a * a, sum of a * b
+                                                DT_S32  width)
 {
-    MI_S32 x = 0;
-    const MI_S32 width_align4 = (width * C) & (-4);
+    DT_S32 x = 0;
+    const DT_S32 width_align4 = (width * C) & (-4);
 
     for (; x < width_align4; x += 4)
     {
         float16x4_t vdf16_a = neon::vload1(row_a + x);
         float16x4_t vdf16_b = neon::vload1(row_b + x);
-        float32x4_t vqf32_a = neon::vcvt<MI_F32>(vdf16_a);
-        float32x4_t vqf32_b = neon::vcvt<MI_F32>(vdf16_b);
+        float32x4_t vqf32_a = neon::vcvt<DT_F32>(vdf16_a);
+        float32x4_t vqf32_b = neon::vcvt<DT_F32>(vdf16_b);
 
         float32x4_t vqf32_aa = neon::vmul(vqf32_a, vqf32_a);
         float32x4_t vqf32_ab = neon::vmul(vqf32_a, vqf32_b);
@@ -231,8 +231,8 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F16 *row_a,  MI_F16 *row_b,
     {
         MI_F16 a = row_a[x];
         MI_F16 b = row_b[x];
-        MI_F32 aa = a * a;
-        MI_F32 ab = a * b;
+        DT_F32 aa = a * a;
+        DT_F32 ab = a * b;
 
         row_aa[x] = aa;
         row_ab[x] = ab;
@@ -244,21 +244,21 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F16 *row_a,  MI_F16 *row_b,
     }
 }
 
-template <typename Tp, typename SumType, typename SqSumType, MI_S32 C,
-          typename std::enable_if<std::is_same<Tp, MI_F16>::value>::type* = MI_NULL>
-static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F16 *row_a,  // original row data
-                                                MI_F32 *row_aa, // a * a, a * b
-                                                MI_F32 *sum_a,  // sum of a, sum of b
-                                                MI_F32 *sum_aa, // sum of a * a, sum of a * b
-                                                MI_S32  width)
+template <typename Tp, typename SumType, typename SqSumType, DT_S32 C,
+          typename std::enable_if<std::is_same<Tp, MI_F16>::value>::type* = DT_NULL>
+static DT_VOID GuideFilterRowDataAccumulateNeon(MI_F16 *row_a,  // original row data
+                                                DT_F32 *row_aa, // a * a, a * b
+                                                DT_F32 *sum_a,  // sum of a, sum of b
+                                                DT_F32 *sum_aa, // sum of a * a, sum of a * b
+                                                DT_S32  width)
 {
-    MI_S32 x = 0;
-    const MI_S32 width_align4 = (width * C) & (-4);
+    DT_S32 x = 0;
+    const DT_S32 width_align4 = (width * C) & (-4);
 
     for (; x < width_align4; x += 4)
     {
         float16x4_t vdf16_a = neon::vload1(row_a + x);
-        float32x4_t vqf32_a = neon::vcvt<MI_F32>(vdf16_a);
+        float32x4_t vqf32_a = neon::vcvt<DT_F32>(vdf16_a);
 
         float32x4_t vqf32_aa = neon::vmul(vqf32_a, vqf32_a);
 
@@ -271,7 +271,7 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F16 *row_a,  // original ro
     for (; x < width * C; x++)
     {
         MI_F16 a = row_a[x];
-        MI_F32 aa = a * a;
+        DT_F32 aa = a * a;
 
         row_aa[x] = aa;
         sum_a[x]  += a;
@@ -279,16 +279,16 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F16 *row_a,  // original ro
     }
 }
 
-template <typename Tp, typename SumType, typename SqSumType, MI_S32 C,
-          typename std::enable_if<std::is_same<Tp, MI_F32>::value>::type* = MI_NULL>
-static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F32 *row_a,  MI_F32 *row_b,  // original row data
-                                                MI_F32 *row_aa, MI_F32 *row_ab, // a * a, a * b
-                                                MI_F32 *sum_a,  MI_F32 *sum_b,  // sum of a, sum of b
-                                                MI_F32 *sum_aa, MI_F32 *sum_ab, // sum of a * a, sum of a * b
-                                                MI_S32  width)
+template <typename Tp, typename SumType, typename SqSumType, DT_S32 C,
+          typename std::enable_if<std::is_same<Tp, DT_F32>::value>::type* = DT_NULL>
+static DT_VOID GuideFilterRowDataAccumulateNeon(DT_F32 *row_a,  DT_F32 *row_b,  // original row data
+                                                DT_F32 *row_aa, DT_F32 *row_ab, // a * a, a * b
+                                                DT_F32 *sum_a,  DT_F32 *sum_b,  // sum of a, sum of b
+                                                DT_F32 *sum_aa, DT_F32 *sum_ab, // sum of a * a, sum of a * b
+                                                DT_S32  width)
 {
-    MI_S32 x = 0;
-    const MI_S32 width_align4 = (width * C) & (-4);
+    DT_S32 x = 0;
+    const DT_S32 width_align4 = (width * C) & (-4);
 
     for (; x < width_align4; x += 4)
     {
@@ -309,10 +309,10 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F32 *row_a,  MI_F32 *row_b,
 
     for (; x < width * C; x++)
     {
-        MI_F32 a  = row_a[x];
-        MI_F32 b  = row_b[x];
-        MI_F32 aa = a * a;
-        MI_F32 ab = a * b;
+        DT_F32 a  = row_a[x];
+        DT_F32 b  = row_b[x];
+        DT_F32 aa = a * a;
+        DT_F32 ab = a * b;
 
         row_aa[x] = aa;
         row_ab[x] = ab;
@@ -324,16 +324,16 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F32 *row_a,  MI_F32 *row_b,
     }
 }
 
-template <typename Tp, typename SumType, typename SqSumType, MI_S32 C,
-          typename std::enable_if<std::is_same<Tp, MI_F32>::value>::type* = MI_NULL>
-static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F32 *row_a,  // original row data
-                                                MI_F32 *row_aa, // a * a, a * b
-                                                MI_F32 *sum_a,  // sum of a, sum of b
-                                                MI_F32 *sum_aa, // sum of a * a, sum of a * b
-                                                MI_S32  width)
+template <typename Tp, typename SumType, typename SqSumType, DT_S32 C,
+          typename std::enable_if<std::is_same<Tp, DT_F32>::value>::type* = DT_NULL>
+static DT_VOID GuideFilterRowDataAccumulateNeon(DT_F32 *row_a,  // original row data
+                                                DT_F32 *row_aa, // a * a, a * b
+                                                DT_F32 *sum_a,  // sum of a, sum of b
+                                                DT_F32 *sum_aa, // sum of a * a, sum of a * b
+                                                DT_S32  width)
 {
-    MI_S32 x = 0;
-    const MI_S32 width_align4 = (width * C) & (-4);
+    DT_S32 x = 0;
+    const DT_S32 width_align4 = (width * C) & (-4);
 
     for (; x < width_align4; x += 4)
     {
@@ -348,8 +348,8 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F32 *row_a,  // original ro
 
     for (; x < width * C; x++)
     {
-        MI_F32 a  = row_a[x];
-        MI_F32 aa = a * a;
+        DT_F32 a  = row_a[x];
+        DT_F32 aa = a * a;
 
         row_aa[x] = aa;
         sum_a[x]  += a;
@@ -358,12 +358,12 @@ static AURA_VOID GuideFilterRowDataAccumulateNeon(MI_F32 *row_a,  // original ro
 }
 
 template <typename Tp, typename SumType,
-          typename std::enable_if<!is_floating_point<Tp>::value>::type* = MI_NULL>
-static AURA_VOID GuideFilterSubRowNeon(Tp *src, SumType *sum, const MI_S32 width)
+          typename std::enable_if<!is_floating_point<Tp>::value>::type* = DT_NULL>
+static DT_VOID GuideFilterSubRowNeon(Tp *src, SumType *sum, const DT_S32 width)
 {
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(SumType);
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(SumType);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width - ELEM_COUNTS; x += ELEM_COUNTS)
     {
         neon::vstore(sum + x, neon::vsubw(neon::vload1q(sum + x), neon::vload1(src + x)));
@@ -376,15 +376,15 @@ static AURA_VOID GuideFilterSubRowNeon(Tp *src, SumType *sum, const MI_S32 width
 }
 
 template <typename Tp, typename SumType,
-          typename std::enable_if<std::is_same<Tp, MI_F16>::value>::type* = MI_NULL>
-static AURA_VOID GuideFilterSubRowNeon(Tp *src, SumType *sum, const MI_S32 width)
+          typename std::enable_if<std::is_same<Tp, MI_F16>::value>::type* = DT_NULL>
+static DT_VOID GuideFilterSubRowNeon(Tp *src, SumType *sum, const DT_S32 width)
 {
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(SumType);
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(SumType);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width - ELEM_COUNTS; x += ELEM_COUNTS)
     {
-        neon::vstore(sum + x, neon::vsub(neon::vload1q(sum + x), neon::vcvt<MI_F32>(neon::vload1(src + x))));
+        neon::vstore(sum + x, neon::vsub(neon::vload1q(sum + x), neon::vcvt<DT_F32>(neon::vload1(src + x))));
     }
 
     for (; x < width; x++)
@@ -394,12 +394,12 @@ static AURA_VOID GuideFilterSubRowNeon(Tp *src, SumType *sum, const MI_S32 width
 }
 
 template <typename Tp, typename SumType,
-          typename std::enable_if<std::is_same<Tp, MI_F32>::value>::type* = MI_NULL>
-static AURA_VOID GuideFilterSubRowNeon(Tp *src, SumType *sum, const MI_S32 width)
+          typename std::enable_if<std::is_same<Tp, DT_F32>::value>::type* = DT_NULL>
+static DT_VOID GuideFilterSubRowNeon(Tp *src, SumType *sum, const DT_S32 width)
 {
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(SumType);
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(SumType);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width - ELEM_COUNTS; x += ELEM_COUNTS)
     {
         neon::vstore(sum + x, neon::vsub(neon::vload1q(sum + x), neon::vload1q(src + x)));
@@ -411,20 +411,20 @@ static AURA_VOID GuideFilterSubRowNeon(Tp *src, SumType *sum, const MI_S32 width
     }
 }
 
-template <typename SumType, typename SqSumType, MI_S32 C>
-static AURA_VOID GuideFilterCalcKernelSum(SumType *a, SumType *b, SqSumType *aa, SqSumType *ab, const MI_S32 n,
-                                        const MI_S32 ksize, MI_F32 eps, MI_F32 *dst_a, MI_F32 *dst_b)
+template <typename SumType, typename SqSumType, DT_S32 C>
+static DT_VOID GuideFilterCalcKernelSum(SumType *a, SumType *b, SqSumType *aa, SqSumType *ab, const DT_S32 n,
+                                        const DT_S32 ksize, DT_F32 eps, DT_F32 *dst_a, DT_F32 *dst_b)
 {
     SqSumType sum_kernel_a[C]  = {0};
     SqSumType sum_kernel_b[C]  = {0};
     SqSumType sum_kernel_aa[C] = {0};
     SqSumType sum_kernel_ab[C] = {0};
 
-    const MI_S32 ksq = ksize * ksize;
+    const DT_S32 ksq = ksize * ksize;
 
-    for (MI_S32 c = 0; c < C; c++)
+    for (DT_S32 c = 0; c < C; c++)
     {
-        for (MI_S32 k = 0; k < ksize; k++)
+        for (DT_S32 k = 0; k < ksize; k++)
         {
             sum_kernel_a[c]  +=  a[k * C + c];
             sum_kernel_b[c]  +=  b[k * C + c];
@@ -432,30 +432,30 @@ static AURA_VOID GuideFilterCalcKernelSum(SumType *a, SumType *b, SqSumType *aa,
             sum_kernel_ab[c] += ab[k * C + c];
         }
 
-        MI_F32 mean_i  = static_cast<MI_F32>(sum_kernel_a[c]) / ksq;
-        MI_F32 mean_p  = static_cast<MI_F32>(sum_kernel_b[c]) / ksq;
-        MI_F32 var     = static_cast<MI_F32>(sum_kernel_aa[c]) / ksq - mean_i * mean_i;
-        MI_F32 cov     = static_cast<MI_F32>(sum_kernel_ab[c]) / ksq - mean_i * mean_p;
-        MI_F32 var_eps = (var + eps);
+        DT_F32 mean_i  = static_cast<DT_F32>(sum_kernel_a[c]) / ksq;
+        DT_F32 mean_p  = static_cast<DT_F32>(sum_kernel_b[c]) / ksq;
+        DT_F32 var     = static_cast<DT_F32>(sum_kernel_aa[c]) / ksq - mean_i * mean_i;
+        DT_F32 cov     = static_cast<DT_F32>(sum_kernel_ab[c]) / ksq - mean_i * mean_p;
+        DT_F32 var_eps = (var + eps);
 
         dst_a[c] = cov / var_eps;
         dst_b[c] = mean_p - mean_i * dst_a[c];
     }
 
-    for (MI_S32 x = 1; x < n; x++)
+    for (DT_S32 x = 1; x < n; x++)
     {
-        for (MI_S32 c = 0; c < C; c++)
+        for (DT_S32 c = 0; c < C; c++)
         {
             sum_kernel_a[c]  = sum_kernel_a[c]  +  a[x * C + c + ksize * C - C] -  a[x * C + c - C];
             sum_kernel_b[c]  = sum_kernel_b[c]  +  b[x * C + c + ksize * C - C] -  b[x * C + c - C];
             sum_kernel_aa[c] = sum_kernel_aa[c] + aa[x * C + c + ksize * C - C] - aa[x * C + c - C];
             sum_kernel_ab[c] = sum_kernel_ab[c] + ab[x * C + c + ksize * C - C] - ab[x * C + c - C];
 
-            MI_F32 mean_i  = static_cast<MI_F32>(sum_kernel_a[c])  / ksq;
-            MI_F32 mean_p  = static_cast<MI_F32>(sum_kernel_b[c])  / ksq;
-            MI_F32 var     = static_cast<MI_F32>(sum_kernel_aa[c]) / ksq - mean_i * mean_i;
-            MI_F32 cov     = static_cast<MI_F32>(sum_kernel_ab[c]) / ksq- mean_i * mean_p;
-            MI_F32 var_eps = (var + eps);
+            DT_F32 mean_i  = static_cast<DT_F32>(sum_kernel_a[c])  / ksq;
+            DT_F32 mean_p  = static_cast<DT_F32>(sum_kernel_b[c])  / ksq;
+            DT_F32 var     = static_cast<DT_F32>(sum_kernel_aa[c]) / ksq - mean_i * mean_i;
+            DT_F32 cov     = static_cast<DT_F32>(sum_kernel_ab[c]) / ksq- mean_i * mean_p;
+            DT_F32 var_eps = (var + eps);
 
             dst_a[x * C + c] = cov / var_eps;
             dst_b[x * C + c] = mean_p - mean_i * dst_a[x * C + c];
@@ -463,41 +463,41 @@ static AURA_VOID GuideFilterCalcKernelSum(SumType *a, SumType *b, SqSumType *aa,
     }
 }
 
-template <typename SumType, typename SqSumType, MI_S32 C>
-static AURA_VOID GuideFilterCalcKernelSum(SumType *a, SqSumType *aa, const MI_S32 n,
-                                        const MI_S32 ksize, MI_F32 eps, MI_F32 *dst_a, MI_F32 *dst_b)
+template <typename SumType, typename SqSumType, DT_S32 C>
+static DT_VOID GuideFilterCalcKernelSum(SumType *a, SqSumType *aa, const DT_S32 n,
+                                        const DT_S32 ksize, DT_F32 eps, DT_F32 *dst_a, DT_F32 *dst_b)
 {
     SqSumType sum_kernel_a[C]  = {0};
     SqSumType sum_kernel_aa[C] = {0};
 
-    const MI_S32 ksq = ksize * ksize;
+    const DT_S32 ksq = ksize * ksize;
 
-    for (MI_S32 c = 0; c < C; c++)
+    for (DT_S32 c = 0; c < C; c++)
     {
-        for (MI_S32 k = 0; k < ksize; k++)
+        for (DT_S32 k = 0; k < ksize; k++)
         {
             sum_kernel_a[c]  +=  a[k * C + c];
             sum_kernel_aa[c] += aa[k * C + c];
         }
 
-        MI_F32 mean_i  = static_cast<MI_F32>(sum_kernel_a[c]) / ksq;
-        MI_F32 var     = static_cast<MI_F32>(sum_kernel_aa[c]) / ksq - mean_i * mean_i;
-        MI_F32 var_eps = (var + eps);
+        DT_F32 mean_i  = static_cast<DT_F32>(sum_kernel_a[c]) / ksq;
+        DT_F32 var     = static_cast<DT_F32>(sum_kernel_aa[c]) / ksq - mean_i * mean_i;
+        DT_F32 var_eps = (var + eps);
 
         dst_a[c] = var / var_eps;
         dst_b[c] = mean_i - mean_i * dst_a[c];
     }
 
-    for (MI_S32 x = 1; x < n; x++)
+    for (DT_S32 x = 1; x < n; x++)
     {
-        for (MI_S32 c = 0; c < C; c++)
+        for (DT_S32 c = 0; c < C; c++)
         {
             sum_kernel_a[c]  = sum_kernel_a[c]  +  a[x * C + c + ksize * C - C] -  a[x * C + c - C];
             sum_kernel_aa[c] = sum_kernel_aa[c] + aa[x * C + c + ksize * C - C] - aa[x * C + c - C];
 
-            MI_F32 mean_i  = static_cast<MI_F32>(sum_kernel_a[c])  / ksq;
-            MI_F32 var     = static_cast<MI_F32>(sum_kernel_aa[c]) / ksq - mean_i * mean_i;
-            MI_F32 var_eps = (var + eps);
+            DT_F32 mean_i  = static_cast<DT_F32>(sum_kernel_a[c])  / ksq;
+            DT_F32 var     = static_cast<DT_F32>(sum_kernel_aa[c]) / ksq - mean_i * mean_i;
+            DT_F32 var_eps = (var + eps);
 
             dst_a[x * C + c] = var / var_eps;
             dst_b[x * C + c] = mean_i - mean_i * dst_a[x * C + c];
@@ -505,17 +505,17 @@ static AURA_VOID GuideFilterCalcKernelSum(SumType *a, SqSumType *aa, const MI_S3
     }
 }
 
-template <typename Tp, typename SumType, typename SqSumType, BorderType BORDER_TYPE, MI_S32 C>
+template <typename Tp, typename SumType, typename SqSumType, BorderType BORDER_TYPE, DT_S32 C>
 static Status GuideFilterCalcABNeonImpl(const Mat &src_a, const Mat &src_b, Mat &dst_a, Mat &dst_b,
                                         ThreadBuffer &row_a_buffer, ThreadBuffer &row_b_buffer, ThreadBuffer &row_aa_buffer,
                                         ThreadBuffer &row_ab_buffer, ThreadBuffer &sum_a_buffer, ThreadBuffer &sum_b_buffer,
                                         ThreadBuffer &sum_aa_buffer, ThreadBuffer &sum_ab_buffer, ThreadBuffer &arr_ptr_buffer,
-                                        MI_S32 ksize, MI_F32 eps, const Scalar &border_value, MI_S32 start_row, MI_S32 end_row)
+                                        DT_S32 ksize, DT_F32 eps, const Scalar &border_value, DT_S32 start_row, DT_S32 end_row)
 {
     const Sizes3 sz    = src_a.GetSizes();
-    const MI_S32 width = sz.m_width;
+    const DT_S32 width = sz.m_width;
 
-    const MI_S32 width_align = AURA_ALIGN((width + ksize) * C, 64);
+    const DT_S32 width_align = AURA_ALIGN((width + ksize) * C, 64);
 
     Tp      *row_a_data  = row_a_buffer.GetThreadData<Tp>();
     Tp      *row_b_data  = row_b_buffer.GetThreadData<Tp>();
@@ -527,7 +527,7 @@ static Status GuideFilterCalcABNeonImpl(const Mat &src_a, const Mat &src_b, Mat 
     SqSumType *sum_aa = sum_aa_buffer.GetThreadData<SqSumType>();
     SqSumType *sum_ab = sum_ab_buffer.GetThreadData<SqSumType>();
 
-    AURA_VOID  **arr_ptr = arr_ptr_buffer.GetThreadData<AURA_VOID*>();
+    DT_VOID  **arr_ptr = arr_ptr_buffer.GetThreadData<DT_VOID*>();
 
     memset(sum_a,  0, width_align * sizeof(SumType));
     memset(sum_b,  0, width_align * sizeof(SumType));
@@ -539,7 +539,7 @@ static Status GuideFilterCalcABNeonImpl(const Mat &src_a, const Mat &src_b, Mat 
     SumType **row_aa = reinterpret_cast<SumType**>(arr_ptr + 2 * ksize);
     SumType **row_ab = reinterpret_cast<SumType**>(arr_ptr + 3 * ksize);
 
-    for (MI_S32 i = 0; i < ksize; i++)
+    for (DT_S32 i = 0; i < ksize; i++)
     {
         row_a[i]  = row_a_data  + i * width_align;
         row_b[i]  = row_b_data  + i * width_align;
@@ -548,7 +548,7 @@ static Status GuideFilterCalcABNeonImpl(const Mat &src_a, const Mat &src_b, Mat 
     }
 
     // 1. Init (ksize rows data)
-    const MI_S32 ksh = ksize / 2;
+    const DT_S32 ksh = ksize / 2;
 
     // 0th row is left unchanged on purpose
     memset(row_a[0],  0, width_align * sizeof(Tp));
@@ -556,7 +556,7 @@ static Status GuideFilterCalcABNeonImpl(const Mat &src_a, const Mat &src_b, Mat 
     memset(row_aa[0], 0, width_align * sizeof(SumType));
     memset(row_ab[0], 0, width_align * sizeof(SumType));
 
-    for (MI_S32 y = 1; y < ksize; y++)
+    for (DT_S32 y = 1; y < ksize; y++)
     {
         MakeBorderOneRow<Tp, BORDER_TYPE, C>(src_a, start_row + y - 1 - ksh, width, ksize, row_a[y], border_value);
         MakeBorderOneRow<Tp, BORDER_TYPE, C>(src_b, start_row + y - 1 - ksh, width, ksize, row_b[y], border_value);
@@ -566,9 +566,9 @@ static Status GuideFilterCalcABNeonImpl(const Mat &src_a, const Mat &src_b, Mat 
     }
 
     // 2. Loop Rows
-    MI_S32 idx_head = 0;
-    MI_S32 idx_tail = ksize - 1;
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    DT_S32 idx_head = 0;
+    DT_S32 idx_tail = ksize - 1;
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         GuideFilterSubRowNeon<Tp,      SumType  >(row_a[idx_head],  sum_a,  (width + ksize - 1) * C);
         GuideFilterSubRowNeon<Tp,      SumType  >(row_b[idx_head],  sum_b,  (width + ksize - 1) * C);
@@ -586,8 +586,8 @@ static Status GuideFilterCalcABNeonImpl(const Mat &src_a, const Mat &src_b, Mat 
                                                                     sum_a, sum_b, sum_aa, sum_ab, width + ksize - 1);
 
         // 2.2 filter done and write back
-        MI_F32 *dst_a_row = dst_a.Ptr<MI_F32>(y);
-        MI_F32 *dst_b_row = dst_b.Ptr<MI_F32>(y);
+        DT_F32 *dst_a_row = dst_a.Ptr<DT_F32>(y);
+        DT_F32 *dst_b_row = dst_b.Ptr<DT_F32>(y);
 
         GuideFilterCalcKernelSum<SumType, SqSumType, C>(sum_a, sum_b, sum_aa, sum_ab,
                                                         width, ksize, eps, dst_a_row, dst_b_row);
@@ -597,23 +597,23 @@ static Status GuideFilterCalcABNeonImpl(const Mat &src_a, const Mat &src_b, Mat 
 }
 
 
-template <typename Tp, typename SumType, typename SqSumType, BorderType BORDER_TYPE, MI_S32 C>
+template <typename Tp, typename SumType, typename SqSumType, BorderType BORDER_TYPE, DT_S32 C>
 static Status GuideFilterCalcABSameSrcNeonImpl(const Mat &src, Mat &dst_a, Mat &dst_b,
                                                ThreadBuffer &row_a_buffer, ThreadBuffer &row_aa_buffer, ThreadBuffer &sum_a_buffer,
-                                               ThreadBuffer &sum_aa_buffer, ThreadBuffer &arr_ptr_buffer, MI_S32 ksize, MI_F32 eps,
-                                               const Scalar &border_value, MI_S32 start_row, MI_S32 end_row)
+                                               ThreadBuffer &sum_aa_buffer, ThreadBuffer &arr_ptr_buffer, DT_S32 ksize, DT_F32 eps,
+                                               const Scalar &border_value, DT_S32 start_row, DT_S32 end_row)
 {
     const Sizes3 sz    = src.GetSizes();
-    const MI_S32 width = sz.m_width;
+    const DT_S32 width = sz.m_width;
 
-    const MI_S32 width_align = AURA_ALIGN((width + ksize) * C, 64);
+    const DT_S32 width_align = AURA_ALIGN((width + ksize) * C, 64);
 
     Tp        *row_a_data  = row_a_buffer.GetThreadData<Tp>();
     SumType   *row_aa_data = row_aa_buffer.GetThreadData<SumType>();
     SumType   *sum_a       = sum_a_buffer.GetThreadData<SumType>();
     SqSumType *sum_aa      = sum_aa_buffer.GetThreadData<SqSumType>();
 
-    AURA_VOID  **arr_ptr = arr_ptr_buffer.GetThreadData<AURA_VOID*>();
+    DT_VOID  **arr_ptr = arr_ptr_buffer.GetThreadData<DT_VOID*>();
 
     memset(sum_a,  0, width_align * sizeof(SumType));
     memset(sum_aa, 0, width_align * sizeof(SqSumType));
@@ -621,29 +621,29 @@ static Status GuideFilterCalcABSameSrcNeonImpl(const Mat &src, Mat &dst_a, Mat &
     Tp      **row_a  = reinterpret_cast<Tp**>(arr_ptr);
     SumType **row_aa = reinterpret_cast<SumType**>(arr_ptr + ksize);
 
-    for (MI_S32 i = 0; i < ksize; i++)
+    for (DT_S32 i = 0; i < ksize; i++)
     {
         row_a[i]  = row_a_data  + i * width_align;
         row_aa[i] = row_aa_data + i * width_align;
     }
 
     // 1. Init (ksize rows data)
-    const MI_S32 ksh = ksize / 2;
+    const DT_S32 ksh = ksize / 2;
 
     // 0th row is left unchanged on purpose
     memset(row_a[0],  0, width_align * sizeof(Tp));
     memset(row_aa[0], 0, width_align * sizeof(SumType));
 
-    for (MI_S32 y = 1; y < ksize; y++)
+    for (DT_S32 y = 1; y < ksize; y++)
     {
         MakeBorderOneRow<Tp, BORDER_TYPE, C>(src, start_row + y - 1 - ksh, width, ksize, row_a[y], border_value);
         GuideFilterRowDataAccumulateNeon<Tp, SumType, SqSumType, C>(row_a[y],row_aa[y], sum_a, sum_aa, width + ksize - 1);
     }
 
     // 2. Loop Rows
-    MI_S32 idx_head = 0;
-    MI_S32 idx_tail = ksize - 1;
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    DT_S32 idx_head = 0;
+    DT_S32 idx_tail = ksize - 1;
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         GuideFilterSubRowNeon<Tp,      SumType  >(row_a[idx_head],  sum_a,  (width + ksize - 1) * C);
         GuideFilterSubRowNeon<SumType, SqSumType>(row_aa[idx_head], sum_aa, (width + ksize - 1) * C);
@@ -657,8 +657,8 @@ static Status GuideFilterCalcABSameSrcNeonImpl(const Mat &src, Mat &dst_a, Mat &
         GuideFilterRowDataAccumulateNeon<Tp, SumType, SqSumType, C>(row_a[idx_tail], row_aa[idx_tail], sum_a, sum_aa, width + ksize - 1);
 
         // 2.2 filter done and write back
-        MI_F32 *dst_a_row = dst_a.Ptr<MI_F32>(y);
-        MI_F32 *dst_b_row = dst_b.Ptr<MI_F32>(y);
+        DT_F32 *dst_a_row = dst_a.Ptr<DT_F32>(y);
+        DT_F32 *dst_b_row = dst_b.Ptr<DT_F32>(y);
 
         GuideFilterCalcKernelSum<SumType, SqSumType, C>(sum_a, sum_aa, width, ksize, eps, dst_a_row, dst_b_row);
     }
@@ -666,14 +666,14 @@ static Status GuideFilterCalcABSameSrcNeonImpl(const Mat &src, Mat &dst_a, Mat &
     return Status::OK;
 }
 
-template <typename D8, typename D16, typename D32, MI_S32 C, typename d8x8xC_t = typename neon::MDVector<D8, C>::MVType,
-          typename std::enable_if<std::is_same<D8, MI_U8>::value || std::is_same<D8, MI_S8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE d8x8xC_t GuideFilterLinearTransNeonCore(const D8 *src_row, const MI_F32 *mean_a_row, const MI_F32 *mean_b_row, MI_S32 x)
+template <typename D8, typename D16, typename D32, DT_S32 C, typename d8x8xC_t = typename neon::MDVector<D8, C>::MVType,
+          typename std::enable_if<std::is_same<D8, DT_U8>::value || std::is_same<D8, DT_S8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE d8x8xC_t GuideFilterLinearTransNeonCore(const D8 *src_row, const DT_F32 *mean_a_row, const DT_F32 *mean_b_row, DT_S32 x)
 {
     using d16x8_t   = typename neon::QVector<D16>::VType;
     using d16x4_t   = typename neon::DVector<D16>::VType;
     using d32x4_t   = typename neon::QVector<D32>::VType;
-    using f32x4xC_t = typename neon::MQVector<MI_F32, C>::MVType;
+    using f32x4xC_t = typename neon::MQVector<DT_F32, C>::MVType;
 
     d8x8xC_t mvd8_src, mvd8_result;
     f32x4xC_t mvqf32_mean_a_lo, mvqf32_mean_a_hi, mvqf32_mean_b_lo, mvqf32_mean_b_hi;
@@ -684,29 +684,29 @@ AURA_ALWAYS_INLINE d8x8xC_t GuideFilterLinearTransNeonCore(const D8 *src_row, co
     neon::vload(mean_b_row + x,         mvqf32_mean_b_lo);
     neon::vload(mean_b_row + x + 4 * C, mvqf32_mean_b_hi);
 
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         d16x8_t vqd16_src    = neon::vmovl(mvd8_src.val[ch]);
         d32x4_t vqd32_src_lo = neon::vmovl(neon::vgetlow(vqd16_src));
         d32x4_t vqd32_src_hi = neon::vmovl(neon::vgethigh(vqd16_src));
 
         d16x4_t vd16_result_lo = neon::vqmovn(neon::vcvt<D32>(neon::vmla(mvqf32_mean_b_lo.val[ch], mvqf32_mean_a_lo.val[ch],
-                                              neon::vcvt<MI_F32>(vqd32_src_lo))));
+                                              neon::vcvt<DT_F32>(vqd32_src_lo))));
         d16x4_t vd16_result_hi = neon::vqmovn(neon::vcvt<D32>(neon::vmla(mvqf32_mean_b_hi.val[ch], mvqf32_mean_a_hi.val[ch],
-                                              neon::vcvt<MI_F32>(vqd32_src_hi))));
+                                              neon::vcvt<DT_F32>(vqd32_src_hi))));
         mvd8_result.val[ch] = neon::vqmovn(neon::vcombine(vd16_result_lo, vd16_result_hi));
     }
 
     return mvd8_result;
 }
 
-template <typename D16, typename D32, typename D64, MI_S32 C, typename d16x8xC_t = typename neon::MQVector<D16, C>::MVType,
-          typename std::enable_if<std::is_same<D16, MI_U16>::value || std::is_same<D16, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE d16x8xC_t GuideFilterLinearTransNeonCore(const D16 *src_row, const MI_F32 *mean_a_row, const MI_F32 *mean_b_row, MI_S32 x)
+template <typename D16, typename D32, typename D64, DT_S32 C, typename d16x8xC_t = typename neon::MQVector<D16, C>::MVType,
+          typename std::enable_if<std::is_same<D16, DT_U16>::value || std::is_same<D16, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE d16x8xC_t GuideFilterLinearTransNeonCore(const D16 *src_row, const DT_F32 *mean_a_row, const DT_F32 *mean_b_row, DT_S32 x)
 {
     using d16x4_t   = typename neon::DVector<D16>::VType;
     using d32x4_t   = typename neon::QVector<D32>::VType;
-    using f32x4xC_t = typename neon::MQVector<MI_F32, C>::MVType;
+    using f32x4xC_t = typename neon::MQVector<DT_F32, C>::MVType;
 
     d16x8xC_t mvd16_src, mvd16_result;
     f32x4xC_t mvqf32_mean_a_lo, mvqf32_mean_a_hi, mvqf32_mean_b_lo, mvqf32_mean_b_hi;
@@ -717,14 +717,14 @@ AURA_ALWAYS_INLINE d16x8xC_t GuideFilterLinearTransNeonCore(const D16 *src_row, 
     neon::vload(mean_b_row + x, mvqf32_mean_b_lo);
     neon::vload(mean_b_row + x + 4 * C, mvqf32_mean_b_hi);
 
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         d32x4_t vqd32_src_lo   = neon::vmovl(neon::vgetlow(mvd16_src.val[ch]));
         d32x4_t vqd32_src_hi   = neon::vmovl(neon::vgethigh(mvd16_src.val[ch]));
         d16x4_t vd16_result_lo = neon::vqmovn(neon::vcvt<D32>(neon::vmla(mvqf32_mean_b_lo.val[ch], mvqf32_mean_a_lo.val[ch],
-                                              neon::vcvt<MI_F32>(vqd32_src_lo))));
+                                              neon::vcvt<DT_F32>(vqd32_src_lo))));
         d16x4_t vd16_result_hi = neon::vqmovn(neon::vcvt<D32>(neon::vmla(mvqf32_mean_b_hi.val[ch], mvqf32_mean_a_hi.val[ch],
-                                              neon::vcvt<MI_F32>(vqd32_src_hi))));
+                                              neon::vcvt<DT_F32>(vqd32_src_hi))));
         mvd16_result.val[ch]   = neon::vcombine(vd16_result_lo, vd16_result_hi);
     }
 
@@ -732,9 +732,9 @@ AURA_ALWAYS_INLINE d16x8xC_t GuideFilterLinearTransNeonCore(const D16 *src_row, 
 }
 
 #if defined(AURA_ENABLE_NEON_FP16)
-template <typename F16, typename F32, typename F64, MI_S32 C, typename f16x8xC_t = typename neon::MQVector<F16, C>::MVType,
-          typename std::enable_if<std::is_same<F16, MI_F16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE f16x8xC_t GuideFilterLinearTransNeonCore(const F16 *src_row, const MI_F32 *mean_a_row, const MI_F32 *mean_b_row, MI_S32 x)
+template <typename F16, typename F32, typename F64, DT_S32 C, typename f16x8xC_t = typename neon::MQVector<F16, C>::MVType,
+          typename std::enable_if<std::is_same<F16, MI_F16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE f16x8xC_t GuideFilterLinearTransNeonCore(const F16 *src_row, const DT_F32 *mean_a_row, const DT_F32 *mean_b_row, DT_S32 x)
 {
     using f16x4_t   = typename neon::DVector<F16>::VType;
     using f32x4xC_t   = typename neon::MQVector<F32, C>::MVType;
@@ -748,14 +748,14 @@ AURA_ALWAYS_INLINE f16x8xC_t GuideFilterLinearTransNeonCore(const F16 *src_row, 
     neon::vload(mean_b_row + x, mvqf32_mean_b_lo);
     neon::vload(mean_b_row + x + 4 * C, mvqf32_mean_b_hi);
 
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         f16x4_t vf16_src_lo   = neon::vgetlow(mvf16_src.val[ch]);
         f16x4_t vf16_src_hi   = neon::vgethigh(mvf16_src.val[ch]);
         f16x4_t vf16_result_lo = neon::vcvt<F16>(neon::vmla(mvqf32_mean_b_lo.val[ch], mvqf32_mean_a_lo.val[ch],
-                                                neon::vcvt<MI_F32>(vf16_src_lo)));
+                                                neon::vcvt<DT_F32>(vf16_src_lo)));
         f16x4_t vf16_result_hi = neon::vcvt<F16>(neon::vmla(mvqf32_mean_b_hi.val[ch], mvqf32_mean_a_hi.val[ch],
-                                                neon::vcvt<MI_F32>(vf16_src_hi)));
+                                                neon::vcvt<DT_F32>(vf16_src_hi)));
         mvf16_result.val[ch]   = neon::vcombine(vf16_result_lo, vf16_result_hi);
     }
 
@@ -763,9 +763,9 @@ AURA_ALWAYS_INLINE f16x8xC_t GuideFilterLinearTransNeonCore(const F16 *src_row, 
 }
 #endif // AURA_ENABLE_NEON_FP16
 
-template <typename F32, typename SumType, typename SqSumType, MI_S32 C, typename f32x4xC_t = typename neon::MQVector<F32, C>::MVType,
-          typename std::enable_if<std::is_same<F32, MI_F32>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE f32x4xC_t GuideFilterLinearTransNeonCore(const F32 *src_row, const MI_F32 *mean_a_row, const MI_F32 *mean_b_row, MI_S32 x)
+template <typename F32, typename SumType, typename SqSumType, DT_S32 C, typename f32x4xC_t = typename neon::MQVector<F32, C>::MVType,
+          typename std::enable_if<std::is_same<F32, DT_F32>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE f32x4xC_t GuideFilterLinearTransNeonCore(const F32 *src_row, const DT_F32 *mean_a_row, const DT_F32 *mean_b_row, DT_S32 x)
 {
     f32x4xC_t mvf32_src, mvf32_result;
     f32x4xC_t mvqf32_mean_a, mvqf32_mean_b;
@@ -774,7 +774,7 @@ AURA_ALWAYS_INLINE f32x4xC_t GuideFilterLinearTransNeonCore(const F32 *src_row, 
     neon::vload(mean_a_row + x, mvqf32_mean_a);
     neon::vload(mean_b_row + x, mvqf32_mean_b);
 
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         mvf32_result.val[ch] = neon::vmla(mvqf32_mean_b.val[ch], mvqf32_mean_a.val[ch], mvf32_src.val[ch]);
     }
@@ -782,27 +782,27 @@ AURA_ALWAYS_INLINE f32x4xC_t GuideFilterLinearTransNeonCore(const F32 *src_row, 
     return mvf32_result;
 }
 
-template <typename Tp, typename SumType, typename SqSumType, MI_S32 C>
-static Status GuideFilterLinearTransNeonImpl(const Mat &src, const Mat &mean_a, const Mat &mean_b, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, typename SumType, typename SqSumType, DT_S32 C>
+static Status GuideFilterLinearTransNeonImpl(const Mat &src, const Mat &mean_a, const Mat &mean_b, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     const Sizes3 sz      = mean_a.GetSizes();
-    const MI_S32 width   = sz.m_width;
+    const DT_S32 width   = sz.m_width;
 
     using MVType = typename std::conditional<sizeof(Tp) == 1, typename neon::MDVector<Tp, C>::MVType,
                    typename neon::MQVector<Tp, C>::MVType>::type;
 
-    constexpr MI_S32 ELEM_COUNTS = (sizeof(Tp) == 4) ? 4 : 8;
-    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
-    const MI_S32 width_align     = (width & -ELEM_COUNTS) * C;
+    constexpr DT_S32 ELEM_COUNTS = (sizeof(Tp) == 4) ? 4 : 8;
+    constexpr DT_S32 VOFFSET     = ELEM_COUNTS * C;
+    const DT_S32 width_align     = (width & -ELEM_COUNTS) * C;
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         const Tp     *src_row    = src.Ptr<Tp>(y);
-        const MI_F32 *mean_a_row = mean_a.Ptr<MI_F32>(y);
-        const MI_F32 *mean_b_row = mean_b.Ptr<MI_F32>(y);
+        const DT_F32 *mean_a_row = mean_a.Ptr<DT_F32>(y);
+        const DT_F32 *mean_b_row = mean_b.Ptr<DT_F32>(y);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
-        MI_S32 x = 0;
+        DT_S32 x = 0;
 
         for (; x < width_align - VOFFSET; x += VOFFSET)
         {
@@ -812,7 +812,7 @@ static Status GuideFilterLinearTransNeonImpl(const Mat &src, const Mat &mean_a, 
 
         for (; x < sz.m_width * sz.m_channel; ++x)
         {
-            dst_row[x] = SaturateCast<Tp>(static_cast<MI_F32>(src_row[x]) * mean_a_row[x] + mean_b_row[x]);
+            dst_row[x] = SaturateCast<Tp>(static_cast<DT_F32>(src_row[x]) * mean_a_row[x] + mean_b_row[x]);
         }
     }
 
@@ -824,7 +824,7 @@ class GuideFilterNeon : public GuideFilterImpl
 public:
     GuideFilterNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src0, const Array *src1, Array *dst, MI_S32 ksize, MI_F32 eps,
+    Status SetArgs(const Array *src0, const Array *src1, Array *dst, DT_S32 ksize, DT_F32 eps,
                    GuideFilterType type = GuideFilterType::NORMAL,
                    BorderType border_type = BorderType::REPLICATE,
                    const Scalar &border_value = Scalar()) override;
@@ -832,10 +832,10 @@ public:
     Status Run() override;
 };
 
-Status GuideFilterNormalNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, const MI_S32 &ksize, const MI_F32 &eps,
+Status GuideFilterNormalNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, const DT_S32 &ksize, const DT_F32 &eps,
                              BorderType &border_type, const Scalar &border_value, const OpTarget &target);
 
-Status GuideFilterFastNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, const MI_S32 &ksize, const MI_F32 &eps,
+Status GuideFilterFastNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, const DT_S32 &ksize, const DT_F32 &eps,
                             BorderType &border_type, const Scalar &border_value, const OpTarget &target);
 
 #endif // defined(AURA_ENABLE_NEON)

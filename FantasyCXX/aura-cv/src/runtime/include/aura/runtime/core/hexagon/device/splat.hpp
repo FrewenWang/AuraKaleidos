@@ -8,28 +8,28 @@
 namespace aura
 {
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value || std::is_same<St, MI_S8>::value>::type* = MI_NULL>
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value || std::is_same<St, DT_S8>::value>::type* = DT_NULL>
 AURA_INLINE HVX_Vector vsplat(St value)
 {
     return Q6_Vb_vsplat_R(value);
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_U16>::value || std::is_same<St, MI_S16>::value>::type* = MI_NULL>
+template <typename St, typename std::enable_if<std::is_same<St, DT_U16>::value || std::is_same<St, DT_S16>::value>::type* = DT_NULL>
 AURA_INLINE HVX_Vector vsplat(St value)
 {
     return Q6_Vh_vsplat_R(value);
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_U32>::value || std::is_same<St, MI_S32>::value>::type* = MI_NULL>
+template <typename St, typename std::enable_if<std::is_same<St, DT_U32>::value || std::is_same<St, DT_S32>::value>::type* = DT_NULL>
 AURA_INLINE HVX_Vector vsplat(St value)
 {
     return Q6_V_vsplat_R(value);
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_F32>::value>::type* = MI_NULL>
+template <typename St, typename std::enable_if<std::is_same<St, DT_F32>::value>::type* = DT_NULL>
 AURA_INLINE HVX_Vector vsplat(St value)
 {
-    return Q6_V_vsplat_R(*reinterpret_cast<MI_S32*>(&value));
+    return Q6_V_vsplat_R(*reinterpret_cast<DT_S32*>(&value));
 }
 
 } // namespace aura

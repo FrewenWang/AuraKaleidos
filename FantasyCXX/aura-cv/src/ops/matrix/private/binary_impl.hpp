@@ -24,7 +24,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src0;
@@ -76,7 +76,7 @@ private:
     CLMem m_cl_src0;
     CLMem m_cl_src1;
     CLMem m_cl_dst;
-    MI_S32 m_elem_counts;
+    DT_S32 m_elem_counts;
 
     Mat m_fkmat;
     std::string m_profiling_string;

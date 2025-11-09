@@ -7,13 +7,13 @@ namespace aura
 static Status WarpAffineHvx(Context *ctx, const Mat &src, const Mat &matrix, Mat &dst, WarpType warp_type, InterpType interp_type, BorderType border_type,
                             const Scalar &border_value, std::string &profiling_string, const OpTarget &target)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
     HexagonEngine *engine = ctx->GetHexagonEngine();
-    if (MI_NULL == engine)
+    if (DT_NULL == engine)
     {
         AURA_ADD_ERROR_STRING(ctx, "Hexagon engine is nullptr");
         return Status::ERROR;
@@ -21,9 +21,9 @@ static Status WarpAffineHvx(Context *ctx, const Mat &src, const Mat &matrix, Mat
 
     Status ret = Status::ERROR;
 
-    MI_S32 mesh_h = (dst.GetSizes().m_height + 15) / 16 + 1;
-    MI_S32 mesh_w = (dst.GetSizes().m_width + 15) / 16 + 1;
-    MI_S32 stride = (mesh_w * 2 * ElemTypeSize(ElemType::S32) + 128) & (-64);
+    DT_S32 mesh_h = (dst.GetSizes().m_height + 15) / 16 + 1;
+    DT_S32 mesh_w = (dst.GetSizes().m_width + 15) / 16 + 1;
+    DT_S32 stride = (mesh_w * 2 * ElemTypeSize(ElemType::S32) + 128) & (-64);
 
     Mat grid = Mat(ctx, ElemType::S32, aura::Sizes3(mesh_h, mesh_w, 2), AURA_MEM_DMA_BUF_HEAP, aura::Sizes(mesh_h, stride));
     if (!grid.IsValid())
@@ -51,7 +51,7 @@ static Status WarpAffineHvx(Context *ctx, const Mat &src, const Mat &matrix, Mat
 
     HexagonProfiling profiling;
     ret = engine->Run(AURA_OPS_WARP_PACKAGE_NAME, AURA_OPS_WARP_OP_NAME, rpc_param, &profiling);
-    if (Status::OK == ret && MI_TRUE == target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == target.m_data.hvx.profiling)
     {
         profiling_string = " " + HexagonProfilingToString(profiling);
     }
@@ -93,7 +93,7 @@ Status WarpHvx::SetArgs(const Array *src, const Array *matrix, Array *dst, Inter
     const Mat *src_mat    = dynamic_cast<const Mat*>(src);
     const Mat *matrix_mat = dynamic_cast<const Mat*>(matrix);
     Mat       *dst_mat    = dynamic_cast<Mat*>(dst);
-    if ((MI_NULL == src_mat || (MI_NULL == matrix_mat)) || (MI_NULL == dst_mat))
+    if ((DT_NULL == src_mat || (DT_NULL == matrix_mat)) || (DT_NULL == dst_mat))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or matrix or dst is not mat");
         return Status::ERROR;
@@ -105,7 +105,7 @@ Status WarpHvx::SetArgs(const Array *src, const Array *matrix, Array *dst, Inter
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1");
@@ -140,7 +140,7 @@ Status WarpHvx::Run()
     const Mat *matrix = dynamic_cast<const Mat*>(m_matrix);
     Mat       *dst    = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == matrix) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == matrix) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or matrix or dst is nullptr");
         return Status::ERROR;
@@ -179,7 +179,7 @@ std::string WarpHvx::ToString() const
 
 Status WarpAffineCoordHvx(Context *ctx, const Mat &matrix, Mat &map_xy, WarpType warp_type, const OpTarget &target)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -188,9 +188,9 @@ Status WarpAffineCoordHvx(Context *ctx, const Mat &matrix, Mat &map_xy, WarpType
 
     std::string profiling_string;
 
-    MI_S32 mesh_h = (map_xy.GetSizes().m_height + 15) / 16 + 1;
-    MI_S32 mesh_w = (map_xy.GetSizes().m_width + 15) / 16 + 1;
-    MI_S32 stride = (mesh_w * 2 * ElemTypeSize(ElemType::S32) + 128) & (-64);
+    DT_S32 mesh_h = (map_xy.GetSizes().m_height + 15) / 16 + 1;
+    DT_S32 mesh_w = (map_xy.GetSizes().m_width + 15) / 16 + 1;
+    DT_S32 stride = (mesh_w * 2 * ElemTypeSize(ElemType::S32) + 128) & (-64);
 
     Mat grid = Mat(ctx, ElemType::S32, aura::Sizes3(mesh_h, mesh_w, 2), AURA_MEM_DMA_BUF_HEAP, aura::Sizes(mesh_h, stride));
     if (!grid.IsValid())
@@ -220,7 +220,7 @@ Status WarpAffineCoordHvx(Context *ctx, const Mat &matrix, Mat &map_xy, WarpType
     HexagonEngine   *engine = ctx->GetHexagonEngine();
 
     ret = engine->Run(AURA_OPS_WARP_PACKAGE_NAME, AURA_OPS_WARP_COORD_OP_NAME, rpc_param, &profiling);
-    if (Status::OK == ret && MI_TRUE == target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == target.m_data.hvx.profiling)
     {
         profiling_string = " " + HexagonProfilingToString(profiling);
     }
@@ -230,7 +230,7 @@ Status WarpAffineCoordHvx(Context *ctx, const Mat &matrix, Mat &map_xy, WarpType
 
 Status WarpCoordHvx(Context *ctx, const Mat &matrix, Mat &map_xy, WarpType warp_type, const OpTarget &target)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }

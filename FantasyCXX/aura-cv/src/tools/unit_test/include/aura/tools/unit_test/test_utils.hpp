@@ -42,7 +42,7 @@ namespace aura
  */
 template <typename Tp>
 Status TestCheckEQ(Context *ctx, const Tp &a, const Tp &b,
-                   const MI_CHAR *info, const MI_CHAR *file, const MI_CHAR *func, MI_S32 line)
+                   const DT_CHAR *info, const DT_CHAR *file, const DT_CHAR *func, DT_S32 line)
 {
     if (a == b)
     {
@@ -74,7 +74,7 @@ Status TestCheckEQ(Context *ctx, const Tp &a, const Tp &b,
  */
 template <typename Tp>
 Status TestCheckIEQ(Context *ctx, const Tp &a, const Tp &b,
-                    const MI_CHAR *info, const MI_CHAR *file, const MI_CHAR *func, MI_S32 line)
+                    const DT_CHAR *info, const DT_CHAR *file, const DT_CHAR *func, DT_S32 line)
 {
     if (a != b)
     {
@@ -99,7 +99,7 @@ Status TestCheckIEQ(Context *ctx, const Tp &a, const Tp &b,
  *
  * @param str The input string to be converted to lowercase.
  */
-AURA_INLINE AURA_VOID StringToLower(std::string &str)
+AURA_INLINE DT_VOID StringToLower(std::string &str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
@@ -109,7 +109,7 @@ AURA_INLINE AURA_VOID StringToLower(std::string &str)
  *
  * @param str The input string to be converted to uppercase.
  */
-AURA_INLINE AURA_VOID StringToUpper(std::string &str)
+AURA_INLINE DT_VOID StringToUpper(std::string &str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 }
@@ -122,7 +122,7 @@ AURA_INLINE AURA_VOID StringToUpper(std::string &str)
  *
  * @return True if the substring is found, otherwise false.
  */
-AURA_INLINE MI_BOOL StringContains(const std::string &str, const std::string &sub_str)
+AURA_INLINE DT_BOOL StringContains(const std::string &str, const std::string &sub_str)
 {
     return str.find(sub_str) != std::string::npos;
 }
@@ -162,16 +162,16 @@ AURA_INLINE std::string GetFileSuffixStr(const std::string &str)
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
 template<typename F, typename ...Types>
-AURA_INLINE Status Executor(MI_S32 count, MI_S32 warm_up, TestTime &time_result, const F func, Types&&... args)
+AURA_INLINE Status Executor(DT_S32 count, DT_S32 warm_up, TestTime &time_result, const F func, Types&&... args)
 {
     Status status = Status::ERROR;
 
     Time max_time(0);
     Time min_time(UINT32_MAX);
     Time sum_time(0);
-    MI_S32 used_cnt = 0;
+    DT_S32 used_cnt = 0;
 
-    for (MI_S32 i = 0; i < count; i++)
+    for (DT_S32 i = 0; i < count; i++)
     {
         Time start_time = Time::Now();
         status          = func(args...);

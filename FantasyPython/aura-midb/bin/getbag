@@ -1,0 +1,3 @@
+#!/bin/bash
+time=$1
+zrun "ls /var/log/pavaro_record_*_*_*$time*.bag" | grep bag | awk -F"" 'END{printf("%s", $1)}' | xargs zpull

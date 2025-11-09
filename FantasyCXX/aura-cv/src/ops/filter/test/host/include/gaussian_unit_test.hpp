@@ -14,7 +14,7 @@ struct GaussianTestParam
     GaussianTestParam()
     {}
 
-    GaussianTestParam(MI_S32 ksize, MI_F32 sigma) : ksize(ksize), sigma(sigma)
+    GaussianTestParam(DT_S32 ksize, DT_F32 sigma) : ksize(ksize), sigma(sigma)
     {}
 
     friend std::ostream& operator<<(std::ostream &os, const GaussianTestParam &gaussian_test_param)
@@ -30,8 +30,8 @@ struct GaussianTestParam
         return sstream.str();
     }
 
-    MI_S32 ksize;
-    MI_F32 sigma;
+    DT_S32 ksize;
+    DT_F32 sigma;
 };
 
 AURA_TEST_PARAM(GaussianParam,
@@ -93,7 +93,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         GaussianParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -115,7 +115,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         GaussianParam run_param(GetParam((index)));
@@ -151,12 +151,12 @@ public:
         Mat ref = m_factory.GetEmptyMat(((ElemType::F16 == elem_type) && (TargetType::NONE == run_param.target.m_type))
                                         ? ElemType::F32 : elem_type, mat_size.m_sizes, AURA_MEM_DEFAULT, mat_size.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
         Scalar border_value = Scalar(0, 0, 0, 0);
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
-        MI_F32 tolerance = (ElemType::F32 == elem_type) ? 0.5f : 1.0f;
+        DT_F32 tolerance = (ElemType::F32 == elem_type) ? 0.5f : 1.0f;
 
         result.param  = BorderTypeToString(run_param.border_type) + " | " + gaussian_ker_param.ToString();
         result.input  = mat_size.ToString() + " " + ElemTypesToString(elem_type);

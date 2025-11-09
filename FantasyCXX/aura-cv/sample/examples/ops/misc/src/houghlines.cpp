@@ -27,13 +27,13 @@ aura::Status HoughLinesSampleTest(aura::Context *ctx, aura::TargetType type)
     std::vector<aura::Scalar> dst;
 
     // set interface parameters
-    MI_F64 rho       = 1;
-    MI_F64 theta     = AURA_PI / 180.f;
-    MI_S32 threshold = 100;
-    MI_F64 srn       = 0;
-    MI_F64 stn       = 0;
-    MI_F64 min_theta = 0;
-    MI_F64 max_theta = AURA_PI;
+    DT_F64 rho       = 1;
+    DT_F64 theta     = AURA_PI / 180.f;
+    DT_S32 threshold = 100;
+    DT_F64 srn       = 0;
+    DT_F64 stn       = 0;
+    DT_F64 min_theta = 0;
+    DT_F64 max_theta = AURA_PI;
     auto line_type   = aura::LinesType::VEC2F;
 
     // ---------------------

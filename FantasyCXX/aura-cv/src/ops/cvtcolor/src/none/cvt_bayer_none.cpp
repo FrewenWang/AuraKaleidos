@@ -7,21 +7,21 @@ namespace aura
 {
 
 template <typename Tp>
-Status CvtBayer2BgrNoneImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_BOOL swapg, MI_S32 start_row, MI_S32 end_row)
+Status CvtBayer2BgrNoneImpl(const Mat &src, Mat &dst, DT_BOOL swapb, DT_BOOL swapg, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width = src.GetSizes().m_width;
+    DT_S32 width = src.GetSizes().m_width;
 
-    const Tp *src_p  = MI_NULL;
-    const Tp *src_c  = MI_NULL;
-    const Tp *src_n0 = MI_NULL;
-    const Tp *src_n1 = MI_NULL;
+    const Tp *src_p  = DT_NULL;
+    const Tp *src_c  = DT_NULL;
+    const Tp *src_n0 = DT_NULL;
+    const Tp *src_n1 = DT_NULL;
 
-    Tp    *dst_c    = MI_NULL;
-    Tp    *dst_n    = MI_NULL;
-    MI_S32 offset   = 0;
-    MI_S32 blue_idx = swapb ? -1 : 1;
+    Tp    *dst_c    = DT_NULL;
+    Tp    *dst_n    = DT_NULL;
+    DT_S32 offset   = 0;
+    DT_S32 blue_idx = swapb ? -1 : 1;
 
-    for (MI_S32 y = (start_row * 2); y < (end_row * 2); y += 2)
+    for (DT_S32 y = (start_row * 2); y < (end_row * 2); y += 2)
     {
         if (swapg)
         {
@@ -42,7 +42,7 @@ Status CvtBayer2BgrNoneImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_BOOL swa
             dst_n  = dst.Ptr<Tp>(y + 2);
         }
 
-        for (MI_S32 x = 1; x < width - 1; x += 2)
+        for (DT_S32 x = 1; x < width - 1; x += 2)
         {
             offset                   = 3 * x + 1;
             dst_c[offset - blue_idx] = (src_c[x - 1] + src_c[x + 1] + 1) >> 1;
@@ -86,21 +86,21 @@ Status CvtBayer2BgrNoneImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_BOOL swa
 
 static Status CvtBayer2BgrRemainNoneImpl(Mat &dst)
 {
-    MI_S32 height = dst.GetSizes().m_height;
-    MI_S32 width  = dst.GetSizes().m_width;
+    DT_S32 height = dst.GetSizes().m_height;
+    DT_S32 width  = dst.GetSizes().m_width;
 
-    AURA_VOID *dst_c = dst.Ptr<AURA_VOID>(height - 1);
-    AURA_VOID *dst_n = dst.Ptr<AURA_VOID>(height - 2);
+    DT_VOID *dst_c = dst.Ptr<DT_VOID>(height - 1);
+    DT_VOID *dst_n = dst.Ptr<DT_VOID>(height - 2);
     memcpy(dst_c, dst_n, 3 * width * ElemTypeSize(dst.GetElemType()));
 
-    dst_c = dst.Ptr<AURA_VOID>(0);
-    dst_n = dst.Ptr<AURA_VOID>(1);
+    dst_c = dst.Ptr<DT_VOID>(0);
+    dst_n = dst.Ptr<DT_VOID>(1);
     memcpy(dst_c, dst_n, 3 * width * ElemTypeSize(dst.GetElemType()));
 
     return Status::OK;
 }
 
-Status CvtBayer2BgrNone(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, MI_BOOL swapg, const OpTarget &target)
+Status CvtBayer2BgrNone(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb, DT_BOOL swapg, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
@@ -122,18 +122,18 @@ Status CvtBayer2BgrNone(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, M
         return Status::ERROR;
     }
 
-    MI_S32 worker_height = (src.GetSizes().m_height - 2) / 2;
+    DT_S32 worker_height = (src.GetSizes().m_height - 2) / 2;
 
 #define CVT_BAYER_NONE_IMPL(type)                                                                                                 \
     if (target.m_data.none.enable_mt)                                                                                             \
     {                                                                                                                             \
         WorkerPool *wp = ctx->GetWorkerPool();                                                                                    \
-        if (MI_NULL == wp)                                                                                                        \
+        if (DT_NULL == wp)                                                                                                        \
         {                                                                                                                         \
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");                                                                   \
             return Status::ERROR;                                                                                                 \
         }                                                                                                                         \
-        ret = wp->ParallelFor((MI_S32)0, worker_height, CvtBayer2BgrNoneImpl<type>, std::cref(src), std::ref(dst), swapb, swapg); \
+        ret = wp->ParallelFor((DT_S32)0, worker_height, CvtBayer2BgrNoneImpl<type>, std::cref(src), std::ref(dst), swapb, swapg); \
     }                                                                                                                             \
     else                                                                                                                          \
     {                                                                                                                             \
@@ -144,13 +144,13 @@ Status CvtBayer2BgrNone(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, M
     {
         case ElemType::U8:
         {
-            CVT_BAYER_NONE_IMPL(MI_U8)
+            CVT_BAYER_NONE_IMPL(DT_U8)
             break;
         }
 
         case ElemType::U16:
         {
-            CVT_BAYER_NONE_IMPL(MI_U16)
+            CVT_BAYER_NONE_IMPL(DT_U16)
             break;
         }
 

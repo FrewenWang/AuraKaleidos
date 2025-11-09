@@ -8,27 +8,27 @@ namespace aura
 {
 
 template <typename Tp>
-static Status MinMaxLocNoneImpl(Context *ctx, const Mat &mat, std::vector<MI_F64> &min_val, std::vector<MI_F64> &max_val,
-                                std::vector<Point3i> &min_pos, std::vector<Point3i> &max_pos, MI_S32 start_row, MI_S32 end_row)
+static Status MinMaxLocNoneImpl(Context *ctx, const Mat &mat, std::vector<DT_F64> &min_val, std::vector<DT_F64> &max_val,
+                                std::vector<Point3i> &min_pos, std::vector<Point3i> &max_pos, DT_S32 start_row, DT_S32 end_row)
 {
     WorkerPool *wp = ctx->GetWorkerPool();
-    MI_S32 thread_idx = wp ? wp->GetComputeThreadIdx() : 0;
+    DT_S32 thread_idx = wp ? wp->GetComputeThreadIdx() : 0;
 
     Tp min_value = mat.At<Tp>(0, 0, 0);
     Tp max_value = mat.At<Tp>(0, 0, 0);
 
     Sizes3 sz = mat.GetSizes();
 
-    MI_S32 idx_min_x = 0;
-    MI_S32 idx_min_y = 0;
-    MI_S32 idx_max_x = 0;
-    MI_S32 idx_max_y = 0;
+    DT_S32 idx_min_x = 0;
+    DT_S32 idx_min_y = 0;
+    DT_S32 idx_max_x = 0;
+    DT_S32 idx_max_y = 0;
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         const Tp *src_c = mat.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < sz.m_width * sz.m_channel; ++x)
+        for (DT_S32 x = 0; x < sz.m_width * sz.m_channel; ++x)
         {
             Tp value = src_c[x];
 
@@ -65,7 +65,7 @@ static Status MinMaxLocNoneImpl(Context *ctx, const Mat &mat, std::vector<MI_F64
 MinMaxLocNone::MinMaxLocNone(Context *ctx, const OpTarget &target) : MinMaxLocImpl(ctx, target)
 {}
 
-Status MinMaxLocNone::SetArgs(const Array *src, MI_F64 *min_val, MI_F64 *max_val, Point3i *min_pos, Point3i *max_pos)
+Status MinMaxLocNone::SetArgs(const Array *src, DT_F64 *min_val, DT_F64 *max_val, Point3i *min_pos, Point3i *max_pos)
 {
     if (MinMaxLocImpl::SetArgs(src, min_val, max_val, min_pos, max_pos) != Status::OK)
     {
@@ -86,23 +86,23 @@ Status MinMaxLocNone::SetArgs(const Array *src, MI_F64 *min_val, MI_F64 *max_val
     if (m_target.m_data.none.enable_mt)                                                                                                 \
     {                                                                                                                                   \
         WorkerPool *wp = m_ctx->GetWorkerPool();                                                                                        \
-        if (MI_NULL == wp)                                                                                                              \
+        if (DT_NULL == wp)                                                                                                              \
         {                                                                                                                               \
             AURA_ADD_ERROR_STRING(m_ctx, "GetWorkerpool failed");                                                                       \
             return Status::ERROR;                                                                                                       \
         }                                                                                                                               \
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), height, MinMaxLocNoneImpl<type>, m_ctx, std::cref(*src), std::ref(min_val),       \
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), height, MinMaxLocNoneImpl<type>, m_ctx, std::cref(*src), std::ref(min_val),       \
                               std::ref(max_val), std::ref(min_pos), std::ref(max_pos));                                                 \
     }                                                                                                                                   \
     else                                                                                                                                \
     {                                                                                                                                   \
         ret = MinMaxLocNoneImpl<type>(m_ctx, *src, min_val, max_val, min_pos, max_pos,                                                  \
-                                      static_cast<MI_S32>(0), height);                                                                  \
+                                      static_cast<DT_S32>(0), height);                                                                  \
     }                                                                                                                                   \
                                                                                                                                         \
     if (ret != Status::OK)                                                                                                              \
     {                                                                                                                                   \
-        MI_CHAR error_msg[128];                                                                                                         \
+        DT_CHAR error_msg[128];                                                                                                         \
         std::snprintf(error_msg, sizeof(error_msg), "MinMaxLocNoneImpl failed (type %s)", #type);                                       \
         AURA_ADD_ERROR_STRING(m_ctx, error_msg);                                                                                        \
         goto EXIT;                                                                                                                      \
@@ -112,7 +112,7 @@ Status MinMaxLocNone::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;
@@ -120,12 +120,12 @@ Status MinMaxLocNone::Run()
 
     Status ret = Status::ERROR;
 
-    MI_S32 height     = src->GetSizes().m_height;
-    MI_S32 thread_num = (m_target.m_data.none.enable_mt && m_ctx->GetWorkerPool()) ? 
+    DT_S32 height     = src->GetSizes().m_height;
+    DT_S32 thread_num = (m_target.m_data.none.enable_mt && m_ctx->GetWorkerPool()) ? 
                         m_ctx->GetWorkerPool()->GetComputeThreadNum() : 1;
 
-    std::vector<MI_F64>  min_val(thread_num, std::numeric_limits<MI_F64>::max());
-    std::vector<MI_F64>  max_val(thread_num, std::numeric_limits<MI_F64>::lowest());
+    std::vector<DT_F64>  min_val(thread_num, std::numeric_limits<DT_F64>::max());
+    std::vector<DT_F64>  max_val(thread_num, std::numeric_limits<DT_F64>::lowest());
     std::vector<Point3i> min_pos(thread_num, {0, 0, 0});
     std::vector<Point3i> max_pos(thread_num, {0, 0, 0});
 
@@ -133,32 +133,32 @@ Status MinMaxLocNone::Run()
     {
         case ElemType::U8:
         {
-            MINMAXLOC_NONE_IMPL(MI_U8);
+            MINMAXLOC_NONE_IMPL(DT_U8);
             break;
         }
         case ElemType::S8:
         {
-            MINMAXLOC_NONE_IMPL(MI_S8);
+            MINMAXLOC_NONE_IMPL(DT_S8);
             break;
         }
         case ElemType::U16:
         {
-            MINMAXLOC_NONE_IMPL(MI_U16);
+            MINMAXLOC_NONE_IMPL(DT_U16);
             break;
         }
         case ElemType::S16:
         {
-            MINMAXLOC_NONE_IMPL(MI_S16);
+            MINMAXLOC_NONE_IMPL(DT_S16);
             break;
         }
         case ElemType::U32:
         {
-            MINMAXLOC_NONE_IMPL(MI_U32);
+            MINMAXLOC_NONE_IMPL(DT_U32);
             break;
         }
         case ElemType::S32:
         {
-            MINMAXLOC_NONE_IMPL(MI_S32);
+            MINMAXLOC_NONE_IMPL(DT_S32);
             break;
         }
 #if defined(AURA_BUILD_HOST)
@@ -169,7 +169,7 @@ Status MinMaxLocNone::Run()
         }
         case ElemType::F32:
         {
-            MINMAXLOC_NONE_IMPL(MI_F32);
+            MINMAXLOC_NONE_IMPL(DT_F32);
             break;
         }
 #endif
@@ -186,7 +186,7 @@ Status MinMaxLocNone::Run()
     *m_max_val = max_val[0];
     *m_max_pos = max_pos[0];
 
-    for (MI_U32 i = 1; i < min_val.size(); i++)
+    for (DT_U32 i = 1; i < min_val.size(); i++)
     {
         if (*m_min_val > min_val[i])
         {

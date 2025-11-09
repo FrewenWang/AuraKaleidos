@@ -52,7 +52,7 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_F64 clip_limit = 40.0, const Sizes &tile_grid_size = Sizes(8, 8));
+    Status SetArgs(const Array *src, Array *dst, DT_F64 clip_limit = 40.0, const Sizes &tile_grid_size = Sizes(8, 8));
 };
 
 /**
@@ -75,7 +75,7 @@ public:
  * -------------|------------------------------------------------- 
  * NONE         | U8C1, U16C1
  */
-AURA_EXPORTS Status ICreateClAHE(Context *ctx, const Mat &src, Mat &dst, MI_F64 clip_limit = 40.0,
+AURA_EXPORTS Status ICreateClAHE(Context *ctx, const Mat &src, Mat &dst, DT_F64 clip_limit = 40.0,
                                  const Sizes &tile_grid_size = Sizes(8, 8), const OpTarget &target = OpTarget::Default());
 
 /**

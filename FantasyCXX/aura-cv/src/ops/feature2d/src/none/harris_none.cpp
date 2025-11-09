@@ -5,50 +5,50 @@
 namespace aura
 {
 
-static AURA_VOID CalcHarrisNone(Context *ctx, const Mat &src, Mat &dst, MI_F64 k)
+static DT_VOID CalcHarrisNone(Context *ctx, const Mat &src, Mat &dst, DT_F64 k)
 {
     AURA_UNUSED(ctx);
     Sizes3 size = src.GetSizes();
 
-    for (MI_S32 y = 0; y < size.m_height; y++)
+    for (DT_S32 y = 0; y < size.m_height; y++)
     {
-        const MI_F32 *src_data = src.Ptr<MI_F32>(y);
-        MI_F32       *dst_data = dst.Ptr<MI_F32>(y);
+        const DT_F32 *src_data = src.Ptr<DT_F32>(y);
+        DT_F32       *dst_data = dst.Ptr<DT_F32>(y);
 
-        for (MI_S32 x = 0; x < size.m_width; x++)
+        for (DT_S32 x = 0; x < size.m_width; x++)
         {
-            MI_F32 a = src_data[x * 3];
-            MI_F32 b = src_data[x * 3 + 1];
-            MI_F32 c = src_data[x * 3 + 2];
+            DT_F32 a = src_data[x * 3];
+            DT_F32 b = src_data[x * 3 + 1];
+            DT_F32 c = src_data[x * 3 + 2];
             dst_data[x] = a * c - b * b - k * (a + c) * (a + c);
         }
     }
 }
 
-static AURA_VOID CalcMinEigenValNone(Context *ctx, const Mat &src, Mat &dst)
+static DT_VOID CalcMinEigenValNone(Context *ctx, const Mat &src, Mat &dst)
 {
     AURA_UNUSED(ctx);
     Sizes3 size = src.GetSizes();
 
-    for (MI_S32 y = 0; y < size.m_height; y++)
+    for (DT_S32 y = 0; y < size.m_height; y++)
     {
-        const MI_F32 *src_data = src.Ptr<MI_F32>(y);
-        MI_F32       *dst_data = dst.Ptr<MI_F32>(y);
+        const DT_F32 *src_data = src.Ptr<DT_F32>(y);
+        DT_F32       *dst_data = dst.Ptr<DT_F32>(y);
 
-        for (MI_S32 x = 0; x < size.m_width; x++)
+        for (DT_S32 x = 0; x < size.m_width; x++)
         {
-            MI_F32 a = src_data[x * 3] * 0.5f;
-            MI_F32 b = src_data[x * 3 + 1];
-            MI_F32 c = src_data[x * 3 + 2] * 0.5f;
+            DT_F32 a = src_data[x * 3] * 0.5f;
+            DT_F32 b = src_data[x * 3 + 1];
+            DT_F32 c = src_data[x * 3 + 2] * 0.5f;
             dst_data[x] = (a + c) - Sqrt(Pow((a - c), 2) + Pow(b, 2));
         }
     }
 }
 
-Status CornerEigenValsVecsNone(Context *ctx, const Mat &src, Mat &dst, MI_S32 block_size, MI_S32 aperture_size,
-                               MI_BOOL use_harris, MI_F64 k, BorderType border_type, const Scalar &border_value, const OpTarget &target)
+Status CornerEigenValsVecsNone(Context *ctx, const Mat &src, Mat &dst, DT_S32 block_size, DT_S32 aperture_size,
+                               DT_BOOL use_harris, DT_F64 k, BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
-    MI_F64 scale = (1 << ((aperture_size > 0 ? aperture_size : 3) - 1)) * block_size;
+    DT_F64 scale = (1 << ((aperture_size > 0 ? aperture_size : 3) - 1)) * block_size;
     if (aperture_size < 0)
     {
         scale *= 2.0;
@@ -82,16 +82,16 @@ Status CornerEigenValsVecsNone(Context *ctx, const Mat &src, Mat &dst, MI_S32 bl
         return Status::ERROR;
     }
 
-    for (MI_S32 y = 0; y < cov_size.m_height; y++)
+    for (DT_S32 y = 0; y < cov_size.m_height; y++)
     {
-        MI_F32 *cov_data = cov.Ptr<MI_F32>(y);
-        MI_F32 *dx_data  = dx.Ptr<MI_F32>(y);
-        MI_F32 *dy_data  = dy.Ptr<MI_F32>(y);
+        DT_F32 *cov_data = cov.Ptr<DT_F32>(y);
+        DT_F32 *dx_data  = dx.Ptr<DT_F32>(y);
+        DT_F32 *dy_data  = dy.Ptr<DT_F32>(y);
 
-        for (MI_S32 x = 0; x < cov_size.m_width; x++)
+        for (DT_S32 x = 0; x < cov_size.m_width; x++)
         {
-            MI_F32 dx = dx_data[x];
-            MI_F32 dy = dy_data[x];
+            DT_F32 dx = dx_data[x];
+            DT_F32 dy = dy_data[x];
 
             cov_data[x * 3] = dx * dx;
             cov_data[x * 3 + 1] = dx * dy;
@@ -113,11 +113,11 @@ Status CornerEigenValsVecsNone(Context *ctx, const Mat &src, Mat &dst, MI_S32 bl
         return Status::ERROR;
     }
 
-    MI_F32 scale_tmp = block_size * block_size;
-    for (MI_S32 y = 0; y < cov_size.m_height; y++)
+    DT_F32 scale_tmp = block_size * block_size;
+    for (DT_S32 y = 0; y < cov_size.m_height; y++)
     {
-        MI_F32 *dst_data = cov_dst.Ptr<MI_F32>(y);
-        for (MI_S32 x = 0; x < cov_size.m_width; x++)
+        DT_F32 *dst_data = cov_dst.Ptr<DT_F32>(y);
+        for (DT_S32 x = 0; x < cov_size.m_width; x++)
         {
             dst_data[x * 3] *= scale_tmp;
             dst_data[x * 3 + 1] *= scale_tmp;
@@ -140,7 +140,7 @@ Status CornerEigenValsVecsNone(Context *ctx, const Mat &src, Mat &dst, MI_S32 bl
 HarrisNone::HarrisNone(Context *ctx, const OpTarget &target) : HarrisImpl(ctx, target)
 {}
 
-Status HarrisNone::SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+Status HarrisNone::SetArgs(const Array *src, Array *dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                            BorderType border_type, const Scalar &border_value)
 {
     if (HarrisImpl::SetArgs(src, dst, block_size, ksize, k, border_type, border_value) != Status::OK)
@@ -162,7 +162,7 @@ Status HarrisNone::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst kmat is null");
         return Status::ERROR;
@@ -175,7 +175,7 @@ Status HarrisNone::Run()
         case ElemType::U8:
         case ElemType::F32:
         {
-            ret = CornerEigenValsVecsNone(m_ctx, *src, *dst, m_block_size, m_ksize, MI_TRUE,
+            ret = CornerEigenValsVecsNone(m_ctx, *src, *dst, m_block_size, m_ksize, DT_TRUE,
                                           m_k, m_border_type, m_border_value, m_target);
             if (ret != Status::OK)
             {

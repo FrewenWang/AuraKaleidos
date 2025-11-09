@@ -5,16 +5,16 @@
 namespace aura
 {
 
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5VCore(const HVX_Vector &vu8_src_p, const HVX_Vector &vu8_src_c,
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5VCore(const HVX_Vector &vu8_src_p, const HVX_Vector &vu8_src_c,
                                          const HVX_Vector &vu8_src_n, HVX_VectorPair &wu32_sum_c_lo,
                                          HVX_VectorPair &wu32_sum_c_hi, HVX_VectorPair &wu32_sum_n_lo,
-                                         HVX_VectorPair &wu32_sum_n_hi, const MI_U16 *kernel)
+                                         HVX_VectorPair &wu32_sum_n_hi, const DT_U16 *kernel)
 {
-    MI_U32 k0k0 = (kernel[0] << 16) | kernel[0];
-    MI_U32 k1k1 = (kernel[1] << 16) | kernel[1];
-    MI_U32 k2k2 = (kernel[2] << 16) | kernel[2];
+    DT_U32 k0k0 = (kernel[0] << 16) | kernel[0];
+    DT_U32 k1k1 = (kernel[1] << 16) | kernel[1];
+    DT_U32 k2k2 = (kernel[2] << 16) | kernel[2];
 
     HVX_VectorPair wu16_sum_c  = Q6_Wh_vadd_VubVub(vu8_src_p, vu8_src_n);
     wu32_sum_c_lo              = Q6_Ww_vmpy_VhRh(Q6_V_lo_W(wu16_sum_c), k0k0);
@@ -30,9 +30,9 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5VCore(const HVX_Vector &vu8_src_p, const HV
     wu32_sum_n_hi              = Q6_Ww_vmpy_VhRh(Q6_V_hi_W(wu16_sum_n), k1k1);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(const HVX_Vector &vu32_sum_l, const HVX_Vector &vu32_sum_c,
-                                         const HVX_Vector &vu32_sum_r, HVX_Vector &vu16_result, const MI_U32 *kk)
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5HCore(const HVX_Vector &vu32_sum_l, const HVX_Vector &vu32_sum_c,
+                                         const HVX_Vector &vu32_sum_r, HVX_Vector &vu16_result, const DT_U32 *kk)
 {
     HVX_Vector vu32_sum0 = Q6_Vw_vmpyi_VwRh(Q6_Vuw_vadd_VuwVuw_sat(vu32_sum_l, vu32_sum_r), kk[0]);
     vu32_sum0            = Q6_Vw_vmpyiacc_VwVwRh(vu32_sum0, vu32_sum_c, kk[2]);
@@ -58,14 +58,14 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(const HVX_Vector &vu32_sum_l, const H
 // low  wu32_sum_x2_lo     128 132 ... 252
 // high wu32_sum_x2_hi     131 135 ... 255
 // low  wu32_sum_x2_hi     129 133 ... 253
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(HVX_VectorPair &wu32_sum_x0_lo, HVX_VectorPair &wu32_sum_x0_hi,
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5HCore(HVX_VectorPair &wu32_sum_x0_lo, HVX_VectorPair &wu32_sum_x0_hi,
                                          HVX_VectorPair &wu32_sum_x1_lo, HVX_VectorPair &wu32_sum_x1_hi,
                                          HVX_VectorPair &wu32_sum_x2_lo, HVX_VectorPair &wu32_sum_x2_hi,
-                                         HVX_Vector &vu8_result_x0, HVX_Vector &vu8_result_x1,const MI_U16 *kernel)
+                                         HVX_Vector &vu8_result_x0, HVX_Vector &vu8_result_x1,const DT_U16 *kernel)
 {
-    const MI_S32 align_size = sizeof(MI_U32);
-    MI_U32 kk[3];
+    const DT_S32 align_size = sizeof(DT_U32);
+    DT_U32 kk[3];
     kk[0] = (kernel[0] << 16) | kernel[0];
     kk[1] = (kernel[1] << 16) | kernel[1];
     kk[2] = (kernel[2] << 16) | kernel[2];
@@ -99,7 +99,7 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(HVX_VectorPair &wu32_sum_x0_lo, HVX_V
     wu16_result1 = Q6_W_vshuff_VVR(vu16_result3, vu16_result1, -align_size);
     vu16_result1 = Q6_Vub_vpack_VhVh_sat(Q6_V_hi_W(wu16_result1), Q6_V_lo_W(wu16_result1));
     // Shuff uh
-    HVX_VectorPair wu8_result = Q6_W_vshuff_VVR(vu16_result1, vu16_result0, -2 * sizeof(MI_U8));
+    HVX_VectorPair wu8_result = Q6_W_vshuff_VVR(vu16_result1, vu16_result0, -2 * sizeof(DT_U8));
 
     vu8_result_x0 = Q6_V_lo_W(wu8_result);
     vu8_result_x1 = Q6_V_hi_W(wu8_result);
@@ -131,20 +131,20 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(HVX_VectorPair &wu32_sum_x0_lo, HVX_V
 // low  wu32_sum_x3_lo            w+0           X ...          X
 // high wu32_sum_x3_hi            w+3           X ...          X
 // low  wu32_sum_x3_hi            w+1           X ...          X
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(HVX_VectorPair &wu32_sum_x0_lo, HVX_VectorPair &wu32_sum_x0_hi,
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5HCore(HVX_VectorPair &wu32_sum_x0_lo, HVX_VectorPair &wu32_sum_x0_hi,
                                          HVX_VectorPair &wu32_sum_x1_lo, HVX_VectorPair &wu32_sum_x1_hi,
                                          HVX_VectorPair &wu32_sum_x2_lo, HVX_VectorPair &wu32_sum_x2_hi,
                                          HVX_VectorPair &wu32_sum_x3_lo, HVX_VectorPair &wu32_sum_x3_hi,
                                          HVX_Vector &vu8_result_x0, HVX_Vector &vu8_result_x1,
                                          HVX_Vector &vu8_last_x0, HVX_Vector &vu8_last_x1,
-                                         const MI_U16 *kernel, MI_S32 rest)
+                                         const DT_U16 *kernel, DT_S32 rest)
 {
     HVX_Vector vu32_sums_l[4];
     HVX_Vector vu32_sums_r[4];
     HVX_Vector vu32_sum_l0, vu32_sum_r0;
     HVX_VectorPair wu32_sum_r0, wu32_sum_l0;
-    MI_S32 idx;
+    DT_S32 idx;
 
     vu32_sums_l[0] = Q6_V_lo_W(wu32_sum_x2_lo);
     vu32_sums_l[1] = Q6_V_lo_W(wu32_sum_x2_hi);
@@ -182,15 +182,15 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(HVX_VectorPair &wu32_sum_x0_lo, HVX_V
 }
 
 template <typename Tp, BorderType BORDER_TYPE, typename Kt,
-          typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_n, MI_S32 iwidth,
+          typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+static DT_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_n, DT_S32 iwidth,
                               Tp *dst_c0, Tp *dst_c1, const Kt *kernel)
 {
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
 
-    MI_S32 src_back_offset = iwidth - ELEM_COUNTS;
-    MI_S32 ox = 0;
-    MI_S32 ix = 0;
+    DT_S32 src_back_offset = iwidth - ELEM_COUNTS;
+    DT_S32 ox = 0;
+    DT_S32 ix = 0;
 
     HVX_Vector     vu8_src_p;
     HVX_Vector     vu8_src_c;
@@ -242,9 +242,9 @@ static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_
     // remain
     {
         ox              = (ix - ELEM_COUNTS) * 2;
-        MI_S32 ix_last  = iwidth - 1;
-        MI_S32 ox_last  = src_back_offset * 2;
-        MI_S32 src_rest = iwidth & (ELEM_COUNTS - 1);
+        DT_S32 ix_last  = iwidth - 1;
+        DT_S32 ox_last  = src_back_offset * 2;
+        DT_S32 src_rest = iwidth & (ELEM_COUNTS - 1);
 
         HVX_Vector     vu8_last_c0x0, vu8_last_c0x1;
         HVX_Vector     vu8_last_c1x0, vu8_last_c1x1;
@@ -285,14 +285,14 @@ static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_
     }
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5VCore(const HVX_Vector &vu16_src_p, const HVX_Vector &vu16_src_c, const HVX_Vector &vu16_src_n,
-                                        HVX_VectorPair &wu32_sum_c, HVX_VectorPair &wu32_sum_n, const MI_U32 *kernel)
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5VCore(const HVX_Vector &vu16_src_p, const HVX_Vector &vu16_src_c, const HVX_Vector &vu16_src_n,
+                                        HVX_VectorPair &wu32_sum_c, HVX_VectorPair &wu32_sum_n, const DT_U32 *kernel)
 {
-    MI_U32 k0k0 = (kernel[0] << 16) | kernel[0];
-    MI_U32 k1k1 = (kernel[1] << 16) | kernel[1];
-    MI_U32 k2k2 = (kernel[2] << 16) | kernel[2];
+    DT_U32 k0k0 = (kernel[0] << 16) | kernel[0];
+    DT_U32 k1k1 = (kernel[1] << 16) | kernel[1];
+    DT_U32 k2k2 = (kernel[2] << 16) | kernel[2];
 
     wu32_sum_c = Q6_Wuw_vmpy_VuhRuh(vu16_src_p, k0k0);
     wu32_sum_c = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum_c, vu16_src_n, k0k0);
@@ -302,9 +302,9 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5VCore(const HVX_Vector &vu16_src_p, const H
     wu32_sum_n = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum_n, vu16_src_n, k1k1);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(const HVX_Vector &vu32_sum_l, const HVX_Vector &vu32_sum_c,
-                                         const HVX_Vector &vu32_sum_r, HVX_Vector &vu16_result, const MI_U32 *kernel)
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5HCore(const HVX_Vector &vu32_sum_l, const HVX_Vector &vu32_sum_c,
+                                         const HVX_Vector &vu32_sum_r, HVX_Vector &vu16_result, const DT_U32 *kernel)
 {
     HVX_Vector vu32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vu32_k1 = Q6_V_vsplat_R(kernel[1]);
@@ -328,14 +328,14 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(const HVX_Vector &vu32_sum_l, const H
     vu16_result = Q6_Vh_vshuffe_VhVh(vu32_sum1, vu32_sum0);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5VCore(const HVX_Vector &vs16_src_p, const HVX_Vector &vs16_src_c, const HVX_Vector &vs16_src_n,
-                                         HVX_VectorPair &ws32_sum_c, HVX_VectorPair &ws32_sum_n, const MI_S32 *kernel)
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5VCore(const HVX_Vector &vs16_src_p, const HVX_Vector &vs16_src_c, const HVX_Vector &vs16_src_n,
+                                         HVX_VectorPair &ws32_sum_c, HVX_VectorPair &ws32_sum_n, const DT_S32 *kernel)
 {
-    MI_S32 k0k0 = (kernel[0] << 16) | kernel[0];
-    MI_S32 k1k1 = (kernel[1] << 16) | kernel[1];
-    MI_S32 k2k2 = (kernel[2] << 16) | kernel[2];
+    DT_S32 k0k0 = (kernel[0] << 16) | kernel[0];
+    DT_S32 k1k1 = (kernel[1] << 16) | kernel[1];
+    DT_S32 k2k2 = (kernel[2] << 16) | kernel[2];
 
     ws32_sum_c = Q6_Ww_vmpy_VhRh(vs16_src_p, k0k0);
     ws32_sum_c = Q6_Ww_vmpyacc_WwVhRh(ws32_sum_c, vs16_src_n, k0k0);
@@ -345,9 +345,9 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5VCore(const HVX_Vector &vs16_src_p, const H
     ws32_sum_n = Q6_Ww_vmpyacc_WwVhRh(ws32_sum_n, vs16_src_n, k1k1);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(const HVX_Vector &vs32_sum_l, const HVX_Vector &vs32_sum_c,
-                                         const HVX_Vector &vs32_sum_r, HVX_Vector &vs16_result, const MI_S32 *kernel)
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5HCore(const HVX_Vector &vs32_sum_l, const HVX_Vector &vs32_sum_c,
+                                         const HVX_Vector &vs32_sum_r, HVX_Vector &vs16_result, const DT_S32 *kernel)
 {
     HVX_Vector vs32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vs32_k1 = Q6_V_vsplat_R(kernel[1]);
@@ -378,11 +378,11 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(const HVX_Vector &vs32_sum_l, const H
 // high wd32_sum_x2    65 67 ... 127
 // low  wd32_sum_x2    64 66 ... 126
 template <typename Tp, typename Kt,
-          typename std::enable_if<std::is_same<Tp, MI_S16>::value || std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(HVX_VectorPair &wd32_sum_x0, HVX_VectorPair &wd32_sum_x1, HVX_VectorPair &wd32_sum_x2,
+          typename std::enable_if<std::is_same<Tp, DT_S16>::value || std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5HCore(HVX_VectorPair &wd32_sum_x0, HVX_VectorPair &wd32_sum_x1, HVX_VectorPair &wd32_sum_x2,
                                          HVX_Vector &vd16_result_x0, HVX_Vector &vd16_result_x1, const Kt *kernel)
 {
-    const MI_S32 align_size  = sizeof(Kt);
+    const DT_S32 align_size  = sizeof(Kt);
     HVX_Vector vd32_sum_minus_1 = Q6_V_vlalign_VVR(Q6_V_hi_W(wd32_sum_x1), Q6_V_hi_W(wd32_sum_x0), align_size);
     HVX_Vector vd32_sum0        = Q6_V_lo_W(wd32_sum_x1);
     HVX_Vector vd32_sum1        = Q6_V_hi_W(wd32_sum_x1);
@@ -412,11 +412,11 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(HVX_VectorPair &wd32_sum_x0, HVX_Vect
 // high vd32_sum3           w+1 ...      w+63
 // low  vd32_sum3           w+0 ...      w+62
 template <typename Tp, typename Kt,
-          typename std::enable_if<std::is_same<Tp, MI_S16>::value || std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(HVX_VectorPair &wd32_sum_x0, HVX_VectorPair &wd32_sum_x1,
+          typename std::enable_if<std::is_same<Tp, DT_S16>::value || std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrup5x5HCore(HVX_VectorPair &wd32_sum_x0, HVX_VectorPair &wd32_sum_x1,
                                          HVX_VectorPair &wd32_sum_x2, HVX_VectorPair &vd32_sum3,
                                          HVX_Vector &vd16_result_x0, HVX_Vector &vd16_result_x1, HVX_Vector &vd16_last_x0,
-                                         HVX_Vector &vd16_last_x1, const Kt *kernel, MI_S32 rest)
+                                         HVX_Vector &vd16_last_x1, const Kt *kernel, DT_S32 rest)
 {
     HVX_Vector vd32_sum_r0;
     HVX_Vector vd32_sum_l0;
@@ -449,15 +449,15 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrup5x5HCore(HVX_VectorPair &wd32_sum_x0, HVX_Vect
 }
 
 template <typename Tp, BorderType BORDER_TYPE, typename Kt,
-          typename std::enable_if<std::is_same<Tp, MI_U16>::value || std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_n, MI_S32 iwidth,
+          typename std::enable_if<std::is_same<Tp, DT_U16>::value || std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+static DT_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_n, DT_S32 iwidth,
                               Tp *dst_c0, Tp *dst_c1, const Kt *kernel)
 {
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
 
-    MI_S32 src_back_offset = iwidth - ELEM_COUNTS;
-    MI_S32 ox = 0;
-    MI_S32 ix = 0;
+    DT_S32 src_back_offset = iwidth - ELEM_COUNTS;
+    DT_S32 ox = 0;
+    DT_S32 ix = 0;
 
     HVX_Vector     vd16_src_p;
     HVX_Vector     vd16_src_c;
@@ -501,8 +501,8 @@ static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_
     }
     // remain
     {
-        MI_S32 src_rest = iwidth & (ELEM_COUNTS - 1);
-        MI_S32 ox_last  = src_back_offset * 2;
+        DT_S32 src_rest = iwidth & (ELEM_COUNTS - 1);
+        DT_S32 ox_last  = src_back_offset * 2;
 
         ox = (ix - ELEM_COUNTS) * 2;
 
@@ -539,30 +539,30 @@ static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_
 }
 
 template <typename Tp, BorderType BORDER_TYPE>
-static Status PyrUp5x5HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, MI_S32 start_row, MI_S32 end_row)
+static Status PyrUp5x5HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, DT_S32 start_row, DT_S32 end_row)
 {
     using Kt = typename PyrUpTraits<Tp>::KernelType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 iheight = src.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 iheight = src.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
 
     const Kt *kernel = kmat.Ptr<Kt>(0);
 
-    const Tp *src_p = src.Ptr<Tp, BORDER_TYPE>(start_row - 1, MI_NULL);
+    const Tp *src_p = src.Ptr<Tp, BORDER_TYPE>(start_row - 1, DT_NULL);
     const Tp *src_c = src.Ptr<Tp>(start_row);
-    const Tp *src_n = src.Ptr<Tp, BorderType::REPLICATE>(start_row + 1, MI_NULL);
-    Tp *dst_c0      = MI_NULL;
-    Tp *dst_c1      = MI_NULL;
-    MI_S32 dy       = 0;
+    const Tp *src_n = src.Ptr<Tp, BorderType::REPLICATE>(start_row + 1, DT_NULL);
+    Tp *dst_c0      = DT_NULL;
+    Tp *dst_c1      = DT_NULL;
+    DT_S32 dy       = 0;
 
-    MI_U64 L2fetch_param = L2PfParam(istride, iwidth * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 sy = start_row; sy < end_row; sy++)
+    DT_U64 L2fetch_param = L2PfParam(istride, iwidth * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 sy = start_row; sy < end_row; sy++)
     {
         dy = sy << 1;
         if (sy + 2 < iheight)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(sy + 2)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(sy + 2)), L2fetch_param);
         }
         dst_c0 = dst.Ptr<Tp>(dy);
         dst_c1 = dst.Ptr<Tp>(dy + 1);
@@ -571,7 +571,7 @@ static Status PyrUp5x5HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, MI_S32 
 
         src_p = src_c;
         src_c = src_n;
-        src_n = src.Ptr<Tp, BorderType::REPLICATE>(sy + 2, MI_NULL);
+        src_n = src.Ptr<Tp, BorderType::REPLICATE>(sy + 2, DT_NULL);
     }
 
     return Status::OK;
@@ -583,26 +583,26 @@ static Status PyrUp5x5HvxHelper(Context *ctx, const Mat &src, Mat &dst, const Ma
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 height = src.GetSizes().m_height;
 
     switch (border_type)
     {
         case BorderType::REPLICATE:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, PyrUp5x5HvxImpl<Tp, BorderType::REPLICATE>,
+            ret = wp->ParallelFor((DT_S32)0, height, PyrUp5x5HvxImpl<Tp, BorderType::REPLICATE>,
                                   std::cref(src), std::ref(dst), std::cref(kmat));
             break;
         }
 
         case BorderType::REFLECT_101:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, PyrUp5x5HvxImpl<Tp, BorderType::REFLECT_101>,
+            ret = wp->ParallelFor((DT_S32)0, height, PyrUp5x5HvxImpl<Tp, BorderType::REFLECT_101>,
                                   std::cref(src), std::ref(dst), std::cref(kmat));
             break;
         }
@@ -625,19 +625,19 @@ Status PyrUp5x5Hvx(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat, Bord
     {
         case ElemType::U8:
         {
-            ret = PyrUp5x5HvxHelper<MI_U8>(ctx, src, dst, kmat, border_type);
+            ret = PyrUp5x5HvxHelper<DT_U8>(ctx, src, dst, kmat, border_type);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = PyrUp5x5HvxHelper<MI_U16>(ctx, src, dst, kmat, border_type);
+            ret = PyrUp5x5HvxHelper<DT_U16>(ctx, src, dst, kmat, border_type);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = PyrUp5x5HvxHelper<MI_S16>(ctx, src, dst, kmat, border_type);
+            ret = PyrUp5x5HvxHelper<DT_S16>(ctx, src, dst, kmat, border_type);
             break;
         }
 

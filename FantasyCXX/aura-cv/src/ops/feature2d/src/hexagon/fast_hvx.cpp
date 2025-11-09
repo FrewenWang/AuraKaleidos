@@ -8,8 +8,8 @@ namespace aura
 FastHvx::FastHvx(Context *ctx, const OpTarget &target) : FastImpl(ctx, target)
 {}
 
-Status FastHvx::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 threshold,
-                        MI_BOOL nonmax_suppression, FastDetectorType type, MI_U32 max_num_corners)
+Status FastHvx::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 threshold,
+                        DT_BOOL nonmax_suppression, FastDetectorType type, DT_U32 max_num_corners)
 {
     if (FastImpl::SetArgs(src, key_points, threshold, nonmax_suppression, type, max_num_corners) != Status::OK)
     {
@@ -23,7 +23,7 @@ Status FastHvx::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_
         return Status::ERROR;
     }
 
-    MI_S32 height = src->GetSizes().m_height;
+    DT_S32 height = src->GetSizes().m_height;
     if (height < 7)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src height only support > 7");
@@ -36,7 +36,7 @@ Status FastHvx::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_
         return Status::ERROR;
     }
 
-    if (((MI_UPTR_T)(dynamic_cast<const Mat*>(src)->GetData()) & 127) && (src->GetStrides().m_width & 127))
+    if (((DT_UPTR_T)(dynamic_cast<const Mat*>(src)->GetData()) & 127) && (src->GetStrides().m_width & 127))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src mat strides need align to 128");
         return Status::ERROR;
@@ -49,7 +49,7 @@ Status FastHvx::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -90,9 +90,9 @@ Status FastRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
     Mat src;
     std::vector<KeyPoint> dst_points;
-    MI_S32 threshold;
-    MI_U32 max_num_corners;
-    MI_BOOL nonmax_suppression;
+    DT_S32 threshold;
+    DT_U32 max_num_corners;
+    DT_BOOL nonmax_suppression;
     FastDetectorType type;
 
     FastInParam in_param(ctx, rpc_param);

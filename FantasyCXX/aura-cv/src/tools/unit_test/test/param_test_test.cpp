@@ -24,9 +24,9 @@ public:
     AxpyTest(Context *ctx, AxpyRunParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32) override
     {
-        if (MI_NULL == test_case)
+        if (DT_NULL == test_case)
         {
             AURA_LOGE(m_ctx, AURA_TAG, "invalid test_case\n");
             return -1;
@@ -45,7 +45,7 @@ public:
         Mat img_ref = m_factory.GetRandomMat(3, 5, run_param.elem_type, run_param.img_size, AURA_MEM_DEFAULT, run_param.img_stride);
 
         // executor
-        MI_S32 loop_count = 1;
+        DT_S32 loop_count = 1;
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
@@ -107,7 +107,7 @@ NEW_TESTCASE(unit_test, axpy, c)
 template<typename T>
 static Status Axpy_(const Context *ctx, const Mat *src_x, const Mat *src_y, Mat *dst)
 {
-    if ((MI_NULL == ctx) || (MI_NULL == src_x) || (MI_NULL == src_y) || (MI_NULL == dst))
+    if ((DT_NULL == ctx) || (DT_NULL == src_x) || (DT_NULL == src_y) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(ctx, "invalid parm");
         return Status::ERROR;
@@ -152,42 +152,42 @@ static Status Axpy(const Context *ctx, const Mat *src_x, const Mat *src_y, Mat *
     {
         case ElemType::U8:
         {
-            Axpy_<MI_U8>(ctx, src_x, src_y, dst);
+            Axpy_<DT_U8>(ctx, src_x, src_y, dst);
             break;
         }
         case ElemType::S8:
         {
-            Axpy_<MI_S8>(ctx, src_x, src_y, dst);
+            Axpy_<DT_S8>(ctx, src_x, src_y, dst);
             break;
         }
         case ElemType::U16:
         {
-            Axpy_<MI_U16>(ctx, src_x, src_y, dst);
+            Axpy_<DT_U16>(ctx, src_x, src_y, dst);
             break;
         }
         case ElemType::S16:
         {
-            Axpy_<MI_S16>(ctx, src_x, src_y, dst);
+            Axpy_<DT_S16>(ctx, src_x, src_y, dst);
             break;
         }
         case ElemType::U32:
         {
-            Axpy_<MI_U32>(ctx, src_x, src_y, dst);
+            Axpy_<DT_U32>(ctx, src_x, src_y, dst);
             break;
         }
         case ElemType::S32:
         {
-            Axpy_<MI_S32>(ctx, src_x, src_y, dst);
+            Axpy_<DT_S32>(ctx, src_x, src_y, dst);
             break;
         }
         case ElemType::F32:
         {
-            Axpy_<MI_F32>(ctx, src_x, src_y, dst);
+            Axpy_<DT_F32>(ctx, src_x, src_y, dst);
             break;
         }
         case ElemType::F64:
         {
-            Axpy_<MI_F64>(ctx, src_x, src_y, dst);
+            Axpy_<DT_F64>(ctx, src_x, src_y, dst);
             break;
         }
         default:

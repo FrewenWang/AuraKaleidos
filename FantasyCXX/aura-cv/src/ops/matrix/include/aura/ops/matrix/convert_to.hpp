@@ -58,7 +58,7 @@ public:
      * should be aligned to a stride, which is obtained through the `GetCLLengthAlignSize` function and is
      * platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta);
+    Status SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta);
 
     /**
      * @brief Generate covertto opencl precompiled cache.
@@ -68,7 +68,7 @@ public:
      * @param alpha The alpha scaling factor applied during conversion (defaults to 1.0f).
      * @param beta The beta scaling factor applied during conversion (defaults to 0.0f).
      */
-    static Status CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, MI_F32 alpha, MI_F32 beta);
+    static Status CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, DT_F32 alpha, DT_F32 beta);
 };
 
 
@@ -97,7 +97,7 @@ public:
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status IConvertTo(Context *ctx, const Mat &src, Mat &dst, MI_F32 alpha = 1.0f, MI_F32 beta = 0.0f,
+AURA_EXPORTS Status IConvertTo(Context *ctx, const Mat &src, Mat &dst, DT_F32 alpha = 1.0f, DT_F32 beta = 0.0f,
                                const OpTarget &target = OpTarget::Default());
 
 /**

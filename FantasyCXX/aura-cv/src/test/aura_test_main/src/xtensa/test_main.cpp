@@ -54,9 +54,9 @@ Example usage:
 
 using namespace aura;
 
-application_symbol_tray *g_symbol_tray = MI_NULL;
+application_symbol_tray *g_symbol_tray = DT_NULL;
 
-static const MI_S32 g_split_width = 86;
+static const DT_S32 g_split_width = 86;
 
 static std::string ParseStringOptions(std::vector<std::string> &options, const std::string &key_short, const std::string &key_long,
                                       size_t offset, const std::string &default_value)
@@ -99,10 +99,10 @@ static std::string ParseStringOptions(std::vector<std::string> &options, const s
     return result;
 }
 
-static MI_S32 ParseIntOptions(std::vector<std::string> &options, const std::string &key_short, const std::string &key_long,
-                              size_t offset, MI_S32 default_value)
+static DT_S32 ParseIntOptions(std::vector<std::string> &options, const std::string &key_short, const std::string &key_long,
+                              size_t offset, DT_S32 default_value)
 {
-    MI_S32 result = 0;
+    DT_S32 result = 0;
 
     if (options.empty() || offset > 1)
     {
@@ -144,19 +144,19 @@ static MI_S32 ParseIntOptions(std::vector<std::string> &options, const std::stri
     return result;
 }
 
-static AURA_VOID PrintHeading(const std::string &heading)
+static DT_VOID PrintHeading(const std::string &heading)
 {
   std::cout << std::endl << std::string(g_split_width, '=') << std::endl;
   std::cout << heading << std::endl;
   std::cout << std::string(g_split_width, '=') << std::endl;
 }
 
-static AURA_VOID PrintSplitLine()
+static DT_VOID PrintSplitLine()
 {
   std::cout << std::string(g_split_width, '=') << std::endl;
 }
 
-static MI_S32 PrintHelpInfo()
+static DT_S32 PrintHelpInfo()
 {
     PrintHeading("Aura UnitTest Help Info");
     std::cout << help_info <<std::endl;
@@ -217,7 +217,7 @@ static Status RunProfileTestCases(Context *ctx, UnitTestConfig &cfg, std::vector
 
     Status ret = Status::ERROR;
     XtensaEngine *xtensa_engine = ctx->GetXtensaEngine();
-    if (MI_NULL == xtensa_engine)
+    if (DT_NULL == xtensa_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "xtensa_engine is null.\n");
         return Status::ERROR;
@@ -266,7 +266,7 @@ static Status RunTestCases(Context *ctx, UnitTestConfig &cfg, const std::string 
         return Status::ERROR;
     }
 
-    MI_S32 stress_count = ParseIntOptions(options, "-s", "--stress", 1, 10);
+    DT_S32 stress_count = ParseIntOptions(options, "-s", "--stress", 1, 10);
 
     if (stress_count > 0)
     {
@@ -350,7 +350,7 @@ static Status GetConfigInfo(std::vector<std::string> &options, const UnitTestCon
     return Status::OK;
 }
 
-MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
+DT_S32 main(DT_S32 argc, DT_CHAR *argv[])
 {
     if (1 == argc)
     {
@@ -360,7 +360,7 @@ MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
     const std::string command(argv[1]);
     std::vector<std::string> options;
 
-    for (MI_S32 i = 2; i < argc; ++i)
+    for (DT_S32 i = 2; i < argc; ++i)
     {
         options.push_back(argv[i]);
     }
@@ -405,7 +405,7 @@ MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
         config.SetLog(unit_test_cfg.m_log_output, unit_test_cfg.m_log_level, unit_test_cfg.m_log_file_name);
 
         std::shared_ptr<Context> ctx = std::make_shared<Context>(config);
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             std::cout << "Context create failed." << std::endl;
             return -1;

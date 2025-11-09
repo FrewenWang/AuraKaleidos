@@ -3,7 +3,7 @@
 
 using namespace aura;
 
-static AURA_VOID StdoutTest()
+static DT_VOID StdoutTest()
 {
     // test with context
     std::shared_ptr<Context> ctx(new Context());
@@ -13,7 +13,7 @@ static AURA_VOID StdoutTest()
         return;
     }
 
-    for (MI_S32 i = 0; i < 10; i++)
+    for (DT_S32 i = 0; i < 10; i++)
     {
         AURA_LOGE(ctx.get(), "std_out_ctx", "test for log error (with context) %d \n", i);
         AURA_LOGI(ctx.get(), "std_out_ctx", "test for log info  (with context) %d \n", i);
@@ -21,7 +21,7 @@ static AURA_VOID StdoutTest()
     }
 
     // test with PRINT
-    for (MI_S32 i = 0; i < 10; i++)
+    for (DT_S32 i = 0; i < 10; i++)
     {
         AURA_PRINTE("std_out_PRINT", "test for log error (AURA_PRINT macro) %d \n", i);
         AURA_PRINTI("std_out_PRINT", "test for log info  (AURA_PRINT macro) %d \n", i);
@@ -29,7 +29,7 @@ static AURA_VOID StdoutTest()
     }
 
     // use stdout interface
-    for (MI_S32 i = 0; i < 10; i++)
+    for (DT_S32 i = 0; i < 10; i++)
     {
         aura::StdoutPrint("std_out_print", LogLevel::ERROR, "test for log error (stdout print) %d \n", i);
         aura::StdoutPrint("std_out_print", LogLevel::INFO,  "test for log info  (stdout print) %d \n", i);
@@ -37,7 +37,7 @@ static AURA_VOID StdoutTest()
     }
 }
 
-static AURA_VOID FarfTest()
+static DT_VOID FarfTest()
 {
     // test with context
     std::shared_ptr<Context> ctx(new Context());
@@ -47,7 +47,7 @@ static AURA_VOID FarfTest()
         return;
     }
 
-    for (MI_S32 i = 0; i < 10; i++)
+    for (DT_S32 i = 0; i < 10; i++)
     {
         AURA_LOGE(ctx.get(), "farf_ctx", "test for log error (with context) %d \n", i);
         AURA_LOGI(ctx.get(), "farf_ctx", "test for log info  (with context) %d \n", i);
@@ -55,7 +55,7 @@ static AURA_VOID FarfTest()
     }
 
     // test with PRINT
-    for (MI_S32 i = 0; i < 10; i++)
+    for (DT_S32 i = 0; i < 10; i++)
     {
         AURA_PRINTE("farf_PRINT", "test for log error (AURA_PRINT macro) %d \n", i);
         AURA_PRINTI("farf_PRINT", "test for log info  (AURA_PRINT macro) %d \n", i);
@@ -63,7 +63,7 @@ static AURA_VOID FarfTest()
     }
 
     // use farf interface
-    for (MI_S32 i = 0; i < 10; i++)
+    for (DT_S32 i = 0; i < 10; i++)
     {
         aura::FarfPrint(LogLevel::ERROR, "test for log error (logcat print) %d \n", i);
         aura::FarfPrint(LogLevel::INFO,  "test for log info  (logcat print) %d \n", i);
@@ -71,7 +71,7 @@ static AURA_VOID FarfTest()
     }
 }
 
-static AURA_VOID FileTest()
+static DT_VOID FileTest()
 {
     // test with context
     std::shared_ptr<Context> ctx(new Context());
@@ -81,7 +81,7 @@ static AURA_VOID FileTest()
         return;
     }
 
-    for (MI_S32 i = 0; i < 10; i++)
+    for (DT_S32 i = 0; i < 10; i++)
     {
         AURA_LOGE(ctx.get(), "file_ctx", "test for log error (with context) %d \n", i);
         AURA_LOGI(ctx.get(), "file_ctx", "test for log info  (with context) %d \n", i);
@@ -91,7 +91,7 @@ static AURA_VOID FileTest()
     // use file interface
     // open file log_file.txt
     FILE *fp = fopen("/data/local/tmp/file_print.txt", "a+");
-    for (MI_S32 i = 0; i < 10; i++)
+    for (DT_S32 i = 0; i < 10; i++)
     {
         aura::FilePrint(fp, "file_print", "test for log error (file print) %d \n", i);
         aura::FilePrint(fp, "file_print", "test for log info  (file print) %d \n", i);

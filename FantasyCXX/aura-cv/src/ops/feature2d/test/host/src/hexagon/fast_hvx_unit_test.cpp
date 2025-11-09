@@ -24,7 +24,7 @@ static FastParam::TupleTable g_fast_table_hvx
 
     // nonmax suppresion
     {
-        MI_TRUE,
+        DT_TRUE,
     },
 
     // type
@@ -41,10 +41,10 @@ static FastParam::TupleTable g_fast_table_hvx
 NEW_TESTCASE(feature2d, Fast, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     FastTest test(UnitTest::GetInstance()->GetContext(), g_fast_table_hvx);
     test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

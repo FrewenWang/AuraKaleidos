@@ -48,7 +48,7 @@ protected:
 
 using XnnExecutorImplCreator = XnnExecutorImpl*(*)(Context*, const std::shared_ptr<XnnModel>&, const NNConfig&);
 
-template<typename Tp, typename std::enable_if<std::is_base_of<XnnExecutorImpl, Tp>::value>::type* = MI_NULL>
+template<typename Tp, typename std::enable_if<std::is_base_of<XnnExecutorImpl, Tp>::value>::type* = DT_NULL>
 XnnExecutorImpl* XnnExecutorImplHelper(Context *ctx, const std::shared_ptr<XnnModel> &model, const NNConfig &config)
 {
     return new Tp(ctx, model, config);

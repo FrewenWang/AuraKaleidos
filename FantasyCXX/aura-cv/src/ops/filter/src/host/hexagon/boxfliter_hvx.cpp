@@ -7,7 +7,7 @@ namespace aura
 BoxFilterHvx::BoxFilterHvx(Context *ctx, const OpTarget &target) : BoxFilterImpl(ctx, target)
 {}
 
-Status BoxFilterHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, BorderType border_type, const Scalar &border_value)
+Status BoxFilterHvx::SetArgs(const Array *src, Array *dst, DT_S32 ksize, BorderType border_type, const Scalar &border_value)
 {
     if (BoxFilterImpl::SetArgs(src, dst, ksize, border_type, border_value) != Status::OK)
     {
@@ -41,7 +41,7 @@ Status BoxFilterHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, BorderT
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1 && ch != 2 && ch != 3)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2/3");
@@ -56,7 +56,7 @@ Status BoxFilterHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -77,7 +77,7 @@ Status BoxFilterHvx::Run()
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
     ret = engine->Run(AURA_OPS_FILTER_PACKAGE_NAME, AURA_OPS_FILTER_BOXFILTER_OP_NAME, rpc_param, &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }

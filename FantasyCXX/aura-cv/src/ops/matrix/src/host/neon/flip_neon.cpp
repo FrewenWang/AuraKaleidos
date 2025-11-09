@@ -6,30 +6,30 @@
 namespace aura
 {
 
-static Status FlipVerticalInplaceNeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status FlipVerticalInplaceNeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    const MI_S32 width     = src.GetSizes().m_width;
-    const MI_S32 height    = src.GetSizes().m_height;
-    const MI_S32 channel   = src.GetSizes().m_channel;
-    const MI_S32 row_bytes = ElemTypeSize(src.GetElemType()) * channel * width;
+    const DT_S32 width     = src.GetSizes().m_width;
+    const DT_S32 height    = src.GetSizes().m_height;
+    const DT_S32 channel   = src.GetSizes().m_channel;
+    const DT_S32 row_bytes = ElemTypeSize(src.GetElemType()) * channel * width;
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        const MI_U8 *src_top = src.Ptr<MI_U8>(y);
-        const MI_U8 *src_bot = src.Ptr<MI_U8>(height - 1 - y);
+        const DT_U8 *src_top = src.Ptr<DT_U8>(y);
+        const DT_U8 *src_bot = src.Ptr<DT_U8>(height - 1 - y);
 
-        MI_U8 *dst_top = dst.Ptr<MI_U8>(y);
-        MI_U8 *dst_bot = dst.Ptr<MI_U8>(height - 1 - y);
+        DT_U8 *dst_top = dst.Ptr<DT_U8>(y);
+        DT_U8 *dst_bot = dst.Ptr<DT_U8>(height - 1 - y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
 
         for (; x <= row_bytes - 16; x += 16)
         {
-            const MI_S32 *src_top_cur = reinterpret_cast<const MI_S32 *>(src_top + x);
-            const MI_S32 *src_bot_cur = reinterpret_cast<const MI_S32 *>(src_bot + x);
+            const DT_S32 *src_top_cur = reinterpret_cast<const DT_S32 *>(src_top + x);
+            const DT_S32 *src_bot_cur = reinterpret_cast<const DT_S32 *>(src_bot + x);
 
-            MI_S32 *dst_top_cur = reinterpret_cast<MI_S32 *>(dst_top + x);
-            MI_S32 *dst_bot_cur = reinterpret_cast<MI_S32 *>(dst_bot + x);
+            DT_S32 *dst_top_cur = reinterpret_cast<DT_S32 *>(dst_top + x);
+            DT_S32 *dst_bot_cur = reinterpret_cast<DT_S32 *>(dst_bot + x);
 
             int32x4_t vqs32_x0 = neon::vload1q(src_top_cur);
             int32x4_t vqs32_x1 = neon::vload1q(src_bot_cur);
@@ -40,17 +40,17 @@ static Status FlipVerticalInplaceNeonImpl(const Mat &src, Mat &dst, MI_S32 start
 
         for (; x <= row_bytes - 4; x += 4)
         {
-            MI_S32 v0 = (reinterpret_cast<const MI_S32 *>(src_top + x))[0];
-            MI_S32 v1 = (reinterpret_cast<const MI_S32 *>(src_bot + x))[0];
+            DT_S32 v0 = (reinterpret_cast<const DT_S32 *>(src_top + x))[0];
+            DT_S32 v1 = (reinterpret_cast<const DT_S32 *>(src_bot + x))[0];
 
-            (reinterpret_cast<MI_S32 *>(dst_top + x))[0] = v1;
-            (reinterpret_cast<MI_S32 *>(dst_bot + x))[0] = v0;
+            (reinterpret_cast<DT_S32 *>(dst_top + x))[0] = v1;
+            (reinterpret_cast<DT_S32 *>(dst_bot + x))[0] = v0;
         }
 
         for (; x < row_bytes; ++x)
         {
-            MI_U8 v0 = src_top[x];
-            MI_U8 v1 = src_bot[x];
+            DT_U8 v0 = src_top[x];
+            DT_U8 v1 = src_bot[x];
 
             dst_top[x] = v1;
             dst_bot[x] = v0;
@@ -60,16 +60,16 @@ static Status FlipVerticalInplaceNeonImpl(const Mat &src, Mat &dst, MI_S32 start
     return Status::OK;
 }
 
-static Status FlipVerticalRowCopy(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status FlipVerticalRowCopy(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    const MI_S32 width     = src.GetSizes().m_width;
-    const MI_S32 height    = src.GetSizes().m_height;
-    const MI_S32 channel   = src.GetSizes().m_channel;
-    const MI_S32 row_bytes = ElemTypeSize(src.GetElemType()) * channel * width;
+    const DT_S32 width     = src.GetSizes().m_width;
+    const DT_S32 height    = src.GetSizes().m_height;
+    const DT_S32 channel   = src.GetSizes().m_channel;
+    const DT_S32 row_bytes = ElemTypeSize(src.GetElemType()) * channel * width;
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        memcpy(dst.Ptr<MI_U8>(height - y - 1), src.Ptr<MI_U8>(y), row_bytes);
+        memcpy(dst.Ptr<DT_U8>(height - y - 1), src.Ptr<DT_U8>(y), row_bytes);
     }
 
     return Status::OK;
@@ -80,7 +80,7 @@ static Status FlipVerticalNeonHelper(const Context *ctx, const Mat &src, Mat &ds
     AURA_UNUSED(target);
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -88,7 +88,7 @@ static Status FlipVerticalNeonHelper(const Context *ctx, const Mat &src, Mat &ds
 
     Status ret = Status::OK;
 
-    MI_S32 height  = src.GetSizes().m_height;
+    DT_S32 height  = src.GetSizes().m_height;
 
     if (src.GetData() == dst.GetData())
     {
@@ -112,39 +112,39 @@ static Status FlipVerticalNeonHelper(const Context *ctx, const Mat &src, Mat &ds
     return Status::OK;
 }
 
-template <typename Tp, MI_S32 C>
-static Status FlipHorizonalInplaceNeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, DT_S32 C>
+static Status FlipHorizonalInplaceNeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     using MVType = typename neon::MQVector<Tp, C>::MVType;
 
-    constexpr MI_S32  VEC_LEN = static_cast<MI_S32>(16 / sizeof(Tp));
-    constexpr MI_S32 MVEC_LEN = VEC_LEN * C;
+    constexpr DT_S32  VEC_LEN = static_cast<DT_S32>(16 / sizeof(Tp));
+    constexpr DT_S32 MVEC_LEN = VEC_LEN * C;
 
-    MI_S32 width    = src.GetSizes().m_width;
-    MI_S32 row_half  = ((width + 1) >> 1) * C;
-    MI_S32 row_total = width * C;
+    DT_S32 width    = src.GetSizes().m_width;
+    DT_S32 row_half  = ((width + 1) >> 1) * C;
+    DT_S32 row_total = width * C;
 
     struct FlipVec
     {
         Tp val[C];
     };
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         Tp *src_row = const_cast<Tp*>(src.Ptr<Tp>(y));
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x <= row_half - MVEC_LEN; x += MVEC_LEN)
         {
-            MI_S32 idx_left  = x;
-            MI_S32 idx_right = row_total - MVEC_LEN - x;
+            DT_S32 idx_left  = x;
+            DT_S32 idx_right = row_total - MVEC_LEN - x;
 
             MVType vsrc_left, vsrc_right;
             neon::vload(src_row + idx_left,  vsrc_left);
             neon::vload(src_row + idx_right, vsrc_right);
 
-            for (MI_S32 i = 0; i < C; i++)
+            for (DT_S32 i = 0; i < C; i++)
             {
                 // reverse elements in every half vector
                 vsrc_left.val[i]  = neon::vrev64(vsrc_left.val[i]);
@@ -160,8 +160,8 @@ static Status FlipHorizonalInplaceNeonImpl(const Mat &src, Mat &dst, MI_S32 star
 
         for (; x < row_half; x += C)
         {
-            MI_S32 idx_left  = x;
-            MI_S32 idx_right = row_total - C - x;
+            DT_S32 idx_left  = x;
+            DT_S32 idx_right = row_total - C - x;
 
             FlipVec src_left  = *((FlipVec*)(src_row + idx_left));
             FlipVec src_right = *((FlipVec*)(src_row + idx_right));
@@ -179,7 +179,7 @@ static Status FlipHorizonalNeonHelper(const Context *ctx, const Mat &src, Mat &d
     AURA_UNUSED(target);
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -187,48 +187,48 @@ static Status FlipHorizonalNeonHelper(const Context *ctx, const Mat &src, Mat &d
 
     Status ret = Status::ERROR;
 
-    MI_S32 height = src.GetSizes().m_height;
-    MI_S32 channel_bytes = src.GetSizes().m_channel * ElemTypeSize(src.GetElemType());
+    DT_S32 height = src.GetSizes().m_height;
+    DT_S32 channel_bytes = src.GetSizes().m_channel * ElemTypeSize(src.GetElemType());
     switch (channel_bytes)
     {
         case 1:
         {
-            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<MI_U8,  1>, src, dst);
+            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<DT_U8,  1>, src, dst);
             break;
         }
         case 2:
         {
-            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<MI_U16, 1>, src, dst);
+            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<DT_U16, 1>, src, dst);
             break;
         }
         case 3:
         {
-            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<MI_U8,  3>, src, dst);
+            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<DT_U8,  3>, src, dst);
             break;
         }
         case 4:
         {
-            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<MI_U32, 1>, src, dst);
+            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<DT_U32, 1>, src, dst);
             break;
         }
         case 6:
         {
-            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<MI_U16, 3>, src, dst);
+            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<DT_U16, 3>, src, dst);
             break;
         }
         case 8:
         {
-            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<MI_U32, 2>, src, dst);
+            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<DT_U32, 2>, src, dst);
             break;
         }
         case 12:
         {
-            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<MI_U32, 3>, src, dst);
+            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<DT_U32, 3>, src, dst);
             break;
         }
         case 16:
         {
-            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<MI_U32, 4>, src, dst);
+            ret = wp->ParallelFor(0, height, FlipHorizonalInplaceNeonImpl<DT_U32, 4>, src, dst);
             break;
         }
         default:
@@ -272,7 +272,7 @@ Status FlipNeon::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;

@@ -10,45 +10,45 @@ namespace aura
 {
 
 template<typename Tp>
-static AURA_VOID FillMatWithRandom_(std::mt19937_64 &engine, Mat &mat, MI_F32 min, MI_F32 max)
+static DT_VOID FillMatWithRandom_(std::mt19937_64 &engine, Mat &mat, DT_F32 min, DT_F32 max)
 {
     using Distribution = typename std::conditional<is_integral<Tp>::value,
                                                    typename std::conditional<is_signed<Tp>::value,
-                                                                             std::uniform_int_distribution<MI_S32>,
-                                                                             std::uniform_int_distribution<MI_U32>>::type,
-                                                   std::uniform_real_distribution<MI_F32>>::type;
+                                                                             std::uniform_int_distribution<DT_S32>,
+                                                                             std::uniform_int_distribution<DT_U32>>::type,
+                                                   std::uniform_real_distribution<DT_F32>>::type;
 
     Tp *data = reinterpret_cast<Tp*>(mat.GetData());
-    MI_S32 n = mat.GetTotalBytes() / sizeof(Tp);
+    DT_S32 n = mat.GetTotalBytes() / sizeof(Tp);
 
-    MI_F32 min_type = SaturateCast<MI_F32>(std::numeric_limits<Tp>::lowest());
-    MI_F32 max_type = SaturateCast<MI_F32>(std::numeric_limits<Tp>::max());
+    DT_F32 min_type = SaturateCast<DT_F32>(std::numeric_limits<Tp>::lowest());
+    DT_F32 max_type = SaturateCast<DT_F32>(std::numeric_limits<Tp>::max());
 
-    MI_F32 min_val = Max(min_type, min);
-    MI_F32 max_val = Min(max_type, max);
+    DT_F32 min_val = Max(min_type, min);
+    DT_F32 max_val = Min(max_type, max);
 
     Distribution distribution(min_val, max_val);
 
-    for (MI_S32 i = 0; i < n; i++)
+    for (DT_S32 i = 0; i < n; i++)
     {
         data[i] = SaturateCast<Tp>(distribution(engine));
     }
 }
 
 template<typename Tp0, typename Tp1>
-static AURA_VOID ResizeConvertTo(const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta)
+static DT_VOID ResizeConvertTo(const Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta)
 {
-    MI_F32 scale_x = static_cast<MI_F32>(src.GetSizes().m_width)  / static_cast<MI_F32>(dst.GetSizes().m_width);
-    MI_F32 scale_y = static_cast<MI_F32>(src.GetSizes().m_height) / static_cast<MI_F32>(dst.GetSizes().m_height);
+    DT_F32 scale_x = static_cast<DT_F32>(src.GetSizes().m_width)  / static_cast<DT_F32>(dst.GetSizes().m_width);
+    DT_F32 scale_y = static_cast<DT_F32>(src.GetSizes().m_height) / static_cast<DT_F32>(dst.GetSizes().m_height);
 
-    for (MI_S32 y = 0; y < dst.GetSizes().m_height; y++)
+    for (DT_S32 y = 0; y < dst.GetSizes().m_height; y++)
     {
-        for (MI_S32 x = 0; x < dst.GetSizes().m_width; x++)
+        for (DT_S32 x = 0; x < dst.GetSizes().m_width; x++)
         {
-            MI_S32 src_x = Max(Min(Round(x * scale_x), src.GetSizes().m_width  - 1), (MI_S32)0);
-            MI_S32 src_y = Max(Min(Round(y * scale_y), src.GetSizes().m_height - 1), (MI_S32)0);
+            DT_S32 src_x = Max(Min(Round(x * scale_x), src.GetSizes().m_width  - 1), (DT_S32)0);
+            DT_S32 src_y = Max(Min(Round(y * scale_y), src.GetSizes().m_height - 1), (DT_S32)0);
 
-            for (MI_S32 c = 0; c < dst.GetSizes().m_channel; c++)
+            for (DT_S32 c = 0; c < dst.GetSizes().m_channel; c++)
             {
                 Tp0 src_pt = src.At<Tp0>(src_y, src_x, c);
                 Tp1 cvt_pt = SaturateCast<Tp1>(src_pt * alpha + beta);
@@ -62,122 +62,122 @@ struct ResizeConvertToImpl
 {
     ElemType src_type;
     ElemType dst_type;
-    std::function<AURA_VOID(const Mat&, Mat&, MI_F32, MI_F32)> func;
+    std::function<DT_VOID(const Mat&, Mat&, DT_F32, DT_F32)> func;
     std::string info;
 };
 
 static const ResizeConvertToImpl g_resize_convert_to_tbl[] =
 {
     //U8
-    {ElemType::U8, ElemType::U8,  ResizeConvertTo<MI_U8, MI_U8>,  "ConvertToU8ToU8" },
-    {ElemType::U8, ElemType::S8,  ResizeConvertTo<MI_U8, MI_S8>,  "ConvertToU8ToS8" },
-    {ElemType::U8, ElemType::U16, ResizeConvertTo<MI_U8, MI_U16>, "ConvertToU8ToU16"},
-    {ElemType::U8, ElemType::S16, ResizeConvertTo<MI_U8, MI_S16>, "ConvertToU8ToS16"},
-    {ElemType::U8, ElemType::U32, ResizeConvertTo<MI_U8, MI_U32>, "ConvertToU8ToU32"},
-    {ElemType::U8, ElemType::S32, ResizeConvertTo<MI_U8, MI_S32>, "ConvertToU8ToS32"},
-    {ElemType::U8, ElemType::F32, ResizeConvertTo<MI_U8, MI_F32>, "ConvertToU8ToF32"},
-    {ElemType::U8, ElemType::F64, ResizeConvertTo<MI_U8, MI_F64>, "ConvertToU8ToF64"},
+    {ElemType::U8, ElemType::U8,  ResizeConvertTo<DT_U8, DT_U8>,  "ConvertToU8ToU8" },
+    {ElemType::U8, ElemType::S8,  ResizeConvertTo<DT_U8, DT_S8>,  "ConvertToU8ToS8" },
+    {ElemType::U8, ElemType::U16, ResizeConvertTo<DT_U8, DT_U16>, "ConvertToU8ToU16"},
+    {ElemType::U8, ElemType::S16, ResizeConvertTo<DT_U8, DT_S16>, "ConvertToU8ToS16"},
+    {ElemType::U8, ElemType::U32, ResizeConvertTo<DT_U8, DT_U32>, "ConvertToU8ToU32"},
+    {ElemType::U8, ElemType::S32, ResizeConvertTo<DT_U8, DT_S32>, "ConvertToU8ToS32"},
+    {ElemType::U8, ElemType::F32, ResizeConvertTo<DT_U8, DT_F32>, "ConvertToU8ToF32"},
+    {ElemType::U8, ElemType::F64, ResizeConvertTo<DT_U8, DT_F64>, "ConvertToU8ToF64"},
 
     //S8
-    {ElemType::S8, ElemType::U8,  ResizeConvertTo<MI_S8, MI_U8>,  "ConvertToS8ToU8" },
-    {ElemType::S8, ElemType::S8,  ResizeConvertTo<MI_S8, MI_S8>,  "ConvertToS8ToS8" },
-    {ElemType::S8, ElemType::U16, ResizeConvertTo<MI_S8, MI_U16>, "ConvertToS8ToU16"},
-    {ElemType::S8, ElemType::S16, ResizeConvertTo<MI_S8, MI_S16>, "ConvertToS8ToS16"},
-    {ElemType::S8, ElemType::U32, ResizeConvertTo<MI_S8, MI_U32>, "ConvertToS8ToU32"},
-    {ElemType::S8, ElemType::S32, ResizeConvertTo<MI_S8, MI_S32>, "ConvertToS8ToS32"},
-    {ElemType::S8, ElemType::F32, ResizeConvertTo<MI_S8, MI_F32>, "ConvertToS8ToF32"},
-    {ElemType::S8, ElemType::F64, ResizeConvertTo<MI_S8, MI_F64>, "ConvertToS8ToF64"},
+    {ElemType::S8, ElemType::U8,  ResizeConvertTo<DT_S8, DT_U8>,  "ConvertToS8ToU8" },
+    {ElemType::S8, ElemType::S8,  ResizeConvertTo<DT_S8, DT_S8>,  "ConvertToS8ToS8" },
+    {ElemType::S8, ElemType::U16, ResizeConvertTo<DT_S8, DT_U16>, "ConvertToS8ToU16"},
+    {ElemType::S8, ElemType::S16, ResizeConvertTo<DT_S8, DT_S16>, "ConvertToS8ToS16"},
+    {ElemType::S8, ElemType::U32, ResizeConvertTo<DT_S8, DT_U32>, "ConvertToS8ToU32"},
+    {ElemType::S8, ElemType::S32, ResizeConvertTo<DT_S8, DT_S32>, "ConvertToS8ToS32"},
+    {ElemType::S8, ElemType::F32, ResizeConvertTo<DT_S8, DT_F32>, "ConvertToS8ToF32"},
+    {ElemType::S8, ElemType::F64, ResizeConvertTo<DT_S8, DT_F64>, "ConvertToS8ToF64"},
 
     //U16
-    {ElemType::U16, ElemType::U8,  ResizeConvertTo<MI_U16, MI_U8>,  "ConvertToU16ToU8" },
-    {ElemType::U16, ElemType::S8,  ResizeConvertTo<MI_U16, MI_S8>,  "ConvertToU16ToS8" },
-    {ElemType::U16, ElemType::U16, ResizeConvertTo<MI_U16, MI_U16>, "ConvertToU16ToU16"},
-    {ElemType::U16, ElemType::S16, ResizeConvertTo<MI_U16, MI_S16>, "ConvertToU16ToS16"},
-    {ElemType::U16, ElemType::U32, ResizeConvertTo<MI_U16, MI_U32>, "ConvertToU16ToU32"},
-    {ElemType::U16, ElemType::S32, ResizeConvertTo<MI_U16, MI_S32>, "ConvertToU16ToS32"},
-    {ElemType::U16, ElemType::F32, ResizeConvertTo<MI_U16, MI_F32>, "ConvertToU16ToF32"},
-    {ElemType::U16, ElemType::F64, ResizeConvertTo<MI_U16, MI_F64>, "ConvertToU16ToF64"},
+    {ElemType::U16, ElemType::U8,  ResizeConvertTo<DT_U16, DT_U8>,  "ConvertToU16ToU8" },
+    {ElemType::U16, ElemType::S8,  ResizeConvertTo<DT_U16, DT_S8>,  "ConvertToU16ToS8" },
+    {ElemType::U16, ElemType::U16, ResizeConvertTo<DT_U16, DT_U16>, "ConvertToU16ToU16"},
+    {ElemType::U16, ElemType::S16, ResizeConvertTo<DT_U16, DT_S16>, "ConvertToU16ToS16"},
+    {ElemType::U16, ElemType::U32, ResizeConvertTo<DT_U16, DT_U32>, "ConvertToU16ToU32"},
+    {ElemType::U16, ElemType::S32, ResizeConvertTo<DT_U16, DT_S32>, "ConvertToU16ToS32"},
+    {ElemType::U16, ElemType::F32, ResizeConvertTo<DT_U16, DT_F32>, "ConvertToU16ToF32"},
+    {ElemType::U16, ElemType::F64, ResizeConvertTo<DT_U16, DT_F64>, "ConvertToU16ToF64"},
 
     //S16
-    {ElemType::S16, ElemType::U8,  ResizeConvertTo<MI_S16, MI_U8>,  "ConvertToS16ToU8" },
-    {ElemType::S16, ElemType::S8,  ResizeConvertTo<MI_S16, MI_S8>,  "ConvertToS16ToS8" },
-    {ElemType::S16, ElemType::U16, ResizeConvertTo<MI_S16, MI_U16>, "ConvertToS16ToU16"},
-    {ElemType::S16, ElemType::S16, ResizeConvertTo<MI_S16, MI_S16>, "ConvertToS16ToS16"},
-    {ElemType::S16, ElemType::U32, ResizeConvertTo<MI_S16, MI_U32>, "ConvertToS16ToU32"},
-    {ElemType::S16, ElemType::S32, ResizeConvertTo<MI_S16, MI_S32>, "ConvertToS16ToS32"},
-    {ElemType::S16, ElemType::F32, ResizeConvertTo<MI_S16, MI_F32>, "ConvertToS16ToF32"},
-    {ElemType::S16, ElemType::F64, ResizeConvertTo<MI_S16, MI_F64>, "ConvertToS16ToF64"},
+    {ElemType::S16, ElemType::U8,  ResizeConvertTo<DT_S16, DT_U8>,  "ConvertToS16ToU8" },
+    {ElemType::S16, ElemType::S8,  ResizeConvertTo<DT_S16, DT_S8>,  "ConvertToS16ToS8" },
+    {ElemType::S16, ElemType::U16, ResizeConvertTo<DT_S16, DT_U16>, "ConvertToS16ToU16"},
+    {ElemType::S16, ElemType::S16, ResizeConvertTo<DT_S16, DT_S16>, "ConvertToS16ToS16"},
+    {ElemType::S16, ElemType::U32, ResizeConvertTo<DT_S16, DT_U32>, "ConvertToS16ToU32"},
+    {ElemType::S16, ElemType::S32, ResizeConvertTo<DT_S16, DT_S32>, "ConvertToS16ToS32"},
+    {ElemType::S16, ElemType::F32, ResizeConvertTo<DT_S16, DT_F32>, "ConvertToS16ToF32"},
+    {ElemType::S16, ElemType::F64, ResizeConvertTo<DT_S16, DT_F64>, "ConvertToS16ToF64"},
 
     //U32
-    {ElemType::U32, ElemType::U8,  ResizeConvertTo<MI_U32, MI_U8>,  "ConvertToU32ToU8" },
-    {ElemType::U32, ElemType::S8,  ResizeConvertTo<MI_U32, MI_S8>,  "ConvertToU32ToS8" },
-    {ElemType::U32, ElemType::U16, ResizeConvertTo<MI_U32, MI_U16>, "ConvertToU32ToU16"},
-    {ElemType::U32, ElemType::S16, ResizeConvertTo<MI_U32, MI_S16>, "ConvertToU32ToS16"},
-    {ElemType::U32, ElemType::U32, ResizeConvertTo<MI_U32, MI_U32>, "ConvertToU32ToU32"},
-    {ElemType::U32, ElemType::S32, ResizeConvertTo<MI_U32, MI_S32>, "ConvertToU32ToS32"},
-    {ElemType::U32, ElemType::F32, ResizeConvertTo<MI_U32, MI_F32>, "ConvertToU32ToF32"},
-    {ElemType::U32, ElemType::F64, ResizeConvertTo<MI_U32, MI_F64>, "ConvertToU32ToF64"},
+    {ElemType::U32, ElemType::U8,  ResizeConvertTo<DT_U32, DT_U8>,  "ConvertToU32ToU8" },
+    {ElemType::U32, ElemType::S8,  ResizeConvertTo<DT_U32, DT_S8>,  "ConvertToU32ToS8" },
+    {ElemType::U32, ElemType::U16, ResizeConvertTo<DT_U32, DT_U16>, "ConvertToU32ToU16"},
+    {ElemType::U32, ElemType::S16, ResizeConvertTo<DT_U32, DT_S16>, "ConvertToU32ToS16"},
+    {ElemType::U32, ElemType::U32, ResizeConvertTo<DT_U32, DT_U32>, "ConvertToU32ToU32"},
+    {ElemType::U32, ElemType::S32, ResizeConvertTo<DT_U32, DT_S32>, "ConvertToU32ToS32"},
+    {ElemType::U32, ElemType::F32, ResizeConvertTo<DT_U32, DT_F32>, "ConvertToU32ToF32"},
+    {ElemType::U32, ElemType::F64, ResizeConvertTo<DT_U32, DT_F64>, "ConvertToU32ToF64"},
 
     //S32
-    {ElemType::S32, ElemType::U8,  ResizeConvertTo<MI_S32, MI_U8>,  "ConvertToS32ToU8" },
-    {ElemType::S32, ElemType::S8,  ResizeConvertTo<MI_S32, MI_S8>,  "ConvertToS32ToS8" },
-    {ElemType::S32, ElemType::U16, ResizeConvertTo<MI_S32, MI_U16>, "ConvertToS32ToU16"},
-    {ElemType::S32, ElemType::S16, ResizeConvertTo<MI_S32, MI_S16>, "ConvertToS32ToS16"},
-    {ElemType::S32, ElemType::U32, ResizeConvertTo<MI_S32, MI_U32>, "ConvertToS32ToU32"},
-    {ElemType::S32, ElemType::S32, ResizeConvertTo<MI_S32, MI_S32>, "ConvertToS32ToS32"},
-    {ElemType::S32, ElemType::F32, ResizeConvertTo<MI_S32, MI_F32>, "ConvertToS32ToF32"},
-    {ElemType::S32, ElemType::F64, ResizeConvertTo<MI_S32, MI_F64>, "ConvertToS32ToF64"},
+    {ElemType::S32, ElemType::U8,  ResizeConvertTo<DT_S32, DT_U8>,  "ConvertToS32ToU8" },
+    {ElemType::S32, ElemType::S8,  ResizeConvertTo<DT_S32, DT_S8>,  "ConvertToS32ToS8" },
+    {ElemType::S32, ElemType::U16, ResizeConvertTo<DT_S32, DT_U16>, "ConvertToS32ToU16"},
+    {ElemType::S32, ElemType::S16, ResizeConvertTo<DT_S32, DT_S16>, "ConvertToS32ToS16"},
+    {ElemType::S32, ElemType::U32, ResizeConvertTo<DT_S32, DT_U32>, "ConvertToS32ToU32"},
+    {ElemType::S32, ElemType::S32, ResizeConvertTo<DT_S32, DT_S32>, "ConvertToS32ToS32"},
+    {ElemType::S32, ElemType::F32, ResizeConvertTo<DT_S32, DT_F32>, "ConvertToS32ToF32"},
+    {ElemType::S32, ElemType::F64, ResizeConvertTo<DT_S32, DT_F64>, "ConvertToS32ToF64"},
 
     //F32
-    {ElemType::F32, ElemType::U8,  ResizeConvertTo<MI_F32, MI_U8>,  "ConvertToF32ToU8" },
-    {ElemType::F32, ElemType::S8,  ResizeConvertTo<MI_F32, MI_S8>,  "ConvertToF32ToS8" },
-    {ElemType::F32, ElemType::U16, ResizeConvertTo<MI_F32, MI_U16>, "ConvertToF32ToU16"},
-    {ElemType::F32, ElemType::S16, ResizeConvertTo<MI_F32, MI_S16>, "ConvertToF32ToS16"},
-    {ElemType::F32, ElemType::U32, ResizeConvertTo<MI_F32, MI_U32>, "ConvertToF32ToU32"},
-    {ElemType::F32, ElemType::S32, ResizeConvertTo<MI_F32, MI_S32>, "ConvertToF32ToS32"},
-    {ElemType::F32, ElemType::F32, ResizeConvertTo<MI_F32, MI_F32>, "ConvertToF32ToF32"},
-    {ElemType::F32, ElemType::F64, ResizeConvertTo<MI_F32, MI_F64>, "ConvertToF32ToF64"},
+    {ElemType::F32, ElemType::U8,  ResizeConvertTo<DT_F32, DT_U8>,  "ConvertToF32ToU8" },
+    {ElemType::F32, ElemType::S8,  ResizeConvertTo<DT_F32, DT_S8>,  "ConvertToF32ToS8" },
+    {ElemType::F32, ElemType::U16, ResizeConvertTo<DT_F32, DT_U16>, "ConvertToF32ToU16"},
+    {ElemType::F32, ElemType::S16, ResizeConvertTo<DT_F32, DT_S16>, "ConvertToF32ToS16"},
+    {ElemType::F32, ElemType::U32, ResizeConvertTo<DT_F32, DT_U32>, "ConvertToF32ToU32"},
+    {ElemType::F32, ElemType::S32, ResizeConvertTo<DT_F32, DT_S32>, "ConvertToF32ToS32"},
+    {ElemType::F32, ElemType::F32, ResizeConvertTo<DT_F32, DT_F32>, "ConvertToF32ToF32"},
+    {ElemType::F32, ElemType::F64, ResizeConvertTo<DT_F32, DT_F64>, "ConvertToF32ToF64"},
 
     //F64
-    {ElemType::F64, ElemType::U8,  ResizeConvertTo<MI_F64, MI_U8>,  "ConvertToF64ToU8" },
-    {ElemType::F64, ElemType::S8,  ResizeConvertTo<MI_F64, MI_S8>,  "ConvertToF64ToS8" },
-    {ElemType::F64, ElemType::U16, ResizeConvertTo<MI_F64, MI_U16>, "ConvertToF64ToU16"},
-    {ElemType::F64, ElemType::S16, ResizeConvertTo<MI_F64, MI_S16>, "ConvertToF64ToS16"},
-    {ElemType::F64, ElemType::U32, ResizeConvertTo<MI_F64, MI_U32>, "ConvertToF64ToU32"},
-    {ElemType::F64, ElemType::S32, ResizeConvertTo<MI_F64, MI_S32>, "ConvertToF64ToS32"},
-    {ElemType::F64, ElemType::F32, ResizeConvertTo<MI_F64, MI_F32>, "ConvertToF64ToF32"},
-    {ElemType::F64, ElemType::F64, ResizeConvertTo<MI_F64, MI_F64>, "ConvertToF64ToF64"},
+    {ElemType::F64, ElemType::U8,  ResizeConvertTo<DT_F64, DT_U8>,  "ConvertToF64ToU8" },
+    {ElemType::F64, ElemType::S8,  ResizeConvertTo<DT_F64, DT_S8>,  "ConvertToF64ToS8" },
+    {ElemType::F64, ElemType::U16, ResizeConvertTo<DT_F64, DT_U16>, "ConvertToF64ToU16"},
+    {ElemType::F64, ElemType::S16, ResizeConvertTo<DT_F64, DT_S16>, "ConvertToF64ToS16"},
+    {ElemType::F64, ElemType::U32, ResizeConvertTo<DT_F64, DT_U32>, "ConvertToF64ToU32"},
+    {ElemType::F64, ElemType::S32, ResizeConvertTo<DT_F64, DT_S32>, "ConvertToF64ToS32"},
+    {ElemType::F64, ElemType::F32, ResizeConvertTo<DT_F64, DT_F32>, "ConvertToF64ToF32"},
+    {ElemType::F64, ElemType::F64, ResizeConvertTo<DT_F64, DT_F64>, "ConvertToF64ToF64"},
 
 #if defined(AURA_BUILD_HOST)
-    {ElemType::U8, ElemType::F16, ResizeConvertTo<MI_U8, MI_F16>, "ConvertToU8ToF16"},
-    {ElemType::S8, ElemType::F16, ResizeConvertTo<MI_S8, MI_F16>, "ConvertToS8ToF16"},
-    {ElemType::U16, ElemType::F16, ResizeConvertTo<MI_U16, MI_F16>, "ConvertToU16ToF16"},
-    {ElemType::S16, ElemType::F16, ResizeConvertTo<MI_S16, MI_F16>, "ConvertToS16ToF16"},
-    {ElemType::U32, ElemType::F16, ResizeConvertTo<MI_U32, MI_F16>, "ConvertToU32ToF16"},
-    {ElemType::S32, ElemType::F16, ResizeConvertTo<MI_S32, MI_F16>, "ConvertToS32ToF16"},
-    {ElemType::F32, ElemType::F16, ResizeConvertTo<MI_F32, MI_F16>, "ConvertToF32ToF16"},
+    {ElemType::U8, ElemType::F16, ResizeConvertTo<DT_U8, MI_F16>, "ConvertToU8ToF16"},
+    {ElemType::S8, ElemType::F16, ResizeConvertTo<DT_S8, MI_F16>, "ConvertToS8ToF16"},
+    {ElemType::U16, ElemType::F16, ResizeConvertTo<DT_U16, MI_F16>, "ConvertToU16ToF16"},
+    {ElemType::S16, ElemType::F16, ResizeConvertTo<DT_S16, MI_F16>, "ConvertToS16ToF16"},
+    {ElemType::U32, ElemType::F16, ResizeConvertTo<DT_U32, MI_F16>, "ConvertToU32ToF16"},
+    {ElemType::S32, ElemType::F16, ResizeConvertTo<DT_S32, MI_F16>, "ConvertToS32ToF16"},
+    {ElemType::F32, ElemType::F16, ResizeConvertTo<DT_F32, MI_F16>, "ConvertToF32ToF16"},
     //F16
-    {ElemType::F16, ElemType::U8,  ResizeConvertTo<MI_F16, MI_U8>,  "ConvertToF16ToU8" },
-    {ElemType::F16, ElemType::S8,  ResizeConvertTo<MI_F16, MI_S8>,  "ConvertToF16ToS8" },
-    {ElemType::F16, ElemType::U16, ResizeConvertTo<MI_F16, MI_U16>, "ConvertToF16ToU16"},
-    {ElemType::F16, ElemType::S16, ResizeConvertTo<MI_F16, MI_S16>, "ConvertToF16ToS16"},
-    {ElemType::F16, ElemType::U32, ResizeConvertTo<MI_F16, MI_U32>, "ConvertToF16ToU32"},
-    {ElemType::F16, ElemType::S32, ResizeConvertTo<MI_F16, MI_S32>, "ConvertToF16ToS32"},
+    {ElemType::F16, ElemType::U8,  ResizeConvertTo<MI_F16, DT_U8>,  "ConvertToF16ToU8" },
+    {ElemType::F16, ElemType::S8,  ResizeConvertTo<MI_F16, DT_S8>,  "ConvertToF16ToS8" },
+    {ElemType::F16, ElemType::U16, ResizeConvertTo<MI_F16, DT_U16>, "ConvertToF16ToU16"},
+    {ElemType::F16, ElemType::S16, ResizeConvertTo<MI_F16, DT_S16>, "ConvertToF16ToS16"},
+    {ElemType::F16, ElemType::U32, ResizeConvertTo<MI_F16, DT_U32>, "ConvertToF16ToU32"},
+    {ElemType::F16, ElemType::S32, ResizeConvertTo<MI_F16, DT_S32>, "ConvertToF16ToS32"},
     {ElemType::F16, ElemType::F16, ResizeConvertTo<MI_F16, MI_F16>, "ConvertToF16ToF16"},
-    {ElemType::F16, ElemType::F32, ResizeConvertTo<MI_F16, MI_F32>, "ConvertToF16ToF32"},
-    {ElemType::F16, ElemType::F64, ResizeConvertTo<MI_F16, MI_F64>, "ConvertToF16ToF64"},
-    {ElemType::F64, ElemType::F16, ResizeConvertTo<MI_F64, MI_F16>, "ConvertToF64ToF16"},
+    {ElemType::F16, ElemType::F32, ResizeConvertTo<MI_F16, DT_F32>, "ConvertToF16ToF32"},
+    {ElemType::F16, ElemType::F64, ResizeConvertTo<MI_F16, DT_F64>, "ConvertToF16ToF64"},
+    {ElemType::F64, ElemType::F16, ResizeConvertTo<DT_F64, MI_F16>, "ConvertToF64ToF16"},
 #endif // AURA_BUILD_HOST
 
 };
 
 static const ResizeConvertToImpl* GetResizeConvertToFunc(const Mat &mat0, const Mat &mat1)
 {
-    const MI_S32 n_func = sizeof(g_resize_convert_to_tbl) / sizeof(g_resize_convert_to_tbl[0]);
+    const DT_S32 n_func = sizeof(g_resize_convert_to_tbl) / sizeof(g_resize_convert_to_tbl[0]);
     const ElemType type0 = mat0.GetElemType();
     const ElemType type1 = mat1.GetElemType();
 
-    for (MI_S32 i = 0; i < n_func; i++)
+    for (DT_S32 i = 0; i < n_func; i++)
     {
         if ((type0 == g_resize_convert_to_tbl[i].src_type) &&
             (type1 == g_resize_convert_to_tbl[i].dst_type))
@@ -186,43 +186,43 @@ static const ResizeConvertToImpl* GetResizeConvertToFunc(const Mat &mat0, const 
         }
     }
 
-    return MI_NULL;
+    return DT_NULL;
 }
 
 // if mat1 and mat2 point to same memory block, return true.
-static MI_BOOL CompareMatData(const Mat &mat1, const Mat &mat2)
+static DT_BOOL CompareMatData(const Mat &mat1, const Mat &mat2)
 {
     if (mat1.GetData() != mat2.GetData())
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
-    return MI_TRUE;
+    return DT_TRUE;
 }
 
-static MI_BOOL operator==(const MatDesc &desc0, const MatDesc &desc1)
+static DT_BOOL operator==(const MatDesc &desc0, const MatDesc &desc1)
 {
     // if is the same mat type
     if (desc0.type != desc1.type)
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
     // if is the same elem type
     if (desc0.elem_type != desc1.elem_type)
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
     // if is the same mem type
     if (desc0.mem_type != desc1.mem_type)
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
     if (desc0.sizes != desc1.sizes)
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
     if (desc0.strides != desc1.strides)
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
 
     // compare type info
@@ -232,7 +232,7 @@ static MI_BOOL operator==(const MatDesc &desc0, const MatDesc &desc1)
         {
             if (strcmp(desc0.param.file_path, desc1.param.file_path))
             {
-                return MI_FALSE;
+                return DT_FALSE;
             }
             break;
         }
@@ -241,7 +241,7 @@ static MI_BOOL operator==(const MatDesc &desc0, const MatDesc &desc1)
             if ((desc0.param.rand_range.min != desc1.param.rand_range.min) ||
                 (desc0.param.rand_range.max != desc1.param.rand_range.max))
             {
-                return MI_FALSE;
+                return DT_FALSE;
             }
             break;
         }
@@ -251,7 +251,7 @@ static MI_BOOL operator==(const MatDesc &desc0, const MatDesc &desc1)
                 (desc0.param.derived_param.beta  != desc1.param.derived_param.beta)  ||
                 (desc0.param.derived_param.base  != desc1.param.derived_param.base))
             {
-                return MI_FALSE;
+                return DT_FALSE;
             }
             break;
         }
@@ -261,14 +261,14 @@ static MI_BOOL operator==(const MatDesc &desc0, const MatDesc &desc1)
         }
         default:
         {
-            return MI_FALSE;
+            return DT_FALSE;
         }
     }
 
-    return MI_TRUE;
+    return DT_TRUE;
 }
 
-Status MatFactory::LoadBaseMat(const std::string &file_path, const ElemType &elem_type, const Sizes3 &sizes, MI_S32 mem_type, const Sizes &strides)
+Status MatFactory::LoadBaseMat(const std::string &file_path, const ElemType &elem_type, const Sizes3 &sizes, DT_S32 mem_type, const Sizes &strides)
 {
     MatDesc desc;
     desc.type = MatDesc::Type::FILE;
@@ -296,7 +296,7 @@ Status MatFactory::LoadBaseMat(const std::string &file_path, const ElemType &ele
     if (mat.IsValid())
     {
         std::lock_guard<std::mutex> guard(this->m_handle_lock);
-        m_base_list.push_back({desc, mat, MI_TRUE});
+        m_base_list.push_back({desc, mat, DT_TRUE});
         return Status::OK;
     }
     else
@@ -306,7 +306,7 @@ Status MatFactory::LoadBaseMat(const std::string &file_path, const ElemType &ele
     }
 }
 
-Mat* MatFactory::FindBaseMat(const MI_S32 channel, const std::string &file_path)
+Mat* MatFactory::FindBaseMat(const DT_S32 channel, const std::string &file_path)
 {
     std::lock_guard<std::mutex> guard(this->m_handle_lock);
 
@@ -328,7 +328,7 @@ Mat* MatFactory::FindBaseMat(const MI_S32 channel, const std::string &file_path)
         }
     }
 
-    return MI_NULL;
+    return DT_NULL;
 }
 
 Mat MatFactory::FindDynamicMat(const MatDesc &desc)
@@ -339,9 +339,9 @@ Mat MatFactory::FindDynamicMat(const MatDesc &desc)
         for (auto it = this->m_dynamic_list.begin(); it != this->m_dynamic_list.end();)
         {
             // find matched one and available
-            if ((MI_TRUE == it->available) && desc == it->desc)
+            if ((DT_TRUE == it->available) && desc == it->desc)
             {
-                it->available = MI_FALSE;
+                it->available = DT_FALSE;
                 MatInfo info;
                 std::swap(info, *it);
                 this->m_dynamic_list.erase(it);
@@ -361,7 +361,7 @@ Mat MatFactory::FindDynamicMat(const MatDesc &desc)
             std::lock_guard<std::mutex> guard(this->m_handle_lock);
 
             this->m_total_mem += mat.GetTotalBytes();
-            this->m_dynamic_list.push_back({desc, mat, MI_FALSE});
+            this->m_dynamic_list.push_back({desc, mat, DT_FALSE});
         }
         else
         {
@@ -378,7 +378,7 @@ Mat MatFactory::FindDynamicMat(const MatDesc &desc)
         {
             if (desc == it->desc)
             {
-                MatInfo info = {it->desc, it->mat.Clone(), MI_FALSE};
+                MatInfo info = {it->desc, it->mat.Clone(), DT_FALSE};
                 this->m_dynamic_list.push_back(info);
                 this->m_total_mem += it->mat.GetTotalBytes(); // how to add lock in this place
 
@@ -435,7 +435,7 @@ Mat MatFactory::CreateMat(const MatDesc &desc)
     return mat;
 }
 
-Mat MatFactory::GetFileMat(const std::string &file_path, const ElemType &elem_type, const Sizes3 &sizes, MI_S32 mem_type, const Sizes &strides)
+Mat MatFactory::GetFileMat(const std::string &file_path, const ElemType &elem_type, const Sizes3 &sizes, DT_S32 mem_type, const Sizes &strides)
 {
     MatDesc desc;
     desc.type = MatDesc::Type::FILE;
@@ -461,7 +461,7 @@ Mat MatFactory::GetFileMat(const std::string &file_path, const ElemType &elem_ty
             if (desc == it.desc)
             {
                 Mat mat_clone = it.mat.Clone();
-                this->m_dynamic_list.push_back({desc, mat_clone, MI_FALSE});
+                this->m_dynamic_list.push_back({desc, mat_clone, DT_FALSE});
                 return mat_clone;
             }
         }
@@ -473,7 +473,7 @@ Mat MatFactory::GetFileMat(const std::string &file_path, const ElemType &elem_ty
     if (mat_new.IsValid())
     {
         std::lock_guard<std::mutex> guard(this->m_handle_lock);
-        this->m_dynamic_list.push_back({desc, mat_new, MI_FALSE});
+        this->m_dynamic_list.push_back({desc, mat_new, DT_FALSE});
         this->m_total_mem += mat_new.GetTotalBytes();
     }
     else
@@ -485,14 +485,14 @@ Mat MatFactory::GetFileMat(const std::string &file_path, const ElemType &elem_ty
     return mat_new;
 }
 
-Mat MatFactory::GetDerivedMat(MI_F32 alpha, MI_F32 beta, const ElemType &elem_type, const Sizes3 &sizes,
-                              MI_S32 mem_type, const Sizes &strides, const std::string &file_path)
+Mat MatFactory::GetDerivedMat(DT_F32 alpha, DT_F32 beta, const ElemType &elem_type, const Sizes3 &sizes,
+                              DT_S32 mem_type, const Sizes &strides, const std::string &file_path)
 {
     // if it exists matched base mat
-    Mat *base_mat_ptr = MI_NULL;
+    Mat *base_mat_ptr = DT_NULL;
     base_mat_ptr = FindBaseMat(sizes.m_channel, file_path);
 
-    if (MI_NULL == base_mat_ptr)
+    if (DT_NULL == base_mat_ptr)
     {
         AURA_ADD_ERROR_STRING(this->m_ctx, "cannot find matched base mat");
         return Mat();
@@ -521,7 +521,7 @@ Mat MatFactory::GetDerivedMat(MI_F32 alpha, MI_F32 beta, const ElemType &elem_ty
     {
         std::lock_guard<std::mutex> guard(this->m_handle_lock);
         this->m_total_mem += mat.GetTotalBytes();
-        this->m_dynamic_list.push_back({desc, mat, MI_FALSE});
+        this->m_dynamic_list.push_back({desc, mat, DT_FALSE});
     }
     else
     {
@@ -533,7 +533,7 @@ Mat MatFactory::GetDerivedMat(MI_F32 alpha, MI_F32 beta, const ElemType &elem_ty
     return mat;
 }
 
-Mat MatFactory::GetRandomMat(MI_F32 min, MI_F32 max, const ElemType &elem_type, const Sizes3 &sizes, MI_S32 mem_type, const Sizes &strides)
+Mat MatFactory::GetRandomMat(DT_F32 min, DT_F32 max, const ElemType &elem_type, const Sizes3 &sizes, DT_S32 mem_type, const Sizes &strides)
 {
     MatDesc desc;
     desc.type             = MatDesc::Type::RAND;
@@ -553,7 +553,7 @@ Mat MatFactory::GetRandomMat(MI_F32 min, MI_F32 max, const ElemType &elem_type, 
     return mat;
 }
 
-Mat MatFactory::GetEmptyMat(const ElemType &elem_type, const Sizes3 &sizes, MI_S32 mem_type, const Sizes &strides)
+Mat MatFactory::GetEmptyMat(const ElemType &elem_type, const Sizes3 &sizes, DT_S32 mem_type, const Sizes &strides)
 {
     MatDesc desc;
     desc.type      = MatDesc::Type::EMPTY;
@@ -572,7 +572,7 @@ Mat MatFactory::GetEmptyMat(const ElemType &elem_type, const Sizes3 &sizes, MI_S
     return mat;
 }
 
-AURA_VOID MatFactory::PutMats(Mat &mat)
+DT_VOID MatFactory::PutMats(Mat &mat)
 {
     std::lock_guard<std::mutex> guard(this->m_handle_lock);
 
@@ -580,23 +580,23 @@ AURA_VOID MatFactory::PutMats(Mat &mat)
     {
         if (CompareMatData(it->mat, mat))
         {
-            it->available = MI_TRUE;
+            it->available = DT_TRUE;
             return;
         }
         it++;
     }
 }
 
-AURA_VOID MatFactory::PutAllMats()
+DT_VOID MatFactory::PutAllMats()
 {
     std::lock_guard<std::mutex> guard(this->m_handle_lock);
     for (auto it = this->m_dynamic_list.begin(); it != this->m_dynamic_list.end(); ++it)
     {
-        it->available = MI_TRUE;
+        it->available = DT_TRUE;
     }
 }
 
-AURA_VOID MatFactory::Clear()
+DT_VOID MatFactory::Clear()
 {
     std::lock_guard<std::mutex> guard(this->m_handle_lock);
     this->m_dynamic_list.clear();
@@ -618,7 +618,7 @@ Status MatFactory::CreateMat(Mat &mat, const std::string &file)
     }
 
     FILE *fp = fopen(file.c_str(), "rb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "file " + file + " open failed";
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -627,7 +627,7 @@ Status MatFactory::CreateMat(Mat &mat, const std::string &file)
 
     fseek(fp, 0, SEEK_END);
 
-    MI_S32 file_length = ftell(fp);
+    DT_S32 file_length = ftell(fp);
 
     if (file_length < mat.GetTotalBytes())
     {
@@ -639,7 +639,7 @@ Status MatFactory::CreateMat(Mat &mat, const std::string &file)
 
     size_t bytes = fread(mat.GetData(), 1, mat.GetTotalBytes(), fp);
 
-    if (static_cast<MI_S32>(bytes) != mat.GetTotalBytes())
+    if (static_cast<DT_S32>(bytes) != mat.GetTotalBytes())
     {
         std::string info = "fread size(" + std::to_string(bytes) + "," + std::to_string(mat.GetTotalBytes()) + ") not match";
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -655,24 +655,24 @@ EXIT:
     return Status::OK;
 }
 
-Status MatFactory::CreateMat(Mat &new_mat, MI_F32 min, MI_F32 max)
+Status MatFactory::CreateMat(Mat &new_mat, DT_F32 min, DT_F32 max)
 {
     // fill mat with random data
     if (ElemType::U8 == new_mat.GetElemType())
     {
-        FillMatWithRandom_<MI_U8>(m_rand_engine, new_mat, min, max);
+        FillMatWithRandom_<DT_U8>(m_rand_engine, new_mat, min, max);
     }
     else if (ElemType::S8 == new_mat.GetElemType())
     {
-        FillMatWithRandom_<MI_S8>(m_rand_engine, new_mat, min, max);
+        FillMatWithRandom_<DT_S8>(m_rand_engine, new_mat, min, max);
     }
     else if (ElemType::U16 == new_mat.GetElemType())
     {
-        FillMatWithRandom_<MI_U16>(m_rand_engine, new_mat, min, max);
+        FillMatWithRandom_<DT_U16>(m_rand_engine, new_mat, min, max);
     }
     else if (ElemType::S16 == new_mat.GetElemType())
     {
-        FillMatWithRandom_<MI_S16>(m_rand_engine, new_mat, min, max);
+        FillMatWithRandom_<DT_S16>(m_rand_engine, new_mat, min, max);
     }
 #if defined(AURA_BUILD_HOST)
     else if (ElemType::F16 == new_mat.GetElemType())
@@ -682,19 +682,19 @@ Status MatFactory::CreateMat(Mat &new_mat, MI_F32 min, MI_F32 max)
 #endif // AURA_BUILD_HOST
     else if (ElemType::U32 == new_mat.GetElemType())
     {
-        FillMatWithRandom_<MI_U32>(m_rand_engine, new_mat, min, max);
+        FillMatWithRandom_<DT_U32>(m_rand_engine, new_mat, min, max);
     }
     else if (ElemType::S32 == new_mat.GetElemType())
     {
-        FillMatWithRandom_<MI_S32>(m_rand_engine, new_mat, min, max);
+        FillMatWithRandom_<DT_S32>(m_rand_engine, new_mat, min, max);
     }
     else if (ElemType::F32 == new_mat.GetElemType())
     {
-        FillMatWithRandom_<MI_F32>(m_rand_engine, new_mat, min, max);
+        FillMatWithRandom_<DT_F32>(m_rand_engine, new_mat, min, max);
     }
     else if (ElemType::F64 == new_mat.GetElemType())
     {
-        FillMatWithRandom_<MI_F64>(m_rand_engine, new_mat, min, max);
+        FillMatWithRandom_<DT_F64>(m_rand_engine, new_mat, min, max);
     }
     else
     {
@@ -705,7 +705,7 @@ Status MatFactory::CreateMat(Mat &new_mat, MI_F32 min, MI_F32 max)
     return Status::OK;
 }
 
-Status MatFactory::CreateMat(const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta)
+Status MatFactory::CreateMat(const Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta)
 {
     if (!src.IsValid() || !dst.IsValid())
     {
@@ -719,7 +719,7 @@ Status MatFactory::CreateMat(const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta
     }
 
     const ResizeConvertToImpl *impl = GetResizeConvertToFunc(src, dst);
-    if (MI_NULL == impl)
+    if (DT_NULL == impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "impl ptr is null ");
         return Status::ERROR;
@@ -730,20 +730,20 @@ Status MatFactory::CreateMat(const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta
     return Status::OK;
 }
 
-AURA_VOID MatFactory::CheckTotalMemory()
+DT_VOID MatFactory::CheckTotalMemory()
 {
     std::lock_guard<std::mutex> guard(this->m_handle_lock);
 
     while (this->m_total_mem > this->m_max_mem)
     {
-        MI_BOOL is_find_available = MI_FALSE;
+        DT_BOOL is_find_available = DT_FALSE;
         for (auto it = this->m_dynamic_list.begin(); it != this->m_dynamic_list.end(); ++it)
         {
             if ((*it).available)
             {
                 this->m_total_mem -= it->mat.GetTotalBytes();
                 this->m_dynamic_list.erase(it);
-                is_find_available = MI_TRUE;
+                is_find_available = DT_TRUE;
                 break;
             }
         }
@@ -759,14 +759,14 @@ AURA_VOID MatFactory::CheckTotalMemory()
     }
 }
 
-AURA_VOID MatFactory::PrintInfo()
+DT_VOID MatFactory::PrintInfo()
 {
     std::lock_guard<std::mutex> guard(this->m_handle_lock);
     std::ostringstream os;
     os << "mat factory info:" << std::endl;
 
-    MI_S64 base_bytes   = 0; // total bytes of basic mat list
-    MI_S64 base_mat_num = 0; // number of base mat
+    DT_S64 base_bytes   = 0; // total bytes of basic mat list
+    DT_S64 base_mat_num = 0; // number of base mat
     for (auto it = this->m_base_list.begin(); it != this->m_base_list.end(); it++)
     {
         base_bytes += it->mat.GetTotalBytes();
@@ -779,23 +779,23 @@ AURA_VOID MatFactory::PrintInfo()
         os << "file path: " << it->desc.param.file_path << " | bytes: " << it->mat.GetTotalBytes() << "B" << std::endl;
     }
 
-    MI_S64 total_bytes_dynamic  = 0; // total bytes of dynamic mat list
+    DT_S64 total_bytes_dynamic  = 0; // total bytes of dynamic mat list
     // Mat info from FILE type
-    MI_S64 file_bytes            = 0;
-    MI_S64 file_num_total        = 0;
-    MI_S64 file_num_available    = 0;
+    DT_S64 file_bytes            = 0;
+    DT_S64 file_num_total        = 0;
+    DT_S64 file_num_available    = 0;
     // Mat info from RANDOM type
-    MI_S64 random_bytes          = 0;
-    MI_S64 random_num_total      = 0;
-    MI_S64 random_num_available  = 0;
+    DT_S64 random_bytes          = 0;
+    DT_S64 random_num_total      = 0;
+    DT_S64 random_num_available  = 0;
     // Mat info from DERIVED type
-    MI_S64 mat_bytes             = 0;
-    MI_S64 mat_num_total         = 0;
-    MI_S64 mat_num_available     = 0;
+    DT_S64 mat_bytes             = 0;
+    DT_S64 mat_num_total         = 0;
+    DT_S64 mat_num_available     = 0;
     // Mat info from EMPTY type
-    MI_S64 empty_bytes           = 0;
-    MI_S64 empty_num_total       = 0;
-    MI_S64 empty_num_available   = 0;
+    DT_S64 empty_bytes           = 0;
+    DT_S64 empty_num_total       = 0;
+    DT_S64 empty_num_available   = 0;
 
     for (auto it = this->m_dynamic_list.begin(); it != this->m_dynamic_list.end(); it++)
     {

@@ -16,7 +16,7 @@ struct ExecInfo
     Time start;
     Time end;
     Status status;
-    MI_U64 thread_id;
+    DT_U64 thread_id;
 };
 
 struct NodeExec
@@ -43,21 +43,21 @@ struct ArrayProfiling
     ArrayType array_type;
     Sizes3 sizes;
     Sizes strides;
-    MI_S64 total_bytes;
+    DT_S64 total_bytes;
 #if defined(AURA_ENABLE_OPENCL)
     CLMemParam cl_param;
 #endif // AURA_ENABLE_OPENCL
     std::string buffer_name;
-    MI_S32 offset;
+    DT_S32 offset;
     ExecInfo alloc;
     ExecInfo free;
 };
 
 struct BufferProfiling
 {
-    MI_S32 type;
-    MI_S64 capacity;
-    MI_S32 property;
+    DT_S32 type;
+    DT_S64 capacity;
+    DT_S32 property;
     ExecInfo alloc;
     ExecInfo free;
 };
@@ -67,15 +67,15 @@ class Profiler::Impl
 public:
     Impl(Context *ctx);
 
-    MI_BOOL IsEnablePerf() const;
-    AURA_VOID Initialize(MI_BOOL enable_perf);
+    DT_BOOL IsEnablePerf() const;
+    DT_VOID Initialize(DT_BOOL enable_perf);
 
     Status AddNewNode(Node *node);
     Status AddNodeProfiling(Node *node, const Time &start, const Time &end, Status result, NodeExecType exec_type);
     Status UpdateNodeOutputs(const std::string &node_name, const std::vector<const Array*> &outputs);
 
     // array
-    Status AddCreateArrayProfiling(const std::string &name, const Array *array, const Time &start, const Time &end, MI_BOOL add_buffer = MI_TRUE);
+    Status AddCreateArrayProfiling(const std::string &name, const Array *array, const Time &start, const Time &end, DT_BOOL add_buffer = DT_TRUE);
     Status AddDeleteArrayProfiling(const Array *array, const Buffer &buffer, const Time &start, const Time &end);
 
     // buffer
@@ -97,16 +97,16 @@ private:
     Status AddExternalMemImpl(const std::string &name, const Buffer &buffer);
 
     Context *m_ctx;
-    MI_BOOL m_enable_perf;
+    DT_BOOL m_enable_perf;
     std::mutex m_mutex;
-    std::unordered_set<AURA_VOID*> m_external_mem;
+    std::unordered_set<DT_VOID*> m_external_mem;
     std::unordered_map<const Array*, std::string> m_array_map;
-    std::unordered_map<AURA_VOID*, std::string> m_buffer_map;
+    std::unordered_map<DT_VOID*, std::string> m_buffer_map;
     std::unordered_map<std::string, NodeProfiling> m_node_profiling;
     std::unordered_map<std::string, ArrayProfiling> m_array_profiling;
     std::unordered_map<std::string, BufferProfiling> m_buffer_profiling;
-    std::unordered_map<std::string, MI_U32> m_repeat_arrays;
-    std::unordered_map<std::string, MI_U32> m_repeat_buffers;
+    std::unordered_map<std::string, DT_U32> m_repeat_arrays;
+    std::unordered_map<std::string, DT_U32> m_repeat_buffers;
 };
 
 } // namespace aura

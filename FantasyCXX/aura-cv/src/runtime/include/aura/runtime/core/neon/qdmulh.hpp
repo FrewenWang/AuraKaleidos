@@ -27,10 +27,10 @@ DECLFUN(int32x4_t,   int32x4_t,   vqdmulhq, s32)
         return prefix##_##postfix(v, u);                 \
     }
 
-DECLFUN(int16x4_t, MI_S16, int16x4_t,  vqdmulh_n,  s16)
-DECLFUN(int16x8_t, MI_S16, int16x8_t,  vqdmulhq_n, s16)
-DECLFUN(int32x2_t, MI_S32, int32x2_t,  vqdmulh_n,  s32)
-DECLFUN(int32x4_t, MI_S32, int32x4_t,  vqdmulhq_n, s32)
+DECLFUN(int16x4_t, DT_S16, int16x4_t,  vqdmulh_n,  s16)
+DECLFUN(int16x8_t, DT_S16, int16x8_t,  vqdmulhq_n, s16)
+DECLFUN(int32x2_t, DT_S32, int32x2_t,  vqdmulh_n,  s32)
+DECLFUN(int32x4_t, DT_S32, int32x4_t,  vqdmulhq_n, s32)
 #undef DECLFUN
 
 #define DECLFUN(dtype, vtype, prefix, postfix)                  \
@@ -64,10 +64,10 @@ DECLFUN(int32x4_t,   int32x4_t,   vqrdmulhq, s32)
         return prefix##_##postfix(v, u);                  \
     }
 
-DECLFUN(int16x4_t, MI_S16, int16x4_t,  vqrdmulh_n,  s16)
-DECLFUN(int16x8_t, MI_S16, int16x8_t,  vqrdmulhq_n, s16)
-DECLFUN(int32x2_t, MI_S32, int32x2_t,  vqrdmulh_n,  s32)
-DECLFUN(int32x4_t, MI_S32, int32x4_t,  vqrdmulhq_n, s32)
+DECLFUN(int16x4_t, DT_S16, int16x4_t,  vqrdmulh_n,  s16)
+DECLFUN(int16x8_t, DT_S16, int16x8_t,  vqrdmulhq_n, s16)
+DECLFUN(int32x2_t, DT_S32, int32x2_t,  vqrdmulh_n,  s32)
+DECLFUN(int32x4_t, DT_S32, int32x4_t,  vqrdmulhq_n, s32)
 #undef DECLFUN
 
 #define DECLFUN(dtype, vtype, prefix, postfix)                  \

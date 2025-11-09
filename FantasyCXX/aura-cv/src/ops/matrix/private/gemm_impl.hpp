@@ -23,7 +23,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
 
@@ -68,19 +68,19 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, MI_S32 elem_counts, MI_S32 load_size);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, DT_S32 elem_counts, DT_S32 load_size);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
     CLMem                 m_cl_src0;
     CLMem                 m_cl_src1;
     CLMem                 m_cl_dst;
-    MI_S32                m_bm = 64;
-    MI_S32                m_bn = 64;
-    MI_S32                m_bk = 8;
-    MI_S32                m_local_size_x;
-    MI_S32                m_local_size_y;
-    MI_S32                m_elem_counts;
+    DT_S32                m_bm = 64;
+    DT_S32                m_bn = 64;
+    DT_S32                m_bk = 8;
+    DT_S32                m_local_size_x;
+    DT_S32                m_local_size_y;
+    DT_S32                m_elem_counts;
 
     std::string m_profiling_string;
 };
@@ -105,7 +105,7 @@ private:
     CLMem                 m_cl_src0;
     CLMem                 m_cl_src1;
     CLMem                 m_cl_dst;
-    MI_S32                m_elem_counts;
+    DT_S32                m_elem_counts;
 
     std::string m_profiling_string;
 };

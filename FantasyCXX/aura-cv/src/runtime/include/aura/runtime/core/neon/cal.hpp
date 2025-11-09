@@ -9,7 +9,7 @@ namespace neon
 
 #define DECLFUN(dtype, vtype, prefix, postfix)                                        \
     template <typename T>                                                             \
-    inline typename std::enable_if<std::is_same<T, MI_F32>::value, dtype>::type       \
+    inline typename std::enable_if<std::is_same<T, DT_F32>::value, dtype>::type       \
     vcale(const vtype &v, const vtype &u)                                             \
     {                                                                                 \
         return prefix##_##postfix(v, u);                                              \
@@ -21,7 +21,7 @@ DECLFUN(uint32x4_t, float32x4_t, vcaleq, f32)
 
 #define DECLFUN(dtype, vtype, prefix, postfix)                                        \
     template <typename T>                                                             \
-    inline typename std::enable_if<std::is_same<T, MI_F32>::value, dtype>::type       \
+    inline typename std::enable_if<std::is_same<T, DT_F32>::value, dtype>::type       \
     vcalt(const vtype &v, const vtype &u)                                             \
     {                                                                                 \
         return prefix##_##postfix(v, u);                                              \

@@ -8,17 +8,17 @@ namespace aura
 template <typename Tp>
 struct GaussianTraits
 {
-    // Tp = MI_F32, MI_U8 MI_U16 MI_S16 MI_F16
+    // Tp = DT_F32, DT_U8 DT_U16 DT_S16 MI_F16
     using KernelType = typename std::conditional<sizeof(Tp) == 4, Tp, typename Promote<Tp>::Type>::type;
-    // Tp = MI_F16 MI_F32, MI_U8, MI_U16 MI_S16
-    static constexpr MI_U32 Q = is_floating_point<Tp>::value ? 0 : (sizeof(Tp) == 2 ? 14 : 8);
+    // Tp = MI_F16 DT_F32, DT_U8, DT_U16 DT_S16
+    static constexpr DT_U32 Q = is_floating_point<Tp>::value ? 0 : (sizeof(Tp) == 2 ? 14 : 8);
 };
 
 
 GaussianNeon::GaussianNeon(Context *ctx, const OpTarget &target) : GaussianImpl(ctx, target)
 {}
 
-Status GaussianNeon::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+Status GaussianNeon::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                              BorderType border_type, const Scalar &border_value)
 {
     if (GaussianImpl::SetArgs(src, dst, ksize, sigma, border_type, border_value) != Status::OK)
@@ -39,7 +39,7 @@ Status GaussianNeon::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
 
     if (ch != 1 && ch != 2 && ch != 3)
     {
@@ -52,11 +52,11 @@ Status GaussianNeon::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 
 
 Status GaussianNeon::PrepareKmat()
 {
-    std::vector<MI_F32> kernel = GetGaussianKernel(m_ksize, m_sigma);
+    std::vector<DT_F32> kernel = GetGaussianKernel(m_ksize, m_sigma);
 
 #define GET_GAUSSIAN_KMAT(type)                                     \
     using KernelType   = typename GaussianTraits<type>::KernelType; \
-    constexpr MI_U32 Q = GaussianTraits<type>::Q;                   \
+    constexpr DT_U32 Q = GaussianTraits<type>::Q;                   \
                                                                     \
     m_kmat = GetGaussianKmat<KernelType, Q>(m_ctx, kernel);         \
 
@@ -64,19 +64,19 @@ Status GaussianNeon::PrepareKmat()
     {
         case ElemType::U8:
         {
-            GET_GAUSSIAN_KMAT(MI_U8)
+            GET_GAUSSIAN_KMAT(DT_U8)
             break;
         }
 
         case ElemType::U16:
         {
-            GET_GAUSSIAN_KMAT(MI_U16)
+            GET_GAUSSIAN_KMAT(DT_U16)
             break;
         }
 
         case ElemType::S16:
         {
-            GET_GAUSSIAN_KMAT(MI_S16)
+            GET_GAUSSIAN_KMAT(DT_S16)
             break;
         }
 
@@ -130,7 +130,7 @@ Status GaussianNeon::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;

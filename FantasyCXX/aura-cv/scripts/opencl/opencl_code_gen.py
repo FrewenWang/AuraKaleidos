@@ -128,7 +128,7 @@ class CodeGenerator:
         source = f"""
             #include \"aura/runtime/opencl/cl_runtime.hpp\"
 
-            static const MI_CHAR g_cl_program_string[]
+            static const DT_CHAR g_cl_program_string[]
             {{
                 {code_str}
             }};

@@ -356,7 +356,7 @@ public:
     AURA_API_PTR(Snpe_StringList_Append);
 
 private:
-    SnpeLibrary() : NNLibrary(), m_handle(MI_NULL)
+    SnpeLibrary() : NNLibrary(), m_handle(DT_NULL)
     {
         Load();
     }
@@ -374,7 +374,7 @@ private:
 
         dlerror();
         m_handle = dlopen(g_snpe_lib_name.c_str(), RTLD_LAZY | RTLD_LOCAL);
-        if (MI_NULL == m_handle)
+        if (DT_NULL == m_handle)
         {
             std::string info = "dlopen libSNPE.so failed, err : " + std::string(dlerror());
             AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
@@ -470,14 +470,14 @@ private:
                 AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
                 ret = Status::ERROR;
             }
-            m_handle = MI_NULL;
+            m_handle = DT_NULL;
         }
 
         return ret;
     }
 
 private:
-    AURA_VOID *m_handle;
+    DT_VOID *m_handle;
 };
 
 static Snpe_DlVersion_Handle_t Snpe_Util_GetLibraryVersion(Context *ctx)
@@ -490,7 +490,7 @@ static Snpe_DlVersion_Handle_t Snpe_Util_GetLibraryVersion(Context *ctx)
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_Util_GetLibraryVersion is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -518,11 +518,11 @@ static const char *Snpe_DlVersion_ToString(Context *ctx, Snpe_DlVersion_Handle_t
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_DlVersion_ToString is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
-static Snpe_DlContainer_Handle_t Snpe_DlContainer_OpenBuffer(Context *ctx, const MI_UCHAR *buffer, const size_t size)
+static Snpe_DlContainer_Handle_t Snpe_DlContainer_OpenBuffer(Context *ctx, const DT_UCHAR *buffer, const size_t size)
 {
     auto func = SnpeLibrary::Get().Snpe_DlContainer_OpenBuffer;
     if (func)
@@ -532,7 +532,7 @@ static Snpe_DlContainer_Handle_t Snpe_DlContainer_OpenBuffer(Context *ctx, const
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_DlContainer_OpenBuffer is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -574,7 +574,7 @@ static Snpe_RuntimeList_Handle_t Snpe_RuntimeList_Create(Context *ctx)
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_RuntimeList_Create is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -616,7 +616,7 @@ static Snpe_SNPEBuilder_Handle_t Snpe_SNPEBuilder_Create(Context *ctx, Snpe_DlCo
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPEBuilder_Create is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -686,7 +686,7 @@ static Snpe_SNPE_Handle_t Snpe_SNPEBuilder_Build(Context *ctx, Snpe_SNPEBuilder_
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPEBuilder_Build is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -800,7 +800,7 @@ static Snpe_IDiagLog_Handle_t Snpe_SNPE_GetDiagLogInterface_Ref(Context *ctx, Sn
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPE_GetDiagLogInterface_Ref is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -814,7 +814,7 @@ static Snpe_StringList_Handle_t Snpe_SNPE_GetInputTensorNames(Context *ctx, Snpe
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPE_GetInputTensorNames is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -828,7 +828,7 @@ static Snpe_StringList_Handle_t Snpe_SNPE_GetOutputTensorNames(Context *ctx, Snp
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPE_GetOutputTensorNames is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -842,7 +842,7 @@ static Snpe_PlatformConfig_Handle_t Snpe_PlatformConfig_Create(Context *ctx)
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_PlatformConfig_Create is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -884,7 +884,7 @@ static Snpe_IBufferAttributes_Handle_t Snpe_SNPE_GetInputOutputBufferAttributes(
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPE_GetInputOutputBufferAttributes is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -898,7 +898,7 @@ static Snpe_Options_Handle_t Snpe_IDiagLog_GetOptions(Context *ctx, Snpe_IDiagLo
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_IDiagLog_GetOptions is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -981,7 +981,7 @@ static Snpe_UserBufferMap_Handle_t Snpe_UserBufferMap_Create(Context *ctx)
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_UserBufferMap_Create is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -1023,7 +1023,7 @@ static const char* Snpe_StringList_At(Context *ctx, Snpe_StringList_Handle_t han
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_StringList_At is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -1051,7 +1051,7 @@ static Snpe_TensorShape_Handle_t Snpe_IBufferAttributes_GetDims(Context *ctx, Sn
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_IBufferAttributes_GetDims is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -1083,7 +1083,7 @@ static size_t Snpe_TensorShape_Rank(Context *ctx, Snpe_TensorShape_Handle_t tens
     }
 }
 
-static Snpe_UserBufferEncoding_Handle_t Snpe_UserBufferEncodingFloatN_Create(Context *ctx, MI_U8 bit_width)
+static Snpe_UserBufferEncoding_Handle_t Snpe_UserBufferEncodingFloatN_Create(Context *ctx, DT_U8 bit_width)
 {
     auto func = SnpeLibrary::Get().Snpe_UserBufferEncodingFloatN_Create;
     if (func)
@@ -1093,7 +1093,7 @@ static Snpe_UserBufferEncoding_Handle_t Snpe_UserBufferEncodingFloatN_Create(Con
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_UserBufferEncodingFloatN_Create is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -1121,7 +1121,7 @@ static Snpe_UserBufferEncoding_Handle_t Snpe_UserBufferEncodingTfN_Create(Contex
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_UserBufferEncodingTfN_Create is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -1163,7 +1163,7 @@ static Snpe_TensorShape_Handle_t Snpe_TensorShape_CreateDimsSize(Context *ctx, c
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_TensorShape_At is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -1205,7 +1205,7 @@ static Snpe_UserBufferEncoding_Handle_t Snpe_IBufferAttributes_GetEncoding_Ref(C
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_IBufferAttributes_GetEncoding_Ref is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -1248,7 +1248,7 @@ static Snpe_IUserBuffer_Handle_t Snpe_Util_CreateUserBuffer(Context *ctx, void *
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_Util_CreateUserBuffer is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -1303,7 +1303,7 @@ static Snpe_StringList_Handle_t Snpe_StringList_Create(Context *ctx)
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "Snpe_StringList_Create is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
@@ -1326,7 +1326,7 @@ class SnpeUtils
 public:
     static std::string GetLibraryVersion(Context *ctx)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return std::string();
         }
@@ -1349,20 +1349,20 @@ public:
     {
         Snpe_ErrorCode_t ret = SNPE_ERRORCODE_CAPI_BAD_ARGUMENT;
 
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return ret;
         }
 
         Snpe_IDiagLog_Handle_t log_handle = Snpe_SNPE_GetDiagLogInterface_Ref(ctx, snpe_handle);
-        if (MI_NULL == log_handle)
+        if (DT_NULL == log_handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPE_GetDiagLogInterface_Ref failed");
             return ret;
         }
 
         Snpe_Options_Handle_t options_handle = Snpe_IDiagLog_GetOptions(ctx, log_handle);
-        if (MI_NULL == options_handle)
+        if (DT_NULL == options_handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "Snpe_IDiagLog_GetOptions failed");
             return ret;
@@ -1391,43 +1391,43 @@ EXIT:
         return ret;
     }
 
-    static Status GetTensorAttributes(Context *ctx, Snpe_SNPE_Handle_t handle, const std::string &tensor_name, MI_U32 &dims, MI_U32 &batch,
-                                      std::vector<size_t> &shape, Snpe_UserBufferEncoding_ElementType_t &elem_type, MI_F32 &scale, MI_U16 &zero_point)
+    static Status GetTensorAttributes(Context *ctx, Snpe_SNPE_Handle_t handle, const std::string &tensor_name, DT_U32 &dims, DT_U32 &batch,
+                                      std::vector<size_t> &shape, Snpe_UserBufferEncoding_ElementType_t &elem_type, DT_F32 &scale, DT_U16 &zero_point)
     {
         Status ret = Status::ERROR;
 
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return ret;
         }
 
-        if (MI_NULL == handle)
+        if (DT_NULL == handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "snpe handle is null");
             return ret;
         }
 
-        Snpe_IBufferAttributes_Handle_t attributes_handle = MI_NULL;
-        Snpe_TensorShape_Handle_t shape_handle = MI_NULL;
-        Snpe_UserBufferEncoding_Handle_t encode_handle = MI_NULL;
+        Snpe_IBufferAttributes_Handle_t attributes_handle = DT_NULL;
+        Snpe_TensorShape_Handle_t shape_handle = DT_NULL;
+        Snpe_UserBufferEncoding_Handle_t encode_handle = DT_NULL;
         size_t stride = 0;
 
         attributes_handle = Snpe_SNPE_GetInputOutputBufferAttributes(ctx, handle, tensor_name.c_str());
-        if (MI_NULL == attributes_handle)
+        if (DT_NULL == attributes_handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPE_GetInputOutputBufferAttributes failed");
             goto EXIT;
         }
 
         shape_handle = Snpe_IBufferAttributes_GetDims(ctx, attributes_handle);
-        if (MI_NULL == shape_handle)
+        if (DT_NULL == shape_handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "Snpe_IBufferAttributes_GetDims failed");
             goto EXIT;
         }
 
         encode_handle = Snpe_IBufferAttributes_GetEncoding_Ref(ctx, attributes_handle);
-        if (MI_NULL == encode_handle)
+        if (DT_NULL == encode_handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "Snpe_IBufferAttributes_GetEncoding_Ref failed");
             goto EXIT;
@@ -1462,7 +1462,7 @@ EXIT:
         }
 
         stride = shape[dims - 1];
-        for (MI_S32 i = dims - 1; i > 0 ; i--)
+        for (DT_S32 i = dims - 1; i > 0 ; i--)
         {
             stride *= Snpe_TensorShape_At(ctx, shape_handle, i);
             shape[i - 1] = stride;
@@ -1496,34 +1496,34 @@ EXIT:
         return ret;
     }
 
-    static Status GetTensorAttributes(Context *ctx, Snpe_SNPE_Handle_t handle, const std::string &tensor_name, MI_F32 &scale, MI_U16 &zero_point)
+    static Status GetTensorAttributes(Context *ctx, Snpe_SNPE_Handle_t handle, const std::string &tensor_name, DT_F32 &scale, DT_U16 &zero_point)
     {
         Status ret = Status::ERROR;
 
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return ret;
         }
 
-        if (MI_NULL == handle)
+        if (DT_NULL == handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "snpe handle is null");
             return ret;
         }
 
-        Snpe_IBufferAttributes_Handle_t attributes_handle = MI_NULL;
-        Snpe_UserBufferEncoding_Handle_t encode_handle = MI_NULL;
+        Snpe_IBufferAttributes_Handle_t attributes_handle = DT_NULL;
+        Snpe_UserBufferEncoding_Handle_t encode_handle = DT_NULL;
         Snpe_UserBufferEncoding_ElementType_t elem_type;
 
         attributes_handle = Snpe_SNPE_GetInputOutputBufferAttributes(ctx, handle, tensor_name.c_str());
-        if (MI_NULL == attributes_handle)
+        if (DT_NULL == attributes_handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPE_GetInputOutputBufferAttributes failed");
             goto EXIT;
         }
 
         encode_handle = Snpe_IBufferAttributes_GetEncoding_Ref(ctx, attributes_handle);
-        if (MI_NULL == encode_handle)
+        if (DT_NULL == encode_handle)
         {
             AURA_ADD_ERROR_STRING(ctx, "Snpe_IBufferAttributes_GetEncoding_Ref failed");
             goto EXIT;
@@ -1572,38 +1572,38 @@ EXIT:
         for (size_t i = 0; i < list_size; i++)
         {
             TensorDesc desc;
-            MI_S32 rank;
+            DT_S32 rank;
             std::string tensor_name = std::string(Snpe_StringList_At(ctx, list_handle, i));
-            Snpe_IBufferAttributes_Handle_t attributes_handle = MI_NULL;
-            Snpe_TensorShape_Handle_t shape_handle = MI_NULL;
-            Snpe_UserBufferEncoding_Handle_t encode_handle = MI_NULL;
+            Snpe_IBufferAttributes_Handle_t attributes_handle = DT_NULL;
+            Snpe_TensorShape_Handle_t shape_handle = DT_NULL;
+            Snpe_UserBufferEncoding_Handle_t encode_handle = DT_NULL;
             Snpe_UserBufferEncoding_ElementType_t elem_type;
 
             attributes_handle = Snpe_SNPE_GetInputOutputBufferAttributes(ctx, snpe_handle, tensor_name.c_str());
-            if (MI_NULL == attributes_handle)
+            if (DT_NULL == attributes_handle)
             {
                 AURA_ADD_ERROR_STRING(ctx, "Snpe_SNPE_GetInputOutputBufferAttributes failed");
                 goto EXIT;
             }
 
             shape_handle = Snpe_IBufferAttributes_GetDims(ctx, attributes_handle);
-            if (MI_NULL == shape_handle)
+            if (DT_NULL == shape_handle)
             {
                 AURA_ADD_ERROR_STRING(ctx, "Snpe_IBufferAttributes_GetDims failed");
                 goto EXIT;
             }
 
             encode_handle = Snpe_IBufferAttributes_GetEncoding_Ref(ctx, attributes_handle);
-            if (MI_NULL == encode_handle)
+            if (DT_NULL == encode_handle)
             {
                 AURA_ADD_ERROR_STRING(ctx, "Snpe_IBufferAttributes_GetEncoding_Ref failed");
                 goto EXIT;
             }
 
             rank = Snpe_TensorShape_Rank(ctx, shape_handle);
-            for (MI_S32 j = 0; j < rank; j++)
+            for (DT_S32 j = 0; j < rank; j++)
             {
-                MI_S32 dim = Snpe_TensorShape_At(ctx, shape_handle, j);
+                DT_S32 dim = Snpe_TensorShape_At(ctx, shape_handle, j);
                 desc.sizes.push_back(dim);
             }
 
@@ -1679,25 +1679,25 @@ std::string SnpeUtils::m_log_path = "/data/vendor/camera";
 class SnpeUserBufferMap
 {
 public:
-    SnpeUserBufferMap(Context *ctx, Snpe_SNPE_Handle_t handle, MI_BOOL is_input)
-                      : m_ctx(ctx), m_handle(handle), m_is_valid(MI_FALSE),
-                        m_is_input(is_input), m_user_buffer_map(MI_NULL)
+    SnpeUserBufferMap(Context *ctx, Snpe_SNPE_Handle_t handle, DT_BOOL is_input)
+                      : m_ctx(ctx), m_handle(handle), m_is_valid(DT_FALSE),
+                        m_is_input(is_input), m_user_buffer_map(DT_NULL)
     {
         do
         {
-            if (MI_NULL == m_ctx)
+            if (DT_NULL == m_ctx)
             {
                 break;
             }
 
             m_user_buffer_map = Snpe_UserBufferMap_Create(m_ctx);
-            if (MI_NULL == m_user_buffer_map)
+            if (DT_NULL == m_user_buffer_map)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "Snpe_UserBufferMap_Create failed");
                 break;
             }
 
-            Snpe_StringList_Handle_t tensor_list = MI_NULL;
+            Snpe_StringList_Handle_t tensor_list = DT_NULL;
             if (m_is_input)
             {
                 tensor_list = Snpe_SNPE_GetInputTensorNames(m_ctx, m_handle);
@@ -1730,7 +1730,7 @@ public:
                 break;
             }
 
-            m_is_valid = MI_TRUE;
+            m_is_valid = DT_TRUE;
 
         } while (0);
     }
@@ -1748,7 +1748,7 @@ public:
             return Status::ERROR;
         }
 
-        if ((MI_NULL == mat_map) || (mat_map->size() != m_tensor_name.size()))
+        if ((DT_NULL == mat_map) || (mat_map->size() != m_tensor_name.size()))
         {
             AURA_ADD_ERROR_STRING(m_ctx, "size match error");
             return Status::ERROR;
@@ -1777,7 +1777,7 @@ public:
         return Status::OK;
     }
 
-    AURA_VOID DeInitialize()
+    DT_VOID DeInitialize()
     {
         for (auto iter = m_quant_mat.begin(); iter != m_quant_mat.end(); ++iter)
         {
@@ -1795,7 +1795,7 @@ public:
                 {
                     AURA_LOGE(m_ctx, AURA_TAG, "Snpe_IUserBuffer_Delete failed, snpe_ret=%d\n", snpe_ret);
                 }
-                *iter = MI_NULL;
+                *iter = DT_NULL;
             }
         }
 
@@ -1808,7 +1808,7 @@ public:
             {
                 AURA_LOGE(m_ctx, AURA_TAG, "Snpe_UserBufferMap_Delete failed, snpe_ret=%d\n", snpe_ret);
             }
-            m_user_buffer_map = MI_NULL;
+            m_user_buffer_map = DT_NULL;
         }
     }
 
@@ -1819,14 +1819,14 @@ public:
 
     Status Quant()
     {
-        if (MI_FALSE == m_is_input)
+        if (DT_FALSE == m_is_input)
         {
             return Status::OK;
         }
 
         Status ret        = Status::ERROR;
-        MI_F32 scale      = 0.f;
-        MI_U16 zero_point = 0;
+        DT_F32 scale      = 0.f;
+        DT_U16 zero_point = 0;
 
         for (size_t i = 0; i < m_tensor_name.size(); i++)
         {
@@ -1859,14 +1859,14 @@ EXIT:
 
     Status DeQuant()
     {
-        if (MI_TRUE == m_is_input)
+        if (DT_TRUE == m_is_input)
         {
             return Status::OK;
         }
 
         Status ret        = Status::ERROR;
-        MI_F32 scale      = 0.f;
-        MI_U16 zero_point = 0;
+        DT_F32 scale      = 0.f;
+        DT_U16 zero_point = 0;
 
         for (size_t i = 0; i < m_tensor_name.size(); i++)
         {
@@ -1900,10 +1900,10 @@ EXIT:
 private:
     Status InitUserBuffer(const std::string &tensor_name)
     {
-        MI_U32 dims = 0;
-        MI_U32 batch = 0;
-        MI_F32 scale = 0.f;
-        MI_U16 zero_point = 0;
+        DT_U32 dims = 0;
+        DT_U32 batch = 0;
+        DT_F32 scale = 0.f;
+        DT_U16 zero_point = 0;
         std::vector<size_t> shape;
         Snpe_UserBufferEncoding_ElementType_t elem_type;
         if (SnpeUtils::GetTensorAttributes(m_ctx, m_handle, tensor_name, dims, batch, shape, elem_type, scale, zero_point) != Status::OK)
@@ -1915,10 +1915,10 @@ private:
         Status ret = Status::ERROR;
         Mat *mat = m_mat_map[tensor_name];
 
-        MI_BOOL is_quant = MI_FALSE;
+        DT_BOOL is_quant = DT_FALSE;
         ElemType src_elem_type = mat->GetElemType();
         ElemType dst_elem_type = GetElemType(elem_type);
-        Snpe_UserBufferEncoding_Handle_t encode_handle = MI_NULL;
+        Snpe_UserBufferEncoding_Handle_t encode_handle = DT_NULL;
         if (src_elem_type == dst_elem_type)
         {
             if (!mat->IsContinuous())
@@ -1930,7 +1930,7 @@ private:
             if ((elem_type == SNPE_USERBUFFERENCODING_ELEMENTTYPE_TF8) || (elem_type == SNPE_USERBUFFERENCODING_ELEMENTTYPE_TF16))
             {
                 encode_handle = Snpe_UserBufferEncodingTfN_Create(m_ctx, zero_point, scale, ElemTypeSize(dst_elem_type) << 3);
-                if (MI_NULL == encode_handle)
+                if (DT_NULL == encode_handle)
                 {
                     AURA_ADD_ERROR_STRING(m_ctx, "Snpe_UserBufferEncodingTfN_Create failed");
                     return Status::ERROR;
@@ -1939,7 +1939,7 @@ private:
             else if ((elem_type == SNPE_USERBUFFERENCODING_ELEMENTTYPE_FLOAT) || (elem_type == SNPE_USERBUFFERENCODING_ELEMENTTYPE_FLOAT16))
             {
                 encode_handle = Snpe_UserBufferEncodingFloatN_Create(m_ctx, ElemTypeSize(dst_elem_type) << 3);
-                if (MI_NULL == encode_handle)
+                if (DT_NULL == encode_handle)
                 {
                     AURA_ADD_ERROR_STRING(m_ctx, "Snpe_UserBufferEncodingFloatN_Create failed");
                     return Status::ERROR;
@@ -1956,13 +1956,13 @@ private:
                                                       (SNPE_USERBUFFERENCODING_ELEMENTTYPE_TF16 == elem_type)))
         {
             encode_handle = Snpe_UserBufferEncodingTfN_Create(m_ctx, zero_point, scale, ElemTypeSize(dst_elem_type) << 3);
-            if (MI_NULL == encode_handle)
+            if (DT_NULL == encode_handle)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "Snpe_UserBufferEncodingTfN_Create failed");
                 return Status::ERROR;
             }
 
-            is_quant = MI_TRUE;
+            is_quant = DT_TRUE;
         }
         else
         {
@@ -1987,7 +1987,7 @@ private:
         }
 
         {
-            MI_S32 elem_counts = batch * shape[0] / ElemTypeSize(dst_elem_type);
+            DT_S32 elem_counts = batch * shape[0] / ElemTypeSize(dst_elem_type);
             if (elem_counts != mat->GetSizes().Total())
             {
                 std::string info = "tensor " + std::string(tensor_name) + ": expected " + std::to_string(elem_counts) + " bytes, "
@@ -1996,18 +1996,18 @@ private:
                 goto EXIT;
             }
 
-            Snpe_TensorShape_Handle_t shape_handle = MI_NULL;
-            Snpe_IUserBuffer_Handle_t user_buffer_handle = MI_NULL;
+            Snpe_TensorShape_Handle_t shape_handle = DT_NULL;
+            Snpe_IUserBuffer_Handle_t user_buffer_handle = DT_NULL;
             Snpe_ErrorCode_t snpe_ret = SNPE_SUCCESS;
             shape_handle = Snpe_TensorShape_CreateDimsSize(m_ctx, shape.data(), dims);
-            if (MI_NULL == shape_handle)
+            if (DT_NULL == shape_handle)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "Snpe_TensorShape_CreateDimsSize failed");
                 goto EXIT;
             }
 
             user_buffer_handle = Snpe_Util_CreateUserBuffer(m_ctx, mat->GetData(), mat->GetSizes().Total() * ElemTypeSize(mat->GetElemType()), shape_handle, encode_handle);
-            if (MI_NULL == user_buffer_handle)
+            if (DT_NULL == user_buffer_handle)
             {
                 snpe_ret = Snpe_TensorShape_Delete(m_ctx, shape_handle);
                 std::string info = "Snpe_Util_CreateUserBuffer failed, Snpe_TensorShape_Delete ret : " + std::to_string(snpe_ret);
@@ -2059,8 +2059,8 @@ private:
     Snpe_SNPE_Handle_t m_handle;
     MatMap m_mat_map;
     MatMap m_quant_mat;
-    MI_BOOL m_is_valid;
-    MI_BOOL m_is_input;
+    DT_BOOL m_is_valid;
+    DT_BOOL m_is_input;
     Snpe_UserBufferMap_Handle_t m_user_buffer_map;
     std::vector<std::string> m_tensor_name;
     std::vector<Snpe_IUserBuffer_Handle_t> m_user_buffer_handle;
@@ -2070,7 +2070,7 @@ class SnpeExecutorImplV2 : public SnpeExecutorImpl
 {
 public:
     SnpeExecutorImplV2(Context *ctx, const std::shared_ptr<SnpeModel> &model, const NNConfig &config)
-                       : SnpeExecutorImpl(ctx, model, config), m_container_handle(MI_NULL), m_snpe_handle(MI_NULL)
+                       : SnpeExecutorImpl(ctx, model, config), m_container_handle(DT_NULL), m_snpe_handle(DT_NULL)
     {
         do
         {
@@ -2111,7 +2111,7 @@ public:
 
                 Snpe_RuntimeCheckOption_t rt_opt = m_config.unsigned_pd ? SNPE_RUNTIME_CHECK_OPTION_DEFAULT : SNPE_RUNTIME_CHECK_OPTION_NORMAL_CHECK;
 
-                MI_S32 ret = Snpe_Util_IsRuntimeAvailableCheckOption(ctx, GetSnpeRuntimeType(m_config.backend), rt_opt);
+                DT_S32 ret = Snpe_Util_IsRuntimeAvailableCheckOption(ctx, GetSnpeRuntimeType(m_config.backend), rt_opt);
                 if (!ret)
                 {
                     std::string info = "Snpe_Util_IsRuntimeAvailableCheckOption failed, backend=" + config.at("backend") + " unsigned_pd=" + std::to_string(m_config.unsigned_pd);
@@ -2125,7 +2125,7 @@ public:
                     return Status::ERROR;
                 }
 
-                m_is_valid = MI_TRUE;
+                m_is_valid = DT_TRUE;
                 return Status::OK;
             };
 
@@ -2166,7 +2166,7 @@ public:
             {
                 AURA_LOGE(m_ctx, AURA_TAG, "Snpe_DlContainer_Delete failed, error=%d\n", snpe_ret);
             }
-            m_container_handle = MI_NULL;
+            m_container_handle = DT_NULL;
         }
 
         if (m_snpe_handle)
@@ -2176,7 +2176,7 @@ public:
             {
                 AURA_LOGE(m_ctx, AURA_TAG, "Snpe_SNPE_Delete failed, error=%d\n", snpe_ret);
             }
-            m_snpe_handle = MI_NULL;
+            m_snpe_handle = DT_NULL;
         }
     }
 
@@ -2205,23 +2205,23 @@ public:
         }
 
         // create SnpeUserBufferMap
-        m_input_map = std::make_shared<SnpeUserBufferMap>(m_ctx, m_snpe_handle, MI_TRUE);
-        m_output_map = std::make_shared<SnpeUserBufferMap>(m_ctx, m_snpe_handle, MI_FALSE);
+        m_input_map = std::make_shared<SnpeUserBufferMap>(m_ctx, m_snpe_handle, DT_TRUE);
+        m_output_map = std::make_shared<SnpeUserBufferMap>(m_ctx, m_snpe_handle, DT_FALSE);
 
         ret = Status::OK;
 
         return ret;
     }
 
-    Status Forward(const MatMap &input, MatMap &output, MI_S32 graph_id) override
+    Status Forward(const MatMap &input, MatMap &output, DT_S32 graph_id) override
     {
         auto process_func = [=]() -> Status
         {
             AURA_UNUSED(graph_id);
             Status ret = Status::ERROR;
 
-            MatMap input_mapped = m_model->MapMatNames(input, MI_TRUE);
-            MatMap output_mapped = m_model->MapMatNames(output, MI_FALSE);
+            MatMap input_mapped = m_model->MapMatNames(input, DT_TRUE);
+            MatMap output_mapped = m_model->MapMatNames(output, DT_FALSE);
 
             if (input_mapped.empty() || output_mapped.empty())
             {
@@ -2243,13 +2243,13 @@ public:
                 return ret;
             }
 
-            if (m_input_map->GetSnpeUserBufferMapHandle() == MI_NULL)
+            if (m_input_map->GetSnpeUserBufferMapHandle() == DT_NULL)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "m_input_map GetSnpeUserBufferMapHandle is null");
                 return ret;
             }
 
-            if (m_output_map->GetSnpeUserBufferMapHandle() == MI_NULL)
+            if (m_output_map->GetSnpeUserBufferMapHandle() == DT_NULL)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "m_output_map GetSnpeUserBufferMapHandle is null");
                 return ret;
@@ -2265,7 +2265,7 @@ public:
             Snpe_ErrorCode_t rt = Snpe_SNPE_ExecuteUserBuffers(m_ctx, m_snpe_handle, m_input_map->GetSnpeUserBufferMapHandle(), m_output_map->GetSnpeUserBufferMapHandle());
             if (rt != SNPE_SUCCESS)
             {
-                MI_CHAR err_str[128];
+                DT_CHAR err_str[128];
                 snprintf(err_str, sizeof(err_str), "Snpe_SNPE_ExecuteUserBuffers failed, error: %d", rt);
                 return ret;
             }
@@ -2294,14 +2294,14 @@ public:
     std::vector<TensorDescMap> GetInputs() override
     {
         Snpe_StringList_Handle_t list_handle = Snpe_SNPE_GetInputTensorNames(m_ctx, m_snpe_handle);
-        if (MI_NULL == list_handle)
+        if (DT_NULL == list_handle)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_SNPE_GetInputTensorNames failed");
             return {};
         }
 
         TensorDescMap result = SnpeUtils::GetTensorDesc(m_ctx, m_snpe_handle, list_handle);
-        result = m_model->MapTensorDescNames(result, MI_TRUE);
+        result = m_model->MapTensorDescNames(result, DT_TRUE);
 
         return {result};
     }
@@ -2309,14 +2309,14 @@ public:
     std::vector<TensorDescMap> GetOutputs() override
     {
         Snpe_StringList_Handle_t list_handle = Snpe_SNPE_GetOutputTensorNames(m_ctx, m_snpe_handle);
-        if (MI_NULL == list_handle)
+        if (DT_NULL == list_handle)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_SNPE_GetOutputTensorNames failed");
             return {};
         }
 
         TensorDescMap result = SnpeUtils::GetTensorDesc(m_ctx, m_snpe_handle, list_handle);
-        result = m_model->MapTensorDescNames(result, MI_FALSE);
+        result = m_model->MapTensorDescNames(result, DT_FALSE);
 
         return {result};
     }
@@ -2338,10 +2338,10 @@ private:
     {
         Status ret = Status::ERROR;
 
-        Snpe_SNPEBuilder_Handle_t builder_handle = MI_NULL;
-        Snpe_StringList_Handle_t string_list = MI_NULL;
-        Snpe_RuntimeList_Handle_t runtime_list = MI_NULL;
-        Snpe_PlatformConfig_Handle_t config_handle = MI_NULL;
+        Snpe_SNPEBuilder_Handle_t builder_handle = DT_NULL;
+        Snpe_StringList_Handle_t string_list = DT_NULL;
+        Snpe_RuntimeList_Handle_t runtime_list = DT_NULL;
+        Snpe_PlatformConfig_Handle_t config_handle = DT_NULL;
         std::string config_options;
         std::string model_name = m_model->GetModelName();
 
@@ -2353,8 +2353,8 @@ private:
             goto EXIT;
         }
 
-        m_container_handle = Snpe_DlContainer_OpenBuffer(m_ctx, (const MI_UCHAR *)buffer.m_data, buffer.m_size);
-        if (MI_NULL == m_container_handle)
+        m_container_handle = Snpe_DlContainer_OpenBuffer(m_ctx, (const DT_UCHAR *)buffer.m_data, buffer.m_size);
+        if (DT_NULL == m_container_handle)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_DlContainer_OpenBuffer failed");
             goto EXIT;
@@ -2362,7 +2362,7 @@ private:
 
         // create builder
         builder_handle = Snpe_SNPEBuilder_Create(m_ctx, m_container_handle);
-        if (MI_NULL == builder_handle)
+        if (DT_NULL == builder_handle)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_SNPEBuilder_Create failed");
             goto EXIT;
@@ -2376,7 +2376,7 @@ private:
 #endif
         // ceate string list
         string_list = Snpe_StringList_Create(m_ctx);
-        if (MI_NULL == string_list)
+        if (DT_NULL == string_list)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_SNPEBuilder_Create failed");
             goto EXIT;
@@ -2385,7 +2385,7 @@ private:
         // set output layers
         if (output_layers.size() > 1)
         {
-            for (MI_U32 i = 0; i < output_layers.size(); i++)
+            for (DT_U32 i = 0; i < output_layers.size(); i++)
             {
                 if (Snpe_StringList_Append(m_ctx, string_list, output_layers[i].c_str()) != SNPE_SUCCESS)
                 {
@@ -2403,13 +2403,13 @@ private:
 
         //set config
         config_handle = Snpe_PlatformConfig_Create(m_ctx);
-        if (MI_NULL == config_handle)
+        if (DT_NULL == config_handle)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_PlatformConfig_Create failed");
             goto EXIT;
         }
 
-        if (MI_FALSE == m_config.unsigned_pd)
+        if (DT_FALSE == m_config.unsigned_pd)
         {
             config_options = "unsignedPD:OFF";
         }
@@ -2437,7 +2437,7 @@ private:
 
         // create runtime list
         runtime_list = Snpe_RuntimeList_Create(m_ctx);
-        if (MI_NULL == runtime_list)
+        if (DT_NULL == runtime_list)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_RuntimeList_Create failed");
             goto EXIT;
@@ -2455,7 +2455,7 @@ private:
             goto EXIT;
         }
 
-        if (Snpe_SNPEBuilder_SetUseUserSuppliedBuffers(m_ctx, builder_handle, MI_TRUE) != SNPE_SUCCESS)
+        if (Snpe_SNPEBuilder_SetUseUserSuppliedBuffers(m_ctx, builder_handle, DT_TRUE) != SNPE_SUCCESS)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_SNPEBuilder_SetUseUserSuppliedBuffers failed");
             goto EXIT;
@@ -2473,7 +2473,7 @@ private:
             goto EXIT;
         }
 
-        if (Snpe_SNPEBuilder_SetInitCacheMode(m_ctx, builder_handle, MI_TRUE) != SNPE_SUCCESS)
+        if (Snpe_SNPEBuilder_SetInitCacheMode(m_ctx, builder_handle, DT_TRUE) != SNPE_SUCCESS)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_SNPEBuilder_SetInitCacheMode failed");
             goto EXIT;
@@ -2486,7 +2486,7 @@ private:
         }
 
         m_snpe_handle = Snpe_SNPEBuilder_Build(m_ctx, builder_handle);
-        if (MI_NULL == m_snpe_handle)
+        if (DT_NULL == m_snpe_handle)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Snpe_SNPEBuilder_Build failed");
             goto EXIT;
@@ -2543,7 +2543,7 @@ EXIT:
         if (m_container_handle)
         {
             Snpe_DlContainer_Delete(m_ctx, m_container_handle);
-            m_container_handle = MI_NULL;
+            m_container_handle = DT_NULL;
         }
 
         return ret;

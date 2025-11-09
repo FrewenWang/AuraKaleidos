@@ -38,14 +38,14 @@ static std::shared_ptr<NormalizeImpl> CreateNormalizeImpl(Context *ctx, const Op
 Normalize::Normalize(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Normalize::SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta, NormType type)
+Status Normalize::SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta, NormType type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -74,14 +74,14 @@ Status Normalize::SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 bet
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateNormalizeImpl(m_ctx, impl_target);
     }
 
     // run initialize
     NormalizeImpl *normalize_impl = dynamic_cast<NormalizeImpl*>(m_impl.get());
-    if (MI_NULL == normalize_impl)
+    if (DT_NULL == normalize_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "normalize_impl is null ptr");
         return Status::ERROR;
@@ -92,7 +92,7 @@ Status Normalize::SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 bet
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status INormalize(Context *ctx, const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta, NormType type, const OpTarget &target)
+AURA_EXPORTS Status INormalize(Context *ctx, const Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta, NormType type, const OpTarget &target)
 {
     Normalize normalize(ctx, target);
 
@@ -100,18 +100,18 @@ AURA_EXPORTS Status INormalize(Context *ctx, const Mat &src, Mat &dst, MI_F32 al
 }
 
 NormalizeImpl::NormalizeImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Normalize", target),
-                                                                     m_src(MI_NULL), m_dst(MI_NULL),
+                                                                     m_src(DT_NULL), m_dst(DT_NULL),
                                                                      m_alpha(1), m_beta(0), m_type(NormType::NORM_INF)
 {}
 
-Status NormalizeImpl::SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta, NormType type)
+Status NormalizeImpl::SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta, NormType type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -157,7 +157,7 @@ std::string NormalizeImpl::ToString() const
     return str;
 }
 
-AURA_VOID NormalizeImpl::Dump(const std::string &prefix) const
+DT_VOID NormalizeImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

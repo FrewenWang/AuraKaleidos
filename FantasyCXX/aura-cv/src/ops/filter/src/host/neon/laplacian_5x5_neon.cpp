@@ -6,7 +6,7 @@ namespace aura
 {
 
 template <typename Tp>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Prepare(Tp *mv_src_p1, Tp *mv_src_p0, Tp *mv_src_c,
+AURA_ALWAYS_INLINE DT_VOID Laplacian5x5Prepare(Tp *mv_src_p1, Tp *mv_src_p0, Tp *mv_src_c,
                                                Tp *mv_src_n0, Tp *mv_src_n1)
 {
     mv_src_p1[0] = mv_src_p1[1];
@@ -23,7 +23,7 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Prepare(Tp *mv_src_p1, Tp *mv_src_p0, T
 }
 
 template <typename Tp>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Prepare(Tp *mv_src_p1, Tp *mv_src_p0, Tp *mv_src_c0,
+AURA_ALWAYS_INLINE DT_VOID Laplacian5x5Prepare(Tp *mv_src_p1, Tp *mv_src_p0, Tp *mv_src_c0,
                                                Tp *mv_src_c1, Tp *mv_src_n0, Tp *mv_src_n1)
 {
     mv_src_p1[0] = mv_src_p1[1];
@@ -43,7 +43,7 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Prepare(Tp *mv_src_p1, Tp *mv_src_p0, T
 
 // d16x4_t = uint16x4_t, int16x4_t
 template <typename d16x4_t, typename std::enable_if<std::is_same<d16x4_t, uint16x4_t>::value ||
-                                                    std::is_same<d16x4_t, int16x4_t>::value>::type* = MI_NULL>
+                                                    std::is_same<d16x4_t, int16x4_t>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE d16x4_t Laplacian5x5Core(d16x4_t &vd16_src_p1x0, d16x4_t &vd16_src_p1x1, d16x4_t &vd16_src_p1x2,
                                             d16x4_t &vd16_src_p0x0, d16x4_t &vd16_src_p0x1, d16x4_t &vd16_src_p0x2,
                                             d16x4_t &vd16_src_cx0,  d16x4_t &vd16_src_cx1,  d16x4_t &vd16_src_cx2,
@@ -142,9 +142,9 @@ AURA_ALWAYS_INLINE int16x8_t Laplacian5x5Core(uint8x8_t &vdu8_src_p1x0, uint8x8_
     int16x8_t vqs16_sum_p1n1_l1r1 = neon::vreinterpret(neon::vadd(vqu16_sum_p1_l1r1, vqu16_sum_n1_l1r1));
     int16x8_t vqs16_sum_p1n1_l0r0 = neon::vreinterpret(neon::vadd(vqu16_sum_p1_l0r0, vqu16_sum_n1_l0r0));
 
-    int16x8_t vqs16_sum_p1n1      = neon::vmul(vqs16_sum_c_p1n1, static_cast<MI_S16>(4));
-    vqs16_sum_p1n1                = neon::vmla(vqs16_sum_p1n1, vqs16_sum_p1n1_l1r1, static_cast<MI_S16>(2));
-    vqs16_sum_p1n1                = neon::vmla(vqs16_sum_p1n1, vqs16_sum_p1n1_l0r0, static_cast<MI_S16>(4));
+    int16x8_t vqs16_sum_p1n1      = neon::vmul(vqs16_sum_c_p1n1, static_cast<DT_S16>(4));
+    vqs16_sum_p1n1                = neon::vmla(vqs16_sum_p1n1, vqs16_sum_p1n1_l1r1, static_cast<DT_S16>(2));
+    vqs16_sum_p1n1                = neon::vmla(vqs16_sum_p1n1, vqs16_sum_p1n1_l0r0, static_cast<DT_S16>(4));
 
     // p0n0
     uint8x8_t vdu8_src_p0l1       = neon::vext<6>(vdu8_src_p0x0, vdu8_src_p0x1);
@@ -158,8 +158,8 @@ AURA_ALWAYS_INLINE int16x8_t Laplacian5x5Core(uint8x8_t &vdu8_src_p1x0, uint8x8_
     int16x8_t vqs16_sum_c_p0n0    = neon::vreinterpret(neon::vaddl(vdu8_src_p0x1, vdu8_src_n0x1));
     int16x8_t vqs16_sum_p0n0_l1r1 = neon::vreinterpret(neon::vadd(vqu16_sum_p0_l1r1, vqu16_sum_n0_l1r1));
 
-    int16x8_t vqs16_sum_p0n0      = neon::vmul(vqs16_sum_c_p0n0, static_cast<MI_S16>(-8));
-    vqs16_sum_p0n0                = neon::vmla(vqs16_sum_p0n0, vqs16_sum_p0n0_l1r1, static_cast<MI_S16>(4));
+    int16x8_t vqs16_sum_p0n0      = neon::vmul(vqs16_sum_c_p0n0, static_cast<DT_S16>(-8));
+    vqs16_sum_p0n0                = neon::vmla(vqs16_sum_p0n0, vqs16_sum_p0n0_l1r1, static_cast<DT_S16>(4));
 
     // c
     uint8x8_t vdu8_src_cl1        = neon::vext<6>(vdu8_src_cx0, vdu8_src_cx1);
@@ -174,9 +174,9 @@ AURA_ALWAYS_INLINE int16x8_t Laplacian5x5Core(uint8x8_t &vdu8_src_p1x0, uint8x8_
     int16x8_t vqs16_sum_c_l1r1    = neon::vreinterpret(vqu16_sum_c_l1r1);
     int16x8_t vqs16_sum_c_l0r0    = neon::vreinterpret(vqu16_sum_c_l0r0);
 
-    int16x8_t vqs16_sum_c         = neon::vmul(vqs16_sum_c_c, static_cast<MI_S16>(-24));
-    vqs16_sum_c                   = neon::vmla(vqs16_sum_c, vqs16_sum_c_l1r1, static_cast<MI_S16>(4));
-    vqs16_sum_c                   = neon::vmla(vqs16_sum_c, vqs16_sum_c_l0r0, static_cast<MI_S16>(-8));
+    int16x8_t vqs16_sum_c         = neon::vmul(vqs16_sum_c_c, static_cast<DT_S16>(-24));
+    vqs16_sum_c                   = neon::vmla(vqs16_sum_c, vqs16_sum_c_l1r1, static_cast<DT_S16>(4));
+    vqs16_sum_c                   = neon::vmla(vqs16_sum_c, vqs16_sum_c_l0r0, static_cast<DT_S16>(-8));
 
     // sum
     int16x8_t vqs16_sum_pn        = neon::vadd(vqs16_sum_p1n1, vqs16_sum_p0n0);
@@ -193,12 +193,12 @@ AURA_ALWAYS_INLINE float16x4_t Laplacian5x5Core(float16x4_t &vdf16_src_p1x0, flo
                                                 float16x4_t &vdf16_src_n1x0, float16x4_t &vdf16_src_n1x1, float16x4_t &vdf16_src_n1x2)
 {
     // p1n1
-    float32x4_t vqf32_src_p1x0      = neon::vcvt<MI_F32>(vdf16_src_p1x0);
-    float32x4_t vqf32_src_p1x1      = neon::vcvt<MI_F32>(vdf16_src_p1x1);
-    float32x4_t vqf32_src_p1x2      = neon::vcvt<MI_F32>(vdf16_src_p1x2);
-    float32x4_t vqf32_src_n1x0      = neon::vcvt<MI_F32>(vdf16_src_n1x0);
-    float32x4_t vqf32_src_n1x1      = neon::vcvt<MI_F32>(vdf16_src_n1x1);
-    float32x4_t vqf32_src_n1x2      = neon::vcvt<MI_F32>(vdf16_src_n1x2);
+    float32x4_t vqf32_src_p1x0      = neon::vcvt<DT_F32>(vdf16_src_p1x0);
+    float32x4_t vqf32_src_p1x1      = neon::vcvt<DT_F32>(vdf16_src_p1x1);
+    float32x4_t vqf32_src_p1x2      = neon::vcvt<DT_F32>(vdf16_src_p1x2);
+    float32x4_t vqf32_src_n1x0      = neon::vcvt<DT_F32>(vdf16_src_n1x0);
+    float32x4_t vqf32_src_n1x1      = neon::vcvt<DT_F32>(vdf16_src_n1x1);
+    float32x4_t vqf32_src_n1x2      = neon::vcvt<DT_F32>(vdf16_src_n1x2);
     float32x4_t vqf32_src_p1l1      = neon::vext<2>(vqf32_src_p1x0, vqf32_src_p1x1);
     float32x4_t vqf32_src_p1l0      = neon::vext<3>(vqf32_src_p1x0, vqf32_src_p1x1);
     float32x4_t vqf32_src_p1r0      = neon::vext<1>(vqf32_src_p1x1, vqf32_src_p1x2);
@@ -224,12 +224,12 @@ AURA_ALWAYS_INLINE float16x4_t Laplacian5x5Core(float16x4_t &vdf16_src_p1x0, flo
     vqf32_sum_p1n1                  = neon::vmla(vqf32_sum_p1n1, vqf32_sum_p1n1_l0r0, 4.f);
 
     // p0n0
-    float32x4_t vqf32_src_p0x0      = neon::vcvt<MI_F32>(vdf16_src_p0x0);
-    float32x4_t vqf32_src_p0x1      = neon::vcvt<MI_F32>(vdf16_src_p0x1);
-    float32x4_t vqf32_src_p0x2      = neon::vcvt<MI_F32>(vdf16_src_p0x2);
-    float32x4_t vqf32_src_n0x0      = neon::vcvt<MI_F32>(vdf16_src_n0x0);
-    float32x4_t vqf32_src_n0x1      = neon::vcvt<MI_F32>(vdf16_src_n0x1);
-    float32x4_t vqf32_src_n0x2      = neon::vcvt<MI_F32>(vdf16_src_n0x2);
+    float32x4_t vqf32_src_p0x0      = neon::vcvt<DT_F32>(vdf16_src_p0x0);
+    float32x4_t vqf32_src_p0x1      = neon::vcvt<DT_F32>(vdf16_src_p0x1);
+    float32x4_t vqf32_src_p0x2      = neon::vcvt<DT_F32>(vdf16_src_p0x2);
+    float32x4_t vqf32_src_n0x0      = neon::vcvt<DT_F32>(vdf16_src_n0x0);
+    float32x4_t vqf32_src_n0x1      = neon::vcvt<DT_F32>(vdf16_src_n0x1);
+    float32x4_t vqf32_src_n0x2      = neon::vcvt<DT_F32>(vdf16_src_n0x2);
     float32x4_t vqf32_src_p0l1      = neon::vext<2>(vqf32_src_p0x0, vqf32_src_p0x1);
     float32x4_t vqf32_src_p0r1      = neon::vext<2>(vqf32_src_p0x1, vqf32_src_p0x2);
 
@@ -247,9 +247,9 @@ AURA_ALWAYS_INLINE float16x4_t Laplacian5x5Core(float16x4_t &vdf16_src_p1x0, flo
     vqf32_sum_p0n0                  = neon::vmla(vqf32_sum_p0n0, vqf32_sum_p0n0_l1r1, 4.f);
 
     // c
-    float32x4_t vqf32_src_cx0       = neon::vcvt<MI_F32>(vdf16_src_cx0);
-    float32x4_t vqf32_src_cx1       = neon::vcvt<MI_F32>(vdf16_src_cx1);
-    float32x4_t vqf32_src_cx2       = neon::vcvt<MI_F32>(vdf16_src_cx2);
+    float32x4_t vqf32_src_cx0       = neon::vcvt<DT_F32>(vdf16_src_cx0);
+    float32x4_t vqf32_src_cx1       = neon::vcvt<DT_F32>(vdf16_src_cx1);
+    float32x4_t vqf32_src_cx2       = neon::vcvt<DT_F32>(vdf16_src_cx2);
     float32x4_t vqf32_src_cl1       = neon::vext<2>(vqf32_src_cx0, vqf32_src_cx1);
     float32x4_t vqf32_src_cl0       = neon::vext<3>(vqf32_src_cx0, vqf32_src_cx1);
     float32x4_t vqf32_src_cr0       = neon::vext<1>(vqf32_src_cx1, vqf32_src_cx2);
@@ -338,17 +338,17 @@ AURA_ALWAYS_INLINE float32x4_t Laplacian5x5Core(float32x4_t &vqf32_src_p1x0, flo
     return vqf32_result;
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C>
-static AURA_VOID Laplacian5x5OneRow(const St *src_p1, const St *src_p0, const St *src_c, const St *src_n0,
-                                  const St *src_n1, Dt *dst, const std::vector<St> &border_value, MI_S32 width)
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C>
+static DT_VOID Laplacian5x5OneRow(const St *src_p1, const St *src_p0, const St *src_c, const St *src_n0,
+                                  const St *src_n1, Dt *dst, const std::vector<St> &border_value, DT_S32 width)
 {
-    using MVSt = typename std::conditional<std::is_same<St, MI_F32>::value, typename neon::MQVector<St, C>::MVType,
+    using MVSt = typename std::conditional<std::is_same<St, DT_F32>::value, typename neon::MQVector<St, C>::MVType,
                                                 typename neon::MDVector<St, C>::MVType>::type;
-    using MVDt = typename std::conditional<std::is_same<St, MI_U8>::value, typename neon::MQVector<Dt, C>::MVType, MVSt>::type;
+    using MVDt = typename std::conditional<std::is_same<St, DT_U8>::value, typename neon::MQVector<Dt, C>::MVType, MVSt>::type;
 
-    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(sizeof(MVDt) / C / sizeof(Dt));
-    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
-    const MI_S32 width_align     = (width & -ELEM_COUNTS) * C;
+    constexpr DT_S32 ELEM_COUNTS = static_cast<DT_S32>(sizeof(MVDt) / C / sizeof(Dt));
+    constexpr DT_S32 VOFFSET     = ELEM_COUNTS * C;
+    const DT_S32 width_align     = (width & -ELEM_COUNTS) * C;
 
     MVSt mv_src_p1[3], mv_src_p0[3], mv_src_c[3], mv_src_n0[3], mv_src_n1[3];
     MVDt mv_result;
@@ -366,7 +366,7 @@ static AURA_VOID Laplacian5x5OneRow(const St *src_p1, const St *src_p0, const St
         neon::vload(src_n1,           mv_src_n1[1]);
         neon::vload(src_n1 + VOFFSET, mv_src_n1[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p1[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
             mv_src_p0[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p0[1].val[ch], src_p0[ch], border_value[ch]);
@@ -386,7 +386,7 @@ static AURA_VOID Laplacian5x5OneRow(const St *src_p1, const St *src_p0, const St
 
     // middle
     {
-        for (MI_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
+        for (DT_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
         {
             neon::vload(src_p1 + x + VOFFSET, mv_src_p1[2]);
             neon::vload(src_p0 + x + VOFFSET, mv_src_p0[2]);
@@ -394,7 +394,7 @@ static AURA_VOID Laplacian5x5OneRow(const St *src_p1, const St *src_p0, const St
             neon::vload(src_n0 + x + VOFFSET, mv_src_n0[2]);
             neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mv_result.val[ch] = Laplacian5x5Core(mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
                                                      mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
@@ -412,7 +412,7 @@ static AURA_VOID Laplacian5x5OneRow(const St *src_p1, const St *src_p0, const St
     {
         if (width_align != width * C)
         {
-            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+            DT_S32 x = (width - (ELEM_COUNTS << 1)) * C;
 
             neon::vload(src_p1 + x - VOFFSET, mv_src_p1[0]);
             neon::vload(src_p1 + x,           mv_src_p1[1]);
@@ -430,7 +430,7 @@ static AURA_VOID Laplacian5x5OneRow(const St *src_p1, const St *src_p0, const St
             neon::vload(src_n1 + x,           mv_src_n1[1]);
             neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mv_result.val[ch] = Laplacian5x5Core(mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
                                                      mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
@@ -446,10 +446,10 @@ static AURA_VOID Laplacian5x5OneRow(const St *src_p1, const St *src_p0, const St
 
     // right
     {
-        MI_S32 x    = (width - ELEM_COUNTS) * C;
-        MI_S32 last = (width - 1) * C;
+        DT_S32 x    = (width - ELEM_COUNTS) * C;
+        DT_S32 last = (width - 1) * C;
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p1[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p1[1].val[ch], src_p1[last], border_value[ch]);
             mv_src_p0[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p0[1].val[ch], src_p0[last], border_value[ch]);
@@ -467,18 +467,18 @@ static AURA_VOID Laplacian5x5OneRow(const St *src_p1, const St *src_p0, const St
     }
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C>
-static AURA_VOID Laplacian5x5TwoRow(const St *src_p1, const St *src_p0, const St *src_c0, const St *src_c1,
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C>
+static DT_VOID Laplacian5x5TwoRow(const St *src_p1, const St *src_p0, const St *src_c0, const St *src_c1,
                                   const St *src_n0, const St *src_n1, Dt *dst_c0, Dt *dst_c1,
-                                  const std::vector<St> &border_value, MI_S32 width)
+                                  const std::vector<St> &border_value, DT_S32 width)
 {
-    using MVSt = typename std::conditional<std::is_same<St, MI_F32>::value, typename neon::MQVector<St, C>::MVType,
+    using MVSt = typename std::conditional<std::is_same<St, DT_F32>::value, typename neon::MQVector<St, C>::MVType,
                                                                             typename neon::MDVector<St, C>::MVType>::type;
-    using MVDt = typename std::conditional<std::is_same<St, MI_U8>::value,  typename neon::MQVector<Dt, C>::MVType, MVSt>::type;
+    using MVDt = typename std::conditional<std::is_same<St, DT_U8>::value,  typename neon::MQVector<Dt, C>::MVType, MVSt>::type;
 
-    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(sizeof(MVDt) / C / sizeof(Dt));
-    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
-    const MI_S32 width_align     = (width & -ELEM_COUNTS) * C;
+    constexpr DT_S32 ELEM_COUNTS = static_cast<DT_S32>(sizeof(MVDt) / C / sizeof(Dt));
+    constexpr DT_S32 VOFFSET     = ELEM_COUNTS * C;
+    const DT_S32 width_align     = (width & -ELEM_COUNTS) * C;
 
     MVSt mv_src_p1[3], mv_src_p0[3], mv_src_c0[3], mv_src_c1[3], mv_src_n0[3], mv_src_n1[3];
     MVDt mv_result0, mv_result1;
@@ -498,7 +498,7 @@ static AURA_VOID Laplacian5x5TwoRow(const St *src_p1, const St *src_p0, const St
         neon::vload(src_n1,           mv_src_n1[1]);
         neon::vload(src_n1 + VOFFSET, mv_src_n1[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p1[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
             mv_src_p0[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p0[1].val[ch], src_p0[ch], border_value[ch]);
@@ -525,7 +525,7 @@ static AURA_VOID Laplacian5x5TwoRow(const St *src_p1, const St *src_p0, const St
 
     // middle
     {
-        for (MI_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
+        for (DT_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
         {
             neon::vload(src_p1 + x + VOFFSET, mv_src_p1[2]);
             neon::vload(src_p0 + x + VOFFSET, mv_src_p0[2]);
@@ -534,7 +534,7 @@ static AURA_VOID Laplacian5x5TwoRow(const St *src_p1, const St *src_p0, const St
             neon::vload(src_n0 + x + VOFFSET, mv_src_n0[2]);
             neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mv_result0.val[ch] = Laplacian5x5Core(mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
                                                       mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
@@ -558,7 +558,7 @@ static AURA_VOID Laplacian5x5TwoRow(const St *src_p1, const St *src_p0, const St
     {
         if (width_align != width * C)
         {
-            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+            DT_S32 x = (width - (ELEM_COUNTS << 1)) * C;
 
             neon::vload(src_p1 + x - VOFFSET, mv_src_p1[0]);
             neon::vload(src_p1 + x,           mv_src_p1[1]);
@@ -579,7 +579,7 @@ static AURA_VOID Laplacian5x5TwoRow(const St *src_p1, const St *src_p0, const St
             neon::vload(src_n1 + x,           mv_src_n1[1]);
             neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mv_result0.val[ch] = Laplacian5x5Core(mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
                                                       mv_src_p0[0].val[ch], mv_src_p0[1].val[ch], mv_src_p0[2].val[ch],
@@ -601,10 +601,10 @@ static AURA_VOID Laplacian5x5TwoRow(const St *src_p1, const St *src_p0, const St
 
     // right
     {
-        MI_S32 x    = (width - ELEM_COUNTS) * C;
-        MI_S32 last = (width - 1) * C;
+        DT_S32 x    = (width - ELEM_COUNTS) * C;
+        DT_S32 last = (width - 1) * C;
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p1[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p1[1].val[ch], src_p1[last], border_value[ch]);
             mv_src_p0[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p0[1].val[ch], src_p0[last], border_value[ch]);
@@ -629,16 +629,16 @@ static AURA_VOID Laplacian5x5TwoRow(const St *src_p1, const St *src_p0, const St
     }
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C>
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C>
 static Status Laplacian5x5NeonImpl(const Mat &src, Mat &dst, const std::vector<St> &border_value,
-                                   const St *border_buffer, MI_S32 start_row, MI_S32 end_row)
+                                   const St *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
-    const St *src_p1 = MI_NULL, *src_p0 = MI_NULL, *src_n0 = MI_NULL, *src_n1 = MI_NULL;
-    const St *src_c0 = MI_NULL, *src_c1 = MI_NULL;
-    Dt *dst_c0 = MI_NULL, *dst_c1 = MI_NULL;
+    const St *src_p1 = DT_NULL, *src_p0 = DT_NULL, *src_n0 = DT_NULL, *src_n1 = DT_NULL;
+    const St *src_c0 = DT_NULL, *src_c1 = DT_NULL;
+    Dt *dst_c0 = DT_NULL, *dst_c1 = DT_NULL;
 
-    MI_S32 width = dst.GetSizes().m_width;
-    MI_S32 y     = start_row;
+    DT_S32 width = dst.GetSizes().m_width;
+    DT_S32 y     = start_row;
 
     src_p1 = src.Ptr<St, BORDER_TYPE>(y - 2, border_buffer);
     src_p0 = src.Ptr<St, BORDER_TYPE>(y - 1, border_buffer);
@@ -647,7 +647,7 @@ static Status Laplacian5x5NeonImpl(const Mat &src, Mat &dst, const std::vector<S
     src_n0 = src.Ptr<St, BORDER_TYPE>(y + 2, border_buffer);
     src_n1 = src.Ptr<St, BORDER_TYPE>(y + 3, border_buffer);
 
-    MI_S32 h_align2 = (end_row - start_row) & (-2);
+    DT_S32 h_align2 = (end_row - start_row) & (-2);
     for (; y < start_row + h_align2; y += 2)
     {
         dst_c0 = dst.Ptr<Dt>(y);
@@ -681,7 +681,7 @@ static Status Laplacian5x5NeonHelper(Context *ctx, const Mat &src, Mat &dst, con
     AURA_UNUSED(target);
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -689,8 +689,8 @@ static Status Laplacian5x5NeonHelper(Context *ctx, const Mat &src, Mat &dst, con
 
     Status ret = Status::ERROR;
 
-    MI_S32 height  = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 height  = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (channel)
     {
@@ -743,18 +743,18 @@ static Status Laplacian5x5NeonHelper(Context *ctx, const Mat &src, Mat &dst, Bor
 {
     Status ret = Status::ERROR;
 
-    St *border_buffer = MI_NULL;
+    St *border_buffer = DT_NULL;
     std::vector<St> vec_border_value = border_value.ToVector<St>();
 
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (border_type)
     {
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -804,36 +804,36 @@ Status Laplacian5x5Neon(Context *ctx, const Mat &src, Mat &dst, BorderType borde
                         const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
 
     switch (pattern)
     {
         case AURA_MAKE_PATTERN(ElemType::U8, ElemType::S16):
         {
-            ret = Laplacian5x5NeonHelper<MI_U8, MI_S16>(ctx, src, dst, border_type, border_value, target);
+            ret = Laplacian5x5NeonHelper<DT_U8, DT_S16>(ctx, src, dst, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Laplacian5x5NeonHelper<MI_U8> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian5x5NeonHelper<DT_U8> failed");
             }
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::U16, ElemType::U16):
         {
-            ret = Laplacian5x5NeonHelper<MI_U16, MI_U16>(ctx, src, dst, border_type, border_value, target);
+            ret = Laplacian5x5NeonHelper<DT_U16, DT_U16>(ctx, src, dst, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Laplacian5x5NeonHelper<MI_U16> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian5x5NeonHelper<DT_U16> failed");
             }
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::S16, ElemType::S16):
         {
-            ret = Laplacian5x5NeonHelper<MI_S16, MI_S16>(ctx, src, dst, border_type, border_value, target);
+            ret = Laplacian5x5NeonHelper<DT_S16, DT_S16>(ctx, src, dst, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Laplacian5x5NeonHelper<MI_S16> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian5x5NeonHelper<DT_S16> failed");
             }
             break;
         }
@@ -852,10 +852,10 @@ Status Laplacian5x5Neon(Context *ctx, const Mat &src, Mat &dst, BorderType borde
 
         case AURA_MAKE_PATTERN(ElemType::F32, ElemType::F32):
         {
-            ret = Laplacian5x5NeonHelper<MI_F32, MI_F32>(ctx, src, dst, border_type, border_value, target);
+            ret = Laplacian5x5NeonHelper<DT_F32, DT_F32>(ctx, src, dst, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Laplacian5x5NeonHelper<MI_F32> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian5x5NeonHelper<DT_F32> failed");
             }
             break;
         }

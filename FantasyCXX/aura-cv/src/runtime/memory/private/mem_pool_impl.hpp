@@ -15,61 +15,61 @@ class MemPool::Impl
 public:
 ~Impl();
 
-    AURA_VOID* Allocate(MI_S32 type, MI_S64 size, MI_S32 align,
-        const MI_CHAR *file, const MI_CHAR *func, MI_S32 line);
+    DT_VOID* Allocate(DT_S32 type, DT_S64 size, DT_S32 align,
+        const DT_CHAR *file, const DT_CHAR *func, DT_S32 line);
         Impl(Context *ctx);
 
-    Status Free(AURA_VOID *ptr);
+    Status Free(DT_VOID *ptr);
 
     Status Map(const Buffer &buffer);
 
     Status Unmap(const Buffer &buffer);
 
-    Buffer GetBuffer(AURA_VOID *ptr);
+    Buffer GetBuffer(DT_VOID *ptr);
 
-    Status RegisterAllocator(MI_S32 type, Allocator *allocator);
+    Status RegisterAllocator(DT_S32 type, Allocator *allocator);
 
-    Status UnregisterAllocator(MI_S32 type);
+    Status UnregisterAllocator(DT_S32 type);
 
-    Allocator* GetAllocator(MI_S32 type);
+    Allocator* GetAllocator(DT_S32 type);
 
-    AURA_VOID MemTraceSet(MI_BOOL enable);
+    DT_VOID MemTraceSet(DT_BOOL enable);
 
-    AURA_VOID MemTraceBegin(const std::string &tag);
+    DT_VOID MemTraceBegin(const std::string &tag);
 
-    AURA_VOID MemTraceEnd(const std::string &tag);
+    DT_VOID MemTraceEnd(const std::string &tag);
 
-    AURA_VOID MemTraceClear();
+    DT_VOID MemTraceClear();
 
     std::string MemTraceReport();
 
 private:
     struct MemTraceData
     {
-        MemTraceData(MI_S32 l, size_t cnt, MI_S64 cur, MI_S64 max)
+        MemTraceData(DT_S32 l, size_t cnt, DT_S64 cur, DT_S64 max)
                    : level(l), alloc_cnt(cnt), cur_size(cur), max_size(max)
         {}
 
         size_t level;
         size_t alloc_cnt;
-        MI_S64 cur_size;
-        MI_S64 max_size;
+        DT_S64 cur_size;
+        DT_S64 max_size;
     };
 
     struct MemBlkData
     {
-        MemBlkData(const MI_CHAR *file_name, const MI_CHAR *func_name, MI_S32 line_num,
-                   Buffer &buffer, MI_BOOL mapped) 
+        MemBlkData(const DT_CHAR *file_name, const DT_CHAR *func_name, DT_S32 line_num,
+                   Buffer &buffer, DT_BOOL mapped) 
                  : file(file_name), func(func_name), line(line_num),
                    buffer(buffer), is_mapped(mapped)
         {}
 
         std::string file;
         std::string func;
-        MI_S32      line;
+        DT_S32      line;
 
         Buffer  buffer;
-        MI_BOOL is_mapped;
+        DT_BOOL is_mapped;
     };
 
     Context   *m_ctx;
@@ -77,16 +77,16 @@ private:
 
     std::deque<std::pair<std::string, MemTraceData>> m_mtrace_running;
     std::deque<std::pair<std::string, MemTraceData>> m_mtrace_completed;
-    std::atomic<MI_BOOL> m_mtrace_enable;
-    std::atomic<MI_BOOL> m_mtrace_match;
+    std::atomic<DT_BOOL> m_mtrace_enable;
+    std::atomic<DT_BOOL> m_mtrace_match;
     std::string m_mtrace_dismatch_string;
     std::mutex m_mtrace_lock;
 
-    MI_S64 m_peak_mem_size;
-    MI_S64 m_total_mem_size;
+    DT_S64 m_peak_mem_size;
+    DT_S64 m_total_mem_size;
 
-    std::unordered_map<MI_UPTR_T, MemBlkData> m_mblk_map;
-    std::unordered_map<MI_S32, Allocator*> m_allocators;
+    std::unordered_map<DT_UPTR_T, MemBlkData> m_mblk_map;
+    std::unordered_map<DT_S32, Allocator*> m_allocators;
 };
 
 } // namespace aura

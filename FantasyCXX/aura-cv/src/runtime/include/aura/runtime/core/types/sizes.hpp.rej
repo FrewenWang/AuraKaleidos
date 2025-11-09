@@ -7,4 +7,4 @@ diff a/AuraFantasyCXX/aura-aura/src/runtime/include/aura/runtime/core/types/size
 +    Tp0 m_width;    /*!< Width value of the size. 图像的宽度像素个数 */
  };
  
- typedef Sizes2_<MI_S32> Sizes;
+ typedef Sizes2_<DT_S32> Sizes;

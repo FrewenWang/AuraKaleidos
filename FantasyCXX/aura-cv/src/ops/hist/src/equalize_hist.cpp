@@ -34,12 +34,12 @@ Status EqualizeHist::SetArgs(const Array *src, Array *dst)
 {
     Status ret = Status::ERROR;
 
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return ret;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return ret;
@@ -48,14 +48,14 @@ Status EqualizeHist::SetArgs(const Array *src, Array *dst)
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateEqualizeHistImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     EqualizeHistImpl *equalize_hist_impl = dynamic_cast<EqualizeHistImpl *>(m_impl.get());
-    if (MI_NULL == equalize_hist_impl)
+    if (DT_NULL == equalize_hist_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "equalize_hist_impl is null ptr");
         return ret;
@@ -74,14 +74,14 @@ AURA_EXPORTS Status IEqualizeHist(Context *ctx, const Mat &src, Mat &dst, const 
 }
 
 EqualizeHistImpl::EqualizeHistImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "EqualizeHist", target),
-                                                                           m_src(MI_NULL), m_dst(MI_NULL)
+                                                                           m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
 Status EqualizeHistImpl::SetArgs(const Array *src, Array *dst)
 {
     Status ret = Status::ERROR;
 
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return ret;
     }
@@ -136,7 +136,7 @@ std::string EqualizeHistImpl::ToString() const
     return str;
 }
 
-AURA_VOID EqualizeHistImpl::Dump(const std::string &prefix) const
+DT_VOID EqualizeHistImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

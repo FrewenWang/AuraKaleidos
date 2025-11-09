@@ -40,12 +40,12 @@ Flip::Flip(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Flip::SetArgs(const Array *src, Array *dst, FlipType type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -54,14 +54,14 @@ Status Flip::SetArgs(const Array *src, Array *dst, FlipType type)
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateFlipImpl(m_ctx, impl_target);
     }
 
     // run initialize
     FlipImpl *flip_impl = dynamic_cast<FlipImpl*>(m_impl.get());
-    if (MI_NULL == flip_impl)
+    if (DT_NULL == flip_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "flip_impl is null ptr");
         return Status::ERROR;
@@ -79,18 +79,18 @@ AURA_EXPORTS Status IFlip(Context *ctx, const Mat &src, Mat &dst, FlipType type,
     return OpCall(ctx, flip, &src, &dst, type);
 }
 
-FlipImpl::FlipImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Flip", target), m_src(MI_NULL),
-                                                           m_dst(MI_NULL), m_type(FlipType::BOTH)
+FlipImpl::FlipImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Flip", target), m_src(DT_NULL),
+                                                           m_dst(DT_NULL), m_type(FlipType::BOTH)
 {}
 
 Status FlipImpl::SetArgs(const Array *src, Array *dst, FlipType type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -134,7 +134,7 @@ std::string FlipImpl::ToString() const
     return str;
 }
 
-AURA_VOID FlipImpl::Dump(const std::string &prefix) const
+DT_VOID FlipImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

@@ -31,7 +31,7 @@ static AuraSumMeanFunc GetAuraSumMeanFunc(SumMeanOpType op)
         }
         default: 
         {
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 }
@@ -120,7 +120,7 @@ public:
     SumMeanTest(Context *ctx, SumMeanTestParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         SumMeanTestParam run_param(GetParam((index)));
         ElemType elem_type = run_param.elem_type;
@@ -136,7 +136,7 @@ public:
         AURA_LOGI(m_ctx, AURA_TAG, "\n\n######################### SumMean Test Param: %s\n", run_param.ToString().c_str());
 
         /// Create src mats
-        MI_S32 mem_type = AURA_MEM_DEFAULT;
+        DT_S32 mem_type = AURA_MEM_DEFAULT;
         Mat src = m_factory.GetRandomMat(-1000, 1100, elem_type, sizes, mem_type, strides);
 
         TestResult result;
@@ -151,10 +151,10 @@ public:
         Scalar ref_scalar;
         std::stringstream ss;
         Status status_exec;
-        MI_S32 loop_count = stress_count ? stress_count : 5;
+        DT_S32 loop_count = stress_count ? stress_count : 5;
 
         AuraSumMeanFunc aura_func = GetAuraSumMeanFunc(op);
-        if (MI_NULL == aura_func)
+        if (DT_NULL == aura_func)
         {
             AURA_LOGE(m_ctx, AURA_TAG, "Aura Binary Function get failed \n");
             result.perf_status = TestStatus::FAILED;

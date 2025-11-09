@@ -6,8 +6,8 @@ using namespace aura;
 #define AURA_RUNTIME_PACKAGE_NAME                 "aura.runtime.xtensa"
 #define AURA_RUNTIME_RPC_PARAM_OP_NAME            "rpc_param_test"
 
-using RpcParamInParam    = XtensaRpcParamType<std::string, std::unordered_map<std::string, MI_S32>>;
-using RpcParamOutParam   = XtensaRpcParamType<MI_S32, std::vector<MI_S32>, std::unordered_map<std::string, MI_S32>>;
+using RpcParamInParam    = XtensaRpcParamType<std::string, std::unordered_map<std::string, DT_S32>>;
+using RpcParamOutParam   = XtensaRpcParamType<DT_S32, std::vector<DT_S32>, std::unordered_map<std::string, DT_S32>>;
 
 template<typename Tp>
 void CheckResult(const Tp &val1, const Tp &val2)
@@ -38,7 +38,7 @@ NEW_TESTCASE(runtime_xtensa_rpc_param_test)
     RpcParamOutParam out_param(ctx, rpc_param);
 
     std::string str("rpc pram test");
-    std::unordered_map<std::string, MI_S32> map = {{"aaa", 1}, {"bbb", 2}, {"ccc", 3}};
+    std::unordered_map<std::string, DT_S32> map = {{"aaa", 1}, {"bbb", 2}, {"ccc", 3}};
 
     ret = in_param.Set(str, map);
     if (ret != Status::OK)
@@ -55,9 +55,9 @@ NEW_TESTCASE(runtime_xtensa_rpc_param_test)
         return;
     }
 
-    MI_S32 value = 0;
-    std::vector<MI_S32> vec;
-    std::unordered_map<std::string, MI_S32> map_out;
+    DT_S32 value = 0;
+    std::vector<DT_S32> vec;
+    std::unordered_map<std::string, DT_S32> map_out;
     ret = out_param.Get(value, vec, map_out);
     if (ret != Status::OK)
     {
@@ -65,16 +65,16 @@ NEW_TESTCASE(runtime_xtensa_rpc_param_test)
         return;
     }
 
-    MI_S32 ref_value = 999;
+    DT_S32 ref_value = 999;
     CheckResult(ref_value, value);
 
-    std::vector<MI_S32> ref_vec = {1, 2, 3};
+    std::vector<DT_S32> ref_vec = {1, 2, 3};
     for (size_t i = 0; i < vec.size(); i++)
     {
         CheckResult(ref_vec[i], vec[i]);
     }
 
-    std::map<std::string, MI_S32> ref_map_out = {{"ddd", 4}, {"eee", 5}, {"fff", 6}};
+    std::map<std::string, DT_S32> ref_map_out = {{"ddd", 4}, {"eee", 5}, {"fff", 6}};
     for (auto it = map_out.begin(); it != map_out.end(); it++)
     {
         auto ref_it = ref_map_out.find(it->first);

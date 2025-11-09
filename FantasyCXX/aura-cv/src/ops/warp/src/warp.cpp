@@ -7,9 +7,9 @@ namespace aura
 {
 
 #if (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))
-Status InitMapGrid(Context *ctx, const Mat &matrix, Mat &grid, MI_S32 grid_pitch)
+Status InitMapGrid(Context *ctx, const Mat &matrix, Mat &grid, DT_S32 grid_pitch)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -20,10 +20,10 @@ Status InitMapGrid(Context *ctx, const Mat &matrix, Mat &grid, MI_S32 grid_pitch
         return Status::ERROR;
     }
 
-    MI_S32 height = grid.GetSizes().m_height;
-    MI_S32 width  = grid.GetSizes().m_width;
+    DT_S32 height = grid.GetSizes().m_height;
+    DT_S32 width  = grid.GetSizes().m_width;
 
-    MI_F64 mivt[6];
+    DT_F64 mivt[6];
     InverseMatrix2x3(matrix, mivt);
 
     Mat map_x = Mat(ctx, ElemType::F32, aura::Sizes3(1, width, 2));
@@ -34,28 +34,28 @@ Status InitMapGrid(Context *ctx, const Mat &matrix, Mat &grid, MI_S32 grid_pitch
         return Status::ERROR;
     }
 
-    MI_F32 *map_x_row = map_x.Ptr<MI_F32>(0);
-    MI_F32 *map_y_row = map_y.Ptr<MI_F32>(0);
+    DT_F32 *map_x_row = map_x.Ptr<DT_F32>(0);
+    DT_F32 *map_y_row = map_y.Ptr<DT_F32>(0);
 
-    for (MI_S32 x = 0; x < width; x++)
+    for (DT_S32 x = 0; x < width; x++)
     {
         map_x_row[(x << 1)]     = (x * grid_pitch) * mivt[0];
         map_x_row[(x << 1) + 1] = (x * grid_pitch) * mivt[3];
     }
 
-    for (MI_S32 y = 0; y < height; y++)
+    for (DT_S32 y = 0; y < height; y++)
     {
         map_y_row[(y << 1)]     = (y * grid_pitch) * mivt[1] + mivt[2];
         map_y_row[(y << 1) + 1] = (y * grid_pitch) * mivt[4] + mivt[5];
     }
 
-    for (MI_S32 y = 0; y < height; y++)
+    for (DT_S32 y = 0; y < height; y++)
     {
-        MI_S32 *grid_data = grid.Ptr<MI_S32>(y);
-        MI_F32  x_y       = map_y_row[(y << 1)];
-        MI_F32  y_y       = map_y_row[(y << 1) + 1];
+        DT_S32 *grid_data = grid.Ptr<DT_S32>(y);
+        DT_F32  x_y       = map_y_row[(y << 1)];
+        DT_F32  y_y       = map_y_row[(y << 1) + 1];
 
-        for (MI_S32 x = 0; x < width; x++)
+        for (DT_S32 x = 0; x < width; x++)
         {
             grid_data[(x << 1)]     = Round((map_x_row[(x << 1)] + x_y) * 1024.0);
             grid_data[(x << 1) + 1] = Round((map_x_row[(x << 1) + 1] + y_y) * 1024.0);
@@ -66,14 +66,14 @@ Status InitMapGrid(Context *ctx, const Mat &matrix, Mat &grid, MI_S32 grid_pitch
 }
 #endif
 
-AURA_VOID InverseMatrix2x3(const Mat &src, MI_F64 dst[6])
+DT_VOID InverseMatrix2x3(const Mat &src, DT_F64 dst[6])
 {
-    const MI_F64 *src_0 = src.Ptr<MI_F64>(0);
-    const MI_F64 *src_1 = src.Ptr<MI_F64>(1);
+    const DT_F64 *src_0 = src.Ptr<DT_F64>(0);
+    const DT_F64 *src_1 = src.Ptr<DT_F64>(1);
 
-    MI_F64 d   = src_0[0] * src_1[1] - src_0[1] * src_1[0];
+    DT_F64 d   = src_0[0] * src_1[1] - src_0[1] * src_1[0];
     d          = NearlyEqual(d, 0) ? 0.f : 1.f / d;
-    MI_F64 a11 = src_1[1] * d, a22 = src_0[0] * d;
+    DT_F64 a11 = src_1[1] * d, a22 = src_0[0] * d;
 
     dst[0] = a11;
     dst[1] = src_0[1] * (-d);
@@ -83,29 +83,29 @@ AURA_VOID InverseMatrix2x3(const Mat &src, MI_F64 dst[6])
     dst[5] = -dst[3] * src_0[2] - dst[4] * src_1[2];
 }
 
-AURA_VOID InverseMatrix3x3(const Mat &src, MI_F64 dst[9])
+DT_VOID InverseMatrix3x3(const Mat &src, DT_F64 dst[9])
 {
-    const MI_F64 *src_0 = src.Ptr<MI_F64>(0);
-    const MI_F64 *src_1 = src.Ptr<MI_F64>(1);
-    const MI_F64 *src_2 = src.Ptr<MI_F64>(2);
+    const DT_F64 *src_0 = src.Ptr<DT_F64>(0);
+    const DT_F64 *src_1 = src.Ptr<DT_F64>(1);
+    const DT_F64 *src_2 = src.Ptr<DT_F64>(2);
 
-    MI_F64 d = src_0[0] * ((MI_F64)src_1[1] * src_2[2] - (MI_F64)src_1[2] * src_2[1]) -
-               src_0[1] * ((MI_F64)src_1[0] * src_2[2] - (MI_F64)src_1[2] * src_2[0]) +
-               src_0[2] * ((MI_F64)src_1[0] * src_2[1] - (MI_F64)src_1[1] * src_2[0]);
+    DT_F64 d = src_0[0] * ((DT_F64)src_1[1] * src_2[2] - (DT_F64)src_1[2] * src_2[1]) -
+               src_0[1] * ((DT_F64)src_1[0] * src_2[2] - (DT_F64)src_1[2] * src_2[0]) +
+               src_0[2] * ((DT_F64)src_1[0] * src_2[1] - (DT_F64)src_1[1] * src_2[0]);
 
     d = NearlyEqual(d, 0) ? 0.f : 1.f / d;
 
-    dst[0] = ((MI_F64)src_1[1] * src_2[2] - (MI_F64)src_1[2] * src_2[1]) * d;
-    dst[1] = ((MI_F64)src_0[2] * src_2[1] - (MI_F64)src_0[1] * src_2[2]) * d;
-    dst[2] = ((MI_F64)src_0[1] * src_1[2] - (MI_F64)src_0[2] * src_1[1]) * d;
+    dst[0] = ((DT_F64)src_1[1] * src_2[2] - (DT_F64)src_1[2] * src_2[1]) * d;
+    dst[1] = ((DT_F64)src_0[2] * src_2[1] - (DT_F64)src_0[1] * src_2[2]) * d;
+    dst[2] = ((DT_F64)src_0[1] * src_1[2] - (DT_F64)src_0[2] * src_1[1]) * d;
 
-    dst[3] = ((MI_F64)src_1[2] * src_2[0] - (MI_F64)src_1[0] * src_2[2]) * d;
-    dst[4] = ((MI_F64)src_0[0] * src_2[2] - (MI_F64)src_0[2] * src_2[0]) * d;
-    dst[5] = ((MI_F64)src_0[2] * src_1[0] - (MI_F64)src_0[0] * src_1[2]) * d;
+    dst[3] = ((DT_F64)src_1[2] * src_2[0] - (DT_F64)src_1[0] * src_2[2]) * d;
+    dst[4] = ((DT_F64)src_0[0] * src_2[2] - (DT_F64)src_0[2] * src_2[0]) * d;
+    dst[5] = ((DT_F64)src_0[2] * src_1[0] - (DT_F64)src_0[0] * src_1[2]) * d;
 
-    dst[6] = ((MI_F64)src_1[0] * src_2[1] - (MI_F64)src_1[1] * src_2[0]) * d;
-    dst[7] = ((MI_F64)src_0[1] * src_2[0] - (MI_F64)src_0[0] * src_2[1]) * d;
-    dst[8] = ((MI_F64)src_0[0] * src_1[1] - (MI_F64)src_0[1] * src_1[0]) * d;
+    dst[6] = ((DT_F64)src_1[0] * src_2[1] - (DT_F64)src_1[1] * src_2[0]) * d;
+    dst[7] = ((DT_F64)src_0[1] * src_2[0] - (DT_F64)src_0[0] * src_2[1]) * d;
+    dst[8] = ((DT_F64)src_0[0] * src_1[1] - (DT_F64)src_0[1] * src_1[0]) * d;
 }
 
 static std::shared_ptr<WarpImpl> CreateWarpImpl(Context *ctx, WarpType warp_type, const OpTarget &target)
@@ -159,12 +159,12 @@ WarpAffine::WarpAffine(Context *ctx, const OpTarget &target) : Op(ctx, target)
 Status WarpAffine::SetArgs(const Array *src, const Array *matrix, Array *dst, InterpType interp_type,
                            BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst) || (MI_NULL == matrix))
+    if ((DT_NULL == src) || (DT_NULL == dst) || (DT_NULL == matrix))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst/matrix is null ptr");
         return Status::ERROR;
@@ -204,14 +204,14 @@ Status WarpAffine::SetArgs(const Array *src, const Array *matrix, Array *dst, In
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateWarpImpl(m_ctx, WarpType::AFFINE, impl_target);
     }
 
     // run initialize
     WarpImpl *warp_impl = dynamic_cast<WarpImpl*>(m_impl.get());
-    if (MI_NULL == warp_impl)
+    if (DT_NULL == warp_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "warp_impl is null ptr");
         return Status::ERROR;
@@ -222,10 +222,10 @@ Status WarpAffine::SetArgs(const Array *src, const Array *matrix, Array *dst, In
     AURA_RETURN(m_ctx, ret);
 }
 
-Status WarpAffine::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, BorderType border_type, InterpType interp_type)
+Status WarpAffine::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, BorderType border_type, InterpType interp_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -261,12 +261,12 @@ WarpPerspective::WarpPerspective(Context *ctx, const OpTarget &target) : Op(ctx,
 Status WarpPerspective::SetArgs(const Array *src, const Array *matrix, Array *dst, InterpType interp_type,
                                 BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst) || (MI_NULL == matrix))
+    if ((DT_NULL == src) || (DT_NULL == dst) || (DT_NULL == matrix))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst/matrix is null ptr");
         return Status::ERROR;
@@ -295,14 +295,14 @@ Status WarpPerspective::SetArgs(const Array *src, const Array *matrix, Array *ds
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateWarpImpl(m_ctx, WarpType::PERSPECTIVE, impl_target);
     }
 
     // run initialize
     WarpImpl *warp_impl = dynamic_cast<WarpImpl*>(m_impl.get());
-    if (MI_NULL == warp_impl)
+    if (DT_NULL == warp_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "warp_impl is null ptr");
         return Status::ERROR;
@@ -313,10 +313,10 @@ Status WarpPerspective::SetArgs(const Array *src, const Array *matrix, Array *ds
     AURA_RETURN(m_ctx, ret);
 }
 
-Status WarpPerspective::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, BorderType border_type, InterpType interp_type)
+Status WarpPerspective::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, BorderType border_type, InterpType interp_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -347,7 +347,7 @@ AURA_EXPORTS Status IWarpPerspective(Context *ctx, const Mat &src, const Mat &ma
 }
 
 WarpImpl::WarpImpl(Context *ctx, WarpType warp_type, const OpTarget &target) : OpImpl(ctx, "Warp", target),
-                                                                               m_src(MI_NULL), m_matrix(MI_NULL), m_dst(MI_NULL),
+                                                                               m_src(DT_NULL), m_matrix(DT_NULL), m_dst(DT_NULL),
                                                                                m_warp_type(warp_type), m_interp_type(InterpType::LINEAR),
                                                                                m_border_type(BorderType::REPLICATE)
 {}
@@ -355,7 +355,7 @@ WarpImpl::WarpImpl(Context *ctx, WarpType warp_type, const OpTarget &target) : O
 Status WarpImpl::SetArgs(const Array *src, const Array *matrix, Array *dst, InterpType interp_type,
                          BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -406,7 +406,7 @@ std::string WarpImpl::ToString() const
     return str;
 }
 
-AURA_VOID WarpImpl::Dump(const std::string &prefix) const
+DT_VOID WarpImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -430,20 +430,20 @@ Status WarpImpl::InitMapOffset(Context *ctx, const Mat &matrix, Mat &map_x, Mat 
         return Status::ERROR;
     }
 
-    MI_F32 *map_x_row = map_x.Ptr<MI_F32>(0);
-    MI_F32 *map_y_row = map_y.Ptr<MI_F32>(0);
+    DT_F32 *map_x_row = map_x.Ptr<DT_F32>(0);
+    DT_F32 *map_y_row = map_y.Ptr<DT_F32>(0);
 
     if (WarpType::AFFINE == warp_type)
     {
-        MI_F64 mivt[6];
+        DT_F64 mivt[6];
         InverseMatrix2x3(matrix, mivt);
 
-        for (MI_S32 x = 0; x < map_x.GetSizes().m_width; x++)
+        for (DT_S32 x = 0; x < map_x.GetSizes().m_width; x++)
         {
             map_x_row[(x << 1)]     = x * mivt[0];
             map_x_row[(x << 1) + 1] = x * mivt[3];
         }
-        for (MI_S32 y = 0; y < map_y.GetSizes().m_width; y++)
+        for (DT_S32 y = 0; y < map_y.GetSizes().m_width; y++)
         {
             map_y_row[(y << 1)]     = y * mivt[1] + mivt[2];
             map_y_row[(y << 1) + 1] = y * mivt[4] + mivt[5];
@@ -451,16 +451,16 @@ Status WarpImpl::InitMapOffset(Context *ctx, const Mat &matrix, Mat &map_x, Mat 
     }
     else if (WarpType::PERSPECTIVE == warp_type)
     {
-        MI_F64 mivt[9];
+        DT_F64 mivt[9];
         InverseMatrix3x3(matrix, mivt);
 
-        for (MI_S32 x = 0; x < map_x.GetSizes().m_width; x++)
+        for (DT_S32 x = 0; x < map_x.GetSizes().m_width; x++)
         {
             map_x_row[x * 3]     = x * mivt[0];
             map_x_row[x * 3 + 1] = x * mivt[3];
             map_x_row[x * 3 + 2] = x * mivt[6];
         }
-        for (MI_S32 y = 0; y < map_y.GetSizes().m_width; y++)
+        for (DT_S32 y = 0; y < map_y.GetSizes().m_width; y++)
         {
             map_y_row[y * 3]     = y * mivt[1] + mivt[2];
             map_y_row[y * 3 + 1] = y * mivt[4] + mivt[5];
@@ -479,7 +479,7 @@ Status WarpImpl::InitMapOffset(Context *ctx, const Mat &matrix, Mat &map_x, Mat 
 AURA_EXPORTS Mat GetAffineTransform(Context *ctx, const std::vector<Point2> &src,
                                     const std::vector<Point2> &dst)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Mat();
     }
@@ -490,11 +490,11 @@ AURA_EXPORTS Mat GetAffineTransform(Context *ctx, const std::vector<Point2> &src
         return Mat();
     }
 
-    MI_F64 det = src[0].m_x * ((MI_F64)src[1].m_y - src[2].m_y) -
-                 src[0].m_y * ((MI_F64)src[1].m_x - src[2].m_x) +
-                 ((MI_F64)src[1].m_x * src[2].m_y - (MI_F64)src[1].m_y * src[2].m_x);
+    DT_F64 det = src[0].m_x * ((DT_F64)src[1].m_y - src[2].m_y) -
+                 src[0].m_y * ((DT_F64)src[1].m_x - src[2].m_x) +
+                 ((DT_F64)src[1].m_x * src[2].m_y - (DT_F64)src[1].m_y * src[2].m_x);
 
-    if (NearlyEqual(det, (MI_F64)0))
+    if (NearlyEqual(det, (DT_F64)0))
     {
         AURA_ADD_ERROR_STRING(ctx, "determinant of src is 0");
         return Mat();
@@ -509,44 +509,44 @@ AURA_EXPORTS Mat GetAffineTransform(Context *ctx, const std::vector<Point2> &src
 
     det = 1. / det;
 
-    matrix.At<MI_F64>(0, 0) = (((MI_F64)src[1].m_y - (MI_F64)src[2].m_y) * dst[0].m_x +
-                               ((MI_F64)src[2].m_y - (MI_F64)src[0].m_y) * dst[1].m_x +
-                               ((MI_F64)src[0].m_y - (MI_F64)src[1].m_y) * dst[2].m_x) * det;
+    matrix.At<DT_F64>(0, 0) = (((DT_F64)src[1].m_y - (DT_F64)src[2].m_y) * dst[0].m_x +
+                               ((DT_F64)src[2].m_y - (DT_F64)src[0].m_y) * dst[1].m_x +
+                               ((DT_F64)src[0].m_y - (DT_F64)src[1].m_y) * dst[2].m_x) * det;
 
-    matrix.At<MI_F64>(0, 1) = (((MI_F64)src[2].m_x - (MI_F64)src[1].m_x) * dst[0].m_x +
-                               ((MI_F64)src[0].m_x - (MI_F64)src[2].m_x) * dst[1].m_x +
-                               ((MI_F64)src[1].m_x - (MI_F64)src[0].m_x) * dst[2].m_x) * det;
+    matrix.At<DT_F64>(0, 1) = (((DT_F64)src[2].m_x - (DT_F64)src[1].m_x) * dst[0].m_x +
+                               ((DT_F64)src[0].m_x - (DT_F64)src[2].m_x) * dst[1].m_x +
+                               ((DT_F64)src[1].m_x - (DT_F64)src[0].m_x) * dst[2].m_x) * det;
 
-    matrix.At<MI_F64>(0, 2) = (((MI_F64)src[1].m_x * src[2].m_y - (MI_F64)src[1].m_y * src[2].m_x) * dst[0].m_x +
-                               ((MI_F64)src[0].m_y * src[2].m_x - (MI_F64)src[0].m_x * src[2].m_y) * dst[1].m_x +
-                               ((MI_F64)src[0].m_x * src[1].m_y - (MI_F64)src[0].m_y * src[1].m_x) * dst[2].m_x) * det;
+    matrix.At<DT_F64>(0, 2) = (((DT_F64)src[1].m_x * src[2].m_y - (DT_F64)src[1].m_y * src[2].m_x) * dst[0].m_x +
+                               ((DT_F64)src[0].m_y * src[2].m_x - (DT_F64)src[0].m_x * src[2].m_y) * dst[1].m_x +
+                               ((DT_F64)src[0].m_x * src[1].m_y - (DT_F64)src[0].m_y * src[1].m_x) * dst[2].m_x) * det;
 
-    matrix.At<MI_F64>(1, 0) = (((MI_F64)src[1].m_y - (MI_F64)src[2].m_y) * dst[0].m_y +
-                               ((MI_F64)src[2].m_y - (MI_F64)src[0].m_y) * dst[1].m_y +
-                               ((MI_F64)src[0].m_y - (MI_F64)src[1].m_y) * dst[2].m_y) * det;
+    matrix.At<DT_F64>(1, 0) = (((DT_F64)src[1].m_y - (DT_F64)src[2].m_y) * dst[0].m_y +
+                               ((DT_F64)src[2].m_y - (DT_F64)src[0].m_y) * dst[1].m_y +
+                               ((DT_F64)src[0].m_y - (DT_F64)src[1].m_y) * dst[2].m_y) * det;
 
-    matrix.At<MI_F64>(1, 1) = (((MI_F64)src[2].m_x - (MI_F64)src[1].m_x) * dst[0].m_y +
-                               ((MI_F64)src[0].m_x - (MI_F64)src[2].m_x) * dst[1].m_y +
-                               ((MI_F64)src[1].m_x - (MI_F64)src[0].m_x) * dst[2].m_y) * det;
+    matrix.At<DT_F64>(1, 1) = (((DT_F64)src[2].m_x - (DT_F64)src[1].m_x) * dst[0].m_y +
+                               ((DT_F64)src[0].m_x - (DT_F64)src[2].m_x) * dst[1].m_y +
+                               ((DT_F64)src[1].m_x - (DT_F64)src[0].m_x) * dst[2].m_y) * det;
 
-    matrix.At<MI_F64>(1, 2) = (((MI_F64)src[1].m_x * src[2].m_y - (MI_F64)src[1].m_y * src[2].m_x) * dst[0].m_y +
-                               ((MI_F64)src[0].m_y * src[2].m_x - (MI_F64)src[0].m_x * src[2].m_y) * dst[1].m_y +
-                               ((MI_F64)src[0].m_x * src[1].m_y - (MI_F64)src[0].m_y * src[1].m_x) * dst[2].m_y) * det;
+    matrix.At<DT_F64>(1, 2) = (((DT_F64)src[1].m_x * src[2].m_y - (DT_F64)src[1].m_y * src[2].m_x) * dst[0].m_y +
+                               ((DT_F64)src[0].m_y * src[2].m_x - (DT_F64)src[0].m_x * src[2].m_y) * dst[1].m_y +
+                               ((DT_F64)src[0].m_x * src[1].m_y - (DT_F64)src[0].m_y * src[1].m_x) * dst[2].m_y) * det;
 
     return matrix;
 }
 
-static Status SolveLU(Context *ctx, MI_F64 a[8][8], MI_F64 b[8])
+static Status SolveLU(Context *ctx, DT_F64 a[8][8], DT_F64 b[8])
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 0; i < 8; i++)
+    for (DT_S32 i = 0; i < 8; i++)
     {
-        MI_S32 k = i;
-        for (MI_S32 j = i + 1; j < 8; j++)
+        DT_S32 k = i;
+        for (DT_S32 j = i + 1; j < 8; j++)
         {
             if (Abs(a[j][i]) > Abs(a[k][i]))
             {
@@ -562,18 +562,18 @@ static Status SolveLU(Context *ctx, MI_F64 a[8][8], MI_F64 b[8])
 
         if (k != i)
         {
-            for (MI_S32 j = i; j < 8; j++)
+            for (DT_S32 j = i; j < 8; j++)
             {
                 Swap(a[i][j], a[k][j]);
             }
             Swap(b[i], b[k]);
         }
 
-        MI_F64 d = -1 / a[i][i];
-        for (MI_S32 j = i + 1; j < 8; j++)
+        DT_F64 d = -1 / a[i][i];
+        for (DT_S32 j = i + 1; j < 8; j++)
         {
-            MI_F64 alpha = a[j][i] * d;
-            for (MI_S32 k = i + 1; k < 8; k++)
+            DT_F64 alpha = a[j][i] * d;
+            for (DT_S32 k = i + 1; k < 8; k++)
             {
                 a[j][k] += alpha * a[i][k];
             }
@@ -581,10 +581,10 @@ static Status SolveLU(Context *ctx, MI_F64 a[8][8], MI_F64 b[8])
         }
     }
 
-    for (MI_S32 i = 7; i >= 0; i--)
+    for (DT_S32 i = 7; i >= 0; i--)
     {
-        MI_F64 s = b[i];
-        for (MI_S32 k = i + 1; k < 8; k++)
+        DT_F64 s = b[i];
+        for (DT_S32 k = i + 1; k < 8; k++)
         {
             s -= a[i][k] * b[k];
         }
@@ -597,7 +597,7 @@ static Status SolveLU(Context *ctx, MI_F64 a[8][8], MI_F64 b[8])
 AURA_EXPORTS Mat GetPerspectiveTransform(Context *ctx, const std::vector<Point2> &src,
                                          const std::vector<Point2> &dst)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Mat();
     }
@@ -615,10 +615,10 @@ AURA_EXPORTS Mat GetPerspectiveTransform(Context *ctx, const std::vector<Point2>
         return Mat();
     }
 
-    MI_F64 a[8][8];
-    MI_F64 b[8];
+    DT_F64 a[8][8];
+    DT_F64 b[8];
 
-    for (MI_S32 i = 0; i < 4; i++)
+    for (DT_S32 i = 0; i < 4; i++)
     {
         a[i][0] = a[i + 4][3] = src[i].m_x;
         a[i][1] = a[i + 4][4] = src[i].m_y;
@@ -640,22 +640,22 @@ AURA_EXPORTS Mat GetPerspectiveTransform(Context *ctx, const std::vector<Point2>
         return Mat();
     }
 
-    matrix.At<MI_F64>(0, 0) = b[0];
-    matrix.At<MI_F64>(0, 1) = b[1];
-    matrix.At<MI_F64>(0, 2) = b[2];
-    matrix.At<MI_F64>(1, 0) = b[3];
-    matrix.At<MI_F64>(1, 1) = b[4];
-    matrix.At<MI_F64>(1, 2) = b[5];
-    matrix.At<MI_F64>(2, 0) = b[6];
-    matrix.At<MI_F64>(2, 1) = b[7];
-    matrix.At<MI_F64>(2, 2) = 1;
+    matrix.At<DT_F64>(0, 0) = b[0];
+    matrix.At<DT_F64>(0, 1) = b[1];
+    matrix.At<DT_F64>(0, 2) = b[2];
+    matrix.At<DT_F64>(1, 0) = b[3];
+    matrix.At<DT_F64>(1, 1) = b[4];
+    matrix.At<DT_F64>(1, 2) = b[5];
+    matrix.At<DT_F64>(2, 0) = b[6];
+    matrix.At<DT_F64>(2, 1) = b[7];
+    matrix.At<DT_F64>(2, 2) = 1;
 
     return matrix;
 }
 
-AURA_EXPORTS Mat GetRotationMatrix2D(Context *ctx, const Point2 &center, MI_F64 angle, MI_F64 scale)
+AURA_EXPORTS Mat GetRotationMatrix2D(Context *ctx, const Point2 &center, DT_F64 angle, DT_F64 scale)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Mat();
     }
@@ -668,22 +668,22 @@ AURA_EXPORTS Mat GetRotationMatrix2D(Context *ctx, const Point2 &center, MI_F64 
     }
 
     angle *= AURA_PI / 180;
-    MI_F64 alpha = Cos(angle) * scale;
-    MI_F64 beta  = Sin(angle) * scale;
+    DT_F64 alpha = Cos(angle) * scale;
+    DT_F64 beta  = Sin(angle) * scale;
 
-    matrix.At<MI_F64>(0, 0) = alpha;
-    matrix.At<MI_F64>(0, 1) = beta;
-    matrix.At<MI_F64>(0, 2) = (1 - alpha) * center.m_x - beta * center.m_y;
-    matrix.At<MI_F64>(1, 0) = -beta;
-    matrix.At<MI_F64>(1, 1) = alpha;
-    matrix.At<MI_F64>(1, 2) = beta * center.m_x + (1 - alpha) * center.m_y;
+    matrix.At<DT_F64>(0, 0) = alpha;
+    matrix.At<DT_F64>(0, 1) = beta;
+    matrix.At<DT_F64>(0, 2) = (1 - alpha) * center.m_x - beta * center.m_y;
+    matrix.At<DT_F64>(1, 0) = -beta;
+    matrix.At<DT_F64>(1, 1) = alpha;
+    matrix.At<DT_F64>(1, 2) = beta * center.m_x + (1 - alpha) * center.m_y;
 
     return matrix;
 }
 
 AURA_EXPORTS Status WarpCoord(Context *ctx, const Mat &matrix, Mat &map_xy, WarpType warp_type, const OpTarget &target)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }

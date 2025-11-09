@@ -1,0 +1,19 @@
+#!/bin/bash
+file=$1
+
+expect << EOF
+    set timeout -1
+    spawn adb shell
+    expect "e171" { send "mkdir /data/local/tmp\r" }
+    expect "e171" { send "rm -r /data/local/tmp/$file\r" }
+    expect "e171" { send "exit\r" }
+    expect eof
+EOF
+adb push $file /data/local/tmp/
+
+expect << EOF
+    set timeout -1
+    spawn adb shell
+    expect "e171" { send "busybox ftpput -u root -p togxuh-8Cyzto-juqven 192.168.78.2 /data/$file /data/local/tmp/$file; rm -r /data/local/tmp/$file; exit\r" }
+    expect eof
+EOF

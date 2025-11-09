@@ -46,8 +46,8 @@ static std::shared_ptr<TransposeImpl> CreateTransposeImpl(Context *ctx, const Op
 #if defined(AURA_ENABLE_NEON)
 AURA_INLINE Status CheckTransposeNeonParam(const Array *src)
 {
-    MI_S32 width  = src->GetSizes().m_width;
-    MI_S32 height = src->GetSizes().m_height;
+    DT_S32 width  = src->GetSizes().m_width;
+    DT_S32 height = src->GetSizes().m_height;
     if ((width < 8) || (height < 8))
     {
         return Status::ERROR;
@@ -61,12 +61,12 @@ Transpose::Transpose(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Transpose::SetArgs(const Array *src, Array *dst)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -105,14 +105,14 @@ Status Transpose::SetArgs(const Array *src, Array *dst)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateTransposeImpl(m_ctx, impl_target);
     }
 
     // run initialize
     TransposeImpl *transpose_impl = dynamic_cast<TransposeImpl*>(m_impl.get());
-    if (MI_NULL == transpose_impl)
+    if (DT_NULL == transpose_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "transpose_impl is null ptr");
         return Status::ERROR;
@@ -123,10 +123,10 @@ Status Transpose::SetArgs(const Array *src, Array *dst)
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Transpose::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 ochannel)
+Status Transpose::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 ochannel)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -154,17 +154,17 @@ AURA_EXPORTS Status ITranspose(Context *ctx, const Mat &src, Mat &dst, const OpT
 }
 
 TransposeImpl::TransposeImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Transpose", target),
-                                                                     m_src(MI_NULL), m_dst(MI_NULL)
+                                                                     m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
 Status TransposeImpl::SetArgs(const Array *src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -216,7 +216,7 @@ std::string TransposeImpl::ToString() const
     return str;
 }
 
-AURA_VOID TransposeImpl::Dump(const std::string &prefix) const
+DT_VOID TransposeImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

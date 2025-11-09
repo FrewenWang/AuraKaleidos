@@ -110,8 +110,8 @@ public:
      *
      * For more details, please refer to @ref houghlines_details
      */
-    Status SetArgs(const Array *src, std::vector<Scalar> &lines, LinesType line_type, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                   MI_F64 srn = 0, MI_F64 stn = 0, MI_F64 min_theta = 0, MI_F64 max_theta = AURA_PI);
+    Status SetArgs(const Array *src, std::vector<Scalar> &lines, LinesType line_type, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                   DT_F64 srn = 0, DT_F64 stn = 0, DT_F64 min_theta = 0, DT_F64 max_theta = AURA_PI);
 };
 
 /**
@@ -146,8 +146,8 @@ public:
      *
      * For more details, please refer to @ref houghlinesp_details
      */
-    Status SetArgs(const Array *src, std::vector<Scalari> &lines, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                   MI_F64 min_line_length, MI_F64 max_gap);
+    Status SetArgs(const Array *src, std::vector<Scalari> &lines, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                   DT_F64 min_line_length, DT_F64 max_gap);
 };
 
 /**
@@ -178,8 +178,8 @@ public:
  *
  * @note The above implementations support LinesType(VEC2F/VEC3F).
  */
-AURA_EXPORTS Status IHoughLines(Context *ctx, const Mat &mat, std::vector<Scalar> &lines, LinesType line_type, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                                MI_F64 srn = 0, MI_F64 stn = 0, MI_F64 min_theta = 0, MI_F64 max_theta = AURA_PI, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IHoughLines(Context *ctx, const Mat &mat, std::vector<Scalar> &lines, LinesType line_type, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                                DT_F64 srn = 0, DT_F64 stn = 0, DT_F64 min_theta = 0, DT_F64 max_theta = AURA_PI, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Finds line segments in a binary iaura using the probabilistic Hough transform.
@@ -206,8 +206,8 @@ AURA_EXPORTS Status IHoughLines(Context *ctx, const Mat &mat, std::vector<Scalar
  * NONE      | U8C1
  *
  */
-AURA_EXPORTS Status IHoughLinesP(Context *ctx, const Mat &mat, std::vector<Scalari> &lines, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                                 MI_F64 min_line_length, MI_F64 max_gap, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IHoughLinesP(Context *ctx, const Mat &mat, std::vector<Scalari> &lines, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                                 DT_F64 min_line_length, DT_F64 max_gap, const OpTarget &target = OpTarget::Default());
 
 } // namespace aura
 

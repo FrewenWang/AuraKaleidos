@@ -24,7 +24,7 @@ aura::Status PsnrSampleTest(aura::Context *ctx, aura::TargetType type)
         return status;
     }
 
-    MI_F64 res_psnr = 0.0;
+    DT_F64 res_psnr = 0.0;
 
     // ---------------------
     //     run interface

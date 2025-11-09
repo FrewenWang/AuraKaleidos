@@ -196,7 +196,7 @@ public:
      * @param source The program string to be registered.
      * @param incs The header files required by the program string.
      */
-    CLProgramString(const std::string &name, const MI_CHAR *source, const std::vector<std::string> &incs);
+    CLProgramString(const std::string &name, const DT_CHAR *source, const std::vector<std::string> &incs);
 
     /**
      * @brief Registers the OpenCL program string.
@@ -228,7 +228,7 @@ public:
      * @param cl_perf_level Performance level for OpenCL execution (default: high).
      * @param cl_priority_level Priority level for OpenCL tasks (default: low).
      */
-    CLEngineConfig(MI_BOOL enable_cl,
+    CLEngineConfig(DT_BOOL enable_cl,
                    const std::string &cache_path,
                    const std::string &cache_prefix,
                    CLPrecompiledType cl_precompiled_type  = CLPrecompiledType::INVALID,
@@ -246,7 +246,7 @@ public:
                      m_external_version(external_version)
     {}
 
-    MI_BOOL           m_enable_cl;            /*!< Flag indicating if OpenCL is enabled. */
+    DT_BOOL           m_enable_cl;            /*!< Flag indicating if OpenCL is enabled. */
     CLPerfLevel       m_cl_perf_level;        /*!< Performance level of OpenCL execution. */
     CLPriorityLevel   m_cl_priority_level;    /*!< Priority level for OpenCL tasks. */
     std::string       m_cache_path;           /*!< Directory path for OpenCL kernel cache storage. */
@@ -323,35 +323,35 @@ public:
      *
      * @return True if the OpenCL runtime is valid; otherwise, false.
      */
-    virtual MI_BOOL IsValid() const                             = 0;
+    virtual DT_BOOL IsValid() const                             = 0;
 
     /**
      * @brief Checks if non-uniform workgroups are supported.
      *
      * @return True if non-uniform workgroups are supported; otherwise, false.
      */
-    virtual MI_BOOL IsNonUniformWorkgroupsSupported() const     = 0;
+    virtual DT_BOOL IsNonUniformWorkgroupsSupported() const     = 0;
 
     /**
      * @brief Gets address alignment size based on platform type
      *
      * @return The address alignment size.
      */
-    virtual MI_S32 GetCLAddrAlignSize() const = 0;
+    virtual DT_S32 GetCLAddrAlignSize() const = 0;
 
     /**
      * @brief Checks if memory sharing is supported in the OpenCL runtime.
      *
      * @return True if memory sharing is supported; otherwise, false.
      */
-    virtual MI_BOOL IsMemShareSupported() const = 0;
+    virtual DT_BOOL IsMemShareSupported() const = 0;
 
     /**
      * @brief Gets the length alignment size for OpenCL memory objects.
      * 
      * @return The length alignment size.
      */
-    virtual MI_S32 GetCLLengthAlignSize() const = 0;
+    virtual DT_S32 GetCLLengthAlignSize() const = 0;
 
     /**
      * @brief Gets the slice alignment size for a specific OpenCL iaura format and dimensions.
@@ -362,7 +362,7 @@ public:
      *
      * @return The slice alignment size.
      */
-    virtual MI_S32 GetCLSliceAlignSize(const cl_iaura_format &cl_fmt, size_t width, size_t height) const = 0;
+    virtual DT_S32 GetCLSliceAlignSize(const cl_iaura_format &cl_fmt, size_t width, size_t height) const = 0;
 
     /**
      * @brief Creates a new OpenCL buffer.
@@ -462,7 +462,7 @@ public:
      *
      * @return The string representation of the maximum constant size.
      */
-    virtual std::string GetCLMaxConstantSizeString(MI_S32 n) = 0;
+    virtual std::string GetCLMaxConstantSizeString(DT_S32 n) = 0;
 
     /**
      * @brief Retrieves the default local size for an OpenCL kernel.
@@ -472,7 +472,7 @@ public:
      *
      * @return The default local size.
      */
-    virtual cl::NDRange GetCLDefaultLocalSize(MI_U32 max_group_size, cl::NDRange &global_size) = 0;
+    virtual cl::NDRange GetCLDefaultLocalSize(DT_U32 max_group_size, cl::NDRange &global_size) = 0;
 
     /**
      * @brief Retrieves information about the GPU.
@@ -486,7 +486,7 @@ public:
      *
      * @param ptr Pointer to the memory object.
      */
-    virtual AURA_VOID DeleteCLMem(AURA_VOID **ptr) = 0;
+    virtual DT_VOID DeleteCLMem(DT_VOID **ptr) = 0;
 
     /**
      * @brief Virtual destructor for CLRuntime.

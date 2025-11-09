@@ -12,8 +12,8 @@ using namespace aura;
 AURA_TEST_PARAM(FastParam,
                 ElemType,         elem_type,
                 MatSize,          mat_sizes,
-                MI_S32,           threshold,
-                MI_BOOL,          nonmax_suppression,
+                DT_S32,           threshold,
+                DT_BOOL,          nonmax_suppression,
                 FastDetectorType, type,
                 OpTarget,         target);
 
@@ -54,7 +54,7 @@ static cv::FastFeatureDetector::DetectorType FastDetectorTypeToOpencv(Context *c
 }
 #endif
 
-static Status CvFast(Context *ctx, Mat &src, std::vector<KeyPoint> &keypoints, MI_S32 threshold, MI_BOOL nonmax_suppression, FastDetectorType type)
+static Status CvFast(Context *ctx, Mat &src, std::vector<KeyPoint> &keypoints, DT_S32 threshold, DT_BOOL nonmax_suppression, FastDetectorType type)
 {
 #if !defined(AURA_BUILD_XPLORER)
     cv::FastFeatureDetector::DetectorType cv_fast_type = FastDetectorTypeToOpencv(ctx, type);
@@ -67,8 +67,8 @@ static Status CvFast(Context *ctx, Mat &src, std::vector<KeyPoint> &keypoints, M
         return Status::ERROR;
     }
 
-    MI_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
-    MI_S32 cv_type = 0;
+    DT_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 cv_type = 0;
 
     if ((src_cv_type != CV_8UC1))
     {
@@ -120,7 +120,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         FastParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -141,7 +141,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         FastParam run_param(GetParam((index)));
@@ -154,14 +154,14 @@ public:
         keypoints_dst.reserve(1024);
         keypoints_ref.reserve(1024);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         UnorderedCmpResult<KeyPoint> cmp_result;
         TestResult result;
 
         // run interface
-        MI_S32 max_num_corners = 3000;
+        DT_S32 max_num_corners = 3000;
         Status ret = Executor(loop_count, 2, time_val, IFast, m_ctx, src, keypoints_dst, run_param.threshold,
                               run_param.nonmax_suppression, run_param.type, max_num_corners,  run_param.target);
 

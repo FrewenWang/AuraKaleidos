@@ -53,12 +53,12 @@ Remap::Remap(Context *ctx, const OpTarget &target) : Op(ctx, target)
 Status Remap::SetArgs(const Array *src, const Array *map, Array *dst, InterpType interp_type,
                       BorderType border_type, const Scalar &border_value)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst) || (MI_NULL == map))
+    if ((DT_NULL == src) || (DT_NULL == dst) || (DT_NULL == map))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst/map is null ptr");
         return Status::ERROR;
@@ -93,14 +93,14 @@ Status Remap::SetArgs(const Array *src, const Array *map, Array *dst, InterpType
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateRemapImpl(m_ctx, impl_target);
     }
 
     // run initialize
     RemapImpl *remap_impl = dynamic_cast<RemapImpl*>(m_impl.get());
-    if (MI_NULL == remap_impl)
+    if (DT_NULL == remap_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "remap_impl is null ptr");
         return Status::ERROR;
@@ -111,11 +111,11 @@ Status Remap::SetArgs(const Array *src, const Array *map, Array *dst, InterpType
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Remap::CLPrecompile(Context *ctx, ElemType map_elem_type, ElemType dst_elem_type, MI_S32 channel,
+Status Remap::CLPrecompile(Context *ctx, ElemType map_elem_type, ElemType dst_elem_type, DT_S32 channel,
                            BorderType border_type, InterpType interp_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -147,15 +147,15 @@ AURA_EXPORTS Status IRemap(Context *ctx, const Mat &src, const Mat &map, Mat &ds
 }
 
 RemapImpl::RemapImpl(Context *ctx, const OpTarget &target = OpTarget::Default()) : OpImpl(ctx, "Remap", target),
-                                                                                   m_src(MI_NULL), m_map(MI_NULL),
-                                                                                   m_dst(MI_NULL), m_interp_type(InterpType::LINEAR),
+                                                                                   m_src(DT_NULL), m_map(DT_NULL),
+                                                                                   m_dst(DT_NULL), m_interp_type(InterpType::LINEAR),
                                                                                    m_border_type(BorderType::REPLICATE)
 {}
 
 Status RemapImpl::SetArgs(const Array *src, const Array *map, Array *dst, InterpType interp_type,
                           BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -213,7 +213,7 @@ std::string RemapImpl::ToString() const
     return str;
 }
 
-AURA_VOID RemapImpl::Dump(const std::string &prefix) const
+DT_VOID RemapImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

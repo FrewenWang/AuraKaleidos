@@ -6,7 +6,7 @@ namespace aura
 {
 
 template <typename Tp, typename VqType = typename neon::QVector<Tp>::VqType>
-AURA_ALWAYS_INLINE AURA_VOID Median7x7Core(VqType *vqs)
+AURA_ALWAYS_INLINE DT_VOID Median7x7Core(VqType *vqs)
 {
     #define OP(r0, r1) MinMaxOp<VqType>(vqs[r0], vqs[r1])
     OP(1, 2);   OP(0, 2);   OP(0, 1);   OP(4, 5);   OP(3, 5);   OP(3, 4);
@@ -150,7 +150,7 @@ AURA_ALWAYS_INLINE AURA_VOID Median7x7Core(VqType *vqs)
 }
 
 template <typename Tp, typename VqType = typename neon::QVector<Tp>::VqType>
-AURA_ALWAYS_INLINE AURA_VOID Median7x7Vector(VqType &vq_src_p2x0, VqType &vq_src_p2x1, VqType &vq_src_p2x2,
+AURA_ALWAYS_INLINE DT_VOID Median7x7Vector(VqType &vq_src_p2x0, VqType &vq_src_p2x1, VqType &vq_src_p2x2,
                                            VqType &vq_src_p1x0, VqType &vq_src_p1x1, VqType &vq_src_p1x2,
                                            VqType &vq_src_p0x0, VqType &vq_src_p0x1, VqType &vq_src_p0x2,
                                            VqType &vq_src_cx0,  VqType &vq_src_cx1,  VqType &vq_src_cx2,
@@ -159,7 +159,7 @@ AURA_ALWAYS_INLINE AURA_VOID Median7x7Vector(VqType &vq_src_p2x0, VqType &vq_src
                                            VqType &vq_src_n2x0, VqType &vq_src_n2x1, VqType &vq_src_n2x2,
                                            VqType &vq_result)
 {
-    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(16 / sizeof(Tp));
+    constexpr DT_S32 ELEM_COUNTS = static_cast<DT_S32>(16 / sizeof(Tp));
 
     VqType vqs[49];
 
@@ -240,16 +240,16 @@ AURA_ALWAYS_INLINE AURA_VOID Median7x7Vector(VqType &vq_src_p2x0, VqType &vq_src
     vq_src_n2x1 = vq_src_n2x2;
 }
 
-template<typename Tp, MI_S32 C>
-static AURA_VOID Median7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_p0, const Tp *src_c,
+template<typename Tp, DT_S32 C>
+static DT_VOID Median7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_p0, const Tp *src_c,
                             const Tp *src_n0, const Tp *src_n1, const Tp *src_n2,
-                            Tp *dst_c, MI_S32 width)
+                            Tp *dst_c, DT_S32 width)
 {
     using MVqType = typename neon::MQVector<Tp, C>::MVType;
 
-    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(16 / sizeof(Tp));
-    constexpr MI_S32 VOFFSET = ELEM_COUNTS * C;
-    const MI_S32 width_align = (width & -ELEM_COUNTS) * C;
+    constexpr DT_S32 ELEM_COUNTS = static_cast<DT_S32>(16 / sizeof(Tp));
+    constexpr DT_S32 VOFFSET = ELEM_COUNTS * C;
+    const DT_S32 width_align = (width & -ELEM_COUNTS) * C;
 
     MVqType mvq_src_p2[3], mvq_src_p1[3], mvq_src_p0[3], mvq_src_c[3], mvq_src_n0[3], mvq_src_n1[3], mvq_src_n2[3];
     MVqType mvq_result;
@@ -271,7 +271,7 @@ static AURA_VOID Median7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_
         neon::vload(src_n1 + VOFFSET, mvq_src_n1[2]);
         neon::vload(src_n2 + VOFFSET, mvq_src_n2[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvq_src_p2[0].val[ch] = GetBorderVector<BorderType::REPLICATE, BorderArea::LEFT>(mvq_src_p2[1].val[ch], src_p2[ch], src_p2[ch]);
             mvq_src_p1[0].val[ch] = GetBorderVector<BorderType::REPLICATE, BorderArea::LEFT>(mvq_src_p1[1].val[ch], src_p1[ch], src_p1[ch]);
@@ -295,7 +295,7 @@ static AURA_VOID Median7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_
 
     //middle
     {
-        for (MI_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
+        for (DT_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
         {
             neon::vload(src_p2 + x + VOFFSET, mvq_src_p2[2]);
             neon::vload(src_p1 + x + VOFFSET, mvq_src_p1[2]);
@@ -305,7 +305,7 @@ static AURA_VOID Median7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_
             neon::vload(src_n1 + x + VOFFSET, mvq_src_n1[2]);
             neon::vload(src_n2 + x + VOFFSET, mvq_src_n2[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Median7x7Vector<Tp>(mvq_src_p2[0].val[ch], mvq_src_p2[1].val[ch], mvq_src_p2[2].val[ch],
                                     mvq_src_p1[0].val[ch], mvq_src_p1[1].val[ch], mvq_src_p1[2].val[ch],
@@ -324,7 +324,7 @@ static AURA_VOID Median7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_
     {
         if (width_align != width * C)
         {
-            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+            DT_S32 x = (width - (ELEM_COUNTS << 1)) * C;
             neon::vload(src_p2 + x - VOFFSET, mvq_src_p2[0]);
             neon::vload(src_p1 + x - VOFFSET, mvq_src_p1[0]);
             neon::vload(src_p0 + x - VOFFSET, mvq_src_p0[0]);
@@ -347,7 +347,7 @@ static AURA_VOID Median7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_
             neon::vload(src_n1 + x + VOFFSET, mvq_src_n1[2]);
             neon::vload(src_n2 + x + VOFFSET, mvq_src_n2[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Median7x7Vector<Tp>(mvq_src_p2[0].val[ch], mvq_src_p2[1].val[ch], mvq_src_p2[2].val[ch],
                                     mvq_src_p1[0].val[ch], mvq_src_p1[1].val[ch], mvq_src_p1[2].val[ch],
@@ -364,10 +364,10 @@ static AURA_VOID Median7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_
 
     // right border
     {
-        MI_S32 x    = (width - ELEM_COUNTS) * C;
-        MI_S32 last = (width - 1) * C;
+        DT_S32 x    = (width - ELEM_COUNTS) * C;
+        DT_S32 last = (width - 1) * C;
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvq_src_p2[2].val[ch] = GetBorderVector<BorderType::REPLICATE, BorderArea::RIGHT>(mvq_src_p2[1].val[ch], src_p2[last + ch], src_p2[last + ch]);
             mvq_src_p1[2].val[ch] = GetBorderVector<BorderType::REPLICATE, BorderArea::RIGHT>(mvq_src_p1[1].val[ch], src_p1[last + ch], src_p1[last + ch]);
@@ -390,11 +390,11 @@ static AURA_VOID Median7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_
     }
 }
 
-template <typename Tp, MI_S32 C>
-static Status Median7x7NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, DT_S32 C>
+static Status Median7x7NeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width = dst.GetSizes().m_width;
-    MI_S32 y = start_row;
+    DT_S32 width = dst.GetSizes().m_width;
+    DT_S32 y = start_row;
 
     const Tp *src_p2 = src.Ptr<Tp, BorderType::REPLICATE>(y - 3);
     const Tp *src_p1 = src.Ptr<Tp, BorderType::REPLICATE>(y - 2);
@@ -429,13 +429,13 @@ static Status Median7x7NeonHelper(Context *ctx, const Mat &src, Mat &dst, const 
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 height = dst.GetSizes().m_height;
+    DT_S32 height = dst.GetSizes().m_height;
 
     switch (dst.GetSizes().m_channel)
     {
@@ -475,60 +475,60 @@ Status Median7x7Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &tar
     {
         case ElemType::U8:
         {
-            ret = Median7x7NeonHelper<MI_U8>(ctx, src, dst, target);
+            ret = Median7x7NeonHelper<DT_U8>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<MI_U8> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<DT_U8> failed");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            ret = Median7x7NeonHelper<MI_S8>(ctx, src, dst, target);
+            ret = Median7x7NeonHelper<DT_S8>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<MI_S8> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<DT_S8> failed");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = Median7x7NeonHelper<MI_U16>(ctx, src, dst, target);
+            ret = Median7x7NeonHelper<DT_U16>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<MI_U16> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<DT_U16> failed");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = Median7x7NeonHelper<MI_S16>(ctx, src, dst, target);
+            ret = Median7x7NeonHelper<DT_S16>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<MI_S16> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<DT_S16> failed");
             }
             break;
         }
 
         case ElemType::U32:
         {
-            ret = Median7x7NeonHelper<MI_U32>(ctx, src, dst, target);
+            ret = Median7x7NeonHelper<DT_U32>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<MI_U32> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<DT_U32> failed");
             }
             break;
         }
 
         case ElemType::S32:
         {
-            ret = Median7x7NeonHelper<MI_S32>(ctx, src, dst, target);
+            ret = Median7x7NeonHelper<DT_S32>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<MI_S32> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<DT_S32> failed");
             }
             break;
         }
@@ -547,10 +547,10 @@ Status Median7x7Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &tar
 
         case ElemType::F32:
         {
-            ret = Median7x7NeonHelper<MI_F32>(ctx, src, dst, target);
+            ret = Median7x7NeonHelper<DT_F32>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<MI_F32> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Median7x7NeonHelper<DT_F32> failed");
             }
             break;
         }

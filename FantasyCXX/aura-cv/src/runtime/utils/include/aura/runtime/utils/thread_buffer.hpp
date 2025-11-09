@@ -24,7 +24,7 @@
 #  define THREAD_ID                 qurt_thread_t
 #  define THIS_THREAD_ID            qurt_thread_get_id()
 #elif defined(AURA_BUILD_XPLORER)
-#  define  THREAD_ID                MI_S32
+#  define  THREAD_ID                DT_S32
 #  define  THIS_THREAD_ID           0
 #else
 #  define  THREAD_ID                std::thread::id
@@ -53,7 +53,7 @@ public:
     * @param size Size of the buffer in bytes.
     * @param mem_type Type of memory to be allocated (default is AURA_MEM_DEFAULT).
     */
-    ThreadBuffer(Context *ctx, MI_S32 size, MI_S32 mem_type = AURA_MEM_DEFAULT)
+    ThreadBuffer(Context *ctx, DT_S32 size, DT_S32 mem_type = AURA_MEM_DEFAULT)
                  : m_ctx(ctx), m_buffer_size(size), m_mem_type(mem_type), m_last_node(&m_first_node)
     {}
 
@@ -65,7 +65,7 @@ public:
     * @param size Size of the buffer in bytes.
     * @param mem_type Type of memory to be allocated (default is AURA_MEM_DEFAULT).
     */
-    ThreadBuffer(Context *ctx, const std::vector<THREAD_ID> &thread_ids, MI_S32 size, MI_S32 mem_type = AURA_MEM_DEFAULT)
+    ThreadBuffer(Context *ctx, const std::vector<THREAD_ID> &thread_ids, DT_S32 size, DT_S32 mem_type = AURA_MEM_DEFAULT)
                  : m_ctx(ctx), m_buffer_size(size), m_mem_type(mem_type), m_last_node(&m_first_node)
     {
         for (auto &id : thread_ids)
@@ -86,10 +86,10 @@ public:
 
     AURA_DISABLE_COPY_AND_ASSIGN(ThreadBuffer);
 
-    AURA_VOID Clear()
+    DT_VOID Clear()
     {
         Node *current_node = m_first_node.next;
-        while (current_node != MI_NULL)
+        while (current_node != DT_NULL)
         {
             Node *next = current_node->next;
 
@@ -119,7 +119,7 @@ public:
     {
         // 1. check if the buffer is already in the list
         Node *current_node = m_first_node.next;
-        while (current_node != MI_NULL)
+        while (current_node != DT_NULL)
         {
             if (id == current_node->thread_id)
             {
@@ -135,8 +135,8 @@ public:
             std::unique_lock<std::mutex> lock(m_mutex);
 #endif // AURA_BUILD_XPLORER
 
-            AURA_VOID *buffer_data = AURA_ALLOC_PARAM(m_ctx, m_mem_type, m_buffer_size, 0);
-            if (MI_NULL == buffer_data)
+            DT_VOID *buffer_data = AURA_ALLOC_PARAM(m_ctx, m_mem_type, m_buffer_size, 0);
+            if (DT_NULL == buffer_data)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "ThreadBuffer allocate memory failed.");
                 return Buffer();
@@ -152,7 +152,7 @@ public:
             }
 
             Node *new_node = static_cast<Node*>(AURA_ALLOC(m_ctx, sizeof(Node)));
-            if (MI_NULL == new_node)
+            if (DT_NULL == new_node)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "Node create failed.");
                 AURA_FREE(m_ctx, buffer_data);
@@ -162,7 +162,7 @@ public:
             {
                 new_node->thread_id = id;
                 new_node->buffer    = buffer;
-                new_node->next      = MI_NULL;
+                new_node->next      = DT_NULL;
             }
 
             m_last_node->next = new_node;
@@ -197,7 +197,7 @@ public:
         if (!buffer.IsValid())
         {
             AURA_ADD_ERROR_STRING(m_ctx, "buffer invalid.");
-            return MI_NULL;
+            return DT_NULL;
         }
 
         return reinterpret_cast<Tp*>(buffer.m_data);
@@ -208,7 +208,7 @@ public:
      *
      * @return The size of the buffer in bytes.
      */
-    MI_S32 GetBufferSize() const
+    DT_S32 GetBufferSize() const
     {
         return m_buffer_size;
     }
@@ -218,7 +218,7 @@ public:
      *
      * @return The memory type of the buffer.
      */
-    MI_S32 GetMemType() const
+    DT_S32 GetMemType() const
     {
         return m_mem_type;
     }
@@ -226,10 +226,10 @@ public:
 private:
     struct Node
     {
-        Node() : next(MI_NULL)
+        Node() : next(DT_NULL)
         {}
 
-        Node(const THREAD_ID id, const Buffer &buffer, Node *next = MI_NULL)
+        Node(const THREAD_ID id, const Buffer &buffer, Node *next = DT_NULL)
              : thread_id(id), buffer(buffer), next(next)
         {}
 
@@ -239,8 +239,8 @@ private:
     };
 
     Context    *m_ctx;         // The associated context.
-    MI_S32     m_buffer_size; // The size of the each buffer.
-    MI_S32     m_mem_type;    // The memory type.
+    DT_S32     m_buffer_size; // The size of the each buffer.
+    DT_S32     m_mem_type;    // The memory type.
 #if !defined(AURA_BUILD_XPLORER)
     std::mutex m_mutex;       // The mutex for m_last_node.
 #endif // AURA_BUILD_XPLORER

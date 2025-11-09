@@ -158,7 +158,7 @@ namespace aura
  * Print(TAG, LogLevel::DEBUG, "%s \n %s \n %s \n", str1, str2, str3);
  * @endcode
  */
-AURA_EXPORTS AURA_VOID Print(const MI_CHAR *tag, LogLevel level, const MI_CHAR *format, ...);
+AURA_EXPORTS DT_VOID Print(const DT_CHAR *tag, LogLevel level, const DT_CHAR *format, ...);
 
 /**
  * @brief Print a formatted message with the specified tag, log level, and format to stdout.
@@ -168,7 +168,7 @@ AURA_EXPORTS AURA_VOID Print(const MI_CHAR *tag, LogLevel level, const MI_CHAR *
  * @param format The format string for the log message.
  * @param ...    Additional arguments for formatting the log message.
  */
-AURA_EXPORTS AURA_VOID StdoutPrint(const MI_CHAR *tag, LogLevel level, const MI_CHAR *format, ...);
+AURA_EXPORTS DT_VOID StdoutPrint(const DT_CHAR *tag, LogLevel level, const DT_CHAR *format, ...);
 
 /**
  * @brief Print a formatted message with the specified tag, log level, and format to a file.
@@ -179,7 +179,7 @@ AURA_EXPORTS AURA_VOID StdoutPrint(const MI_CHAR *tag, LogLevel level, const MI_
  * @param format The format string for the log message.
  * @param ...    Additional arguments for formatting the log message.
  */
-AURA_EXPORTS AURA_VOID FilePrint(FILE *fp, const MI_CHAR *tag, const MI_CHAR *format, ...);
+AURA_EXPORTS DT_VOID FilePrint(FILE *fp, const DT_CHAR *tag, const DT_CHAR *format, ...);
 
 /**
  * @brief Print a formatted message with the specified tag, log level, and format to logcat.
@@ -197,7 +197,7 @@ AURA_EXPORTS AURA_VOID FilePrint(FILE *fp, const MI_CHAR *tag, const MI_CHAR *fo
  * LogcatPrint(TAG, LogLevel::DEBUG, "%s \n %s \n %s \n", str1, str2, str3);
  * @endcode
  */
-AURA_EXPORTS AURA_VOID LogcatPrint(const MI_CHAR *tag, LogLevel level, const MI_CHAR *format, ...);
+AURA_EXPORTS DT_VOID LogcatPrint(const DT_CHAR *tag, LogLevel level, const DT_CHAR *format, ...);
 
 /**
  * @brief Print a formatted message with the specified log level and format to Farf.
@@ -207,7 +207,7 @@ AURA_EXPORTS AURA_VOID LogcatPrint(const MI_CHAR *tag, LogLevel level, const MI_
  * @param format The format string for the log message.
  * @param ...    Additional arguments for formatting the log message.
  */
-AURA_EXPORTS AURA_VOID FarfPrint(LogLevel level, const MI_CHAR *format, ...);
+AURA_EXPORTS DT_VOID FarfPrint(LogLevel level, const DT_CHAR *format, ...);
 
 /**
  * @brief Logger class for handling logging and error string management.
@@ -239,7 +239,7 @@ public:
      * @param format The format string for the log message.
      * @param ... Additional arguments for formatting the log message.
      */
-    AURA_VOID Log(const MI_CHAR *tag, LogLevel level, const MI_CHAR *format, ...);
+    DT_VOID Log(const DT_CHAR *tag, LogLevel level, const DT_CHAR *format, ...);
 
     /**
      * @brief Adds an error string to the logger.
@@ -249,7 +249,7 @@ public:
      * @param line The line number associated with the error.
      * @param info Additional information about the error.
      */
-    AURA_VOID AddErrorString(const MI_CHAR *file, const MI_CHAR *func, MI_S32 line, const MI_CHAR *info);
+    DT_VOID AddErrorString(const DT_CHAR *file, const DT_CHAR *func, DT_S32 line, const DT_CHAR *info);
 
     /**
      * @brief Get the accumulated error string.

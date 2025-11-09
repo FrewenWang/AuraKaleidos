@@ -6,7 +6,7 @@ namespace aura
 namespace xtensa
 {
 
-const MI_U8 sel_deinterleave_d16_c3_step_0[] __attribute__((aligned(128))) =
+const DT_U8 sel_deinterleave_d16_c3_step_0[] __attribute__((aligned(128))) =
 {
     0,  2,   1,  5,   3,  8,   4,  11,  6,  14,  7,  17,  9,  20,  10, 23,
     12, 26,  13, 29,  15, 32,  16, 35,  18, 38,  19, 41,  21, 44,  22, 47,
@@ -18,7 +18,7 @@ const MI_U8 sel_deinterleave_d16_c3_step_0[] __attribute__((aligned(128))) =
     84, 42,  85, 45,  87, 48,  88, 51,  90, 54,  91, 57,  93, 60,  94, 63
 };
 
-const MI_U8 sel_deinterleave_d16_c3_step_1[] __attribute__((aligned(128))) =
+const DT_U8 sel_deinterleave_d16_c3_step_1[] __attribute__((aligned(128))) =
 {
     96,  2,   97,  5,   99,  8,   100, 11,  102, 14,  103, 17,  105, 20,  106, 23,
     108, 26,  109, 29,  111, 32,  112, 35,  114, 38,  115, 41,  117, 44,  118, 47,
@@ -30,12 +30,12 @@ const MI_U8 sel_deinterleave_d16_c3_step_1[] __attribute__((aligned(128))) =
     52,  42,  53,  45,  55,  48,  56,  51,  58,  54,  59,  57,  61,  60,  62,  63
 };
 
-const MI_U8 sel_deinterleave_d16_c3_step_1_msk[] __attribute__((aligned(128))) =
+const DT_U8 sel_deinterleave_d16_c3_step_1_msk[] __attribute__((aligned(128))) =
 {
     0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
 };
 
-const MI_U8 dsel_deinterleave_d8_1[] __attribute__((aligned(128))) =
+const DT_U8 dsel_deinterleave_d8_1[] __attribute__((aligned(128))) =
 {
     0,   2,   1,   3,   4,   6,   5,   7,   8,   10,  9,   11,  12,  14,  13,  15,
     16,  18,  17,  19,  20,  22,  21,  23,  24,  26,  25,  27,  28,  30,  29,  31,
@@ -47,7 +47,7 @@ const MI_U8 dsel_deinterleave_d8_1[] __attribute__((aligned(128))) =
     112, 114, 113, 115, 116, 118, 117, 119, 120, 122, 121, 123, 124, 126, 125, 127
 };
 
-const MI_U8 dsel_deinterleave_d16_1[] __attribute__((aligned(128))) =
+const DT_U8 dsel_deinterleave_d16_1[] __attribute__((aligned(128))) =
 {
     0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,
     16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
@@ -59,7 +59,7 @@ const MI_U8 dsel_deinterleave_d16_1[] __attribute__((aligned(128))) =
     112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127
 };
 
-const MI_U8 sel_interleave_d16_c3_step_0[] __attribute__((aligned(128))) =
+const DT_U8 sel_interleave_d16_c3_step_0[] __attribute__((aligned(128))) =
 {
     0,  43, 1,  85, 64, 44, 2,  45, 3,  86, 65, 46, 4,  47, 5,  87,
     66, 48, 6,  49, 7,  88, 67, 50, 8,  51, 9,  89, 68, 52, 10, 53,
@@ -71,7 +71,7 @@ const MI_U8 sel_interleave_d16_c3_step_0[] __attribute__((aligned(128))) =
     82, 0,  38, 0,  39, 0,  83, 0,  40, 0,  41, 0,  84, 0,  42, 0
 };
 
-const MI_U8 sel_interleave_d16_c3_step_1[] __attribute__((aligned(128))) =
+const DT_U8 sel_interleave_d16_c3_step_1[] __attribute__((aligned(128))) =
 {
     0,  106, 0,   22,  0,   23,  0,  107, 0,   24,  0,   25,  0,   108, 0,   26,
     0,  27,  0,   109, 0,   28,  0,  29,  0,   110, 0,   30,  0,   31,  0,   111,
@@ -83,12 +83,12 @@ const MI_U8 sel_interleave_d16_c3_step_1[] __attribute__((aligned(128))) =
     16, 59,  17,  125, 104, 60,  18, 61,  19,  126, 105, 62,  20,  63,  21,  127
 };
 
-const MI_U8 sel_interleave_d16_c3_step_1_msk[] __attribute__((aligned(128))) =
+const DT_U8 sel_interleave_d16_c3_step_1_msk[] __attribute__((aligned(128))) =
 {
     0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
 };
 
-const MI_U8 dsel_interleave_d8_1[] __attribute__((aligned(128))) =
+const DT_U8 dsel_interleave_d8_1[] __attribute__((aligned(128))) =
 {
     0,  32, 64, 96,  1,  33, 65, 97,  2,  34, 66, 98,  3,  35, 67, 99,
     4,  36, 68, 100, 5,  37, 69, 101, 6,  38, 70, 102, 7,  39, 71, 103,
@@ -100,7 +100,7 @@ const MI_U8 dsel_interleave_d8_1[] __attribute__((aligned(128))) =
     28, 60, 92, 124, 29, 61, 93, 125, 30, 62, 94, 126, 31, 63, 95, 127
 };
 
-const MI_U8 dsel_interleave_d16_1[] __attribute__((aligned(128))) =
+const DT_U8 dsel_interleave_d16_1[] __attribute__((aligned(128))) =
 {
     0,  32, 1,  33, 64, 96,  65, 97,  2,  34, 3,  35, 66, 98,  67, 99,
     4,  36, 5,  37, 68, 100, 69, 101, 6,  38, 7,  39, 70, 102, 71, 103,

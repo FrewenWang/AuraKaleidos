@@ -28,14 +28,14 @@ aura::Status RemapSampleTest(aura::Context *ctx, aura::TargetType type)
     }
 
     // set map value
-    MI_S32 rows = size.m_height;
-    MI_S32 cols = size.m_width;
-    for (MI_S32 i = 0; i < rows; i++)
+    DT_S32 rows = size.m_height;
+    DT_S32 cols = size.m_width;
+    for (DT_S32 i = 0; i < rows; i++)
     {
-        for (MI_S32 j = 0;j < cols; j++)
+        for (DT_S32 j = 0;j < cols; j++)
         {
-            map.At<MI_F32>(i, j, 0) = static_cast<MI_F32>(cols - j);
-            map.At<MI_F32>(i, j, 1) = static_cast<MI_F32>(rows - i);
+            map.At<DT_F32>(i, j, 0) = static_cast<DT_F32>(cols - j);
+            map.At<DT_F32>(i, j, 1) = static_cast<DT_F32>(rows - i);
         }
     }
 

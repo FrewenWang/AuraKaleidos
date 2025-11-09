@@ -6,10 +6,10 @@ namespace aura
 
 #define QVECTOR_NUM         (4)
 
-template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, MI_S32 ELEM_COUNTS,
+template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, DT_S32 ELEM_COUNTS,
           typename VqTpye = typename neon::QVector<Tp>::VType,
-          typename std::enable_if<MorphShape::RECT == MORPH_SHAPE, Tp>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x0, VqTpye &vq_src_p1x1, VqTpye &vq_src_p1x2,
+          typename std::enable_if<MorphShape::RECT == MORPH_SHAPE, Tp>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Morph5x5Vector(VqTpye &vq_src_p1x0, VqTpye &vq_src_p1x1, VqTpye &vq_src_p1x2,
                                           VqTpye &vq_src_p0x0, VqTpye &vq_src_p0x1, VqTpye &vq_src_p0x2,
                                           VqTpye &vq_src_cx0,  VqTpye &vq_src_cx1,  VqTpye &vq_src_cx2,
                                           VqTpye &vq_src_n0x0, VqTpye &vq_src_n0x1, VqTpye &vq_src_n0x2,
@@ -35,10 +35,10 @@ AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x0, VqTpye &vq_src_
     vq_vertical_results[1] = vq_vertical_results[2];
 }
 
-template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, MI_S32 ELEM_COUNTS,
+template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, DT_S32 ELEM_COUNTS,
           typename VqTpye = typename neon::QVector<Tp>::VType,
-          typename std::enable_if<MorphShape::RECT == MORPH_SHAPE, Tp>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x2, VqTpye &vq_src_p0x2, VqTpye &vq_src_cx0,
+          typename std::enable_if<MorphShape::RECT == MORPH_SHAPE, Tp>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Morph5x5Vector(VqTpye &vq_src_p1x2, VqTpye &vq_src_p0x2, VqTpye &vq_src_cx0,
                                           VqTpye &vq_src_cx1,  VqTpye &vq_src_cx2,  VqTpye &vq_src_n0x2,
                                           VqTpye &vq_src_n1x2, VqTpye &vq_result,   VqTpye *vq_vertical_results)
 {
@@ -62,10 +62,10 @@ AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x2, VqTpye &vq_src_
     vq_vertical_results[1] = vq_vertical_results[2];
 }
 
-template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, MI_S32 ELEM_COUNTS,
+template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, DT_S32 ELEM_COUNTS,
           typename VqTpye = typename neon::QVector<Tp>::VType,
-          typename std::enable_if<MorphShape::CROSS == MORPH_SHAPE, Tp>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x0, VqTpye &vq_src_p1x1, VqTpye &vq_src_p1x2,
+          typename std::enable_if<MorphShape::CROSS == MORPH_SHAPE, Tp>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Morph5x5Vector(VqTpye &vq_src_p1x0, VqTpye &vq_src_p1x1, VqTpye &vq_src_p1x2,
                                           VqTpye &vq_src_p0x0, VqTpye &vq_src_p0x1, VqTpye &vq_src_p0x2,
                                           VqTpye &vq_src_cx0,  VqTpye &vq_src_cx1,  VqTpye &vq_src_cx2,
                                           VqTpye &vq_src_n0x0, VqTpye &vq_src_n0x1, VqTpye &vq_src_n0x2,
@@ -96,10 +96,10 @@ AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x0, VqTpye &vq_src_
     vq_src_cx1 = vq_src_cx2;
 }
 
-template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, MI_S32 ELEM_COUNTS,
+template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, DT_S32 ELEM_COUNTS,
           typename VqTpye = typename neon::QVector<Tp>::VType,
-          typename std::enable_if<MorphShape::CROSS == MORPH_SHAPE, Tp>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x2, VqTpye &vq_src_p0x2, VqTpye &vq_src_cx0,  VqTpye &vq_src_cx1,
+          typename std::enable_if<MorphShape::CROSS == MORPH_SHAPE, Tp>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Morph5x5Vector(VqTpye &vq_src_p1x2, VqTpye &vq_src_p0x2, VqTpye &vq_src_cx0,  VqTpye &vq_src_cx1,
                                           VqTpye &vq_src_cx2,  VqTpye &vq_src_n0x2, VqTpye &vq_src_n1x2,
                                           VqTpye &vq_result,   VqTpye *vq_vertical_results)
 {
@@ -119,10 +119,10 @@ AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x2, VqTpye &vq_src_
     vq_src_cx1 = vq_src_cx2;
 }
 
-template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, MI_S32 ELEM_COUNTS,
+template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, DT_S32 ELEM_COUNTS,
           typename VqTpye = typename neon::QVector<Tp>::VType,
-          typename std::enable_if<MorphShape::ELLIPSE == MORPH_SHAPE, Tp>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x0, VqTpye &vq_src_p1x1, VqTpye &vq_src_p1x2,
+          typename std::enable_if<MorphShape::ELLIPSE == MORPH_SHAPE, Tp>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Morph5x5Vector(VqTpye &vq_src_p1x0, VqTpye &vq_src_p1x1, VqTpye &vq_src_p1x2,
                                           VqTpye &vq_src_p0x0, VqTpye &vq_src_p0x1, VqTpye &vq_src_p0x2,
                                           VqTpye &vq_src_cx0,  VqTpye &vq_src_cx1,  VqTpye &vq_src_cx2,
                                           VqTpye &vq_src_n0x0, VqTpye &vq_src_n0x1, VqTpye &vq_src_n0x2,
@@ -154,10 +154,10 @@ AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x0, VqTpye &vq_src_
     vq_vertical_results[1] = vq_vertical_results[2];
 }
 
-template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, MI_S32 ELEM_COUNTS,
+template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, DT_S32 ELEM_COUNTS,
           typename VqTpye = typename neon::QVector<Tp>::VType,
-          typename std::enable_if<MorphShape::ELLIPSE == MORPH_SHAPE, Tp>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x2, VqTpye &vq_src_p0x2, VqTpye &vq_src_cx0,
+          typename std::enable_if<MorphShape::ELLIPSE == MORPH_SHAPE, Tp>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Morph5x5Vector(VqTpye &vq_src_p1x2, VqTpye &vq_src_p0x2, VqTpye &vq_src_cx0,
                                           VqTpye &vq_src_cx1,  VqTpye &vq_src_cx2,
                                           VqTpye &vq_src_n0x2, VqTpye &vq_src_n1x2,
                                           VqTpye &vq_result,   VqTpye *vq_vertical_results)
@@ -185,16 +185,16 @@ AURA_ALWAYS_INLINE AURA_VOID Morph5x5Vector(VqTpye &vq_src_p1x2, VqTpye &vq_src_
     vq_vertical_results[1] = vq_vertical_results[2];
 }
 
-template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, MI_S32 C>
-static AURA_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0,
-                           const Tp *src_n1, Tp *dst, MI_S32 width)
+template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, DT_S32 C>
+static DT_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0,
+                           const Tp *src_n1, Tp *dst, DT_S32 width)
 {
     using MVqTpye = typename neon::MQVector<Tp, C>::MVType;
     using VqTpye  = typename neon::QVector<Tp>::VType;
 
-    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(16 / sizeof(Tp));
-    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
-    const MI_S32 width_align     = (width & -ELEM_COUNTS) * C;
+    constexpr DT_S32 ELEM_COUNTS = static_cast<DT_S32>(16 / sizeof(Tp));
+    constexpr DT_S32 VOFFSET     = ELEM_COUNTS * C;
+    const DT_S32 width_align     = (width & -ELEM_COUNTS) * C;
 
     MVqTpye mvq_src_p1[3], mvq_src_p0[3], mvq_src_c[3], mvq_src_n0[3], mvq_src_n1[3], mvq_result;
     VqTpye vq_vertical_results[QVECTOR_NUM * C];
@@ -212,7 +212,7 @@ static AURA_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c
         neon::vload(src_n1,           mvq_src_n1[1]);
         neon::vload(src_n1 + VOFFSET, mvq_src_n1[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             neon::vdup(mvq_src_p1[0].val[ch], src_p1[ch]);
             neon::vdup(mvq_src_p0[0].val[ch], src_p0[ch]);
@@ -232,7 +232,7 @@ static AURA_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c
 
     // middle
     {
-        for (MI_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
+        for (DT_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
         {
             neon::vload(src_p1 + x + VOFFSET, mvq_src_p1[2]);
             neon::vload(src_p0 + x + VOFFSET, mvq_src_p0[2]);
@@ -240,7 +240,7 @@ static AURA_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c
             neon::vload(src_n0 + x + VOFFSET, mvq_src_n0[2]);
             neon::vload(src_n1 + x + VOFFSET, mvq_src_n1[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Morph5x5Vector<Tp, MORPH_SHAPE, MORPH_TYPE, ELEM_COUNTS>(mvq_src_p1[2].val[ch], mvq_src_p0[2].val[ch],
                                                                          mvq_src_c[0].val[ch],  mvq_src_c[1].val[ch], mvq_src_c[2].val[ch],
@@ -255,7 +255,7 @@ static AURA_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c
     {
         if (width_align != width * C)
         {
-            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+            DT_S32 x = (width - (ELEM_COUNTS << 1)) * C;
 
             neon::vload(src_p1 + x - VOFFSET, mvq_src_p1[0]);
             neon::vload(src_p1 + x,           mvq_src_p1[1]);
@@ -273,7 +273,7 @@ static AURA_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c
             neon::vload(src_n1 + x,           mvq_src_n1[1]);
             neon::vload(src_n1 + x + VOFFSET, mvq_src_n1[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Morph5x5Vector<Tp, MORPH_SHAPE, MORPH_TYPE, ELEM_COUNTS>(mvq_src_p1[0].val[ch], mvq_src_p1[1].val[ch], mvq_src_p1[2].val[ch],
                                                                          mvq_src_p0[0].val[ch], mvq_src_p0[1].val[ch], mvq_src_p0[2].val[ch],
@@ -288,8 +288,8 @@ static AURA_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c
 
     // right
     {
-        MI_S32 x    = (width - ELEM_COUNTS) * C;
-        MI_S32 last = (width - 1) * C;
+        DT_S32 x    = (width - ELEM_COUNTS) * C;
+        DT_S32 last = (width - 1) * C;
 
         mvq_src_p1[1] = mvq_src_p1[2];
         mvq_src_p0[1] = mvq_src_p0[2];
@@ -297,7 +297,7 @@ static AURA_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c
         mvq_src_n0[1] = mvq_src_n0[2];
         mvq_src_n1[1] = mvq_src_n1[2];
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             neon::vdup(mvq_src_p1[2].val[ch], src_p1[last]);
             neon::vdup(mvq_src_p0[2].val[ch], src_p0[last]);
@@ -315,20 +315,20 @@ static AURA_VOID Morph5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c
     }
 }
 
-template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, MI_S32 C>
-static Status Morph5x5NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, MorphShape MORPH_SHAPE, MorphType MORPH_TYPE, DT_S32 C>
+static Status Morph5x5NeonImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
-    MI_S32 width = dst.GetSizes().m_width;
+    DT_S32 width = dst.GetSizes().m_width;
 
-    MI_S32 y = start_row;
+    DT_S32 y = start_row;
 
-    const Tp *src_p1 = src.Ptr<Tp, BorderType::REPLICATE>(y - 2, MI_NULL);
-    const Tp *src_p0 = src.Ptr<Tp, BorderType::REPLICATE>(y - 1, MI_NULL);
+    const Tp *src_p1 = src.Ptr<Tp, BorderType::REPLICATE>(y - 2, DT_NULL);
+    const Tp *src_p0 = src.Ptr<Tp, BorderType::REPLICATE>(y - 1, DT_NULL);
     const Tp *src_c  = src.Ptr<Tp>(y);
-    const Tp *src_n0 = src.Ptr<Tp, BorderType::REPLICATE>(y + 1, MI_NULL);
-    const Tp *src_n1 = src.Ptr<Tp, BorderType::REPLICATE>(y + 2, MI_NULL);
+    const Tp *src_n0 = src.Ptr<Tp, BorderType::REPLICATE>(y + 1, DT_NULL);
+    const Tp *src_n1 = src.Ptr<Tp, BorderType::REPLICATE>(y + 2, DT_NULL);
 
     for (; y < end_row; y++)
     {
@@ -339,7 +339,7 @@ static Status Morph5x5NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 st
         src_p0 = src_c;
         src_c  = src_n0;
         src_n0 = src_n1;
-        src_n1 = src.Ptr<Tp, BorderType::REPLICATE>(y + 3, MI_NULL);
+        src_n1 = src.Ptr<Tp, BorderType::REPLICATE>(y + 3, DT_NULL);
     }
 
     return Status::OK;
@@ -352,13 +352,13 @@ static Status Morph5x5NeonHelper(Context *ctx, const Mat &src, Mat &dst, const O
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 height = dst.GetSizes().m_height;
+    DT_S32 height = dst.GetSizes().m_height;
 
     switch (dst.GetSizes().m_channel)
     {
@@ -486,30 +486,30 @@ Status Morph5x5Neon(Context *ctx, const Mat &src, Mat &dst, MorphType type, Morp
     {
         case ElemType::U8:
         {
-            ret = Morph5x5NeonHelper<MI_U8>(ctx, src, dst, type, shape, target);
+            ret = Morph5x5NeonHelper<DT_U8>(ctx, src, dst, type, shape, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Morph5x5NeonHelper<MI_U8> run failed!");
+                AURA_ADD_ERROR_STRING(ctx, "Morph5x5NeonHelper<DT_U8> run failed!");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = Morph5x5NeonHelper<MI_U16>(ctx, src, dst, type, shape, target);
+            ret = Morph5x5NeonHelper<DT_U16>(ctx, src, dst, type, shape, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Morph5x5NeonHelper<MI_U16> run failed!");
+                AURA_ADD_ERROR_STRING(ctx, "Morph5x5NeonHelper<DT_U16> run failed!");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = Morph5x5NeonHelper<MI_S16>(ctx, src, dst, type, shape, target);
+            ret = Morph5x5NeonHelper<DT_S16>(ctx, src, dst, type, shape, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Morph5x5NeonHelper<MI_S16> run failed!");
+                AURA_ADD_ERROR_STRING(ctx, "Morph5x5NeonHelper<DT_S16> run failed!");
             }
             break;
         }
@@ -528,10 +528,10 @@ Status Morph5x5Neon(Context *ctx, const Mat &src, Mat &dst, MorphType type, Morp
 
         case ElemType::F32:
         {
-            ret = Morph5x5NeonHelper<MI_F32>(ctx, src, dst, type, shape, target);
+            ret = Morph5x5NeonHelper<DT_F32>(ctx, src, dst, type, shape, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Morph5x5NeonHelper<MI_F32> run failed!");
+                AURA_ADD_ERROR_STRING(ctx, "Morph5x5NeonHelper<DT_F32> run failed!");
             }
             break;
         }

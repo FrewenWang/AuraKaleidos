@@ -6,30 +6,30 @@
 namespace aura
 {
 
-// Tp = MI_U8, MI_S8
+// Tp = DT_U8, DT_S8
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, Status>::type
-ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, Status>::type
+ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MDVector<Tp, 3>::MVType;
 
-    MI_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy = y * 2;
+        DT_S32 sy = y * 2;
 
         const Tp *src_row0 = src.Ptr<Tp>(sy);
         const Tp *src_row1 = src.Ptr<Tp>(sy + 1);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 owidth_align8 = owidth & (-8);
+        DT_S32 owidth_align8 = owidth & (-8);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < owidth_align8; x += 8)
         {
             auto v3q8_c  = neon::vload3q(src_row0);
@@ -81,30 +81,30 @@ ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_ro
     return Status::OK;
 }
 
-// Tp = MI_U8, MI_S8
+// Tp = DT_U8, DT_S8
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, Status>::type
-ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, Status>::type
+ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MDVector<Tp, 3>::MVType;
 
-    MI_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 owidth = dst.GetSizes().m_width;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy = y * 4;
+        DT_S32 sy = y * 4;
 
         const Tp *src_row0 = src.Ptr<Tp>(sy + 1);
         const Tp *src_row1 = src.Ptr<Tp>(sy + 2);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 width_align8 = owidth & (-8);
+        DT_S32 width_align8 = owidth & (-8);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align8; x += 8)
         {
             auto v3q8_cx0  = neon::vload3q(src_row0);
@@ -171,10 +171,10 @@ ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_ro
     return Status::OK;
 }
 
-// Tp = MI_U8, MI_S8
+// Tp = DT_U8, DT_S8
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, Status>::type
-ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, Status>::type
+ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
@@ -182,9 +182,9 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     using MVType   = typename neon::MQVector<MovlType, 3>::MVType;
     using VType    = typename neon::DVector<Tp>::VType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     MovlType *rows = thread_buffer.GetThreadData<MovlType>();
 
@@ -207,12 +207,12 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 
     VType vd8_const_3;
     neon::vdup(vd8_const_3, static_cast<Tp>(3));
-    MI_S32 iwidth_1_align8 = (iwidth - 1) & (-8);
+    DT_S32 iwidth_1_align8 = (iwidth - 1) & (-8);
 
     *rows1_tmp++ = (*src_row0) * 4;
     *rows1_tmp++ = (*(src_row0 + 1)) * 4;
     *rows1_tmp++ = (*(src_row0 + 2)) * 4;
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < iwidth_1_align8; x += 8)
     {
         auto v3d8_x0 = neon::vload3(src_row0);
@@ -263,7 +263,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (0 == start_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; ++x)
+        for (DT_S32 x = 0; x < owidth; ++x)
         {
             *dst_row++ = SaturateCast<Tp>(((*rows1_tmp++) + 2) >> 2);
             *dst_row++ = SaturateCast<Tp>(((*rows1_tmp++) + 2) >> 2);
@@ -276,7 +276,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = (*(src_r_1 + 1)) * 4;
         *rows0_tmp++ = (*(src_r_1 + 2)) * 4;
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align8; x += 8)
         {
             auto v3d8_x0 = neon::vload3(src_r_1);
@@ -325,8 +325,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows0;
         MovlType *rows1_y = rows1;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align8 = owidth_x3 & (-8);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align8 = owidth_x3 & (-8);
         x = 0;
         for(; x < owidth_x3_align8; x += 8)
         {
@@ -354,9 +354,9 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 
     src_r_1 = src.Ptr<Tp>(end_row >> 1);
 
-    for (MI_S32 y = start_row + 1; y < end_row - 1; y += 2)
+    for (DT_S32 y = start_row + 1; y < end_row - 1; y += 2)
     {
-        MI_S32 sy = (y - 1) >> 1;
+        DT_S32 sy = (y - 1) >> 1;
 
         MovlType *rows0_old = rows0;
         rows0 = rows1;
@@ -369,7 +369,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows1_tmp++ = (*(src_row1 + 1)) * 4;
         *rows1_tmp++ = (*(src_row1 + 2)) * 4;
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align8; x += 8)
         {
             auto v3d8_x0 = neon::vload3(src_row1);
@@ -421,8 +421,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         Tp *dst_row0 = dst.Ptr<Tp>(y);
         Tp *dst_row1 = dst.Ptr<Tp>(y + 1);
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align8 = owidth_x3 & (-8);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align8 = owidth_x3 & (-8);
         x = 0;
         for(; x < owidth_x3_align8; x += 8)
         {
@@ -459,7 +459,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (oheight == end_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
             *dst_row++ = SaturateCast<Tp>(((*rows1_tmp++) + 2) >> 2);
             *dst_row++ = SaturateCast<Tp>(((*rows1_tmp++) + 2) >> 2);
@@ -473,7 +473,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = (*(src_r_1 + 1)) * 4;
         *rows0_tmp++ = (*(src_r_1 + 2)) * 4;
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align8; x += 8)
         {
             auto v3d8_x0 = neon::vload3(src_r_1);
@@ -522,8 +522,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows1;
         MovlType *rows1_y = rows0;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align8 = owidth_x3 & (-8);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align8 = owidth_x3 & (-8);
         x = 0;
         for(; x < owidth_x3_align8; x += 8)
         {
@@ -552,19 +552,19 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     AURA_RETURN(ctx, ret);
 }
 
-// Tp = MI_U8, MI_S8
+// Tp = DT_U8, DT_S8
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, Status>::type
-ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, Status>::type
+ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MQVector<MovlType, 3>::MVType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     MovlType *rows = thread_buffer.GetThreadData<MovlType>();
 
@@ -585,7 +585,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     MovlType *rows0_tmp = rows0;
     MovlType *rows1_tmp = rows1;
 
-    MI_S32 iwidth_1_align8 = (iwidth - 1) & (-8);
+    DT_S32 iwidth_1_align8 = (iwidth - 1) & (-8);
 
     *rows1_tmp++ = (*src_row0) << 3;
     *rows1_tmp++ = (*(src_row0 + 1)) << 3;
@@ -593,7 +593,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     *rows1_tmp++ = (*src_row0) << 3;
     *rows1_tmp++ = (*(src_row0 + 1)) << 3;
     *rows1_tmp++ = (*(src_row0 + 2)) << 3;
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < iwidth_1_align8; x += 8)
     {
         auto v3d8_x0 = neon::vload3(src_row0);
@@ -704,7 +704,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (0 == start_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; ++x)
+        for (DT_S32 x = 0; x < owidth; ++x)
         {
             *dst_row0++ = SaturateCast<Tp>((rows1_tmp[0] + 4) >> 3);
             *dst_row0++ = SaturateCast<Tp>((rows1_tmp[1] + 4) >> 3);
@@ -724,7 +724,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = (*src_r_1) << 3;
         *rows0_tmp++ = (*(src_r_1 + 1)) << 3;
         *rows0_tmp++ = (*(src_r_1 + 2)) << 3;
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align8; x += 8)
         {
             auto v3d8_x0 = neon::vload3(src_r_1);
@@ -832,8 +832,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows0;
         MovlType *rows1_y = rows1;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align8 = owidth_x3 & (-8);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align8 = owidth_x3 & (-8);
         x = 0;
         for(; x < owidth_x3_align8; x += 8)
         {
@@ -869,9 +869,9 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 
     src_r_1 = src.Ptr<Tp>(end_row >> 2);
 
-    for (MI_S32 y = start_row + 2; y < end_row - 2; y += 4)
+    for (DT_S32 y = start_row + 2; y < end_row - 2; y += 4)
     {
-        MI_S32 sy = (y - 2) >> 2;
+        DT_S32 sy = (y - 2) >> 2;
 
         MovlType *rows0_old = rows0;
         rows0 = rows1;
@@ -887,7 +887,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows1_tmp++ = (*src_row1) << 3;
         *rows1_tmp++ = (*(src_row1 + 1)) << 3;
         *rows1_tmp++ = (*(src_row1 + 2)) << 3;
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align8; x += 8)
         {
             auto v3d8_x0 = neon::vload3(src_row1);
@@ -1000,8 +1000,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         Tp *dst_row2 = dst.Ptr<Tp>(y + 2);
         Tp *dst_row3 = dst.Ptr<Tp>(y + 3);
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align8 = owidth_x3 & (-8);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align8 = owidth_x3 & (-8);
         x = 0;
         for(; x < owidth_x3_align8; x += 8)
         {
@@ -1053,7 +1053,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (oheight == end_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
             *dst_row0++ = SaturateCast<Tp>((rows1_tmp[0] + 4) >> 3);
             *dst_row0++ = SaturateCast<Tp>((rows1_tmp[1] + 4) >> 3);
@@ -1073,7 +1073,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = (*src_r_1) << 3;
         *rows0_tmp++ = (*(src_r_1 + 1)) << 3;
         *rows0_tmp++ = (*(src_r_1 + 2)) << 3;
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align8; x += 8)
         {
             auto v3d8_x0 = neon::vload3(src_r_1);
@@ -1181,8 +1181,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows1;
         MovlType *rows1_y = rows0;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align8 = owidth_x3 & (-8);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align8 = owidth_x3 & (-8);
         x = 0;
         for(; x < owidth_x3_align8; x += 8)
         {
@@ -1219,29 +1219,29 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     AURA_RETURN(ctx, ret);
 }
 
-// Tp = MI_U16, MI_S16
+// Tp = DT_U16, DT_S16
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, Status>::type
-ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, Status>::type
+ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MDVector<Tp, 3>::MVType;
 
-    MI_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 owidth = dst.GetSizes().m_width;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy = y * 2;
+        DT_S32 sy = y * 2;
 
         const Tp *src_row0 = src.Ptr<Tp>(sy);
         const Tp *src_row1 = src.Ptr<Tp>(sy + 1);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 owidth_align4 = owidth & (-4);
-        MI_S32 x = 0;
+        DT_S32 owidth_align4 = owidth & (-4);
+        DT_S32 x = 0;
         for (; x < owidth_align4; x += 4)
         {
             auto v3q16_c  = neon::vload3q(src_row0);
@@ -1293,29 +1293,29 @@ ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_ro
     return Status::OK;
 }
 
-// Tp = MI_U16, MI_S16
+// Tp = DT_U16, DT_S16
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, Status>::type
-ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, Status>::type
+ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MDVector<Tp, 3>::MVType;
 
-    MI_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 owidth = dst.GetSizes().m_width;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy = y * 4;
+        DT_S32 sy = y * 4;
 
         const Tp *src_row0 = src.Ptr<Tp>(sy + 1);
         const Tp *src_row1 = src.Ptr<Tp>(sy + 2);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 width_align4 = owidth & (-4);
-        MI_S32 x = 0;
+        DT_S32 width_align4 = owidth & (-4);
+        DT_S32 x = 0;
         for (; x < width_align4; x += 4)
         {
             auto v3q16_cx0  = neon::vload3q(src_row0);
@@ -1381,19 +1381,19 @@ ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_ro
     return Status::OK;
 }
 
-// Tp = MI_U16, MI_S16
+// Tp = DT_U16, DT_S16
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, Status>::type
-ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, Status>::type
+ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MQVector<MovlType, 3>::MVType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     MovlType *rows = thread_buffer.GetThreadData<MovlType>();
 
@@ -1414,12 +1414,12 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     MovlType *rows0_tmp = rows0;
     MovlType *rows1_tmp = rows1;
 
-    MI_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
+    DT_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
 
     *rows1_tmp++ = (*src_row0) * 4;
     *rows1_tmp++ = (*(src_row0 + 1)) * 4;
     *rows1_tmp++ = (*(src_row0 + 2)) * 4;
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < iwidth_1_align4; x += 4)
     {
         auto v3d16_x0 = neon::vload3(src_row0);
@@ -1470,7 +1470,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (0 == start_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; ++x)
+        for (DT_S32 x = 0; x < owidth; ++x)
         {
             *dst_row++ = SaturateCast<Tp>(((*rows1_tmp++) + 2) >> 2);
             *dst_row++ = SaturateCast<Tp>(((*rows1_tmp++) + 2) >> 2);
@@ -1483,7 +1483,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = (*(src_r_1 + 1)) * 4;
         *rows0_tmp++ = (*(src_r_1 + 2)) * 4;
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             auto v3d16_x0 = neon::vload3(src_r_1);
@@ -1532,8 +1532,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows0;
         MovlType *rows1_y = rows1;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -1561,9 +1561,9 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 
     src_r_1 = src.Ptr<Tp>(end_row >> 1);
 
-    for (MI_S32 y = start_row + 1; y < end_row - 1; y += 2)
+    for (DT_S32 y = start_row + 1; y < end_row - 1; y += 2)
     {
-        MI_S32 sy = (y - 1) >> 1;
+        DT_S32 sy = (y - 1) >> 1;
 
         MovlType *rows0_old = rows0;
         rows0 = rows1;
@@ -1576,7 +1576,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows1_tmp++ = (*(src_row1 + 1)) * 4;
         *rows1_tmp++ = (*(src_row1 + 2)) * 4;
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             auto v3d16_x0 = neon::vload3(src_row1);
@@ -1628,8 +1628,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         Tp *dst_row0 = dst.Ptr<Tp>(y);
         Tp *dst_row1 = dst.Ptr<Tp>(y + 1);
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -1666,7 +1666,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (oheight == end_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
             *dst_row++ = SaturateCast<Tp>(((*rows1_tmp++) + 2) >> 2);
             *dst_row++ = SaturateCast<Tp>(((*rows1_tmp++) + 2) >> 2);
@@ -1680,7 +1680,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = (*(src_r_1 + 1)) * 4;
         *rows0_tmp++ = (*(src_r_1 + 2)) * 4;
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             auto v3d16_x0 = neon::vload3(src_r_1);
@@ -1729,8 +1729,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows1;
         MovlType *rows1_y = rows0;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -1759,19 +1759,19 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     AURA_RETURN(ctx, ret);
 }
 
-// Tp = MI_U16, MI_S16
+// Tp = DT_U16, DT_S16
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, Status>::type
-ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, Status>::type
+ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MQVector<MovlType, 3>::MVType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     MovlType *rows = thread_buffer.GetThreadData<MovlType>();
 
@@ -1792,7 +1792,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     MovlType *rows0_tmp = rows0;
     MovlType *rows1_tmp = rows1;
 
-    MI_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
+    DT_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
 
     *rows1_tmp++ = (*src_row0) << 3;
     *rows1_tmp++ = (*(src_row0 + 1)) << 3;
@@ -1800,7 +1800,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     *rows1_tmp++ = (*src_row0) << 3;
     *rows1_tmp++ = (*(src_row0 + 1)) << 3;
     *rows1_tmp++ = (*(src_row0 + 2)) << 3;
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < iwidth_1_align4; x += 4)
     {
         auto v3d16_x0 = neon::vload3(src_row0);
@@ -1911,7 +1911,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (0 == start_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; ++x)
+        for (DT_S32 x = 0; x < owidth; ++x)
         {
             *dst_row0++ = SaturateCast<Tp>((rows1_tmp[0] + 4) >> 3);
             *dst_row0++ = SaturateCast<Tp>((rows1_tmp[1] + 4) >> 3);
@@ -1931,7 +1931,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = (*src_r_1) << 3;
         *rows0_tmp++ = (*(src_r_1 + 1)) << 3;
         *rows0_tmp++ = (*(src_r_1 + 2)) << 3;
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             auto v3d16_x0 = neon::vload3(src_r_1);
@@ -2039,8 +2039,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows0;
         MovlType *rows1_y = rows1;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -2076,9 +2076,9 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 
     src_r_1 = src.Ptr<Tp>(end_row >> 2);
 
-    for (MI_S32 y = start_row + 2; y < end_row - 2; y += 4)
+    for (DT_S32 y = start_row + 2; y < end_row - 2; y += 4)
     {
-        MI_S32 sy = (y - 2) >> 2;
+        DT_S32 sy = (y - 2) >> 2;
 
         MovlType *rows0_old = rows0;
         rows0 = rows1;
@@ -2094,7 +2094,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows1_tmp++ = (*src_row1) << 3;
         *rows1_tmp++ = (*(src_row1 + 1)) << 3;
         *rows1_tmp++ = (*(src_row1 + 2)) << 3;
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             auto v3d16_x0 = neon::vload3(src_row1);
@@ -2207,8 +2207,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         Tp *dst_row2 = dst.Ptr<Tp>(y + 2);
         Tp *dst_row3 = dst.Ptr<Tp>(y + 3);
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -2260,7 +2260,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (oheight == end_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
             *dst_row0++ = SaturateCast<Tp>((rows1_tmp[0] + 4) >> 3);
             *dst_row0++ = SaturateCast<Tp>((rows1_tmp[1] + 4) >> 3);
@@ -2280,7 +2280,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = (*src_r_1) << 3;
         *rows0_tmp++ = (*(src_r_1 + 1)) << 3;
         *rows0_tmp++ = (*(src_r_1 + 2)) << 3;
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             auto v3d16_x0 = neon::vload3(src_r_1);
@@ -2388,8 +2388,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows1;
         MovlType *rows1_y = rows0;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -2426,32 +2426,32 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     AURA_RETURN(ctx, ret);
 }
 
-// Tp = MI_F32
+// Tp = DT_F32
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_F32, Tp>::value, Status>::type
-ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_F32, Tp>::value, Status>::type
+ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MDVector<Tp, 3>::MVType;
 
-    MI_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 owidth = dst.GetSizes().m_width;
 
     float32x2_t vdf32_const_1_4;
     neon::vdup(vdf32_const_1_4, 0.25f);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy = y * 2;
+        DT_S32 sy = y * 2;
 
         const Tp *src_row0 = src.Ptr<Tp>(sy);
         const Tp *src_row1 = src.Ptr<Tp>(sy + 1);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 owidth_align2 = owidth & (-2);
-        MI_S32 x = 0;
+        DT_S32 owidth_align2 = owidth & (-2);
+        DT_S32 x = 0;
         for (; x < owidth_align2; x += 2)
         {
             float32x4x3_t v3qf32_c  = neon::vload3q(src_row0);
@@ -2503,32 +2503,32 @@ ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_ro
     return Status::OK;
 }
 
-// Tp = MI_F32
+// Tp = DT_F32
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_F32, Tp>::value, Status>::type
-ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_F32, Tp>::value, Status>::type
+ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MDVector<Tp, 3>::MVType;
 
-    MI_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 owidth = dst.GetSizes().m_width;
 
     float32x2_t vdf32_const_1_4;
     neon::vdup(vdf32_const_1_4, 0.25f);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy = y * 4;
+        DT_S32 sy = y * 4;
 
         const Tp *src_row0 = src.Ptr<Tp>(sy + 1);
         const Tp *src_row1 = src.Ptr<Tp>(sy + 2);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 width_align2 = owidth & (-2);
-        MI_S32 x = 0;
+        DT_S32 width_align2 = owidth & (-2);
+        DT_S32 x = 0;
         for (; x < width_align2; x += 2)
         {
             float32x4x3_t v3qf32_cx0  = neon::vload3q(src_row0);
@@ -2588,19 +2588,19 @@ ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_ro
     return Status::OK;
 }
 
-// Tp = MI_F32
+// Tp = DT_F32
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_F32, Tp>::value, Status>::type
-ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_F32, Tp>::value, Status>::type
+ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MQVector<Tp, 3>::MVType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     MovlType *rows = thread_buffer.GetThreadData<MovlType>();
 
@@ -2621,12 +2621,12 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     MovlType *rows0_tmp = rows0;
     MovlType *rows1_tmp = rows1;
 
-    MI_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
+    DT_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
 
     *rows1_tmp++ = *src_row0;
     *rows1_tmp++ = *(src_row0 + 1);
     *rows1_tmp++ = *(src_row0 + 2);
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < iwidth_1_align4; x += 4)
     {
         float32x4x3_t v3qf32_x0 = neon::vload3q(src_row0);
@@ -2677,7 +2677,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (0 == start_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; ++x)
+        for (DT_S32 x = 0; x < owidth; ++x)
         {
             *dst_row++ = *rows1_tmp++;
             *dst_row++ = *rows1_tmp++;
@@ -2690,7 +2690,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = *(src_r_1 + 1);
         *rows0_tmp++ = *(src_r_1 + 2);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float32x4x3_t v3qf32_x0 = neon::vload3q(src_r_1);
@@ -2739,8 +2739,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows0;
         MovlType *rows1_y = rows1;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -2766,9 +2766,9 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 
     src_r_1 = src.Ptr<Tp>(end_row >> 1);
 
-    for (MI_S32 y = start_row + 1; y < end_row - 1; y += 2)
+    for (DT_S32 y = start_row + 1; y < end_row - 1; y += 2)
     {
-        MI_S32 sy = (y - 1) >> 1;
+        DT_S32 sy = (y - 1) >> 1;
 
         MovlType *rows0_old = rows0;
         rows0 = rows1;
@@ -2781,7 +2781,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows1_tmp++ = *(src_row1 + 1);
         *rows1_tmp++ = *(src_row1 + 2);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float32x4x3_t v3qf32_x0 = neon::vload3q(src_row1);
@@ -2833,8 +2833,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         Tp *dst_row0 = dst.Ptr<Tp>(y);
         Tp *dst_row1 = dst.Ptr<Tp>(y + 1);
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -2868,7 +2868,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (oheight == end_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
             *dst_row++ = *rows1_tmp++;
             *dst_row++ = *rows1_tmp++;
@@ -2882,7 +2882,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = *(src_r_1 + 1);
         *rows0_tmp++ = *(src_r_1 + 2);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float32x4x3_t v3qf32_x0 = neon::vload3q(src_r_1);
@@ -2931,8 +2931,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows1;
         MovlType *rows1_y = rows0;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -2959,19 +2959,19 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     AURA_RETURN(ctx, ret);
 }
 
-// Tp = MI_F32
+// Tp = DT_F32
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_F32, Tp>::value, Status>::type
-ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_F32, Tp>::value, Status>::type
+ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
     using MVType   = typename neon::MQVector<MovlType, 3>::MVType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     MovlType *rows = thread_buffer.GetThreadData<MovlType>();
 
@@ -2992,7 +2992,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     MovlType *rows0_tmp = rows0;
     MovlType *rows1_tmp = rows1;
 
-    MI_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
+    DT_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
 
     *rows1_tmp++ = *src_row0;
     *rows1_tmp++ = *(src_row0 + 1);
@@ -3000,7 +3000,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     *rows1_tmp++ = *src_row0;
     *rows1_tmp++ = *(src_row0 + 1);
     *rows1_tmp++ = *(src_row0 + 2);
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < iwidth_1_align4; x += 4)
     {
         float32x4x3_t v3qf32_x0 = neon::vload3q(src_row0);
@@ -3111,7 +3111,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (0 == start_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; ++x)
+        for (DT_S32 x = 0; x < owidth; ++x)
         {
             *dst_row0++ = rows1_tmp[0];
             *dst_row0++ = rows1_tmp[1];
@@ -3131,7 +3131,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = *src_r_1;
         *rows0_tmp++ = *(src_r_1 + 1);
         *rows0_tmp++ = *(src_r_1 + 2);
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float32x4x3_t v3qf32_x0 = neon::vload3q(src_r_1);
@@ -3239,8 +3239,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows0;
         MovlType *rows1_y = rows1;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -3274,9 +3274,9 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 
     src_r_1 = src.Ptr<Tp>(end_row >> 2);
 
-    for (MI_S32 y = start_row + 2; y < end_row - 2; y += 4)
+    for (DT_S32 y = start_row + 2; y < end_row - 2; y += 4)
     {
-        MI_S32 sy = (y - 2) >> 2;
+        DT_S32 sy = (y - 2) >> 2;
 
         MovlType *rows0_old = rows0;
         rows0 = rows1;
@@ -3292,7 +3292,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows1_tmp++ = *src_row1;
         *rows1_tmp++ = *(src_row1 + 1);
         *rows1_tmp++ = *(src_row1 + 2);
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float32x4x3_t v3qf32_x0 = neon::vload3q(src_row1);
@@ -3405,8 +3405,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         Tp *dst_row2 = dst.Ptr<Tp>(y + 2);
         Tp *dst_row3 = dst.Ptr<Tp>(y + 3);
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -3454,7 +3454,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (oheight == end_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
             *dst_row0++ = rows1_tmp[0];
             *dst_row0++ = rows1_tmp[1];
@@ -3474,7 +3474,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = *src_r_1;
         *rows0_tmp++ = *(src_r_1 + 1);
         *rows0_tmp++ = *(src_r_1 + 2);
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float32x4x3_t v3qf32_x0 = neon::vload3q(src_r_1);
@@ -3582,8 +3582,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows1;
         MovlType *rows1_y = rows0;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -3622,28 +3622,28 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 // Tp = MI_F16
 template <typename Tp>
 static typename std::enable_if<std::is_same<MI_F16, Tp>::value, Status>::type
-ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
 
-    MI_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 owidth = dst.GetSizes().m_width;
 
     float32x4_t vqf32_const_1_4;
     neon::vdup(vqf32_const_1_4, 0.25f);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy = y * 2;
+        DT_S32 sy = y * 2;
 
         const Tp *src_row0 = src.Ptr<Tp>(sy);
         const Tp *src_row1 = src.Ptr<Tp>(sy + 1);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 owidth_align4 = owidth & (-4);
-        MI_S32 x = 0;
+        DT_S32 owidth_align4 = owidth & (-4);
+        DT_S32 x = 0;
         for (; x < owidth_align4; x += 4)
         {
             float16x8x3_t v3qf16_c  = neon::vload3q(src_row0);
@@ -3698,28 +3698,28 @@ ResizeBnC3DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_ro
 // Tp = MI_F16
 template <typename Tp>
 static typename std::enable_if<std::is_same<MI_F16, Tp>::value, Status>::type
-ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
 
-    MI_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 owidth = dst.GetSizes().m_width;
 
     float32x4_t vqf32_const_1_4;
     neon::vdup(vqf32_const_1_4, 0.25f);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy = y * 4;
+        DT_S32 sy = y * 4;
 
         const Tp *src_row0 = src.Ptr<Tp>(sy + 1);
         const Tp *src_row1 = src.Ptr<Tp>(sy + 2);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 width_align4 = owidth & (-4);
-        MI_S32 x = 0;
+        DT_S32 width_align4 = owidth & (-4);
+        DT_S32 x = 0;
         for (; x < width_align4; x += 4)
         {
             float16x8x3_t v3qf16_cx0  = neon::vload3q(src_row0);
@@ -3786,15 +3786,15 @@ ResizeBnC3DownX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 start_ro
 // Tp = MI_F16
 template <typename Tp>
 static typename std::enable_if<std::is_same<MI_F16, Tp>::value, Status>::type
-ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     MovlType *rows = thread_buffer.GetThreadData<MovlType>();
 
@@ -3815,12 +3815,12 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     MovlType *rows0_tmp = rows0;
     MovlType *rows1_tmp = rows1;
 
-    MI_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
+    DT_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
 
     *rows1_tmp++ = *src_row0;
     *rows1_tmp++ = *(src_row0 + 1);
     *rows1_tmp++ = *(src_row0 + 2);
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < iwidth_1_align4; x += 4)
     {
         float16x4x3_t v3df16_x0 = neon::vload3(src_row0);
@@ -3871,7 +3871,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (0 == start_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; ++x)
+        for (DT_S32 x = 0; x < owidth; ++x)
         {
             *dst_row++ = *rows1_tmp++;
             *dst_row++ = *rows1_tmp++;
@@ -3884,7 +3884,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = *(src_r_1 + 1);
         *rows0_tmp++ = *(src_r_1 + 2);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float16x4x3_t v3df16_x0 = neon::vload3(src_r_1);
@@ -3933,8 +3933,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows0;
         MovlType *rows1_y = rows1;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -3960,9 +3960,9 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 
     src_r_1 = src.Ptr<Tp>(end_row >> 1);
 
-    for (MI_S32 y = start_row + 1; y < end_row - 1; y += 2)
+    for (DT_S32 y = start_row + 1; y < end_row - 1; y += 2)
     {
-        MI_S32 sy = (y - 1) >> 1;
+        DT_S32 sy = (y - 1) >> 1;
 
         MovlType *rows0_old = rows0;
         rows0 = rows1;
@@ -3975,7 +3975,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows1_tmp++ = *(src_row1 + 1);
         *rows1_tmp++ = *(src_row1 + 2);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float16x4x3_t v3df16_x0 = neon::vload3(src_row1);
@@ -4027,8 +4027,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         Tp *dst_row0 = dst.Ptr<Tp>(y);
         Tp *dst_row1 = dst.Ptr<Tp>(y + 1);
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -4062,7 +4062,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (oheight == end_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
             *dst_row++ = *rows1_tmp++;
             *dst_row++ = *rows1_tmp++;
@@ -4076,7 +4076,7 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = *(src_r_1 + 1);
         *rows0_tmp++ = *(src_r_1 + 2);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float16x4x3_t v3df16_x0 = neon::vload3(src_r_1);
@@ -4125,8 +4125,8 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows1;
         MovlType *rows1_y = rows0;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -4156,15 +4156,15 @@ ResizeBnC3UpX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 // Tp = MI_F16
 template <typename Tp>
 static typename std::enable_if<std::is_same<MI_F16, Tp>::value, Status>::type
-ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     MovlType *rows = thread_buffer.GetThreadData<MovlType>();
 
@@ -4185,7 +4185,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     MovlType *rows0_tmp = rows0;
     MovlType *rows1_tmp = rows1;
 
-    MI_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
+    DT_S32 iwidth_1_align4 = (iwidth - 1) & (-4);
 
     *rows1_tmp++ = *src_row0;
     *rows1_tmp++ = *(src_row0 + 1);
@@ -4193,7 +4193,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     *rows1_tmp++ = *src_row0;
     *rows1_tmp++ = *(src_row0 + 1);
     *rows1_tmp++ = *(src_row0 + 2);
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < iwidth_1_align4; x += 4)
     {
         float16x4x3_t v3df16_x0 = neon::vload3(src_row0);
@@ -4311,7 +4311,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (0 == start_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; ++x)
+        for (DT_S32 x = 0; x < owidth; ++x)
         {
             *dst_row0++ = rows1_tmp[0];
             *dst_row0++ = rows1_tmp[1];
@@ -4331,7 +4331,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = *src_r_1;
         *rows0_tmp++ = *(src_r_1 + 1);
         *rows0_tmp++ = *(src_r_1 + 2);
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float16x4x3_t v3df16_x0 = neon::vload3(src_r_1);
@@ -4446,8 +4446,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows0;
         MovlType *rows1_y = rows1;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -4481,9 +4481,9 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
 
     src_r_1 = src.Ptr<Tp>(end_row >> 2);
 
-    for (MI_S32 y = start_row + 2; y < end_row - 2; y += 4)
+    for (DT_S32 y = start_row + 2; y < end_row - 2; y += 4)
     {
-        MI_S32 sy = (y - 2) >> 2;
+        DT_S32 sy = (y - 2) >> 2;
 
         MovlType *rows0_old = rows0;
         rows0 = rows1;
@@ -4499,7 +4499,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows1_tmp++ = *src_row1;
         *rows1_tmp++ = *(src_row1 + 1);
         *rows1_tmp++ = *(src_row1 + 2);
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float16x4x3_t v3df16_x0 = neon::vload3(src_row1);
@@ -4619,8 +4619,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         Tp *dst_row2 = dst.Ptr<Tp>(y + 2);
         Tp *dst_row3 = dst.Ptr<Tp>(y + 3);
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -4668,7 +4668,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
     if (oheight == end_row)
     {
         rows1_tmp = rows1;
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
             *dst_row0++ = rows1_tmp[0];
             *dst_row0++ = rows1_tmp[1];
@@ -4688,7 +4688,7 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         *rows0_tmp++ = *src_r_1;
         *rows0_tmp++ = *(src_r_1 + 1);
         *rows0_tmp++ = *(src_r_1 + 2);
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < iwidth_1_align4; x += 4)
         {
             float16x4x3_t v3df16_x0 = neon::vload3(src_r_1);
@@ -4803,8 +4803,8 @@ ResizeBnC3UpX4NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thr
         MovlType *rows0_y = rows1;
         MovlType *rows1_y = rows0;
 
-        MI_S32 owidth_x3 = owidth * 3;
-        MI_S32 owidth_x3_align4 = owidth_x3 & (-4);
+        DT_S32 owidth_x3 = owidth * 3;
+        DT_S32 owidth_x3_align4 = owidth_x3 & (-4);
         x = 0;
         for(; x < owidth_x3_align4; x += 4)
         {
@@ -4847,16 +4847,16 @@ static Status ResizeBnFastC3NeonHelper(Context *ctx, const Mat &src, Mat &dst, c
     Status ret = Status::ERROR;
 
     using MovlType = typename ResizeBnCuTraits<Tp>::MovlType;
-    MI_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         return Status::ERROR;
     }
 
-    MI_F32 scale_x = static_cast<MI_F64>(src.GetSizes().m_width) / dst.GetSizes().m_width;
-    MI_F32 scale_y = static_cast<MI_F64>(src.GetSizes().m_height) / dst.GetSizes().m_height;
+    DT_F32 scale_x = static_cast<DT_F64>(src.GetSizes().m_width) / dst.GetSizes().m_width;
+    DT_F32 scale_y = static_cast<DT_F64>(src.GetSizes().m_height) / dst.GetSizes().m_height;
 
     if (NearlyEqual(scale_x, scale_y) && NearlyEqual(scale_x, 2.f))
     {
@@ -4892,40 +4892,40 @@ Status ResizeBnFastC3Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget
     {
         case ElemType::U8:
         {
-            ret = ResizeBnFastC3NeonHelper<MI_U8>(ctx, src, dst, target);
+            ret = ResizeBnFastC3NeonHelper<DT_U8>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: MI_U8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: DT_U8");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            ret = ResizeBnFastC3NeonHelper<MI_S8>(ctx, src, dst, target);
+            ret = ResizeBnFastC3NeonHelper<DT_S8>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: MI_S8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: DT_S8");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = ResizeBnFastC3NeonHelper<MI_U16>(ctx, src, dst, target);
+            ret = ResizeBnFastC3NeonHelper<DT_U16>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: MI_U16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: DT_U16");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = ResizeBnFastC3NeonHelper<MI_S16>(ctx, src, dst, target);
+            ret = ResizeBnFastC3NeonHelper<DT_S16>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: MI_S16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: DT_S16");
             }
             break;
         }
@@ -4944,10 +4944,10 @@ Status ResizeBnFastC3Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget
 
         case ElemType::F32:
         {
-            ret = ResizeBnFastC3NeonHelper<MI_F32>(ctx, src, dst, target);
+            ret = ResizeBnFastC3NeonHelper<DT_F32>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: MI_F32");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastC3NeonHelper run failed, type: DT_F32");
             }
             break;
         }

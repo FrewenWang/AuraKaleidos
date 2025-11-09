@@ -42,8 +42,8 @@ Status ResizeBnNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &targ
 {
     Status ret = Status::ERROR;
 
-    MI_F32 scale_x = static_cast<MI_F64>(src.GetSizes().m_width) / dst.GetSizes().m_width;
-    MI_F32 scale_y = static_cast<MI_F64>(src.GetSizes().m_height) / dst.GetSizes().m_height;
+    DT_F32 scale_x = static_cast<DT_F64>(src.GetSizes().m_width) / dst.GetSizes().m_width;
+    DT_F32 scale_y = static_cast<DT_F64>(src.GetSizes().m_height) / dst.GetSizes().m_height;
 
     if (NearlyEqual(scale_x, scale_y) &&
         (NearlyEqual(scale_x, 0.25f) || NearlyEqual(scale_x, 0.5f) ||
@@ -53,7 +53,7 @@ Status ResizeBnNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &targ
     }
     else
     {
-        ret = ResizeBnCommNeon(ctx, src, dst, MI_FALSE, target);
+        ret = ResizeBnCommNeon(ctx, src, dst, DT_FALSE, target);
     }
 
     AURA_RETURN(ctx, ret);

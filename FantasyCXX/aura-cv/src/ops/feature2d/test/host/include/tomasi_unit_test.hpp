@@ -14,8 +14,8 @@ struct TomasiTestParam
     TomasiTestParam()
     {}
 
-    TomasiTestParam(MI_S32 max_corners, MI_F64 quality_level, MI_F64 min_distance,
-                    MI_S32 block_size, MI_S32 gradient_size, MI_BOOL use_harris, MI_F64 harris_k)
+    TomasiTestParam(DT_S32 max_corners, DT_F64 quality_level, DT_F64 min_distance,
+                    DT_S32 block_size, DT_S32 gradient_size, DT_BOOL use_harris, DT_F64 harris_k)
                     : max_corners(max_corners), quality_level(quality_level), min_distance(min_distance),
                       block_size(block_size), gradient_size(gradient_size), use_harris(use_harris), harris_k(harris_k)
     {}
@@ -35,13 +35,13 @@ struct TomasiTestParam
         return sstream.str();
     }
 
-    MI_S32 max_corners;
-    MI_F64 quality_level;
-    MI_F64 min_distance;
-    MI_S32 block_size;
-    MI_S32 gradient_size;
-    MI_BOOL use_harris;
-    MI_F64 harris_k;
+    DT_S32 max_corners;
+    DT_F64 quality_level;
+    DT_F64 min_distance;
+    DT_S32 block_size;
+    DT_S32 gradient_size;
+    DT_BOOL use_harris;
+    DT_F64 harris_k;
 };
 
 AURA_TEST_PARAM(TomasiParam,
@@ -63,8 +63,8 @@ static Status CvGoodFeaturesToTrack(Context *ctx, Mat &src, std::vector<KeyPoint
 
     key_points.clear();
 
-    MI_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
-    MI_S32 cv_type = 0;
+    DT_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 cv_type = 0;
 
     if (CV_8UC1 != src_cv_type && CV_32FC1 != src_cv_type)
     {
@@ -115,7 +115,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         TomasiParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -136,18 +136,18 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         TomasiParam run_param(GetParam((index)));
         // creat iauras
-        MI_F32 alpha = run_param.elem_type == ElemType::U8 ? 1.0f : 1 / 255.f;
+        DT_F32 alpha = run_param.elem_type == ElemType::U8 ? 1.0f : 1 / 255.f;
         Mat src = m_factory.GetDerivedMat(alpha, 0.0f, run_param.elem_type, run_param.mat_sizes.m_sizes, AURA_MEM_DEFAULT, run_param.mat_sizes.m_strides);
 
         std::vector<KeyPoint> dst;
         std::vector<KeyPoint> ref;
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         UnorderedCmpResult<KeyPoint> cmp_result;

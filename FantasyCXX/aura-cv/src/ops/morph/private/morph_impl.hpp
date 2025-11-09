@@ -25,7 +25,7 @@ class MorphImpl : public OpImpl
 public:
     MorphImpl(Context *ctx, MorphType type, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape = MorphShape::RECT, MI_S32 iterations = 1);
+    virtual Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape = MorphShape::RECT, DT_S32 iterations = 1);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -33,13 +33,13 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    MI_S32     m_ksize;
+    DT_S32     m_ksize;
     MorphType  m_type;
     MorphShape m_shape;
-    MI_S32     m_iterations;
+    DT_S32     m_iterations;
 
     const Array *m_src;
     Array       *m_dst;
@@ -50,7 +50,7 @@ class MorphNone : public MorphImpl
 public:
     MorphNone(Context *ctx, MorphType type, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape = MorphShape::RECT, MI_S32 iterations = 1) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape = MorphShape::RECT, DT_S32 iterations = 1) override;
 
     Status Initialize() override;
 
@@ -69,7 +69,7 @@ class MorphNeon : public MorphImpl
 public:
     MorphNeon(Context *ctx, MorphType type, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape = MorphShape::RECT, MI_S32 iterations = 1) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape = MorphShape::RECT, DT_S32 iterations = 1) override;
 
     Status Run() override;
 };
@@ -143,7 +143,7 @@ class MorphCL : public MorphImpl
 public:
     MorphCL(Context *ctx, MorphType type, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape = MorphShape::RECT, MI_S32 iterations = 1) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape = MorphShape::RECT, DT_S32 iterations = 1) override;
 
     Status Initialize() override;
 
@@ -153,7 +153,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, MorphShape shape, MorphType type);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, MorphShape shape, MorphType type);
 
 private:
     Status MorphCLImpl(CLMem &cl_src, CLMem &cl_dst);
@@ -174,7 +174,7 @@ class MorphHvx : public MorphImpl
 public:
     MorphHvx(Context *ctx, MorphType type, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape = MorphShape::RECT, MI_S32 iterations = 1) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape = MorphShape::RECT, DT_S32 iterations = 1) override;
 
     Status Initialize() override;
 
@@ -192,9 +192,9 @@ private:
 };
 
 #  if defined(AURA_BUILD_HEXAGON)
-// using Tp = MI_U8
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_result)
+// using Tp = DT_U8
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
     {
@@ -206,9 +206,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &
     }
 }
 
-// using Tp = MI_U8
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2, HVX_Vector &vu8_result)
+// using Tp = DT_U8
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2, HVX_Vector &vu8_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
     {
@@ -220,9 +220,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &
     }
 }
 
-// using Tp = MI_U8
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1,
+// using Tp = DT_U8
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1,
                                           HVX_Vector &vu8_src_x2, HVX_Vector &vu8_src_x3, HVX_Vector &vu8_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
@@ -235,9 +235,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &
     }
 }
 
-// using Tp = MI_U8
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2,
+// using Tp = DT_U8
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2,
                                           HVX_Vector &vu8_src_x3, HVX_Vector &vu8_src_x4, HVX_Vector &vu8_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
@@ -254,9 +254,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &
     }
 }
 
-// using Tp = MI_U8
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2,
+// using Tp = DT_U8
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2,
                                           HVX_Vector &vu8_src_x3, HVX_Vector &vu8_src_x4, HVX_Vector &vu8_src_x5,
                                           HVX_Vector &vu8_result)
 {
@@ -276,9 +276,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &
     }
 }
 
-// using Tp = MI_U8
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2, HVX_Vector &vu8_src_x3,
+// using Tp = DT_U8
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2, HVX_Vector &vu8_src_x3,
                                           HVX_Vector &vu8_src_x4, HVX_Vector &vu8_src_x5, HVX_Vector &vu8_src_x6, HVX_Vector &vu8_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
@@ -297,9 +297,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu8_src_x0, HVX_Vector &
     }
 }
 
-// using Tp = MI_U16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_result)
+// using Tp = DT_U16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
     {
@@ -311,9 +311,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_U16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2, HVX_Vector &vu16_result)
+// using Tp = DT_U16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2, HVX_Vector &vu16_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
     {
@@ -325,9 +325,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_U16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1,
+// using Tp = DT_U16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1,
                                           HVX_Vector &vu16_src_x2, HVX_Vector &vu16_src_x3, HVX_Vector &vu16_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
@@ -340,9 +340,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_U16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2, HVX_Vector &vu16_src_x3,
+// using Tp = DT_U16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2, HVX_Vector &vu16_src_x3,
                                           HVX_Vector &vu16_src_x4, HVX_Vector &vu16_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
@@ -359,9 +359,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_U16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2,
+// using Tp = DT_U16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2,
                                           HVX_Vector &vu16_src_x3, HVX_Vector &vu16_src_x4, HVX_Vector &vu16_src_x5, HVX_Vector &vu16_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
@@ -380,9 +380,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_U16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2, HVX_Vector &vu16_src_x3,
+// using Tp = DT_U16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2, HVX_Vector &vu16_src_x3,
                                           HVX_Vector &vu16_src_x4, HVX_Vector &vu16_src_x5, HVX_Vector &vu16_src_x6, HVX_Vector &vu16_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
@@ -401,9 +401,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vu16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_S16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_result)
+// using Tp = DT_S16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
     {
@@ -415,9 +415,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_S16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1,
+// using Tp = DT_S16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1,
                                           HVX_Vector &vs16_src_x2, HVX_Vector &vs16_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
@@ -430,9 +430,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_S16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1,
+// using Tp = DT_S16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1,
                                           HVX_Vector &vs16_src_x2, HVX_Vector &vs16_src_x3,
                                           HVX_Vector &vs16_result)
 {
@@ -446,9 +446,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_S16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_src_x2,
+// using Tp = DT_S16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_src_x2,
                                           HVX_Vector &vs16_src_x3, HVX_Vector &vs16_src_x4, HVX_Vector &vs16_result)
 {
     if (MorphType::ERODE == MORPH_TYPE)
@@ -465,9 +465,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_S16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_src_x2,
+// using Tp = DT_S16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_src_x2,
                                           HVX_Vector &vs16_src_x3, HVX_Vector &vs16_src_x4, HVX_Vector &vs16_src_x5,
                                           HVX_Vector &vs16_result)
 {
@@ -487,9 +487,9 @@ AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector 
     }
 }
 
-// using Tp = MI_S16
-template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_src_x2,
+// using Tp = DT_S16
+template <typename Tp, MorphType MORPH_TYPE, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID MorphHvxMinMax(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_src_x2,
                                           HVX_Vector &vs16_src_x3, HVX_Vector &vs16_src_x4, HVX_Vector &vs16_src_x5,
                                           HVX_Vector &vs16_src_x6, HVX_Vector &vs16_result)
 {
@@ -514,7 +514,7 @@ Status Morph5x5Hvx(Context *ctx, const Mat &src, Mat &dst, MorphType type, Morph
 Status Morph7x7Hvx(Context *ctx, const Mat &src, Mat &dst, MorphType type, MorphShape shape);
 #  endif // AURA_BUILD_HEXAGON
 
-using MorphInParam = HexagonRpcParamType<Mat, Mat, Buffer, MorphType, MI_S32, MorphShape, MI_S32>;
+using MorphInParam = HexagonRpcParamType<Mat, Mat, Buffer, MorphType, DT_S32, MorphShape, DT_S32>;
 #  define AURA_OPS_MORPH_MORPH_OP_NAME          "Morph"
 
 #endif // (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))

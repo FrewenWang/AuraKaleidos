@@ -7,8 +7,8 @@ namespace aura
 
 // using d16x4_t = uint16x4_t , int16x4_t
 template <typename d16x4_t, typename Kt, typename d32x4_t = typename neon::WVectorBits<d16x4_t>::VType,
-          typename std::enable_if<(std::is_same<d16x4_t, uint16x4_t>::value || std::is_same<d16x4_t, int16x4_t>::value)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(d16x4_t &vd16_src_p1, d16x4_t &vd16_src_p0, d16x4_t &vd16_src_c, d16x4_t &vd16_src_n0,
+          typename std::enable_if<(std::is_same<d16x4_t, uint16x4_t>::value || std::is_same<d16x4_t, int16x4_t>::value)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5VCore(d16x4_t &vd16_src_p1, d16x4_t &vd16_src_p0, d16x4_t &vd16_src_c, d16x4_t &vd16_src_n0,
                                             d16x4_t &vd16_src_n1, d32x4_t &vq32_result, const Kt *kernel)
 {
     Kt k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
@@ -22,8 +22,8 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(d16x4_t &vd16_src_p1, d16x4_t &vd1
 
 // using d16x4_t = uint16x4_t , int16x4_t
 template <typename d16x4_t, typename Kt, typename d32x4_t = typename neon::WVectorBits<d16x4_t>::VType,
-          typename std::enable_if<(std::is_same<d16x4_t, uint16x4_t>::value || std::is_same<d16x4_t, int16x4_t>::value)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(d32x4_t &vq32_sum_x0, d32x4_t &vq32_sum_x1, d32x4_t &vq32_sum_x2,
+          typename std::enable_if<(std::is_same<d16x4_t, uint16x4_t>::value || std::is_same<d16x4_t, int16x4_t>::value)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(d32x4_t &vq32_sum_x0, d32x4_t &vq32_sum_x1, d32x4_t &vq32_sum_x2,
                                             d16x4_t &vd16_result, const Kt *kernel)
 {
     using d32x2_t = typename neon::DVector<Kt>::VType;
@@ -53,11 +53,11 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(d32x4_t &vq32_sum_x0, d32x4_t &vq3
     vq32_sum_x1 = vq32_sum_x2;
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(uint8x8_t &vdu8_src_p1, uint8x8_t &vdu8_src_p0, uint8x8_t &vdu8_src_c,
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5VCore(uint8x8_t &vdu8_src_p1, uint8x8_t &vdu8_src_p0, uint8x8_t &vdu8_src_c,
                                             uint8x8_t &vdu8_src_n0, uint8x8_t &vdu8_src_n1,
-                                            uint16x8_t &vqu16_result, const MI_U16 *kernel)
+                                            uint16x8_t &vqu16_result, const DT_U16 *kernel)
 {
-    MI_U16 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
+    DT_U16 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
 
     uint16x8_t vqu16_sum_p1n1 = neon::vaddl(vdu8_src_p1, vdu8_src_n1);
     uint16x8_t vqu16_sum_p0n0 = neon::vaddl(vdu8_src_p0, vdu8_src_n0);
@@ -68,10 +68,10 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(uint8x8_t &vdu8_src_p1, uint8x8_t 
     vqu16_result              = neon::vmla(vqu16_result, neon::vmovl(vdu8_src_c), k2);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(uint16x8_t &vqu16_sum_x0, uint16x8_t &vqu16_sum_x1, uint16x8_t &vqu16_sum_x2,
-                                            uint8x8_t &vdu8_result, const MI_U16 *kernel)
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(uint16x8_t &vqu16_sum_x0, uint16x8_t &vqu16_sum_x1, uint16x8_t &vqu16_sum_x2,
+                                            uint8x8_t &vdu8_result, const DT_U16 *kernel)
 {
-    MI_U16 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
+    DT_U16 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
 
     uint16x8_t vqu16_sum_l1      = neon::vext<6>(vqu16_sum_x0, vqu16_sum_x1);
     uint16x8_t vqu16_sum_l0      = neon::vext<7>(vqu16_sum_x0, vqu16_sum_x1);
@@ -81,13 +81,13 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(uint16x8_t &vqu16_sum_x0, uint16x8
     uint32x4_t vqu32_sum_c_hi    = neon::vmull(neon::vgethigh(vqu16_sum_x1), k2);
     uint32x4_t vpu32_sum_l0r0_lo = neon::vaddl(neon::vgetlow(vqu16_sum_l0), neon::vgetlow(vqu16_sum_r0));
     uint32x4_t vpu32_sum_l0r0_hi = neon::vaddl(neon::vgethigh(vqu16_sum_l0), neon::vgethigh(vqu16_sum_r0));
-    uint32x4_t vqu32_result_lo   = neon::vmla(vqu32_sum_c_lo, vpu32_sum_l0r0_lo, static_cast<MI_U32>(k1));
-    uint32x4_t vqu32_result_hi   = neon::vmla(vqu32_sum_c_hi, vpu32_sum_l0r0_hi, static_cast<MI_U32>(k1));
+    uint32x4_t vqu32_result_lo   = neon::vmla(vqu32_sum_c_lo, vpu32_sum_l0r0_lo, static_cast<DT_U32>(k1));
+    uint32x4_t vqu32_result_hi   = neon::vmla(vqu32_sum_c_hi, vpu32_sum_l0r0_hi, static_cast<DT_U32>(k1));
     uint32x4_t vqu32_sum_l1r1_lo = neon::vaddl(neon::vgetlow(vqu16_sum_l1), neon::vgetlow(vqu16_sum_r1));
     uint32x4_t vqu32_sum_l1r1_hi = neon::vaddl(neon::vgethigh(vqu16_sum_l1), neon::vgethigh(vqu16_sum_r1));
 
-    vqu32_result_lo              = neon::vmla(vqu32_result_lo, vqu32_sum_l1r1_lo, static_cast<MI_U32>(k0));
-    vqu32_result_hi              = neon::vmla(vqu32_result_hi, vqu32_sum_l1r1_hi, static_cast<MI_U32>(k0));
+    vqu32_result_lo              = neon::vmla(vqu32_result_lo, vqu32_sum_l1r1_lo, static_cast<DT_U32>(k0));
+    vqu32_result_hi              = neon::vmla(vqu32_result_hi, vqu32_sum_l1r1_hi, static_cast<DT_U32>(k0));
 
     uint16x4_t vdu16_result_lo   = neon::vqshrn_n<8>(vqu32_result_lo);
     uint16x4_t vdu16_result_hi   = neon::vqshrn_n<8>(vqu32_result_hi);
@@ -98,22 +98,22 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(uint16x8_t &vqu16_sum_x0, uint16x8
 }
 
 #if defined(AURA_ENABLE_NEON_FP16)
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(float16x4_t &vdf16_src_p1, float16x4_t &vdf16_src_p0, float16x4_t &vdf16_src_c,
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5VCore(float16x4_t &vdf16_src_p1, float16x4_t &vdf16_src_p0, float16x4_t &vdf16_src_c,
                                             float16x4_t &vdf16_src_n0, float16x4_t &vdf16_src_n1,
-                                            float32x4_t &vqf32_result, const MI_F32 *kernel)
+                                            float32x4_t &vqf32_result, const DT_F32 *kernel)
 {
-    MI_F32 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
+    DT_F32 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
 
-    float32x4_t vqf32_sum_p1n1 = neon::vadd(neon::vcvt<MI_F32>(vdf16_src_p1), neon::vcvt<MI_F32>(vdf16_src_n1));
-    float32x4_t vqf32_sum_p0n0 = neon::vadd(neon::vcvt<MI_F32>(vdf16_src_p0), neon::vcvt<MI_F32>(vdf16_src_n0));
+    float32x4_t vqf32_sum_p1n1 = neon::vadd(neon::vcvt<DT_F32>(vdf16_src_p1), neon::vcvt<DT_F32>(vdf16_src_n1));
+    float32x4_t vqf32_sum_p0n0 = neon::vadd(neon::vcvt<DT_F32>(vdf16_src_p0), neon::vcvt<DT_F32>(vdf16_src_n0));
     vqf32_result               = neon::vadd(neon::vmul(vqf32_sum_p0n0, k1), neon::vmul(vqf32_sum_p1n1, k0));
-    vqf32_result               = neon::vmla(vqf32_result, neon::vcvt<MI_F32>(vdf16_src_c), k2);
+    vqf32_result               = neon::vmla(vqf32_result, neon::vcvt<DT_F32>(vdf16_src_c), k2);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(float32x4_t &vqf32_sum_x0, float32x4_t &vqf32_sum_x1, float32x4_t &vqf32_sum_x2,
-                                            float16x4_t &vdf16_result, const MI_F32 *kernel)
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(float32x4_t &vqf32_sum_x0, float32x4_t &vqf32_sum_x1, float32x4_t &vqf32_sum_x2,
+                                            float16x4_t &vdf16_result, const DT_F32 *kernel)
 {
-    MI_F32 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
+    DT_F32 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
 
     float32x4_t vqf32_sum_l1   = neon::vext<2>(vqf32_sum_x0, vqf32_sum_x1);
     float32x4_t vqf32_sum_l0   = neon::vext<3>(vqf32_sum_x0, vqf32_sum_x1);
@@ -131,11 +131,11 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(float32x4_t &vqf32_sum_x0, float32
 }
 #endif // AURA_ENABLE_NEON_FP16
 
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(float32x4_t &vqf32_src_p1, float32x4_t &vqf32_src_p0, float32x4_t &vqf32_src_c,
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5VCore(float32x4_t &vqf32_src_p1, float32x4_t &vqf32_src_p0, float32x4_t &vqf32_src_c,
                                             float32x4_t &vqf32_src_n0, float32x4_t &vqf32_src_n1,
-                                            float32x4_t &vqf32_result, const MI_F32 *kernel)
+                                            float32x4_t &vqf32_result, const DT_F32 *kernel)
 {
-    MI_F32 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
+    DT_F32 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
 
     float32x4_t vqf32_sum_p1n1 = neon::vadd(vqf32_src_p1, vqf32_src_n1);
     float32x4_t vqf32_sum_p0n0 = neon::vadd(vqf32_src_p0, vqf32_src_n0);
@@ -146,10 +146,10 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5VCore(float32x4_t &vqf32_src_p1, float32
     vqf32_result               = neon::vmla(vqf32_result, vqf32_src_c, k2);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(float32x4_t &vqf32_sum_x0, float32x4_t &vqf32_sum_x1, float32x4_t &vqf32_sum_x2,
-                                            float32x4_t &vqf32_result, const MI_F32 *kernel)
+AURA_ALWAYS_INLINE DT_VOID Gaussian5x5HCore(float32x4_t &vqf32_sum_x0, float32x4_t &vqf32_sum_x1, float32x4_t &vqf32_sum_x2,
+                                            float32x4_t &vqf32_result, const DT_F32 *kernel)
 {
-    MI_F32 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
+    DT_F32 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
 
     float32x4_t vqf32_sum_l1   = neon::vext<2>(vqf32_sum_x0, vqf32_sum_x1);
     float32x4_t vqf32_sum_l0   = neon::vext<3>(vqf32_sum_x0, vqf32_sum_x1);
@@ -167,18 +167,18 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian5x5HCore(float32x4_t &vqf32_sum_x0, float32
     vqf32_sum_x1 = vqf32_sum_x2;
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C, typename Kt>
-static AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0, const Tp *src_n1,
-                              Tp *dst, const Kt *kernel, const std::vector<Tp> &border_value, MI_S32 width)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C, typename Kt>
+static DT_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0, const Tp *src_n1,
+                              Tp *dst, const Kt *kernel, const std::vector<Tp> &border_value, DT_S32 width)
 {
-    using MVType    = typename std::conditional<std::is_same<Tp, MI_F32>::value, typename neon::MQVector<Tp, C>::MVType,
+    using MVType    = typename std::conditional<std::is_same<Tp, DT_F32>::value, typename neon::MQVector<Tp, C>::MVType,
                       typename neon::MDVector<Tp, C>::MVType>::type;
-    using MVSumType = typename std::conditional<std::is_same<Tp, MI_F32>::value, MVType,
+    using MVSumType = typename std::conditional<std::is_same<Tp, DT_F32>::value, MVType,
                       typename neon::MQVector<typename Promote<Tp>::Type, C>::MVType>::type;
 
-    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(sizeof(MVType) / C / sizeof(Tp));
-    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
-    const MI_S32 width_align     = (width & -ELEM_COUNTS) * C;
+    constexpr DT_S32 ELEM_COUNTS = static_cast<DT_S32>(sizeof(MVType) / C / sizeof(Tp));
+    constexpr DT_S32 VOFFSET     = ELEM_COUNTS * C;
+    const DT_S32 width_align     = (width & -ELEM_COUNTS) * C;
 
     MVType mv_src_p1[3], mv_src_p0[3], mv_src_c[3], mv_src_n0[3], mv_src_n1[3], mv_result;
     MVSumType mv_sum[3];
@@ -196,7 +196,7 @@ static AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *sr
         neon::vload(src_n1,           mv_src_n1[1]);
         neon::vload(src_n1 + VOFFSET, mv_src_n1[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p1[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
             mv_src_p0[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p0[1].val[ch], src_p0[ch], border_value[ch]);
@@ -216,7 +216,7 @@ static AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *sr
     }
 
     // middle
-    for (MI_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
+    for (DT_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
     {
         neon::vload(src_p1 + x + VOFFSET, mv_src_p1[2]);
         neon::vload(src_p0 + x + VOFFSET, mv_src_p0[2]);
@@ -224,7 +224,7 @@ static AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *sr
         neon::vload(src_n0 + x + VOFFSET, mv_src_n0[2]);
         neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             Gaussian5x5VCore(mv_src_p1[2].val[ch], mv_src_p0[2].val[ch], mv_src_c[2].val[ch],
                              mv_src_n0[2].val[ch], mv_src_n1[2].val[ch], mv_sum[2].val[ch], kernel);
@@ -237,7 +237,7 @@ static AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *sr
     {
         if (width_align != width * C)
         {
-            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+            DT_S32 x = (width - (ELEM_COUNTS << 1)) * C;
 
             neon::vload(src_p1 + x - VOFFSET, mv_src_p1[0]);
             neon::vload(src_p1 + x,           mv_src_p1[1]);
@@ -255,7 +255,7 @@ static AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *sr
             neon::vload(src_n1 + x,           mv_src_n1[1]);
             neon::vload(src_n1 + x + VOFFSET, mv_src_n1[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Gaussian5x5VCore(mv_src_p1[0].val[ch], mv_src_p0[0].val[ch], mv_src_c[0].val[ch],
                                  mv_src_n0[0].val[ch], mv_src_n1[0].val[ch], mv_sum[0].val[ch], kernel);
@@ -271,10 +271,10 @@ static AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *sr
 
     // right
     {
-        MI_S32 x    = (width - ELEM_COUNTS) * C;
-        MI_S32 last = (width - 1) * C;
+        DT_S32 x    = (width - ELEM_COUNTS) * C;
+        DT_S32 last = (width - 1) * C;
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p1[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p1[2].val[ch], src_p1[last + ch], border_value[ch]);
             mv_src_p0[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p0[2].val[ch], src_p0[last + ch], border_value[ch]);
@@ -290,13 +290,13 @@ static AURA_VOID Gaussian5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *sr
     }
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C>
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C>
 static Status Gaussian5x5NeonImpl(const Mat &src, Mat &dst, const Mat &kmat, const std::vector<Tp> &border_value, const Tp *border_buffer,
-                                  MI_S32 start_row, MI_S32 end_row)
+                                  DT_S32 start_row, DT_S32 end_row)
 {
     using Kt = typename std::conditional<sizeof(Tp) == 4, Tp, typename Promote<Tp>::Type>::type;
 
-    MI_S32 width  = src.GetSizes().m_width;
+    DT_S32 width  = src.GetSizes().m_width;
 
     const Kt *kernel = kmat.Ptr<Kt>(0);
 
@@ -306,7 +306,7 @@ static Status Gaussian5x5NeonImpl(const Mat &src, Mat &dst, const Mat &kmat, con
     const Tp *src_n0 = src.Ptr<Tp, BORDER_TYPE>(start_row + 1, border_buffer);
     const Tp *src_n1 = src.Ptr<Tp, BORDER_TYPE>(start_row + 2, border_buffer);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         Tp *dst_row = dst.Ptr<Tp>(y);
         Gaussian5x5Row<Tp, BORDER_TYPE, C, Kt>(src_p1, src_p0, src_c, src_n0, src_n1, dst_row, kernel, border_value, width);
@@ -329,14 +329,14 @@ static Status Gaussian5x5NeonHelper(Context *ctx, const Mat &src, Mat &dst, cons
     Status ret     = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height  = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 height  = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (channel)
     {
@@ -380,18 +380,18 @@ static Status Gaussian5x5NeonHelper(Context *ctx, const Mat &src, Mat &dst, cons
 {
     Status ret = Status::ERROR;
 
-    Tp *border_buffer = MI_NULL;
+    Tp *border_buffer = DT_NULL;
     std::vector<Tp> vec_border_value = border_value.ToVector<Tp>();
 
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (border_type)
     {
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -434,19 +434,19 @@ Status Gaussian5x5Neon(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat,
     {
         case ElemType::U8:
         {
-            ret = Gaussian5x5NeonHelper<MI_U8>(ctx, src, dst, kmat, border_type, border_value, target);
+            ret = Gaussian5x5NeonHelper<DT_U8>(ctx, src, dst, kmat, border_type, border_value, target);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = Gaussian5x5NeonHelper<MI_U16>(ctx, src, dst, kmat, border_type, border_value, target);
+            ret = Gaussian5x5NeonHelper<DT_U16>(ctx, src, dst, kmat, border_type, border_value, target);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = Gaussian5x5NeonHelper<MI_S16>(ctx, src, dst, kmat, border_type, border_value, target);
+            ret = Gaussian5x5NeonHelper<DT_S16>(ctx, src, dst, kmat, border_type, border_value, target);
             break;
         }
 
@@ -460,7 +460,7 @@ Status Gaussian5x5Neon(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat,
 
         case ElemType::F32:
         {
-            ret = Gaussian5x5NeonHelper<MI_F32>(ctx, src, dst, kmat, border_type, border_value, target);
+            ret = Gaussian5x5NeonHelper<DT_F32>(ctx, src, dst, kmat, border_type, border_value, target);
             break;
         }
 

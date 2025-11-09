@@ -53,7 +53,7 @@ public:
      *
      * For more details, please refer to @ref mulspectrums_details
      */
-    Status SetArgs(const Array *src0, const Array *src1, Array *dst, MI_BOOL conj_src1);
+    Status SetArgs(const Array *src0, const Array *src1, Array *dst, DT_BOOL conj_src1);
 
     /**
      * @brief Generate MulSpectrums opencl precompiled cache.
@@ -61,7 +61,7 @@ public:
      * @param elem_type The element type of the src/dst array.
      * @param conj_src1 The flag that conjugates the second input array before the multiplication.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_BOOL conj_src1);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_BOOL conj_src1);
 };
 
 /**
@@ -87,7 +87,7 @@ public:
  * NEON         | F32C2
  * OpenCL       | F32C2
  */
-AURA_EXPORTS Status IMulSpectrums(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, MI_BOOL conj_src1, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IMulSpectrums(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, DT_BOOL conj_src1, const OpTarget &target = OpTarget::Default());
 
 /**
  * @}

@@ -71,7 +71,7 @@ elseif(AURA_BUILD_ANDROID)
     target_link_libraries(${AURA_LIB_NAME} log)
 endif()
 
-if(NOT AURA_BUILD_WIN)
+if(NOT AURA_BUILD_WIN  AND NOT AURA_BUILD_MAC)
     strip_lib(${AURA_LIB_NAME} ${AURA_SHARED_LIBRARY} ${AURA_RELEASE})
 endif()
 
@@ -106,9 +106,9 @@ if(AURA_BUILD_UNIT_TEST)
             # link aura_xtensa for profile
             target_link_libraries(aura_test_main ${AURA_XTENSA_LIB_NAME})
         else()
-            if(OpenCV_DIR)
+            if(OPENCV_DIR)
                 message(STATUS "OpenCV_DIR = ${OpenCV_DIR}")
-
+                # TODO 暂时还是不能根据OPENCV_DIR的加载OpenCV的环境，后续我们需要解决
                 find_package(OpenCV REQUIRED)
                 if(NOT OpenCV_FOUND)
                     message(FATAL_ERROR "find_package(OpenCV REQUIRED) failed")

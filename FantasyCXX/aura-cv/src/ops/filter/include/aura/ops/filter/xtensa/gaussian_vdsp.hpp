@@ -31,10 +31,10 @@ namespace xtensa
  * @param ksize The size of the Gaussian kernel (must be an odd number).
  * @param sigma The standard deviation of the Gaussian kernel.
  *
- * @return A vector of `MI_F32` type representing the Gaussian kernel.
+ * @return A vector of `DT_F32` type representing the Gaussian kernel.
  *         The kernel is centered at index `ksize / 2`.
  */
-vector<MI_F32> GetGaussianKernel(MI_S32 ksize, MI_F32 sigma);
+vector<DT_F32> GetGaussianKernel(DT_S32 ksize, DT_F32 sigma);
 
 /**
  * @brief Enumerated type for Gaussian blur filter.
@@ -65,7 +65,7 @@ public:
      *
      * @return Status::OK if the operation is successful; otherwise, an appropriate error status.
      */
-    Status SetArgs(const Mat *src, Mat *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Mat *src, Mat *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar());
 
@@ -79,7 +79,7 @@ public:
      *
      * @return Status::OK if the operation is successful; otherwise, an appropriate error status.
      */
-    Status SetArgs(const TileWrapper *src, TileWrapper *dst, MI_S32 ksize, MI_F32 sigma);
+    Status SetArgs(const TileWrapper *src, TileWrapper *dst, DT_S32 ksize, DT_F32 sigma);
 
     AURA_VDSP_OP_HPP();
 };

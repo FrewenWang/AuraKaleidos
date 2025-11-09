@@ -5,7 +5,7 @@
 namespace aura
 {
 
-static const MI_S32 BETA_S16[10][4] = {
+static const DT_S32 BETA_S16[10][4] = {
     { 2273, -225,   0,     0},
     { 2195, -147,   0,     0},
     { 1834,  235,  -21,    0},
@@ -18,7 +18,7 @@ static const MI_S32 BETA_S16[10][4] = {
     {-21,    235,   1981, -147}
 };
 
-static const MI_S32 BETA_S32[10][4] = {
+static const DT_S32 BETA_S32[10][4] = {
     { 36368, -3600,   0,      0},
     { 35120, -2352,   0,      0},
     { 29344,  3760,  -336,    0},
@@ -31,8 +31,8 @@ static const MI_S32 BETA_S32[10][4] = {
     {-336,    3760,   31696, -2352}
 };
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vu8_src,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX2HCore(HVX_Vector &vu8_src,
                                              HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                              HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1,
                                              HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
@@ -59,8 +59,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vu8_src,
     ws32_result_h = Q6_Ww_vmpyacc_WwVhVuh(ws32_result_h, vs16_alpha3, Q6_V_hi_W(wu16_r2_src));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vs8_src,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX2HCore(HVX_Vector &vs8_src,
                                              HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                              HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1,
                                              HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
@@ -87,8 +87,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vs8_src,
     ws32_result_h = Q6_Ww_vmpyacc_WwVhVh(ws32_result_h, vs16_alpha3, Q6_V_hi_W(ws16_r2_src));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vu16_src, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX2HCore(HVX_Vector &vu16_src, HVX_VectorPair &ws32_result,
                                              HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1,
                                              HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -106,8 +106,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vu16_src, HVX_VectorP
     ws32_result = Q6_Ww_vmpyacc_WwVhVuh(ws32_result, vs16_alpha3, vu16_r2_src);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vs16_src, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX2HCore(HVX_Vector &vs16_src, HVX_VectorPair &ws32_result,
                                              HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1,
                                              HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -125,8 +125,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vs16_src, HVX_VectorP
     ws32_result = Q6_Ww_vmpyacc_WwVhVh(ws32_result, vs16_alpha3, vs16_r2_src);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vu8_x0_twin, HVX_Vector &vu8_x1_src,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX2HCore(HVX_Vector &vu8_x0_twin, HVX_Vector &vu8_x1_src,
                                              HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                              HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1,
                                              HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
@@ -152,8 +152,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vu8_x0_twin, HVX_Vect
     ws32_result_h = Q6_Ww_vmpyacc_WwVhVuh(ws32_result_h, vs16_alpha3, Q6_V_hi_W(wu16_r2_src));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vs8_x0_twin, HVX_Vector &vs8_x1_src,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX2HCore(HVX_Vector &vs8_x0_twin, HVX_Vector &vs8_x1_src,
                                              HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                              HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1,
                                              HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
@@ -179,8 +179,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vs8_x0_twin, HVX_Vect
     ws32_result_h = Q6_Ww_vmpyacc_WwVhVh(ws32_result_h, vs16_alpha3, Q6_V_hi_W(ws16_r2_src));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vu16_x0_twin, HVX_Vector &vu16_x1_src,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX2HCore(HVX_Vector &vu16_x0_twin, HVX_Vector &vu16_x1_src,
                                              HVX_VectorPair &ws32_result,
                                              HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1,
                                              HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
@@ -198,8 +198,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vu16_x0_twin, HVX_Vec
     ws32_result = Q6_Ww_vmpyacc_WwVhVuh(ws32_result, vs16_alpha3, vu16_r2_src);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vs16_x0_twin, HVX_Vector &vs16_x1_src,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX2HCore(HVX_Vector &vs16_x0_twin, HVX_Vector &vs16_x1_src,
                                              HVX_VectorPair &ws32_result,
                                              HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1,
                                              HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
@@ -217,8 +217,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX2HCore(HVX_Vector &vs16_x0_twin, HVX_Vec
     ws32_result = Q6_Ww_vmpyacc_WwVhVh(ws32_result, vs16_alpha3, vs16_r2_src);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H0Core(HVX_Vector &vu8_twin_src,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H0Core(HVX_Vector &vu8_twin_src,
                                               HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -244,8 +244,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H0Core(HVX_Vector &vu8_twin_src,
     ws32_result_h = Q6_Ww_vmpyacc_WwVhVuh(ws32_result_h, vs16_alpha3, Q6_V_hi_W(wu16_r2_quad));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H0Core(HVX_Vector &vs8_twin_src,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H0Core(HVX_Vector &vs8_twin_src,
                                               HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -271,8 +271,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H0Core(HVX_Vector &vs8_twin_src,
     ws32_result_h = Q6_Ww_vmpyacc_WwVhVh(ws32_result_h, vs16_alpha3, Q6_V_hi_W(ws16_r2_quad));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H0Core(HVX_Vector &vu16_twin_src, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H0Core(HVX_Vector &vu16_twin_src, HVX_VectorPair &ws32_result,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
     HVX_VectorPair wu16_quad = Q6_W_vshuff_VVR(vu16_twin_src, vu16_twin_src, -4);
@@ -289,8 +289,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H0Core(HVX_Vector &vu16_twin_src, HVX_V
     ws32_result = Q6_Ww_vmpyacc_WwVhVuh(ws32_result, vs16_alpha3, vu16_r2_quad);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H0Core(HVX_Vector &vs16_twin_src, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H0Core(HVX_Vector &vs16_twin_src, HVX_VectorPair &ws32_result,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
     HVX_VectorPair ws16_quad = Q6_W_vshuff_VVR(vs16_twin_src, vs16_twin_src, -4);
@@ -307,8 +307,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H0Core(HVX_Vector &vs16_twin_src, HVX_V
     ws32_result = Q6_Ww_vmpyacc_WwVhVh(ws32_result, vs16_alpha3, vs16_r2_quad);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H1Core(HVX_Vector &vu8_x0_quad, HVX_Vector &vu8_x1_twin,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H1Core(HVX_Vector &vu8_x0_quad, HVX_Vector &vu8_x1_twin,
                                               HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -336,8 +336,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H1Core(HVX_Vector &vu8_x0_quad, HVX_Vec
     vu8_x0_quad = vu8_x1_quad;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H1Core(HVX_Vector &vs8_x0_quad, HVX_Vector &vs8_x1_twin,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H1Core(HVX_Vector &vs8_x0_quad, HVX_Vector &vs8_x1_twin,
                                               HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -365,8 +365,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H1Core(HVX_Vector &vs8_x0_quad, HVX_Vec
     vs8_x0_quad = vs8_x1_quad;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H1Core(HVX_Vector &vu16_x0_quad, HVX_Vector &vu16_x1_twin, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H1Core(HVX_Vector &vu16_x0_quad, HVX_Vector &vu16_x1_twin, HVX_VectorPair &ws32_result,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
     HVX_VectorPair wu16_quad = Q6_W_vshuff_VVR(vu16_x1_twin, vu16_x1_twin, -4);
@@ -385,8 +385,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H1Core(HVX_Vector &vu16_x0_quad, HVX_Ve
     vu16_x0_quad = vu16_x1_quad;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H1Core(HVX_Vector &vs16_x0_quad, HVX_Vector &vs16_x1_twin, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H1Core(HVX_Vector &vs16_x0_quad, HVX_Vector &vs16_x1_twin, HVX_VectorPair &ws32_result,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
     HVX_VectorPair ws16_quad = Q6_W_vshuff_VVR(vs16_x1_twin, vs16_x1_twin, -4);
@@ -405,8 +405,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H1Core(HVX_Vector &vs16_x0_quad, HVX_Ve
     vs16_x0_quad = vs16_x1_quad;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H2Core(HVX_Vector &vu8_x0_quad, HVX_Vector &vu8_x1_quad,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H2Core(HVX_Vector &vu8_x0_quad, HVX_Vector &vu8_x1_quad,
                                               HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -430,8 +430,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H2Core(HVX_Vector &vu8_x0_quad, HVX_Vec
     vu8_x0_quad = vu8_x1_quad;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H2Core(HVX_Vector &vs8_x0_quad, HVX_Vector &vs8_x1_quad,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H2Core(HVX_Vector &vs8_x0_quad, HVX_Vector &vs8_x1_quad,
                                               HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -455,8 +455,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H2Core(HVX_Vector &vs8_x0_quad, HVX_Vec
     vs8_x0_quad = vs8_x1_quad;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H2Core(HVX_Vector &vu16_x0_quad, HVX_Vector &vu16_x1_quad, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H2Core(HVX_Vector &vu16_x0_quad, HVX_Vector &vu16_x1_quad, HVX_VectorPair &ws32_result,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
     HVX_Vector vu16_r0_quad = Q6_V_valign_VVR(vu16_x1_quad, vu16_x0_quad, 8);
@@ -471,8 +471,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H2Core(HVX_Vector &vu16_x0_quad, HVX_Ve
     vu16_x0_quad = vu16_x1_quad;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H2Core(HVX_Vector &vs16_x0_quad, HVX_Vector &vs16_x1_quad, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H2Core(HVX_Vector &vs16_x0_quad, HVX_Vector &vs16_x1_quad, HVX_VectorPair &ws32_result,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
     HVX_Vector vs16_r0_quad = Q6_V_valign_VVR(vs16_x1_quad, vs16_x0_quad, 8);
@@ -487,8 +487,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H2Core(HVX_Vector &vs16_x0_quad, HVX_Ve
     vs16_x0_quad = vs16_x1_quad;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H3Core(HVX_Vector &vu8_x0_quad, HVX_Vector &vu8_x1_twin,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H3Core(HVX_Vector &vu8_x0_quad, HVX_Vector &vu8_x1_twin,
                                               HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -513,8 +513,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H3Core(HVX_Vector &vu8_x0_quad, HVX_Vec
     ws32_result_h = Q6_Ww_vmpyacc_WwVhVuh(ws32_result_h, vs16_alpha3, Q6_V_hi_W(wu16_r2_quad));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H3Core(HVX_Vector &vs8_x0_quad, HVX_Vector &vs8_x1_twin,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H3Core(HVX_Vector &vs8_x0_quad, HVX_Vector &vs8_x1_twin,
                                               HVX_VectorPair &ws32_result_l, HVX_VectorPair &ws32_result_h,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
@@ -539,8 +539,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H3Core(HVX_Vector &vs8_x0_quad, HVX_Vec
     ws32_result_h = Q6_Ww_vmpyacc_WwVhVh(ws32_result_h, vs16_alpha3, Q6_V_hi_W(ws16_r2_quad));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H3Core(HVX_Vector &vu16_x0_quad, HVX_Vector &vu16_x1_twin, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H3Core(HVX_Vector &vu16_x0_quad, HVX_Vector &vu16_x1_twin, HVX_VectorPair &ws32_result,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
     HVX_VectorPair wu16_quad = Q6_W_vshuff_VVR(vu16_x1_twin, vu16_x1_twin, -4);
@@ -556,8 +556,8 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H3Core(HVX_Vector &vu16_x0_quad, HVX_Ve
     ws32_result = Q6_Ww_vmpyacc_WwVhVuh(ws32_result, vs16_alpha3, vu16_r2_quad);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H3Core(HVX_Vector &vs16_x0_quad, HVX_Vector &vs16_x1_twin, HVX_VectorPair &ws32_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuUpX4H3Core(HVX_Vector &vs16_x0_quad, HVX_Vector &vs16_x1_twin, HVX_VectorPair &ws32_result,
                                               HVX_Vector &vs16_alpha0, HVX_Vector &vs16_alpha1, HVX_Vector &vs16_alpha2, HVX_Vector &vs16_alpha3)
 {
     HVX_VectorPair ws16_quad = Q6_W_vshuff_VVR(vs16_x1_twin, vs16_x1_twin, -4);
@@ -573,10 +573,10 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuUpX4H3Core(HVX_Vector &vs16_x0_quad, HVX_Ve
     ws32_result = Q6_Ww_vmpyacc_WwVhVh(ws32_result, vs16_alpha3, vs16_r2_quad);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
                                                HVX_VectorPair &ws32_n0_result_l, HVX_VectorPair &ws32_n0_result_h,
-                                               HVX_Vector &vu8_dst, MI_S32 beta0, MI_S32 beta1)
+                                               HVX_Vector &vu8_dst, DT_S32 beta0, DT_S32 beta1)
 {
     HVX_Vector vs16_beta0 = Q6_Vh_vsplat_R(beta0);
     HVX_Vector vs16_beta1 = Q6_Vh_vsplat_R(beta1);
@@ -595,10 +595,10 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l
     vu8_dst = Q6_Vb_vdeal_Vb(Q6_Vub_vasr_VhVhR_rnd_sat(vu16_result_h, vu16_result_l, 6));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
                                                HVX_VectorPair &ws32_n0_result_l, HVX_VectorPair &ws32_n0_result_h,
-                                               HVX_Vector &vs8_dst, MI_S32 beta0, MI_S32 beta1)
+                                               HVX_Vector &vs8_dst, DT_S32 beta0, DT_S32 beta1)
 {
     HVX_Vector vs16_beta0 = Q6_Vh_vsplat_R(beta0);
     HVX_Vector vs16_beta1 = Q6_Vh_vsplat_R(beta1);
@@ -617,9 +617,9 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l
     vs8_dst = Q6_Vb_vdeal_Vb(Q6_Vb_vasr_VhVhR_rnd_sat(vs16_result_h, vs16_result_l, 6));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, HVX_VectorPair &ws32_n0_result,
-                                               HVX_Vector &vu16_dst, MI_S32 beta0, MI_S32 beta1)
+template <typename Tp, typename std::enable_if<std::is_same<DT_U16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, HVX_VectorPair &ws32_n0_result,
+                                               HVX_Vector &vu16_dst, DT_S32 beta0, DT_S32 beta1)
 {
     HVX_Vector vs32_beta0   = Q6_V_vsplat_R(beta0);
     HVX_Vector vs32_beta1   = Q6_V_vsplat_R(beta1);
@@ -639,9 +639,9 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, 
     vu16_dst = Q6_Vuh_vsat_VuwVuw(vu32_sum_h, vu32_sum_l);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, HVX_VectorPair &ws32_n0_result,
-                                               HVX_Vector &vs16_dst, MI_S32 beta0, MI_S32 beta1)
+template <typename Tp, typename std::enable_if<std::is_same<DT_S16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, HVX_VectorPair &ws32_n0_result,
+                                               HVX_Vector &vs16_dst, DT_S32 beta0, DT_S32 beta1)
 {
     HVX_Vector vs32_beta0   = Q6_V_vsplat_R(beta0);
     HVX_Vector vs32_beta1   = Q6_V_vsplat_R(beta1);
@@ -659,11 +659,11 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, 
     vs16_dst = Q6_Vh_vsat_VwVw(vs32_sum_h, vs32_sum_l);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
                                                HVX_VectorPair &ws32_n0_result_l, HVX_VectorPair &ws32_n0_result_h,
                                                HVX_VectorPair &ws32_n1_result_l, HVX_VectorPair &ws32_n1_result_h,
-                                               HVX_Vector &vu8_dst, MI_S32 beta0, MI_S32 beta1, MI_S32 beta2)
+                                               HVX_Vector &vu8_dst, DT_S32 beta0, DT_S32 beta1, DT_S32 beta2)
 {
     HVX_Vector vs16_beta0 = Q6_Vh_vsplat_R(beta0);
     HVX_Vector vs16_beta1 = Q6_Vh_vsplat_R(beta1);
@@ -687,11 +687,11 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l
     vu8_dst = Q6_Vb_vdeal_Vb(Q6_Vub_vasr_VhVhR_rnd_sat(vu16_result_h, vu16_result_l, 6));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
                                                HVX_VectorPair &ws32_n0_result_l, HVX_VectorPair &ws32_n0_result_h,
                                                HVX_VectorPair &ws32_n1_result_l, HVX_VectorPair &ws32_n1_result_h,
-                                               HVX_Vector &vs8_dst, MI_S32 beta0, MI_S32 beta1, MI_S32 beta2)
+                                               HVX_Vector &vs8_dst, DT_S32 beta0, DT_S32 beta1, DT_S32 beta2)
 {
     HVX_Vector vs16_beta0 = Q6_Vh_vsplat_R(beta0);
     HVX_Vector vs16_beta1 = Q6_Vh_vsplat_R(beta1);
@@ -715,9 +715,9 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l
     vs8_dst = Q6_Vb_vdeal_Vb(Q6_Vb_vasr_VhVhR_rnd_sat(vs16_result_h, vs16_result_l, 6));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, HVX_VectorPair &ws32_n0_result, HVX_VectorPair &ws32_n1_result,
-                                               HVX_Vector &vu16_dst, MI_S32 beta0, MI_S32 beta1, MI_S32 beta2)
+template <typename Tp, typename std::enable_if<std::is_same<DT_U16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, HVX_VectorPair &ws32_n0_result, HVX_VectorPair &ws32_n1_result,
+                                               HVX_Vector &vu16_dst, DT_S32 beta0, DT_S32 beta1, DT_S32 beta2)
 {
     HVX_Vector vs32_beta0   = Q6_V_vsplat_R(beta0);
     HVX_Vector vs32_beta1   = Q6_V_vsplat_R(beta1);
@@ -740,9 +740,9 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, 
     vu16_dst = Q6_Vuh_vsat_VuwVuw(vu32_sum_h, vu32_sum_l);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, HVX_VectorPair &ws32_n0_result, HVX_VectorPair &ws32_n1_result,
-                                               HVX_Vector &vs16_dst, MI_S32 beta0, MI_S32 beta1, MI_S32 beta2)
+template <typename Tp, typename std::enable_if<std::is_same<DT_S16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, HVX_VectorPair &ws32_n0_result, HVX_VectorPair &ws32_n1_result,
+                                               HVX_Vector &vs16_dst, DT_S32 beta0, DT_S32 beta1, DT_S32 beta2)
 {
     HVX_Vector vs32_beta0   = Q6_V_vsplat_R(beta0);
     HVX_Vector vs32_beta1   = Q6_V_vsplat_R(beta1);
@@ -763,12 +763,12 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, 
     vs16_dst = Q6_Vh_vsat_VwVw(vs32_sum_h, vs32_sum_l);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
                                                HVX_VectorPair &ws32_n0_result_l, HVX_VectorPair &ws32_n0_result_h,
                                                HVX_VectorPair &ws32_n1_result_l, HVX_VectorPair &ws32_n1_result_h,
                                                HVX_VectorPair &ws32_n2_result_l, HVX_VectorPair &ws32_n2_result_h,
-                                               HVX_Vector &vu8_dst, MI_S32 beta0, MI_S32 beta1, MI_S32 beta2, MI_S32 beta3)
+                                               HVX_Vector &vu8_dst, DT_S32 beta0, DT_S32 beta1, DT_S32 beta2, DT_S32 beta3)
 {
     HVX_Vector vs16_beta0 = Q6_Vh_vsplat_R(beta0);
     HVX_Vector vs16_beta1 = Q6_Vh_vsplat_R(beta1);
@@ -797,12 +797,12 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l
     vu8_dst = Q6_Vb_vdeal_Vb(Q6_Vub_vasr_VhVhR_rnd_sat(vu16_result_h, vu16_result_l, 6));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S8, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S8, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l,  HVX_VectorPair &ws32_c_result_h,
                                                HVX_VectorPair &ws32_n0_result_l, HVX_VectorPair &ws32_n0_result_h,
                                                HVX_VectorPair &ws32_n1_result_l, HVX_VectorPair &ws32_n1_result_h,
                                                HVX_VectorPair &ws32_n2_result_l, HVX_VectorPair &ws32_n2_result_h,
-                                               HVX_Vector &vs8_dst, MI_S32 beta0, MI_S32 beta1, MI_S32 beta2, MI_S32 beta3)
+                                               HVX_Vector &vs8_dst, DT_S32 beta0, DT_S32 beta1, DT_S32 beta2, DT_S32 beta3)
 {
     HVX_Vector vs16_beta0 = Q6_Vh_vsplat_R(beta0);
     HVX_Vector vs16_beta1 = Q6_Vh_vsplat_R(beta1);
@@ -831,10 +831,10 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result_l
     vs8_dst = Q6_Vb_vdeal_Vb(Q6_Vb_vasr_VhVhR_rnd_sat(vs16_result_h, vs16_result_l, 6));
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_U16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result,  HVX_VectorPair &ws32_n0_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_U16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result,  HVX_VectorPair &ws32_n0_result,
                                                HVX_VectorPair &ws32_n1_result, HVX_VectorPair &ws32_n2_result,
-                                               HVX_Vector &vu16_dst, MI_S32 beta0, MI_S32 beta1, MI_S32 beta2, MI_S32 beta3)
+                                               HVX_Vector &vu16_dst, DT_S32 beta0, DT_S32 beta1, DT_S32 beta2, DT_S32 beta3)
 {
     HVX_Vector vs32_beta0   = Q6_V_vsplat_R(beta0);
     HVX_Vector vs32_beta1   = Q6_V_vsplat_R(beta1);
@@ -861,10 +861,10 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, 
     vu16_dst = Q6_Vuh_vsat_VuwVuw(vu32_sum_h, vu32_sum_l);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<MI_S16, Tp>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result,  HVX_VectorPair &ws32_n0_result,
+template <typename Tp, typename std::enable_if<std::is_same<DT_S16, Tp>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result,  HVX_VectorPair &ws32_n0_result,
                                                HVX_VectorPair &ws32_n1_result, HVX_VectorPair &ws32_n2_result,
-                                               HVX_Vector &vs16_dst, MI_S32 beta0, MI_S32 beta1, MI_S32 beta2, MI_S32 beta3)
+                                               HVX_Vector &vs16_dst, DT_S32 beta0, DT_S32 beta1, DT_S32 beta2, DT_S32 beta3)
 {
     HVX_Vector vs32_beta0   = Q6_V_vsplat_R(beta0);
     HVX_Vector vs32_beta1   = Q6_V_vsplat_R(beta1);
@@ -888,15 +888,15 @@ AURA_ALWAYS_INLINE AURA_VOID ResizeCuFastUpVCore(HVX_VectorPair &ws32_c_result, 
     vs16_dst = Q6_Vh_vsat_VwVw(vs32_sum_h, vs32_sum_l);
 }
 
-// Tp = MI_U8 / MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, AURA_VOID>::type
-ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 istride, MI_S32 ostride)
+// Tp = DT_U8 / DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, DT_VOID>::type
+ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 istride, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     const Tp *src_n0 = src_c  + (istride / sizeof(Tp));
     const Tp *src_n1 = src_n0 + (istride / sizeof(Tp));
@@ -906,13 +906,13 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     Tp *dst_n2 = dst_n1 + (ostride / sizeof(Tp));
     Tp *dst_n3 = dst_n2 + (ostride / sizeof(Tp));
 
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row_head      = reinterpret_cast<MI_S32*>(vtcm_buffer->row_head);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row_head      = reinterpret_cast<DT_S32*>(vtcm_buffer->row_head);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
 
     MVType mv_c_x0_src, mv_n0_x0_src, mv_n1_x0_src, mv_n2_x0_src;
     MVType mv_c_x1_src, mv_n0_x1_src, mv_n1_x1_src, mv_n2_x1_src;
@@ -922,18 +922,18 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     HVX_Vector v_alpha2 = Q6_V_vsplat_R(0x07080218);    // (1800 << 16) + (536)
     HVX_Vector v_alpha3 = Q6_V_vsplat_R(0xFF28FFB8);    // (-216 << 16) + (-72)
 
-    MI_S32 *row1_head = row_head + C * 6;
-    MI_S32 *row2_head = row_head + C * 12;
-    MI_S32 *row3_head = row_head + C * 18;
+    DT_S32 *row1_head = row_head + C * 6;
+    DT_S32 *row2_head = row_head + C * 12;
+    DT_S32 *row3_head = row_head + C * 18;
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 row0_head[3];
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
+        DT_S32 row0_head[3];
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
 
         row0_head[0]   = src_c[id0]  * 2264 + src_c[id1]  * (-216);
         row1_head[id0] = src_n0[id0] * 2264 + src_n0[id1] * (-216);
@@ -990,7 +990,7 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     vload(src_n1, mv_n1_x0_src);
     vload(src_n2, mv_n2_x0_src);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         vload(src_c  + (x + elem_counts) * C, mv_c_x1_src);
@@ -1116,8 +1116,8 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
         vstore(dst_n2 + ((x << 1) + elem_counts + 3) * C, mv_n2_dst);
         vstore(dst_n3 + ((x << 1) + elem_counts + 3) * C, mv_n3_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 3 - (elem_counts << 1);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 3 - (elem_counts << 1);
 
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
         HVX_VectorPair *v_back_row2 = (HVX_VectorPair *)(row2_back_ptr);
@@ -1187,10 +1187,10 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 row0_head[3];
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 row0_head[3];
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[0]          = src_c[id2]  * (-216) + src_c[id1]  * 1800 + src_c[id0]  * 464;
         row1_head[3 * C + ch] = src_n0[id2] * (-216) + src_n0[id1] * 1800 + src_n0[id0] * 464;
@@ -1223,15 +1223,15 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     }
 }
 
-// Tp = MI_U16 / MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, AURA_VOID>::type
-ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 istride, MI_S32 ostride)
+// Tp = DT_U16 / DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, DT_VOID>::type
+ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 istride, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     const Tp *src_n0 = src_c  + (istride / sizeof(Tp));
     const Tp *src_n1 = src_n0 + (istride / sizeof(Tp));
@@ -1241,13 +1241,13 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     Tp *dst_n2 = dst_n1 + (ostride / sizeof(Tp));
     Tp *dst_n3 = dst_n2 + (ostride / sizeof(Tp));
 
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S64 *row_head      = reinterpret_cast<MI_S64*>(vtcm_buffer->row_head);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S64 *row_head      = reinterpret_cast<DT_S64*>(vtcm_buffer->row_head);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
 
     MVType mv_c_x0_src, mv_n0_x0_src, mv_n1_x0_src, mv_n2_x0_src;
     MVType mv_c_x1_src, mv_n0_x1_src, mv_n1_x1_src, mv_n2_x1_src;
@@ -1257,18 +1257,18 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     HVX_Vector v_alpha2 = Q6_V_vsplat_R(0x70802180);    // (28800 << 16) + (8576)
     HVX_Vector v_alpha3 = Q6_V_vsplat_R(0xF280FB80);    // (-3456 << 16) + (-1152)
 
-    MI_S64 *row1_head = row_head + C * 6;
-    MI_S64 *row2_head = row_head + C * 12;
-    MI_S64 *row3_head = row_head + C * 18;
+    DT_S64 *row1_head = row_head + C * 6;
+    DT_S64 *row2_head = row_head + C * 12;
+    DT_S64 *row3_head = row_head + C * 18;
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S64 row0_head[3];
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
+        DT_S64 row0_head[3];
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
 
         row0_head[0]   = src_c[id0]  * 36224 + src_c[id1]  * (-3456);
         row1_head[id0] = src_n0[id0] * 36224 + src_n0[id1] * (-3456);
@@ -1319,7 +1319,7 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     vload(src_n1, mv_n1_x0_src);
     vload(src_n2, mv_n2_x0_src);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         vload(src_c  + (x + elem_counts) * C, mv_c_x1_src);
@@ -1433,8 +1433,8 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
         vstore(dst_n2 + ((x << 1) + elem_counts + 3) * C, mv_n2_dst);
         vstore(dst_n3 + ((x << 1) + elem_counts + 3) * C, mv_n3_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 3 - (elem_counts << 1);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 3 - (elem_counts << 1);
 
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
         HVX_VectorPair *v_back_row2 = (HVX_VectorPair *)(row2_back_ptr);
@@ -1498,10 +1498,10 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S64 row0_head[3];
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S64 row0_head[3];
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[0]          = src_c[id2]  * (-3456) + src_c[id1]  * 28800 + src_c[id0]  * 7424;
         row1_head[3 * C + ch] = src_n0[id2] * (-3456) + src_n0[id1] * 28800 + src_n0[id0] * 7424;
@@ -1534,28 +1534,28 @@ ResizeCuUpX2ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     }
 }
 
-// Tp = MI_U8 / MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, AURA_VOID>::type
-ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 istride, MI_S32 ostride)
+// Tp = DT_U8 / DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, DT_VOID>::type
+ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 istride, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     const Tp *src_n0 = src_c  + (istride / sizeof(Tp));
     const Tp *src_n1 = src_n0 + (istride / sizeof(Tp));
     const Tp *src_n2 = src_n1 + (istride / sizeof(Tp));
     Tp *dst_n0 = dst_c + (ostride / sizeof(Tp));
 
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row_head      = reinterpret_cast<MI_S32*>(vtcm_buffer->row_head);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row_head      = reinterpret_cast<DT_S32*>(vtcm_buffer->row_head);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
 
     MVType mv_c_x0_src, mv_n0_x0_src, mv_n1_x0_src, mv_n2_x0_src;
     MVType mv_c_x1_src, mv_n0_x1_src, mv_n1_x1_src, mv_n2_x1_src;
@@ -1565,18 +1565,18 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     HVX_Vector v_alpha2 = Q6_V_vsplat_R(0x07080218);    // (1800 << 16) + (536)
     HVX_Vector v_alpha3 = Q6_V_vsplat_R(0xFF28FFB8);    // (-216 << 16) + (-72)
 
-    MI_S32 *row1_head = row_head + C * 6;
-    MI_S32 *row2_head = row_head + C * 12;
-    MI_S32 *row3_head = row_head + C * 18;
+    DT_S32 *row1_head = row_head + C * 6;
+    DT_S32 *row2_head = row_head + C * 12;
+    DT_S32 *row3_head = row_head + C * 18;
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 row0_head[3];
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
+        DT_S32 row0_head[3];
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
 
         row0_head[0]   = src_c[id0]  * 2264 + src_c[id1]  * (-216);
         row1_head[id0] = src_n0[id0] * 2264 + src_n0[id1] * (-216);
@@ -1618,7 +1618,7 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     vload(src_n1, mv_n1_x0_src);
     vload(src_n2, mv_n2_x0_src);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         vload(src_c  + (x + elem_counts) * C, mv_c_x1_src);
@@ -1733,8 +1733,8 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
         vstore(dst_c  + ((x << 1) + elem_counts + 3) * C, mv_c_dst);
         vstore(dst_n0 + ((x << 1) + elem_counts + 3) * C, mv_n0_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 3 - (elem_counts << 1);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 3 - (elem_counts << 1);
 
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
         HVX_VectorPair *v_back_row2 = (HVX_VectorPair *)(row2_back_ptr);
@@ -1798,10 +1798,10 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 row0_head[3];
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 row0_head[3];
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[0]          = src_c[id2]  * (-216) + src_c[id1]  * 1800 + src_c[id0]  * 464;
         row1_head[3 * C + ch] = src_n0[id2] * (-216) + src_n0[id1] * 1800 + src_n0[id0] * 464;
@@ -1825,28 +1825,28 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     }
 }
 
-// Tp = MI_U16 / MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, AURA_VOID>::type
-ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 istride, MI_S32 ostride)
+// Tp = DT_U16 / DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, DT_VOID>::type
+ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 istride, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     const Tp *src_n0 = src_c  + (istride / sizeof(Tp));
     const Tp *src_n1 = src_n0 + (istride / sizeof(Tp));
     const Tp *src_n2 = src_n1 + (istride / sizeof(Tp));
     Tp *dst_n0 = dst_c + (ostride / sizeof(Tp));
 
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S64 *row_head      = reinterpret_cast<MI_S64*>(vtcm_buffer->row_head);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S64 *row_head      = reinterpret_cast<DT_S64*>(vtcm_buffer->row_head);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
 
     MVType mv_c_x0_src, mv_n0_x0_src, mv_n1_x0_src, mv_n2_x0_src;
     MVType mv_c_x1_src, mv_n0_x1_src, mv_n1_x1_src, mv_n2_x1_src;
@@ -1856,18 +1856,18 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     HVX_Vector v_alpha2 = Q6_V_vsplat_R(0x70802180);    // (28800 << 16) + (8576)
     HVX_Vector v_alpha3 = Q6_V_vsplat_R(0xF280FB80);    // (-3456 << 16) + (-1152)
 
-    MI_S64 *row1_head = row_head + C * 6;
-    MI_S64 *row2_head = row_head + C * 12;
-    MI_S64 *row3_head = row_head + C * 18;
+    DT_S64 *row1_head = row_head + C * 6;
+    DT_S64 *row2_head = row_head + C * 12;
+    DT_S64 *row3_head = row_head + C * 18;
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S64 row0_head[3];
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
+        DT_S64 row0_head[3];
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
 
         row0_head[0]   = src_c[id0]  * 36224 + src_c[id1]  * (-3456);
         row1_head[id0] = src_n0[id0] * 36224 + src_n0[id1] * (-3456);
@@ -1906,7 +1906,7 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     vload(src_n1, mv_n1_x0_src);
     vload(src_n2, mv_n2_x0_src);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         vload(src_c  + (x + elem_counts) * C, mv_c_x1_src);
@@ -2008,8 +2008,8 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
         vstore(dst_c  + ((x << 1) + elem_counts + 3) * C, mv_c_dst);
         vstore(dst_n0 + ((x << 1) + elem_counts + 3) * C, mv_n0_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 3 - (elem_counts << 1);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 3 - (elem_counts << 1);
 
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
         HVX_VectorPair *v_back_row2 = (HVX_VectorPair *)(row2_back_ptr);
@@ -2067,10 +2067,10 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S64 row0_head[3];
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S64 row0_head[3];
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[0]          = src_c[id2]  * (-3456) + src_c[id1]  * 28800 + src_c[id0]  * 7424;
         row1_head[3 * C + ch] = src_n0[id2] * (-3456) + src_n0[id1] * 28800 + src_n0[id0] * 7424;
@@ -2094,30 +2094,30 @@ ResizeCuUpX2UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     }
 }
 
-// Tp = MI_U8 / MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, AURA_VOID>::type
-ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 ostride)
+// Tp = DT_U8 / DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, DT_VOID>::type
+ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     Tp *dst_n0            = dst_c + (ostride / sizeof(Tp));
-    MI_S32 *row0_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row0_ptr);
-    MI_S32 *row_head      = reinterpret_cast<MI_S32*>(vtcm_buffer->row_head);
-    MI_S32 *row0_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row0_ptr + row_pre_size);
-    vtcm_buffer->row0_ptr = reinterpret_cast<MI_U8*>(row0_ptr);
-    vtcm_buffer->row1_ptr = reinterpret_cast<MI_U8*>(row1_ptr);
-    vtcm_buffer->row2_ptr = reinterpret_cast<MI_U8*>(row2_ptr);
-    vtcm_buffer->row3_ptr = reinterpret_cast<MI_U8*>(row3_ptr);
+    DT_S32 *row0_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row0_ptr);
+    DT_S32 *row_head      = reinterpret_cast<DT_S32*>(vtcm_buffer->row_head);
+    DT_S32 *row0_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row0_ptr + row_pre_size);
+    vtcm_buffer->row0_ptr = reinterpret_cast<DT_U8*>(row0_ptr);
+    vtcm_buffer->row1_ptr = reinterpret_cast<DT_U8*>(row1_ptr);
+    vtcm_buffer->row2_ptr = reinterpret_cast<DT_U8*>(row2_ptr);
+    vtcm_buffer->row3_ptr = reinterpret_cast<DT_U8*>(row3_ptr);
 
     MVType mv_c_x0_src, mv_c_x1_src;
     MVType mv_c_dst, mv_n0_dst;
@@ -2126,18 +2126,18 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     HVX_Vector v_alpha2 = Q6_V_vsplat_R(0x07080218);    // (1800 << 16) + (536)
     HVX_Vector v_alpha3 = Q6_V_vsplat_R(0xFF28FFB8);    // (-216 << 16) + (-72)
 
-    MI_S32 *row0_head = row_head;
-    MI_S32 *row1_head = row_head + C * 6;
-    MI_S32 *row2_head = row_head + C * 12;
-    MI_S32 *row3_head = row_head + C * 18;
+    DT_S32 *row0_head = row_head;
+    DT_S32 *row1_head = row_head + C * 6;
+    DT_S32 *row2_head = row_head + C * 12;
+    DT_S32 *row3_head = row_head + C * 18;
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
 
         row0_head[id0] = row1_head[id0]; row1_head[id0] = row2_head[id0]; row2_head[id0] = row3_head[id0];
         row0_head[id1] = row1_head[id1]; row1_head[id1] = row2_head[id1]; row2_head[id1] = row3_head[id1];
@@ -2171,7 +2171,7 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
 
     vload(src_c, mv_c_x0_src);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         vload(src_c + (x + elem_counts) * C, mv_c_x1_src);
@@ -2269,8 +2269,8 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
         vstore(dst_c  + ((x << 1) + elem_counts + 3) * C, mv_c_dst);
         vstore(dst_n0 + ((x << 1) + elem_counts + 3) * C, mv_n0_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 3 - (elem_counts << 1);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 3 - (elem_counts << 1);
 
         HVX_VectorPair *v_back_row0 = (HVX_VectorPair *)(row0_back_ptr);
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
@@ -2327,9 +2327,9 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[3 * C + ch] = row1_head[3 * C + ch];
         row0_head[4 * C + ch] = row1_head[4 * C + ch];
@@ -2353,30 +2353,30 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     }
 }
 
-// Tp = MI_U16 / MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, AURA_VOID>::type
-ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 ostride)
+// Tp = DT_U16 / DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, DT_VOID>::type
+ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     Tp *dst_n0            = dst_c + (ostride / sizeof(Tp));
-    MI_S32 *row0_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row0_ptr);
-    MI_S64 *row_head      = reinterpret_cast<MI_S64*>(vtcm_buffer->row_head);
-    MI_S32 *row0_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row0_ptr + row_pre_size);
-    vtcm_buffer->row0_ptr = reinterpret_cast<MI_U8*>(row0_ptr);
-    vtcm_buffer->row1_ptr = reinterpret_cast<MI_U8*>(row1_ptr);
-    vtcm_buffer->row2_ptr = reinterpret_cast<MI_U8*>(row2_ptr);
-    vtcm_buffer->row3_ptr = reinterpret_cast<MI_U8*>(row3_ptr);
+    DT_S32 *row0_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row0_ptr);
+    DT_S64 *row_head      = reinterpret_cast<DT_S64*>(vtcm_buffer->row_head);
+    DT_S32 *row0_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row0_ptr + row_pre_size);
+    vtcm_buffer->row0_ptr = reinterpret_cast<DT_U8*>(row0_ptr);
+    vtcm_buffer->row1_ptr = reinterpret_cast<DT_U8*>(row1_ptr);
+    vtcm_buffer->row2_ptr = reinterpret_cast<DT_U8*>(row2_ptr);
+    vtcm_buffer->row3_ptr = reinterpret_cast<DT_U8*>(row3_ptr);
 
     MVType mv_c_x0_src, mv_c_x1_src;
     MVType mv_c_dst, mv_n0_dst;
@@ -2385,18 +2385,18 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     HVX_Vector v_alpha2 = Q6_V_vsplat_R(0x70802180);    // (28800 << 16) + (8576)
     HVX_Vector v_alpha3 = Q6_V_vsplat_R(0xF280FB80);    // (-3456 << 16) + (-1152)
 
-    MI_S64 *row0_head = row_head;
-    MI_S64 *row1_head = row_head + C * 6;
-    MI_S64 *row2_head = row_head + C * 12;
-    MI_S64 *row3_head = row_head + C * 18;
+    DT_S64 *row0_head = row_head;
+    DT_S64 *row1_head = row_head + C * 6;
+    DT_S64 *row2_head = row_head + C * 12;
+    DT_S64 *row3_head = row_head + C * 18;
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
 
         row0_head[id0] = row1_head[id0]; row1_head[id0] = row2_head[id0]; row2_head[id0] = row3_head[id0];
         row0_head[id1] = row1_head[id1]; row1_head[id1] = row2_head[id1]; row2_head[id1] = row3_head[id1];
@@ -2427,7 +2427,7 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
 
     vload(src_c, mv_c_x0_src);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         vload(src_c + (x + elem_counts) * C, mv_c_x1_src);
@@ -2509,8 +2509,8 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
         vstore(dst_c  + ((x << 1) + elem_counts + 3) * C, mv_c_dst);
         vstore(dst_n0 + ((x << 1) + elem_counts + 3) * C, mv_n0_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 3 - (elem_counts << 1);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 3 - (elem_counts << 1);
 
         HVX_VectorPair *v_back_row0 = (HVX_VectorPair *)(row0_back_ptr);
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
@@ -2559,9 +2559,9 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[3 * C + ch] = row1_head[3 * C + ch];
         row0_head[4 * C + ch] = row1_head[4 * C + ch];
@@ -2585,31 +2585,31 @@ ResizeCuUpX2Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     }
 }
 
-// Tp = MI_U8 / MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, AURA_VOID>::type
-ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 ostride)
+// Tp = DT_U8 / DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, DT_VOID>::type
+ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     Tp *dst_n0 = dst_c  + (ostride / sizeof(Tp));
     Tp *dst_n1 = dst_n0 + (ostride / sizeof(Tp));
     Tp *dst_n2 = dst_n1 + (ostride / sizeof(Tp));
     Tp *dst_n3 = dst_n2 + (ostride / sizeof(Tp));
 
-    MI_S32 *row0_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row_head      = reinterpret_cast<MI_S32*>(vtcm_buffer->row_head);
-    MI_S32 *row0_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
-    vtcm_buffer->row0_ptr = reinterpret_cast<MI_U8*>(row0_ptr);
-    vtcm_buffer->row1_ptr = reinterpret_cast<MI_U8*>(row1_ptr);
-    vtcm_buffer->row2_ptr = reinterpret_cast<MI_U8*>(row2_ptr);
+    DT_S32 *row0_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row_head      = reinterpret_cast<DT_S32*>(vtcm_buffer->row_head);
+    DT_S32 *row0_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    vtcm_buffer->row0_ptr = reinterpret_cast<DT_U8*>(row0_ptr);
+    vtcm_buffer->row1_ptr = reinterpret_cast<DT_U8*>(row1_ptr);
+    vtcm_buffer->row2_ptr = reinterpret_cast<DT_U8*>(row2_ptr);
 
     MVType mv_c_x0_src, mv_c_x1_src;
     MVType mv_c_dst, mv_n0_dst, mv_n1_dst, mv_n2_dst, mv_n3_dst;
@@ -2618,18 +2618,18 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     HVX_Vector v_alpha2 = Q6_V_vsplat_R(0x07080218);    // (1800 << 16) + (536)
     HVX_Vector v_alpha3 = Q6_V_vsplat_R(0xFF28FFB8);    // (-216 << 16) + (-72)
 
-    MI_S32 *row0_head = row_head;
-    MI_S32 *row1_head = row_head + C * 6;
-    MI_S32 *row2_head = row_head + C * 12;
-    MI_S32 *row3_head = row_head + C * 18;
+    DT_S32 *row0_head = row_head;
+    DT_S32 *row1_head = row_head + C * 6;
+    DT_S32 *row2_head = row_head + C * 12;
+    DT_S32 *row3_head = row_head + C * 18;
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
 
         row0_head[id0] = row1_head[id0];
         row0_head[id1] = row1_head[id1];
@@ -2682,7 +2682,7 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
 
     vload(src_c, mv_c_x0_src);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         vload(src_c + (x + elem_counts) * C, mv_c_x1_src);
@@ -2784,8 +2784,8 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
         vstore(dst_n2 + ((x << 1) + elem_counts + 3) * C, mv_n2_dst);
         vstore(dst_n3 + ((x << 1) + elem_counts + 3) * C, mv_n3_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 3 - (elem_counts << 1);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 3 - (elem_counts << 1);
 
         HVX_VectorPair *v_back_row0 = (HVX_VectorPair *)(row0_back_ptr);
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
@@ -2843,9 +2843,9 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[3 * C + ch] = row1_head[3 * C + ch];
         row0_head[4 * C + ch] = row1_head[4 * C + ch];
@@ -2878,31 +2878,31 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     }
 }
 
-// Tp = MI_U16 / MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, AURA_VOID>::type
-ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 ostride)
+// Tp = DT_U16 / DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, DT_VOID>::type
+ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     Tp *dst_n0 = dst_c  + (ostride / sizeof(Tp));
     Tp *dst_n1 = dst_n0 + (ostride / sizeof(Tp));
     Tp *dst_n2 = dst_n1 + (ostride / sizeof(Tp));
     Tp *dst_n3 = dst_n2 + (ostride / sizeof(Tp));
 
-    MI_S32 *row0_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S64 *row_head      = reinterpret_cast<MI_S64*>(vtcm_buffer->row_head);
-    MI_S32 *row0_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
-    vtcm_buffer->row0_ptr = reinterpret_cast<MI_U8*>(row0_ptr);
-    vtcm_buffer->row1_ptr = reinterpret_cast<MI_U8*>(row1_ptr);
-    vtcm_buffer->row2_ptr = reinterpret_cast<MI_U8*>(row2_ptr);
+    DT_S32 *row0_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S64 *row_head      = reinterpret_cast<DT_S64*>(vtcm_buffer->row_head);
+    DT_S32 *row0_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    vtcm_buffer->row0_ptr = reinterpret_cast<DT_U8*>(row0_ptr);
+    vtcm_buffer->row1_ptr = reinterpret_cast<DT_U8*>(row1_ptr);
+    vtcm_buffer->row2_ptr = reinterpret_cast<DT_U8*>(row2_ptr);
 
     MVType mv_c_x0_src, mv_c_x1_src;
     MVType mv_c_dst, mv_n0_dst, mv_n1_dst, mv_n2_dst, mv_n3_dst;
@@ -2911,18 +2911,18 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     HVX_Vector v_alpha2 = Q6_V_vsplat_R(0x70802180);    // (28800 << 16) + (8576)
     HVX_Vector v_alpha3 = Q6_V_vsplat_R(0xF280FB80);    // (-3456 << 16) + (-1152)
 
-    MI_S64 *row0_head = row_head;
-    MI_S64 *row1_head = row_head + C * 6;
-    MI_S64 *row2_head = row_head + C * 12;
-    MI_S64 *row3_head = row_head + C * 18;
+    DT_S64 *row0_head = row_head;
+    DT_S64 *row1_head = row_head + C * 6;
+    DT_S64 *row2_head = row_head + C * 12;
+    DT_S64 *row3_head = row_head + C * 18;
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
 
         row0_head[id0] = row1_head[id0];
         row0_head[id1] = row1_head[id1];
@@ -2970,7 +2970,7 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
 
     vload(src_c, mv_c_x0_src);
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         vload(src_c + (x + elem_counts) * C, mv_c_x1_src);
@@ -3060,8 +3060,8 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
         vstore(dst_n2 + ((x << 1) + elem_counts + 3) * C, mv_n2_dst);
         vstore(dst_n3 + ((x << 1) + elem_counts + 3) * C, mv_n3_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 3 - (elem_counts << 1);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 3 - (elem_counts << 1);
 
         HVX_VectorPair *v_back_row0 = (HVX_VectorPair *)(row0_back_ptr);
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
@@ -3113,9 +3113,9 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[3 * C + ch] = row1_head[3 * C + ch];
         row0_head[4 * C + ch] = row1_head[4 * C + ch];
@@ -3148,15 +3148,15 @@ ResizeCuUpX2BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     }
 }
 
-// Tp = MI_U8 / MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, AURA_VOID>::type
-ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 istride, MI_S32 ostride)
+// Tp = DT_U8 / DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, DT_VOID>::type
+ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 istride, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     const Tp *src_n0 = src_c  + (istride / sizeof(Tp));
     const Tp *src_n1 = src_n0 + (istride / sizeof(Tp));
@@ -3171,13 +3171,13 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     Tp *dst_n7       = dst_n6 + (ostride / sizeof(Tp));
     Tp *dst_n8       = dst_n7 + (ostride / sizeof(Tp));
 
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row_head      = reinterpret_cast<MI_S32*>(vtcm_buffer->row_head);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row_head      = reinterpret_cast<DT_S32*>(vtcm_buffer->row_head);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
 
     MVType mv_c_x0_src, mv_n0_x0_src, mv_n1_x0_src, mv_n2_x0_src;
     MVType mv_c_x1_src, mv_n0_x1_src, mv_n1_x1_src, mv_n2_x1_src;
@@ -3188,26 +3188,26 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     HVX_Vector v_alpha2 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0x07BD05FF), Q6_V_vsplat_R(0x036900EB), -4));    // (1981 << 16) + (1535)  (873 << 16) + (235)
     HVX_Vector v_alpha3 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0xFF6DFF1F), Q6_V_vsplat_R(0xFF79FFEB), -4));    // (-147 << 16) + (-225)  (-135 << 16) + (-21)
 
-    MI_S32 *row1_head = row_head + C * 12;
-    MI_S32 *row2_head = row_head + C * 24;
-    MI_S32 *row3_head = row_head + C * 36;
+    DT_S32 *row1_head = row_head + C * 12;
+    DT_S32 *row2_head = row_head + C * 24;
+    DT_S32 *row3_head = row_head + C * 36;
 
     vload(src_c , mv_c_x0_src);
     vload(src_n0, mv_n0_x0_src);
     vload(src_n1, mv_n1_x0_src);
     vload(src_n2, mv_n2_x0_src);
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 row0_head[6];
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
-        MI_S32 id3 = 3 * C + ch;
-        MI_S32 id4 = 4 * C + ch;
-        MI_S32 id5 = 5 * C + ch;
+        DT_S32 row0_head[6];
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
+        DT_S32 id3 = 3 * C + ch;
+        DT_S32 id4 = 4 * C + ch;
+        DT_S32 id5 = 5 * C + ch;
 
         row0_head[0]   = src_c[id0]  * 2273 + src_c[id1]  * (-225);
         row1_head[id0] = src_n0[id0] * 2273 + src_n0[id1] * (-225);
@@ -3236,7 +3236,7 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
 
         Tp *dst = dst_c;
         #pragma unroll(10)
-        for (MI_S32 y = 0; y < 10; y++)
+        for (DT_S32 y = 0; y < 10; y++)
         {
             dst[id0] = SaturateCast<Tp>((row0_head[0] * BETA_S16[y][0] + row1_head[id0] * BETA_S16[y][1] + row2_head[id0] * BETA_S16[y][2] + row3_head[id0] * BETA_S16[y][3] + 2097152) >> 22);
             dst[id1] = SaturateCast<Tp>((row0_head[1] * BETA_S16[y][0] + row1_head[id1] * BETA_S16[y][1] + row2_head[id1] * BETA_S16[y][2] + row3_head[id1] * BETA_S16[y][3] + 2097152) >> 22);
@@ -3292,7 +3292,7 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
                                 ws32_n2_result_l, ws32_n2_result_h, mv_n8_dst.val[ch], -21, 235, 1981, -147);
     };
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         for (ch = 0; ch < C; ch++)
@@ -3581,8 +3581,8 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
         vstore(dst_n7 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n7_dst);
         vstore(dst_n8 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n8_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 6 - (elem_counts << 2);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 6 - (elem_counts << 2);
 
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
         HVX_VectorPair *v_back_row2 = (HVX_VectorPair *)(row2_back_ptr);
@@ -3749,10 +3749,10 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 row0_head[6];
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 row0_head[6];
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[0]           = src_c[id2]  * (-147) + src_c[id1]  * 1981 + src_c[id0]  * 214;
         row1_head[6 * C + ch]  = src_n0[id2] * (-147) + src_n0[id1] * 1981 + src_n0[id0] * 214;
@@ -3781,7 +3781,7 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
 
         Tp *dst = dst_c;
         #pragma unroll(10)
-        for (MI_S32 y = 0; y < 10; y++)
+        for (DT_S32 y = 0; y < 10; y++)
         {
             dst[(owidth - 6) * C + ch] = SaturateCast<Tp>((row0_head[0] * BETA_S16[y][0] + row1_head[6 * C + ch]  * BETA_S16[y][1] + row2_head[6 * C + ch]  * BETA_S16[y][2] + row3_head[6 * C + ch]  * BETA_S16[y][3] + 2097152) >> 22);
             dst[(owidth - 5) * C + ch] = SaturateCast<Tp>((row0_head[1] * BETA_S16[y][0] + row1_head[7 * C + ch]  * BETA_S16[y][1] + row2_head[7 * C + ch]  * BETA_S16[y][2] + row3_head[7 * C + ch]  * BETA_S16[y][3] + 2097152) >> 22);
@@ -3795,15 +3795,15 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     }
 }
 
-// Tp = MI_U8 / MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, AURA_VOID>::type
-ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 istride, MI_S32 ostride)
+// Tp = DT_U8 / DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, DT_VOID>::type
+ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 istride, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     const Tp *src_n0 = src_c  + (istride / sizeof(Tp));
     const Tp *src_n1 = src_n0 + (istride / sizeof(Tp));
@@ -3812,13 +3812,13 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     Tp *dst_n1       = dst_n0 + (ostride / sizeof(Tp));
     Tp *dst_n2       = dst_n1 + (ostride / sizeof(Tp));
 
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row_head      = reinterpret_cast<MI_S32*>(vtcm_buffer->row_head);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row_head      = reinterpret_cast<DT_S32*>(vtcm_buffer->row_head);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
 
     MVType mv_c_x0_src, mv_n0_x0_src, mv_n1_x0_src, mv_n2_x0_src;
     MVType mv_c_x1_src, mv_n0_x1_src, mv_n1_x1_src, mv_n2_x1_src;
@@ -3828,26 +3828,26 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     HVX_Vector v_alpha2 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0x07BD05FF), Q6_V_vsplat_R(0x036900EB), -4));    // (1981 << 16) + (1535)  (873 << 16) + (235)
     HVX_Vector v_alpha3 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0xFF6DFF1F), Q6_V_vsplat_R(0xFF79FFEB), -4));    // (-147 << 16) + (-225)  (-135 << 16) + (-21)
 
-    MI_S32 *row1_head = row_head + C * 12;
-    MI_S32 *row2_head = row_head + C * 24;
-    MI_S32 *row3_head = row_head + C * 36;
+    DT_S32 *row1_head = row_head + C * 12;
+    DT_S32 *row2_head = row_head + C * 24;
+    DT_S32 *row3_head = row_head + C * 36;
 
     vload(src_c , mv_c_x0_src);
     vload(src_n0, mv_n0_x0_src);
     vload(src_n1, mv_n1_x0_src);
     vload(src_n2, mv_n2_x0_src);
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 row0_head[6];
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
-        MI_S32 id3 = 3 * C + ch;
-        MI_S32 id4 = 4 * C + ch;
-        MI_S32 id5 = 5 * C + ch;
+        DT_S32 row0_head[6];
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
+        DT_S32 id3 = 3 * C + ch;
+        DT_S32 id4 = 4 * C + ch;
+        DT_S32 id5 = 5 * C + ch;
 
         row0_head[0]   = src_c[id0]  * 2273 + src_c[id1]  * (-225);
         row1_head[id0] = src_n0[id0] * 2273 + src_n0[id1] * (-225);
@@ -3876,7 +3876,7 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
 
         Tp *dst = dst_c;
         #pragma unroll(4)
-        for (MI_S32 y = 6; y < 10; y++)
+        for (DT_S32 y = 6; y < 10; y++)
         {
             dst[id0] = SaturateCast<Tp>((row0_head[0] * BETA_S16[y][0] + row1_head[id0] * BETA_S16[y][1] + row2_head[id0] * BETA_S16[y][2] + row3_head[id0] * BETA_S16[y][3] + 2097152) >> 22);
             dst[id1] = SaturateCast<Tp>((row0_head[1] * BETA_S16[y][0] + row1_head[id1] * BETA_S16[y][1] + row2_head[id1] * BETA_S16[y][2] + row3_head[id1] * BETA_S16[y][3] + 2097152) >> 22);
@@ -3920,7 +3920,7 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
                                 ws32_n2_result_l, ws32_n2_result_h, mv_n2_dst.val[ch], -21, 235, 1981, -147);
     };
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         for (ch = 0; ch < C; ch++)
@@ -4161,8 +4161,8 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
         vstore(dst_n1 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n1_dst);
         vstore(dst_n2 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n2_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 6 - (elem_counts << 2);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 6 - (elem_counts << 2);
 
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
         HVX_VectorPair *v_back_row2 = (HVX_VectorPair *)(row2_back_ptr);
@@ -4305,10 +4305,10 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 row0_head[6];
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 row0_head[6];
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[0]           = src_c[id2]  * (-147) + src_c[id1]  * 1981 + src_c[id0]  * 214;
         row1_head[6 * C + ch]  = src_n0[id2] * (-147) + src_n0[id1] * 1981 + src_n0[id0] * 214;
@@ -4337,7 +4337,7 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
 
         Tp *dst = dst_c;
         #pragma unroll(4)
-        for (MI_S32 y = 6; y < 10; y++)
+        for (DT_S32 y = 6; y < 10; y++)
         {
             dst[(owidth - 6) * C + ch] = SaturateCast<Tp>((row0_head[0] * BETA_S16[y][0] + row1_head[6 * C + ch]  * BETA_S16[y][1] + row2_head[6 * C + ch]  * BETA_S16[y][2] + row3_head[6 * C + ch]  * BETA_S16[y][3] + 2097152) >> 22);
             dst[(owidth - 5) * C + ch] = SaturateCast<Tp>((row0_head[1] * BETA_S16[y][0] + row1_head[7 * C + ch]  * BETA_S16[y][1] + row2_head[7 * C + ch]  * BETA_S16[y][2] + row3_head[7 * C + ch]  * BETA_S16[y][3] + 2097152) >> 22);
@@ -4351,33 +4351,33 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     }
 }
 
-// Tp = MI_U8 / MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, AURA_VOID>::type
-ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 ostride)
+// Tp = DT_U8 / DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, DT_VOID>::type
+ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     Tp *dst_n0 = dst_c  + (ostride / sizeof(Tp));
     Tp *dst_n1 = dst_n0 + (ostride / sizeof(Tp));
     Tp *dst_n2 = dst_n1 + (ostride / sizeof(Tp));
 
-    MI_S32 *row0_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row0_ptr);
-    MI_S32 *row_head      = reinterpret_cast<MI_S32*>(vtcm_buffer->row_head);
-    MI_S32 *row0_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row0_ptr + row_pre_size);
-    vtcm_buffer->row0_ptr = reinterpret_cast<MI_U8*>(row0_ptr);
-    vtcm_buffer->row1_ptr = reinterpret_cast<MI_U8*>(row1_ptr);
-    vtcm_buffer->row2_ptr = reinterpret_cast<MI_U8*>(row2_ptr);
-    vtcm_buffer->row3_ptr = reinterpret_cast<MI_U8*>(row3_ptr);
+    DT_S32 *row0_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row0_ptr);
+    DT_S32 *row_head      = reinterpret_cast<DT_S32*>(vtcm_buffer->row_head);
+    DT_S32 *row0_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row0_ptr + row_pre_size);
+    vtcm_buffer->row0_ptr = reinterpret_cast<DT_U8*>(row0_ptr);
+    vtcm_buffer->row1_ptr = reinterpret_cast<DT_U8*>(row1_ptr);
+    vtcm_buffer->row2_ptr = reinterpret_cast<DT_U8*>(row2_ptr);
+    vtcm_buffer->row3_ptr = reinterpret_cast<DT_U8*>(row3_ptr);
 
     MVType mv_c_x0_src, mv_c_x1_src;
     MVType mv_c_dst, mv_n0_dst, mv_n1_dst, mv_n2_dst;
@@ -4386,23 +4386,23 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     HVX_Vector v_alpha2 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0x07BD05FF), Q6_V_vsplat_R(0x036900EB), -4));    // (1981 << 16) + (1535)  (873 << 16) + (235)
     HVX_Vector v_alpha3 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0xFF6DFF1F), Q6_V_vsplat_R(0xFF79FFEB), -4));    // (-147 << 16) + (-225)  (-135 << 16) + (-21)
 
-    MI_S32 *row0_head = row_head;
-    MI_S32 *row1_head = row_head + C * 12;
-    MI_S32 *row2_head = row_head + C * 24;
-    MI_S32 *row3_head = row_head + C * 36;
+    DT_S32 *row0_head = row_head;
+    DT_S32 *row1_head = row_head + C * 12;
+    DT_S32 *row2_head = row_head + C * 24;
+    DT_S32 *row3_head = row_head + C * 36;
 
     vload(src_c , mv_c_x0_src);
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
-        MI_S32 id3 = 3 * C + ch;
-        MI_S32 id4 = 4 * C + ch;
-        MI_S32 id5 = 5 * C + ch;
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
+        DT_S32 id3 = 3 * C + ch;
+        DT_S32 id4 = 4 * C + ch;
+        DT_S32 id5 = 5 * C + ch;
 
         row0_head[id0] = row1_head[id0]; row1_head[id0] = row2_head[id0]; row2_head[id0] = row3_head[id0];
         row0_head[id1] = row1_head[id1]; row1_head[id1] = row2_head[id1]; row2_head[id1] = row3_head[id1];
@@ -4419,7 +4419,7 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
 
         Tp *dst = dst_c;
         #pragma unroll(4)
-        for (MI_S32 y = 6; y < 10; y++)
+        for (DT_S32 y = 6; y < 10; y++)
         {
             dst[id0] = SaturateCast<Tp>((row0_head[id0] * BETA_S16[y][0] + row1_head[id0] * BETA_S16[y][1] + row2_head[id0] * BETA_S16[y][2] + row3_head[id0] * BETA_S16[y][3] + 2097152) >> 22);
             dst[id1] = SaturateCast<Tp>((row0_head[id1] * BETA_S16[y][0] + row1_head[id1] * BETA_S16[y][1] + row2_head[id1] * BETA_S16[y][2] + row3_head[id1] * BETA_S16[y][3] + 2097152) >> 22);
@@ -4455,7 +4455,7 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
                                 ws32_c_result_l, ws32_c_result_h, mv_n2_dst.val[ch], -21, 235, 1981, -147);
     };
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         for (ch = 0; ch < C; ch++)
@@ -4659,8 +4659,8 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
         vstore(dst_n1 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n1_dst);
         vstore(dst_n2 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n2_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 6 - (elem_counts << 2);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 6 - (elem_counts << 2);
 
         HVX_VectorPair *v_back_row0 = (HVX_VectorPair *)(row0_back_ptr);
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
@@ -4775,9 +4775,9 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[6  * C + ch] = row1_head[6  * C + ch]; row1_head[6  * C + ch] = row2_head[6  * C + ch];
         row0_head[7  * C + ch] = row1_head[7  * C + ch]; row1_head[7  * C + ch] = row2_head[7  * C + ch];
@@ -4800,7 +4800,7 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
 
         Tp *dst = dst_c;
         #pragma unroll(4)
-        for (MI_S32 y = 6; y < 10; y++)
+        for (DT_S32 y = 6; y < 10; y++)
         {
             dst[(owidth - 6) * C + ch] = SaturateCast<Tp>((row0_head[6  * C + ch] * BETA_S16[y][0] + row1_head[6  * C + ch] * BETA_S16[y][1] + row2_head[6  * C + ch] * BETA_S16[y][2] + row3_head[6  * C + ch] * BETA_S16[y][3] + 2097152) >> 22);
             dst[(owidth - 5) * C + ch] = SaturateCast<Tp>((row0_head[7  * C + ch] * BETA_S16[y][0] + row1_head[7  * C + ch] * BETA_S16[y][1] + row2_head[7  * C + ch] * BETA_S16[y][2] + row3_head[7  * C + ch] * BETA_S16[y][3] + 2097152) >> 22);
@@ -4814,15 +4814,15 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     }
 }
 
-// Tp = MI_U8 / MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, AURA_VOID>::type
-ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 ostride)
+// Tp = DT_U8 / DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, DT_VOID>::type
+ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     Tp *dst_n0 = dst_c  + (ostride / sizeof(Tp));
     Tp *dst_n1 = dst_n0 + (ostride / sizeof(Tp));
@@ -4834,16 +4834,16 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     Tp *dst_n7 = dst_n6 + (ostride / sizeof(Tp));
     Tp *dst_n8 = dst_n7 + (ostride / sizeof(Tp));
 
-    MI_S32 *row0_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row_head      = reinterpret_cast<MI_S32*>(vtcm_buffer->row_head);
-    MI_S32 *row0_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
-    vtcm_buffer->row0_ptr = reinterpret_cast<MI_U8*>(row0_ptr);
-    vtcm_buffer->row1_ptr = reinterpret_cast<MI_U8*>(row1_ptr);
-    vtcm_buffer->row2_ptr = reinterpret_cast<MI_U8*>(row2_ptr);
+    DT_S32 *row0_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row_head      = reinterpret_cast<DT_S32*>(vtcm_buffer->row_head);
+    DT_S32 *row0_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    vtcm_buffer->row0_ptr = reinterpret_cast<DT_U8*>(row0_ptr);
+    vtcm_buffer->row1_ptr = reinterpret_cast<DT_U8*>(row1_ptr);
+    vtcm_buffer->row2_ptr = reinterpret_cast<DT_U8*>(row2_ptr);
 
     MVType mv_c_x0_src, mv_c_x1_src;
     MVType mv_c_dst,  mv_n0_dst, mv_n1_dst, mv_n2_dst, mv_n3_dst;
@@ -4853,23 +4853,23 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     HVX_Vector v_alpha2 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0x07BD05FF), Q6_V_vsplat_R(0x036900EB), -4));    // (1981 << 16) + (1535)  (873 << 16) + (235)
     HVX_Vector v_alpha3 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0xFF6DFF1F), Q6_V_vsplat_R(0xFF79FFEB), -4));    // (-147 << 16) + (-225)  (-135 << 16) + (-21)
 
-    MI_S32 *row0_head = row_head;
-    MI_S32 *row1_head = row_head + C * 12;
-    MI_S32 *row2_head = row_head + C * 24;
-    MI_S32 *row3_head = row_head + C * 36;
+    DT_S32 *row0_head = row_head;
+    DT_S32 *row1_head = row_head + C * 12;
+    DT_S32 *row2_head = row_head + C * 24;
+    DT_S32 *row3_head = row_head + C * 36;
 
     vload(src_c , mv_c_x0_src);
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
-        MI_S32 id3 = 3 * C + ch;
-        MI_S32 id4 = 4 * C + ch;
-        MI_S32 id5 = 5 * C + ch;
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
+        DT_S32 id3 = 3 * C + ch;
+        DT_S32 id4 = 4 * C + ch;
+        DT_S32 id5 = 5 * C + ch;
 
         row0_head[id0] = row1_head[id0]; row1_head[id0] = row2_head[id0]; row2_head[id0] = row3_head[id0];
         row0_head[id1] = row1_head[id1]; row1_head[id1] = row2_head[id1]; row2_head[id1] = row3_head[id1];
@@ -4886,7 +4886,7 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
 
         Tp *dst = dst_c;
         #pragma unroll(10)
-        for (MI_S32 y = 0; y < 10; y++)
+        for (DT_S32 y = 0; y < 10; y++)
         {
             dst[id0] = SaturateCast<Tp>((row0_head[id0] * BETA_S16[9 - y][3] + row1_head[id0] * BETA_S16[9 - y][2] + row2_head[id0] * BETA_S16[9 - y][1] + row3_head[id0] * BETA_S16[9 - y][0] + 2097152) >> 22);
             dst[id1] = SaturateCast<Tp>((row0_head[id1] * BETA_S16[9 - y][3] + row1_head[id1] * BETA_S16[9 - y][2] + row2_head[id1] * BETA_S16[9 - y][1] + row3_head[id1] * BETA_S16[9 - y][0] + 2097152) >> 22);
@@ -4933,7 +4933,7 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
                                 mv_n8_dst.val[ch], -225, 2273);
     };
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         for (ch = 0; ch < C; ch++)
@@ -5169,8 +5169,8 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
         vstore(dst_n7 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n7_dst);
         vstore(dst_n8 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n8_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 6 - (elem_counts << 2);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 6 - (elem_counts << 2);
 
         HVX_VectorPair *v_back_row0 = (HVX_VectorPair *)(row0_back_ptr);
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
@@ -5300,9 +5300,9 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[6  * C + ch] = row1_head[6  * C + ch]; row1_head[6  * C + ch] = row2_head[6  * C + ch];
         row0_head[7  * C + ch] = row1_head[7  * C + ch]; row1_head[7  * C + ch] = row2_head[7  * C + ch];
@@ -5325,7 +5325,7 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
 
         Tp *dst = dst_c;
         #pragma unroll(10)
-        for (MI_S32 y = 0; y < 10; y++)
+        for (DT_S32 y = 0; y < 10; y++)
         {
             dst[(owidth - 6) * C + ch] = SaturateCast<Tp>((row0_head[6  * C + ch] * BETA_S16[9 - y][3] + row1_head[6  * C + ch] * BETA_S16[9 - y][2] + row2_head[6  * C + ch] * BETA_S16[9 - y][1] + row3_head[6  * C + ch] * BETA_S16[9 - y][0] + 2097152) >> 22);
             dst[(owidth - 5) * C + ch] = SaturateCast<Tp>((row0_head[7  * C + ch] * BETA_S16[9 - y][3] + row1_head[7  * C + ch] * BETA_S16[9 - y][2] + row2_head[7  * C + ch] * BETA_S16[9 - y][1] + row3_head[7  * C + ch] * BETA_S16[9 - y][0] + 2097152) >> 22);
@@ -5339,15 +5339,15 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     }
 }
 
-// Tp = MI_U16 / MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, AURA_VOID>::type
-ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 istride, MI_S32 ostride)
+// Tp = DT_U16 / DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, DT_VOID>::type
+ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 istride, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     const Tp *src_n0 = src_c  + (istride / sizeof(Tp));
     const Tp *src_n1 = src_n0 + (istride / sizeof(Tp));
@@ -5362,13 +5362,13 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     Tp *dst_n7       = dst_n6 + (ostride / sizeof(Tp));
     Tp *dst_n8       = dst_n7 + (ostride / sizeof(Tp));
 
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S64 *row_head      = reinterpret_cast<MI_S64*>(vtcm_buffer->row_head);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S64 *row_head      = reinterpret_cast<DT_S64*>(vtcm_buffer->row_head);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
 
     MVType mv_c_x0_src, mv_n0_x0_src, mv_n1_x0_src, mv_n2_x0_src;
     MVType mv_c_x1_src, mv_n0_x1_src, mv_n1_x1_src, mv_n2_x1_src;
@@ -5379,26 +5379,26 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     HVX_Vector v_alpha2 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0x7BD05FF0), Q6_V_vsplat_R(0x36900EB0), -4));    // (31696 << 16) + (24560) (13968 << 16) + (3760)
     HVX_Vector v_alpha3 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0xF6D0F1F0), Q6_V_vsplat_R(0xF790FEB0), -4));    // (-2385 << 16) + (-3600) (-2160 << 16) + (-336)
 
-    MI_S64 *row1_head = row_head + C * 12;
-    MI_S64 *row2_head = row_head + C * 24;
-    MI_S64 *row3_head = row_head + C * 36;
+    DT_S64 *row1_head = row_head + C * 12;
+    DT_S64 *row2_head = row_head + C * 24;
+    DT_S64 *row3_head = row_head + C * 36;
 
     vload(src_c , mv_c_x0_src);
     vload(src_n0, mv_n0_x0_src);
     vload(src_n1, mv_n1_x0_src);
     vload(src_n2, mv_n2_x0_src);
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S64 row0_head[6];
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
-        MI_S32 id3 = 3 * C + ch;
-        MI_S32 id4 = 4 * C + ch;
-        MI_S32 id5 = 5 * C + ch;
+        DT_S64 row0_head[6];
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
+        DT_S32 id3 = 3 * C + ch;
+        DT_S32 id4 = 4 * C + ch;
+        DT_S32 id5 = 5 * C + ch;
 
         row0_head[0]   = src_c[id0]  * 36368 + src_c[id1]  * (-3600);
         row1_head[id0] = src_n0[id0] * 36368 + src_n0[id1] * (-3600);
@@ -5427,7 +5427,7 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
 
         Tp *dst = dst_c;
         #pragma unroll(10)
-        for (MI_S32 y = 0; y < 10; y++)
+        for (DT_S32 y = 0; y < 10; y++)
         {
             dst[id0] = SaturateCast<Tp>((row0_head[0] * BETA_S32[y][0] + row1_head[id0] * BETA_S32[y][1] + row2_head[id0] * BETA_S32[y][2] + row3_head[id0] * BETA_S32[y][3] + 536870912) >> 30);
             dst[id1] = SaturateCast<Tp>((row0_head[1] * BETA_S32[y][0] + row1_head[id1] * BETA_S32[y][1] + row2_head[id1] * BETA_S32[y][2] + row3_head[id1] * BETA_S32[y][3] + 536870912) >> 30);
@@ -5472,7 +5472,7 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
         ResizeCuFastUpVCore<Tp>(ws32_c_result, ws32_n0_result, ws32_n1_result, ws32_n2_result, mv_n8_dst.val[ch], -336,  3760,  31696, -2352);
     };
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         for (ch = 0; ch < C; ch++)
@@ -5737,8 +5737,8 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
         vstore(dst_n7 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n7_dst);
         vstore(dst_n8 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n8_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 6 - (elem_counts << 2);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 6 - (elem_counts << 2);
 
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
         HVX_VectorPair *v_back_row2 = (HVX_VectorPair *)(row2_back_ptr);
@@ -5893,10 +5893,10 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S64 row0_head[6];
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S64 row0_head[6];
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[0]           = src_c[id2]  * (-2352) + src_c[id1]  * 31696 + src_c[id0]  * 3424;
         row1_head[6 * C + ch]  = src_n0[id2] * (-2352) + src_n0[id1] * 31696 + src_n0[id0] * 3424;
@@ -5925,7 +5925,7 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
 
         Tp *dst = dst_c;
         #pragma unroll(10)
-        for (MI_S32 y = 0; y < 10; y++)
+        for (DT_S32 y = 0; y < 10; y++)
         {
             dst[(owidth - 6) * C + ch] = SaturateCast<Tp>((row0_head[0] * BETA_S32[y][0] + row1_head[6 * C + ch]  * BETA_S32[y][1] + row2_head[6 * C + ch]  * BETA_S32[y][2] + row3_head[6 * C + ch]  * BETA_S32[y][3] + 536870912) >> 30);
             dst[(owidth - 5) * C + ch] = SaturateCast<Tp>((row0_head[1] * BETA_S32[y][0] + row1_head[7 * C + ch]  * BETA_S32[y][1] + row2_head[7 * C + ch]  * BETA_S32[y][2] + row3_head[7 * C + ch]  * BETA_S32[y][3] + 536870912) >> 30);
@@ -5939,15 +5939,15 @@ ResizeCuUpX4ZeroRow(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buf
     }
 }
 
-// Tp = MI_U16 / MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, AURA_VOID>::type
-ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 istride, MI_S32 ostride)
+// Tp = DT_U16 / DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, DT_VOID>::type
+ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 istride, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     const Tp *src_n0 = src_c  + (istride / sizeof(Tp));
     const Tp *src_n1 = src_n0 + (istride / sizeof(Tp));
@@ -5956,13 +5956,13 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     Tp *dst_n1       = dst_n0 + (ostride / sizeof(Tp));
     Tp *dst_n2       = dst_n1 + (ostride / sizeof(Tp));
 
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S64 *row_head      = reinterpret_cast<MI_S64*>(vtcm_buffer->row_head);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S64 *row_head      = reinterpret_cast<DT_S64*>(vtcm_buffer->row_head);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
 
     MVType mv_c_x0_src, mv_n0_x0_src, mv_n1_x0_src, mv_n2_x0_src;
     MVType mv_c_x1_src, mv_n0_x1_src, mv_n1_x1_src, mv_n2_x1_src;
@@ -5972,26 +5972,26 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     HVX_Vector v_alpha2 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0x7BD05FF0), Q6_V_vsplat_R(0x36900EB0), -4));    // (31696 << 16) + (24560) (13968 << 16) + (3760)
     HVX_Vector v_alpha3 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0xF6D0F1F0), Q6_V_vsplat_R(0xF790FEB0), -4));    // (-2385 << 16) + (-3600) (-2160 << 16) + (-336)
 
-    MI_S64 *row1_head = row_head + C * 12;
-    MI_S64 *row2_head = row_head + C * 24;
-    MI_S64 *row3_head = row_head + C * 36;
+    DT_S64 *row1_head = row_head + C * 12;
+    DT_S64 *row2_head = row_head + C * 24;
+    DT_S64 *row3_head = row_head + C * 36;
 
     vload(src_c , mv_c_x0_src);
     vload(src_n0, mv_n0_x0_src);
     vload(src_n1, mv_n1_x0_src);
     vload(src_n2, mv_n2_x0_src);
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S64 row0_head[6];
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
-        MI_S32 id3 = 3 * C + ch;
-        MI_S32 id4 = 4 * C + ch;
-        MI_S32 id5 = 5 * C + ch;
+        DT_S64 row0_head[6];
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
+        DT_S32 id3 = 3 * C + ch;
+        DT_S32 id4 = 4 * C + ch;
+        DT_S32 id5 = 5 * C + ch;
 
         row0_head[0]   = src_c[id0]  * 36368 + src_c[id1]  * (-3600);
         row1_head[id0] = src_n0[id0] * 36368 + src_n0[id1] * (-3600);
@@ -6020,7 +6020,7 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
 
         Tp *dst = dst_c;
         #pragma unroll(4)
-        for (MI_S32 y = 6; y < 10; y++)
+        for (DT_S32 y = 6; y < 10; y++)
         {
             dst[id0] = SaturateCast<Tp>((row0_head[0] * BETA_S32[y][0] + row1_head[id0] * BETA_S32[y][1] + row2_head[id0] * BETA_S32[y][2] + row3_head[id0] * BETA_S32[y][3] + 536870912) >> 30);
             dst[id1] = SaturateCast<Tp>((row0_head[1] * BETA_S32[y][0] + row1_head[id1] * BETA_S32[y][1] + row2_head[id1] * BETA_S32[y][2] + row3_head[id1] * BETA_S32[y][3] + 536870912) >> 30);
@@ -6059,7 +6059,7 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
         ResizeCuFastUpVCore<Tp>(ws32_c_result, ws32_n0_result, ws32_n1_result, ws32_n2_result, mv_n2_dst.val[ch], -336,  3760,  31696, -2352);
     };
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         for (ch = 0; ch < C; ch++)
@@ -6276,8 +6276,8 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
         vstore(dst_n1 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n1_dst);
         vstore(dst_n2 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n2_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 6 - (elem_counts << 2);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 6 - (elem_counts << 2);
 
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
         HVX_VectorPair *v_back_row2 = (HVX_VectorPair *)(row2_back_ptr);
@@ -6408,10 +6408,10 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S64 row0_head[6];
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S64 row0_head[6];
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[0]           = src_c[id2]  * (-2352) + src_c[id1]  * 31696 + src_c[id0]  * 3424;
         row1_head[6 * C + ch]  = src_n0[id2] * (-2352) + src_n0[id1] * 31696 + src_n0[id0] * 3424;
@@ -6440,7 +6440,7 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
 
         Tp *dst = dst_c;
         #pragma unroll(4)
-        for (MI_S32 y = 6; y < 10; y++)
+        for (DT_S32 y = 6; y < 10; y++)
         {
             dst[(owidth - 6) * C + ch] = SaturateCast<Tp>((row0_head[0] * BETA_S32[y][0] + row1_head[6 * C + ch]  * BETA_S32[y][1] + row2_head[6 * C + ch]  * BETA_S32[y][2] + row3_head[6 * C + ch]  * BETA_S32[y][3] + 536870912) >> 30);
             dst[(owidth - 5) * C + ch] = SaturateCast<Tp>((row0_head[1] * BETA_S32[y][0] + row1_head[7 * C + ch]  * BETA_S32[y][1] + row2_head[7 * C + ch]  * BETA_S32[y][2] + row3_head[7 * C + ch]  * BETA_S32[y][3] + 536870912) >> 30);
@@ -6454,33 +6454,33 @@ ResizeCuUpX4UpBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_bu
     }
 }
 
-// Tp = MI_U16 / MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, AURA_VOID>::type
-ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 ostride)
+// Tp = DT_U16 / DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, DT_VOID>::type
+ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     Tp *dst_n0 = dst_c  + (ostride / sizeof(Tp));
     Tp *dst_n1 = dst_n0 + (ostride / sizeof(Tp));
     Tp *dst_n2 = dst_n1 + (ostride / sizeof(Tp));
 
-    MI_S32 *row0_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S32 *row3_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row0_ptr);
-    MI_S64 *row_head      = reinterpret_cast<MI_S64*>(vtcm_buffer->row_head);
-    MI_S32 *row0_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
-    MI_S32 *row3_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row0_ptr + row_pre_size);
-    vtcm_buffer->row0_ptr = reinterpret_cast<MI_U8*>(row0_ptr);
-    vtcm_buffer->row1_ptr = reinterpret_cast<MI_U8*>(row1_ptr);
-    vtcm_buffer->row2_ptr = reinterpret_cast<MI_U8*>(row2_ptr);
-    vtcm_buffer->row3_ptr = reinterpret_cast<MI_U8*>(row3_ptr);
+    DT_S32 *row0_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S32 *row3_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row0_ptr);
+    DT_S64 *row_head      = reinterpret_cast<DT_S64*>(vtcm_buffer->row_head);
+    DT_S32 *row0_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    DT_S32 *row3_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row0_ptr + row_pre_size);
+    vtcm_buffer->row0_ptr = reinterpret_cast<DT_U8*>(row0_ptr);
+    vtcm_buffer->row1_ptr = reinterpret_cast<DT_U8*>(row1_ptr);
+    vtcm_buffer->row2_ptr = reinterpret_cast<DT_U8*>(row2_ptr);
+    vtcm_buffer->row3_ptr = reinterpret_cast<DT_U8*>(row3_ptr);
 
     MVType mv_c_x0_src, mv_c_x1_src;
     MVType mv_c_dst, mv_n0_dst, mv_n1_dst, mv_n2_dst;
@@ -6489,23 +6489,23 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     HVX_Vector v_alpha2 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0x7BD05FF0), Q6_V_vsplat_R(0x36900EB0), -4));    // (31696 << 16) + (24560) (13968 << 16) + (3760)
     HVX_Vector v_alpha3 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0xF6D0F1F0), Q6_V_vsplat_R(0xF790FEB0), -4));    // (-2385 << 16) + (-3600) (-2160 << 16) + (-336)
 
-    MI_S64 *row0_head = row_head;
-    MI_S64 *row1_head = row_head + C * 12;
-    MI_S64 *row2_head = row_head + C * 24;
-    MI_S64 *row3_head = row_head + C * 36;
+    DT_S64 *row0_head = row_head;
+    DT_S64 *row1_head = row_head + C * 12;
+    DT_S64 *row2_head = row_head + C * 24;
+    DT_S64 *row3_head = row_head + C * 36;
 
     vload(src_c , mv_c_x0_src);
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
-        MI_S32 id3 = 3 * C + ch;
-        MI_S32 id4 = 4 * C + ch;
-        MI_S32 id5 = 5 * C + ch;
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
+        DT_S32 id3 = 3 * C + ch;
+        DT_S32 id4 = 4 * C + ch;
+        DT_S32 id5 = 5 * C + ch;
 
         row0_head[id0] = row1_head[id0]; row1_head[id0] = row2_head[id0]; row2_head[id0] = row3_head[id0];
         row0_head[id1] = row1_head[id1]; row1_head[id1] = row2_head[id1]; row2_head[id1] = row3_head[id1];
@@ -6522,7 +6522,7 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
 
         Tp *dst = dst_c;
         #pragma unroll(4)
-        for (MI_S32 y = 6; y < 10; y++)
+        for (DT_S32 y = 6; y < 10; y++)
         {
             dst[id0] = SaturateCast<Tp>((row0_head[id0] * BETA_S32[y][0] + row1_head[id0] * BETA_S32[y][1] + row2_head[id0] * BETA_S32[y][2] + row3_head[id0] * BETA_S32[y][3] + 536870912) >> 30);
             dst[id1] = SaturateCast<Tp>((row0_head[id1] * BETA_S32[y][0] + row1_head[id1] * BETA_S32[y][1] + row2_head[id1] * BETA_S32[y][2] + row3_head[id1] * BETA_S32[y][3] + 536870912) >> 30);
@@ -6553,7 +6553,7 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
         ResizeCuFastUpVCore<Tp>(ws32_p2_result, ws32_p1_result, ws32_p0_result, ws32_c_result, mv_n2_dst.val[ch], -336,  3760,  31696, -2352);
     };
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         for (ch = 0; ch < C; ch++)
@@ -6725,8 +6725,8 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
         vstore(dst_n1 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n1_dst);
         vstore(dst_n2 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n2_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 6 - (elem_counts << 2);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 6 - (elem_counts << 2);
 
         HVX_VectorPair *v_back_row0 = (HVX_VectorPair *)(row0_back_ptr);
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
@@ -6825,9 +6825,9 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[6  * C + ch] = row1_head[6  * C + ch]; row1_head[6  * C + ch] = row2_head[6  * C + ch];
         row0_head[7  * C + ch] = row1_head[7  * C + ch]; row1_head[7  * C + ch] = row2_head[7  * C + ch];
@@ -6850,7 +6850,7 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
 
         Tp *dst = dst_c;
         #pragma unroll(4)
-        for (MI_S32 y = 6; y < 10; y++)
+        for (DT_S32 y = 6; y < 10; y++)
         {
             dst[(owidth - 6) * C + ch] = SaturateCast<Tp>((row0_head[6  * C + ch] * BETA_S32[y][0] + row1_head[6  * C + ch] * BETA_S32[y][1] + row2_head[6  * C + ch] * BETA_S32[y][2] + row3_head[6  * C + ch] * BETA_S32[y][3] + 536870912) >> 30);
             dst[(owidth - 5) * C + ch] = SaturateCast<Tp>((row0_head[7  * C + ch] * BETA_S32[y][0] + row1_head[7  * C + ch] * BETA_S32[y][1] + row2_head[7  * C + ch] * BETA_S32[y][2] + row3_head[7  * C + ch] * BETA_S32[y][3] + 536870912) >> 30);
@@ -6864,15 +6864,15 @@ ResizeCuUpX4Row(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer,
     }
 }
 
-// Tp = MI_U16 / MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, AURA_VOID>::type
-ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 ostride)
+// Tp = DT_U16 / DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, DT_VOID>::type
+ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtcm_buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 ostride)
 {
     using MVType = typename MVHvxVector<C>::Type;
-    MI_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
-    MI_S32 width_align  = (iwidth - 3) & (-elem_counts);
-    MI_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN);
+    DT_S32 elem_counts  = AURA_HVLEN / sizeof(Tp);
+    DT_S32 width_align  = (iwidth - 3) & (-elem_counts);
+    DT_S32 row_pre_size = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN);
 
     Tp *dst_n0 = dst_c  + (ostride / sizeof(Tp));
     Tp *dst_n1 = dst_n0 + (ostride / sizeof(Tp));
@@ -6884,16 +6884,16 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     Tp *dst_n7 = dst_n6 + (ostride / sizeof(Tp));
     Tp *dst_n8 = dst_n7 + (ostride / sizeof(Tp));
 
-    MI_S32 *row0_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr);
-    MI_S32 *row1_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr);
-    MI_S32 *row2_ptr      = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr);
-    MI_S64 *row_head      = reinterpret_cast<MI_S64*>(vtcm_buffer->row_head);
-    MI_S32 *row0_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
-    MI_S32 *row1_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
-    MI_S32 *row2_back_ptr = reinterpret_cast<MI_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
-    vtcm_buffer->row0_ptr = reinterpret_cast<MI_U8*>(row0_ptr);
-    vtcm_buffer->row1_ptr = reinterpret_cast<MI_U8*>(row1_ptr);
-    vtcm_buffer->row2_ptr = reinterpret_cast<MI_U8*>(row2_ptr);
+    DT_S32 *row0_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr);
+    DT_S32 *row1_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr);
+    DT_S32 *row2_ptr      = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr);
+    DT_S64 *row_head      = reinterpret_cast<DT_S64*>(vtcm_buffer->row_head);
+    DT_S32 *row0_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row1_ptr + row_pre_size);
+    DT_S32 *row1_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row2_ptr + row_pre_size);
+    DT_S32 *row2_back_ptr = reinterpret_cast<DT_S32*>(vtcm_buffer->row3_ptr + row_pre_size);
+    vtcm_buffer->row0_ptr = reinterpret_cast<DT_U8*>(row0_ptr);
+    vtcm_buffer->row1_ptr = reinterpret_cast<DT_U8*>(row1_ptr);
+    vtcm_buffer->row2_ptr = reinterpret_cast<DT_U8*>(row2_ptr);
 
     MVType mv_c_x0_src, mv_c_x1_src;
     MVType mv_c_dst,  mv_n0_dst, mv_n1_dst, mv_n2_dst, mv_n3_dst;
@@ -6903,23 +6903,23 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     HVX_Vector v_alpha2 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0x7BD05FF0), Q6_V_vsplat_R(0x36900EB0), -4));    // (31696 << 16) + (24560) (13968 << 16) + (3760)
     HVX_Vector v_alpha3 = Q6_V_lo_W(Q6_W_vshuff_VVR(Q6_V_vsplat_R(0xF6D0F1F0), Q6_V_vsplat_R(0xF790FEB0), -4));    // (-2385 << 16) + (-3600) (-2160 << 16) + (-336)
 
-    MI_S64 *row0_head = row_head;
-    MI_S64 *row1_head = row_head + C * 12;
-    MI_S64 *row2_head = row_head + C * 24;
-    MI_S64 *row3_head = row_head + C * 36;
+    DT_S64 *row0_head = row_head;
+    DT_S64 *row1_head = row_head + C * 12;
+    DT_S64 *row2_head = row_head + C * 24;
+    DT_S64 *row3_head = row_head + C * 36;
 
     vload(src_c , mv_c_x0_src);
 
-    MI_S32 ch = 0;
+    DT_S32 ch = 0;
     #pragma unroll(C)
     for (; ch < C; ch++)
     {
-        MI_S32 id0 = ch;
-        MI_S32 id1 = C + ch;
-        MI_S32 id2 = 2 * C + ch;
-        MI_S32 id3 = 3 * C + ch;
-        MI_S32 id4 = 4 * C + ch;
-        MI_S32 id5 = 5 * C + ch;
+        DT_S32 id0 = ch;
+        DT_S32 id1 = C + ch;
+        DT_S32 id2 = 2 * C + ch;
+        DT_S32 id3 = 3 * C + ch;
+        DT_S32 id4 = 4 * C + ch;
+        DT_S32 id5 = 5 * C + ch;
 
         row0_head[id0] = row1_head[id0]; row1_head[id0] = row2_head[id0]; row2_head[id0] = row3_head[id0];
         row0_head[id1] = row1_head[id1]; row1_head[id1] = row2_head[id1]; row2_head[id1] = row3_head[id1];
@@ -6936,7 +6936,7 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
 
         Tp *dst = dst_c;
         #pragma unroll(10)
-        for (MI_S32 y = 0; y < 10; y++)
+        for (DT_S32 y = 0; y < 10; y++)
         {
             dst[id0] = SaturateCast<Tp>((row0_head[id0] * BETA_S32[9 - y][3] + row1_head[id0] * BETA_S32[9 - y][2] + row2_head[id0] * BETA_S32[9 - y][1] + row3_head[id0] * BETA_S32[9 - y][0] + 536870912) >> 30);
             dst[id1] = SaturateCast<Tp>((row0_head[id1] * BETA_S32[9 - y][3] + row1_head[id1] * BETA_S32[9 - y][2] + row2_head[id1] * BETA_S32[9 - y][1] + row3_head[id1] * BETA_S32[9 - y][0] + 536870912) >> 30);
@@ -6972,7 +6972,7 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
         ResizeCuFastUpVCore<Tp>(ws32_p0_result, ws32_c_result, mv_n8_dst.val[ch], -3600, 36368);
     };
 
-    MI_S32 x = 0;
+    DT_S32 x = 0;
     for (; x < width_align - elem_counts; x += elem_counts)
     {
         for (ch = 0; ch < C; ch++)
@@ -7184,8 +7184,8 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
         vstore(dst_n7 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n7_dst);
         vstore(dst_n8 + ((x << 2) + (elem_counts * 3) + 6) * C, mv_n8_dst);
 
-        MI_S32 sx = iwidth - 3 - elem_counts;
-        MI_S32 dx = owidth - 6 - (elem_counts << 2);
+        DT_S32 sx = iwidth - 3 - elem_counts;
+        DT_S32 dx = owidth - 6 - (elem_counts << 2);
 
         HVX_VectorPair *v_back_row0 = (HVX_VectorPair *)(row0_back_ptr);
         HVX_VectorPair *v_back_row1 = (HVX_VectorPair *)(row1_back_ptr);
@@ -7303,9 +7303,9 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     #pragma unroll(C)
     for (ch = 0; ch < C; ch++)
     {
-        MI_S32 id0 = (iwidth - 1) * C + ch;
-        MI_S32 id1 = (iwidth - 2) * C + ch;
-        MI_S32 id2 = (iwidth - 3) * C + ch;
+        DT_S32 id0 = (iwidth - 1) * C + ch;
+        DT_S32 id1 = (iwidth - 2) * C + ch;
+        DT_S32 id2 = (iwidth - 3) * C + ch;
 
         row0_head[6  * C + ch] = row1_head[6  * C + ch]; row1_head[6  * C + ch] = row2_head[6  * C + ch];
         row0_head[7  * C + ch] = row1_head[7  * C + ch]; row1_head[7  * C + ch] = row2_head[7  * C + ch];
@@ -7328,7 +7328,7 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
 
         Tp *dst = dst_c;
         #pragma unroll(10)
-        for (MI_S32 y = 0; y < 10; y++)
+        for (DT_S32 y = 0; y < 10; y++)
         {
             dst[(owidth - 6) * C + ch] = SaturateCast<Tp>((row0_head[6  * C + ch] * BETA_S32[9 - y][3] + row1_head[6  * C + ch] * BETA_S32[9 - y][2] + row2_head[6  * C + ch] * BETA_S32[9 - y][1] + row3_head[6  * C + ch] * BETA_S32[9 - y][0] + 536870912) >> 30);
             dst[(owidth - 5) * C + ch] = SaturateCast<Tp>((row0_head[7  * C + ch] * BETA_S32[9 - y][3] + row1_head[7  * C + ch] * BETA_S32[9 - y][2] + row2_head[7  * C + ch] * BETA_S32[9 - y][1] + row3_head[7  * C + ch] * BETA_S32[9 - y][0] + 536870912) >> 30);
@@ -7342,19 +7342,19 @@ ResizeCuUpX4BottomBorder(const Tp *src_c, Tp *dst_c, ResizeCuFastVtcmBuffer *vtc
     }
 }
 
-template<typename Tp, MI_S32 C>
-static Status ResizeCuUpX2HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuffer vtcm_buffer, MI_S32 thread_num, MI_S32 start_row, MI_S32 end_row)
+template<typename Tp, DT_S32 C>
+static Status ResizeCuUpX2HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuffer vtcm_buffer, DT_S32 thread_num, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 iwidth    = src.GetSizes().m_width;
-    MI_S32 iheight   = src.GetSizes().m_height;
-    MI_S32 owidth    = dst.GetSizes().m_width;
-    MI_S32 oheight   = dst.GetSizes().m_height;
-    MI_S32 istride   = src.GetStrides().m_width;
-    MI_S32 ostride   = dst.GetStrides().m_width;
-    MI_S32 thread_id = SaturateCast<MI_S32>(static_cast<MI_F32>(start_row) * thread_num / iheight);
-    MI_S32 head_size = AURA_HVLEN * ((owidth / iwidth) >> 1) * sizeof(MI_S32) * sizeof(Tp);
-    MI_S32 back_size = AURA_HVLEN * (owidth / iwidth) * C * sizeof(MI_S32);
-    MI_S32 row_size  = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN) + back_size;
+    DT_S32 iwidth    = src.GetSizes().m_width;
+    DT_S32 iheight   = src.GetSizes().m_height;
+    DT_S32 owidth    = dst.GetSizes().m_width;
+    DT_S32 oheight   = dst.GetSizes().m_height;
+    DT_S32 istride   = src.GetStrides().m_width;
+    DT_S32 ostride   = dst.GetStrides().m_width;
+    DT_S32 thread_id = SaturateCast<DT_S32>(static_cast<DT_F32>(start_row) * thread_num / iheight);
+    DT_S32 head_size = AURA_HVLEN * ((owidth / iwidth) >> 1) * sizeof(DT_S32) * sizeof(Tp);
+    DT_S32 back_size = AURA_HVLEN * (owidth / iwidth) * C * sizeof(DT_S32);
+    DT_S32 row_size  = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN) + back_size;
 
     vtcm_buffer.row0_ptr = vtcm_buffer.row0_ptr + row_size  * thread_id;
     vtcm_buffer.row1_ptr = vtcm_buffer.row1_ptr + row_size  * thread_id;
@@ -7362,15 +7362,15 @@ static Status ResizeCuUpX2HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuff
     vtcm_buffer.row3_ptr = vtcm_buffer.row3_ptr + row_size  * thread_id;
     vtcm_buffer.row_head = vtcm_buffer.row_head + head_size * thread_id;
 
-    MI_U64 l2fetch_param = L2PfParam(istride, iwidth * sizeof(Tp) * C, 4, 0);
-    MI_S32 y        = start_row;
-    MI_S32 loop_row = end_row - 4 * (iheight == end_row);
+    DT_U64 l2fetch_param = L2PfParam(istride, iwidth * sizeof(Tp) * C, 4, 0);
+    DT_S32 y        = start_row;
+    DT_S32 loop_row = end_row - 4 * (iheight == end_row);
 
     if (0 == y)
     {
         const Tp *src_c = src.Ptr<Tp>(0);
         Tp *dst_c       = dst.Ptr<Tp>(0);
-        L2Fetch(reinterpret_cast<MI_U32>(src_c), l2fetch_param);
+        L2Fetch(reinterpret_cast<DT_U32>(src_c), l2fetch_param);
         ResizeCuUpX2ZeroRow<Tp, C>(src_c, dst_c, &vtcm_buffer, iwidth, owidth, istride, ostride);
         y = 1;
     }
@@ -7378,20 +7378,20 @@ static Status ResizeCuUpX2HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuff
     {
         const Tp *src_c = src.Ptr<Tp>(y);
         Tp *dst_c       = dst.Ptr<Tp>((y << 1) + 3);
-        L2Fetch(reinterpret_cast<MI_U32>(src_c), l2fetch_param);
+        L2Fetch(reinterpret_cast<DT_U32>(src_c), l2fetch_param);
         ResizeCuUpX2UpBorder<Tp, C>(src_c, dst_c, &vtcm_buffer, iwidth, owidth, istride, ostride);
         y++;
     }
 
-    MI_S32 yofs   = (y << 1) + 3;
+    DT_S32 yofs   = (y << 1) + 3;
     l2fetch_param = L2PfParam(istride, iwidth * sizeof(Tp) * C, 1, 0);
-    L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 3)), l2fetch_param);
+    L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 3)), l2fetch_param);
 
     for (; y < loop_row; y++)
     {
         if (y + 4 < loop_row)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 4)), l2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 4)), l2fetch_param);
         }
 
         const Tp *src_c = src.Ptr<Tp>(y + 3);
@@ -7411,19 +7411,19 @@ static Status ResizeCuUpX2HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuff
     return Status::OK;
 }
 
-template<typename Tp, MI_S32 C>
-static Status ResizeCuUpX4HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuffer vtcm_buffer, MI_S32 thread_num, MI_S32 start_row, MI_S32 end_row)
+template<typename Tp, DT_S32 C>
+static Status ResizeCuUpX4HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuffer vtcm_buffer, DT_S32 thread_num, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 iwidth    = src.GetSizes().m_width;
-    MI_S32 iheight   = src.GetSizes().m_height;
-    MI_S32 owidth    = dst.GetSizes().m_width;
-    MI_S32 oheight   = dst.GetSizes().m_height;
-    MI_S32 istride   = src.GetStrides().m_width;
-    MI_S32 ostride   = dst.GetStrides().m_width;
-    MI_S32 thread_id = SaturateCast<MI_S32>(static_cast<MI_F32>(start_row) * thread_num / iheight);
-    MI_S32 head_size = AURA_HVLEN * ((owidth / iwidth) >> 1) * sizeof(MI_S32) * sizeof(Tp);
-    MI_S32 back_size = AURA_HVLEN * (owidth / iwidth) * C * sizeof(MI_S32);
-    MI_S32 row_size  = AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN) + back_size;
+    DT_S32 iwidth    = src.GetSizes().m_width;
+    DT_S32 iheight   = src.GetSizes().m_height;
+    DT_S32 owidth    = dst.GetSizes().m_width;
+    DT_S32 oheight   = dst.GetSizes().m_height;
+    DT_S32 istride   = src.GetStrides().m_width;
+    DT_S32 ostride   = dst.GetStrides().m_width;
+    DT_S32 thread_id = SaturateCast<DT_S32>(static_cast<DT_F32>(start_row) * thread_num / iheight);
+    DT_S32 head_size = AURA_HVLEN * ((owidth / iwidth) >> 1) * sizeof(DT_S32) * sizeof(Tp);
+    DT_S32 back_size = AURA_HVLEN * (owidth / iwidth) * C * sizeof(DT_S32);
+    DT_S32 row_size  = AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN) + back_size;
 
     vtcm_buffer.row0_ptr = vtcm_buffer.row0_ptr + row_size  * thread_id;
     vtcm_buffer.row1_ptr = vtcm_buffer.row1_ptr + row_size  * thread_id;
@@ -7431,15 +7431,15 @@ static Status ResizeCuUpX4HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuff
     vtcm_buffer.row3_ptr = vtcm_buffer.row3_ptr + row_size  * thread_id;
     vtcm_buffer.row_head = vtcm_buffer.row_head + head_size * thread_id;
 
-    MI_U64 l2fetch_param = L2PfParam(istride, iwidth * sizeof(Tp) * C, 4, 0);
-    MI_S32 y             = start_row;
-    MI_S32 loop_row      = end_row - 4 * (iheight == end_row);
+    DT_U64 l2fetch_param = L2PfParam(istride, iwidth * sizeof(Tp) * C, 4, 0);
+    DT_S32 y             = start_row;
+    DT_S32 loop_row      = end_row - 4 * (iheight == end_row);
 
     if (0 == y)
     {
         const Tp *src_c = src.Ptr<Tp>(0);
         Tp *dst_c       = dst.Ptr<Tp>(0);
-        L2Fetch(reinterpret_cast<MI_U32>(src_c), l2fetch_param);
+        L2Fetch(reinterpret_cast<DT_U32>(src_c), l2fetch_param);
         ResizeCuUpX4ZeroRow<Tp, C>(src_c, dst_c, &vtcm_buffer, iwidth, owidth, istride, ostride);
         y = 1;
     }
@@ -7447,20 +7447,20 @@ static Status ResizeCuUpX4HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuff
     {
         const Tp *src_c = src.Ptr<Tp>(y);
         Tp *dst_c = dst.Ptr<Tp>((y << 2) + 6);
-        L2Fetch(reinterpret_cast<MI_U32>(src_c), l2fetch_param);
+        L2Fetch(reinterpret_cast<DT_U32>(src_c), l2fetch_param);
         ResizeCuUpX4UpBorder<Tp, C>(src_c, dst_c, &vtcm_buffer, iwidth, owidth, istride, ostride);
         y++;
     }
 
-    MI_S32 yofs   = (y << 2) + 6;
+    DT_S32 yofs   = (y << 2) + 6;
     l2fetch_param = L2PfParam(istride, iwidth * sizeof(Tp) * C, 1, 0);
-    L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 3)), l2fetch_param);
+    L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 3)), l2fetch_param);
 
     for (; y < loop_row; y++)
     {
         if (y + 4 < loop_row)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 4)), l2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 4)), l2fetch_param);
         }
 
         const Tp *src_c = src.Ptr<Tp>(y + 3);
@@ -7480,27 +7480,27 @@ static Status ResizeCuUpX4HvxImpl(const Mat &src, Mat &dst, ResizeCuFastVtcmBuff
     return Status::OK;
 }
 
-template <typename Tp, MI_S32 C>
+template <typename Tp, DT_S32 C>
 static Status ResizeCuFastUpHvxHelper(Context *ctx, const Mat &src, Mat &dst)
 {
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool fail");
         return Status::ERROR;
     }
 
     Status ret               = Status::ERROR;
-    MI_S32 iwidth            = src.GetSizes().m_width;
-    MI_S32 owidth            = dst.GetSizes().m_width;
-    MI_S32 thread_num        = wp->GetComputeThreadNum();
-    MI_S32 head_buffer_size  = AURA_HVLEN * ((owidth / iwidth) >> 1) * sizeof(MI_S32) * sizeof(Tp) * thread_num;
-    MI_S32 back_buffer_size  = AURA_HVLEN * (owidth / iwidth) * C * sizeof(MI_S32);
-    MI_S32 row_buffer_size   = (AURA_ALIGN(owidth * C * sizeof(MI_S32), AURA_HVLEN) + back_buffer_size) * thread_num;
-    MI_S32 total_buffer_size = head_buffer_size + row_buffer_size * 4;
+    DT_S32 iwidth            = src.GetSizes().m_width;
+    DT_S32 owidth            = dst.GetSizes().m_width;
+    DT_S32 thread_num        = wp->GetComputeThreadNum();
+    DT_S32 head_buffer_size  = AURA_HVLEN * ((owidth / iwidth) >> 1) * sizeof(DT_S32) * sizeof(Tp) * thread_num;
+    DT_S32 back_buffer_size  = AURA_HVLEN * (owidth / iwidth) * C * sizeof(DT_S32);
+    DT_S32 row_buffer_size   = (AURA_ALIGN(owidth * C * sizeof(DT_S32), AURA_HVLEN) + back_buffer_size) * thread_num;
+    DT_S32 total_buffer_size = head_buffer_size + row_buffer_size * 4;
 
-    MI_U8 *vtcm_mem = static_cast<MI_U8*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_VTCM, total_buffer_size, AURA_HVLEN));
-    if (MI_NULL == vtcm_mem)
+    DT_U8 *vtcm_mem = static_cast<DT_U8*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_VTCM, total_buffer_size, AURA_HVLEN));
+    if (DT_NULL == vtcm_mem)
     {
         AURA_ADD_ERROR_STRING(ctx, "alloc vtcm memory failed");
         AURA_FREE(ctx, vtcm_mem);
@@ -7516,11 +7516,11 @@ static Status ResizeCuFastUpHvxHelper(Context *ctx, const Mat &src, Mat &dst)
 
     if (owidth == 2 * iwidth)
     {
-        ret = wp->ParallelFor((MI_S32)0, src.GetSizes().m_height, ResizeCuUpX2HvxImpl<Tp, C>, std::cref(src), std::ref(dst), vtcm_buffer, thread_num);
+        ret = wp->ParallelFor((DT_S32)0, src.GetSizes().m_height, ResizeCuUpX2HvxImpl<Tp, C>, std::cref(src), std::ref(dst), vtcm_buffer, thread_num);
     }
     else if (owidth == 4 * iwidth)
     {
-        ret = wp->ParallelFor((MI_S32)0, src.GetSizes().m_height, ResizeCuUpX4HvxImpl<Tp, C>, std::cref(src), std::ref(dst), vtcm_buffer, thread_num);
+        ret = wp->ParallelFor((DT_S32)0, src.GetSizes().m_height, ResizeCuUpX4HvxImpl<Tp, C>, std::cref(src), std::ref(dst), vtcm_buffer, thread_num);
     }
     else
     {
@@ -7537,7 +7537,7 @@ template <typename Tp>
 static Status ResizeCuFastUpHvxHelper(Context *ctx, const Mat &src, Mat &dst)
 {
     Status ret     = Status::ERROR;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
@@ -7589,40 +7589,40 @@ Status ResizeCuFastUpHvx(Context *ctx, const Mat &src, Mat &dst)
     {
         case ElemType::U8:
         {
-            ret = ResizeCuFastUpHvxHelper<MI_U8>(ctx, src, dst);
+            ret = ResizeCuFastUpHvxHelper<DT_U8>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastUpHvxHelper run failed, type: MI_U8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastUpHvxHelper run failed, type: DT_U8");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            ret = ResizeCuFastUpHvxHelper<MI_S8>(ctx, src, dst);
+            ret = ResizeCuFastUpHvxHelper<DT_S8>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastUpHvxHelper run failed, type: MI_S8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastUpHvxHelper run failed, type: DT_S8");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = ResizeCuFastUpHvxHelper<MI_U16>(ctx, src, dst);
+            ret = ResizeCuFastUpHvxHelper<DT_U16>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastUpHvxHelper run failed, type: MI_U16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastUpHvxHelper run failed, type: DT_U16");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = ResizeCuFastUpHvxHelper<MI_S16>(ctx, src, dst);
+            ret = ResizeCuFastUpHvxHelper<DT_S16>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastUpHvxHelper run failed, type: MI_S16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastUpHvxHelper run failed, type: DT_S16");
             }
             break;
         }

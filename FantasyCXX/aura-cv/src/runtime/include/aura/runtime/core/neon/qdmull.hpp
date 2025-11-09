@@ -25,8 +25,8 @@ DECLFUN(int64x2_t,   int32x2_t,   vqdmull,  s32)
         return prefix##_##postfix(v, u);                   \
     }
 
-DECLFUN(int32x4_t, int16x4_t, MI_S16, vqdmull_n, s16)
-DECLFUN(int64x2_t, int32x2_t, MI_S32, vqdmull_n, s32)
+DECLFUN(int32x4_t, int16x4_t, DT_S16, vqdmull_n, s16)
+DECLFUN(int64x2_t, int32x2_t, DT_S32, vqdmull_n, s32)
 #undef DECLFUN
 
 #define DECLFUN(dtype, vtype, prefix, postfix)                  \

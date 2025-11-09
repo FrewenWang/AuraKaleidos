@@ -22,15 +22,15 @@ struct CalcHistTestParam
     CalcHistTestParam()
     {}
 
-    CalcHistTestParam(ElemType elem_type, MI_S32 channel, MI_S32 hist_size, Scalar range, MI_BOOL accumulate, MI_BOOL use_mask) : 
+    CalcHistTestParam(ElemType elem_type, DT_S32 channel, DT_S32 hist_size, Scalar range, DT_BOOL accumulate, DT_BOOL use_mask) : 
                       elem_type(elem_type), channel(channel), hist_size(hist_size), range(range), accumulate(accumulate), use_mask(use_mask)
     {}
 
     friend std::ostream& operator<<(std::ostream &os, const CalcHistTestParam &calc_hist_test_param)
     {
         os << "channel:" << calc_hist_test_param.channel << " | hist_size:" << calc_hist_test_param.hist_size 
-           << " | ranges:[" << static_cast<MI_S32>(calc_hist_test_param.range.m_val[0]) 
-           << " " << static_cast<MI_S32>(calc_hist_test_param.range.m_val[1])
+           << " | ranges:[" << static_cast<DT_S32>(calc_hist_test_param.range.m_val[0]) 
+           << " " << static_cast<DT_S32>(calc_hist_test_param.range.m_val[1])
            << "] | accumulate:" << calc_hist_test_param.accumulate << " | use_mask:" << calc_hist_test_param.use_mask;
         return os;
     }
@@ -43,11 +43,11 @@ struct CalcHistTestParam
     }
 
     ElemType elem_type;
-    MI_S32   channel;
-    MI_S32   hist_size;
+    DT_S32   channel;
+    DT_S32   hist_size;
     Scalar   range;
-    MI_BOOL  accumulate;
-    MI_BOOL  use_mask;
+    DT_BOOL  accumulate;
+    DT_BOOL  use_mask;
 };
 
 AURA_TEST_PARAM(CalcHistParam,
@@ -55,23 +55,23 @@ AURA_TEST_PARAM(CalcHistParam,
                 CalcHistTestParam, param,
                 OpTarget,          target);
 
-static Status CvCalcHist(Context *ctx, Mat &src, MI_S32 channel, std::vector<MI_U32> &dst, MI_S32 hist_size, 
-                         Scalar &range, Mat &mask, MI_BOOL accumulate)
+static Status CvCalcHist(Context *ctx, Mat &src, DT_S32 channel, std::vector<DT_U32> &dst, DT_S32 hist_size, 
+                         Scalar &range, Mat &mask, DT_BOOL accumulate)
 {
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
     if (src_cv_type != -1)
     {
         cv::Mat cv_src  = MatToOpencv(src);
         cv::Mat cv_dst  = cv::Mat(hist_size, 1, CV_32SC1, dst.data());
         cv::Mat cv_mask = mask.IsValid() ? MatToOpencv(mask) : cv::Mat();
 
-        MI_F32 cv_range[]        = {static_cast<MI_F32>(range.m_val[0]), static_cast<MI_F32>(range.m_val[1])};
-        const MI_F32 *hist_range = {cv_range};
+        DT_F32 cv_range[]        = {static_cast<DT_F32>(range.m_val[0]), static_cast<DT_F32>(range.m_val[1])};
+        const DT_F32 *hist_range = {cv_range};
         cv::Mat result;
         cv::calcHist(&cv_src, 1, &channel, cv_mask, result, 1, &hist_size, &hist_range, true, accumulate);
         result.convertTo(cv_dst, cv_dst.type());
-        if ((MI_U32 *)cv_dst.data != dst.data())
+        if ((DT_U32 *)cv_dst.data != dst.data())
         {
             memcpy(dst.data(), cv_dst.data, cv_dst.total() * cv_dst.elemSize());
         }
@@ -114,24 +114,24 @@ public:
         }
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         CalcHistParam run_param(GetParam((index)));
         ElemType elem_type = run_param.param.elem_type;
         MatSize mat_sizes  = run_param.mat_sizes;
-        MI_S32 channel     = run_param.param.channel;
-        MI_S32 hist_size   = run_param.param.hist_size;
+        DT_S32 channel     = run_param.param.channel;
+        DT_S32 hist_size   = run_param.param.hist_size;
         Scalar range       = run_param.param.range;
-        MI_BOOL accumulate = run_param.param.accumulate;
-        MI_BOOL use_mask   = run_param.param.use_mask;
+        DT_BOOL accumulate = run_param.param.accumulate;
+        DT_BOOL use_mask   = run_param.param.use_mask;
 
         Sizes3 mask_size  = {mat_sizes.m_sizes.m_height, mat_sizes.m_sizes.m_width, 1};
         Mat src  = m_factory.GetDerivedMat(1.0f, 0.0f, elem_type, mat_sizes.m_sizes, AURA_MEM_DEFAULT, mat_sizes.m_strides);
         Mat mask = use_mask ? m_factory.GetRandomMat(0, 255, ElemType::U8, mask_size, AURA_MEM_DEFAULT, src.GetStrides()) : Mat();
-        std::vector<MI_U32> dst(hist_size, 0);
-        std::vector<MI_U32> ref(hist_size, 0);
+        std::vector<DT_U32> dst(hist_size, 0);
+        std::vector<DT_U32> ref(hist_size, 0);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         ArrayCmpResult cmp_result;

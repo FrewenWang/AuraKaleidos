@@ -5,15 +5,15 @@
 namespace aura
 {
 
-const static MI_S32 g_adreno_elem_counts = 8;
-const static MI_S32 g_mail_elem_counts   = 2;
+const static DT_S32 g_adreno_elem_counts = 8;
+const static DT_S32 g_mail_elem_counts   = 2;
 
-static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, MI_BOOL conj_src1)
+static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, DT_BOOL conj_src1)
 {
     CLBuildOptions cl_build_opt(ctx);
 
     GpuType gpu_type = ctx->GetCLEngine()->GetCLRuntime()->GetGpuInfo().m_type;
-    MI_S32 elem_counts = (GpuType::ADRENO == gpu_type) ? g_adreno_elem_counts : g_mail_elem_counts;
+    DT_S32 elem_counts = (GpuType::ADRENO == gpu_type) ? g_adreno_elem_counts : g_mail_elem_counts;
 
     cl_build_opt.AddOption("Tp",          CLTypeString(elem_type));
     cl_build_opt.AddOption("CONJ",        conj_src1 ? "1" : "0");
@@ -25,7 +25,7 @@ static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, MI_BOOL c
 MulSpectrumsCL::MulSpectrumsCL(Context *ctx, const OpTarget &target) : MulSpectrumsImpl(ctx, target), m_profiling_string()
 {}
 
-Status MulSpectrumsCL::SetArgs(const Array *src0, const Array *src1, Array *dst, MI_BOOL conj_src1)
+Status MulSpectrumsCL::SetArgs(const Array *src0, const Array *src1, Array *dst, DT_BOOL conj_src1)
 {
     if (MulSpectrumsImpl::SetArgs(src0, src1, dst, conj_src1) != Status::OK)
     {
@@ -110,17 +110,17 @@ Status MulSpectrumsCL::DeInitialize()
 
 Status MulSpectrumsCL::Run()
 {
-    MI_S32 istep0 = m_src0->GetRowPitch() / ElemTypeSize(m_src0->GetElemType());
-    MI_S32 istep1 = m_src1->GetRowPitch() / ElemTypeSize(m_src1->GetElemType());
-    MI_S32 ostep  = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 height = m_dst->GetSizes().m_height;
-    MI_S32 width  = m_dst->GetSizes().m_width;
+    DT_S32 istep0 = m_src0->GetRowPitch() / ElemTypeSize(m_src0->GetElemType());
+    DT_S32 istep1 = m_src1->GetRowPitch() / ElemTypeSize(m_src1->GetElemType());
+    DT_S32 ostep  = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 height = m_dst->GetSizes().m_height;
+    DT_S32 width  = m_dst->GetSizes().m_width;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
     // 1. get center_area and cl_global_size
     GpuType gpu_type = m_ctx->GetCLEngine()->GetCLRuntime()->GetGpuInfo().m_type;
-    MI_S32 elem_counts = (GpuType::ADRENO == gpu_type) ? g_adreno_elem_counts : g_mail_elem_counts;
+    DT_S32 elem_counts = (GpuType::ADRENO == gpu_type) ? g_adreno_elem_counts : g_mail_elem_counts;
 
     cl::NDRange cl_global_size = cl::NDRange((width + elem_counts - 1) / elem_counts, height);
     cl::Event cl_event;
@@ -128,13 +128,13 @@ Status MulSpectrumsCL::Run()
     Status ret    = Status::ERROR;
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src0.GetCLMemRef<cl::Buffer>(), istep0,
                                  m_cl_src1.GetCLMemRef<cl::Buffer>(), istep1,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                  width,
-                                 (MI_S32)(cl_global_size.get()[1]),
-                                 (MI_S32)(cl_global_size.get()[0]),
+                                 (DT_S32)(cl_global_size.get()[1]),
+                                 (DT_S32)(cl_global_size.get()[0]),
                                  cl_global_size, cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size),
                                  &(cl_event));
 
@@ -145,7 +145,7 @@ Status MulSpectrumsCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -154,7 +154,7 @@ Status MulSpectrumsCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -175,7 +175,7 @@ std::string MulSpectrumsCL::ToString() const
     return MulSpectrumsImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> MulSpectrumsCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_BOOL conj_src1)
+std::vector<CLKernel> MulSpectrumsCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_BOOL conj_src1)
 {
     std::vector<CLKernel> cl_kernels;
     std::vector<std::string> program_names, kernel_names;

@@ -45,7 +45,7 @@ public:
         }
         else
         {
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 
@@ -57,7 +57,7 @@ public:
         }
         else
         {
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 };

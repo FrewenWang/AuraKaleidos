@@ -89,7 +89,7 @@ private:
     /**
      * @brief Destructor to ensure proper cleanup in derived classes.
      */
-    JsonHelper() : m_ctx(MI_NULL)
+    JsonHelper() : m_ctx(DT_NULL)
     {}
 
     AURA_DISABLE_COPY_AND_ASSIGN(JsonHelper);

@@ -48,12 +48,12 @@ MipiPack::MipiPack(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status MipiPack::SetArgs(const Array *src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -93,14 +93,14 @@ Status MipiPack::SetArgs(const Array *src, Array *dst)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateMipiPackImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     MipiPackImpl *mipipack_impl = dynamic_cast<MipiPackImpl *>(m_impl.get());
-    if (MI_NULL == mipipack_impl)
+    if (DT_NULL == mipipack_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "mipipack_impl is null ptr");
         return Status::ERROR;
@@ -119,12 +119,12 @@ AURA_EXPORTS Status IMipiPack(Context *ctx, const Mat &src, Mat &dst, const OpTa
 }
 
 MipiPackImpl::MipiPackImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "MipiPack", target),
-                                                                   m_src(MI_NULL), m_dst(MI_NULL)
+                                                                   m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
 Status MipiPackImpl::SetArgs(const Array *src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -147,11 +147,11 @@ Status MipiPackImpl::SetArgs(const Array *src, Array *dst)
         return Status::ERROR;
     }
 
-    MI_S32 iwidth  = src->GetSizes().m_width;
-    MI_S32 iheight = src->GetSizes().m_height;
-    MI_S32 channel = src->GetSizes().m_channel;
-    MI_S32 owidth  = dst->GetSizes().m_width;
-    MI_S32 oheight = dst->GetSizes().m_height;
+    DT_S32 iwidth  = src->GetSizes().m_width;
+    DT_S32 iheight = src->GetSizes().m_height;
+    DT_S32 channel = src->GetSizes().m_channel;
+    DT_S32 owidth  = dst->GetSizes().m_width;
+    DT_S32 oheight = dst->GetSizes().m_height;
     if (((iwidth % 4) != 0) || ((owidth % 5) != 0) || (((owidth / 5) << 2) != iwidth) || (iheight != oheight) || (channel != 1))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "size err, iwidth should be 4/5 of owidth, height should be equal, channel should be 1");
@@ -181,7 +181,7 @@ std::string MipiPackImpl::ToString() const
     return str;
 }
 
-AURA_VOID MipiPackImpl::Dump(const std::string &prefix) const
+DT_VOID MipiPackImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -239,12 +239,12 @@ MipiUnPack::MipiUnPack(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status MipiUnPack::SetArgs(const Array *src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -283,14 +283,14 @@ Status MipiUnPack::SetArgs(const Array *src, Array *dst)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateMipiUnPackImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     MipiUnPackImpl *mipiunpack_impl = dynamic_cast<MipiUnPackImpl *>(m_impl.get());
-    if (MI_NULL == mipiunpack_impl)
+    if (DT_NULL == mipiunpack_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "mipiunpack_impl is null ptr");
         return Status::ERROR;
@@ -309,12 +309,12 @@ AURA_EXPORTS Status IMipiUnpack(Context *ctx, const Mat &src, Mat &dst, const Op
 }
 
 MipiUnPackImpl::MipiUnPackImpl(Context *ctx, const OpTarget &target): OpImpl(ctx, "MipiUnPack", target),
-                                                                      m_src(MI_NULL), m_dst(MI_NULL)
+                                                                      m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
 Status MipiUnPackImpl::SetArgs(const Array *src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -337,11 +337,11 @@ Status MipiUnPackImpl::SetArgs(const Array *src, Array *dst)
         return Status::ERROR;
     }
 
-    MI_S32 iwidth  = src->GetSizes().m_width;
-    MI_S32 iheight = src->GetSizes().m_height;
-    MI_S32 channel = src->GetSizes().m_channel;
-    MI_S32 owidth  = dst->GetSizes().m_width;
-    MI_S32 oheight = dst->GetSizes().m_height;
+    DT_S32 iwidth  = src->GetSizes().m_width;
+    DT_S32 iheight = src->GetSizes().m_height;
+    DT_S32 channel = src->GetSizes().m_channel;
+    DT_S32 owidth  = dst->GetSizes().m_width;
+    DT_S32 oheight = dst->GetSizes().m_height;
 
     if (((iwidth % 5) != 0) || (owidth != iwidth / 5 * 4) || (iheight != oheight) || (channel != 1))
     {
@@ -372,7 +372,7 @@ std::string MipiUnPackImpl::ToString() const
     return str;
 }
 
-AURA_VOID MipiUnPackImpl::Dump(const std::string &prefix) const
+DT_VOID MipiUnPackImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

@@ -17,7 +17,7 @@
 
 using namespace aura;
 #if !defined(AURA_BUILD_XPLORER)
-static MI_S32 ModeToOpencv(ContoursMode mode)
+static DT_S32 ModeToOpencv(ContoursMode mode)
 {
     switch (mode)
     {
@@ -36,7 +36,7 @@ static MI_S32 ModeToOpencv(ContoursMode mode)
     }
 }
 
-static MI_S32 MethodToOpencv(ContoursMethod method)
+static DT_S32 MethodToOpencv(ContoursMethod method)
 {
     switch (method)
     {
@@ -57,7 +57,7 @@ static MI_S32 MethodToOpencv(ContoursMethod method)
 #endif
 
 static Status ResultCompare(Context *ctx, const std::vector<std::vector<Point2i>> &dst,
-                            const std::vector<std::vector<Point2i>> &ref, MatCmpResult &cmp_result, MI_F32 tolerate)
+                            const std::vector<std::vector<Point2i>> &ref, MatCmpResult &cmp_result, DT_F32 tolerate)
 {
     if ((dst.size() == 0) || (ref.size() == 0))
     {
@@ -72,10 +72,10 @@ static Status ResultCompare(Context *ctx, const std::vector<std::vector<Point2i>
 
     cmp_result.Clear();
 
-    MI_S32 vec_size = (MI_S32)(dst.size());
-    MI_S32 points_size = 0;
+    DT_S32 vec_size = (DT_S32)(dst.size());
+    DT_S32 points_size = 0;
 
-    for (MI_S32 i = 0; i < vec_size; i++)
+    for (DT_S32 i = 0; i < vec_size; i++)
     {
         if (dst[i].size() != ref[i].size())
         {
@@ -83,18 +83,18 @@ static Status ResultCompare(Context *ctx, const std::vector<std::vector<Point2i>
             AURA_ADD_ERROR_STRING(ctx, error_info.c_str());
             return Status::ERROR;
         }
-        points_size += (MI_S32)dst[i].size();
+        points_size += (DT_S32)dst[i].size();
     }
 
     const Sizes3 size_mat = Sizes3(1, 2 * points_size, 1);
     Mat dst_mat = Mat(ctx, aura::ElemType::S32, size_mat);
     Mat ref_mat = Mat(ctx, aura::ElemType::S32, size_mat);
-    MI_S32 *dst_data = (MI_S32 *)dst_mat.GetData();
-    MI_S32 *ref_data = (MI_S32 *)ref_mat.GetData();
+    DT_S32 *dst_data = (DT_S32 *)dst_mat.GetData();
+    DT_S32 *ref_data = (DT_S32 *)ref_mat.GetData();
 
-    for (MI_S32 i = 0; i < vec_size; i++)
+    for (DT_S32 i = 0; i < vec_size; i++)
     {
-        for (MI_S32 j = 0; j < (MI_S32)dst[i].size(); j++)
+        for (DT_S32 j = 0; j < (DT_S32)dst[i].size(); j++)
         {
             dst_data[2 * j]     = dst[i][j].m_x;
             dst_data[2 * j + 1] = dst[i][j].m_y;
@@ -126,17 +126,17 @@ static Status CvFindContours(Context *ctx, Mat &src, std::vector<std::vector<Poi
 
 #if !defined(AURA_BUILD_XPLORER)
     cv::Mat src_mat   = MatToOpencv(src);
-    MI_S32  cv_mode   = ModeToOpencv(mode);
-    MI_S32  cv_method = MethodToOpencv(method);
+    DT_S32  cv_mode   = ModeToOpencv(mode);
+    DT_S32  cv_method = MethodToOpencv(method);
     std::vector<std::vector<cv::Point>> ref_contours;
 
     cv::findContours(src_mat, ref_contours, cv_mode, cv_method, cv::Point(0, 0));
 
     dst.resize(ref_contours.size());
-    for (MI_S32 i = 0; i < (MI_S32)(dst.size()); i++)
+    for (DT_S32 i = 0; i < (DT_S32)(dst.size()); i++)
     {
         dst[i].resize(ref_contours[i].size());
-        for (MI_S32 j = 0; j < (MI_S32)(dst[i].size()); j++)
+        for (DT_S32 j = 0; j < (DT_S32)(dst[i].size()); j++)
         {
             dst[i][j].m_x = ref_contours[i][j].x;
             dst[i][j].m_y = ref_contours[i][j].y;
@@ -168,7 +168,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         FindContoursParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -191,7 +191,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         FindContoursParam run_param(GetParam((index)));
@@ -212,7 +212,7 @@ public:
         std::vector<std::vector<Point2i>> ref;
         std::vector<Scalari> hierarchy;
 
-        MI_S32 loop_count = stress_count > 0 ? stress_count : 5;
+        DT_S32 loop_count = stress_count > 0 ? stress_count : 5;
 
         TestTime time_val;
         MatCmpResult cmp_result;

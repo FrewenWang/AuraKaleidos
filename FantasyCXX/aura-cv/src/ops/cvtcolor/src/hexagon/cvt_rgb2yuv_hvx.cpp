@@ -49,7 +49,7 @@ namespace aura
  * 536870912 (0x20000000): 512 * (1 << CVTCOLOR_COEF_BITS)
  */
 
-AURA_ALWAYS_INLINE AURA_VOID CvtAsrShiftCastU8(HVX_VectorPair &ws32_x_lo, HVX_VectorPair &ws32_x_hi, HVX_Vector &vu8_x)
+AURA_ALWAYS_INLINE DT_VOID CvtAsrShiftCastU8(HVX_VectorPair &ws32_x_lo, HVX_VectorPair &ws32_x_hi, HVX_Vector &vu8_x)
 {
     HVX_Vector vs32_x_lo_lo = Q6_Vw_vmax_VwVw(Q6_V_lo_W(ws32_x_lo), Q6_V_vzero());
     HVX_Vector vs32_x_lo_hi = Q6_Vw_vmax_VwVw(Q6_V_hi_W(ws32_x_lo), Q6_V_vzero());
@@ -62,7 +62,7 @@ AURA_ALWAYS_INLINE AURA_VOID CvtAsrShiftCastU8(HVX_VectorPair &ws32_x_lo, HVX_Ve
     vu8_x = Q6_Vub_vasr_VuhVuhR_rnd_sat(vs16_x_hi, vs16_x_lo, 5);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID CvtDealRgbCore(HVX_VectorX3 &v3_src0, HVX_VectorX3 &v3_src1, MI_S32 rt)
+AURA_ALWAYS_INLINE DT_VOID CvtDealRgbCore(HVX_VectorX3 &v3_src0, HVX_VectorX3 &v3_src1, DT_S32 rt)
 {
     HVX_VectorPair w_r = Q6_W_vdeal_VVR(v3_src1.val[0], v3_src0.val[0], rt);
     HVX_VectorPair w_g = Q6_W_vdeal_VVR(v3_src1.val[1], v3_src0.val[1], rt);
@@ -77,8 +77,8 @@ AURA_ALWAYS_INLINE AURA_VOID CvtDealRgbCore(HVX_VectorX3 &v3_src0, HVX_VectorX3 
     v3_src1.val[2] = Q6_V_hi_W(w_b);
 }
 
-template <MI_U32 MODE, typename std::enable_if<0 == MODE>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CvtRgb2YCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu8_dst_y)
+template <DT_U32 MODE, typename std::enable_if<0 == MODE>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CvtRgb2YCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu8_dst_y)
 {
     HVX_VectorPair ws32_yc = Q6_W_vcombine_VV(Q6_V_vsplat_R(0x01000000), Q6_V_vsplat_R(0x01000000));
 
@@ -97,8 +97,8 @@ AURA_ALWAYS_INLINE AURA_VOID CvtRgb2YCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu
     CvtAsrShiftCastU8(ws32_y_lo, ws32_y_hi, vu8_dst_y);
 }
 
-template <MI_U32 MODE, typename std::enable_if<1 == MODE>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CvtRgb2YCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu8_dst_y)
+template <DT_U32 MODE, typename std::enable_if<1 == MODE>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CvtRgb2YCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu8_dst_y)
 {
     HVX_VectorPair ws16_yr = Q6_Wh_vmpy_VubRb(v3u8_src.val[0], 0x0c0c0c0c);
     HVX_VectorPair wu16_yg = Q6_Wuh_vmpy_VubRub(v3u8_src.val[1], 0xf1f1f1f1);
@@ -115,8 +115,8 @@ AURA_ALWAYS_INLINE AURA_VOID CvtRgb2YCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu
     CvtAsrShiftCastU8(ws32_y_lo, ws32_y_hi, vu8_dst_y);
 }
 
-template <MI_U32 MODE, typename std::enable_if<0 == MODE>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CvtRgb2UVCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu8_dst_u, HVX_Vector &vu8_dst_v)
+template <DT_U32 MODE, typename std::enable_if<0 == MODE>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CvtRgb2UVCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu8_dst_u, HVX_Vector &vu8_dst_v)
 {
     HVX_VectorPair ws32_uc = Q6_W_vcombine_VV(Q6_V_vsplat_R(0x08000000), Q6_V_vsplat_R(0x08000000));
 
@@ -151,8 +151,8 @@ AURA_ALWAYS_INLINE AURA_VOID CvtRgb2UVCore(HVX_VectorX3 &v3u8_src, HVX_Vector &v
     CvtAsrShiftCastU8(ws32_v_lo, ws32_v_hi, vu8_dst_v);
 }
 
-template <MI_U32 MODE, typename std::enable_if<1 == MODE>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CvtRgb2UVCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu8_dst_u, HVX_Vector &vu8_dst_v)
+template <DT_U32 MODE, typename std::enable_if<1 == MODE>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CvtRgb2UVCore(HVX_VectorX3 &v3u8_src, HVX_Vector &vu8_dst_u, HVX_Vector &vu8_dst_v)
 {
     HVX_VectorPair ws32_uc = Q6_W_vcombine_VV(Q6_V_vsplat_R(0x08000000), Q6_V_vsplat_R(0x08000000));
 
@@ -187,37 +187,37 @@ AURA_ALWAYS_INLINE AURA_VOID CvtRgb2UVCore(HVX_VectorX3 &v3u8_src, HVX_Vector &v
     CvtAsrShiftCastU8(ws32_v_lo, ws32_v_hi, vu8_dst_v);
 }
 
-template <MI_U32 MODE>
-static Status CvtRgb2NvHvxImpl(const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv, MI_S32 start_row, MI_S32 end_row)
+template <DT_U32 MODE>
+static Status CvtRgb2NvHvxImpl(const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv, DT_S32 start_row, DT_S32 end_row)
 {
-    const MI_S32 width       = src.GetSizes().m_width;
-    const MI_S32 ichannel    = src.GetSizes().m_channel;
-    const MI_S32 istride     = src.GetStrides().m_width;
-    const MI_S32 width_align = width & (-(AURA_HVLEN * 2));
-    const MI_S32 uidx        = swapuv;
-    const MI_S32 vidx        = 1 - uidx;
+    const DT_S32 width       = src.GetSizes().m_width;
+    const DT_S32 ichannel    = src.GetSizes().m_channel;
+    const DT_S32 istride     = src.GetStrides().m_width;
+    const DT_S32 width_align = width & (-(AURA_HVLEN * 2));
+    const DT_S32 uidx        = swapuv;
+    const DT_S32 vidx        = 1 - uidx;
 
-    MI_U64 L2fetch_param = L2PfParam(istride, width * ichannel * ElemTypeSize(src.GetElemType()), 2, 0);
+    DT_U64 L2fetch_param = L2PfParam(istride, width * ichannel * ElemTypeSize(src.GetElemType()), 2, 0);
 
     HVX_VectorX3 v3u8_src_c_lo, v3u8_src_c_hi, v3u8_src_n_lo, v3u8_src_n_hi;
     HVX_VectorX2 v2u8_dst_y_c, v2u8_dst_y_n, v2u8_dst_uv;
 
-    for (MI_S32 uv = start_row; uv < end_row; uv++)
+    for (DT_S32 uv = start_row; uv < end_row; uv++)
     {
-        MI_S32 y = uv * 2;
+        DT_S32 y = uv * 2;
         if (uv < end_row - 1)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(y + 2)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(y + 2)), L2fetch_param);
         }
 
-        MI_U8 *src_c = (MI_U8 *)src.Ptr<MI_U8>(y);
-        MI_U8 *src_n = (MI_U8 *)src.Ptr<MI_U8>(y + 1);
+        DT_U8 *src_c = (DT_U8 *)src.Ptr<DT_U8>(y);
+        DT_U8 *src_n = (DT_U8 *)src.Ptr<DT_U8>(y + 1);
 
-        MI_U8 *dst_y_c  = dst_y.Ptr<MI_U8>(y);
-        MI_U8 *dst_y_n  = dst_y.Ptr<MI_U8>(y + 1);
-        MI_U8 *dst_uv_c = dst_uv.Ptr<MI_U8>(uv);
+        DT_U8 *dst_y_c  = dst_y.Ptr<DT_U8>(y);
+        DT_U8 *dst_y_n  = dst_y.Ptr<DT_U8>(y + 1);
+        DT_U8 *dst_uv_c = dst_uv.Ptr<DT_U8>(uv);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += (AURA_HVLEN * 2))
         {
 LOOP_BODY:
@@ -250,7 +250,7 @@ LOOP_BODY:
     return Status::OK;
 }
 
-Status CvtRgb2NvHvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv, CvtColorType type)
+Status CvtRgb2NvHvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv, CvtColorType type)
 {
     Status ret = Status::ERROR;
 
@@ -268,10 +268,10 @@ Status CvtRgb2NvHvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BO
         return ret;
     }
 
-    MI_S32 height = dst_uv.GetSizes().m_height;
+    DT_S32 height = dst_uv.GetSizes().m_height;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
@@ -282,14 +282,14 @@ Status CvtRgb2NvHvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BO
         case CvtColorType::RGB2YUV_NV12:
         case CvtColorType::RGB2YUV_NV21:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtRgb2NvHvxImpl<0>, std::cref(src), std::ref(dst_y), std::ref(dst_uv), swapuv);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtRgb2NvHvxImpl<0>, std::cref(src), std::ref(dst_y), std::ref(dst_uv), swapuv);
             break;
         }
 
         case CvtColorType::RGB2YUV_NV12_601:
         case CvtColorType::RGB2YUV_NV21_601:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtRgb2NvHvxImpl<1>, std::cref(src), std::ref(dst_y), std::ref(dst_uv), swapuv);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtRgb2NvHvxImpl<1>, std::cref(src), std::ref(dst_y), std::ref(dst_uv), swapuv);
             break;
         }
 
@@ -303,37 +303,37 @@ Status CvtRgb2NvHvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BO
     AURA_RETURN(ctx, ret);
 }
 
-template <MI_U32 MODE>
-static Status CvtRgb2Y420HvxImpl(const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, MI_BOOL swapuv, MI_S32 start_row, MI_S32 end_row)
+template <DT_U32 MODE>
+static Status CvtRgb2Y420HvxImpl(const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, DT_BOOL swapuv, DT_S32 start_row, DT_S32 end_row)
 {
-    const MI_S32 width       = src.GetSizes().m_width;
-    const MI_S32 ichannel    = src.GetSizes().m_channel;
-    const MI_S32 istride     = src.GetStrides().m_width;
-    const MI_S32 width_align = width & (-(AURA_HVLEN * 2));
+    const DT_S32 width       = src.GetSizes().m_width;
+    const DT_S32 ichannel    = src.GetSizes().m_channel;
+    const DT_S32 istride     = src.GetStrides().m_width;
+    const DT_S32 width_align = width & (-(AURA_HVLEN * 2));
 
-    MI_U64 L2fetch_param = L2PfParam(istride, width * ichannel * ElemTypeSize(src.GetElemType()), 2, 0);
+    DT_U64 L2fetch_param = L2PfParam(istride, width * ichannel * ElemTypeSize(src.GetElemType()), 2, 0);
 
     HVX_VectorX3 v3u8_src_c_lo, v3u8_src_c_hi, v3u8_src_n_lo, v3u8_src_n_hi;
     HVX_VectorX2 v2u8_dst_y_c, v2u8_dst_y_n;
     HVX_Vector   vu8_dst_u, vu8_dst_v;
 
-    for (MI_S32 uv = start_row; uv < end_row; uv++)
+    for (DT_S32 uv = start_row; uv < end_row; uv++)
     {
-        MI_S32 y = uv * 2;
+        DT_S32 y = uv * 2;
         if (uv < end_row - 1)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(y + 2)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(y + 2)), L2fetch_param);
         }
 
-        const MI_U8 *src_c = src.Ptr<MI_U8>(y);
-        const MI_U8 *src_n = src.Ptr<MI_U8>(y + 1);
+        const DT_U8 *src_c = src.Ptr<DT_U8>(y);
+        const DT_U8 *src_n = src.Ptr<DT_U8>(y + 1);
 
-        MI_U8 *dst_y_c = dst_y.Ptr<MI_U8>(y);
-        MI_U8 *dst_y_n = dst_y.Ptr<MI_U8>(y + 1);
-        MI_U8 *dst_u_c = swapuv ? dst_v.Ptr<MI_U8>(y >> 1) : dst_u.Ptr<MI_U8>(y >> 1);
-        MI_U8 *dst_v_c = swapuv ? dst_u.Ptr<MI_U8>(y >> 1) : dst_v.Ptr<MI_U8>(y >> 1);
+        DT_U8 *dst_y_c = dst_y.Ptr<DT_U8>(y);
+        DT_U8 *dst_y_n = dst_y.Ptr<DT_U8>(y + 1);
+        DT_U8 *dst_u_c = swapuv ? dst_v.Ptr<DT_U8>(y >> 1) : dst_u.Ptr<DT_U8>(y >> 1);
+        DT_U8 *dst_v_c = swapuv ? dst_u.Ptr<DT_U8>(y >> 1) : dst_v.Ptr<DT_U8>(y >> 1);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += (AURA_HVLEN * 2))
         {
 LOOP_BODY:
@@ -367,7 +367,7 @@ LOOP_BODY:
     return Status::OK;
 }
 
-Status CvtRgb2Y420Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, MI_BOOL swapuv, CvtColorType type)
+Status CvtRgb2Y420Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, DT_BOOL swapuv, CvtColorType type)
 {
     Status ret = Status::ERROR;
 
@@ -386,10 +386,10 @@ Status CvtRgb2Y420Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat 
         return ret;
     }
 
-    MI_S32 height = dst_u.GetSizes().m_height;
+    DT_S32 height = dst_u.GetSizes().m_height;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
@@ -400,7 +400,7 @@ Status CvtRgb2Y420Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat 
         case CvtColorType::RGB2YUV_YU12:
         case CvtColorType::RGB2YUV_YV12:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtRgb2Y420HvxImpl<0>, std::cref(src), std::ref(dst_y), std::ref(dst_u),
+            ret = wp->ParallelFor((DT_S32)0, height, CvtRgb2Y420HvxImpl<0>, std::cref(src), std::ref(dst_y), std::ref(dst_u),
                                   std::ref(dst_v), swapuv);
             break;
         }
@@ -408,7 +408,7 @@ Status CvtRgb2Y420Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat 
         case CvtColorType::RGB2YUV_YU12_601:
         case CvtColorType::RGB2YUV_YV12_601:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtRgb2Y420HvxImpl<1>, std::cref(src), std::ref(dst_y), std::ref(dst_u),
+            ret = wp->ParallelFor((DT_S32)0, height, CvtRgb2Y420HvxImpl<1>, std::cref(src), std::ref(dst_y), std::ref(dst_u),
                                   std::ref(dst_v), swapuv);
             break;
         }
@@ -423,33 +423,33 @@ Status CvtRgb2Y420Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat 
     AURA_RETURN(ctx, ret);
 }
 
-template <MI_U32 MODE>
-static Status CvtRgb2Y444HvxImpl(const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, MI_S32 start_row, MI_S32 end_row)
+template <DT_U32 MODE>
+static Status CvtRgb2Y444HvxImpl(const Mat &src, Mat &dst_y, Mat &dst_u, Mat &dst_v, DT_S32 start_row, DT_S32 end_row)
 {
-    const MI_S32 width       = src.GetSizes().m_width;
-    const MI_S32 ichannel    = src.GetSizes().m_channel;
-    const MI_S32 istride     = src.GetStrides().m_width;
-    const MI_S32 width_align = width & (-AURA_HVLEN);
+    const DT_S32 width       = src.GetSizes().m_width;
+    const DT_S32 ichannel    = src.GetSizes().m_channel;
+    const DT_S32 istride     = src.GetStrides().m_width;
+    const DT_S32 width_align = width & (-AURA_HVLEN);
 
-    MI_U64 L2fetch_param = L2PfParam(istride, width * ichannel * ElemTypeSize(src.GetElemType()), 1, 0);
+    DT_U64 L2fetch_param = L2PfParam(istride, width * ichannel * ElemTypeSize(src.GetElemType()), 1, 0);
 
     HVX_VectorX3 v3u8_src;
     HVX_Vector   vu8_dst_y, vu8_dst_u, vu8_dst_v;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y < end_row - 1)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(y + 1)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(y + 1)), L2fetch_param);
         }
 
-        const MI_U8 *src_c = src.Ptr<MI_U8>(y);
+        const DT_U8 *src_c = src.Ptr<DT_U8>(y);
 
-        MI_U8 *dst_y_c = dst_y.Ptr<MI_U8>(y);
-        MI_U8 *dst_u_c = dst_u.Ptr<MI_U8>(y);
-        MI_U8 *dst_v_c = dst_v.Ptr<MI_U8>(y);
+        DT_U8 *dst_y_c = dst_y.Ptr<DT_U8>(y);
+        DT_U8 *dst_u_c = dst_u.Ptr<DT_U8>(y);
+        DT_U8 *dst_v_c = dst_v.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += AURA_HVLEN)
         {
 LOOP_BODY:
@@ -486,10 +486,10 @@ Status CvtRgb2Y444Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat 
         return ret;
     }
 
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 height = src.GetSizes().m_height;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
@@ -499,13 +499,13 @@ Status CvtRgb2Y444Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat 
     {
         case CvtColorType::RGB2YUV_Y444:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtRgb2Y444HvxImpl<0>, std::cref(src), std::ref(dst_y), std::ref(dst_u), std::ref(dst_v));
+            ret = wp->ParallelFor((DT_S32)0, height, CvtRgb2Y444HvxImpl<0>, std::cref(src), std::ref(dst_y), std::ref(dst_u), std::ref(dst_v));
             break;
         }
 
         case CvtColorType::RGB2YUV_Y444_601:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtRgb2Y444HvxImpl<1>, std::cref(src), std::ref(dst_y), std::ref(dst_u), std::ref(dst_v));
+            ret = wp->ParallelFor((DT_S32)0, height, CvtRgb2Y444HvxImpl<1>, std::cref(src), std::ref(dst_y), std::ref(dst_u), std::ref(dst_v));
             break;
         }
 
@@ -519,7 +519,7 @@ Status CvtRgb2Y444Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_u, Mat 
     AURA_RETURN(ctx, ret);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID CvtRgb2YP010Core(HVX_VectorX3 &v3u16_src, HVX_VectorX3 &v3s32_rgb2y, HVX_Vector &vu16_y)
+AURA_ALWAYS_INLINE DT_VOID CvtRgb2YP010Core(HVX_VectorX3 &v3u16_src, HVX_VectorX3 &v3s32_rgb2y, HVX_Vector &vu16_y)
 {
     HVX_Vector vs32_yr_lo = Q6_Vw_vmpyie_VwVuh(v3s32_rgb2y.val[0], v3u16_src.val[0]);
     HVX_Vector vs32_yg_lo = Q6_Vw_vmpyie_VwVuh(v3s32_rgb2y.val[1], v3u16_src.val[1]);
@@ -538,7 +538,7 @@ AURA_ALWAYS_INLINE AURA_VOID CvtRgb2YP010Core(HVX_VectorX3 &v3u16_src, HVX_Vecto
     vu16_y = Q6_Vuh_vasr_VwVwR_rnd_sat(vs32_y_hi, vs32_y_lo, CVTCOLOR_COEF_BITS - 6);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID CvtRgb2UVP010Core(HVX_VectorX3 &v3u16_src, HVX_VectorX3 &v3s32_rgb2u, HVX_VectorX2 &v2s32_rgb2v,
+AURA_ALWAYS_INLINE DT_VOID CvtRgb2UVP010Core(HVX_VectorX3 &v3u16_src, HVX_VectorX3 &v3s32_rgb2u, HVX_VectorX2 &v2s32_rgb2v,
                                              HVX_Vector &vu16_u, HVX_Vector &vu16_v)
 {
     HVX_Vector vs32_uc = Q6_V_vsplat_R(0x20000000);
@@ -582,26 +582,26 @@ AURA_ALWAYS_INLINE AURA_VOID CvtRgb2UVP010Core(HVX_VectorX3 &v3u16_src, HVX_Vect
     vu16_v = Q6_Vuh_vasr_VwVwR_rnd_sat(vs32_x_hi, vs32_x_lo, CVTCOLOR_COEF_BITS - 6);
 }
 
-template <MI_U32 MODE>
-static Status CvtRgb2NvP010HvxImpl(const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv, MI_S32 start_row, MI_S32 end_row)
+template <DT_U32 MODE>
+static Status CvtRgb2NvP010HvxImpl(const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv, DT_S32 start_row, DT_S32 end_row)
 {
-    constexpr MI_S32 R2Y = Rgb2YuvParamTraits<MODE>::R2Y;
-    constexpr MI_S32 G2Y = Rgb2YuvParamTraits<MODE>::G2Y;
-    constexpr MI_S32 B2Y = Rgb2YuvParamTraits<MODE>::B2Y;
-    constexpr MI_S32 R2U = Rgb2YuvParamTraits<MODE>::R2U;
-    constexpr MI_S32 G2U = Rgb2YuvParamTraits<MODE>::G2U;
-    constexpr MI_S32 B2U = Rgb2YuvParamTraits<MODE>::B2U;
-    constexpr MI_S32 G2V = Rgb2YuvParamTraits<MODE>::G2V;
-    constexpr MI_S32 B2V = Rgb2YuvParamTraits<MODE>::B2V;
+    constexpr DT_S32 R2Y = Rgb2YuvParamTraits<MODE>::R2Y;
+    constexpr DT_S32 G2Y = Rgb2YuvParamTraits<MODE>::G2Y;
+    constexpr DT_S32 B2Y = Rgb2YuvParamTraits<MODE>::B2Y;
+    constexpr DT_S32 R2U = Rgb2YuvParamTraits<MODE>::R2U;
+    constexpr DT_S32 G2U = Rgb2YuvParamTraits<MODE>::G2U;
+    constexpr DT_S32 B2U = Rgb2YuvParamTraits<MODE>::B2U;
+    constexpr DT_S32 G2V = Rgb2YuvParamTraits<MODE>::G2V;
+    constexpr DT_S32 B2V = Rgb2YuvParamTraits<MODE>::B2V;
 
-    const MI_S32 width       = src.GetSizes().m_width;
-    const MI_S32 ichannel    = src.GetSizes().m_channel;
-    const MI_S32 istride     = src.GetStrides().m_width;
-    const MI_S32 width_align = width & (-AURA_HVLEN);
-    const MI_S32 uidx        = swapuv;
-    const MI_S32 vidx        = 1 - uidx;
+    const DT_S32 width       = src.GetSizes().m_width;
+    const DT_S32 ichannel    = src.GetSizes().m_channel;
+    const DT_S32 istride     = src.GetStrides().m_width;
+    const DT_S32 width_align = width & (-AURA_HVLEN);
+    const DT_S32 uidx        = swapuv;
+    const DT_S32 vidx        = 1 - uidx;
 
-    MI_U64 L2fetch_param = L2PfParam(istride, width * ichannel * ElemTypeSize(src.GetElemType()), 2, 0);
+    DT_U64 L2fetch_param = L2PfParam(istride, width * ichannel * ElemTypeSize(src.GetElemType()), 2, 0);
 
     HVX_VectorX3 v3s32_rgb2y, v3s32_rgb2u;
     HVX_VectorX3 v3u16_src_c_lo, v3u16_src_c_hi, v3u16_src_n_lo, v3u16_src_n_hi;
@@ -618,22 +618,22 @@ static Status CvtRgb2NvP010HvxImpl(const Mat &src, Mat &dst_y, Mat &dst_uv, MI_B
     v2s32_rgb2v.val[0] = Q6_V_vsplat_R(G2V);
     v2s32_rgb2v.val[1] = Q6_V_vsplat_R(B2V);
 
-    for (MI_S32 uv = start_row; uv < end_row; uv++)
+    for (DT_S32 uv = start_row; uv < end_row; uv++)
     {
-        MI_S32 y = uv * 2;
+        DT_S32 y = uv * 2;
         if (uv < end_row - 1)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U16>(y + 2)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U16>(y + 2)), L2fetch_param);
         }
 
-        MI_U16 *src_c = (MI_U16 *)src.Ptr<MI_U16>(y);
-        MI_U16 *src_n = (MI_U16 *)src.Ptr<MI_U16>(y + 1);
+        DT_U16 *src_c = (DT_U16 *)src.Ptr<DT_U16>(y);
+        DT_U16 *src_n = (DT_U16 *)src.Ptr<DT_U16>(y + 1);
 
-        MI_U16 *dst_y_c  = dst_y.Ptr<MI_U16>(y);
-        MI_U16 *dst_y_n  = dst_y.Ptr<MI_U16>(y + 1);
-        MI_U16 *dst_uv_c = dst_uv.Ptr<MI_U16>(uv);
+        DT_U16 *dst_y_c  = dst_y.Ptr<DT_U16>(y);
+        DT_U16 *dst_y_n  = dst_y.Ptr<DT_U16>(y + 1);
+        DT_U16 *dst_uv_c = dst_uv.Ptr<DT_U16>(uv);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += AURA_HVLEN)
         {
 LOOP_BODY:
@@ -666,7 +666,7 @@ LOOP_BODY:
     return Status::OK;
 }
 
-Status CvtRgb2NvP010Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, MI_BOOL swapuv)
+Status CvtRgb2NvP010Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, DT_BOOL swapuv)
 {
     Status ret = Status::ERROR;
 
@@ -684,16 +684,16 @@ Status CvtRgb2NvP010Hvx(Context *ctx, const Mat &src, Mat &dst_y, Mat &dst_uv, M
         return ret;
     }
 
-    MI_S32 height = dst_uv.GetSizes().m_height;
+    DT_S32 height = dst_uv.GetSizes().m_height;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    if ((ret = wp->ParallelFor((MI_S32)0, height, CvtRgb2NvP010HvxImpl<1>, std::cref(src), std::ref(dst_y), std::ref(dst_uv), swapuv)) != Status::OK)
+    if ((ret = wp->ParallelFor((DT_S32)0, height, CvtRgb2NvP010HvxImpl<1>, std::cref(src), std::ref(dst_y), std::ref(dst_uv), swapuv)) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "ParallelFor run failed");
         return ret;

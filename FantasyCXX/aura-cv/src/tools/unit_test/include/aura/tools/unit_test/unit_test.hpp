@@ -64,12 +64,12 @@ public:
     /**
      * @brief Print a brief summary of the unit test report.
      */
-    AURA_VOID PrintBrief() const;
+    DT_VOID PrintBrief() const;
 
     /**
      * @brief Clear all recorded results in the unit test report.
      */
-    AURA_VOID Clear();
+    DT_VOID Clear();
 
     /**
      * @brief Record the result of a test case in the unit test report.
@@ -77,7 +77,7 @@ public:
      * @param info Information related to the test case.
      * @param test_case The test case object to record.
      */
-    AURA_VOID Record(const std::string &info, std::shared_ptr<TestCase> test_case);
+    DT_VOID Record(const std::string &info, std::shared_ptr<TestCase> test_case);
 
     /**
      * @brief Virtual destructor for the UnitTestReport class.
@@ -97,7 +97,7 @@ public:
     /**
      * @brief Abstract function to print a verbose version of the unit test report.
      */
-    virtual AURA_VOID PrintVerbose()                   = 0;
+    virtual DT_VOID PrintVerbose()                   = 0;
 
 protected:
     std::string m_name;                                                  /*!< The name of the unit test report. */
@@ -141,16 +141,16 @@ public:
     /**
      * @brief Print a verbose version of the text-based unit test report.
      */
-    AURA_VOID PrintVerbose() override;
+    DT_VOID PrintVerbose() override;
 
     /**
      * @brief Get a string representation of the text-based unit test report.
      *
-     * @param with_color Flag indicating whether to include color information (default is MI_FALSE).
+     * @param with_color Flag indicating whether to include color information (default is DT_FALSE).
      *
      * @return A string containing the text-based unit test report.
      */
-    std::string GetReportString(MI_BOOL with_color = MI_FALSE);
+    std::string GetReportString(DT_BOOL with_color = DT_FALSE);
 };
 
 /**
@@ -189,7 +189,7 @@ public:
     /**
      * @brief Print a verbose version of the JSON-based unit test report.
      */
-    virtual AURA_VOID PrintVerbose() override;
+    virtual DT_VOID PrintVerbose() override;
 };
 
 /**
@@ -222,15 +222,15 @@ public:
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
     Status Initialize(Context *ctx, const std::string &data_path, const std::string &dump_path, const std::string &report_type = "txt",
-                      const std::string &report_name = "auto_test", MI_S32 stress_count = 0, MI_S32 enable_mem_profiling = 0);
+                      const std::string &report_name = "auto_test", DT_S32 stress_count = 0, DT_S32 enable_mem_profiling = 0);
 
     /**
      * @brief Deinitialize the unit test environment.
      */
-    AURA_VOID DeInitialize()
+    DT_VOID DeInitialize()
     {
-        m_initialized = MI_FALSE;
-        m_ctx = MI_NULL;
+        m_initialized = DT_FALSE;
+        m_ctx = DT_NULL;
         m_report.reset();
         m_case_map.clear();
     }
@@ -303,9 +303,9 @@ public:
     /**
      * @brief Check if the unit test is in stress mode.
      *
-     * @return MI_TRUE if the unit test is in stress mode, MI_FALSE otherwise.
+     * @return DT_TRUE if the unit test is in stress mode, DT_FALSE otherwise.
      */
-    MI_BOOL IsStressMode() const
+    DT_BOOL IsStressMode() const
     {
         return (m_stress_count > 0);
     }
@@ -315,7 +315,7 @@ public:
      *
      * @return The stress count for the unit test.
      */
-    MI_S32 GetStressCount() const
+    DT_S32 GetStressCount() const
     {
         return m_stress_count;
     }
@@ -323,9 +323,9 @@ public:
     /**
      * @brief Get the memory profiling flag for the unit test.
      *
-     * @return MI_TRUE if the unit test is enable memory Profiling, MI_FALSE otherwise.
+     * @return DT_TRUE if the unit test is enable memory Profiling, DT_FALSE otherwise.
      */
-    MI_BOOL IsMemProfiling() const
+    DT_BOOL IsMemProfiling() const
     {
         return (m_enable_mem_profiling > 0);
     }
@@ -384,7 +384,7 @@ private:
     /**
      * @brief Private constructor for UnitTest.
      */
-    UnitTest() : m_initialized(MI_FALSE), m_ctx(MI_NULL), m_report(MI_NULL)
+    UnitTest() : m_initialized(DT_FALSE), m_ctx(DT_NULL), m_report(DT_NULL)
     {}
 
     /**
@@ -398,12 +398,12 @@ private:
     AURA_DISABLE_COPY_AND_ASSIGN(UnitTest);
 
 private:
-    MI_BOOL m_initialized;                                                  /*!< Flag indicating whether the unit test is initialized. */
+    DT_BOOL m_initialized;                                                  /*!< Flag indicating whether the unit test is initialized. */
     Context *m_ctx;                                                         /*!< Pointer to the Context instance. */
     std::string m_data_path;                                                /*!< The path to test data. */
     std::string m_dump_path;                                                /*!< The dump path of test result. */
-    MI_S32 m_stress_count;                                                  /*!< The stress count for the unit test. */
-    MI_S32 m_enable_mem_profiling;                                          /*!< The memory profiling flag for the unit test. */
+    DT_S32 m_stress_count;                                                  /*!< The stress count for the unit test. */
+    DT_S32 m_enable_mem_profiling;                                          /*!< The memory profiling flag for the unit test. */
     std::shared_ptr<UnitTestReport> m_report;                               /*!< Shared pointer to the UnitTestReport instance. */
     std::unordered_map<std::string, std::shared_ptr<TestCase>> m_case_map;  /*!< Map of test case names to test cases. */
 
@@ -446,7 +446,7 @@ private:
         virtual ~TESTCASE_NAME(module_name, interface_name, impl_name)()                                                \
         {};                                                                                                             \
                                                                                                                         \
-        virtual AURA_VOID Run() override;                                                                                 \
+        virtual DT_VOID Run() override;                                                                                 \
                                                                                                                         \
     private:                                                                                                            \
         static const std::shared_ptr<aura::TestCase> m_case;                                                            \
@@ -457,7 +457,7 @@ private:
                 new TESTCASE_NAME(module_name, interface_name, impl_name)(#module_name, #interface_name, #impl_name)),  \
                     #module_name, #interface_name, #impl_name);                                                         \
                                                                                                                         \
-    AURA_VOID TESTCASE_NAME(module_name, interface_name, impl_name)::Run()
+    DT_VOID TESTCASE_NAME(module_name, interface_name, impl_name)::Run()
 
 /**
  * @brief Macro to create and register a new test case with a single argument (test_case_name).

@@ -38,7 +38,7 @@ namespace aura
  * @param token The token to wait for.
  */
 template<typename Tp>
-AURA_VOID WaitTokens(Tp &&token)
+DT_VOID WaitTokens(Tp &&token)
 {
     if (token.valid())
     {
@@ -58,7 +58,7 @@ AURA_VOID WaitTokens(Tp &&token)
  * @param tokens The rest of the tokens.
  */
 template<typename Tp0, typename ...Tp1>
-AURA_VOID WaitTokens(Tp0 &&token, Tp1 &&...tokens)
+DT_VOID WaitTokens(Tp0 &&token, Tp1 &&...tokens)
 {
     WaitTokens(token);
     WaitTokens(tokens...);
@@ -72,7 +72,7 @@ AURA_VOID WaitTokens(Tp0 &&token, Tp1 &&...tokens)
  * @param tokens The vector of tokens to wait for.
  */
 template<typename Tp>
-AURA_VOID WaitTokens(std::vector<Tp> &tokens)
+DT_VOID WaitTokens(std::vector<Tp> &tokens)
 {
     for (auto &token : tokens)
     {
@@ -109,7 +109,7 @@ public:
      * @param async_threads Number of threads for asynchronous task in the pool.
      */
     WorkerPool(Context *ctx, const std::string &tag = AURA_TAG, CpuAffinity compute_affinity = CpuAffinity::ALL,
-               CpuAffinity async_affinity = CpuAffinity::ALL, MI_S32 compute_threads = 0, MI_S32 async_threads = 0);
+               CpuAffinity async_affinity = CpuAffinity::ALL, DT_S32 compute_threads = 0, DT_S32 async_threads = 0);
 
     /**
      * @brief Destructor for WorkerPool to terminates all threads and stops the worker pool.
@@ -181,21 +181,21 @@ public:
      *
      * @return The number of compute threads.
      */
-    MI_S32 GetComputeThreadNum() {return m_compute_threads.size() + 1;}
+    DT_S32 GetComputeThreadNum() {return m_compute_threads.size() + 1;}
 
     /**
      * @brief Gets the number of asynchronous threads in the worker pool.
      *
      * @return The number of asynchronous threads.
      */
-    MI_S32 GetAsyncThreadNum() {return m_async_threads.size();}
+    DT_S32 GetAsyncThreadNum() {return m_async_threads.size();}
 
     /**
      * @brief Gets the index of the current thread in the compute thread pool.
      *
      * @return The index of the current thread in the compute thread pool.
      */
-    MI_S32 GetComputeThreadIdx()
+    DT_S32 GetComputeThreadIdx()
     {
         auto search = m_compute_tid_map.find(std::this_thread::get_id());
         if (search != m_compute_tid_map.end())
@@ -229,9 +229,9 @@ public:
         return ids;
     }
 #else  // AURA_BUILD_XPLORER
-    std::vector<MI_S32> GetComputeThreadIDs()
+    std::vector<DT_S32> GetComputeThreadIDs()
     {
-        std::vector<MI_S32> ids;
+        std::vector<DT_S32> ids;
 
         ids.push_back(0);
         return ids;
@@ -243,7 +243,7 @@ public:
      *
      * @return The index of the current thread in the asynchronous thread pool.
      */
-    MI_S32 GetAsyncThreadIdx()
+    DT_S32 GetAsyncThreadIdx()
     {
         auto search = m_async_tid_map.find(std::this_thread::get_id());
         if (search != m_async_tid_map.end())
@@ -259,7 +259,7 @@ public:
     /**
      * @brief Send a stop signal to awaken all threads in preparation for exiting the thread callback function.
      */
-    AURA_VOID Stop();
+    DT_VOID Stop();
 
 private:
     /**
@@ -271,31 +271,31 @@ private:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
     */
-    Status SetThreadName(const std::string &tag, MI_CHAR type, MI_S32 idx);
+    Status SetThreadName(const std::string &tag, DT_CHAR type, DT_S32 idx);
 
     /**
      * @brief Function to be executed by asynchronous threads.
      *
      * @param async_affinity CPU affinity for asynchronous threads.
      */
-    AURA_VOID AsyncThreadRun(CpuAffinity async_affinity);
+    DT_VOID AsyncThreadRun(CpuAffinity async_affinity);
 
     /**
      * @brief Function to be executed by compute threads.
      *
      * @param compute_affinity CPU affinity for compute threads.
      */
-    AURA_VOID ComputeThreadRun(CpuAffinity compute_affinity);
+    DT_VOID ComputeThreadRun(CpuAffinity compute_affinity);
 
     /**
      * @brief Check if compute threads are available.
      */
-    AURA_VOID CheckComputeThreads();
+    DT_VOID CheckComputeThreads();
 
     /**
      * @brief Check if asynchronous threads are available.
      */
-    AURA_VOID CheckAsyncThreads();
+    DT_VOID CheckAsyncThreads();
 
 public:
     /**
@@ -340,20 +340,20 @@ private:
     CpuAffinity                       m_async_affinity;       /*!< CPU affinity for asynchronous threads. */
     std::atomic_bool                  m_stopped;              /*!< Atomic flag to indicate whether the worker pool has been stopped. */
     std::atomic_size_t                m_async_running_count;  /*!< Atomic counter for the number of running asynchronous tasks. */
-    MI_S32                            m_max_compute_threads;  /*!< Maximum number of compute threads. */
-    MI_S32                            m_max_async_threads;    /*!< Maximum number of asynchronous threads. */
+    DT_S32                            m_max_compute_threads;  /*!< Maximum number of compute threads. */
+    DT_S32                            m_max_async_threads;    /*!< Maximum number of asynchronous threads. */
 
     std::mutex                        m_async_mutex;          /*!< Mutex for synchronizing access to the asynchronous task queue. */
-    std::atomic<MI_S32>               m_async_thread_idx;     /*!< Atomic index for tracking asynchronous thread indices. */
+    std::atomic<DT_S32>               m_async_thread_idx;     /*!< Atomic index for tracking asynchronous thread indices. */
     std::condition_variable           m_async_wait_cv;        /*!< Condition variable for asynchronous thread synchronization. */
     std::vector<std::thread>          m_async_threads;        /*!< Vector of asynchronous threads. */
-    std::map<std::thread::id, MI_S32> m_async_tid_map;        /*!< Map to store thread IDs and their corresponding asynchronous thread indices. */
+    std::map<std::thread::id, DT_S32> m_async_tid_map;        /*!< Map to store thread IDs and their corresponding asynchronous thread indices. */
 
     std::mutex                        m_compute_mutex;        /*!< Mutex for synchronizing access to the compute task queue. */
-    std::atomic<MI_S32>               m_compute_thread_idx;   /*!< Atomic index for tracking compute thread indices. */
+    std::atomic<DT_S32>               m_compute_thread_idx;   /*!< Atomic index for tracking compute thread indices. */
     std::condition_variable           m_compute_wait_cv;      /*!< Condition variable for compute thread synchronization. */
     std::vector<std::thread>          m_compute_threads;      /*!< Vector of compute threads. */
-    std::map<std::thread::id, MI_S32> m_compute_tid_map;      /*!< Map to store thread IDs and their corresponding compute thread indices. */
+    std::map<std::thread::id, DT_S32> m_compute_tid_map;      /*!< Map to store thread IDs and their corresponding compute thread indices. */
 
     std::list<ThreadTask>             m_async_task_list;      /*!< List for asynchronous tasks. */
     std::list<ThreadTask>             m_compute_task_list;    /*!< List for compute tasks. */
@@ -361,69 +361,69 @@ private:
 
 struct WorkerPool::ThreadTask
 {
-    ThreadTask(std::function<AURA_VOID()> &&f) : func(std::move(f))
+    ThreadTask(std::function<DT_VOID()> &&f) : func(std::move(f))
     {
         tid = std::this_thread::get_id();
     }
 
-    ThreadTask(const std::thread::id &thread_id, std::function<AURA_VOID(AURA_VOID)> &&f) :
+    ThreadTask(const std::thread::id &thread_id, std::function<DT_VOID(DT_VOID)> &&f) :
                tid(thread_id), func(std::move(f))
     {}
 
     std::thread::id          tid;
-    std::function<AURA_VOID()> func;
+    std::function<DT_VOID()> func;
 };
 
 class WorkerPool::AtomicQueue
 {
 public:
-    AtomicQueue(MI_S32 head, MI_S32 tail): m_head_idx(head), m_tail_idx(tail) {};
+    AtomicQueue(DT_S32 head, DT_S32 tail): m_head_idx(head), m_tail_idx(tail) {};
 
-    MI_BOOL Pop(MI_S32 &start_row, MI_S32 &end_row)
+    DT_BOOL Pop(DT_S32 &start_row, DT_S32 &end_row)
     {
-        MI_S32 head = m_head_idx.fetch_add(1);
+        DT_S32 head = m_head_idx.fetch_add(1);
 
         if (head >= m_tail_idx.load())
         {
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         start_row = head;
         end_row   = Min(head + 1, m_tail_idx.load());
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
-    MI_BOOL PopChunk(MI_S32 &start_row, MI_S32 &end_row)
+    DT_BOOL PopChunk(DT_S32 &start_row, DT_S32 &end_row)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        MI_S32 tail = m_tail_idx.load();
-        MI_S32 head = m_head_idx.load();
-        MI_S32 steal_num = ((tail - head) + 1) / 2;
+        DT_S32 tail = m_tail_idx.load();
+        DT_S32 head = m_head_idx.load();
+        DT_S32 steal_num = ((tail - head) + 1) / 2;
         if (steal_num <= 0)
         {
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         head = m_head_idx.fetch_add(steal_num);
         if (head >= tail)
         {
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         start_row = head;
         end_row   = Min(head + steal_num, tail);
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
-    MI_BOOL IsEmpty()
+    DT_BOOL IsEmpty()
     {
         return m_head_idx.load() >= m_tail_idx.load();
     }
 
 public:
-    alignas(128) std::atomic<MI_S32> m_head_idx;
-    alignas(128) std::atomic<MI_S32> m_tail_idx;
+    alignas(128) std::atomic<DT_S32> m_head_idx;
+    alignas(128) std::atomic<DT_S32> m_tail_idx;
     std::mutex m_mutex;
 };
 
@@ -431,27 +431,27 @@ template <typename FuncType, typename ...ArgsType>
 class WorkerPool::WaveFrontHelper
 {
 public:
-    WaveFrontHelper(FuncType &&f, MI_S32 h, MI_S32 w) : m_f(std::forward<FuncType>(f)), m_h(h), m_w(w)
+    WaveFrontHelper(FuncType &&f, DT_S32 h, DT_S32 w) : m_f(std::forward<FuncType>(f)), m_h(h), m_w(w)
     {
         if ((w > 0) && (h > 0))
         {
             m_counters.resize(h * w);
-            for (MI_S32 row = 0; row < h; row++)
+            for (DT_S32 row = 0; row < h; row++)
             {
-                for (MI_S32 col = 0; col < w; col++)
+                for (DT_S32 col = 0; col < w; col++)
                 {
-                    m_counters[row * w + col] = static_cast<MI_U8>(row > 0) + 
-                                                static_cast<MI_U8>(col > 0);
+                    m_counters[row * w + col] = static_cast<DT_U8>(row > 0) + 
+                                                static_cast<DT_U8>(col > 0);
                 }
             }
         }
 
-        m_task_finished = MI_FALSE;
-        m_task_failed   = MI_FALSE;
+        m_task_finished = DT_FALSE;
+        m_task_failed   = DT_FALSE;
     }
 
     Status operator()(WorkerPool *wp, std::vector<std::shared_future<Status>> &tokens,
-                      MI_S32 row, MI_S32 col, ArgsType &&...args)
+                      DT_S32 row, DT_S32 col, ArgsType &&...args)
     {
         if ((m_task_failed) || (row > m_h - 1) || (col > m_w - 1))
         {
@@ -461,14 +461,14 @@ public:
         Status ret = m_f(std::forward<ArgsType>(args)..., row, col);
         if (ret != Status::OK)
         {
-            m_task_failed = MI_TRUE;
+            m_task_failed = DT_TRUE;
             return ret;
         }
 
-        while (MI_TRUE)
+        while (DT_TRUE)
         {
-            MI_BOOL to_east  = MI_FALSE;
-            MI_BOOL to_south = MI_FALSE;
+            DT_BOOL to_east  = DT_FALSE;
+            DT_BOOL to_south = DT_FALSE;
 
             {
                 std::unique_lock<std::mutex> lock(m_mutex);
@@ -483,7 +483,7 @@ public:
                 ret = m_f(std::forward<ArgsType>(args)..., row, col + 1);
                 if (ret != Status::OK)
                 {
-                    m_task_failed = MI_TRUE;
+                    m_task_failed = DT_TRUE;
                     return ret;
                 }
 
@@ -494,7 +494,7 @@ public:
                 ret = m_f(std::forward<ArgsType>(args)..., row + 1, col);
                 if (ret != Status::OK)
                 {
-                    m_task_failed = MI_TRUE;
+                    m_task_failed = DT_TRUE;
                     return ret;
                 }
 
@@ -505,7 +505,7 @@ public:
                 ret = m_f(std::forward<ArgsType>(args)..., row, col + 1);
                 if (ret != Status::OK)
                 {
-                    m_task_failed = MI_TRUE;
+                    m_task_failed = DT_TRUE;
                     return ret;
                 }
 
@@ -520,21 +520,21 @@ public:
         // last task done
         if ((row == (m_h - 1)) && (col == (m_w - 1)))
         {
-            m_task_finished = MI_TRUE;
+            m_task_finished = DT_TRUE;
         }
 
         return ret;
     }
 
 public:
-    MI_BOOL m_task_finished;
-    MI_BOOL m_task_failed;
+    DT_BOOL m_task_finished;
+    DT_BOOL m_task_failed;
 
 private:
     FuncType           m_f;
-    MI_S32             m_h;
-    MI_S32             m_w;
-    std::vector<MI_U8> m_counters;
+    DT_S32             m_h;
+    DT_S32             m_w;
+    std::vector<DT_U8> m_counters;
     std::mutex         m_mutex;
 };
 
@@ -566,15 +566,15 @@ Status WorkerPool::ParallelFor(RangeType start, RangeType end, FuncType &&f, Arg
     }
 
     std::vector<std::shared_future<RetType>> tokens;
-    std::atomic_bool task_failed(MI_FALSE);
+    std::atomic_bool task_failed(DT_FALSE);
 
     auto functor = std::bind(std::forward<FuncType>(f), std::forward<ArgsType>(args)..., std::placeholders::_1, std::placeholders::_2);
 
-    auto task_func = [&](std::vector<std::shared_ptr<AtomicQueue>> &wp_queue, MI_S32 thread_idx, MI_S32 thread_num) -> Status
+    auto task_func = [&](std::vector<std::shared_ptr<AtomicQueue>> &wp_queue, DT_S32 thread_idx, DT_S32 thread_num) -> Status
     {
         Status ret = Status::OK;
-        MI_S32 start_row, end_row;
-        while (MI_TRUE)
+        DT_S32 start_row, end_row;
+        while (DT_TRUE)
         {
             while(!wp_queue[thread_idx]->IsEmpty())
             {
@@ -583,9 +583,9 @@ Status WorkerPool::ParallelFor(RangeType start, RangeType end, FuncType &&f, Arg
                     ret |= functor(start_row, end_row);
                 }
             }
-            for (MI_S32 i = 0; i < thread_num; i++)
+            for (DT_S32 i = 0; i < thread_num; i++)
             {
-                MI_S32 steal_thread = (thread_idx + i + 1) % thread_num;
+                DT_S32 steal_thread = (thread_idx + i + 1) % thread_num;
                 if (!wp_queue[steal_thread]->IsEmpty())
                 {
                     if (wp_queue[steal_thread]->PopChunk(start_row, end_row)) //task stealing
@@ -607,33 +607,33 @@ Status WorkerPool::ParallelFor(RangeType start, RangeType end, FuncType &&f, Arg
 
         if (ret != Status::OK)
         {
-            task_failed = MI_TRUE;
+            task_failed = DT_TRUE;
         }
         return ret;
     };
 
-    MI_S32 thread_num = GetComputeThreadNum();
+    DT_S32 thread_num = GetComputeThreadNum();
     RangeType cur = start;
-    MI_S32 task_num_per_thread = ((end - start) + thread_num - 1) / thread_num;
+    DT_S32 task_num_per_thread = ((end - start) + thread_num - 1) / thread_num;
 
     std::vector<std::shared_ptr<AtomicQueue>> wp_queue;
-    for (MI_S32 thread_idx = 0; thread_idx < thread_num; thread_idx++)
+    for (DT_S32 thread_idx = 0; thread_idx < thread_num; thread_idx++)
     {
-        MI_S32 head = cur;
+        DT_S32 head = cur;
         cur += task_num_per_thread;
         cur = (cur > end) ? end : cur;
-        MI_S32 tail = cur;
+        DT_S32 tail = cur;
         wp_queue.emplace_back(std::make_shared<AtomicQueue>(head, tail));
     }
 
-    for (MI_S32 thread_idx = 0; thread_idx < thread_num; thread_idx++)
+    for (DT_S32 thread_idx = 0; thread_idx < thread_num; thread_idx++)
     {
         tokens.emplace_back(this->AddTask(TaskType::COMPUTE_TASK, task_func, wp_queue, thread_idx, thread_num));
     }
 
-    while (MI_TRUE)
+    while (DT_TRUE)
     {
-        std::function<AURA_VOID()> task;
+        std::function<DT_VOID()> task;
 
         {
             std::unique_lock<std::mutex> lock(m_compute_mutex);
@@ -704,9 +704,9 @@ Status WorkerPool::WaveFront(RangeType h, RangeType w, FuncType &&f, ArgsType &&
     tokens.emplace_back(this->AddTask(TaskType::COMPUTE_TASK, std::ref(task_helper),
                         this, tokens, 0, 0, std::forward<ArgsType>(args)...));
 
-    while (MI_TRUE)
+    while (DT_TRUE)
     {
-        std::function<AURA_VOID()> task;
+        std::function<DT_VOID()> task;
 
         {
             std::unique_lock<std::mutex> lock(m_compute_mutex);

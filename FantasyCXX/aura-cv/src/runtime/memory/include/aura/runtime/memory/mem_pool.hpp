@@ -105,8 +105,8 @@ public:
      * 
      * @return A pointer to the allocated memory.
      */
-    AURA_VOID* Allocate(MI_S32 type, MI_S64 size, MI_S32 align,
-                      const MI_CHAR *file, const MI_CHAR *func, MI_S32 line);
+    DT_VOID* Allocate(DT_S32 type, DT_S64 size, DT_S32 align,
+                      const DT_CHAR *file, const DT_CHAR *func, DT_S32 line);
 
     /**
      * @brief Free memory allocated by the memory pool.
@@ -115,7 +115,7 @@ public:
      * 
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status Free(AURA_VOID *ptr);
+    Status Free(DT_VOID *ptr);
 
     /**
      * @brief Map a buffer for access.
@@ -142,7 +142,7 @@ public:
      * 
      * @return The Buffer instance.
      */
-    Buffer GetBuffer(AURA_VOID *ptr);
+    Buffer GetBuffer(DT_VOID *ptr);
 
     /**
      * @brief Register an allocator into memory pool.
@@ -152,7 +152,7 @@ public:
      * 
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status RegisterAllocator(MI_S32 type, Allocator *allocator);
+    Status RegisterAllocator(DT_S32 type, Allocator *allocator);
 
     /**
      * @brief Unregister an allocator from the memory pool.
@@ -161,7 +161,7 @@ public:
      * 
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status UnregisterAllocator(MI_S32 type);
+    Status UnregisterAllocator(DT_S32 type);
 
     /**
      * @brief Get the allocator associated with a type.
@@ -170,33 +170,33 @@ public:
      * 
      * @return A pointer to the allocator.
      */
-    Allocator* GetAllocator(MI_S32 type);
+    Allocator* GetAllocator(DT_S32 type);
 
     /**
      * @brief Enable or disable memory tracing.
      *
-     * @param enable `MI_TRUE` to enable memory tracing, `MI_FALSE` to disable.
+     * @param enable `DT_TRUE` to enable memory tracing, `DT_FALSE` to disable.
      */
-    AURA_VOID MemTraceSet(MI_BOOL enable);
+    DT_VOID MemTraceSet(DT_BOOL enable);
 
     /**
      * @brief Begin a memory trace with a specific tag.
      *
      * @param tag The tag for the memory trace.
      */
-    AURA_VOID MemTraceBegin(const std::string &tag);
+    DT_VOID MemTraceBegin(const std::string &tag);
 
     /**
      * @brief End a memory trace with a specific tag.
      *
      * @param tag The tag for the memory trace.
      */
-    AURA_VOID MemTraceEnd(const std::string &tag);
+    DT_VOID MemTraceEnd(const std::string &tag);
 
     /**
      * @brief Clear all memory traces.
      */
-    AURA_VOID MemTraceClear();
+    DT_VOID MemTraceClear();
 
     /**
      * @brief Generate a memory trace report.
@@ -223,14 +223,14 @@ private:
  * 
  * @return A pointer to the allocated memory.
  */
-AURA_INLINE AURA_VOID* AllocateInternal(Context *ctx, MI_S32 type, MI_S64 size, MI_S32 align,
-                                      const MI_CHAR *file, const MI_CHAR *func, MI_S32 line)
+AURA_INLINE DT_VOID* AllocateInternal(Context *ctx, DT_S32 type, DT_S64 size, DT_S32 align,
+                                      const DT_CHAR *file, const DT_CHAR *func, DT_S32 line)
 {
     if (ctx && ctx->GetMemPool())
     {
         return (ctx)->GetMemPool()->Allocate(type, size, align, file, func, line);
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 /**
@@ -241,9 +241,9 @@ AURA_INLINE AURA_VOID* AllocateInternal(Context *ctx, MI_S32 type, MI_S64 size, 
  * 
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
-AURA_INLINE Status FreeInternal(Context *ctx, AURA_VOID *ptr)
+AURA_INLINE Status FreeInternal(Context *ctx, DT_VOID *ptr)
 {
-    if (MI_NULL == ptr)
+    if (DT_NULL == ptr)
     {
         return Status::OK;
     }
@@ -269,11 +269,11 @@ AURA_INLINE Status FreeInternal(Context *ctx, AURA_VOID *ptr)
 template <typename Tp, typename ...ArgsType>
 AURA_INLINE Tp* Create(Context *ctx, ArgsType &&...args)
 {
-    Tp *ptr = MI_NULL;
+    Tp *ptr = DT_NULL;
     if (ctx)
     {
-        AURA_VOID *buffer = AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, sizeof(Tp), 0);
-        if (buffer != MI_NULL)
+        DT_VOID *buffer = AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, sizeof(Tp), 0);
+        if (buffer != DT_NULL)
         {
             ptr = new(buffer) Tp(ctx, std::forward<ArgsType>(args)...);
         }
@@ -291,13 +291,13 @@ AURA_INLINE Tp* Create(Context *ctx, ArgsType &&...args)
  * @param ptr A pointer to the instance to delete.
  */
 template <typename Tp>
-AURA_INLINE AURA_VOID Delete(Context *ctx, Tp **ptr)
+AURA_INLINE DT_VOID Delete(Context *ctx, Tp **ptr)
 {
-    if (ctx != MI_NULL && ptr != MI_NULL && *ptr != MI_NULL)
+    if (ctx != DT_NULL && ptr != DT_NULL && *ptr != DT_NULL)
     {
         (*ptr)->~Tp();
         AURA_FREE(ctx, *ptr);
-        *ptr = MI_NULL;
+        *ptr = DT_NULL;
     }
 }
 

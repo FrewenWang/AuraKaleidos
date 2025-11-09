@@ -35,7 +35,7 @@ static CannyPixelParam::TupleTable g_canny_pixel_table_none
 
     // l2_gradient
     {
-        MI_FALSE, MI_TRUE,
+        DT_FALSE, DT_TRUE,
     },
 
     // target
@@ -77,7 +77,7 @@ static CannyGradientParam::TupleTable g_canny_gradient_table_none
 
     // l2_gradient
     {
-        MI_FALSE, MI_TRUE,
+        DT_FALSE, DT_TRUE,
     },
 
     // target

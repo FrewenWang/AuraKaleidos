@@ -22,7 +22,7 @@ struct SobelTestParam
     SobelTestParam()
     {}
 
-    SobelTestParam(MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_F32 scale) : dx(dx), dy(dy), ksize(ksize), scale(scale)
+    SobelTestParam(DT_S32 dx, DT_S32 dy, DT_S32 ksize, DT_F32 scale) : dx(dx), dy(dy), ksize(ksize), scale(scale)
     {}
 
     friend std::ostream& operator<<(std::ostream &os, const SobelTestParam &sobel_test_param)
@@ -39,10 +39,10 @@ struct SobelTestParam
         return sstream.str();
     }
 
-    MI_S32 dx;
-    MI_S32 dy;
-    MI_S32 ksize;
-    MI_F32 scale;
+    DT_S32 dx;
+    DT_S32 dy;
+    DT_S32 ksize;
+    DT_F32 scale;
 };
 
 AURA_TEST_PARAM(SobelParam,
@@ -61,7 +61,7 @@ static Status CvSobel(Context *ctx, Mat &src, Mat &dst, SobelParam &param)
 
     cv::Mat src_mat = MatToOpencv(src);
     cv::Mat ref_mat = MatToOpencv(dst);
-    MI_S32 ddepth   = ElemTypeToOpencv(dst.GetElemType(), 1);
+    DT_S32 ddepth   = ElemTypeToOpencv(dst.GetElemType(), 1);
     cv::Sobel(src_mat, ref_mat, ddepth, sobel_test_param.dx, sobel_test_param.dy,
               sobel_test_param.ksize, sobel_test_param.scale, 0.f, BorderTypeToOpencv(param.border_type));
 #else
@@ -92,7 +92,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         SobelParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -114,7 +114,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         SobelParam run_param(GetParam((index)));
@@ -128,7 +128,7 @@ public:
                   sobel_test_param.ToString().c_str(), BorderTypeToString(run_param.border_type).c_str());
 
         // creat iauras
-        MI_BOOL promote_fp16 = ElemType::F16 == src_elem_type && TargetType::NONE == run_param.target.m_type;
+        DT_BOOL promote_fp16 = ElemType::F16 == src_elem_type && TargetType::NONE == run_param.target.m_type;
         ElemType ref_elem_type = promote_fp16 ? ElemType::F32 : dst_elem_type;
         Mat src = m_factory.GetDerivedMat(1.f, 0.f, src_elem_type, mat_size.m_sizes, AURA_MEM_DEFAULT, mat_size.m_strides);
         Mat dst = m_factory.GetEmptyMat(dst_elem_type, mat_size.m_sizes, AURA_MEM_DEFAULT, mat_size.m_strides);
@@ -136,12 +136,12 @@ public:
 
         Scalar border_value = Scalar(0, 0, 0, 0);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
-        MI_F64 tolerate = promote_fp16 ? 2.f : 1.f;
+        DT_F64 tolerate = promote_fp16 ? 2.f : 1.f;
 
         // run interface
         result.param  = BorderTypeToString(run_param.border_type) + " | " + sobel_test_param.ToString();

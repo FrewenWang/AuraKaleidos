@@ -5,14 +5,14 @@ namespace aura
 namespace xtensa
 {
 
-template <MI_S32 IC>
-MI_S32 CvtBgr2GrayVdspImpl(const xvTile *src, xvTile *dst, MI_BOOL swapb)
+template <DT_S32 IC>
+DT_S32 CvtBgr2GrayVdspImpl(const xvTile *src, xvTile *dst, DT_BOOL swapb)
 {
-    using u8x128xC_t = typename xtensa::MQVector<MI_U8, IC>::MVType;
+    using u8x128xC_t = typename xtensa::MQVector<DT_U8, IC>::MVType;
 
-    MI_U16 b_coeff = Bgr2GrayParam::BC;
-    MI_U16 g_coeff = Bgr2GrayParam::GC;
-    MI_U16 r_coeff = Bgr2GrayParam::RC;
+    DT_U16 b_coeff = Bgr2GrayParam::BC;
+    DT_U16 g_coeff = Bgr2GrayParam::GC;
+    DT_U16 r_coeff = Bgr2GrayParam::RC;
     if (swapb)
     {
         Swap(b_coeff, r_coeff);
@@ -22,17 +22,17 @@ MI_S32 CvtBgr2GrayVdspImpl(const xvTile *src, xvTile *dst, MI_BOOL swapb)
     xb_vec2Nx8U *__restrict vqu8_src, *__restrict vqu8_dst;
     u8x128xC_t mvqu8_src;
 
-    for (MI_S32 y = 0; y < dst->height; y++)
+    for (DT_S32 y = 0; y < dst->height; y++)
     {
-        MI_S32 src_len = src->pitch * sizeof(MI_U8);
-        MI_S32 dst_len = dst->pitch * sizeof(MI_U8);
+        DT_S32 src_len = src->pitch * sizeof(DT_U8);
+        DT_S32 dst_len = dst->pitch * sizeof(DT_U8);
 
-        MI_U8 *src_row = (MI_U8*)(src->pData) + y * src->pitch;
-        MI_U8 *dst_row = (MI_U8*)(dst->pData) + y * dst->pitch;
+        DT_U8 *src_row = (DT_U8*)(src->pData) + y * src->pitch;
+        DT_U8 *dst_row = (DT_U8*)(dst->pData) + y * dst->pitch;
 
         vqu8_src = (xb_vec2Nx8U*)(src_row);
         vqu8_dst = (xb_vec2Nx8U*)(dst_row);
-        for (MI_S32 x = 0; x < dst->width; x += AURA_VDSP_VLEN)
+        for (DT_S32 x = 0; x < dst->width; x += AURA_VDSP_VLEN)
         {
             vload(vqu8_src, mvqu8_src, src_len);
 
@@ -51,7 +51,7 @@ MI_S32 CvtBgr2GrayVdspImpl(const xvTile *src, xvTile *dst, MI_BOOL swapb)
     return AURA_XTENSA_OK;
 }
 
-MI_S32 CvtBgr2GrayVdsp(const xvTile *src, xvTile *dst, MI_BOOL swapb)
+DT_S32 CvtBgr2GrayVdsp(const xvTile *src, xvTile *dst, DT_BOOL swapb)
 {
     if (src->height != dst->height || src->width != dst->width)
     {
@@ -65,7 +65,7 @@ MI_S32 CvtBgr2GrayVdsp(const xvTile *src, xvTile *dst, MI_BOOL swapb)
         return AURA_XTENSA_ERROR;
     }
 
-    MI_S32 ret = AURA_XTENSA_ERROR;
+    DT_S32 ret = AURA_XTENSA_ERROR;
 
     switch (XV_TYPE_CHANNELS(src->type))
     {

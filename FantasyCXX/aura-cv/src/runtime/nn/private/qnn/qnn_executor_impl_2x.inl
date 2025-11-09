@@ -22,7 +22,7 @@ enum ModelError_t
 // from QnnInterfaceUtils.hpp
 struct GraphConfigInfo_t
 {
-    MI_CHAR *graph_name;
+    DT_CHAR *graph_name;
     const QnnGraph_Config_t **graph_configs;
 };
 
@@ -32,11 +32,11 @@ class QnnTensorMap;
 struct GraphInfo_t
 {
     Qnn_GraphHandle_t graph;
-    MI_CHAR           *graph_name;
+    DT_CHAR           *graph_name;
     Qnn_Tensor_t      *input_tensors;
-    MI_U32            num_input_tensors;
+    DT_U32            num_input_tensors;
     Qnn_Tensor_t      *output_tensors;
-    MI_U32            num_output_tensors;
+    DT_U32            num_output_tensors;
     QnnTensorMap      *input_tensor_map;
     QnnTensorMap      *output_tensor_map;
 };
@@ -213,12 +213,12 @@ public:
 
     Qnn_DeviceHandle_t GetDeviceHandle()
     {
-        static MI_BOOL call_once_flag = MI_FALSE;
+        static DT_BOOL call_once_flag = DT_FALSE;
 
         if (!call_once_flag)
         {
             CreateDevice();
-            call_once_flag = MI_TRUE;
+            call_once_flag = DT_TRUE;
         }
 
         return m_device_handle;
@@ -243,9 +243,9 @@ EXIT:
         return ret;
     }
 private:
-    QnnLibrary(const std::string &backend_type) : NNLibrary(), m_backend_type(backend_type), m_qnn_backend_handle(MI_NULL),
-                                                  m_qnn_sys_lib_handle(MI_NULL), m_interface(QNN_INTERFACE_VER_TYPE_INIT),
-                                                  m_system_interface(QNN_SYSTEM_INTERFACE_VER_TYPE_INIT), m_device_handle(MI_NULL)
+    QnnLibrary(const std::string &backend_type) : NNLibrary(), m_backend_type(backend_type), m_qnn_backend_handle(DT_NULL),
+                                                  m_qnn_sys_lib_handle(DT_NULL), m_interface(QNN_INTERFACE_VER_TYPE_INIT),
+                                                  m_system_interface(QNN_SYSTEM_INTERFACE_VER_TYPE_INIT), m_device_handle(DT_NULL)
     {
         if (Load() == Status::OK)
         {
@@ -282,7 +282,7 @@ private:
 
             dlerror();
             m_qnn_backend_handle = dlopen(qnn_lib_name.c_str(), RTLD_LAZY | RTLD_LOCAL);
-            if (MI_NULL == m_qnn_backend_handle)
+            if (DT_NULL == m_qnn_backend_handle)
             {
                 std::string info = "Unable to load backend, dlerror : " + std::string(dlerror());
                 AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
@@ -291,7 +291,7 @@ private:
             AURA_DLSYM_API(m_qnn_backend_handle, QnnInterface_getProviders);
 
             m_qnn_sys_lib_handle = dlopen(g_qnn_system_lib_name.c_str(), RTLD_LAZY | RTLD_LOCAL);
-            if (MI_NULL == m_qnn_sys_lib_handle)
+            if (DT_NULL == m_qnn_sys_lib_handle)
             {
                 std::string info = "Unable to load sys_backend, dlerror : " + std::string(dlerror());
                 AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
@@ -314,26 +314,26 @@ private:
     {
         Status ret = Status::OK;
 
-        if (m_qnn_backend_handle != MI_NULL)
+        if (m_qnn_backend_handle != DT_NULL)
         {
             if (dlclose(m_qnn_backend_handle) != 0)
             {
                 AURA_PRINTE(AURA_TAG, "dlclose m_qnn_backend_handle failed\n");
                 ret = Status::ERROR;
             }
-            m_qnn_backend_handle = MI_NULL;
-            QnnInterface_getProviders = MI_NULL;
+            m_qnn_backend_handle = DT_NULL;
+            QnnInterface_getProviders = DT_NULL;
         }
 
-        if (m_qnn_sys_lib_handle != MI_NULL)
+        if (m_qnn_sys_lib_handle != DT_NULL)
         {
             if (dlclose(m_qnn_sys_lib_handle) != 0)
             {
                 AURA_PRINTE(AURA_TAG, "dlclose m_qnn_sys_lib_handle failed\n");
                 ret = Status::ERROR;
             }
-            m_qnn_sys_lib_handle = MI_NULL;
-            QnnSystemInterface_getProviders = MI_NULL;
+            m_qnn_sys_lib_handle = DT_NULL;
+            QnnSystemInterface_getProviders = DT_NULL;
         }
 
         return ret;
@@ -351,10 +351,10 @@ private:
         };
 
         qurt_arch_version_t qurt_version;
-        MI_S32 ret = qurt_sysenv_get_arch_version(&qurt_version);
+        DT_S32 ret = qurt_sysenv_get_arch_version(&qurt_version);
         if (QURT_EOK == ret)
         {
-            MI_S32 cdsp_version = qurt_version.arch_version & 0xff;
+            DT_S32 cdsp_version = qurt_version.arch_version & 0xff;
             if (qnn_lib_name.count(cdsp_version))
             {
                 lib_name = qnn_lib_name[cdsp_version];
@@ -385,11 +385,11 @@ private:
             Qnn_ErrorHandle_t qnn_err = QNN_SUCCESS;
 
             //check interface_providers
-            MI_BOOL found_valid_interface = MI_FALSE;
-            MI_U32 num_providers = 0;
+            DT_BOOL found_valid_interface = DT_FALSE;
+            DT_U32 num_providers = 0;
 
-            QnnInterface_t **interface_providers = MI_NULL;
-            QnnSystemInterface_t **system_interface_providers = MI_NULL;
+            QnnInterface_t **interface_providers = DT_NULL;
+            QnnSystemInterface_t **system_interface_providers = DT_NULL;
 
             qnn_err = QnnInterface_getProviders((const QnnInterface_t ***)&interface_providers, &num_providers);
             if (qnn_err != QNN_SUCCESS)
@@ -399,15 +399,15 @@ private:
                 break;
             }
 
-            if ((MI_NULL == interface_providers) || (0 == num_providers))
+            if ((DT_NULL == interface_providers) || (0 == num_providers))
             {
                 AURA_PRINTE(AURA_TAG, "QnnInterface_getProviders failed : null interface providers received or 0 interface providers\n");
                 break;
             }
 
-            for (MI_U32 idx = 0; idx < num_providers; idx++)
+            for (DT_U32 idx = 0; idx < num_providers; idx++)
             {
-                if (MI_NULL == interface_providers[idx])
+                if (DT_NULL == interface_providers[idx])
                 {
                     AURA_PRINTE(AURA_TAG, "interface_providers[idx] is null\n");
                     break;
@@ -416,7 +416,7 @@ private:
                 if ((QNN_API_VERSION_MAJOR == interface_providers[idx]->apiVersion.coreApiVersion.major) &&
                     (QNN_API_VERSION_MINOR <= interface_providers[idx]->apiVersion.coreApiVersion.minor))
                 {
-                    found_valid_interface = MI_TRUE;
+                    found_valid_interface = DT_TRUE;
                     m_interface = interface_providers[idx]->QNN_INTERFACE_VER_NAME;
                     break;
                 }
@@ -429,7 +429,7 @@ private:
             }
 
             // check system_interface_providers
-            found_valid_interface = MI_FALSE;
+            found_valid_interface = DT_FALSE;
             num_providers = 0;
 
             qnn_err = QnnSystemInterface_getProviders((const QnnSystemInterface_t***)&system_interface_providers, &num_providers);
@@ -440,18 +440,18 @@ private:
                 break;
             }
 
-            if (MI_NULL == system_interface_providers || 0 == num_providers)
+            if (DT_NULL == system_interface_providers || 0 == num_providers)
             {
                 AURA_PRINTE(AURA_TAG, "QnnSystemInterface_getProviders failed : null interface providers received or 0 interface providers\n");
                 break;
             }
 
-            for (MI_U32 idx = 0; idx < num_providers; idx++)
+            for (DT_U32 idx = 0; idx < num_providers; idx++)
             {
                 if ((QNN_SYSTEM_API_VERSION_MAJOR == system_interface_providers[idx]->systemApiVersion.major) &&
                     (QNN_SYSTEM_API_VERSION_MINOR <= system_interface_providers[idx]->systemApiVersion.minor))
                 {
-                    found_valid_interface = MI_TRUE;
+                    found_valid_interface = DT_TRUE;
                     m_system_interface = system_interface_providers[idx]->QNN_SYSTEM_INTERFACE_VER_NAME;
                     break;
                 }
@@ -472,22 +472,22 @@ private:
     Status CreateDevice()
     {
         Qnn_ErrorHandle_t qnn_err = QNN_SUCCESS;
-        MI_BOOL device_supported = MI_TRUE;
+        DT_BOOL device_supported = DT_TRUE;
 
-        if (m_interface.propertyHasCapability != MI_NULL)
+        if (m_interface.propertyHasCapability != DT_NULL)
         {
             qnn_err = m_interface.propertyHasCapability(QNN_PROPERTY_GROUP_DEVICE);
             if (qnn_err != QNN_PROPERTY_NO_ERROR)
             {
-                device_supported = MI_FALSE;
+                device_supported = DT_FALSE;
             }
         }
 
         if (device_supported)
         {
-            if (m_interface.deviceCreate != MI_NULL)
+            if (m_interface.deviceCreate != DT_NULL)
             {
-                qnn_err = m_interface.deviceCreate(MI_NULL, MI_NULL, &m_device_handle);
+                qnn_err = m_interface.deviceCreate(DT_NULL, DT_NULL, &m_device_handle);
                 if (qnn_err != QNN_SUCCESS)
                 {
                     std::string info = std::string("Failed to create divice, err : ") + std::to_string(qnn_err);
@@ -504,7 +504,7 @@ private:
     {
         if (m_device_handle)
         {
-            if (m_interface.deviceFree != MI_NULL)
+            if (m_interface.deviceFree != DT_NULL)
             {
                 Qnn_ErrorHandle_t qnn_err = m_interface.deviceFree(m_device_handle);
                 if (qnn_err != QNN_SUCCESS)
@@ -514,22 +514,22 @@ private:
                     return Status::ERROR;
                 }
             }
-            m_device_handle = MI_NULL;
+            m_device_handle = DT_NULL;
         }
 
         return Status::OK;
     }
 
-    AURA_API_DEF(QnnInterface_getProviders) = Qnn_ErrorHandle_t(*)(const QnnInterface_t ***provider_list, MI_U32 *num_providers);
+    AURA_API_DEF(QnnInterface_getProviders) = Qnn_ErrorHandle_t(*)(const QnnInterface_t ***provider_list, DT_U32 *num_providers);
     AURA_API_PTR(QnnInterface_getProviders);
 
-    AURA_API_DEF(QnnSystemInterface_getProviders) = Qnn_ErrorHandle_t(*)(const QnnSystemInterface_t ***providerList, MI_U32 *numProviders);
+    AURA_API_DEF(QnnSystemInterface_getProviders) = Qnn_ErrorHandle_t(*)(const QnnSystemInterface_t ***providerList, DT_U32 *numProviders);
     AURA_API_PTR(QnnSystemInterface_getProviders);
 
 private:
     std::string m_backend_type;
-    AURA_VOID *m_qnn_backend_handle;
-    AURA_VOID *m_qnn_sys_lib_handle;
+    DT_VOID *m_qnn_backend_handle;
+    DT_VOID *m_qnn_sys_lib_handle;
 
     // qnn interface
     QNN_INTERFACE_VER_TYPE m_interface;
@@ -554,19 +554,19 @@ class QnnUtils
 public:
     static std::string GetBuildId(Context *ctx, QNN_INTERFACE_VER_TYPE &interface)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return "";
         }
 
-        MI_CHAR *backend_build_id = MI_NULL;
-        if (MI_NULL == interface.backendGetBuildId)
+        DT_CHAR *backend_build_id = DT_NULL;
+        if (DT_NULL == interface.backendGetBuildId)
         {
             AURA_ADD_ERROR_STRING(ctx, "m_qnn_interface.backendGetBuildId is null");
         }
         else
         {
-            Qnn_ErrorHandle_t qnn_err = interface.backendGetBuildId((const MI_CHAR **)&backend_build_id);
+            Qnn_ErrorHandle_t qnn_err = interface.backendGetBuildId((const DT_CHAR **)&backend_build_id);
             if ( qnn_err != QNN_SUCCESS)
             {
                 std::string info = "Unable to get build id from the backend, err : " + std::to_string(qnn_err);
@@ -574,17 +574,17 @@ public:
             }
         }
 
-        return (MI_NULL == backend_build_id) ? "" : std::string(backend_build_id);
+        return (DT_NULL == backend_build_id) ? "" : std::string(backend_build_id);
     }
 
     static Status CreateLogHandle(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, Qnn_LogHandle_t &log_handle, const NNLogLevel &log_level)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        Qnn_ErrorHandle_t qnn_err = interface.logCreate(MI_NULL, GetQnnLogLevel(log_level), &log_handle);
+        Qnn_ErrorHandle_t qnn_err = interface.logCreate(DT_NULL, GetQnnLogLevel(log_level), &log_handle);
         if (qnn_err != QNN_SUCCESS)
         {
             std::string info = "Unable to initialize logging in the backend, err : " + std::to_string(qnn_err);
@@ -597,7 +597,7 @@ public:
 
     static Status DeleteLogHandle(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, Qnn_LogHandle_t &log_handle)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -611,7 +611,7 @@ public:
                 AURA_ADD_ERROR_STRING(ctx, info.c_str());
                 return Status::ERROR;
             }
-            log_handle = MI_NULL;
+            log_handle = DT_NULL;
         }
 
         return Status::OK;
@@ -619,12 +619,12 @@ public:
 
     static Status CreateBackend(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, const Qnn_LogHandle_t &log_handle, Qnn_BackendHandle_t &backend_handle)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        QnnBackend_Config_t **backend_config = MI_NULL;
+        QnnBackend_Config_t **backend_config = DT_NULL;
 
         // create a QnnBackend.
         Qnn_ErrorHandle_t qnn_err = interface.backendCreate(log_handle, (const QnnBackend_Config_t **)backend_config, &backend_handle);
@@ -640,7 +640,7 @@ public:
 
     static Status DeleteBackend(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, Qnn_BackendHandle_t &backend_handle)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -654,7 +654,7 @@ public:
                 AURA_ADD_ERROR_STRING(ctx, info.c_str());
                 return Status::ERROR;
             }
-            backend_handle = MI_NULL;
+            backend_handle = DT_NULL;
         }
 
         return Status::OK;
@@ -662,7 +662,7 @@ public:
 
     static Status CreateProfiler(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, const Qnn_BackendHandle_t &backend_handle, const NNProfilingLevel &profiling_level, Qnn_ProfileHandle_t &profile_handle)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -685,7 +685,7 @@ public:
 
     static Status DeleteProfiler(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, Qnn_ProfileHandle_t &profile_handle)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -699,23 +699,23 @@ public:
                 AURA_ADD_ERROR_STRING(ctx, info.c_str());
                 return Status::ERROR;
             }
-            profile_handle = MI_NULL;
+            profile_handle = DT_NULL;
         }
 
         return Status::OK;
     }
 
     static Status CreatePowerConfigId(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, const std::string &backend_type,
-                                      QnnHtpDevice_PerfInfrastructure_t &perf_infra, MI_U32 &power_config_id)
+                                      QnnHtpDevice_PerfInfrastructure_t &perf_infra, DT_U32 &power_config_id)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
         if ("npu" == backend_type)
         {
-            QnnDevice_Infrastructure_t device_infra = MI_NULL;
+            QnnDevice_Infrastructure_t device_infra = DT_NULL;
 
             Qnn_ErrorHandle_t qnn_err = interface.deviceGetInfrastructure(&device_infra);
             if (qnn_err != QNN_SUCCESS)
@@ -728,8 +728,8 @@ public:
             QnnHtpDevice_Infrastructure_t *htp_infra = static_cast<QnnHtpDevice_Infrastructure_t *>(device_infra);
             perf_infra = htp_infra->perfInfra;
 
-            MI_U32 device_id = 0;
-            MI_U32 core_id = 0;
+            DT_U32 device_id = 0;
+            DT_U32 core_id = 0;
 
             qnn_err = perf_infra.createPowerConfigId(device_id, core_id, &power_config_id);
             if (qnn_err != QNN_SUCCESS)
@@ -743,9 +743,9 @@ public:
         return Status::OK;
     }
 
-    static Status SetMemStepSize(Context *ctx, const QnnHtpDevice_PerfInfrastructure_t &perf_infra, MI_S32 mem_step_size)
+    static Status SetMemStepSize(Context *ctx, const QnnHtpDevice_PerfInfrastructure_t &perf_infra, DT_S32 mem_step_size)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -772,9 +772,9 @@ public:
         return Status::OK;
     }
 
-    static Status DeletePowerConfigId(Context *ctx, MI_U32 &power_config_id, const QnnHtpDevice_PerfInfrastructure_t &perf_infra)
+    static Status DeletePowerConfigId(Context *ctx, DT_U32 &power_config_id, const QnnHtpDevice_PerfInfrastructure_t &perf_infra)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -796,7 +796,7 @@ public:
 
     static Status RegisterOpPackages(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, const Qnn_BackendHandle_t &backend_handle, const std::string &udo_lib)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -806,7 +806,7 @@ public:
             return Status::OK;
         }
 
-        if (MI_NULL == interface.backendRegisterOpPackage)
+        if (DT_NULL == interface.backendRegisterOpPackage)
         {
             AURA_ADD_ERROR_STRING(ctx, "backendRegisterOpPackage is null");
             return Status::ERROR;
@@ -820,7 +820,7 @@ public:
             std::vector<std::string> udo_info;
             udo_info = NNSplit(udo_str, ':');
 
-            const MI_CHAR *target = MI_NULL;
+            const DT_CHAR *target = DT_NULL;
 
             if (udo_info.size() == 3)
             {
@@ -833,7 +833,7 @@ public:
                 return Status::ERROR;
             }
 
-            Qnn_ErrorHandle_t qnn_err = interface.backendRegisterOpPackage(backend_handle, (MI_CHAR *)udo_info[0].c_str(), (MI_CHAR *)udo_info[1].c_str(), target);
+            Qnn_ErrorHandle_t qnn_err = interface.backendRegisterOpPackage(backend_handle, (DT_CHAR *)udo_info[0].c_str(), (DT_CHAR *)udo_info[1].c_str(), target);
             if (qnn_err != QNN_BACKEND_NO_ERROR)
             {
                 std::string info = "register op package failed, err : " + std::to_string(qnn_err) + " Package lib: " + udo_info[0] + " interface Provider: " + udo_info[1];
@@ -847,7 +847,7 @@ public:
 
     static Status DeleteContext(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, const Qnn_ProfileHandle_t &profile_handle, Qnn_ContextHandle_t &context_handle)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -861,7 +861,7 @@ public:
                 AURA_ADD_ERROR_STRING(ctx, info.c_str());
                 return Status::ERROR;
             }
-            context_handle = MI_NULL;
+            context_handle = DT_NULL;
         }
 
         return Status::OK;
@@ -870,27 +870,27 @@ public:
     static Status CreateGraphsFromBinary(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, const QNN_SYSTEM_INTERFACE_VER_TYPE &system_interface,
                                          const Buffer &binary_buffer, const Qnn_BackendHandle_t &backend_handle, const Qnn_DeviceHandle_t &device_handle,
                                          const Qnn_ProfileHandle_t &profile_handle, Qnn_ContextHandle_t &context_handle, GraphInfoPtr_t **graphs_info_ptr,
-                                         MI_U32 &graphs_count, std::vector<MI_S8> &graph_ids, MI_S32 budget)
+                                         DT_U32 &graphs_count, std::vector<DT_S8> &graph_ids, DT_S32 budget)
     {
         AURA_UNUSED(graph_ids);
         AURA_UNUSED(budget);
 
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
         // generate context and graph
-        if (MI_NULL == system_interface.systemContextCreate ||
-            MI_NULL == system_interface.systemContextGetBinaryInfo ||
-            MI_NULL == system_interface.systemContextFree)
+        if (DT_NULL == system_interface.systemContextCreate ||
+            DT_NULL == system_interface.systemContextGetBinaryInfo ||
+            DT_NULL == system_interface.systemContextFree)
         {
             AURA_ADD_ERROR_STRING(ctx, "Qnn System function pointers are not populated.");
             return Status::ERROR;
         }
 
         Status ret = Status::ERROR;
-        QnnSystemContext_Handle_t sys_ctx_handle = MI_NULL;
+        QnnSystemContext_Handle_t sys_ctx_handle = DT_NULL;
 
         Qnn_ErrorHandle_t qnn_err = system_interface.systemContextCreate(&sys_ctx_handle);
         if (qnn_err != QNN_SUCCESS)
@@ -900,7 +900,7 @@ public:
             return ret;
         }
 
-        const QnnSystemContext_BinaryInfo_t *binary_info = MI_NULL;
+        const QnnSystemContext_BinaryInfo_t *binary_info = DT_NULL;
         Qnn_ContextBinarySize_t binary_info_size = 0;
 
         std::vector<QnnContext_Config_t *> cfg;
@@ -909,7 +909,7 @@ public:
         QnnContext_Config_t enable_graphs_config;
         QnnContext_Config_t weight_sharing_config;
         QnnHtpContext_CustomConfig_t weight_sharing_enabled;
-        std::vector<const MI_CHAR*> graphs_nams;
+        std::vector<const DT_CHAR*> graphs_nams;
 #endif
 
 // qnn 2.19.0 -> qnn API version 2.13.0
@@ -918,7 +918,7 @@ public:
         QnnHtpContext_CustomConfig_t file_read_memory_budget;
 #endif
 
-        std::unordered_set<MI_S8> ids_set;
+        std::unordered_set<DT_S8> ids_set;
 
         qnn_err = system_interface.systemContextGetBinaryInfo(sys_ctx_handle, binary_buffer.m_data, binary_buffer.m_size,
                                                               &binary_info, &binary_info_size);
@@ -974,9 +974,9 @@ public:
         }
 
         system_interface.systemContextFree(sys_ctx_handle);
-        sys_ctx_handle = MI_NULL;
+        sys_ctx_handle = DT_NULL;
 
-        if (MI_NULL == interface.contextCreateFromBinary)
+        if (DT_NULL == interface.contextCreateFromBinary)
         {
             AURA_ADD_ERROR_STRING(ctx, "contextCreateFromBinary is nullptr");
             goto EXIT;
@@ -989,7 +989,7 @@ public:
             if (graphs_count > 1)
             {
                 weight_sharing_enabled.option  = QNN_HTP_CONTEXT_CONFIG_OPTION_WEIGHT_SHARING_ENABLED;
-                weight_sharing_enabled.weightSharingEnabled = MI_TRUE;
+                weight_sharing_enabled.weightSharingEnabled = DT_TRUE;
 
                 weight_sharing_config.option = QNN_CONTEXT_CONFIG_OPTION_CUSTOM;
                 weight_sharing_config.customConfig = &weight_sharing_enabled;
@@ -1000,7 +1000,7 @@ public:
         {
             enable_graphs_config.option = QNN_CONTEXT_CONFIG_ENABLE_GRAPHS;
 
-            MI_S8 max_id = -1;
+            DT_S8 max_id = -1;
             for (auto &id : graph_ids)
             {
                 if (id >= 0)
@@ -1010,20 +1010,20 @@ public:
                 }
             }
 
-            if (static_cast<MI_U32>(max_id) >= graphs_count)
+            if (static_cast<DT_U32>(max_id) >= graphs_count)
             {
                 AURA_ADD_ERROR_STRING(ctx, "invalid graph_ids");
                 goto EXIT;
             }
 
-            for (MI_U32 i = 0; i < graphs_count; i++)
+            for (DT_U32 i = 0; i < graphs_count; i++)
             {
                 if (ids_set.find(i) != ids_set.end())
                 {
                     graphs_nams.push_back((**graphs_info_ptr)[i].graph_name);
                 }
             }
-            graphs_nams.push_back(MI_NULL);
+            graphs_nams.push_back(DT_NULL);
 
             enable_graphs_config.enableGraphs = graphs_nams.data();
             cfg.push_back(&enable_graphs_config);
@@ -1031,7 +1031,7 @@ public:
             if (graphs_nams.size() > 2)
             {
                 weight_sharing_enabled.option  = QNN_HTP_CONTEXT_CONFIG_OPTION_WEIGHT_SHARING_ENABLED;
-                weight_sharing_enabled.weightSharingEnabled = MI_TRUE;
+                weight_sharing_enabled.weightSharingEnabled = DT_TRUE;
 
                 weight_sharing_config.option = QNN_CONTEXT_CONFIG_OPTION_CUSTOM;
                 weight_sharing_config.customConfig = &weight_sharing_enabled;
@@ -1054,7 +1054,7 @@ public:
         }
 #endif
 
-        cfg.push_back(MI_NULL);
+        cfg.push_back(DT_NULL);
         qnn_err = interface.contextCreateFromBinary(backend_handle, device_handle, const_cast<const QnnContext_Config_t**>(cfg.data()),
                                                     binary_buffer.m_data, binary_buffer.m_size, &context_handle, profile_handle);
         if (qnn_err != QNN_SUCCESS)
@@ -1064,13 +1064,13 @@ public:
             goto EXIT;
         }
 
-        if (MI_NULL == interface.graphRetrieve)
+        if (DT_NULL == interface.graphRetrieve)
         {
             AURA_ADD_ERROR_STRING(ctx, "graphRetrieve is null");
             goto EXIT;
         }
 
-        for (MI_U32 graph_idx = 0; graph_idx < graphs_count; graph_idx++)
+        for (DT_U32 graph_idx = 0; graph_idx < graphs_count; graph_idx++)
         {
             if (!ids_set.empty() && ids_set.find(graph_idx) == ids_set.end())
             {
@@ -1093,10 +1093,10 @@ public:
 EXIT:
         if (ret != Status::OK)
         {
-            if (sys_ctx_handle != MI_NULL)
+            if (sys_ctx_handle != DT_NULL)
             {
                 system_interface.systemContextFree(sys_ctx_handle);
-                sys_ctx_handle = MI_NULL;
+                sys_ctx_handle = DT_NULL;
             }
 
             DeinitGraphsInfo((Context *)ctx, graphs_info_ptr, graphs_count);
@@ -1107,9 +1107,9 @@ EXIT:
 
     static Status CreateGraphsFromModel(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, const Qnn_BackendHandle_t &backend_handle, const Qnn_DeviceHandle_t &device_handle,
                                         const Qnn_ProfileHandle_t &profile_handle, const ModelInterface &model_interface, const NNLogLevel &log_level,
-                                        Qnn_ContextHandle_t &context_handle, GraphInfoPtr_t **graphs_info_ptr, MI_U32 &graphs_count)
+                                        Qnn_ContextHandle_t &context_handle, GraphInfoPtr_t **graphs_info_ptr, DT_U32 &graphs_count)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -1117,7 +1117,7 @@ EXIT:
         Status ret = Status::ERROR;
 
         // create a context in a backend
-        Qnn_ErrorHandle_t qnn_err = interface.contextCreate(backend_handle, device_handle, MI_NULL, &context_handle);
+        Qnn_ErrorHandle_t qnn_err = interface.contextCreate(backend_handle, device_handle, DT_NULL, &context_handle);
         if (qnn_err != QNN_CONTEXT_NO_ERROR)
         {
             std::string info = "contextCreate failed, err : " + std::to_string(qnn_err);
@@ -1128,12 +1128,12 @@ EXIT:
         QnnLog_Level_t qnn_log_level = GetQnnLogLevel(log_level);
 
         // compose graphs
-        const GraphConfigInfo_t **graph_configs_info = MI_NULL;
-        MI_U32 graph_configs_count = 0;
-        MI_BOOL debug = MI_FALSE;
+        const GraphConfigInfo_t **graph_configs_info = DT_NULL;
+        DT_U32 graph_configs_count = 0;
+        DT_BOOL debug = DT_FALSE;
 
         ModelError_t model_status = model_interface.create_func(backend_handle, interface, context_handle, graph_configs_info, graph_configs_count,
-                                                                graphs_info_ptr, &graphs_count, debug, MI_NULL, qnn_log_level);
+                                                                graphs_info_ptr, &graphs_count, debug, DT_NULL, qnn_log_level);
         if (model_status != ModelError_t::MODEL_NO_ERROR)
         {
             std::string info = "QnnModel_composeGraphs failed, err : " + std::to_string(model_status);
@@ -1144,7 +1144,7 @@ EXIT:
         // finalize graphs
         for (size_t graph_idx = 0; graph_idx < graphs_count; graph_idx++)
         {
-            Qnn_ErrorHandle_t qnn_err = interface.graphFinalize((*(*graphs_info_ptr))[graph_idx].graph, profile_handle, MI_NULL);
+            Qnn_ErrorHandle_t qnn_err = interface.graphFinalize((*(*graphs_info_ptr))[graph_idx].graph, profile_handle, DT_NULL);
             if (qnn_err != QNN_GRAPH_NO_ERROR)
             {
                 std::string info = "graphFinalize failed, err : " + std::to_string(qnn_err);
@@ -1173,7 +1173,7 @@ EXIT:
     static Status ExtractBackendProfilingInfo(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, const Qnn_ProfileHandle_t &profile_handle,
                                               const NNProfilingLevel &profiling_level, std::string &profile_data, ProfileStage profile_stage)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -1189,8 +1189,8 @@ EXIT:
             return Status::ERROR;
         }
 
-        const QnnProfile_EventId_t *profile_events = MI_NULL;
-        MI_U32 num_events = 0;
+        const QnnProfile_EventId_t *profile_events = DT_NULL;
+        DT_U32 num_events = 0;
 
         Qnn_ErrorHandle_t qnn_err = interface.profileGetEvents(profile_handle, &profile_events, &num_events);
         if (qnn_err != QNN_PROFILE_NO_ERROR)
@@ -1216,10 +1216,10 @@ EXIT:
     }
 
     static Status SetPerformance(Context *ctx, const QnnHtpDevice_PerfInfrastructure_t &perf_infra, NNPerfLevel htp_perf_level,
-                                 NNPerfLevel hmx_perf_level, const std::string &backend_type, MI_U32 power_config_id,
+                                 NNPerfLevel hmx_perf_level, const std::string &backend_type, DT_U32 power_config_id,
                                  QnnHtpDevice_Arch_t arch)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -1334,13 +1334,13 @@ EXIT:
 
         // qnn sdk larger than 2.22.1
         // qnn can not set hmx perf on linux
-        const QnnHtpPerfInfrastructure_PowerConfig_t *power_configs[] = {&power_config, MI_NULL, MI_NULL};
+        const QnnHtpPerfInfrastructure_PowerConfig_t *power_configs[] = {&power_config, DT_NULL, DT_NULL};
 #if (((AURA_QNN_V2_MAGIC & 0xFFFF) >= 0x08AD) && !defined(AURA_BUILD_LINUX))
         QnnHtpPerfInfrastructure_PowerConfig_t power_config_hmx;
         memset(&power_config_hmx, 0, sizeof(power_config_hmx));
 
         if ((arch != QnnHtpDevice_Arch_t::QNN_HTP_DEVICE_ARCH_UNKNOWN) &&
-            (static_cast<MI_S32>(arch) >= static_cast<MI_S32>(QnnHtpDevice_Arch_t::QNN_HTP_DEVICE_ARCH_V75)))
+            (static_cast<DT_S32>(arch) >= static_cast<DT_S32>(QnnHtpDevice_Arch_t::QNN_HTP_DEVICE_ARCH_V75)))
         {
             QnnHtpPerfInfrastructure_ClkPerfMode_t clk_perf_model = QNN_HTP_PERF_INFRASTRUCTURE_CLK_PERF_HIGH;
             QnnHtpPerfInfrastructure_ExpVoltageCorner_t exp_volt_corner = DCVS_EXP_VCORNER_DISABLE;
@@ -1396,8 +1396,8 @@ EXIT:
         qnn_err = perf_infra.setPowerConfig(power_config_id, power_configs);
         if (qnn_err != QNN_SUCCESS)
         {
-            std::string info = std::string("setPowerConfig failed, htp perf level = ") + std::to_string((MI_U32)htp_perf_level) +
-                                           " hmx perf level = " + std::to_string((MI_U32)hmx_perf_level) + ", err : " + std::to_string(qnn_err);
+            std::string info = std::string("setPowerConfig failed, htp perf level = ") + std::to_string((DT_U32)htp_perf_level) +
+                                           " hmx perf level = " + std::to_string((DT_U32)hmx_perf_level) + ", err : " + std::to_string(qnn_err);
             AURA_ADD_ERROR_STRING(ctx, info.c_str());
             return Status::ERROR;
         }
@@ -1408,16 +1408,16 @@ EXIT:
 
     static Status GetGraphsBinary(Context *ctx, const QNN_INTERFACE_VER_TYPE &interface, const Qnn_ContextHandle_t &context_handle, Buffer &binary_buffer)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
         Status ret = Status::ERROR;
 
-        MI_U64 required_buffer_size = 0;
-        MI_CHAR *buffer_data = MI_NULL;
-        MI_U64 written_buffer_size = 0;
+        DT_U64 required_buffer_size = 0;
+        DT_CHAR *buffer_data = DT_NULL;
+        DT_U64 written_buffer_size = 0;
 
         Qnn_ErrorHandle_t qnn_err = interface.contextGetBinarySize(context_handle, &required_buffer_size);
         if (qnn_err != QNN_CONTEXT_NO_ERROR)
@@ -1427,16 +1427,16 @@ EXIT:
             return ret;
         }
 
-        buffer_data = (MI_CHAR *)(AURA_ALLOC(ctx, required_buffer_size));
-        if (MI_NULL == buffer_data)
+        buffer_data = (DT_CHAR *)(AURA_ALLOC(ctx, required_buffer_size));
+        if (DT_NULL == buffer_data)
         {
             std::string info = "AURA_ALLOC size " + std::to_string(required_buffer_size) + " failed";
             AURA_ADD_ERROR_STRING(ctx, info.c_str());
             goto EXIT;
         }
 
-        if (MI_NULL == interface.contextGetBinarySize ||
-            MI_NULL == interface.contextGetBinary)
+        if (DT_NULL == interface.contextGetBinarySize ||
+            DT_NULL == interface.contextGetBinary)
         {
             AURA_ADD_ERROR_STRING(ctx, "contextGetBinarySize or contextGetBinary is nullptr.");
             goto EXIT;
@@ -1468,7 +1468,7 @@ EXIT:
             if (buffer_data)
             {
                 AURA_FREE(ctx, buffer_data);
-                buffer_data = MI_NULL;
+                buffer_data = DT_NULL;
                 binary_buffer.Clear();
             }
         }
@@ -1476,26 +1476,26 @@ EXIT:
         AURA_RETURN(ctx, ret);
     }
 
-    static Status DeinitGraphsInfo(Context *ctx, GraphInfoPtr_t **graphs_info_ptr, MI_U32 graphs_count)
+    static Status DeinitGraphsInfo(Context *ctx, GraphInfoPtr_t **graphs_info_ptr, DT_U32 graphs_count)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        if (MI_NULL == *graphs_info_ptr || MI_NULL == *(*graphs_info_ptr))
+        if (DT_NULL == *graphs_info_ptr || DT_NULL == *(*graphs_info_ptr))
         {
             return Status::OK;
         }
 
         GraphInfo_t *graphs_info = *(*graphs_info_ptr);
 
-        for (MI_U32 idx = 0; idx < graphs_count; idx++)
+        for (DT_U32 idx = 0; idx < graphs_count; idx++)
         {
             if (graphs_info[idx].graph_name)
             {
                 AURA_FREE(ctx, graphs_info[idx].graph_name);
-                graphs_info[idx].graph_name = MI_NULL;
+                graphs_info[idx].graph_name = DT_NULL;
             }
 
             DeinitTensorsInfoV1(ctx, &graphs_info[idx].input_tensors, graphs_info[idx].num_input_tensors);
@@ -1520,40 +1520,40 @@ EXIT:
         if (graphs_info)
         {
             AURA_FREE(ctx, graphs_info);
-            graphs_info = MI_NULL;
-            *(*graphs_info_ptr) = MI_NULL;
+            graphs_info = DT_NULL;
+            *(*graphs_info_ptr) = DT_NULL;
         }
 
         if (*graphs_info_ptr)
         {
             AURA_FREE(ctx, *graphs_info_ptr);
-            *graphs_info_ptr = MI_NULL;
+            *graphs_info_ptr = DT_NULL;
         }
 
         return Status::OK;
     }
 
-    static Status CreateGraphsInfo(Context *ctx, GraphInfoPtr_t **src_grpahs_info_ptr, GraphInfoPtr_t **dst_grpahs_info_ptr, MI_U32 graph_count)
+    static Status CreateGraphsInfo(Context *ctx, GraphInfoPtr_t **src_grpahs_info_ptr, GraphInfoPtr_t **dst_grpahs_info_ptr, DT_U32 graph_count)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
         Status ret = Status::ERROR;
 
-        GraphInfo_t *graphs_info = MI_NULL;
+        GraphInfo_t *graphs_info = DT_NULL;
         GraphInfo_t *src_graphs_info = *(*src_grpahs_info_ptr);
 
         *dst_grpahs_info_ptr = (GraphInfoPtr_t *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, sizeof(GraphInfoPtr_t), 0);
-        if (MI_NULL == *dst_grpahs_info_ptr)
+        if (DT_NULL == *dst_grpahs_info_ptr)
         {
             AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
             goto EXIT;
         }
 
         graphs_info = (GraphInfo_t *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, graph_count * sizeof(GraphInfo_t), 0);
-        if (MI_NULL == graphs_info)
+        if (DT_NULL == graphs_info)
         {
             AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
             goto EXIT;
@@ -1561,11 +1561,11 @@ EXIT:
 
         *(*dst_grpahs_info_ptr) = graphs_info;
 
-        for (MI_U32 idx = 0; idx < graph_count; idx++)
+        for (DT_U32 idx = 0; idx < graph_count; idx++)
         {
-            graphs_info[idx].graph = MI_NULL;
-            graphs_info[idx].graph_name = (MI_CHAR *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, strlen(src_graphs_info[idx].graph_name) + 1, 0);
-            if (MI_NULL == graphs_info[idx].graph_name)
+            graphs_info[idx].graph = DT_NULL;
+            graphs_info[idx].graph_name = (DT_CHAR *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, strlen(src_graphs_info[idx].graph_name) + 1, 0);
+            if (DT_NULL == graphs_info[idx].graph_name)
             {
                 AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
                 goto EXIT;
@@ -1573,7 +1573,7 @@ EXIT:
 
             strcpy(graphs_info[idx].graph_name, src_graphs_info[idx].graph_name);
 
-            graphs_info[idx].input_tensors = MI_NULL;
+            graphs_info[idx].input_tensors = DT_NULL;
             graphs_info[idx].num_input_tensors = 0;
 
             if (src_graphs_info[idx].input_tensors)
@@ -1587,7 +1587,7 @@ EXIT:
                 graphs_info[idx].num_input_tensors = src_graphs_info[idx].num_input_tensors;
             }
 
-            graphs_info[idx].output_tensors = MI_NULL;
+            graphs_info[idx].output_tensors = DT_NULL;
             graphs_info[idx].num_output_tensors = 0;
 
             if (src_graphs_info[idx].output_tensors)
@@ -1620,14 +1620,14 @@ EXIT:
         AURA_RETURN(ctx, ret);
     }
 
-    static Status DeleteGraphsInfo(Context *ctx, GraphInfoPtr_t **graphs_info_ptr, MI_U32 graph_count)
+    static Status DeleteGraphsInfo(Context *ctx, GraphInfoPtr_t **graphs_info_ptr, DT_U32 graph_count)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        if ((MI_NULL == *graphs_info_ptr) || (MI_NULL == *(*graphs_info_ptr)))
+        if ((DT_NULL == *graphs_info_ptr) || (DT_NULL == *(*graphs_info_ptr)))
         {
             return Status::OK;
         }
@@ -1641,14 +1641,14 @@ EXIT:
         return Status::OK;
     }
 
-    static Status InitGraphsInfoV1(Context *ctx, const QnnSystemContext_GraphInfo_t *graphs_input, GraphInfoPtr_t **graphs_info_ptr, MI_U32 graphs_count)
+    static Status InitGraphsInfoV1(Context *ctx, const QnnSystemContext_GraphInfo_t *graphs_input, GraphInfoPtr_t **graphs_info_ptr, DT_U32 graphs_count)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        if (MI_NULL == graphs_input)
+        if (DT_NULL == graphs_input)
         {
             AURA_ADD_ERROR_STRING(ctx, "graphs_input is null");
             return Status::ERROR;
@@ -1656,11 +1656,11 @@ EXIT:
 
         Status ret = Status::ERROR;
 
-        GraphInfo_t *graphs_info = MI_NULL;
+        GraphInfo_t *graphs_info = DT_NULL;
 
         *graphs_info_ptr = (GraphInfoPtr_t *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, sizeof(GraphInfoPtr_t), 0);
         graphs_info = (GraphInfo_t *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, graphs_count * sizeof(GraphInfo_t), 0);
-        if ((MI_NULL == graphs_info) || (MI_NULL == *graphs_info_ptr))
+        if ((DT_NULL == graphs_info) || (DT_NULL == *graphs_info_ptr))
         {
             AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
             goto EXIT;
@@ -1668,18 +1668,18 @@ EXIT:
 
         *(*graphs_info_ptr) = graphs_info;
 
-        for (MI_U32 idx = 0; idx < graphs_count; idx++)
+        for (DT_U32 idx = 0; idx < graphs_count; idx++)
         {
-            graphs_info[idx].graph = MI_NULL;
-            graphs_info[idx].graph_name = (MI_CHAR *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, strlen(graphs_input[idx].graphInfoV1.graphName) + 1, 0);
-            if (MI_NULL == graphs_info[idx].graph_name)
+            graphs_info[idx].graph = DT_NULL;
+            graphs_info[idx].graph_name = (DT_CHAR *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, strlen(graphs_input[idx].graphInfoV1.graphName) + 1, 0);
+            if (DT_NULL == graphs_info[idx].graph_name)
             {
                 AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
                 goto EXIT;
             }
             strcpy(graphs_info[idx].graph_name, graphs_input[idx].graphInfoV1.graphName);
 
-            graphs_info[idx].input_tensors = MI_NULL;
+            graphs_info[idx].input_tensors = DT_NULL;
             graphs_info[idx].num_input_tensors = 0;
 
             if (graphs_input[idx].graphInfoV1.graphInputs)
@@ -1693,7 +1693,7 @@ EXIT:
                 graphs_info[idx].num_input_tensors = graphs_input[idx].graphInfoV1.numGraphInputs;
             }
 
-            graphs_info[idx].output_tensors = MI_NULL;
+            graphs_info[idx].output_tensors = DT_NULL;
             graphs_info[idx].num_output_tensors = 0;
 
             if (graphs_input[idx].graphInfoV1.graphOutputs)
@@ -1726,14 +1726,14 @@ EXIT:
 
 // qnn 2.28.0 -> qnn API version 2.21.0
 #if ((QNN_API_VERSION_MAJOR >= 2) && (QNN_API_VERSION_MINOR >= 21))
-    static Status InitGraphsInfoV3(Context *ctx, const QnnSystemContext_GraphInfo_t *graphs_input, GraphInfoPtr_t **graphs_info_ptr, MI_U32 graphs_count)
+    static Status InitGraphsInfoV3(Context *ctx, const QnnSystemContext_GraphInfo_t *graphs_input, GraphInfoPtr_t **graphs_info_ptr, DT_U32 graphs_count)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        if (MI_NULL == graphs_input)
+        if (DT_NULL == graphs_input)
         {
             AURA_ADD_ERROR_STRING(ctx, "graphs_input is null");
             return Status::ERROR;
@@ -1741,11 +1741,11 @@ EXIT:
 
         Status ret = Status::ERROR;
 
-        GraphInfo_t *graphs_info = MI_NULL;
+        GraphInfo_t *graphs_info = DT_NULL;
 
         *graphs_info_ptr = (GraphInfoPtr_t *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, sizeof(GraphInfoPtr_t), 0);
         graphs_info = (GraphInfo_t *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, graphs_count * sizeof(GraphInfo_t), 0);
-        if ((MI_NULL == graphs_info) || (MI_NULL == *graphs_info_ptr))
+        if ((DT_NULL == graphs_info) || (DT_NULL == *graphs_info_ptr))
         {
             AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
             goto EXIT;
@@ -1753,18 +1753,18 @@ EXIT:
 
         *(*graphs_info_ptr) = graphs_info;
 
-        for (MI_U32 idx = 0; idx < graphs_count; idx++)
+        for (DT_U32 idx = 0; idx < graphs_count; idx++)
         {
-            graphs_info[idx].graph = MI_NULL;
-            graphs_info[idx].graph_name = (MI_CHAR *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, strlen(graphs_input[idx].graphInfoV3.graphName) + 1, 0);
-            if (MI_NULL == graphs_info[idx].graph_name)
+            graphs_info[idx].graph = DT_NULL;
+            graphs_info[idx].graph_name = (DT_CHAR *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, strlen(graphs_input[idx].graphInfoV3.graphName) + 1, 0);
+            if (DT_NULL == graphs_info[idx].graph_name)
             {
                 AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
                 goto EXIT;
             }
             strcpy(graphs_info[idx].graph_name, graphs_input[idx].graphInfoV3.graphName);
 
-            graphs_info[idx].input_tensors = MI_NULL;
+            graphs_info[idx].input_tensors = DT_NULL;
             graphs_info[idx].num_input_tensors = 0;
 
             if (graphs_input[idx].graphInfoV3.graphInputs)
@@ -1778,7 +1778,7 @@ EXIT:
                 graphs_info[idx].num_input_tensors = graphs_input[idx].graphInfoV3.numGraphInputs;
             }
 
-            graphs_info[idx].output_tensors = MI_NULL;
+            graphs_info[idx].output_tensors = DT_NULL;
             graphs_info[idx].num_output_tensors = 0;
 
             if (graphs_input[idx].graphInfoV3.graphOutputs)
@@ -1811,14 +1811,14 @@ EXIT:
     {
         arch = QnnHtpDevice_Arch_t::QNN_HTP_DEVICE_ARCH_UNKNOWN;
 
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        const QnnDevice_PlatformInfo_t *platform_info = MI_NULL;
+        const QnnDevice_PlatformInfo_t *platform_info = DT_NULL;
         Qnn_ErrorHandle_t qnn_err = interface.deviceGetPlatformInfo(log_handle, &platform_info);
-        if ((qnn_err != QNN_SUCCESS) || (MI_NULL == platform_info))
+        if ((qnn_err != QNN_SUCCESS) || (DT_NULL == platform_info))
         {
             AURA_ADD_ERROR_STRING(ctx, ("failed to get platform info from the device, err : " + std::to_string(qnn_err)).c_str());
             return Status::ERROR;
@@ -1840,14 +1840,14 @@ EXIT:
     }
 
 private:
-    static Status InitTensorsInfoV1(Context *ctx, const Qnn_Tensor_t *tensor_src, Qnn_Tensor_t **tensors_wrapper, const MI_U32 count)
+    static Status InitTensorsInfoV1(Context *ctx, const Qnn_Tensor_t *tensor_src, Qnn_Tensor_t **tensors_wrapper, const DT_U32 count)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        if (MI_NULL == tensor_src)
+        if (DT_NULL == tensor_src)
         {
             AURA_ADD_ERROR_STRING(ctx, "tensor_src is null");
             return Status::ERROR;
@@ -1856,25 +1856,25 @@ private:
         Status ret = Status::ERROR;
 
         *tensors_wrapper = (Qnn_Tensor_t *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, count * sizeof(Qnn_Tensor_t), 0);
-        if (MI_NULL == *tensors_wrapper)
+        if (DT_NULL == *tensors_wrapper)
         {
             AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
             return ret;
         }
 
-        for (MI_U32 idx = 0; idx < count; idx++)
+        for (DT_U32 idx = 0; idx < count; idx++)
         {
             (*tensors_wrapper)[idx] = QNN_TENSOR_INIT;
 
             // copy tensor name
-            (*tensors_wrapper)[idx].v1.name = (MI_CHAR *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, strlen(tensor_src[idx].v1.name) + 1, 0);
-            if (MI_NULL == (*tensors_wrapper)[idx].v1.name)
+            (*tensors_wrapper)[idx].v1.name = (DT_CHAR *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, strlen(tensor_src[idx].v1.name) + 1, 0);
+            if (DT_NULL == (*tensors_wrapper)[idx].v1.name)
             {
                 AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
                 goto EXIT;
             }
 
-            strcpy((MI_CHAR *)(*tensors_wrapper)[idx].v1.name, tensor_src[idx].v1.name);
+            strcpy((DT_CHAR *)(*tensors_wrapper)[idx].v1.name, tensor_src[idx].v1.name);
 
             (*tensors_wrapper)[idx].version = tensor_src[idx].version;
             (*tensors_wrapper)[idx].v1.id = tensor_src[idx].v1.id;
@@ -1904,13 +1904,13 @@ private:
                                                                     ctx, AURA_MEM_HEAP,
                                                                     src_q_params.axisScaleOffsetEncoding.numScaleOffsets * sizeof(Qnn_ScaleOffset_t),
                                                                     0);
-                    if (MI_NULL == q_params.axisScaleOffsetEncoding.scaleOffset)
+                    if (DT_NULL == q_params.axisScaleOffsetEncoding.scaleOffset)
                     {
                         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
                         goto EXIT;
                     }
 
-                    for (MI_U32 idx = 0; idx < q_params.axisScaleOffsetEncoding.numScaleOffsets; idx++)
+                    for (DT_U32 idx = 0; idx < q_params.axisScaleOffsetEncoding.numScaleOffsets; idx++)
                     {
                         q_params.axisScaleOffsetEncoding.scaleOffset[idx].scale = src_q_params.axisScaleOffsetEncoding.scaleOffset[idx].scale;
                         q_params.axisScaleOffsetEncoding.scaleOffset[idx].offset = src_q_params.axisScaleOffsetEncoding.scaleOffset[idx].offset;
@@ -1924,8 +1924,8 @@ private:
 
             if (tensor_src[idx].v1.rank > 0)
             {
-                MI_S32 len = tensor_src[idx].v1.rank * sizeof(MI_U32);
-                (*tensors_wrapper)[idx].v1.dimensions = (MI_U32 *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, len, 0);
+                DT_S32 len = tensor_src[idx].v1.rank * sizeof(DT_U32);
+                (*tensors_wrapper)[idx].v1.dimensions = (DT_U32 *)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, len, 0);
                 if ((*tensors_wrapper)[idx].v1.dimensions)
                 {
                     memcpy((*tensors_wrapper)[idx].v1.dimensions, tensor_src[idx].v1.dimensions, len);
@@ -1939,7 +1939,7 @@ private:
 
             (*tensors_wrapper)[idx].v1.memType = QNN_TENSORMEMTYPE_UNDEFINED;
             (*tensors_wrapper)[idx].v1.clientBuf = QNN_CLIENT_BUFFER_INIT;
-            (*tensors_wrapper)[idx].v1.memHandle = MI_NULL;
+            (*tensors_wrapper)[idx].v1.memHandle = DT_NULL;
         }
 
         ret = Status::OK;
@@ -1952,51 +1952,51 @@ EXIT:
         AURA_RETURN(ctx, ret);
     }
 
-    static Status DeinitTensorsInfoV1(Context *ctx, Qnn_Tensor_t **tensors_wrapper, MI_U32 count)
+    static Status DeinitTensorsInfoV1(Context *ctx, Qnn_Tensor_t **tensors_wrapper, DT_U32 count)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        if (MI_NULL == tensors_wrapper || MI_NULL == *tensors_wrapper)
+        if (DT_NULL == tensors_wrapper || DT_NULL == *tensors_wrapper)
         {
             AURA_ADD_ERROR_STRING(ctx, "null ptr");
             return Status::OK;
         }
 
-        for (MI_U32 idx = 0; idx < count; idx++)
+        for (DT_U32 idx = 0; idx < count; idx++)
         {
-            if ((*tensors_wrapper)[idx].v1.name != MI_NULL)
+            if ((*tensors_wrapper)[idx].v1.name != DT_NULL)
             {
-                AURA_FREE(ctx, (AURA_VOID*)(*tensors_wrapper)[idx].v1.name);
-                (*tensors_wrapper)[idx].v1.name = MI_NULL;
+                AURA_FREE(ctx, (DT_VOID*)(*tensors_wrapper)[idx].v1.name);
+                (*tensors_wrapper)[idx].v1.name = DT_NULL;
             }
 
-            if ((*tensors_wrapper)[idx].v1.dimensions != MI_NULL)
+            if ((*tensors_wrapper)[idx].v1.dimensions != DT_NULL)
             {
                 AURA_FREE(ctx, (*tensors_wrapper)[idx].v1.dimensions);
-                (*tensors_wrapper)[idx].v1.dimensions = MI_NULL;
+                (*tensors_wrapper)[idx].v1.dimensions = DT_NULL;
             }
 
-            if ((*tensors_wrapper)[idx].v1.quantizeParams.axisScaleOffsetEncoding.scaleOffset != MI_NULL)
+            if ((*tensors_wrapper)[idx].v1.quantizeParams.axisScaleOffsetEncoding.scaleOffset != DT_NULL)
             {
                 AURA_FREE(ctx, (*tensors_wrapper)[idx].v1.quantizeParams.axisScaleOffsetEncoding.scaleOffset);
-                (*tensors_wrapper)[idx].v1.quantizeParams.axisScaleOffsetEncoding.scaleOffset = MI_NULL;
+                (*tensors_wrapper)[idx].v1.quantizeParams.axisScaleOffsetEncoding.scaleOffset = DT_NULL;
             }
 
             (*tensors_wrapper)[idx] = QNN_TENSOR_INIT;
         }
 
         AURA_FREE(ctx, *tensors_wrapper);
-        *tensors_wrapper = MI_NULL;
+        *tensors_wrapper = DT_NULL;
 
         return Status::OK;
     }
 
     static Status ExtractProfilingEvent(Context *ctx, const QnnProfile_EventId_t profile_event_id, const QNN_INTERFACE_VER_TYPE &interface, std::string &profile_data, ProfileStage profile_stage)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
@@ -2018,13 +2018,13 @@ EXIT:
 
     static Status ExtractProfilingSubEvents(Context *ctx, const QnnProfile_EventId_t profile_event_id, const QNN_INTERFACE_VER_TYPE &interface, std::string &profile_data, ProfileStage profile_stage)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return Status::ERROR;
         }
 
-        const QnnProfile_EventId_t *profile_sub_events = MI_NULL;
-        MI_U32 num_sub_events = 0;
+        const QnnProfile_EventId_t *profile_sub_events = DT_NULL;
+        DT_U32 num_sub_events = 0;
 
         Qnn_ErrorHandle_t qnn_err = interface.profileGetSubEvents(profile_event_id, &profile_sub_events, &num_sub_events);
         if (qnn_err != QNN_PROFILE_NO_ERROR)
@@ -2052,19 +2052,19 @@ EXIT:
 class QnnTensorMap
 {
 public:
-    QnnTensorMap(Context *ctx, Qnn_Tensor_t *tensors, MI_U32 tensors_num, MI_BOOL is_input, Qnn_ContextHandle_t context_handle, QNN_INTERFACE_VER_TYPE *interface, std::string backend_type)
+    QnnTensorMap(Context *ctx, Qnn_Tensor_t *tensors, DT_U32 tensors_num, DT_BOOL is_input, Qnn_ContextHandle_t context_handle, QNN_INTERFACE_VER_TYPE *interface, std::string backend_type)
                  : m_ctx(ctx), m_is_input(is_input), m_tensors(tensors),
                    m_tensors_num(tensors_num), m_backend_type(backend_type), m_context_handle(context_handle), m_interface(interface)
     {
         do
         {
-            if ((MI_NULL == m_ctx) || (MI_NULL == m_tensors) || (MI_NULL == m_context_handle) || (MI_NULL == m_interface))
+            if ((DT_NULL == m_ctx) || (DT_NULL == m_tensors) || (DT_NULL == m_context_handle) || (DT_NULL == m_interface))
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
                 break;
             }
 
-            m_is_valid = MI_TRUE;
+            m_is_valid = DT_TRUE;
         } while (0);
     }
 
@@ -2084,7 +2084,7 @@ public:
             return Status::ERROR;
         }
 
-        if ((MI_NULL == mat_map) || (mat_map->size() != m_tensors_num))
+        if ((DT_NULL == mat_map) || (mat_map->size() != m_tensors_num))
         {
             AURA_ADD_ERROR_STRING(m_ctx, "size match error");
             return Status::ERROR;
@@ -2092,7 +2092,7 @@ public:
 
         m_mat_map = *mat_map;
 
-        for (MI_U32 i = 0; i < m_tensors_num; i++)
+        for (DT_U32 i = 0; i < m_tensors_num; i++)
         {
             std::string tensor_name = std::string(m_tensors[i].v1.name);
             if (m_mat_map.find(tensor_name) == m_mat_map.end())
@@ -2128,7 +2128,7 @@ public:
 
     Status Quant()
     {
-        if (MI_FALSE == m_is_input)
+        if (DT_FALSE == m_is_input)
         {
             return Status::OK;
         }
@@ -2139,7 +2139,7 @@ public:
             return Status::ERROR;
         }
 
-        for (MI_U32 i = 0; i < m_tensors_num; i++)
+        for (DT_U32 i = 0; i < m_tensors_num; i++)
         {
             std::string tensor_name = std::string(m_tensors[i].v1.name);
 
@@ -2160,7 +2160,7 @@ public:
 
     Status DeQuant()
     {
-        if (MI_TRUE == m_is_input)
+        if (DT_TRUE == m_is_input)
         {
             return Status::OK;
         }
@@ -2171,7 +2171,7 @@ public:
             return Status::ERROR;
         }
 
-        for (MI_U32 i = 0; i < m_tensors_num; i++)
+        for (DT_U32 i = 0; i < m_tensors_num; i++)
         {
             std::string tensor_name = std::string(m_tensors[i].v1.name);
 
@@ -2192,7 +2192,7 @@ public:
 
     Status RegisterMem()
     {
-        for (MI_U32 idx = 0; idx < m_tensors_num; idx++)
+        for (DT_U32 idx = 0; idx < m_tensors_num; idx++)
         {
             std::string tensor_name = std::string(m_tensors[idx].v1.name);
 
@@ -2202,7 +2202,7 @@ public:
             }
 
             Qnn_MemDescriptor_t mem_descriptor = QNN_MEM_DESCRIPTOR_INIT;
-            mem_descriptor.memShape = {m_tensors[idx].v1.rank, m_tensors[idx].v1.dimensions, MI_NULL};
+            mem_descriptor.memShape = {m_tensors[idx].v1.rank, m_tensors[idx].v1.dimensions, DT_NULL};
             mem_descriptor.dataType = m_tensors[idx].v1.dataType;
             mem_descriptor.memType = QNN_MEM_TYPE_ION;
             mem_descriptor.ionInfo.fd = m_register_mat_map[tensor_name]->GetBuffer().m_property;
@@ -2221,7 +2221,7 @@ public:
 
     Status DeRegisterMem()
     {
-        for (MI_U32 idx = 0; idx < m_tensors_num; idx++)
+        for (DT_U32 idx = 0; idx < m_tensors_num; idx++)
         {
             if (QNN_TENSORMEMTYPE_RAW == m_tensors[idx].v1.memType)
             {
@@ -2229,7 +2229,7 @@ public:
             }
             else if (QNN_TENSORMEMTYPE_MEMHANDLE == m_tensors[idx].v1.memType)
             {
-                if (m_tensors[idx].v1.memHandle != MI_NULL)
+                if (m_tensors[idx].v1.memHandle != DT_NULL)
                 {
                     Qnn_ErrorHandle_t qnn_err = m_interface->memDeRegister(&(m_tensors[idx].v1.memHandle), 1u);
                     if (qnn_err != QNN_SUCCESS)
@@ -2239,7 +2239,7 @@ public:
                         return Status::ERROR;
                     }
 
-                    m_tensors[idx].v1.memHandle = MI_NULL;
+                    m_tensors[idx].v1.memHandle = DT_NULL;
                 }
 
             }
@@ -2266,7 +2266,7 @@ private:
             return Status::ERROR;
         }
 
-        MI_BOOL is_quant = MI_FALSE;
+        DT_BOOL is_quant = DT_FALSE;
         ElemType src_elem_type = mat->GetElemType();
         ElemType dst_elem_type = GetElemType(tensor->v1.dataType);
         if ((src_elem_type != ElemType::INVALID) && (src_elem_type == dst_elem_type))
@@ -2280,7 +2280,7 @@ private:
         else if ((ElemType::F32 == src_elem_type) && ((QNN_DATATYPE_UFIXED_POINT_8 == tensor->v1.dataType) ||
                                                       (QNN_DATATYPE_UFIXED_POINT_16 == tensor->v1.dataType)))
         {
-            is_quant = MI_TRUE;
+            is_quant = DT_TRUE;
         }
         else
         {
@@ -2329,7 +2329,7 @@ private:
         else if (AURA_MEM_DMA_BUF_HEAP == mat->GetMemType())
         {
             tensor->v1.memType = QNN_TENSORMEMTYPE_MEMHANDLE;
-            tensor->v1.memHandle = MI_NULL;
+            tensor->v1.memHandle = DT_NULL;
 
             m_register_mat_map[tensor_name] = mat;
         }
@@ -2344,11 +2344,11 @@ private:
 
     Context *m_ctx;
 
-    MI_BOOL m_is_valid;
-    MI_BOOL m_is_input;
+    DT_BOOL m_is_valid;
+    DT_BOOL m_is_input;
 
     Qnn_Tensor_t *m_tensors;
-    MI_U32 m_tensors_num;
+    DT_U32 m_tensors_num;
     std::string m_backend_type;
 
     MatMap m_mat_map;
@@ -2368,26 +2368,26 @@ public:
                       : QnnExecutorImpl(ctx, model, config),
                         m_interface(QNN_INTERFACE_VER_TYPE_INIT),
                         m_system_interface(QNN_SYSTEM_INTERFACE_VER_TYPE_INIT),
-                        m_log_handle(MI_NULL),
+                        m_log_handle(DT_NULL),
                         m_arch(QnnHtpDevice_Arch_t::QNN_HTP_DEVICE_ARCH_UNKNOWN),
-                        m_backend_handle(MI_NULL),
-                        m_profile_handle(MI_NULL),
+                        m_backend_handle(DT_NULL),
+                        m_profile_handle(DT_NULL),
                         m_power_config_id(0),
                         m_perf_infra(QNN_HTP_DEVICE_PERF_INFRASTRUCTURE_INIT),
-                        m_context(MI_NULL),
-                        m_graphs_info(MI_NULL),
+                        m_context(DT_NULL),
+                        m_graphs_info(DT_NULL),
                         m_graphs_count(0)
     {
         do
         {
-            if (MI_NULL == m_model)
+            if (DT_NULL == m_model)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "m_model is null");
                 break;
             }
 
             m_interface = QnnLibrary::Get(m_model->GetBackendType()).GetInterface();
-            if (MI_NULL == m_interface.graphExecute)
+            if (DT_NULL == m_interface.graphExecute)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "m_interface is null");
                 break;
@@ -2441,7 +2441,7 @@ public:
                     return Status::ERROR;
                 }
 
-                m_is_valid = MI_TRUE;
+                m_is_valid = DT_TRUE;
                 return Status::OK;
             };
 #if defined(AURA_BUILD_HEXAGON)
@@ -2450,7 +2450,7 @@ public:
                 AURA_ADD_ERROR_STRING(m_ctx, "m_interface is null");
                 break;
             }
-            m_config.async_call = MI_FALSE;
+            m_config.async_call = DT_FALSE;
 #else
             if (m_wp)
             {
@@ -2511,12 +2511,12 @@ public:
             goto EXIT;
         }
 
-        for (MI_U32 idx = 0; idx < m_graphs_count; idx++)
+        for (DT_U32 idx = 0; idx < m_graphs_count; idx++)
         {
-            QnnTensorMap *in_tensor_map = Create<QnnTensorMap>(m_ctx, (*m_graphs_info)[idx].input_tensors, (*m_graphs_info)[idx].num_input_tensors, MI_TRUE, m_context, &m_interface, m_model->GetBackendType());
-            QnnTensorMap *out_tensor_map = Create<QnnTensorMap>(m_ctx, (*m_graphs_info)[idx].output_tensors, (*m_graphs_info)[idx].num_output_tensors, MI_FALSE, m_context, &m_interface, m_model->GetBackendType());
+            QnnTensorMap *in_tensor_map = Create<QnnTensorMap>(m_ctx, (*m_graphs_info)[idx].input_tensors, (*m_graphs_info)[idx].num_input_tensors, DT_TRUE, m_context, &m_interface, m_model->GetBackendType());
+            QnnTensorMap *out_tensor_map = Create<QnnTensorMap>(m_ctx, (*m_graphs_info)[idx].output_tensors, (*m_graphs_info)[idx].num_output_tensors, DT_FALSE, m_context, &m_interface, m_model->GetBackendType());
 
-            if (MI_NULL == in_tensor_map || MI_NULL == out_tensor_map)
+            if (DT_NULL == in_tensor_map || DT_NULL == out_tensor_map)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "Create QnnTensorMap failed");
                 goto EXIT;
@@ -2590,17 +2590,17 @@ EXIT:
         return  Status::ERROR;
     }
 
-    Status Forward(const MatMap &input, MatMap &output, MI_S32 graph_id) override
+    Status Forward(const MatMap &input, MatMap &output, DT_S32 graph_id) override
     {
         auto process_func = [=]() -> Status
         {
             Status ret = Status::OK;
             Qnn_ErrorHandle_t qnn_err;
 
-            MI_BOOL valid_graph_id = MI_TRUE;
+            DT_BOOL valid_graph_id = DT_TRUE;
 
-            MatMap input_mapped = m_model->MapMatNames(input, MI_TRUE);
-            MatMap output_mapped = m_model->MapMatNames(output, MI_FALSE);
+            MatMap input_mapped = m_model->MapMatNames(input, DT_TRUE);
+            MatMap output_mapped = m_model->MapMatNames(output, DT_FALSE);
 
             if (input_mapped.empty() || output_mapped.empty())
             {
@@ -2608,22 +2608,22 @@ EXIT:
                 return Status::ERROR;
             }
 
-            if (graph_id >= static_cast<MI_S32>(m_graphs_count) || graph_id < 0)
+            if (graph_id >= static_cast<DT_S32>(m_graphs_count) || graph_id < 0)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "invalid graph id");
-                valid_graph_id = MI_FALSE;
+                valid_graph_id = DT_FALSE;
                 ret = Status::ERROR;
                 return ret;
             }
 
             if (m_config.graph_ids[0] != -1)
             {
-                valid_graph_id = MI_FALSE;
+                valid_graph_id = DT_FALSE;
                 for (auto &id : m_config.graph_ids)
                 {
                     if (graph_id == id)
                     {
-                        valid_graph_id = MI_TRUE;
+                        valid_graph_id = DT_TRUE;
                         break;
                     }
                 }
@@ -2692,7 +2692,7 @@ EXIT:
                                                (*graphs_info)[graph_id].output_tensors,
                                                (*graphs_info)[graph_id].num_output_tensors,
                                                 m_profile_handle,
-                                                MI_NULL);
+                                                DT_NULL);
             if (qnn_err != QNN_GRAPH_NO_ERROR)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, ("graphExecute failed, err : " + std::to_string(qnn_err)).c_str());
@@ -2754,18 +2754,18 @@ EXIT:
     {
         std::vector<TensorDescMap> result;
 
-        for (MI_U32 i = 0; i < m_graphs_count; i++)
+        for (DT_U32 i = 0; i < m_graphs_count; i++)
         {
             GraphInfo_t graph_info = (*m_graphs_info)[i];
             TensorDescMap graph_inputs;
 
-            for (MI_U32 j = 0; j < graph_info.num_input_tensors; j++)
+            for (DT_U32 j = 0; j < graph_info.num_input_tensors; j++)
             {
                 TensorDesc desc;
                 std::string name = graph_info.input_tensors[j].v1.name;
 
                 desc.elem_type = GetElemType(graph_info.input_tensors[j].v1.dataType);
-                for (MI_U32 k = 0; k < graph_info.input_tensors[j].v1.rank; k++)
+                for (DT_U32 k = 0; k < graph_info.input_tensors[j].v1.rank; k++)
                 {
                     desc.sizes.push_back(graph_info.input_tensors[j].v1.dimensions[k]);
                 }
@@ -2777,7 +2777,7 @@ EXIT:
                 graph_inputs[name] = desc;
             }
 
-            graph_inputs = m_model->MapTensorDescNames(graph_inputs, MI_TRUE);
+            graph_inputs = m_model->MapTensorDescNames(graph_inputs, DT_TRUE);
             result.push_back(graph_inputs);
         }
 
@@ -2788,18 +2788,18 @@ EXIT:
     {
         std::vector<TensorDescMap> result;
 
-        for (MI_U32 i = 0; i < m_graphs_count; i++)
+        for (DT_U32 i = 0; i < m_graphs_count; i++)
         {
             GraphInfo_t graph_info = (*m_graphs_info)[i];
             TensorDescMap graph_outputs;
 
-            for (MI_U32 j = 0; j < graph_info.num_output_tensors; j++)
+            for (DT_U32 j = 0; j < graph_info.num_output_tensors; j++)
             {
                 TensorDesc desc;
                 std::string name = graph_info.output_tensors[j].v1.name;
 
                 desc.elem_type = GetElemType(graph_info.output_tensors[j].v1.dataType);
-                for (MI_U32 k = 0; k < graph_info.output_tensors[j].v1.rank; k++)
+                for (DT_U32 k = 0; k < graph_info.output_tensors[j].v1.rank; k++)
                 {
                     desc.sizes.push_back(graph_info.output_tensors[j].v1.dimensions[k]);
                 }
@@ -2811,7 +2811,7 @@ EXIT:
                 graph_outputs[name] = desc;
             }
 
-            graph_outputs = m_model->MapTensorDescNames(graph_outputs, MI_FALSE);
+            graph_outputs = m_model->MapTensorDescNames(graph_outputs, DT_FALSE);
             result.push_back(graph_outputs);
         }
 
@@ -2880,7 +2880,7 @@ EXIT:
 
         ret |= QnnUtils::DeletePowerConfigId(m_ctx, m_power_config_id, m_perf_infra);
 
-        ret |= ExtractBackendProfilingInfo(ProfileStage::DEINIT_STATUS, MI_TRUE);
+        ret |= ExtractBackendProfilingInfo(ProfileStage::DEINIT_STATUS, DT_TRUE);
 
         ret |= QnnUtils::DeleteProfiler(m_ctx, m_interface, m_profile_handle);
 
@@ -2937,7 +2937,7 @@ EXIT:
             AURA_ADD_ERROR_STRING(m_ctx, "SetPerf default failed");
         }
 
-        for (MI_U32 i = 0; i < m_input_tensor_map.size(); i++)
+        for (DT_U32 i = 0; i < m_input_tensor_map.size(); i++)
         {
             Delete<QnnTensorMap>(m_ctx, &m_input_tensor_map[i]);
             Delete<QnnTensorMap>(m_ctx, &m_output_tensor_map[i]);
@@ -2979,7 +2979,7 @@ EXIT:
         return head_info;
     }
 
-    Status ExtractBackendProfilingInfo(ProfileStage profile_stage, MI_BOOL save_profiling = MI_FALSE)
+    Status ExtractBackendProfilingInfo(ProfileStage profile_stage, DT_BOOL save_profiling = DT_FALSE)
     {
         if (QnnUtils::ExtractBackendProfilingInfo(m_ctx, m_interface, m_profile_handle, m_config.profiling_level, m_profile_data, profile_stage) != Status::OK)
         {
@@ -3032,8 +3032,8 @@ EXIT:
             return ret;
         }
 
-        MI_S32 graph_id = 0;
-        if (params.HasKeys("graph_id") == MI_TRUE)
+        DT_S32 graph_id = 0;
+        if (params.HasKeys("graph_id") == DT_TRUE)
         {
             ret = params.Get("graph_id", graph_id);
             if (ret != Status::OK)
@@ -3073,8 +3073,8 @@ EXIT:
             return ret;
         }
 
-        MI_S32 graph_id = 0;
-        if (params.HasKeys("graph_id") == MI_TRUE)
+        DT_S32 graph_id = 0;
+        if (params.HasKeys("graph_id") == DT_TRUE)
         {
             ret = params.Get("graph_id", graph_id);
             if (ret != Status::OK)
@@ -3094,12 +3094,12 @@ EXIT:
         return Status::OK;
     }
 
-    Status RegisterImpl(const MatMap &input, MatMap &output, MI_S32 graph_id = 0)
+    Status RegisterImpl(const MatMap &input, MatMap &output, DT_S32 graph_id = 0)
     {
         Status ret = Status::ERROR;
 
-        MatMap input_mapped  = m_model->MapMatNames(input, MI_TRUE);
-        MatMap output_mapped = m_model->MapMatNames(output, MI_FALSE);
+        MatMap input_mapped  = m_model->MapMatNames(input, DT_TRUE);
+        MatMap output_mapped = m_model->MapMatNames(output, DT_FALSE);
 
         // check wether registed
         GraphInfo_t **graphs_info = GetGraphsInfo(input_mapped, output_mapped);
@@ -3117,11 +3117,11 @@ EXIT:
         }
 
         // recode tensor map
-        for (MI_U32 idx = 0; idx < m_graphs_count; idx++)
+        for (DT_U32 idx = 0; idx < m_graphs_count; idx++)
         {
-            QnnTensorMap *input_tensor_map  = Create<QnnTensorMap>(m_ctx, (*graphs_info)[idx].input_tensors,  (*graphs_info)[idx].num_input_tensors,  MI_TRUE,  m_context, &m_interface, m_model->GetBackendType());
-            QnnTensorMap *output_tensor_map = Create<QnnTensorMap>(m_ctx, (*graphs_info)[idx].output_tensors, (*graphs_info)[idx].num_output_tensors, MI_FALSE, m_context, &m_interface, m_model->GetBackendType());
-            if ((MI_NULL == input_tensor_map) || (MI_NULL == output_tensor_map))
+            QnnTensorMap *input_tensor_map  = Create<QnnTensorMap>(m_ctx, (*graphs_info)[idx].input_tensors,  (*graphs_info)[idx].num_input_tensors,  DT_TRUE,  m_context, &m_interface, m_model->GetBackendType());
+            QnnTensorMap *output_tensor_map = Create<QnnTensorMap>(m_ctx, (*graphs_info)[idx].output_tensors, (*graphs_info)[idx].num_output_tensors, DT_FALSE, m_context, &m_interface, m_model->GetBackendType());
+            if ((DT_NULL == input_tensor_map) || (DT_NULL == output_tensor_map))
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "Create QnnTensorMap failed");
                 ret = Status::ERROR;
@@ -3188,12 +3188,12 @@ EXIT:
         return ret;
     }
 
-    Status DeRegisterImpl(const MatMap &input, MatMap &output, MI_S32 graph_id = 0)
+    Status DeRegisterImpl(const MatMap &input, MatMap &output, DT_S32 graph_id = 0)
     {
         Status ret = Status::ERROR;
 
-        MatMap input_mapped  = m_model->MapMatNames(input, MI_TRUE);
-        MatMap output_mapped = m_model->MapMatNames(output, MI_FALSE);
+        MatMap input_mapped  = m_model->MapMatNames(input, DT_TRUE);
+        MatMap output_mapped = m_model->MapMatNames(output, DT_FALSE);
 
         // check Whether registed
         GraphInfo_t **graphs_info = GetGraphsInfo(input_mapped, output_mapped);
@@ -3224,17 +3224,17 @@ EXIT:
         std::vector<Mat>().swap(*output_register_mat);
 
         // when on other graph in using, delete graphs info
-        MI_BOOL is_graph_using = MI_FALSE;
+        DT_BOOL is_graph_using = DT_FALSE;
 
-        for (MI_U32 i = 0; i < m_graphs_count; i++)
+        for (DT_U32 i = 0; i < m_graphs_count; i++)
         {
             if (((*graphs_info)[graph_id].input_tensor_map->GetRegisterMat()->size() != 0) || ((*graphs_info)[graph_id].output_tensor_map->GetRegisterMat()->size() != 0))
             {
-                is_graph_using = MI_TRUE;
+                is_graph_using = DT_TRUE;
             }
         }
 
-        if (MI_FALSE == is_graph_using)
+        if (DT_FALSE == is_graph_using)
         {
             auto it = std::find(m_register_graphs_info.begin(), m_register_graphs_info.end(), graphs_info);
 
@@ -3249,14 +3249,14 @@ EXIT:
         return ret;
     }
 
-    GraphInfo_t** GetGraphsInfo(const MatMap &input, const MatMap &output, MI_S32 graph_id = 0)
+    GraphInfo_t** GetGraphsInfo(const MatMap &input, const MatMap &output, DT_S32 graph_id = 0)
     {
         GraphInfo_t **graph_info = NULL;
 
         // check whether mat registed
-        auto check_mat_register_func = [](const MatMap &matmap, const std::vector<Mat> &regster_mat) -> MI_BOOL
+        auto check_mat_register_func = [](const MatMap &matmap, const std::vector<Mat> &regster_mat) -> DT_BOOL
         {
-            MI_BOOL is_register = MI_TRUE;
+            DT_BOOL is_register = DT_TRUE;
 
             for (const auto &iter : matmap)
             {
@@ -3266,7 +3266,7 @@ EXIT:
                                                                     });
                 if (match_mat == regster_mat.end())
                 {
-                    is_register = MI_FALSE;
+                    is_register = DT_FALSE;
                     break;
                 }
             }
@@ -3280,8 +3280,8 @@ EXIT:
             std::vector<Mat> *input_register_mat  = (*iter)[graph_id].input_tensor_map->GetRegisterMat();
             std::vector<Mat> *output_register_mat = (*iter)[graph_id].output_tensor_map->GetRegisterMat();
 
-            if ((check_mat_register_func(input,  *input_register_mat)  == MI_TRUE) &&
-                (check_mat_register_func(output, *output_register_mat) == MI_TRUE))
+            if ((check_mat_register_func(input,  *input_register_mat)  == DT_TRUE) &&
+                (check_mat_register_func(output, *output_register_mat) == DT_TRUE))
             {
                 graph_info = iter;
                 break;
@@ -3342,13 +3342,13 @@ EXIT:
     Qnn_ProfileHandle_t m_profile_handle;
     std::string m_profile_data;
 
-    MI_U32 m_power_config_id;
+    DT_U32 m_power_config_id;
     QnnHtpDevice_PerfInfrastructure_t m_perf_infra;
 
     Qnn_ContextHandle_t m_context;
 
     GraphInfo_t **m_graphs_info;
-    MI_U32 m_graphs_count;
+    DT_U32 m_graphs_count;
 
     std::vector<QnnTensorMap*> m_input_tensor_map;
     std::vector<QnnTensorMap*> m_output_tensor_map;

@@ -14,7 +14,7 @@ Status CvtColorVdsp::SetArgs(const std::vector<const Array*> &src, const std::ve
         return Status::ERROR;
     }
 
-    for (MI_U32 i = 0; i < src.size(); i++)
+    for (DT_U32 i = 0; i < src.size(); i++)
     {
         if (src[i]->GetArrayType() != ArrayType::MAT)
         {
@@ -23,7 +23,7 @@ Status CvtColorVdsp::SetArgs(const std::vector<const Array*> &src, const std::ve
         }
     }
 
-    for (MI_U32 i = 0; i < dst.size(); i++)
+    for (DT_U32 i = 0; i < dst.size(); i++)
     {
         if (dst[i]->GetArrayType() != ArrayType::MAT)
         {
@@ -44,7 +44,7 @@ Status CvtColorVdsp::Initialize()
     }
 
     m_xtensa_src.clear();
-    for (MI_U32 i = 0; i < m_src.size(); i++)
+    for (DT_U32 i = 0; i < m_src.size(); i++)
     {
         XtensaMat xtensa_src = XtensaMat::FromArray(m_ctx, *(m_src[i]));
         if (!xtensa_src.IsValid())
@@ -62,7 +62,7 @@ Status CvtColorVdsp::Initialize()
     }
 
     m_xtensa_dst.clear();
-    for (MI_U32 i = 0; i < m_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_dst.size(); i++)
     {
         XtensaMat xtensa_dst = XtensaMat::FromArray(m_ctx, *(m_dst[i]));
         if (!xtensa_dst.IsValid())
@@ -84,13 +84,13 @@ Status CvtColorVdsp::Initialize()
 
 Status CvtColorVdsp::DeInitialize()
 {
-    for (MI_U32 i = 0; i < m_xtensa_src.size(); i++)
+    for (DT_U32 i = 0; i < m_xtensa_src.size(); i++)
     {
         m_xtensa_src[i].Release();
     }
     m_xtensa_src.clear();
 
-    for (MI_U32 i = 0; i < m_xtensa_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_xtensa_dst.size(); i++)
     {
         m_xtensa_dst[i].Release();
     }
@@ -118,7 +118,7 @@ Status CvtColorVdsp::Run()
     }
 
     XtensaEngine *engine = m_ctx->GetXtensaEngine();
-    if (MI_NULL == engine)
+    if (DT_NULL == engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "GetXtensaEngine failed");
         return Status::ERROR;
@@ -130,7 +130,7 @@ Status CvtColorVdsp::Run()
         goto EXIT;
     }
 
-    for (MI_U32 i = 0; i < m_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_dst.size(); i++)
     {
         if (m_xtensa_dst[i].Sync(XtensaSyncType::READ) != Status::OK)
         {

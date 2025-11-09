@@ -48,14 +48,14 @@ static std::shared_ptr<ThresholdImpl> CreateThresholdImpl(Context *ctx, const Op
 Threshold::Threshold(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Threshold::SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type)
+Status Threshold::SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -95,14 +95,14 @@ Status Threshold::SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 ma
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateThresholdImpl(m_ctx, impl_target);
     }
 
     // run initialize
     ThresholdImpl *threshold_impl = dynamic_cast<ThresholdImpl*>(m_impl.get());
-    if (MI_NULL == threshold_impl)
+    if (DT_NULL == threshold_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "threshold_impl is null ptr");
         return Status::ERROR;
@@ -114,7 +114,7 @@ Status Threshold::SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 ma
 }
 
 AURA_EXPORTS Status IThreshold(Context *ctx, const Mat &src, Mat &dst,
-                               MI_F32 thresh, MI_F32 max_val, MI_S32 type,
+                               DT_F32 thresh, DT_F32 max_val, DT_S32 type,
                                const OpTarget &target)
 {
     Threshold threshold(ctx, target);
@@ -124,12 +124,12 @@ AURA_EXPORTS Status IThreshold(Context *ctx, const Mat &src, Mat &dst,
 
 ThresholdImpl::ThresholdImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Threshold", target),
                                                                      m_thresh(0.f), m_max_val(0.f), m_type(0),
-                                                                     m_src(MI_NULL), m_dst(MI_NULL)
+                                                                     m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status ThresholdImpl::SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type)
+Status ThresholdImpl::SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -155,35 +155,35 @@ Status ThresholdImpl::SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F3
     return Status::OK;
 }
 
-static Status ThresholdOstu(Context *ctx, const Mat &src, MI_S32 &thresh, OpTarget &target)
+static Status ThresholdOstu(Context *ctx, const Mat &src, DT_S32 &thresh, OpTarget &target)
 {
-    std::vector<MI_U32> histgram(256, 0);
+    std::vector<DT_U32> histgram(256, 0);
     Scalar range = {0, 256};
 
-    if (ICalcHist(ctx, src, 0, histgram, 256, range, Mat(), MI_FALSE, target) != Status::OK)
+    if (ICalcHist(ctx, src, 0, histgram, 256, range, Mat(), DT_FALSE, target) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "CalcHist failed");
         return Status::ERROR;
     }
 
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 height = src.GetSizes().m_height;
 
-    MI_F32 value_avg = 0.0f;
-    MI_F32 scale = 1.0f / (width * height);
+    DT_F32 value_avg = 0.0f;
+    DT_F32 scale = 1.0f / (width * height);
 
-    for (MI_S32 i = 0; i < 256; i++)
+    for (DT_S32 i = 0; i < 256; i++)
     {
-        value_avg += i * static_cast<MI_F32>(histgram[i]);
+        value_avg += i * static_cast<DT_F32>(histgram[i]);
     }
 
     value_avg *= scale;
-    MI_F32 value_foreground = 0, ratio_foreground = 0;
-    MI_F32 max_sigma = 0, value_max = 0;
+    DT_F32 value_foreground = 0, ratio_foreground = 0;
+    DT_F32 max_sigma = 0, value_max = 0;
 
-    for (MI_S32 i = 0; i < 256; i++)
+    for (DT_S32 i = 0; i < 256; i++)
     {
-        MI_F32 ratio_i, ratio_background, value_background, sigma;
+        DT_F32 ratio_i, ratio_background, value_background, sigma;
         ratio_i = histgram[i] * scale;
         value_foreground *= ratio_foreground;
         ratio_foreground += ratio_i;
@@ -205,27 +205,27 @@ static Status ThresholdOstu(Context *ctx, const Mat &src, MI_S32 &thresh, OpTarg
         }
     }
 
-    thresh = static_cast<MI_S32>(value_max);
+    thresh = static_cast<DT_S32>(value_max);
 
     return Status::OK;
 }
 
-static Status ThresholdTriangle(Context *ctx, const Mat &src, MI_S32 &thresh, OpTarget &target)
+static Status ThresholdTriangle(Context *ctx, const Mat &src, DT_S32 &thresh, OpTarget &target)
 {
-    std::vector<MI_U32> histgram(256, 0);
+    std::vector<DT_U32> histgram(256, 0);
     Scalar range = {0, 256};
 
-    if (ICalcHist(ctx, src, 0, histgram, 256, range, Mat(), MI_FALSE, target) != Status::OK)
+    if (ICalcHist(ctx, src, 0, histgram, 256, range, Mat(), DT_FALSE, target) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "CalcHist failed");
         return Status::ERROR;
     }
 
-    MI_S32 i = 0, j = 0;
-    MI_S32 left_bound = 0, right_bound = 0;
-    MI_S32 max_index  = 0;
-    MI_U32 max_val    = 0;
-    MI_S32 is_flipped = 0;
+    DT_S32 i = 0, j = 0;
+    DT_S32 left_bound = 0, right_bound = 0;
+    DT_S32 max_index  = 0;
+    DT_U32 max_val    = 0;
+    DT_S32 is_flipped = 0;
 
     for (i = 0; i < 256; i++)
     {
@@ -269,7 +269,7 @@ static Status ThresholdTriangle(Context *ctx, const Mat &src, MI_S32 &thresh, Op
         is_flipped = 1;
         i = 0;
         j = 255;
-        MI_U32 temp_hist = 0;
+        DT_U32 temp_hist = 0;
         // swap data
         while (i < j)
         {
@@ -283,10 +283,10 @@ static Status ThresholdTriangle(Context *ctx, const Mat &src, MI_S32 &thresh, Op
         max_index  = 255 - max_index;
     }
 
-    MI_S32 threshold = left_bound;
-    MI_F32 a = max_val;
-    MI_F32 b = left_bound - max_index;
-    MI_F32 dist = 0, tempdist = 0;
+    DT_S32 threshold = left_bound;
+    DT_F32 a = max_val;
+    DT_F32 b = left_bound - max_index;
+    DT_F32 dist = 0, tempdist = 0;
 
     for (i = left_bound + 1; i <= max_index; i++)
     {
@@ -310,12 +310,12 @@ static Status ThresholdTriangle(Context *ctx, const Mat &src, MI_S32 &thresh, Op
     return Status::OK;
 }
 
-Status ThresholdImpl::ReCalcThresh(MI_S32 &thresh)
+Status ThresholdImpl::ReCalcThresh(DT_S32 &thresh)
 {
     Status ret = Status::OK;
 
     const Mat *src = dynamic_cast<const Mat*>(m_src);
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;
@@ -381,7 +381,7 @@ std::string ThresholdImpl::ToString() const
     return str;
 }
 
-AURA_VOID ThresholdImpl::Dump(const std::string &prefix) const
+DT_VOID ThresholdImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

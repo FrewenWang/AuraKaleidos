@@ -24,7 +24,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     Scalar *m_result;
@@ -88,10 +88,10 @@ public:
     static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type);
 
 private:
-    MI_S32 m_blk_h = 128;
-    MI_S32 m_blk_w = 32;
-    MI_S32 m_group_size_x_main;
-    MI_S32 m_group_size_y_main;
+    DT_S32 m_blk_h = 128;
+    DT_S32 m_blk_w = 32;
+    DT_S32 m_group_size_x_main;
+    DT_S32 m_group_size_y_main;
     std::vector<CLKernel> m_cl_kernels;
     CLMem m_cl_src;
     CLMem m_cl_partial;

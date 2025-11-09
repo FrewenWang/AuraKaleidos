@@ -1,16 +1,16 @@
 diff a/AuraFantasyCXX/aura-aura/src/ops/matrix/src/none/make_border_none.cpp b/AuraFantasyCXX/aura-aura/src/ops/matrix/src/none/make_border_none.cpp	(rejected hunks)
 @@ -10,10 +10,14 @@
- static AURA_VOID MakeBorderConstantNoneImpl(const Mat &src, Mat &dst, MI_S32 top, MI_S32 bottom,
-                                           MI_S32 left, MI_S32 right, const Scalar &border_value)
+ static DT_VOID MakeBorderConstantNoneImpl(const Mat &src, Mat &dst, DT_S32 top, DT_S32 bottom,
+                                           DT_S32 left, DT_S32 right, const Scalar &border_value)
  {
 +    /// 获取src和dst的Size3的引用
      const Sizes3 &src_sz = src.GetSizes();
      const Sizes3 &dst_sz = dst.GetSizes();
 -
-+    //// Tp是MI_U8
++    //// Tp是DT_U8
 +    /// SaturateCast 是进行饱和转换，即超过对应数据类型大小。则按照对应数据类型大小来处理
 +    /// 创建vector 的元素个数，最多创建4个元素。常量数据就是border_value.m_val[0]。默认是border_value.m_val[0]
-     std::vector<Tp> border_val(Max(static_cast<MI_S32>(4), src_sz.m_channel), SaturateCast<Tp>(border_value.m_val[0]));
+     std::vector<Tp> border_val(Max(static_cast<DT_S32>(4), src_sz.m_channel), SaturateCast<Tp>(border_value.m_val[0]));
 +    /// 如果原始数据的channel小于4，则则设置对应通道的常量数据
      if (src_sz.m_channel <= 4)
      {
@@ -21,14 +21,14 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/matrix/src/none/make_border_none.cpp b/A
  
 -    // Process the top rows
 +    // Process the top rows  进行顶部行数的补边
-     for (MI_S32 y = 0; y < top; ++y)
+     for (DT_S32 y = 0; y < top; ++y)
      {
 +        ////
          Tp *dst_row = dst.Ptr<Tp>(y);
-         for (MI_S32 x = 0; x < dst_sz.m_width; ++x)
+         for (DT_S32 x = 0; x < dst_sz.m_width; ++x)
          {
 +            //// 这个就是填充对应channel的补边数据
-             for (MI_S32 ch = 0; ch < dst_sz.m_channel; ++ch)
+             for (DT_S32 ch = 0; ch < dst_sz.m_channel; ++ch)
              {
                  *dst_row++ = border_val[ch];
 @@ -34,12 +40,12 @@
@@ -37,7 +37,7 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/matrix/src/none/make_border_none.cpp b/A
  
 -    // Process the middle rows
 +    // Process the middle rows  进行中间组数的处理
-     for (MI_S32 y = 0; y < src_sz.m_height; ++y)
+     for (DT_S32 y = 0; y < src_sz.m_height; ++y)
      {
          const Tp *src_row = src.Ptr<Tp>(y);
 -        Tp *dst_row       = dst.Ptr<Tp>(y + top);
@@ -45,7 +45,7 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/matrix/src/none/make_border_none.cpp b/A
 +        Tp *dst_row = dst.Ptr<Tp>(y + top);
 +        
          // Process left border
-         for (MI_S32 x = 0; x < left; ++x)
+         for (DT_S32 x = 0; x < left; ++x)
          {
 @@ -48,10 +54,10 @@
                  *dst_row++ = border_val[ch];
@@ -59,7 +59,7 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/matrix/src/none/make_border_none.cpp b/A
 +        
          // Process right border
          dst_row += src_sz.m_width * src_sz.m_channel;
-         for (MI_S32 x = 0; x < right; ++x)
+         for (DT_S32 x = 0; x < right; ++x)
 @@ -215,6 +221,7 @@
  {
      switch (type)

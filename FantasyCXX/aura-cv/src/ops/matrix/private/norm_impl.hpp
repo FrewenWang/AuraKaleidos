@@ -16,17 +16,17 @@ class NormImpl : public OpImpl
 public:
     NormImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, MI_F64 *result, NormType type);
+    virtual Status SetArgs(const Array *src, DT_F64 *result, NormType type);
 
     std::vector<const Array*> GetInputArrays() const override;
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src;
-    MI_F64 *m_result;
+    DT_F64 *m_result;
     NormType m_type;
 };
 class NormNone : public NormImpl
@@ -34,13 +34,13 @@ class NormNone : public NormImpl
 public:
     NormNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, MI_F64 *result, NormType type) override;
+    Status SetArgs(const Array *src, DT_F64 *result, NormType type) override;
 
     Status Run() override;
 };
 
 #if defined(AURA_ENABLE_NEON)
-Status AbsSumNeon(Context *ctx, const Mat &src, MI_F64 &result, const OpTarget &target);
+Status AbsSumNeon(Context *ctx, const Mat &src, DT_F64 &result, const OpTarget &target);
 Status SqSumNeon(Context *ctx, const Mat &mat, Scalar &result, const OpTarget &target);
 
 class NormNeon : public NormImpl
@@ -48,7 +48,7 @@ class NormNeon : public NormImpl
 public:
     NormNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, MI_F64 *result, NormType type) override;
+    Status SetArgs(const Array *src, DT_F64 *result, NormType type) override;
 
     Status Run() override;
 };
@@ -60,7 +60,7 @@ class NormCL : public NormImpl
 public:
     NormCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, MI_F64 *result, NormType type) override;
+    Status SetArgs(const Array *src, DT_F64 *result, NormType type) override;
 
     Status Initialize() override;
 
@@ -73,10 +73,10 @@ public:
     static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, NormType m_type);
 
 private:
-    MI_S32 m_blk_h = 128;
-    MI_S32 m_blk_w = 32;
-    MI_S32 m_group_size_x_main;
-    MI_S32 m_group_size_y_main;
+    DT_S32 m_blk_h = 128;
+    DT_S32 m_blk_w = 32;
+    DT_S32 m_group_size_x_main;
+    DT_S32 m_group_size_y_main;
     std::vector<CLKernel> m_cl_kernels;
     CLMem m_cl_src;
     CLMem m_cl_partial;

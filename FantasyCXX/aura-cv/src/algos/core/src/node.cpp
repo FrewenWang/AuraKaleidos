@@ -3,13 +3,13 @@
 namespace aura
 {
 
-Node::Node() : m_ctx(MI_NULL), m_type(NodeType::INVALID), m_op(MI_NULL),
-               m_graph(MI_NULL), m_enable_print(MI_FALSE), m_enable_dump(MI_FALSE)
+Node::Node() : m_ctx(DT_NULL), m_type(NodeType::INVALID), m_op(DT_NULL),
+               m_graph(DT_NULL), m_enable_print(DT_FALSE), m_enable_dump(DT_FALSE)
 {}
 
 Node::Node(Context *ctx, Op *op, NodeType type, Graph *graph, const std::string &name)
            : m_ctx(ctx), m_type(type), m_op(op), m_name(name), m_graph(graph),
-             m_enable_print(MI_FALSE), m_enable_dump(MI_FALSE)
+             m_enable_print(DT_FALSE), m_enable_dump(DT_FALSE)
 {}
 
 Status Node::SyncRun()
@@ -110,7 +110,7 @@ std::shared_future<Status> Node::AsyncRun()
         return std::shared_future<Status>();
     }
 
-    MI_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
+    DT_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
     m_graph->m_tokens[thread_id].push_back(token);
 
     return token;
@@ -131,7 +131,7 @@ std::shared_future<Status> Node::AsyncDeInitialize()
         return std::shared_future<Status>();
     }
 
-    MI_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
+    DT_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
     m_graph->m_tokens[thread_id].push_back(token);
 
     return token;
@@ -163,22 +163,22 @@ std::string Node::GetName() const
     return m_graph->m_name + "." + m_name;
 }
 
-AURA_VOID Node::SetPrint(const std::vector<std::string> &print_props)
+DT_VOID Node::SetPrint(const std::vector<std::string> &print_props)
 {
     m_enable_print = IsMatch(print_props);
 }
 
-AURA_VOID Node::SetDump(const std::vector<std::string> &dump_props)
+DT_VOID Node::SetDump(const std::vector<std::string> &dump_props)
 {
     m_enable_dump = IsMatch(dump_props);
 }
 
-MI_BOOL Node::IsValid() const
+DT_BOOL Node::IsValid() const
 {
     return (m_ctx && (m_type != NodeType::INVALID) && m_op && m_graph);
 }
 
-MI_BOOL Node::IsMatch(const std::vector<std::string> &props) const
+DT_BOOL Node::IsMatch(const std::vector<std::string> &props) const
 {
     for (const auto &prop : props)
     {
@@ -187,18 +187,18 @@ MI_BOOL Node::IsMatch(const std::vector<std::string> &props) const
             std::string str = prop.substr(0, prop.size() - 1);
             if (GetName().substr(0, str.size()) == str)
             {
-                return MI_TRUE;
+                return DT_TRUE;
             }
         }
         else
         {
             if (GetName() == prop)
             {
-                return MI_TRUE;
+                return DT_TRUE;
             }
         }
     }
-    return MI_FALSE;
+    return DT_FALSE;
 }
 
 } // namespace aura

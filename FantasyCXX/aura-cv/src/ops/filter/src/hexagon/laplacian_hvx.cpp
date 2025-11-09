@@ -8,7 +8,7 @@ namespace aura
 LaplacianHvx::LaplacianHvx(Context *ctx, const OpTarget &target) : LaplacianImpl(ctx, target)
 {}
 
-Status LaplacianHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+Status LaplacianHvx::SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                              BorderType border_type, const Scalar &border_value)
 {
     if (LaplacianImpl::SetArgs(src, dst, ksize, border_type, border_value) != Status::OK)
@@ -23,7 +23,7 @@ Status LaplacianHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if ((ch != 1) && (ch != 2) && (ch != 3))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2/3");
@@ -48,7 +48,7 @@ Status LaplacianHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat       *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -101,7 +101,7 @@ Status LaplacianRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
     Mat src;
     Mat dst;
-    MI_S32 ksize;
+    DT_S32 ksize;
     BorderType border_type;
     Scalar border_value;
 

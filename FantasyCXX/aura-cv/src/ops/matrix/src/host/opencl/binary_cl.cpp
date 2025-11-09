@@ -9,7 +9,7 @@ static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, BinaryOpT
 {
     CLBuildOptions cl_build_opt(ctx);
 
-    MI_S32 elem_counts = 16 / ElemTypeSize(elem_type);
+    DT_S32 elem_counts = 16 / ElemTypeSize(elem_type);
     cl_build_opt.AddOption("Tp",          CLTypeString(elem_type));
     cl_build_opt.AddOption("OP_TYPE",     BinaryOpTypeToString(op_type));
     cl_build_opt.AddOption("ELEM_COUNTS", std::to_string(elem_counts));
@@ -17,7 +17,7 @@ static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, BinaryOpT
     return cl_build_opt.ToString();
 }
 
-static AURA_VOID GetCLGlobalSize(MI_S32 height, MI_S32 width, MI_S32 channel, MI_S32 elem_counts, cl::NDRange &cl_range)
+static DT_VOID GetCLGlobalSize(DT_S32 height, DT_S32 width, DT_S32 channel, DT_S32 elem_counts, cl::NDRange &cl_range)
 {
     cl_range = cl::NDRange((width * channel + elem_counts - 1) / elem_counts, height);
 }
@@ -99,12 +99,12 @@ Status BinaryCL::DeInitialize()
 
 Status BinaryCL::Run()
 {
-    MI_S32 istep0  = m_src0->GetRowPitch() / ElemTypeSize(m_src0->GetElemType());
-    MI_S32 istep1  = m_src1->GetRowPitch() / ElemTypeSize(m_src1->GetElemType());
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 height  = m_src0->GetSizes().m_height;
-    MI_S32 width   = m_src0->GetSizes().m_width;
-    MI_S32 channel = m_src0->GetSizes().m_channel;
+    DT_S32 istep0  = m_src0->GetRowPitch() / ElemTypeSize(m_src0->GetElemType());
+    DT_S32 istep1  = m_src1->GetRowPitch() / ElemTypeSize(m_src1->GetElemType());
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 height  = m_src0->GetSizes().m_height;
+    DT_S32 width   = m_src0->GetSizes().m_width;
+    DT_S32 channel = m_src0->GetSizes().m_channel;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -117,7 +117,7 @@ Status BinaryCL::Run()
     Status ret = Status::ERROR;
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src0.GetCLMemRef<cl::Buffer>(), istep0,
                                  m_cl_src1.GetCLMemRef<cl::Buffer>(), istep1,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(),  ostep,
@@ -131,7 +131,7 @@ Status BinaryCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -140,7 +140,7 @@ Status BinaryCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }

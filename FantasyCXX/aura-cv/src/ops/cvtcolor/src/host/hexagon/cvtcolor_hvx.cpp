@@ -14,7 +14,7 @@ Status CvtColorHvx::SetArgs(const std::vector<const Array*> &src, const std::vec
         return Status::ERROR;
     }
 
-    for (MI_U32 i = 0; i < src.size(); i++)
+    for (DT_U32 i = 0; i < src.size(); i++)
     {
         if (src[i]->GetArrayType() != ArrayType::MAT)
         {
@@ -23,7 +23,7 @@ Status CvtColorHvx::SetArgs(const std::vector<const Array*> &src, const std::vec
         }
     }
 
-    for (MI_U32 i = 0; i < dst.size(); i++)
+    for (DT_U32 i = 0; i < dst.size(); i++)
     {
         if (dst[i]->GetArrayType() != ArrayType::MAT)
         {
@@ -40,13 +40,13 @@ Status CvtColorHvx::Run()
     std::vector<Mat> vec_src;
     std::vector<Mat> vec_dst;
 
-    for (MI_U32 i = 0; i < m_src.size(); i++)
+    for (DT_U32 i = 0; i < m_src.size(); i++)
     {
         Mat *p_src = dynamic_cast<Mat*>(const_cast<Array*>(m_src[i]));
         vec_src.push_back(*p_src);
     }
 
-    for (MI_U32 i = 0; i < m_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_dst.size(); i++)
     {
         Mat *p_dst = dynamic_cast<Mat*>(m_dst[i]);
         vec_dst.push_back(*p_dst);
@@ -74,7 +74,7 @@ Status CvtColorHvx::Run()
     HexagonEngine   *engine = m_ctx->GetHexagonEngine();
     ret                     = engine->Run(AURA_OPS_CVTCOLOR_PACKAGE_NAME, AURA_OPS_CVTCOLOR_OP_NAME, rpc_param, &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }

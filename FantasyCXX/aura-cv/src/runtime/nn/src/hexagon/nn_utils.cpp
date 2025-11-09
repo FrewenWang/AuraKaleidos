@@ -18,7 +18,7 @@ static Status KeyGenerate(Context *ctx, const std::string &main_key, std::string
     return Status::OK;
 }
 
-static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, MI_U64 size)
+static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, DT_U64 size)
 {
     if (src.m_size != dst.m_size)
     {
@@ -26,7 +26,7 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
         return Status::ERROR;
     }
 
-    if (size > static_cast<MI_U64>(dst.m_size))
+    if (size > static_cast<DT_U64>(dst.m_size))
     {
         AURA_ADD_ERROR_STRING(ctx, "size can not be larger than dst's size");
         return Status::ERROR;
@@ -39,9 +39,9 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
     }
 
     std::string gen_key;
-    MI_U64 size_align128 = size & (-128);
-    MI_U64 size_align16  = size & (-16);
-    MI_U8 u8_key_value[128];
+    DT_U64 size_align128 = size & (-128);
+    DT_U64 size_align16  = size & (-16);
+    DT_U8 u8_key_value[128];
 
     if (KeyGenerate(ctx, key, gen_key) != Status::OK)
     {
@@ -49,9 +49,9 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
         return Status::ERROR;
     }
 
-    const MI_U8 *src_data = reinterpret_cast<MI_U8*>(src.m_data);
-    MI_U8 *dst_data = reinterpret_cast<MI_U8*>(dst.m_data);
-    MI_U64 i = 0;
+    const DT_U8 *src_data = reinterpret_cast<DT_U8*>(src.m_data);
+    DT_U8 *dst_data = reinterpret_cast<DT_U8*>(dst.m_data);
+    DT_U64 i = 0;
 
     for (i = 0; i < 8; i++)
     {
@@ -71,15 +71,15 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
 
     for (; i < size_align16; i += 16)
     {
-        for (MI_S32 k = 0; k < 16; k++)
+        for (DT_S32 k = 0; k < 16; k++)
         {
-            dst_data[i + k] = src_data[i + k] ^ (MI_U8)gen_key[k];
+            dst_data[i + k] = src_data[i + k] ^ (DT_U8)gen_key[k];
         }
     }
 
     if (src_data != dst_data)
     {
-        for (; i < static_cast<MI_U64>(dst.m_size); i++)
+        for (; i < static_cast<DT_U64>(dst.m_size); i++)
         {
             dst_data[i] = src_data[i];
         }
@@ -88,7 +88,7 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
     return Status::OK;
 }
 
-Status NNEncrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, MI_U64 size)
+Status NNEncrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, DT_U64 size)
 {
     if (SymmetricKeyAlgo(ctx, src, dst, key, size) != Status::OK)
     {
@@ -99,7 +99,7 @@ Status NNEncrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string
     return Status::OK;
 }
 
-Status NNDecrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, MI_U64 size)
+Status NNDecrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, DT_U64 size)
 {
     if (SymmetricKeyAlgo(ctx, src, dst, key, size) != Status::OK)
     {
@@ -110,7 +110,7 @@ Status NNDecrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string
     return Status::OK;
 }
 
-Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_F32 scale)
+Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, DT_S32 zero_point, DT_F32 scale)
 {
     AURA_UNUSED(src);
     AURA_UNUSED(dst);
@@ -121,7 +121,7 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
     return Status::ERROR;
 }
 
-Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_F32 scale)
+Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, DT_S32 zero_point, DT_F32 scale)
 {
     AURA_UNUSED(src);
     AURA_UNUSED(dst);
@@ -132,7 +132,7 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
     return Status::ERROR;
 }
 
-std::vector<std::string> NNSplit(const std::string &src, MI_CHAR separator)
+std::vector<std::string> NNSplit(const std::string &src, DT_CHAR separator)
 {
     std::vector<std::string> result;
     std::string value;

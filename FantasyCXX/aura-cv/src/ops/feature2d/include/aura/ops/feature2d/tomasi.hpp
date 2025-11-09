@@ -52,9 +52,9 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 max_num_corners,
-                   MI_F64 quality_level, MI_F64 min_distance, MI_S32 block_size, MI_S32 gradient_size,
-                   MI_BOOL use_harris = MI_FALSE, MI_F64 harris_k = 0.04);
+    Status SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 max_num_corners,
+                   DT_F64 quality_level, DT_F64 min_distance, DT_S32 block_size, DT_S32 gradient_size,
+                   DT_BOOL use_harris = DT_FALSE, DT_F64 harris_k = 0.04);
 };
 
 /**
@@ -71,7 +71,7 @@ public:
  * @param min_distance Minimum possible Euclidean distance between the returned corners.
  * @param block_size Size of the averaging block for computing derivative covariation matrix.
  * @param gradient_size Aperture parameter for the Sobel operator.
- * @param use_harris Flag indicating whether to use Harris detector (default is MI_FALSE).
+ * @param use_harris Flag indicating whether to use Harris detector (default is DT_FALSE).
  * @param harris_k Free parameter of the Harris detector (default is 0.04).
  * @param target The platform on which this function runs.
  * 
@@ -83,9 +83,9 @@ public:
  * NONE         | U8C1
  * NEON         | U8C1
  */
-AURA_EXPORTS Status GoodFeaturesToTrack(Context *ctx, const Mat &src, std::vector<KeyPoint> &key_points, MI_S32 max_num_corners,
-                                        MI_F64 quality_level, MI_F64 min_distance, MI_S32 block_size, MI_S32 gradient_size,
-                                        MI_BOOL use_harris = MI_FALSE, MI_F64 harris_k = 0.04, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status GoodFeaturesToTrack(Context *ctx, const Mat &src, std::vector<KeyPoint> &key_points, DT_S32 max_num_corners,
+                                        DT_F64 quality_level, DT_F64 min_distance, DT_S32 block_size, DT_S32 gradient_size,
+                                        DT_BOOL use_harris = DT_FALSE, DT_F64 harris_k = 0.04, const OpTarget &target = OpTarget::Default());
 /**
  * @}
 */

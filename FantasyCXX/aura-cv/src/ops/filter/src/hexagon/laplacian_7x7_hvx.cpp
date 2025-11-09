@@ -5,16 +5,16 @@
 namespace aura
 {
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Sum(const HVX_Vector &vu8_src_p_x0, const HVX_Vector &vu8_src_p_x1, const HVX_Vector &vu8_src_p_x2,
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian7x7Sum(const HVX_Vector &vu8_src_p_x0, const HVX_Vector &vu8_src_p_x1, const HVX_Vector &vu8_src_p_x2,
                                            const HVX_Vector &vu8_src_n_x0, const HVX_Vector &vu8_src_n_x1, const HVX_Vector &vu8_src_n_x2,
                                            HVX_VectorPair &wu16_sum_l2r2, HVX_VectorPair &wu16_sum_l1r1, HVX_VectorPair &wu16_sum_l0r0,
-                                           HVX_VectorPair &wu16_sum_c, MI_S16 k0, MI_S16 k1, MI_S16 k2, MI_S16 k3)
+                                           HVX_VectorPair &wu16_sum_c, DT_S16 k0, DT_S16 k1, DT_S16 k2, DT_S16 k3)
 {
-    MI_U32 k0k0 = (k0 << 24) | (k0 << 16) | (k0 << 8) | k0;
-    MI_U32 k1k1 = (k1 << 24) | (k1 << 16) | (k1 << 8) | k1;
-    MI_U32 k2k2 = (k2 << 24) | (k2 << 16) | (k2 << 8) | k2;
-    MI_U32 k3k3 = (k3 << 24) | (k3 << 16) | (k3 << 8) | k3;
+    DT_U32 k0k0 = (k0 << 24) | (k0 << 16) | (k0 << 8) | k0;
+    DT_U32 k1k1 = (k1 << 24) | (k1 << 16) | (k1 << 8) | k1;
+    DT_U32 k2k2 = (k2 << 24) | (k2 << 16) | (k2 << 8) | k2;
+    DT_U32 k3k3 = (k3 << 24) | (k3 << 16) | (k3 << 8) | k3;
 
     HVX_Vector vu8_src_p_l2 = Q6_V_vlalign_VVR(vu8_src_p_x1, vu8_src_p_x0, 3);
     HVX_Vector vu8_src_p_l1 = Q6_V_vlalign_VVR(vu8_src_p_x1, vu8_src_p_x0, 2);
@@ -47,16 +47,16 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Sum(const HVX_Vector &vu8_src_p_x0, con
     wu16_sum_c    = Q6_Wuh_vmpyacc_WuhVubRub(wu16_sum_c, vu8_src_n_x1, k3k3);
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Sum(const HVX_Vector &vu16_src_p_x0, const HVX_Vector &vu16_src_p_x1, const HVX_Vector &vu16_src_p_x2,
+template <typename St, typename std::enable_if<std::is_same<St, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian7x7Sum(const HVX_Vector &vu16_src_p_x0, const HVX_Vector &vu16_src_p_x1, const HVX_Vector &vu16_src_p_x2,
                                            const HVX_Vector &vu16_src_n_x0, const HVX_Vector &vu16_src_n_x1, const HVX_Vector &vu16_src_n_x2,
                                            HVX_VectorPair &wu32_sum_l2r2, HVX_VectorPair &wu32_sum_l1r1, HVX_VectorPair &wu32_sum_l0r0,
-                                           HVX_VectorPair &wu32_sum_c, MI_S16 k0, MI_S16 k1, MI_S16 k2, MI_S16 k3)
+                                           HVX_VectorPair &wu32_sum_c, DT_S16 k0, DT_S16 k1, DT_S16 k2, DT_S16 k3)
 {
-    MI_U32 k0k0 = k0 << 16 | k0;
-    MI_U32 k1k1 = k1 << 16 | k1;
-    MI_U32 k2k2 = k2 << 16 | k2;
-    MI_U32 k3k3 = k3 << 16 | k3;
+    DT_U32 k0k0 = k0 << 16 | k0;
+    DT_U32 k1k1 = k1 << 16 | k1;
+    DT_U32 k2k2 = k2 << 16 | k2;
+    DT_U32 k3k3 = k3 << 16 | k3;
 
     HVX_Vector vu16_src_p_l2 = Q6_V_vlalign_VVR(vu16_src_p_x1, vu16_src_p_x0, 6);
     HVX_Vector vu16_src_p_l1 = Q6_V_vlalign_VVR(vu16_src_p_x1, vu16_src_p_x0, 4);
@@ -89,16 +89,16 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Sum(const HVX_Vector &vu16_src_p_x0, co
     wu32_sum_c    = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum_c, vu16_src_n_x1, k3k3);
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Sum(const HVX_Vector &vs16_src_p_x0, const HVX_Vector &vs16_src_p_x1, const HVX_Vector &vs16_src_p_x2,
+template <typename St, typename std::enable_if<std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian7x7Sum(const HVX_Vector &vs16_src_p_x0, const HVX_Vector &vs16_src_p_x1, const HVX_Vector &vs16_src_p_x2,
                                            const HVX_Vector &vs16_src_n_x0, const HVX_Vector &vs16_src_n_x1, const HVX_Vector &vs16_src_n_x2,
                                            HVX_VectorPair &ws32_sum_l2r2, HVX_VectorPair &ws32_sum_l1r1, HVX_VectorPair &ws32_sum_l0r0,
-                                           HVX_VectorPair &ws32_sum_c, MI_S16 k0, MI_S16 k1, MI_S16 k2, MI_S16 k3)
+                                           HVX_VectorPair &ws32_sum_c, DT_S16 k0, DT_S16 k1, DT_S16 k2, DT_S16 k3)
 {
-    MI_U32 k0k0 = k0 << 16 | k0;
-    MI_U32 k1k1 = k1 << 16 | k1;
-    MI_U32 k2k2 = k2 << 16 | k2;
-    MI_U32 k3k3 = k3 << 16 | k3;
+    DT_U32 k0k0 = k0 << 16 | k0;
+    DT_U32 k1k1 = k1 << 16 | k1;
+    DT_U32 k2k2 = k2 << 16 | k2;
+    DT_U32 k3k3 = k3 << 16 | k3;
 
     HVX_Vector vs16_src_p_l2 = Q6_V_vlalign_VVR(vs16_src_p_x1, vs16_src_p_x0, 6);
     HVX_Vector vs16_src_p_l1 = Q6_V_vlalign_VVR(vs16_src_p_x1, vs16_src_p_x0, 4);
@@ -131,9 +131,9 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Sum(const HVX_Vector &vs16_src_p_x0, co
     ws32_sum_c    = Q6_Ww_vmpyacc_WwVhRh(ws32_sum_c, vs16_src_n_x1, k3k3);
 }
 
-// using St = MI_U8
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vu8_src_p2_x0, const HVX_Vector &vu8_src_p2_x1, const HVX_Vector &vu8_src_p2_x2,
+// using St = DT_U8
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian7x7Core(const HVX_Vector &vu8_src_p2_x0, const HVX_Vector &vu8_src_p2_x1, const HVX_Vector &vu8_src_p2_x2,
                                             const HVX_Vector &vu8_src_p1_x0, const HVX_Vector &vu8_src_p1_x1, const HVX_Vector &vu8_src_p1_x2,
                                             const HVX_Vector &vu8_src_p0_x0, const HVX_Vector &vu8_src_p0_x1, const HVX_Vector &vu8_src_p0_x2,
                                             const HVX_Vector &vu8_src_c_x0,  const HVX_Vector &vu8_src_c_x1,  const HVX_Vector &vu8_src_c_x2,
@@ -198,9 +198,9 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vu8_src_p2_x0, c
     vs16_dst_hi = Q6_Vh_vadd_VhVh(Q6_V_hi_W(ws16_sum), Q6_V_hi_W(ws16_sum));
 }
 
-// using St = MI_U16
-template <typename St, typename std::enable_if<std::is_same<St, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vu16_src_p2_x0, const HVX_Vector &vu16_src_p2_x1, const HVX_Vector &vu16_src_p2_x2,
+// using St = DT_U16
+template <typename St, typename std::enable_if<std::is_same<St, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian7x7Core(const HVX_Vector &vu16_src_p2_x0, const HVX_Vector &vu16_src_p2_x1, const HVX_Vector &vu16_src_p2_x2,
                                             const HVX_Vector &vu16_src_p1_x0, const HVX_Vector &vu16_src_p1_x1, const HVX_Vector &vu16_src_p1_x2,
                                             const HVX_Vector &vu16_src_p0_x0, const HVX_Vector &vu16_src_p0_x1, const HVX_Vector &vu16_src_p0_x2,
                                             const HVX_Vector &vu16_src_c_x0,  const HVX_Vector &vu16_src_c_x1,  const HVX_Vector &vu16_src_c_x2,
@@ -264,9 +264,9 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vu16_src_p2_x0, 
     vu16_dst = Q6_Vuh_vpack_VwVw_sat(Q6_V_hi_W(ws32_sum), Q6_V_lo_W(ws32_sum));
 }
 
-// using St = MI_S16
-template <typename St, typename std::enable_if<std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vs16_src_p2_x0, const HVX_Vector &vs16_src_p2_x1, const HVX_Vector &vs16_src_p2_x2,
+// using St = DT_S16
+template <typename St, typename std::enable_if<std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian7x7Core(const HVX_Vector &vs16_src_p2_x0, const HVX_Vector &vs16_src_p2_x1, const HVX_Vector &vs16_src_p2_x2,
                                             const HVX_Vector &vs16_src_p1_x0, const HVX_Vector &vs16_src_p1_x1, const HVX_Vector &vs16_src_p1_x2,
                                             const HVX_Vector &vs16_src_p0_x0, const HVX_Vector &vs16_src_p0_x1, const HVX_Vector &vs16_src_p0_x2,
                                             const HVX_Vector &vs16_src_c_x0,  const HVX_Vector &vs16_src_c_x1,  const HVX_Vector &vs16_src_c_x2,
@@ -329,8 +329,8 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vs16_src_p2_x0, 
     vs16_dst = Q6_Vh_vpack_VwVw_sat(Q6_V_hi_W(ws32_sum), Q6_V_lo_W(ws32_sum));
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vu8_src_p2_x0, const HVX_Vector &vu8_src_p2_x1, const HVX_Vector &vu8_src_p2_x2, const HVX_Vector &vu8_border_p2,
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian7x7Core(const HVX_Vector &vu8_src_p2_x0, const HVX_Vector &vu8_src_p2_x1, const HVX_Vector &vu8_src_p2_x2, const HVX_Vector &vu8_border_p2,
                                             const HVX_Vector &vu8_src_p1_x0, const HVX_Vector &vu8_src_p1_x1, const HVX_Vector &vu8_src_p1_x2, const HVX_Vector &vu8_border_p1,
                                             const HVX_Vector &vu8_src_p0_x0, const HVX_Vector &vu8_src_p0_x1, const HVX_Vector &vu8_src_p0_x2, const HVX_Vector &vu8_border_p0,
                                             const HVX_Vector &vu8_src_c_x0,  const HVX_Vector &vu8_src_c_x1,  const HVX_Vector &vu8_src_c_x2,  const HVX_Vector &vu8_border_c,
@@ -338,7 +338,7 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vu8_src_p2_x0, c
                                             const HVX_Vector &vu8_src_n1_x0, const HVX_Vector &vu8_src_n1_x1, const HVX_Vector &vu8_src_n1_x2, const HVX_Vector &vu8_border_n1,
                                             const HVX_Vector &vu8_src_n2_x0, const HVX_Vector &vu8_src_n2_x1, const HVX_Vector &vu8_src_n2_x2, const HVX_Vector &vu8_border_n2,
                                             HVX_Vector &vs16_dst_x0_lo, HVX_Vector &vs16_dst_x0_hi, HVX_Vector &vs16_dst_x1_lo, HVX_Vector &vs16_dst_x1_hi,
-                                            MI_S32 align_size)
+                                            DT_S32 align_size)
 {
     HVX_Vector vu8_src_p2_r = Q6_V_vlalign_VVR(vu8_border_p2, vu8_src_p2_x2, align_size);
     HVX_Vector vu8_src_p1_r = Q6_V_vlalign_VVR(vu8_border_p1, vu8_src_p1_x2, align_size);
@@ -373,8 +373,8 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vu8_src_p2_x0, c
                          vs16_dst_x1_lo, vs16_dst_x1_hi);
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_U16>::value || std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vd16_src_p2_x0, const HVX_Vector &vd16_src_p2_x1, const HVX_Vector &vd16_src_p2_x2, const HVX_Vector &vd16_border_p2,
+template <typename St, typename std::enable_if<std::is_same<St, DT_U16>::value || std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian7x7Core(const HVX_Vector &vd16_src_p2_x0, const HVX_Vector &vd16_src_p2_x1, const HVX_Vector &vd16_src_p2_x2, const HVX_Vector &vd16_border_p2,
                                             const HVX_Vector &vd16_src_p1_x0, const HVX_Vector &vd16_src_p1_x1, const HVX_Vector &vd16_src_p1_x2, const HVX_Vector &vd16_border_p1,
                                             const HVX_Vector &vd16_src_p0_x0, const HVX_Vector &vd16_src_p0_x1, const HVX_Vector &vd16_src_p0_x2, const HVX_Vector &vd16_border_p0,
                                             const HVX_Vector &vd16_src_c_x0,  const HVX_Vector &vd16_src_c_x1,  const HVX_Vector &vd16_src_c_x2,  const HVX_Vector &vd16_border_c,
@@ -382,7 +382,7 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vd16_src_p2_x0, 
                                             const HVX_Vector &vd16_src_n1_x0, const HVX_Vector &vd16_src_n1_x1, const HVX_Vector &vd16_src_n1_x2, const HVX_Vector &vd16_border_n1,
                                             const HVX_Vector &vd16_src_n2_x0, const HVX_Vector &vd16_src_n2_x1, const HVX_Vector &vd16_src_n2_x2, const HVX_Vector &vd16_border_n2,
                                             HVX_Vector &vd16_dst_x0, HVX_Vector &vd16_dst_x1,
-                                            MI_S32 align_size)
+                                            DT_S32 align_size)
 {
     HVX_Vector vd16_src_p2_c = Q6_V_vlalign_VVR(vd16_border_p2, vd16_src_p2_x2, align_size);
     HVX_Vector vd16_src_p1_c = Q6_V_vlalign_VVR(vd16_border_p1, vd16_src_p1_x2, align_size);
@@ -417,16 +417,16 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian7x7Core(const HVX_Vector &vd16_src_p2_x0, 
                          vd16_dst_x1);
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *src_p0, const St *src_c,
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+static DT_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *src_p0, const St *src_c,
                                const St *src_n0, const St *src_n1, const St *src_n2, Dt *dst_c,
-                               const std::vector<St> &border_value, MI_S32 width)
+                               const std::vector<St> &border_value, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(St);
-    MI_S32 back_offset = width - ELEM_COUNTS;
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(St);
+    DT_S32 back_offset = width - ELEM_COUNTS;
 
     MVType mvu8_src_p2[3], mvu8_src_p1[3], mvu8_src_p0[3], mvu8_src_c[3], mvu8_src_n0[3], mvu8_src_n1[3], mvu8_src_n2[3];
     MVType mvs16_dst_lo, mvs16_dst_hi;
@@ -442,7 +442,7 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
         vload(src_n2, mvu8_src_n2[1]);
 
         #pragma unroll
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvu8_src_p2[0].val[ch] = GetBorderVector<St, BORDER_TYPE, BorderArea::LEFT>(mvu8_src_p2[1].val[ch], src_p2[ch], border_value[ch]);
             mvu8_src_p1[0].val[ch] = GetBorderVector<St, BORDER_TYPE, BorderArea::LEFT>(mvu8_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
@@ -456,7 +456,7 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
 
     // main(0 ~ n-2)
     {
-        for (MI_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
+        for (DT_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
         {
             vload(src_p2 + C * x, mvu8_src_p2[2]);
             vload(src_p1 + C * x, mvu8_src_p1[2]);
@@ -467,7 +467,7 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
             vload(src_n2 + C * x, mvu8_src_n2[2]);
 
             #pragma unroll
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Laplacian7x7Core<St>(mvu8_src_p2[0].val[ch], mvu8_src_p2[1].val[ch], mvu8_src_p2[2].val[ch],
                                      mvu8_src_p1[0].val[ch], mvu8_src_p1[1].val[ch], mvu8_src_p1[2].val[ch],
@@ -502,8 +502,8 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
 
     // remain
     {
-        MI_S32 last = (width - 1) * C;
-        MI_S32 rest = width % ELEM_COUNTS;
+        DT_S32 last = (width - 1) * C;
+        DT_S32 rest = width % ELEM_COUNTS;
         MVType mvs16_last_l, mvs16_last_h;
 
         vload(src_p2 + C * back_offset, mvu8_src_p2[2]);
@@ -515,7 +515,7 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
         vload(src_n2 + C * back_offset, mvu8_src_n2[2]);
 
         #pragma unroll
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector vu8_border_p2 = GetBorderVector<St, BORDER_TYPE, BorderArea::RIGHT>(mvu8_src_p2[2].val[ch], src_p2[last + ch], border_value[ch]);
             HVX_Vector vu8_border_p1 = GetBorderVector<St, BORDER_TYPE, BorderArea::RIGHT>(mvu8_src_p1[2].val[ch], src_p1[last + ch], border_value[ch]);
@@ -543,16 +543,16 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
     }
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<std::is_same<St, MI_U16>::value || std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *src_p0, const St *src_c,
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<std::is_same<St, DT_U16>::value || std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+static DT_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *src_p0, const St *src_c,
                                const St *src_n0, const St *src_n1, const St *src_n2, Dt *dst_c,
-                               const std::vector<St> &border_value, MI_S32 width)
+                               const std::vector<St> &border_value, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(St);
-    MI_S32 back_offset = width - ELEM_COUNTS;
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(St);
+    DT_S32 back_offset = width - ELEM_COUNTS;
 
     MVType mvd16_src_p2[3], mvd16_src_p1[3], mvd16_src_p0[3], mvd16_src_c[3], mvd16_src_n0[3], mvd16_src_n1[3], mvd16_src_n2[3];
     MVType mvd16_dst;
@@ -568,7 +568,7 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
         vload(src_n2, mvd16_src_n2[1]);
 
         #pragma unroll
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvd16_src_p2[0].val[ch] = GetBorderVector<St, BORDER_TYPE, BorderArea::LEFT>(mvd16_src_p2[1].val[ch], src_p2[ch], border_value[ch]);
             mvd16_src_p1[0].val[ch] = GetBorderVector<St, BORDER_TYPE, BorderArea::LEFT>(mvd16_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
@@ -582,7 +582,7 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
 
     // main(0 ~ n-2)
     {
-        for (MI_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
+        for (DT_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
         {
             vload(src_p2 + C * x, mvd16_src_p2[2]);
             vload(src_p1 + C * x, mvd16_src_p1[2]);
@@ -593,7 +593,7 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
             vload(src_n2 + C * x, mvd16_src_n2[2]);
 
             #pragma unroll
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Laplacian7x7Core<St>(mvd16_src_p2[0].val[ch], mvd16_src_p2[1].val[ch], mvd16_src_p2[2].val[ch],
                                      mvd16_src_p1[0].val[ch], mvd16_src_p1[1].val[ch], mvd16_src_p1[2].val[ch],
@@ -627,8 +627,8 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
 
     // remain
     {
-        MI_S32 last = (width - 1) * C;
-        MI_S32 rest = width % ELEM_COUNTS;
+        DT_S32 last = (width - 1) * C;
+        DT_S32 rest = width % ELEM_COUNTS;
         MVType mvd16_last;
 
         vload(src_p2 + C * back_offset, mvd16_src_p2[2]);
@@ -640,7 +640,7 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
         vload(src_n2 + C * back_offset, mvd16_src_n2[2]);
 
         #pragma unroll
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector vd16_border_p2 = GetBorderVector<St, BORDER_TYPE, BorderArea::RIGHT>(mvd16_src_p2[2].val[ch], src_p2[last + ch], border_value[ch]);
             HVX_Vector vd16_border_p1 = GetBorderVector<St, BORDER_TYPE, BorderArea::RIGHT>(mvd16_src_p1[2].val[ch], src_p1[last + ch], border_value[ch]);
@@ -666,13 +666,13 @@ static AURA_VOID Laplacian7x7Row(const St *src_p2, const St *src_p1, const St *s
     }
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C>
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C>
 static Status Laplacian7x7HvxImpl(const Mat &src, Mat &dst, const std::vector<St> &border_value,
-                                  const St *border_buffer, MI_S32 start_row, MI_S32 end_row)
+                                  const St *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width   = src.GetSizes().m_width;
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 width   = src.GetSizes().m_width;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
 
     const St *src_p2 = src.Ptr<St, BORDER_TYPE>(start_row - 3, border_buffer);
     const St *src_p1 = src.Ptr<St, BORDER_TYPE>(start_row - 2, border_buffer);
@@ -682,12 +682,12 @@ static Status Laplacian7x7HvxImpl(const Mat &src, Mat &dst, const std::vector<St
     const St *src_n1 = src.Ptr<St, BORDER_TYPE>(start_row + 2, border_buffer);
     const St *src_n2 = src.Ptr<St, BORDER_TYPE>(start_row + 3, border_buffer);
 
-    MI_U64 L2fetch_row_param = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 L2fetch_row_param = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 4 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<St>(y + 4)), L2fetch_row_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<St>(y + 4)), L2fetch_row_param);
         }
 
         Dt *dst_c = dst.Ptr<Dt>(y);
@@ -711,34 +711,34 @@ static Status Laplacian7x7HvxHelper(Context *ctx, const Mat &src, Mat &dst, cons
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
         case 1:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Laplacian7x7HvxImpl<St, Dt, BORDER_TYPE, 1>,
+            ret = wp->ParallelFor((DT_S32)0, height, Laplacian7x7HvxImpl<St, Dt, BORDER_TYPE, 1>,
                                   std::cref(src), std::ref(dst), std::cref(border_value), border_buffer);
             break;
         }
 
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Laplacian7x7HvxImpl<St, Dt, BORDER_TYPE, 2>,
+            ret = wp->ParallelFor((DT_S32)0, height, Laplacian7x7HvxImpl<St, Dt, BORDER_TYPE, 2>,
                                   std::cref(src), std::ref(dst), std::cref(border_value), border_buffer);
             break;
         }
 
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Laplacian7x7HvxImpl<St, Dt, BORDER_TYPE, 3>,
+            ret = wp->ParallelFor((DT_S32)0, height, Laplacian7x7HvxImpl<St, Dt, BORDER_TYPE, 3>,
                                   std::cref(src), std::ref(dst), std::cref(border_value), border_buffer);
             break;
         }
@@ -758,18 +758,18 @@ static Status Laplacian7x7HvxHelper(Context *ctx, const Mat &src, Mat &dst, Bord
 {
     Status ret = Status::ERROR;
 
-    St *border_buffer = MI_NULL;
+    St *border_buffer = DT_NULL;
     std::vector<St> vec_border_value = border_value.ToVector<St>();
 
-    MI_S32 width   = src.GetSizes().m_width;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 width   = src.GetSizes().m_width;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (border_type)
     {
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -807,25 +807,25 @@ Status Laplacian7x7Hvx(Context *ctx, const Mat &src, Mat &dst, BorderType border
 {
     Status ret = Status::ERROR;
 
-    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
 
     switch (pattern)
     {
         case AURA_MAKE_PATTERN(ElemType::U8, ElemType::S16):
         {
-            ret = Laplacian7x7HvxHelper<MI_U8, MI_S16>(ctx, src, dst, border_type, border_value);
+            ret = Laplacian7x7HvxHelper<DT_U8, DT_S16>(ctx, src, dst, border_type, border_value);
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::U16, ElemType::U16):
         {
-            ret = Laplacian7x7HvxHelper<MI_U16, MI_U16>(ctx, src, dst, border_type, border_value);
+            ret = Laplacian7x7HvxHelper<DT_U16, DT_U16>(ctx, src, dst, border_type, border_value);
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::S16, ElemType::S16):
         {
-            ret = Laplacian7x7HvxHelper<MI_S16, MI_S16>(ctx, src, dst, border_type, border_value);
+            ret = Laplacian7x7HvxHelper<DT_S16, DT_S16>(ctx, src, dst, border_type, border_value);
             break;
         }
 

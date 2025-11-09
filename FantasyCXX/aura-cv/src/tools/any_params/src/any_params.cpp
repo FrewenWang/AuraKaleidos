@@ -17,12 +17,12 @@ const any& AnyParams::operator[](const std::string &key) const
     return m_any_params.at(key);
 }
 
-MI_BOOL AnyParams::HasKeys(const std::string &key) const
+DT_BOOL AnyParams::HasKeys(const std::string &key) const
 {
     return m_any_params.find(key) != m_any_params.end();
 }
 
-MI_S32 AnyParams::Size()
+DT_S32 AnyParams::Size()
 {
     return m_any_params.size();
 }

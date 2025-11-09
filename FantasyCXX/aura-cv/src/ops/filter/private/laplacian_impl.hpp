@@ -18,7 +18,7 @@ class LaplacianImpl : public OpImpl
 public:
     LaplacianImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    virtual Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                            BorderType border_type = BorderType::REFLECT_101,
                            const Scalar &border_value = Scalar());
 
@@ -28,10 +28,10 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    MI_S32     m_ksize;
+    DT_S32     m_ksize;
     BorderType m_border_type;
     Scalar     m_border_value;
 
@@ -44,7 +44,7 @@ class LaplacianNone : public LaplacianImpl
 public:
     LaplacianNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -57,7 +57,7 @@ class LaplacianNeon : public LaplacianImpl
 public:
     LaplacianNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -80,7 +80,7 @@ class LaplacianCL : public LaplacianImpl
 public:
     LaplacianCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -92,7 +92,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
@@ -109,7 +109,7 @@ class LaplacianHvx : public LaplacianImpl
 public:
     LaplacianHvx(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -128,7 +128,7 @@ Status Laplacian5x5Hvx(Context *ctx, const Mat &src, Mat &dst, BorderType border
 Status Laplacian7x7Hvx(Context *ctx, const Mat &src, Mat &dst, BorderType border_type, const Scalar &border_value);
 #  endif // AURA_BUILD_HEXAGON
 
-using LaplacianInParam = HexagonRpcParamType<Mat, Mat, MI_S32, BorderType, Scalar>;
+using LaplacianInParam = HexagonRpcParamType<Mat, Mat, DT_S32, BorderType, Scalar>;
 #  define AURA_OPS_FILTER_LAPLACIAN_OP_NAME          "Laplacian"
 
 #endif // (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))

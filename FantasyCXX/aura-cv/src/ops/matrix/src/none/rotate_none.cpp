@@ -84,7 +84,7 @@ template <typename Tp, RotateType ROTATE_TYPE>
 static Status RotateNoneHelper(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    MI_S32 height = dst.GetSizes().m_height;
+    DT_S32 height = dst.GetSizes().m_height;
 
     switch (dst.GetSizes().m_channel)
     {
@@ -208,7 +208,7 @@ Status RotateNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -221,7 +221,7 @@ Status RotateNone::Run()
         case ElemType::U8:
         case ElemType::S8:
         {
-            ret = RotateNoneHelper<MI_U8>(m_ctx, *src, *dst, m_type, m_target);
+            ret = RotateNoneHelper<DT_U8>(m_ctx, *src, *dst, m_type, m_target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "RotateNone Elem8 failed.");
@@ -234,7 +234,7 @@ Status RotateNone::Run()
         case ElemType::F16:
 #endif
         {
-            ret = RotateNoneHelper<MI_U16>(m_ctx, *src, *dst, m_type, m_target);
+            ret = RotateNoneHelper<DT_U16>(m_ctx, *src, *dst, m_type, m_target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "RotateNone Elem16 failed.");
@@ -247,7 +247,7 @@ Status RotateNone::Run()
         case ElemType::F32:
 #endif
         {
-            ret = RotateNoneHelper<MI_U32>(m_ctx, *src, *dst, m_type, m_target);
+            ret = RotateNoneHelper<DT_U32>(m_ctx, *src, *dst, m_type, m_target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "RotateNone Elem32 failed.");

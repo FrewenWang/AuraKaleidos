@@ -4,13 +4,13 @@
 namespace aura
 {
 
-XtensaRpcWrapper::XtensaRpcWrapper(Context *ctx, AURA_VOID *handle, MI_U32 op_id, std::string &name, XtensaRpcParam *param) :
-                                   m_ctx(ctx), m_handle(handle), m_op_id(op_id), m_param(param), m_xtensa_engine(MI_NULL)
+XtensaRpcWrapper::XtensaRpcWrapper(Context *ctx, DT_VOID *handle, DT_U32 op_id, std::string &name, XtensaRpcParam *param) :
+                                   m_ctx(ctx), m_handle(handle), m_op_id(op_id), m_param(param), m_xtensa_engine(DT_NULL)
 {
     m_full_name_buffer = m_ctx->GetMemPool()->GetBuffer(AURA_ALLOC_PARAM(m_ctx, AURA_MEM_DMA_BUF_HEAP, name.size(), 0));
 
     m_xtensa_engine = m_ctx->GetXtensaEngine();
-    if (MI_NULL == m_xtensa_engine)
+    if (DT_NULL == m_xtensa_engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "GetXtensaEngine failed, m_xtensa_engine is null ptr");
         return;
@@ -48,10 +48,10 @@ Status XtensaRpcWrapper::Run()
     XtensaRpcData rpc_data(m_xtensa_engine->GetDeviceAddr(m_full_name_buffer), m_full_name_buffer.m_size,
                            m_xtensa_engine->GetDeviceAddr(m_param->m_rpc_param), m_param->m_rpc_param.m_size);
 
-    MI_U32 *in_data = NULL;
-    MI_U32 in_data_len = 0;
-    MI_S32 output = -1;
-    MI_U32 output_size = sizeof(MI_S32);
+    DT_U32 *in_data = NULL;
+    DT_U32 in_data_len = 0;
+    DT_S32 output = -1;
+    DT_U32 output_size = sizeof(DT_S32);
 
     in_data = rpc_data.GetData(in_data_len);
     Status ret = Status::ERROR;

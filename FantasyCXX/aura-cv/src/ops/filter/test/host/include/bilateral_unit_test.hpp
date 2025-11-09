@@ -14,7 +14,7 @@ struct BilateralTestParam
     BilateralTestParam()
     {}
 
-    BilateralTestParam(MI_F32 sigma_color, MI_F32 sigma_space, MI_S32 ksize) : sigma_color(sigma_color),
+    BilateralTestParam(DT_F32 sigma_color, DT_F32 sigma_space, DT_S32 ksize) : sigma_color(sigma_color),
                        sigma_space(sigma_space), ksize(ksize)
     {}
 
@@ -32,9 +32,9 @@ struct BilateralTestParam
         return sstream.str();
     }
 
-    MI_F32 sigma_color;
-    MI_F32 sigma_space;
-    MI_S32 ksize;
+    DT_F32 sigma_color;
+    DT_F32 sigma_space;
+    DT_S32 ksize;
 };
 
 AURA_TEST_PARAM(BilateralParam,
@@ -56,10 +56,10 @@ static Status CvBilateralFilter(Context *ctx, Mat &src, Mat &dst, BilateralTestP
     }
 
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 cv_border_type = BorderTypeToOpencv(border_type);
+    DT_S32 cv_border_type = BorderTypeToOpencv(border_type);
 
-    MI_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
-    MI_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
+    DT_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
 
     if (src_cv_type != -1 && dst_cv_type != -1 && cv_border_type != -1)
     {
@@ -101,7 +101,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         BilateralParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -122,7 +122,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         BilateralParam run_param(GetParam((index)));
         ElemType src_elem_type = run_param.elem_type;
@@ -141,12 +141,12 @@ public:
 
         Scalar border_val = Scalar(0, 0, 0, 0);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
-        MI_F32 tolerance = 1.0f;
+        DT_F32 tolerance = 1.0f;
 
         result.param  = BorderTypeToString(run_param.border_type) + " | "+ bilateral_test_param.ToString();
         result.input  = run_param.mat_size.ToString() + " " + ElemTypesToString(src_elem_type);

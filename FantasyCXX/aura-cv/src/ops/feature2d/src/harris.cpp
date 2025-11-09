@@ -38,15 +38,15 @@ static std::shared_ptr<HarrisImpl> CreateHarrisImpl(Context *ctx, const OpTarget
 Harris::Harris(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Harris::SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+Status Harris::SetArgs(const Array *src, Array *dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                        BorderType border_type, const Scalar &border_value)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -75,14 +75,14 @@ Status Harris::SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 k
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateHarrisImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     HarrisImpl *harris_impl = dynamic_cast<HarrisImpl *>(m_impl.get());
-    if (MI_NULL == harris_impl)
+    if (DT_NULL == harris_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "harris_impl is null ptr");
         return Status::ERROR;
@@ -93,7 +93,7 @@ Status Harris::SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 k
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status IHarris(Context *ctx, const Mat &src, Mat &dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+AURA_EXPORTS Status IHarris(Context *ctx, const Mat &src, Mat &dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                             BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Harris harris(ctx, target);
@@ -104,13 +104,13 @@ AURA_EXPORTS Status IHarris(Context *ctx, const Mat &src, Mat &dst, MI_S32 block
 HarrisImpl::HarrisImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Harris", target),
                                                                m_block_size(0), m_ksize(0), m_k(0.0),
                                                                m_border_type(BorderType::REFLECT_101),
-                                                               m_src(MI_NULL), m_dst(MI_NULL)
+                                                               m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status HarrisImpl::SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+Status HarrisImpl::SetArgs(const Array *src, Array *dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                            BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -165,7 +165,7 @@ std::string HarrisImpl::ToString() const
 {
     std::string str;
 
-    MI_CHAR k_str[20];
+    DT_CHAR k_str[20];
     snprintf(k_str, sizeof(k_str), "%.2f", m_k);
 
     str = "op(Harris)";
@@ -177,7 +177,7 @@ std::string HarrisImpl::ToString() const
     return str;
 }
 
-AURA_VOID HarrisImpl::Dump(const std::string &prefix) const
+DT_VOID HarrisImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

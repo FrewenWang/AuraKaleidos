@@ -11,10 +11,10 @@ class NpModel : public NNModel
 public:
     struct TensorAttr
     {
-        MI_S32 zero_point;
-        MI_F32 scale;
+        DT_S32 zero_point;
+        DT_F32 scale;
         ElemType elem_type;
-        std::vector<MI_S32> sizes;
+        std::vector<DT_S32> sizes;
     };
 
     NpModel(Context *ctx, const ModelInfo &model_info);

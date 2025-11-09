@@ -1,0 +1,15 @@
+#!/usr/bin/expect -f
+spawn adb root
+spawn adb remount
+spawn adb shell
+
+expect "e171" { send "busybox telnet 192.168.78.2; exit\r" }
+expect "login" { send "root\r" }
+expect "Password" { send "togxuh-8Cyzto-juqven\r" }
+expect "#" { send "mount -uw /mnt/vendor/adas\r" }
+expect "#" { send "sed -i 's/output_encode_data :.*/output_encode_data : false/g' /mnt/vendor/adas/conf/drivers/camera_data.conf\r" }
+expect "#" { send "cat /mnt/vendor/adas/conf/drivers/camera_data.conf\r" }
+expect "#" { send "mount -ur /mnt/vendor/adas\r" }
+expect "#" { send "exit\r" }
+
+interact

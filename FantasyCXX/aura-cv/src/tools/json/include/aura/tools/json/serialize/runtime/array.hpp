@@ -13,26 +13,26 @@ namespace aura
  * @brief Define the json serialize method for Mat type reference and pointer.
  *
  */
-AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const Mat *mat);
+AURA_EXPORTS DT_VOID to_json(aura_json::json &json, const Mat *mat);
 
-AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, Mat *&mat);
+AURA_EXPORTS DT_VOID from_json(const aura_json::json &json, Mat *&mat);
 
-AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const Mat &mat);
+AURA_EXPORTS DT_VOID to_json(aura_json::json &json, const Mat &mat);
 
-AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, Mat &mat);
+AURA_EXPORTS DT_VOID from_json(const aura_json::json &json, Mat &mat);
 
 /**
  * @brief Define the json serialize method for CLMem type reference and pointer.
  *
  */
 #if defined(AURA_ENABLE_OPENCL)
-AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const CLMem *cl_mem);
+AURA_EXPORTS DT_VOID to_json(aura_json::json &json, const CLMem *cl_mem);
 
-AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, CLMem *&cl_mem);
+AURA_EXPORTS DT_VOID from_json(const aura_json::json &json, CLMem *&cl_mem);
 
-AURA_EXPORTS AURA_VOID to_json(aura_json::json &json, const CLMem &cl_mem);
+AURA_EXPORTS DT_VOID to_json(aura_json::json &json, const CLMem &cl_mem);
 
-AURA_EXPORTS AURA_VOID from_json(const aura_json::json &json, CLMem &cl_mem);
+AURA_EXPORTS DT_VOID from_json(const aura_json::json &json, CLMem &cl_mem);
 #endif
 
 /**

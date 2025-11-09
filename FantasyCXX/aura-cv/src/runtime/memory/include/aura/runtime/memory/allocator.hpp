@@ -71,7 +71,7 @@ namespace aura
  * @{
  */
 
-AURA_INLINE std::string MemTypeToString(const MI_S32 mem_type)
+AURA_INLINE std::string MemTypeToString(const DT_S32 mem_type)
 {
     if (mem_type == AURA_MEM_INVALID)
     {
@@ -117,7 +117,7 @@ public:
      * @brief Default constructor for Buffer.
      */
     Buffer() : m_type(AURA_MEM_INVALID), m_capacity(0), m_size(0),
-               m_data(MI_NULL), m_origin(MI_NULL), m_property(0)
+               m_data(DT_NULL), m_origin(DT_NULL), m_property(0)
     {}
 
     /**
@@ -130,8 +130,8 @@ public:
      * @param origin A pointer to the origin of the buffer.
      * @param property The property of the buffer.
      */
-    Buffer(MI_S32 type, MI_S64 capacity, MI_S64 size,
-           AURA_VOID *data, AURA_VOID *origin, MI_S32 property)
+    Buffer(DT_S32 type, DT_S64 capacity, DT_S64 size,
+           DT_VOID *data, DT_VOID *origin, DT_S32 property)
            : m_type(type), m_capacity(capacity), m_size(size),
              m_data(data), m_origin(origin), m_property(property)
     {}
@@ -209,9 +209,9 @@ public:
      * @param buffer0 The first Buffer to compare.
      * @param buffer1 The second Buffer to compare.
      *
-     * @return `MI_TRUE` if the Buffers are equal, `MI_FALSE` otherwise.
+     * @return `DT_TRUE` if the Buffers are equal, `DT_FALSE` otherwise.
      */
-    AURA_EXPORTS friend MI_BOOL operator==(const Buffer &buffer0, const Buffer &buffer1)
+    AURA_EXPORTS friend DT_BOOL operator==(const Buffer &buffer0, const Buffer &buffer1)
     {
         if (buffer0.m_type     == buffer1.m_type &&
             buffer0.m_capacity == buffer1.m_capacity &&
@@ -220,9 +220,9 @@ public:
             buffer0.m_origin   == buffer1.m_origin &&
             buffer0.m_property == buffer1.m_property)
         {
-            return MI_TRUE;
+            return DT_TRUE;
         }
-        return MI_FALSE;
+        return DT_FALSE;
     }
 
     /**
@@ -230,9 +230,9 @@ public:
      *
      * @return The offset.
      */
-    MI_S32 GetOffset() const
+    DT_S32 GetOffset() const
     {
-        MI_S32 offset = reinterpret_cast<MI_UPTR_T>(m_data) - reinterpret_cast<MI_UPTR_T>(m_origin);
+        DT_S32 offset = reinterpret_cast<DT_UPTR_T>(m_data) - reinterpret_cast<DT_UPTR_T>(m_origin);
         return offset;
     }
 
@@ -244,9 +244,9 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status Resize(MI_S32 size, MI_S32 relative_offset = 0)
+    Status Resize(DT_S32 size, DT_S32 relative_offset = 0)
     {
-        m_data = reinterpret_cast<MI_U8*>(m_data) + relative_offset;
+        m_data = reinterpret_cast<DT_U8*>(m_data) + relative_offset;
         m_size = size;
         return Status::OK;
     }
@@ -254,24 +254,24 @@ public:
     /**
      * @brief Check if the buffer is valid.
      *
-     * @return `MI_TRUE` if the buffer is valid, `MI_FALSE` otherwise.
+     * @return `DT_TRUE` if the buffer is valid, `DT_FALSE` otherwise.
      */
-    MI_BOOL IsValid() const
+    DT_BOOL IsValid() const
     {
-        return ((m_type != AURA_MEM_INVALID) && (m_origin != MI_NULL)
-                && (m_data != MI_NULL) && (m_capacity >= m_size) && (m_size > 0));
+        return ((m_type != AURA_MEM_INVALID) && (m_origin != DT_NULL)
+                && (m_data != DT_NULL) && (m_capacity >= m_size) && (m_size > 0));
     }
 
     /**
      * @brief Clear the buffer.
      */
-    AURA_VOID Clear()
+    DT_VOID Clear()
     {
         m_type     = AURA_MEM_INVALID;
         m_capacity = 0;
         m_size     = 0;
-        m_data     = MI_NULL;
-        m_origin   = MI_NULL;
+        m_data     = DT_NULL;
+        m_origin   = DT_NULL;
         m_property = 0;
     }
 
@@ -285,15 +285,15 @@ public:
      * @return The data.
      */
     template<typename Tp>
-    Tp GetData(MI_S32 offset = 0)
+    Tp GetData(DT_S32 offset = 0)
     {
         if (std::is_pointer<Tp>::value)
         {
-            return reinterpret_cast<Tp>(reinterpret_cast<MI_U8*>(m_data) + offset);
+            return reinterpret_cast<Tp>(reinterpret_cast<DT_U8*>(m_data) + offset);
         }
         else
         {
-            return reinterpret_cast<Tp*>(reinterpret_cast<MI_U8*>(m_data) + offset)[0];
+            return reinterpret_cast<Tp*>(reinterpret_cast<DT_U8*>(m_data) + offset)[0];
         }
     }
 
@@ -307,25 +307,25 @@ public:
      * @return The constant data.
      */
     template<typename Tp>
-    const Tp GetData(MI_S32 offset = 0) const
+    const Tp GetData(DT_S32 offset = 0) const
     {
         if (std::is_pointer<Tp>::value)
         {
-            return reinterpret_cast<Tp>(reinterpret_cast<MI_U8*>(m_data) + offset);
+            return reinterpret_cast<Tp>(reinterpret_cast<DT_U8*>(m_data) + offset);
         }
         else
         {
-            return reinterpret_cast<Tp*>(reinterpret_cast<MI_U8*>(m_data) + offset)[0];
+            return reinterpret_cast<Tp*>(reinterpret_cast<DT_U8*>(m_data) + offset)[0];
         }
     }
 
-    MI_S32 m_type;      /*!< The type of the buffer. */
-    MI_S64 m_capacity;  /*!< The capacity of the buffer. */
-    MI_S64 m_size;      /*!< The size of the buffer. */
+    DT_S32 m_type;      /*!< The type of the buffer. */
+    DT_S64 m_capacity;  /*!< The capacity of the buffer. */
+    DT_S64 m_size;      /*!< The size of the buffer. */
 
-    AURA_VOID *m_data;    /*!< A pointer to the data of the buffer. */
-    AURA_VOID *m_origin;  /*!< A pointer to the origin of the buffer. */
-    MI_S32  m_property; /*!< The property of the buffer. */
+    DT_VOID *m_data;    /*!< A pointer to the data of the buffer. */
+    DT_VOID *m_origin;  /*!< A pointer to the origin of the buffer. */
+    DT_S32  m_property; /*!< The property of the buffer. */
 };
 
 /**
@@ -351,7 +351,7 @@ public:
      * @param type The type of the allocator.
      * @param name The name of the allocator.
      */
-    Allocator(MI_S32 type, const std::string &name) : m_type(type), m_name(name)
+    Allocator(DT_S32 type, const std::string &name) : m_type(type), m_name(name)
     {
         AURA_UNUSED(m_type);
     }
@@ -359,7 +359,7 @@ public:
     /**
      * @brief Destructor for Allocator.
      */
-    virtual ~Allocator(AURA_VOID)
+    virtual ~Allocator(DT_VOID)
     {}
 
     /**
@@ -385,14 +385,14 @@ public:
      *
      * @return The allocated buffer.
      */
-    virtual Buffer Allocate(MI_S64 size, MI_S32 align = 0) = 0;
+    virtual Buffer Allocate(DT_S64 size, DT_S32 align = 0) = 0;
 
     /**
      * @brief Free a buffer allocated by the allocator.
      *
      * @param buffer The buffer to free.
      */
-    virtual AURA_VOID Free(Buffer &buffer) = 0;
+    virtual DT_VOID Free(Buffer &buffer) = 0;
 
     /**
      * @brief Map a buffer for access.
@@ -413,7 +413,7 @@ public:
     virtual Status Unmap(const Buffer &buffer) = 0;
 
 private:
-    MI_S32 m_type;          /*!< The type of the allocator. */
+    DT_S32 m_type;          /*!< The type of the allocator. */
     std::string m_name;     /*!< The name of the allocator. */
 };
 

@@ -9,34 +9,34 @@ namespace aura
 {
 
 template <typename Tp>
-static Status CvtBayer2BgrNeonImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_BOOL swapg, MI_S32 start_row, MI_S32 end_row)
+static Status CvtBayer2BgrNeonImpl(const Mat &src, Mat &dst, DT_BOOL swapb, DT_BOOL swapg, DT_S32 start_row, DT_S32 end_row)
 {
     using VdType  = typename neon::DVector<Tp>::VType;
     using VqType  = typename neon::WVectorBits<VdType>::VType;
     using V2dType = typename neon::MDVector<Tp, 2>::MVType;
     using V3qType = typename neon::MQVector<Tp, 3>::MVType;
 
-    const Tp *src_p  = MI_NULL;
-    const Tp *src_c  = MI_NULL;
-    const Tp *src_n0 = MI_NULL;
-    const Tp *src_n1 = MI_NULL;
+    const Tp *src_p  = DT_NULL;
+    const Tp *src_c  = DT_NULL;
+    const Tp *src_n0 = DT_NULL;
+    const Tp *src_n1 = DT_NULL;
 
-    Tp *dst_c = MI_NULL;
-    Tp *dst_n = MI_NULL;
+    Tp *dst_c = DT_NULL;
+    Tp *dst_n = DT_NULL;
 
-    MI_S32 width       = dst.GetSizes().m_width;
-    MI_S32 elem_counts = 16 / ElemTypeSize(GetElemType<Tp>()) - 2;
-    MI_S32 width_align = width - (elem_counts + 2);
+    DT_S32 width       = dst.GetSizes().m_width;
+    DT_S32 elem_counts = 16 / ElemTypeSize(GetElemType<Tp>()) - 2;
+    DT_S32 width_align = width - (elem_counts + 2);
 
-    MI_S32 offset  = 0;
-    MI_S32 b_idx_s = swapb ? -1 : 1;
-    MI_S32 b_idx_v = swapb ? 0 : 2;
-    MI_S32 r_idx_v = swapb ? 2 : 0;
+    DT_S32 offset  = 0;
+    DT_S32 b_idx_s = swapb ? -1 : 1;
+    DT_S32 b_idx_v = swapb ? 0 : 2;
+    DT_S32 r_idx_v = swapb ? 2 : 0;
 
     V2dType v2d_src_p, v2d_src_c, v2d_src_n0, v2d_src_n1;
     V3qType v3q_dst;
 
-    for (MI_S32 y = (start_row * 2); y < (end_row * 2); y += 2)
+    for (DT_S32 y = (start_row * 2); y < (end_row * 2); y += 2)
     {
         if (swapg)
         {
@@ -57,7 +57,7 @@ static Status CvtBayer2BgrNeonImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_B
             dst_n  = dst.Ptr<Tp>(y + 2);
         }
 
-        MI_S32 x = 1;
+        DT_S32 x = 1;
         for (; x < width_align; x += elem_counts)
         {
             v2d_src_p  = neon::vload2(src_p + x - 1);
@@ -154,21 +154,21 @@ static Status CvtBayer2BgrNeonImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_B
 
 static Status CvtBayer2BgrRemainNeonImpl(Mat &dst)
 {
-    MI_S32 height = dst.GetSizes().m_height;
-    MI_S32 width  = dst.GetSizes().m_width;
+    DT_S32 height = dst.GetSizes().m_height;
+    DT_S32 width  = dst.GetSizes().m_width;
 
-    AURA_VOID *dst_c = dst.Ptr<AURA_VOID>(height - 1);
-    AURA_VOID *dst_n = dst.Ptr<AURA_VOID>(height - 2);
+    DT_VOID *dst_c = dst.Ptr<DT_VOID>(height - 1);
+    DT_VOID *dst_n = dst.Ptr<DT_VOID>(height - 2);
     memcpy(dst_c, dst_n, 3 * width * ElemTypeSize(dst.GetElemType()));
 
-    dst_c = dst.Ptr<AURA_VOID>(0);
-    dst_n = dst.Ptr<AURA_VOID>(1);
+    dst_c = dst.Ptr<DT_VOID>(0);
+    dst_n = dst.Ptr<DT_VOID>(1);
     memcpy(dst_c, dst_n, 3 * width * ElemTypeSize(dst.GetElemType()));
 
     return Status::OK;
 }
 
-Status CvtBayer2BgrNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, MI_BOOL swapg, const OpTarget &target)
+Status CvtBayer2BgrNeon(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb, DT_BOOL swapg, const OpTarget &target)
 {
     AURA_UNUSED(target);
     Status ret = Status::ERROR;
@@ -191,10 +191,10 @@ Status CvtBayer2BgrNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, M
         return ret;
     }
 
-    MI_S32 height = (src.GetSizes().m_height - 2) / 2;
+    DT_S32 height = (src.GetSizes().m_height - 2) / 2;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
@@ -204,13 +204,13 @@ Status CvtBayer2BgrNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, M
     {
         case ElemType::U8:
         {
-            ret = wp->ParallelFor(0, height, CvtBayer2BgrNeonImpl<MI_U8>, std::cref(src), std::ref(dst), swapb, swapg);
+            ret = wp->ParallelFor(0, height, CvtBayer2BgrNeonImpl<DT_U8>, std::cref(src), std::ref(dst), swapb, swapg);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = wp->ParallelFor(0, height, CvtBayer2BgrNeonImpl<MI_U16>, std::cref(src), std::ref(dst), swapb, swapg);
+            ret = wp->ParallelFor(0, height, CvtBayer2BgrNeonImpl<DT_U16>, std::cref(src), std::ref(dst), swapb, swapg);
             break;
         }
 

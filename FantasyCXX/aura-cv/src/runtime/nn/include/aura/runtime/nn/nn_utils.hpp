@@ -29,7 +29,7 @@ namespace aura
  *
  * @return Status::OK if successful; otherwise, an appropriate error status
  */
-AURA_EXPORTS Status NNEncrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, MI_U64 size);
+AURA_EXPORTS Status NNEncrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, DT_U64 size);
 
 /**
  * @brief Decryption function, decrypt intput buffer with key and get decrypted output buffer
@@ -42,7 +42,7 @@ AURA_EXPORTS Status NNEncrypt(Context *ctx, const Buffer &src, Buffer &dst, cons
  *
  * @return Status::OK if successful; otherwise, an appropriate error status
  */
-AURA_EXPORTS Status NNDecrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, MI_U64 size);
+AURA_EXPORTS Status NNDecrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, DT_U64 size);
 
 /**
  * @brief Quantize function, use scale、zero_point to quantize input buffer
@@ -55,7 +55,7 @@ AURA_EXPORTS Status NNDecrypt(Context *ctx, const Buffer &src, Buffer &dst, cons
  *
  * @return Status::OK if successful; otherwise, an appropriate error status
  */
-AURA_EXPORTS Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_F32 scale);
+AURA_EXPORTS Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, DT_S32 zero_point, DT_F32 scale);
 
 /**
  * @brief Dequantize function, use scale、zero_point to quantize input buffer
@@ -68,7 +68,7 @@ AURA_EXPORTS Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 ze
  *
  * @return Status::OK if successful; otherwise, an appropriate error status
  */
-AURA_EXPORTS Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_F32 scale);
+AURA_EXPORTS Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, DT_S32 zero_point, DT_F32 scale);
 
 /**
  * @brief Split function, use separator to split input string
@@ -78,7 +78,7 @@ AURA_EXPORTS Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 
  *
  * @return Delimited list of strings
  */
-AURA_EXPORTS std::vector<std::string> NNSplit(const std::string &src, MI_CHAR separator = ';');
+AURA_EXPORTS std::vector<std::string> NNSplit(const std::string &src, DT_CHAR separator = ';');
 
 /**
  * @}

@@ -6,7 +6,7 @@ namespace aura
 {
 
 static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, ElemType map_type, BorderType border_type,
-                                 MI_S32 elem_counts, MI_S32 elem_height, MI_S32 channel, std::string &build_opt)
+                                 DT_S32 elem_counts, DT_S32 elem_height, DT_S32 channel, std::string &build_opt)
 {
     const std::vector<std::string> tbl =
     {
@@ -50,7 +50,7 @@ static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, ElemType map_t
 }
 
 static Status GetCLKernelParam(Context *ctx, InterpType interp_type, BorderType border_type, ElemType map_elem_type,
-                               MI_S32 channel, MI_S32 &elem_counts, MI_S32 &elem_height)
+                               DT_S32 channel, DT_S32 &elem_counts, DT_S32 &elem_height)
 {
     std::shared_ptr<CLRuntime> cl_rt = ctx->GetCLEngine()->GetCLRuntime();
     GpuType gpu_type = cl_rt->GetGpuInfo().m_type;
@@ -105,7 +105,7 @@ static std::string InterpTypeToCLString(InterpType interp_type)
     return std::string();
 }
 
-static Status GetCLName(Context *ctx, MI_S32 channel, InterpType interp_type, std::string &kernel_name, std::string &program_name)
+static Status GetCLName(Context *ctx, DT_S32 channel, InterpType interp_type, std::string &kernel_name, std::string &program_name)
 {
     std::string interp_type_str = InterpTypeToCLString(interp_type);
 
@@ -122,7 +122,7 @@ static Status GetCLName(Context *ctx, MI_S32 channel, InterpType interp_type, st
     return Status::OK;
 }
 
-static AURA_VOID GetCLGlobalSize(Array *dst, MI_S32 elem_counts, MI_S32 elem_height, cl::NDRange &range)
+static DT_VOID GetCLGlobalSize(Array *dst, DT_S32 elem_counts, DT_S32 elem_height, cl::NDRange &range)
 {
     range = cl::NDRange((dst->GetSizes().m_width  + elem_counts - 1) / elem_counts,
                         (dst->GetSizes().m_height + elem_height - 1) / elem_height);
@@ -163,7 +163,7 @@ Status RemapCL::Initialize()
         return Status::ERROR;
     }
 
-    MI_S32 channel = m_dst->GetSizes().m_channel;
+    DT_S32 channel = m_dst->GetSizes().m_channel;
 
     // 1. init cl_mem
     cl_channel_order cl_ch_order = (1 == channel) ? CL_R : CL_RG;
@@ -234,13 +234,13 @@ Status RemapCL::DeInitialize()
 
 Status RemapCL::Run()
 {
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 mstep   = m_map->GetRowPitch() / ElemTypeSize(m_map->GetElemType());
-    MI_S32 oheight = m_dst->GetSizes().m_height;
-    MI_S32 owidth  = m_dst->GetSizes().m_width;
-    MI_S32 channel = m_dst->GetSizes().m_channel;
-    MI_S32 iheight = m_src->GetSizes().m_height;
-    MI_S32 iwidth  = m_src->GetSizes().m_width;
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 mstep   = m_map->GetRowPitch() / ElemTypeSize(m_map->GetElemType());
+    DT_S32 oheight = m_dst->GetSizes().m_height;
+    DT_S32 owidth  = m_dst->GetSizes().m_width;
+    DT_S32 channel = m_dst->GetSizes().m_channel;
+    DT_S32 iheight = m_src->GetSizes().m_height;
+    DT_S32 iwidth  = m_src->GetSizes().m_width;
     CLScalar cl_border_value = clScalar(m_border_value);
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -254,7 +254,7 @@ Status RemapCL::Run()
     Status ret_sync = Status::ERROR;
 
     // 3. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Iaura2D, MI_S32, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, cl::Buffer, MI_S32, CLScalar>(
+    cl_ret = m_cl_kernels[0].Run<cl::Iaura2D, DT_S32, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, cl::Buffer, DT_S32, CLScalar>(
                              m_cl_src.GetCLMemRef<cl::Iaura2D>(), iheight, iwidth,
                              m_cl_dst.GetCLMemRef<cl::Buffer>(),  oheight, owidth * channel, ostep,
                              m_cl_map.GetCLMemRef<cl::Buffer>(),  mstep,
@@ -267,7 +267,7 @@ Status RemapCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -276,7 +276,7 @@ Status RemapCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -300,11 +300,11 @@ std::string RemapCL::ToString() const
     return RemapImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> RemapCL::GetCLKernels(Context *ctx, ElemType map_elem_type, ElemType dst_elem_type, MI_S32 channel,
+std::vector<CLKernel> RemapCL::GetCLKernels(Context *ctx, ElemType map_elem_type, ElemType dst_elem_type, DT_S32 channel,
                                             BorderType border_type, InterpType interp_type)
 {
     std::vector<CLKernel> cl_kernels;
-    MI_S32 elem_counts, elem_height;
+    DT_S32 elem_counts, elem_height;
 
     if (GetCLKernelParam(ctx, interp_type, border_type, map_elem_type, channel, elem_counts, elem_height) != Status::OK)
     {

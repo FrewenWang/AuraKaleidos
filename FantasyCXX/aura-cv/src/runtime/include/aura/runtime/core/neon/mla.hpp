@@ -49,16 +49,16 @@ inline float16x8_t vmla(const float16x8_t &a, const float16x8_t &b, const float1
         return prefix##_##postfix(v, u, p);                            \
     }
 
-DECLFUN(uint16x4_t,  uint16x4_t,  MI_U16,  vmla_n,  u16)
-DECLFUN(uint16x8_t,  uint16x8_t,  MI_U16,  vmlaq_n, u16)
-DECLFUN(int16x4_t,   int16x4_t,   MI_S16,  vmla_n,  s16)
-DECLFUN(int16x8_t,   int16x8_t,   MI_S16,  vmlaq_n, s16)
-DECLFUN(uint32x2_t,  uint32x2_t,  MI_U32,  vmla_n,  u32)
-DECLFUN(uint32x4_t,  uint32x4_t,  MI_U32,  vmlaq_n, u32)
-DECLFUN(int32x2_t,   int32x2_t,   MI_S32,  vmla_n,  s32)
-DECLFUN(int32x4_t,   int32x4_t,   MI_S32,  vmlaq_n, s32)
-DECLFUN(float32x2_t, float32x2_t, MI_F32,  vmla_n,  f32)
-DECLFUN(float32x4_t, float32x4_t, MI_F32,  vmlaq_n, f32)
+DECLFUN(uint16x4_t,  uint16x4_t,  DT_U16,  vmla_n,  u16)
+DECLFUN(uint16x8_t,  uint16x8_t,  DT_U16,  vmlaq_n, u16)
+DECLFUN(int16x4_t,   int16x4_t,   DT_S16,  vmla_n,  s16)
+DECLFUN(int16x8_t,   int16x8_t,   DT_S16,  vmlaq_n, s16)
+DECLFUN(uint32x2_t,  uint32x2_t,  DT_U32,  vmla_n,  u32)
+DECLFUN(uint32x4_t,  uint32x4_t,  DT_U32,  vmlaq_n, u32)
+DECLFUN(int32x2_t,   int32x2_t,   DT_S32,  vmla_n,  s32)
+DECLFUN(int32x4_t,   int32x4_t,   DT_S32,  vmlaq_n, s32)
+DECLFUN(float32x2_t, float32x2_t, DT_F32,  vmla_n,  f32)
+DECLFUN(float32x4_t, float32x4_t, DT_F32,  vmlaq_n, f32)
 #undef DECLFUN
 
 #define DECLFUN(dtype, vtype, prefix, postfix)                         \
@@ -81,10 +81,10 @@ DECLFUN(int64x2_t,   int32x2_t,   vmlal,  s32)
         return prefix##_##postfix(v, u, p);                            \
     }
 
-DECLFUN(uint32x4_t,  uint16x4_t, MI_U16,  vmlal_n,  u16)
-DECLFUN(int32x4_t,   int16x4_t,  MI_S16,  vmlal_n,  s16)
-DECLFUN(uint64x2_t,  uint32x2_t, MI_U32,  vmlal_n,  u32)
-DECLFUN(int64x2_t,   int32x2_t,  MI_S32,  vmlal_n,  s32)
+DECLFUN(uint32x4_t,  uint16x4_t, DT_U16,  vmlal_n,  u16)
+DECLFUN(int32x4_t,   int16x4_t,  DT_S16,  vmlal_n,  s16)
+DECLFUN(uint64x2_t,  uint32x2_t, DT_U32,  vmlal_n,  u32)
+DECLFUN(int64x2_t,   int32x2_t,  DT_S32,  vmlal_n,  s32)
 #undef DECLFUN
 
 } // namespace neon

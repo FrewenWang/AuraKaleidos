@@ -29,7 +29,7 @@ Status MipiPackHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -50,7 +50,7 @@ Status MipiPackHvx::Run()
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
     ret = engine->Run(AURA_OPS_MISC_PACKAGE_NAME, AURA_OPS_MISC_MIPIPACK_OP_NAME, rpc_param, &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }
@@ -88,7 +88,7 @@ Status MipiUnPackHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -109,7 +109,7 @@ Status MipiUnPackHvx::Run()
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
     ret = engine->Run(AURA_OPS_MISC_PACKAGE_NAME, AURA_OPS_MISC_MIPIUNPACK_OP_NAME, rpc_param, &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }

@@ -54,14 +54,14 @@ static std::shared_ptr<MedianImpl> CreateMedianImpl(Context *ctx, const OpTarget
 Median::Median(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Median::SetArgs(const Array *src, Array *dst, MI_S32 ksize)
+Status Median::SetArgs(const Array *src, Array *dst, DT_S32 ksize)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -112,14 +112,14 @@ Status Median::SetArgs(const Array *src, Array *dst, MI_S32 ksize)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateMedianImpl(m_ctx, impl_target);
     }
 
     // run initialize
     MedianImpl *median_impl = dynamic_cast<MedianImpl *>(m_impl.get());
-    if (MI_NULL == median_impl)
+    if (DT_NULL == median_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "median_impl is null ptr");
         return Status::ERROR;
@@ -130,10 +130,10 @@ Status Median::SetArgs(const Array *src, Array *dst, MI_S32 ksize)
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Median::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize)
+Status Median::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -154,7 +154,7 @@ Status Median::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI
     return Status::OK;
 }
 
-AURA_EXPORTS Status IMedian(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, const OpTarget &target)
+AURA_EXPORTS Status IMedian(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, const OpTarget &target)
 {
     Median median(ctx, target);
 
@@ -162,12 +162,12 @@ AURA_EXPORTS Status IMedian(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize
 }
 
 MedianImpl::MedianImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Median", target),
-                                                               m_ksize(0), m_src(MI_NULL), m_dst(MI_NULL)
+                                                               m_ksize(0), m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status MedianImpl::SetArgs(const Array *src, Array *dst, MI_S32 ksize)
+Status MedianImpl::SetArgs(const Array *src, Array *dst, DT_S32 ksize)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -224,7 +224,7 @@ std::string MedianImpl::ToString() const
     return str;
 }
 
-AURA_VOID MedianImpl::Dump(const std::string &prefix) const
+DT_VOID MedianImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

@@ -15,7 +15,7 @@ class GridDftImpl : public OpImpl
 public:
     GridDftImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len);
+    virtual Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -23,12 +23,12 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src;
     Array *m_dst;
-    MI_S32 m_grid_len;
+    DT_S32 m_grid_len;
 };
 
 class GridDftNone : public GridDftImpl
@@ -36,7 +36,7 @@ class GridDftNone : public GridDftImpl
 public:
     GridDftNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len) override;
 
     Status Run() override;
 };
@@ -47,7 +47,7 @@ class GridDftNeon : public GridDftImpl
 public:
     GridDftNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len) override;
 
     Status Run() override;
 };
@@ -59,7 +59,7 @@ class GridDftCL : public GridDftImpl
 public:
     GridDftCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len) override;
 
     Status Initialize() override;
 
@@ -69,7 +69,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 grid_len);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 grid_len);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
@@ -77,7 +77,7 @@ private:
     CLMem m_cl_dst;
     CLMem m_cl_param;
     Mat m_param;
-    MI_S32 m_local_buffer_size;
+    DT_S32 m_local_buffer_size;
     std::string m_profiling_string;
 };
 #endif
@@ -87,7 +87,7 @@ class GridIDftImpl : public OpImpl
 public:
     GridIDftImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL with_scale);
+    virtual Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len, DT_BOOL with_scale);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -95,13 +95,13 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src;
     Array *m_dst;
-    MI_S32 m_grid_len;
-    MI_BOOL m_with_scale;
+    DT_S32 m_grid_len;
+    DT_BOOL m_with_scale;
 };
 
 class GridIDftNone : public GridIDftImpl
@@ -109,7 +109,7 @@ class GridIDftNone : public GridIDftImpl
 public:
     GridIDftNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL with_scale) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len, DT_BOOL with_scale) override;
 
     Status Run() override;
 };
@@ -120,7 +120,7 @@ class GridIDftNeon : public GridIDftImpl
 public:
     GridIDftNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL with_scale) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len, DT_BOOL with_scale) override;
 
     Status Run() override;
 };
@@ -132,7 +132,7 @@ class GridIDftCL : public GridIDftImpl
 public:
     GridIDftCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL with_scale) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len, DT_BOOL with_scale) override;
 
     Status Initialize() override;
 
@@ -142,7 +142,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 grid_len, MI_S32 with_scale, MI_BOOL save_real_only);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 grid_len, DT_S32 with_scale, DT_BOOL save_real_only);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
@@ -150,7 +150,7 @@ private:
     CLMem m_cl_dst;
     CLMem m_cl_param;
     Mat m_param;
-    MI_S32 m_local_buffer_size;
+    DT_S32 m_local_buffer_size;
 
     std::string m_profiling_string;
 };

@@ -5,15 +5,15 @@ namespace aura
 {
 
 template <typename Tp, BorderType BORDER_TYPE, typename Kt>
-static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_n,
-                              MI_S32 iwidth, Tp *dst_c0, Tp *dst_c1, const Kt *kernel)
+static DT_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_n,
+                              DT_S32 iwidth, Tp *dst_c0, Tp *dst_c1, const Kt *kernel)
 {
     using SumType = typename Promote<Kt>::Type;
 
-    MI_S32 dx = 0;
-    MI_S32 src_idx_l = 0, src_idx_c = 0, src_idx_n = 0;
+    DT_S32 dx = 0;
+    DT_S32 src_idx_l = 0, src_idx_c = 0, src_idx_n = 0;
     SumType e_sum[3] = {0}, o_sum[3] = {0}, result[4] = {0};
-    for (MI_S32 sx = 0; sx < iwidth; sx++)
+    for (DT_S32 sx = 0; sx < iwidth; sx++)
     {
         dx = sx << 1;
         src_idx_l = GetBorderIdx<BORDER_TYPE>(sx - 1, iwidth);
@@ -43,21 +43,21 @@ static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_
 }
 
 template <typename Tp, BorderType BORDER_TYPE>
-static Status PyrUp5x5NoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat, MI_S32 start_row, MI_S32 end_row)
+static Status PyrUp5x5NoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using Kt = typename PyrUpTraits<Tp>::KernelType;
     const Kt *kernel = kmat.Ptr<Kt>(0);
 
-    const MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 dy = 0;
+    const DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 dy = 0;
 
-    const Tp *src_p = src.Ptr<Tp, BORDER_TYPE>(start_row - 1, MI_NULL);
+    const Tp *src_p = src.Ptr<Tp, BORDER_TYPE>(start_row - 1, DT_NULL);
     const Tp *src_c = src.Ptr<Tp>(start_row);
-    const Tp *src_n = src.Ptr<Tp, BorderType::REPLICATE>(start_row + 1, MI_NULL);
+    const Tp *src_n = src.Ptr<Tp, BorderType::REPLICATE>(start_row + 1, DT_NULL);
 
-    for (MI_S32 sy = start_row; sy < end_row; sy++)
+    for (DT_S32 sy = start_row; sy < end_row; sy++)
     {
         dy = sy << 1;
 
@@ -68,7 +68,7 @@ static Status PyrUp5x5NoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat
 
         src_p = src_c;
         src_c = src_n;
-        src_n = src.Ptr<Tp, BorderType::REPLICATE>(sy + 2, MI_NULL);
+        src_n = src.Ptr<Tp, BorderType::REPLICATE>(sy + 2, DT_NULL);
     }
 
     return Status::OK;
@@ -80,7 +80,7 @@ static Status PyrUp5x5NoneHelper(Context *ctx, const Mat &src, Mat &dst, const M
                                  BorderType &border_type, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    MI_S32 iheight = src.GetSizes().m_height;
+    DT_S32 iheight = src.GetSizes().m_height;
 
     switch (border_type)
     {
@@ -89,13 +89,13 @@ static Status PyrUp5x5NoneHelper(Context *ctx, const Mat &src, Mat &dst, const M
             if (target.m_data.none.enable_mt)
             {
                 WorkerPool *wp = ctx->GetWorkerPool();
-                if (MI_NULL == wp)
+                if (DT_NULL == wp)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                     return Status::ERROR;
                 }
 
-                ret = wp->ParallelFor(static_cast<MI_S32>(0), iheight,
+                ret = wp->ParallelFor(static_cast<DT_S32>(0), iheight,
                                       PyrUp5x5NoneImpl<Tp, BorderType::REPLICATE>, ctx,
                                       std::cref(src), std::ref(dst), std::cref(kmat));
             }
@@ -111,13 +111,13 @@ static Status PyrUp5x5NoneHelper(Context *ctx, const Mat &src, Mat &dst, const M
             if (target.m_data.none.enable_mt)
             {
                 WorkerPool *wp = ctx->GetWorkerPool();
-                if (MI_NULL == wp)
+                if (DT_NULL == wp)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                     return Status::ERROR;
                 }
 
-                ret = wp->ParallelFor(static_cast<MI_S32>(0), iheight,
+                ret = wp->ParallelFor(static_cast<DT_S32>(0), iheight,
                                       PyrUp5x5NoneImpl<Tp, BorderType::REFLECT_101>, ctx,
                                       std::cref(src), std::ref(dst), std::cref(kmat));
             }
@@ -146,19 +146,19 @@ Status PyrUp5x5None(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat, Bor
     {
         case ElemType::U8:
         {
-            ret = PyrUp5x5NoneHelper<MI_U8>(ctx, src, dst, kmat, border_type, target);
+            ret = PyrUp5x5NoneHelper<DT_U8>(ctx, src, dst, kmat, border_type, target);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = PyrUp5x5NoneHelper<MI_U16>(ctx, src, dst, kmat, border_type, target);
+            ret = PyrUp5x5NoneHelper<DT_U16>(ctx, src, dst, kmat, border_type, target);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = PyrUp5x5NoneHelper<MI_S16>(ctx, src, dst, kmat, border_type, target);
+            ret = PyrUp5x5NoneHelper<DT_S16>(ctx, src, dst, kmat, border_type, target);
             break;
         }
 

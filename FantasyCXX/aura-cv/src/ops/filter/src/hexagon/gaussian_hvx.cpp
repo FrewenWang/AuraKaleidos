@@ -8,16 +8,16 @@ namespace aura
 template <typename Tp>
 struct GaussianTraits
 {
-    // MI_U32 MI_S32 MI_F32, MI_U8 MI_U16 MI_S16
+    // DT_U32 DT_S32 DT_F32, DT_U8 DT_U16 DT_S16
     using KernelType = typename std::conditional<sizeof(Tp) == 4, Tp, typename Promote<Tp>::Type>::type;
-    // MI_F32, MI_U8 MI_U32 MI_S32, MI_U16 MI_S16
-    static constexpr MI_U32 Q = is_floating_point<Tp>::value ? 0 : (sizeof(Tp) > 1 ? 14 : 8);
+    // DT_F32, DT_U8 DT_U32 DT_S32, DT_U16 DT_S16
+    static constexpr DT_U32 Q = is_floating_point<Tp>::value ? 0 : (sizeof(Tp) > 1 ? 14 : 8);
 };
 
 GaussianHvx::GaussianHvx(Context *ctx, const OpTarget &target) : GaussianImpl(ctx, target)
 {}
 
-Status GaussianHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+Status GaussianHvx::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                             BorderType border_type, const Scalar &border_value)
 {
     if (GaussianImpl::SetArgs(src, dst, ksize, sigma, border_type, border_value) != Status::OK)
@@ -32,7 +32,7 @@ Status GaussianHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 s
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1 && ch != 2 && ch != 3)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2/3");
@@ -52,11 +52,11 @@ Status GaussianHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 s
 
 Status GaussianHvx::PrepareKmat()
 {
-    std::vector<MI_F32> kernel = GetGaussianKernel(m_ksize, m_sigma);
+    std::vector<DT_F32> kernel = GetGaussianKernel(m_ksize, m_sigma);
 
 #define GET_GAUSSIAN_KMAT(type)                                     \
     using KernelType   = typename GaussianTraits<type>::KernelType; \
-    constexpr MI_U32 Q = GaussianTraits<type>::Q;                   \
+    constexpr DT_U32 Q = GaussianTraits<type>::Q;                   \
                                                                     \
     m_kmat = GetGaussianKmat<KernelType, Q>(m_ctx, kernel);         \
 
@@ -64,31 +64,31 @@ Status GaussianHvx::PrepareKmat()
     {
         case ElemType::U8:
         {
-            GET_GAUSSIAN_KMAT(MI_U8)
+            GET_GAUSSIAN_KMAT(DT_U8)
             break;
         }
 
         case ElemType::U16:
         {
-            GET_GAUSSIAN_KMAT(MI_U16)
+            GET_GAUSSIAN_KMAT(DT_U16)
             break;
         }
 
         case ElemType::S16:
         {
-            GET_GAUSSIAN_KMAT(MI_S16)
+            GET_GAUSSIAN_KMAT(DT_S16)
             break;
         }
 
         case ElemType::U32:
         {
-            GET_GAUSSIAN_KMAT(MI_U32)
+            GET_GAUSSIAN_KMAT(DT_U32)
             break;
         }
 
         case ElemType::S32:
         {
-            GET_GAUSSIAN_KMAT(MI_S32)
+            GET_GAUSSIAN_KMAT(DT_S32)
             break;
         }
 
@@ -135,7 +135,7 @@ Status GaussianHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -202,8 +202,8 @@ Status GaussianRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
     Mat src;
     Mat dst;
-    MI_S32 ksize;
-    MI_F32 sigma;
+    DT_S32 ksize;
+    DT_F32 sigma;
     BorderType border_type;
     Scalar border_value;
 

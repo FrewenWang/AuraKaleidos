@@ -46,14 +46,14 @@ static std::shared_ptr<MulSpectrumsImpl> CreateMulSpectrumsImpl(Context *ctx, co
 MulSpectrums::MulSpectrums(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status MulSpectrums::SetArgs(const Array *src0, const Array *src1, Array *dst, MI_BOOL conj_src1)
+Status MulSpectrums::SetArgs(const Array *src0, const Array *src1, Array *dst, DT_BOOL conj_src1)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -93,14 +93,14 @@ Status MulSpectrums::SetArgs(const Array *src0, const Array *src1, Array *dst, M
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateMulSpectrumsImpl(m_ctx, impl_target);
     }
 
     // run initialize
     MulSpectrumsImpl *mul_spectrums_impl = dynamic_cast<MulSpectrumsImpl*>(m_impl.get());
-    if (MI_NULL == mul_spectrums_impl)
+    if (DT_NULL == mul_spectrums_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "mul_spectrums_impl is null ptr");
         return Status::ERROR;
@@ -111,10 +111,10 @@ Status MulSpectrums::SetArgs(const Array *src0, const Array *src1, Array *dst, M
     AURA_RETURN(m_ctx, ret);
 }
 
-Status MulSpectrums::CLPrecompile(Context *ctx, ElemType elem_type, MI_BOOL conj_src1)
+Status MulSpectrums::CLPrecompile(Context *ctx, ElemType elem_type, DT_BOOL conj_src1)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -134,7 +134,7 @@ Status MulSpectrums::CLPrecompile(Context *ctx, ElemType elem_type, MI_BOOL conj
     return Status::OK;
 }
 
-AURA_EXPORTS Status IMulSpectrums(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, MI_BOOL conj_src1, const OpTarget &target)
+AURA_EXPORTS Status IMulSpectrums(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, DT_BOOL conj_src1, const OpTarget &target)
 {
     MulSpectrums mul_spectrums(ctx, target);
 
@@ -142,17 +142,17 @@ AURA_EXPORTS Status IMulSpectrums(Context *ctx, const Mat &src0, const Mat &src1
 }
 
 MulSpectrumsImpl::MulSpectrumsImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "MulSpectrums", target),
-                                                                           m_src0(MI_NULL), m_src1(MI_NULL), m_dst(MI_NULL)
+                                                                           m_src0(DT_NULL), m_src1(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status MulSpectrumsImpl::SetArgs(const Array *src0, const Array *src1, Array *dst, MI_BOOL conj_src1)
+Status MulSpectrumsImpl::SetArgs(const Array *src0, const Array *src1, Array *dst, DT_BOOL conj_src1)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -167,7 +167,7 @@ Status MulSpectrumsImpl::SetArgs(const Array *src0, const Array *src1, Array *ds
     if (src0->GetElemType() != ElemType::F32 || src1->GetElemType() != ElemType::F32 ||
         dst->GetElemType() != ElemType::F32)
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "current src and dst only support MI_F32 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "current src and dst only support DT_F32 type.");
         return Status::ERROR;
     }
 
@@ -210,7 +210,7 @@ std::string MulSpectrumsImpl::ToString() const
     return str;
 }
 
-AURA_VOID MulSpectrumsImpl::Dump(const std::string &prefix) const
+DT_VOID MulSpectrumsImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

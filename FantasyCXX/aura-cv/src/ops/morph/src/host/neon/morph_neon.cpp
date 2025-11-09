@@ -6,7 +6,7 @@ namespace aura
 MorphNeon::MorphNeon(Context *ctx, MorphType type, const OpTarget &target) : MorphImpl(ctx, type, target)
 {}
 
-Status MorphNeon::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape, MI_S32 iterations)
+Status MorphNeon::SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape, DT_S32 iterations)
 {
     if (MorphImpl::SetArgs(src, dst, ksize, shape, iterations) != Status::OK)
     {
@@ -26,7 +26,7 @@ Status MorphNeon::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
 
     if (ch != 1 && ch != 2 && ch != 3)
     {
@@ -42,7 +42,7 @@ Status MorphNeon::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
@@ -64,7 +64,7 @@ Status MorphNeon::Run()
         }
     }
 
-    for (MI_S32 i = 0; i < m_iterations; i++)
+    for (DT_S32 i = 0; i < m_iterations; i++)
     {
         switch (m_ksize)
         {

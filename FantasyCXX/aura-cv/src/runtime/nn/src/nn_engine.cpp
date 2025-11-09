@@ -134,17 +134,17 @@ AURA_INLINE Status NNExecutorImplRegister()
     return Status::OK;
 }
 
-static MI_S16 GetFrameWork(Context *ctx, const ModelInfo &model_info)
+static DT_S16 GetFrameWork(Context *ctx, const ModelInfo &model_info)
 {
-    MI_S16 framework = 0;
+    DT_S16 framework = 0;
 
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         AURA_ADD_ERROR_STRING(ctx, "ctx is NULL");
         return framework;
     }
 
-    MI_S64 data_offset = 0;
+    DT_S64 data_offset = 0;
     MinnHeader header;
 
     if (NNDeserialize(ctx, model_info.minn_buffer, data_offset, header) != Status::OK)
@@ -181,12 +181,12 @@ static MI_S16 GetFrameWork(Context *ctx, const ModelInfo &model_info)
 
 static std::shared_ptr<NNExecutor> CreateNNExecutorImpl(Context *ctx, const ModelInfo &model_info, const NNConfig &config)
 {
-    MI_S16 framework = GetFrameWork(ctx, model_info);
+    DT_S16 framework = GetFrameWork(ctx, model_info);
 
     if (1 == framework)
     {
         std::shared_ptr<QnnModel> qnn_model = std::make_shared<QnnModel>(ctx, model_info);
-        if ((MI_NULL == qnn_model) || (!qnn_model->IsValid()))
+        if ((DT_NULL == qnn_model) || (!qnn_model->IsValid()))
         {
             AURA_ADD_ERROR_STRING(ctx, "create model failed");
         }
@@ -197,7 +197,7 @@ static std::shared_ptr<NNExecutor> CreateNNExecutorImpl(Context *ctx, const Mode
     else if (2 == framework)
     {
         std::shared_ptr<SnpeModel> snpe_model = std::make_shared<SnpeModel>(ctx, model_info);
-        if ((MI_NULL == snpe_model) || (!snpe_model->IsValid()))
+        if ((DT_NULL == snpe_model) || (!snpe_model->IsValid()))
         {
             AURA_ADD_ERROR_STRING(ctx, "create model failed");
         }
@@ -207,7 +207,7 @@ static std::shared_ptr<NNExecutor> CreateNNExecutorImpl(Context *ctx, const Mode
     else if (10 == framework)
     {
         std::shared_ptr<NpModel> np_model = std::make_shared<NpModel>(ctx, model_info);
-        if ((MI_NULL == np_model) || (!np_model->IsValid()))
+        if ((DT_NULL == np_model) || (!np_model->IsValid()))
         {
             AURA_ADD_ERROR_STRING(ctx, "create model failed");
         }
@@ -217,7 +217,7 @@ static std::shared_ptr<NNExecutor> CreateNNExecutorImpl(Context *ctx, const Mode
     else if (20 == framework)
     {
         std::shared_ptr<XnnModel> xnn_model = std::make_shared<XnnModel>(ctx, model_info);
-        if ((MI_NULL == xnn_model) || (!xnn_model->IsValid()))
+        if ((DT_NULL == xnn_model) || (!xnn_model->IsValid()))
         {
             AURA_ADD_ERROR_STRING(ctx, "create model failed");
         }
@@ -227,7 +227,7 @@ static std::shared_ptr<NNExecutor> CreateNNExecutorImpl(Context *ctx, const Mode
     else if (30 == framework)
     {
         std::shared_ptr<MnnModel> mnn_model = std::make_shared<MnnModel>(ctx, model_info);
-        if ((MI_NULL == mnn_model) || (!mnn_model->IsValid()))
+        if ((DT_NULL == mnn_model) || (!mnn_model->IsValid()))
         {
             AURA_ADD_ERROR_STRING(ctx, "create model failed");
         }
@@ -240,10 +240,10 @@ static std::shared_ptr<NNExecutor> CreateNNExecutorImpl(Context *ctx, const Mode
         AURA_ADD_ERROR_STRING(ctx, "unsupported framework type");
     }
 
-    return MI_NULL;
+    return DT_NULL;
 }
 
-NNEngine::NNEngine(Context *ctx, MI_BOOL enable_nn) : m_ctx(ctx), m_enable_nn(enable_nn)
+NNEngine::NNEngine(Context *ctx, DT_BOOL enable_nn) : m_ctx(ctx), m_enable_nn(enable_nn)
 {
     NNExecutorImplRegister();
 #if defined(AURA_BUILD_HEXAGON)
@@ -265,7 +265,7 @@ std::shared_ptr<NNExecutor> NNEngine::CreateNNExecutor(const std::string &minn_f
     if (!m_enable_nn)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "nn is not enabled");
-        return MI_NULL;
+        return DT_NULL;
     }
 
 #if defined(AURA_BUILD_HOST)
@@ -273,14 +273,14 @@ std::shared_ptr<NNExecutor> NNEngine::CreateNNExecutor(const std::string &minn_f
     if (!minn_buffer.IsValid())
     {
         AURA_ADD_ERROR_STRING(m_ctx, "MapModelBufferFromFile failed");
-        return MI_NULL;
+        return DT_NULL;
     }
 #else
     Buffer minn_buffer = NNModel::CreateModelBufferFromFile(m_ctx, minn_file);
     if (!minn_buffer.IsValid())
     {
         AURA_ADD_ERROR_STRING(m_ctx, "CreateModelBufferFromFile failed");
-        return MI_NULL;
+        return DT_NULL;
     }
 #endif // AURA_BUILD_HOST
 
@@ -291,34 +291,34 @@ std::shared_ptr<NNExecutor> NNEngine::CreateNNExecutor(const std::string &minn_f
     return CreateNNExecutorImpl(m_ctx, ModelInfo(minn_buffer, decrypt_key, minn_name), config);
 }
 
-std::shared_ptr<NNExecutor> NNEngine::CreateNNExecutor(const MI_U8 *minn_data,
-                                                       MI_S64 minn_size,
+std::shared_ptr<NNExecutor> NNEngine::CreateNNExecutor(const DT_U8 *minn_data,
+                                                       DT_S64 minn_size,
                                                        const std::string &decrypt_key,
                                                        const NNConfig &config)
 {
     if (!m_enable_nn)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "nn is not enabled");
-        return MI_NULL;
+        return DT_NULL;
     }
 
-    if (MI_NULL == minn_data)
+    if (DT_NULL == minn_data)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "minn_data is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (minn_size == 0)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "minn_size is zero, is invalid");
-        return MI_NULL;
+        return DT_NULL;
     }
 
-    Buffer minn_buffer(AURA_MEM_HEAP, minn_size, minn_size, const_cast<MI_U8*>(minn_data), const_cast<MI_U8*>(minn_data), 0);
+    Buffer minn_buffer(AURA_MEM_HEAP, minn_size, minn_size, const_cast<DT_U8*>(minn_data), const_cast<DT_U8*>(minn_data), 0);
     if (!minn_buffer.IsValid())
     {
         AURA_ADD_ERROR_STRING(m_ctx, "minn_buffer init failed");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return CreateNNExecutorImpl(m_ctx, ModelInfo(minn_buffer, decrypt_key), config);
@@ -332,19 +332,19 @@ std::shared_ptr<NNExecutor> NNEngine::CreateNNExecutor(const std::string &minb_f
     if (!m_enable_nn)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "nn is not enabled");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (minb_file.empty())
     {
         AURA_ADD_ERROR_STRING(m_ctx, "minb_file is empty");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (minn_name.empty())
     {
         AURA_ADD_ERROR_STRING(m_ctx, "minn_name is empty");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     Buffer minn_buffer;
@@ -352,7 +352,7 @@ std::shared_ptr<NNExecutor> NNEngine::CreateNNExecutor(const std::string &minb_f
     if (!nb_model->IsValid())
     {
         AURA_ADD_ERROR_STRING(m_ctx, "create nb model failed");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     minn_buffer = nb_model->GetModelBuffer(minn_name);
@@ -360,7 +360,7 @@ std::shared_ptr<NNExecutor> NNEngine::CreateNNExecutor(const std::string &minb_f
     {
         std::string info = "get model buffer " + minn_name + " fail!\n";
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return CreateNNExecutorImpl(m_ctx, ModelInfo(minn_buffer, decrypt_key, minn_name), config);

@@ -26,10 +26,10 @@ static IntegralParam::TupleTable g_integral_table_hvx
 NEW_TESTCASE(matrix, Integral, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     MatrixIntegralTest matrix_integral_test(UnitTest::GetInstance()->GetContext(), g_integral_table_hvx);
     matrix_integral_test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

@@ -61,7 +61,7 @@ public:
      *
      * Resets internal variables and releases resources held by this object.
      */
-    AURA_VOID DeInitialize();
+    DT_VOID DeInitialize();
 
     /**
      * @brief Gets the OpenCL kernel associated with this CLKernel object.
@@ -88,7 +88,7 @@ public:
     cl_int Run(Tp... tp,
                cl::NDRange cl_global,
                cl::NDRange cl_local,
-               cl::Event *cl_event = MI_NULL,
+               cl::Event *cl_event = DT_NULL,
                const std::vector<cl::Event> &cl_events = std::vector<cl::Event>(),
                cl::NDRange cl_offset = cl::NDRange())
     {
@@ -101,7 +101,7 @@ public:
                 auto cl_kernel_func = cl::KernelFunctor<Tp...>(*m_cl_kernel);
                 cl::EnqueueArgs enqueue_arg(*m_cl_queue, cl_events, cl_offset, cl_global, cl_local);
 
-                if (MI_NULL == cl_event)
+                if (DT_NULL == cl_event)
                 {
                     cl::Event cl_event = cl_kernel_func(enqueue_arg, std::forward<Tp>(tp)..., cl_err);
                     if (CL_SUCCESS == cl_err)
@@ -124,14 +124,14 @@ public:
      *
      * @return True if the kernel is valid; otherwise, false.
      */
-    MI_BOOL IsValid() const;
+    DT_BOOL IsValid() const;
 
     /**
      * @brief Retrieves the maximum group size of the kernel.
      *
      * @return The maximum group size supported by the kernel.
      */
-    MI_U32 GetMaxGroupSize() const;
+    DT_U32 GetMaxGroupSize() const;
 
     /**
      * @brief Retrieves the name of the kernel.
@@ -155,7 +155,7 @@ private:
     Context *m_ctx;                               /*!< The pointer to the Context object. */
     std::shared_ptr<cl::CommandQueue> m_cl_queue; /*!< Shared pointer to the OpenCL command queue. */
     std::shared_ptr<cl::Kernel> m_cl_kernel;      /*!< Shared pointer to the OpenCL kernel. */
-    MI_S32 m_max_group_size;                      /*!< Maximum group size supported by the kernel. */
+    DT_S32 m_max_group_size;                      /*!< Maximum group size supported by the kernel. */
     std::string m_kernel_name;                    /*!< The name of the kernel. */
 };
 
@@ -172,7 +172,7 @@ private:
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
-AURA_INLINE Status CheckCLKernels(Context *ctx, const std::vector<CLKernel> &cl_kernels, MI_U32 num = 0)
+AURA_INLINE Status CheckCLKernels(Context *ctx, const std::vector<CLKernel> &cl_kernels, DT_U32 num = 0)
 {
     if ((num != 0) && (num != cl_kernels.size()))
     {
@@ -181,7 +181,7 @@ AURA_INLINE Status CheckCLKernels(Context *ctx, const std::vector<CLKernel> &cl_
         return Status::ERROR;
     }
 
-    for (MI_U32 i = 0; i < cl_kernels.size(); i++)
+    for (DT_U32 i = 0; i < cl_kernels.size(); i++)
     {
         if (!cl_kernels[i].IsValid())
         {

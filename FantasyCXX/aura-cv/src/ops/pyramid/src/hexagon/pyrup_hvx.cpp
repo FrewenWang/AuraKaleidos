@@ -8,7 +8,7 @@ namespace aura
 PyrUpHvx::PyrUpHvx(Context *ctx, const OpTarget &target) : PyrUpImpl(ctx, target)
 {}
 
-Status PyrUpHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+Status PyrUpHvx::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                             BorderType border_type)
 {
     if (PyrUpImpl::SetArgs(src, dst, ksize, sigma, border_type) != Status::OK)
@@ -25,7 +25,7 @@ Status PyrUpHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -60,8 +60,8 @@ Status PyrUpRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
     Mat src;
     Mat dst;
-    MI_S32 ksize;
-    MI_F32 sigma;
+    DT_S32 ksize;
+    DT_F32 sigma;
     BorderType border_type;
     Scalar border_value;
 

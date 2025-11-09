@@ -24,10 +24,10 @@ aura::Status CalcHistSampleTest(aura::Context *ctx, aura::TargetType type)
         return status;
     }
 
-    MI_S32 hist_size   = 256;
+    DT_S32 hist_size   = 256;
     aura::Scalar range = {0, static_cast<double>(hist_size)};
 
-    std::vector<MI_U32> dst(hist_size, 0);
+    std::vector<DT_U32> dst(hist_size, 0);
 
     // ---------------------
     //     run interface
@@ -40,7 +40,7 @@ aura::Status CalcHistSampleTest(aura::Context *ctx, aura::TargetType type)
 
     // run and time
     aura::Time start_time = aura::Time::Now();
-    status = ICalcHist(ctx, src, 0, dst, hist_size, range, aura::Mat(), MI_FALSE, aura::OpTarget(type));
+    status = ICalcHist(ctx, src, 0, dst, hist_size, range, aura::Mat(), DT_FALSE, aura::OpTarget(type));
     aura::Time end_time = aura::Time::Now();
 
     // ---------------------

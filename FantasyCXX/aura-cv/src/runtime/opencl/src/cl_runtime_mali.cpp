@@ -24,7 +24,7 @@ void PfnNotify(const char *errinfo, const void *private_info, size_t cb, void *u
 
 void CLArmPrintCB(const char *buffer, size_t len, size_t complete, void *user_data)
 {
-    (AURA_VOID)(complete);
+    (DT_VOID)(complete);
     MaliCLRuntime *cl_rt = reinterpret_cast<MaliCLRuntime*>(user_data);
     if (cl_rt)
     {
@@ -80,7 +80,7 @@ Status MaliCLRuntime::Initialize()
 
         if (m_cl_version >= 2.0f)
         {
-            MI_S32 ind = 2;
+            DT_S32 ind = 2;
             ParseContextProps(m_cl_conf->m_cl_perf_level, m_cl_conf->m_cl_priority_level, queue_properties, ind);
         }
 
@@ -120,7 +120,7 @@ Status MaliCLRuntime::Initialize()
 
     m_cl_import_func = (ClImportMemoryARMFunc)clGetExtensionFunctionAddressForPlatform((*m_cl_platform)(), "clImportMemoryARM");
 
-    m_valid = MI_TRUE;
+    m_valid = DT_TRUE;
 
     //svm register
     RegisterSvmAllocator();
@@ -130,7 +130,7 @@ Status MaliCLRuntime::Initialize()
     return ret;
 }
 
-Status MaliCLRuntime::ParseContextProps(CLPerfLevel cl_perf_level, CLPriorityLevel cl_priority_level, cl_queue_properties *queue_properties, MI_S32 ind)
+Status MaliCLRuntime::ParseContextProps(CLPerfLevel cl_perf_level, CLPriorityLevel cl_priority_level, cl_queue_properties *queue_properties, DT_S32 ind)
 {
     Status ret = Status::OK;
 
@@ -206,7 +206,7 @@ Status MaliCLRuntime::ParseContextProps(CLPerfLevel cl_perf_level, CLPriorityLev
 
 cl::Buffer* MaliCLRuntime::InitCLBuffer(const Buffer &buffer, cl_mem_flags cl_flags, CLMemSyncMethod &cl_sync_method)
 {
-    cl::Buffer *cl_buffer = MI_NULL;
+    cl::Buffer *cl_buffer = DT_NULL;
 
     if (AURA_MEM_SVM == buffer.m_type)
     {
@@ -215,27 +215,27 @@ cl::Buffer* MaliCLRuntime::InitCLBuffer(const Buffer &buffer, cl_mem_flags cl_fl
 #endif
     }
     else if (((AURA_MEM_DMA_BUF_HEAP == buffer.m_type) || (AURA_MEM_HEAP == buffer.m_type)) && ((buffer.m_capacity % GetCLLengthAlignSize()) == 0) &&
-            (((MI_UPTR_T)buffer.m_origin % GetCLLengthAlignSize()) == 0) && IsMemShareSupported())
+            (((DT_UPTR_T)buffer.m_origin % GetCLLengthAlignSize()) == 0) && IsMemShareSupported())
     {
         cl_int cl_err = CL_SUCCESS;
-        cl_mem ion_mem = MI_NULL;
+        cl_mem ion_mem = DT_NULL;
 
         if (AURA_MEM_HEAP == buffer.m_type)
         {
-            ion_mem        = m_cl_import_func(m_cl_context->get(), cl_flags, MI_NULL, buffer.m_origin, buffer.m_capacity, &cl_err);
+            ion_mem        = m_cl_import_func(m_cl_context->get(), cl_flags, DT_NULL, buffer.m_origin, buffer.m_capacity, &cl_err);
             cl_sync_method = CLMemSyncMethod::AUTO;
         }
         else
         {
             cl_import_properties_arm prop[5] = {CL_IMPORT_TYPE_ARM, CL_IMPORT_TYPE_DMA_BUF_ARM, 0};
-            ion_mem        = m_cl_import_func(m_cl_context->get(), cl_flags, prop, (AURA_VOID*)(&buffer.m_property), buffer.m_capacity, &cl_err);
+            ion_mem        = m_cl_import_func(m_cl_context->get(), cl_flags, prop, (DT_VOID*)(&buffer.m_property), buffer.m_capacity, &cl_err);
             cl_sync_method = CLMemSyncMethod::FLUSH;
         }
 
         if (CL_SUCCESS == cl_err)
         {
-            MI_S32 roi_offset = buffer.GetOffset();
-            MI_S32 addr_align_size = GetCLAddrAlignSize();
+            DT_S32 roi_offset = buffer.GetOffset();
+            DT_S32 addr_align_size = GetCLAddrAlignSize();
 
             if (roi_offset > 0)
             {
@@ -268,7 +268,7 @@ cl::Buffer* MaliCLRuntime::InitCLBuffer(const Buffer &buffer, cl_mem_flags cl_fl
             if (CL_SUCCESS == cl_err && cl_buffer)
             {
                 std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
-                m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_buffer), sizeof(cl::Buffer));
+                m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_buffer), sizeof(cl::Buffer));
             }
         }
     }
@@ -279,7 +279,7 @@ cl::Buffer* MaliCLRuntime::InitCLBuffer(const Buffer &buffer, cl_mem_flags cl_fl
 cl::Iaura2D* MaliCLRuntime::InitCLIaura2D(const Buffer &buffer, cl_mem_flags cl_flags, const cl_iaura_format &cl_fmt, size_t width,
                                           size_t height, size_t pitch, CLMemSyncMethod &cl_sync_method)
 {
-    cl::Iaura2D *cl_iaura2d = MI_NULL;
+    cl::Iaura2D *cl_iaura2d = DT_NULL;
 
     AURA_UNUSED(pitch);
 
@@ -289,11 +289,11 @@ cl::Iaura2D* MaliCLRuntime::InitCLIaura2D(const Buffer &buffer, cl_mem_flags cl_
         cl_iaura2d = InitCLIaura2DWithSvm(buffer, cl_flags, cl_fmt, width, height, pitch, cl_sync_method);
     }
     else if (AURA_MEM_DMA_BUF_HEAP == buffer.m_type && ((pitch % GetCLLengthAlignSize()) == 0) &&
-            (((MI_UPTR_T)buffer.m_origin % GetCLLengthAlignSize()) == 0) && IsMemShareSupported())
+            (((DT_UPTR_T)buffer.m_origin % GetCLLengthAlignSize()) == 0) && IsMemShareSupported())
     {
         cl_int cl_err = CL_SUCCESS;
         cl_import_properties_arm prop[3] = {CL_IMPORT_TYPE_ARM, CL_IMPORT_TYPE_DMA_BUF_ARM, 0};
-        cl_mem ion_mem = m_cl_import_func((*m_cl_context)(), cl_flags, prop, (AURA_VOID*)(&buffer.m_property), buffer.m_capacity, &cl_err);
+        cl_mem ion_mem = m_cl_import_func((*m_cl_context)(), cl_flags, prop, (DT_VOID*)(&buffer.m_property), buffer.m_capacity, &cl_err);
 
         if (CL_SUCCESS == cl_err)
         {
@@ -306,14 +306,14 @@ cl::Iaura2D* MaliCLRuntime::InitCLIaura2D(const Buffer &buffer, cl_mem_flags cl_
             if (CL_SUCCESS == cl_err)
             {
                 std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
-                m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_iaura2d), sizeof(cl::Iaura2D));
+                m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_iaura2d), sizeof(cl::Iaura2D));
             }
             else
             {
                 if (cl_iaura2d)
                 {
                     delete cl_iaura2d;
-                    cl_iaura2d = MI_NULL;
+                    cl_iaura2d = DT_NULL;
                 }
             }
         }
@@ -336,24 +336,24 @@ cl::Iaura3D* MaliCLRuntime::InitCLIaura3D(const Buffer &buffer, cl_mem_flags cl_
     return cl_iaura3d;
 }
 
-MI_S32 MaliCLRuntime::GetCLAddrAlignSize() const
+DT_S32 MaliCLRuntime::GetCLAddrAlignSize() const
 {
-    MI_S32 addr_align_size = 128;
+    DT_S32 addr_align_size = 128;
 
     return addr_align_size;
 }
 
-MI_BOOL MaliCLRuntime::IsMemShareSupported() const
+DT_BOOL MaliCLRuntime::IsMemShareSupported() const
 {
-    return (m_cl_import_func != MI_NULL);
+    return (m_cl_import_func != DT_NULL);
 }
 
-MI_S32 MaliCLRuntime::GetCLLengthAlignSize() const
+DT_S32 MaliCLRuntime::GetCLLengthAlignSize() const
 {
     return m_cache_line_size;
 }
 
-std::string MaliCLRuntime::GetCLMaxConstantSizeString(MI_S32 n)
+std::string MaliCLRuntime::GetCLMaxConstantSizeString(DT_S32 n)
 {
     AURA_UNUSED(n);
 

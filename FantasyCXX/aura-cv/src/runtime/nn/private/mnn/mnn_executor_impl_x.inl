@@ -173,35 +173,35 @@ public:
     }
 
 public:
-    AURA_API_DEF(MnnInit) = MNN::Context (*)(MNN::NNBackend, MNN::Precision, MNN::Memory, MNN::Tuning, MNN::CLMem, MI_U32, const AURA_VOID*, size_t, const MI_CHAR*, MI_U32, const MI_CHAR*);
+    AURA_API_DEF(MnnInit) = MNN::Context (*)(MNN::NNBackend, MNN::Precision, MNN::Memory, MNN::Tuning, MNN::CLMem, DT_U32, const DT_VOID*, size_t, const DT_CHAR*, DT_U32, const DT_CHAR*);
     AURA_API_PTR(MnnInit);
 
-    AURA_API_DEF(MnnCopySessionInput) = MI_S32 (*)(MNN::Context, const MI_CHAR*, AURA_VOID*);
+    AURA_API_DEF(MnnCopySessionInput) = DT_S32 (*)(MNN::Context, const DT_CHAR*, DT_VOID*);
     AURA_API_PTR(MnnCopySessionInput);
 
-    AURA_API_DEF(MnnCopySessionOutput) = MI_S32 (*)(MNN::Context, const MI_CHAR*, AURA_VOID*);
+    AURA_API_DEF(MnnCopySessionOutput) = DT_S32 (*)(MNN::Context, const DT_CHAR*, DT_VOID*);
     AURA_API_PTR(MnnCopySessionOutput);
 
-    AURA_API_DEF(MnnRunSession) = MI_S32 (*)(MNN::Context);
+    AURA_API_DEF(MnnRunSession) = DT_S32 (*)(MNN::Context);
     AURA_API_PTR(MnnRunSession);
 
-    AURA_API_DEF(MnnUnit) = MI_S32 (*)(MNN::Context*);
+    AURA_API_DEF(MnnUnit) = DT_S32 (*)(MNN::Context*);
     AURA_API_PTR(MnnUnit);
 
-    AURA_API_DEF(MnnGetVersion) = const MI_CHAR* (*)();
+    AURA_API_DEF(MnnGetVersion) = const DT_CHAR* (*)();
     AURA_API_PTR(MnnGetVersion);
 
-    AURA_API_DEF(MnnGetSessionInputs) = MNN::TensorDesc* (*)(MNN::Context, MI_S32*);
+    AURA_API_DEF(MnnGetSessionInputs) = MNN::TensorDesc* (*)(MNN::Context, DT_S32*);
     AURA_API_PTR(MnnGetSessionInputs);
 
-    AURA_API_DEF(MnnGetSessionOutputs) = MNN::TensorDesc* (*)(MNN::Context, MI_S32*);
+    AURA_API_DEF(MnnGetSessionOutputs) = MNN::TensorDesc* (*)(MNN::Context, DT_S32*);
     AURA_API_PTR(MnnGetSessionOutputs);
 
-    AURA_API_DEF(MnnDeleteTensorDesc) = AURA_VOID (*)(MNN::TensorDesc**, MI_S32);
+    AURA_API_DEF(MnnDeleteTensorDesc) = DT_VOID (*)(MNN::TensorDesc**, DT_S32);
     AURA_API_PTR(MnnDeleteTensorDesc);
 
 private:
-    MnnLibrary() : NNLibrary(), m_handle(MI_NULL)
+    MnnLibrary() : NNLibrary(), m_handle(DT_NULL)
     {
         Load();
     }
@@ -219,7 +219,7 @@ private:
 
         dlerror();
         m_handle = dlopen(g_mnn_lib_name.c_str(), RTLD_LAZY | RTLD_LOCAL);
-        if (MI_NULL == m_handle)
+        if (DT_NULL == m_handle)
         {
             std::string info = "dlopen libmnn_wrapper.so failed, err : " + std::string(dlerror());
             AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
@@ -256,18 +256,18 @@ private:
                 AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
                 ret = Status::ERROR;
             }
-            m_handle = MI_NULL;
+            m_handle = DT_NULL;
         }
 
         return ret;
     }
 
 private:
-    AURA_VOID *m_handle;
+    DT_VOID *m_handle;
 };
 
 static MNN::Context MnnInit(Context *ctx, MNN::NNBackend backend, MNN::Precision precision, MNN::Memory memory, MNN::Tuning tuning, MNN::CLMem cl_mem,
-                            MI_U32 version, const AURA_VOID *buffer, size_t size, const MI_CHAR *cache_file, MI_U32 dump_layers, const MI_CHAR *profiling_path)
+                            DT_U32 version, const DT_VOID *buffer, size_t size, const DT_CHAR *cache_file, DT_U32 dump_layers, const DT_CHAR *profiling_path)
 {
     auto func = MnnLibrary::Get().MnnInit;
     if (func)
@@ -277,11 +277,11 @@ static MNN::Context MnnInit(Context *ctx, MNN::NNBackend backend, MNN::Precision
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "MnnInit is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
-static MI_S32 MnnCopySessionInput(Context *ctx, MNN::Context mnn_ctx, const MI_CHAR* name, AURA_VOID* data)
+static DT_S32 MnnCopySessionInput(Context *ctx, MNN::Context mnn_ctx, const DT_CHAR* name, DT_VOID* data)
 {
     auto func = MnnLibrary::Get().MnnCopySessionInput;
     if (func)
@@ -295,7 +295,7 @@ static MI_S32 MnnCopySessionInput(Context *ctx, MNN::Context mnn_ctx, const MI_C
     }
 }
 
-static MI_S32 MnnCopySessionOutput(Context *ctx, MNN::Context mnn_ctx, const MI_CHAR* name, AURA_VOID* data)
+static DT_S32 MnnCopySessionOutput(Context *ctx, MNN::Context mnn_ctx, const DT_CHAR* name, DT_VOID* data)
 {
     auto func = MnnLibrary::Get().MnnCopySessionOutput;
     if (func)
@@ -309,7 +309,7 @@ static MI_S32 MnnCopySessionOutput(Context *ctx, MNN::Context mnn_ctx, const MI_
     }
 }
 
-static MI_S32 MnnRunSession(Context *ctx, MNN::Context mnn_ctx)
+static DT_S32 MnnRunSession(Context *ctx, MNN::Context mnn_ctx)
 {
     auto func = MnnLibrary::Get().MnnRunSession;
     if (func)
@@ -323,7 +323,7 @@ static MI_S32 MnnRunSession(Context *ctx, MNN::Context mnn_ctx)
     }
 }
 
-static MI_S32 MnnUnit(Context *ctx, MNN::Context *mnn_ctx)
+static DT_S32 MnnUnit(Context *ctx, MNN::Context *mnn_ctx)
 {
     auto func = MnnLibrary::Get().MnnUnit;
     if (func)
@@ -337,7 +337,7 @@ static MI_S32 MnnUnit(Context *ctx, MNN::Context *mnn_ctx)
     }
 }
 
-static const MI_CHAR* MnnGetVersion(Context *ctx)
+static const DT_CHAR* MnnGetVersion(Context *ctx)
 {
     auto func = MnnLibrary::Get().MnnGetVersion;
     if (func)
@@ -347,11 +347,11 @@ static const MI_CHAR* MnnGetVersion(Context *ctx)
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "MnnGetVersion is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
-static MNN::TensorDesc* MnnGetSessionInputs(Context *ctx, MNN::Context mnn_ctx, MI_S32 *num)
+static MNN::TensorDesc* MnnGetSessionInputs(Context *ctx, MNN::Context mnn_ctx, DT_S32 *num)
 {
     auto func = MnnLibrary::Get().MnnGetSessionInputs;
     if (func)
@@ -361,11 +361,11 @@ static MNN::TensorDesc* MnnGetSessionInputs(Context *ctx, MNN::Context mnn_ctx, 
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "MnnGetSessionInputs is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
-static MNN::TensorDesc* MnnGetSessionOutputs(Context *ctx, MNN::Context mnn_ctx, MI_S32 *num)
+static MNN::TensorDesc* MnnGetSessionOutputs(Context *ctx, MNN::Context mnn_ctx, DT_S32 *num)
 {
     auto func = MnnLibrary::Get().MnnGetSessionOutputs;
     if (func)
@@ -375,11 +375,11 @@ static MNN::TensorDesc* MnnGetSessionOutputs(Context *ctx, MNN::Context mnn_ctx,
     else
     {
         AURA_ADD_ERROR_STRING(ctx, "MnnGetSessionOutputs is null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
-static AURA_VOID MnnDeleteTensorDesc(Context *ctx, MNN::TensorDesc **ptr, MI_S32 num)
+static DT_VOID MnnDeleteTensorDesc(Context *ctx, MNN::TensorDesc **ptr, DT_S32 num)
 {
     auto func = MnnLibrary::Get().MnnDeleteTensorDesc;
     if (func)
@@ -397,7 +397,7 @@ class MnnUtils
 public:
     static std::string GetLibraryVersion(Context *ctx)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return std::string();
         }
@@ -407,30 +407,30 @@ public:
         return "v" + version;
     }
 
-    static TensorDescMap GetTensorDescMap(Context *ctx, MNN::Context mnn_ctx, MI_BOOL is_input)
+    static TensorDescMap GetTensorDescMap(Context *ctx, MNN::Context mnn_ctx, DT_BOOL is_input)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return TensorDescMap();
         }
 
-        if (MI_NULL == mnn_ctx)
+        if (DT_NULL == mnn_ctx)
         {
             AURA_ADD_ERROR_STRING(ctx, "null ptr");
             return TensorDescMap();
         }
 
-        MI_S32 tensor_num = 0;
+        DT_S32 tensor_num = 0;
         MNN::TensorDesc *tensor_desc = is_input ? MnnGetSessionInputs(ctx, mnn_ctx, &tensor_num)
                                                 : MnnGetSessionOutputs(ctx, mnn_ctx, &tensor_num);
-        if (MI_NULL == tensor_desc)
+        if (DT_NULL == tensor_desc)
         {
             AURA_ADD_ERROR_STRING(ctx, "get tensor desc failed");
             return TensorDescMap();
         }
 
         TensorDescMap tensor_desc_map;
-        for (MI_S32 i = 0; i < tensor_num; i++)
+        for (DT_S32 i = 0; i < tensor_num; i++)
         {
             TensorDesc desc;
             if (4 == tensor_desc[i].rank)
@@ -442,7 +442,7 @@ public:
             }
             else
             {
-                for (MI_S32 j = 0; j < tensor_desc[i].rank; j++)
+                for (DT_S32 j = 0; j < tensor_desc[i].rank; j++)
                 {
                     desc.sizes.push_back(tensor_desc[i].dims[j]);
                 }
@@ -461,12 +461,12 @@ public:
 class MnnTensorMap
 {
 public:
-    MnnTensorMap(Context *ctx, MNN::Context mnn_ctx, MI_BOOL is_input)
-                 : m_ctx(ctx), m_mnn_ctx(mnn_ctx), m_is_valid(MI_FALSE), m_is_input(is_input)
+    MnnTensorMap(Context *ctx, MNN::Context mnn_ctx, DT_BOOL is_input)
+                 : m_ctx(ctx), m_mnn_ctx(mnn_ctx), m_is_valid(DT_FALSE), m_is_input(is_input)
     {
         do
         {
-            if ((MI_NULL == m_ctx) || (MI_NULL == m_mnn_ctx))
+            if ((DT_NULL == m_ctx) || (DT_NULL == m_mnn_ctx))
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
                 break;
@@ -479,7 +479,7 @@ public:
                 break;
             }
 
-            m_is_valid = MI_TRUE;
+            m_is_valid = DT_TRUE;
         } while (0);
     }
 
@@ -494,7 +494,7 @@ public:
             return Status::ERROR;
         }
 
-        if ((MI_NULL == mat_map) || (mat_map->size() != m_tensor_desc_map.size()))
+        if ((DT_NULL == mat_map) || (mat_map->size() != m_tensor_desc_map.size()))
         {
             AURA_ADD_ERROR_STRING(m_ctx, "size match error");
             return Status::ERROR;
@@ -524,9 +524,9 @@ public:
                 return Status::ERROR;
             }
 
-            auto get_elem_counts_func = [](const TensorDesc &desc) -> MI_S32
+            auto get_elem_counts_func = [](const TensorDesc &desc) -> DT_S32
             {
-                MI_S32 elem_counts = 1;
+                DT_S32 elem_counts = 1;
                 for (auto &size: desc.sizes)
                 {
                     elem_counts *= size;
@@ -534,7 +534,7 @@ public:
                 return elem_counts;
             };
 
-            MI_S32 elem_counts = get_elem_counts_func(tensor_desc.second);
+            DT_S32 elem_counts = get_elem_counts_func(tensor_desc.second);
             if (elem_counts != mat->GetSizes().Total())
             {
                 std::string info = "tensor " + tensor_name + ": expected " + std::to_string(elem_counts) + " bytes, "
@@ -569,8 +569,8 @@ public:
 private:
     Context *m_ctx;
     MNN::Context m_mnn_ctx;
-    MI_BOOL m_is_valid;
-    MI_BOOL m_is_input;
+    DT_BOOL m_is_valid;
+    DT_BOOL m_is_input;
     TensorDescMap m_tensor_desc_map;
 };
 
@@ -578,7 +578,7 @@ class MnnExecutorImplVx : public MnnExecutorImpl
 {
 public:
     MnnExecutorImplVx(Context *ctx, const std::shared_ptr<MnnModel> &model, const NNConfig &config)
-                      : MnnExecutorImpl(ctx, model, config), m_mnn_ctx(MI_NULL)
+                      : MnnExecutorImpl(ctx, model, config), m_mnn_ctx(DT_NULL)
     {
         do
         {
@@ -639,7 +639,7 @@ public:
                     return Status::ERROR;
                 }
 
-                m_is_valid = MI_TRUE;
+                m_is_valid = DT_TRUE;
                 return Status::OK;
             };
 
@@ -681,8 +681,8 @@ public:
             return Status::ERROR;
         }
 
-        m_input_map = std::make_shared<MnnTensorMap>(m_ctx, m_mnn_ctx, MI_TRUE);
-        m_output_map = std::make_shared<MnnTensorMap>(m_ctx, m_mnn_ctx, MI_FALSE);
+        m_input_map = std::make_shared<MnnTensorMap>(m_ctx, m_mnn_ctx, DT_TRUE);
+        m_output_map = std::make_shared<MnnTensorMap>(m_ctx, m_mnn_ctx, DT_FALSE);
 
         return Status::OK;
     }
@@ -692,13 +692,13 @@ public:
         return (m_model->GetVersion() + " device(mnn." + m_version + ")");
     }
 
-    Status Forward(const MatMap &input, MatMap &output, MI_S32 graph_id) override
+    Status Forward(const MatMap &input, MatMap &output, DT_S32 graph_id) override
     {
         AURA_UNUSED(graph_id);
         Status ret = Status::ERROR;
 
-        MatMap input_mapped = m_model->MapMatNames(input, MI_TRUE);
-        MatMap output_mapped = m_model->MapMatNames(output, MI_FALSE);
+        MatMap input_mapped = m_model->MapMatNames(input, DT_TRUE);
+        MatMap output_mapped = m_model->MapMatNames(output, DT_FALSE);
 
         if (input_mapped.empty() || output_mapped.empty())
         {
@@ -730,15 +730,15 @@ public:
 
     std::vector<TensorDescMap> GetInputs() override
     {
-        TensorDescMap tensor_desc_map = MnnUtils::GetTensorDescMap(m_ctx, m_mnn_ctx, MI_TRUE);
-        tensor_desc_map = m_model->MapTensorDescNames(tensor_desc_map, MI_TRUE);
+        TensorDescMap tensor_desc_map = MnnUtils::GetTensorDescMap(m_ctx, m_mnn_ctx, DT_TRUE);
+        tensor_desc_map = m_model->MapTensorDescNames(tensor_desc_map, DT_TRUE);
         return {tensor_desc_map};
     }
 
     std::vector<TensorDescMap> GetOutputs() override
     {
-        TensorDescMap tensor_desc_map = MnnUtils::GetTensorDescMap(m_ctx, m_mnn_ctx, MI_FALSE);
-        tensor_desc_map = m_model->MapTensorDescNames(tensor_desc_map, MI_FALSE);
+        TensorDescMap tensor_desc_map = MnnUtils::GetTensorDescMap(m_ctx, m_mnn_ctx, DT_FALSE);
+        tensor_desc_map = m_model->MapTensorDescNames(tensor_desc_map, DT_FALSE);
         return {tensor_desc_map};
     }
 
@@ -756,8 +756,8 @@ private:
 
         m_mnn_ctx = MnnInit(m_ctx, GetMnnBackend(m_config.backend), GetMnnPrecision(m_config.precision),
                             GetMnnMemory(m_config.memory), GetMnnTuning(m_config.tuning), GetMnnCLMem(m_config.cl_mem),
-                            m_model->GetMinnVersion(), buffer.m_data, buffer.m_size, NULL, MI_FALSE, m_config.profiling_path.c_str());
-        if (MI_NULL == m_mnn_ctx)
+                            m_model->GetMinnVersion(), buffer.m_data, buffer.m_size, NULL, DT_FALSE, m_config.profiling_path.c_str());
+        if (DT_NULL == m_mnn_ctx)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "MnnInit failed");
             goto EXIT;

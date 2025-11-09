@@ -18,14 +18,14 @@
 namespace aura
 {
 
-AURA_INLINE Mat GetGaussianKmat(Context *ctx, const std::vector<MI_F32> &kernel)
+AURA_INLINE Mat GetGaussianKmat(Context *ctx, const std::vector<DT_F32> &kernel)
 {
-    const MI_S32 ksize = kernel.size();
+    const DT_S32 ksize = kernel.size();
 
     Mat kmat(ctx, ElemType::F32, Sizes3(1, ksize, 1));
-    MI_F32 *ker_row = kmat.Ptr<MI_F32>(0);
+    DT_F32 *ker_row = kmat.Ptr<DT_F32>(0);
 
-    for (MI_S32 i = 0; i < ksize; i++)
+    for (DT_S32 i = 0; i < ksize; i++)
     {
         ker_row[i] = kernel[i];
     }
@@ -41,23 +41,23 @@ AURA_INLINE Mat GetGaussianKmat(Context *ctx, const std::vector<MI_F32> &kernel)
  * @param kernel
  * @return
  */
-template <typename Tp, MI_U32 Q>
-AURA_INLINE Mat GetGaussianKmat(Context *ctx, const std::vector<MI_F32> &kernel)
+template <typename Tp, DT_U32 Q>
+AURA_INLINE Mat GetGaussianKmat(Context *ctx, const std::vector<DT_F32> &kernel)
 {
-    //
-    const MI_S32 ksize = kernel.size();
+    // 获取高斯核系数的数量
+    const DT_S32 ksize = kernel.size();
     //
     Mat kmat(ctx, GetElemType<Tp>(), Sizes3(1, ksize, 1));
     Tp *ker_row = kmat.Ptr<Tp>(0);
     //
-    MI_S32 sum = 0;
-    MI_F32 err = 0.f;
+    DT_S32 sum = 0;
+    DT_F32 err = 0.f;
 
-    for (MI_S32 i = 0; i < ksize / 2; i++)
+    for (DT_S32 i = 0; i < ksize / 2; i++)
     {
-        MI_F32 tmp             = kernel[i] * (1 << Q) + err;
+        DT_F32 tmp             = kernel[i] * (1 << Q) + err;
         Tp result              = static_cast<Tp>(Round(tmp));
-        err                    = tmp - (MI_F32)result;
+        err                    = tmp - (DT_F32)result;
         ker_row[i]             = result;
         ker_row[ksize - 1 - i] = result;
         sum += result;
@@ -76,7 +76,7 @@ class GaussianImpl : public OpImpl
 public:
     GaussianImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    virtual Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                            BorderType border_type = BorderType::REFLECT_101,
                            const Scalar &border_value = Scalar());
 
@@ -86,13 +86,13 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    // 高斯核的大小。TODO 为什么要用MI_S32
-    MI_S32     m_ksize;
+    // 高斯核的大小。TODO 为什么要用DT_S32
+    DT_S32     m_ksize;
     /// sugma的值
-    MI_F32     m_sigma;
+    DT_F32     m_sigma;
     /// 边界类型
     BorderType m_border_type;
     Scalar     m_border_value;
@@ -107,7 +107,7 @@ class GaussianNone : public GaussianImpl
 public:
     GaussianNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -130,7 +130,7 @@ class GaussianNeon : public GaussianImpl
 public:
     GaussianNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -161,7 +161,7 @@ class GaussianCL : public GaussianImpl
 public:
     GaussianCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -173,7 +173,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type);
 
 private:
     Status PrepareKmat();
@@ -194,7 +194,7 @@ class GaussianHvx : public GaussianImpl
 public:
     GaussianHvx(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -229,7 +229,7 @@ Status Gaussian9x9Hvx(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat,
 #  endif // AURA_BUILD_HEXAGON
 
 //// 进行高斯滤波的输入参数的类型重定义
-using GaussianInParamHvx = HexagonRpcParamType<Mat, Mat, MI_S32, MI_F32, BorderType, Scalar>;
+using GaussianInParamHvx = HexagonRpcParamType<Mat, Mat, DT_S32, DT_F32, BorderType, Scalar>;
 
 #endif // (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))
 
@@ -239,7 +239,7 @@ class GaussianVdsp : public GaussianImpl
 public:
     GaussianVdsp(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -256,7 +256,7 @@ private:
     XtensaMat m_xtensa_dst;
 };
 
-using GaussianInParamVdsp = XtensaRpcParamType<XtensaMat, XtensaMat, MI_S32, MI_F32, BorderType, Scalar>;
+using GaussianInParamVdsp = XtensaRpcParamType<XtensaMat, XtensaMat, DT_S32, DT_F32, BorderType, Scalar>;
 
 #endif // defined(AURA_ENABLE_XTENSA)
 

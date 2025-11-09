@@ -6,7 +6,7 @@
 #include <queue>
 
 #define AURA_CONTOURS_STORAGE_BLOCK_SIZE   ((1 << 16) - 128)
-#define AURA_CONTOURS_STRUCT_ALIGN         ((MI_S32)sizeof(MI_F64))
+#define AURA_CONTOURS_STRUCT_ALIGN         ((DT_S32)sizeof(DT_F64))
 #define AURA_CONTOURS_SEQ_CHAIN_CONTOUR    (41)
 #define AURA_CONTOURS_SEQ_FLAG_HOLE        (2 << 14)
 #define AURA_CONTOURS_SEQ_POLYGON          (16384)
@@ -16,15 +16,15 @@
 namespace aura
 {
 
-constexpr MI_S32 FIND_CONTOURS_MAX_SIZE = 16;
+constexpr DT_S32 FIND_CONTOURS_MAX_SIZE = 16;
 static const Point2i code_deltas[8] = {{ 1, 0}, { 1, -1}, {0, -1}, {-1, -1},
                                        {-1, 0}, {-1,  1}, {0,  1}, { 1,  1}};
 
 struct ContoursTreeNode
 {
-    MI_S32            color;
-    MI_S32            flags;
-    MI_S32            header_size;
+    DT_S32            color;
+    DT_S32            flags;
+    DT_S32            header_size;
     ContoursTreeNode *h_prev;
     ContoursTreeNode *h_next;
     ContoursTreeNode *v_prev;
@@ -40,9 +40,9 @@ struct MemBlock
 struct ContoursMemStorage
 {
     MemBlock           *bottom;
-    MI_S32              block_size;
+    DT_S32              block_size;
     MemBlock           *top;
-    MI_S32              free_space;
+    DT_S32              free_space;
     ContoursMemStorage *parent;
 };
 
@@ -50,18 +50,18 @@ struct SeqBlock
 {
     SeqBlock *prev;
     SeqBlock *next;
-    MI_S32    start_index;
-    MI_S32    count;
-    MI_S8    *data;
+    DT_S32    start_index;
+    DT_S32    count;
+    DT_S8    *data;
 };
 
 struct ContoursSeq : public ContoursTreeNode
 {
-    MI_S32              total;
-    MI_S32              elem_size;
-    MI_S8              *block_max;
-    MI_S8              *ptr;
-    MI_S32              delta_elems;
+    DT_S32              total;
+    DT_S32              elem_size;
+    DT_S8              *block_max;
+    DT_S8              *ptr;
+    DT_S32              delta_elems;
     ContoursMemStorage *storage;
     SeqBlock           *free_blocks;
     SeqBlock           *first;
@@ -69,7 +69,7 @@ struct ContoursSeq : public ContoursTreeNode
 
 struct ContourInfo
 {
-    MI_S32       flags;
+    DT_S32       flags;
     ContourInfo *next;
     ContourInfo *parent;
     ContoursSeq *contour;
@@ -80,40 +80,40 @@ struct ContourScanner
 {
     ContoursMemStorage *storage1;
     ContoursMemStorage *storage2;
-    MI_S8              *img0;
-    MI_S8              *img;
-    MI_S32              img_step;
+    DT_S8              *img0;
+    DT_S8              *img;
+    DT_S32              img_step;
     Sizes               img_size;
     Point2i             offset;
     Point2i             pt;
     Point2i             lnbd;
-    MI_S32              nbd;
+    DT_S32              nbd;
     ContourInfo         l_cinfo;
     ContourInfo         frame_info;
     ContoursSeq         frame;
     ContoursMethod      approx_method;
     ContoursMode        mode;
-    MI_S32              seq_type1;
-    MI_S32              header_size1;
-    MI_S32              elem_size1;
+    DT_S32              seq_type1;
+    DT_S32              header_size1;
+    DT_S32              elem_size1;
 };
 
 struct SeqOperator
 {
     ContoursSeq *seq;
     SeqBlock    *block;
-    MI_S8       *ptr;
-    MI_S8       *block_max;
+    DT_S8       *ptr;
+    DT_S8       *block_max;
 };
 
 using ContourScannerPointer = ContourScanner*;
 using MemStorage = ContoursMemStorage*;
 
-constexpr MI_S32 ALIGNED_SEQ_BLOCK_SIZE = (MI_S32)AURA_ALIGN(sizeof(SeqBlock), AURA_CONTOURS_STRUCT_ALIGN);
+constexpr DT_S32 ALIGNED_SEQ_BLOCK_SIZE = (DT_S32)AURA_ALIGN(sizeof(SeqBlock), AURA_CONTOURS_STRUCT_ALIGN);
 
 static Status FlushSeqWriter(Context *ctx, SeqOperator *writer)
 {
-    if (MI_NULL == writer)
+    if (DT_NULL == writer)
     {
         AURA_ADD_ERROR_STRING(ctx, "nullptr..");
         return Status::ERROR;
@@ -124,11 +124,11 @@ static Status FlushSeqWriter(Context *ctx, SeqOperator *writer)
 
     if (writer->block)
     {
-        MI_S32 total          = 0;
+        DT_S32 total          = 0;
         SeqBlock *first_block = writer->seq->first;
         SeqBlock *block       = first_block;
 
-        writer->block->count = (MI_S32)((writer->ptr - writer->block->data) / seq->elem_size);
+        writer->block->count = (DT_S32)((writer->ptr - writer->block->data) / seq->elem_size);
 
         if (writer->block->count <= 0)
         {
@@ -147,19 +147,19 @@ static Status FlushSeqWriter(Context *ctx, SeqOperator *writer)
     return Status::OK;
 }
 
-static Status SetSeqBlockSize(Context *ctx, ContoursSeq *seq, MI_S32 delta_elements)
+static Status SetSeqBlockSize(Context *ctx, ContoursSeq *seq, DT_S32 delta_elements)
 {
-    if ((MI_NULL == seq) || (MI_NULL == seq->storage) || (delta_elements < 0))
+    if ((DT_NULL == seq) || (DT_NULL == seq->storage) || (delta_elements < 0))
     {
         AURA_ADD_ERROR_STRING(ctx, "nullptr or delta_elements out of range ...");
         return Status::ERROR;
     }
 
-    MI_S32 block_size_aligned = (seq->storage->block_size - sizeof(MemBlock) - sizeof(SeqBlock)) & (-AURA_CONTOURS_STRUCT_ALIGN);
+    DT_S32 block_size_aligned = (seq->storage->block_size - sizeof(MemBlock) - sizeof(SeqBlock)) & (-AURA_CONTOURS_STRUCT_ALIGN);
 
     if (0 == delta_elements)
     {
-        delta_elements = Max((1 << 10) / seq->elem_size, (MI_S32)1);
+        delta_elements = Max((1 << 10) / seq->elem_size, (DT_S32)1);
     }
     if (delta_elements * seq->elem_size > block_size_aligned)
     {
@@ -191,7 +191,7 @@ static Status GoNextMemBlock(Context *ctx, ContoursMemStorage *storage)
         if (!(storage->parent))
         {
             block = (MemBlock*)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, storage->block_size, 32);
-            if (MI_NULL == block)
+            if (DT_NULL == block)
             {
                 AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed...");
                 return Status::ERROR;
@@ -207,7 +207,7 @@ static Status GoNextMemBlock(Context *ctx, ContoursMemStorage *storage)
                  return Status::ERROR;
             }
 
-            if (MI_NULL == parent->top)
+            if (DT_NULL == parent->top)
             {
                 parent->top = parent->bottom;
                 parent->free_space = parent->top ? parent->block_size - sizeof(MemBlock) : 0;
@@ -261,27 +261,27 @@ static Status GoNextMemBlock(Context *ctx, ContoursMemStorage *storage)
     return Status::OK;
 }
 
-static AURA_VOID* MemStorageAlloc(Context *ctx, ContoursMemStorage *storage, size_t size, Status &ret)
+static DT_VOID* MemStorageAlloc(Context *ctx, ContoursMemStorage *storage, size_t size, Status &ret)
 {
-    if (MI_NULL == storage)
+    if (DT_NULL == storage)
     {
         AURA_ADD_ERROR_STRING(ctx, "nullptr...");
         ret = Status::ERROR;
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (size > INT_MAX)
     {
         AURA_ADD_ERROR_STRING(ctx, "Too large memory block is requested..");
         ret = Status::ERROR;
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (0 != (storage->free_space % AURA_CONTOURS_STRUCT_ALIGN))
     {
         AURA_ADD_ERROR_STRING(ctx, "free space not aligned...");
         ret = Status::ERROR;
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if ((size_t)storage->free_space < size)
@@ -291,7 +291,7 @@ static AURA_VOID* MemStorageAlloc(Context *ctx, ContoursMemStorage *storage, siz
         {
             AURA_ADD_ERROR_STRING(ctx, "requested size is negative or too big..");
             ret = Status::ERROR;
-            return MI_NULL;
+            return DT_NULL;
         }
 
         ret = GoNextMemBlock(ctx, storage);
@@ -299,27 +299,27 @@ static AURA_VOID* MemStorageAlloc(Context *ctx, ContoursMemStorage *storage, siz
         {
             AURA_ADD_ERROR_STRING(ctx, "GoNextMemBlock failed..");
             ret = Status::ERROR;
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 
-    MI_S8 *ptr = (MI_S8*)storage->top + storage->block_size - storage->free_space;
+    DT_S8 *ptr = (DT_S8*)storage->top + storage->block_size - storage->free_space;
     if (0 != (size_t)ptr % AURA_CONTOURS_STRUCT_ALIGN)
     {
         AURA_ADD_ERROR_STRING(ctx, "ptr not aligned..");
         ret = Status::ERROR;
-        return MI_NULL;
+        return DT_NULL;
     }
 
-    storage->free_space = (storage->free_space - (MI_S32)size) & (-AURA_CONTOURS_STRUCT_ALIGN);
+    storage->free_space = (storage->free_space - (DT_S32)size) & (-AURA_CONTOURS_STRUCT_ALIGN);
 
     ret = Status::OK;
     return ptr;
 }
 
-static Status GrowSeq(Context *ctx, ContoursSeq *seq, MI_S32 in_front_of)
+static Status GrowSeq(Context *ctx, ContoursSeq *seq, DT_S32 in_front_of)
 {
-    if (MI_NULL == seq)
+    if (DT_NULL == seq)
     {
         AURA_ADD_ERROR_STRING(ctx, "nullptr...");
         return Status::ERROR;
@@ -330,8 +330,8 @@ static Status GrowSeq(Context *ctx, ContoursSeq *seq, MI_S32 in_front_of)
 
     if (!block)
     {
-        MI_S32 elem_size = seq->elem_size;
-        MI_S32 delta_elems = seq->delta_elems;
+        DT_S32 elem_size = seq->elem_size;
+        DT_S32 delta_elems = seq->delta_elems;
         ContoursMemStorage *storage = seq->storage;
 
         if (seq->total >= delta_elems * 4)
@@ -339,34 +339,34 @@ static Status GrowSeq(Context *ctx, ContoursSeq *seq, MI_S32 in_front_of)
             Status ret = SetSeqBlockSize(ctx, seq, delta_elems * 2);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "The sequence has MI_NULL storage pointer..");
+                AURA_ADD_ERROR_STRING(ctx, "The sequence has DT_NULL storage pointer..");
                 return Status::ERROR;
             }
         }
 
-        if (MI_NULL == storage)
+        if (DT_NULL == storage)
         {
-            AURA_ADD_ERROR_STRING(ctx, "The sequence has MI_NULL storage pointer..");
+            AURA_ADD_ERROR_STRING(ctx, "The sequence has DT_NULL storage pointer..");
             return Status::ERROR;
         }
 
-        if ((size_t)(((MI_S8*)storage->top + storage->block_size - storage->free_space) - seq->block_max) < AURA_CONTOURS_STRUCT_ALIGN &&
+        if ((size_t)(((DT_S8*)storage->top + storage->block_size - storage->free_space) - seq->block_max) < AURA_CONTOURS_STRUCT_ALIGN &&
             storage->free_space >= seq->elem_size && !in_front_of)
         {
-            MI_S32 delta = storage->free_space / elem_size;
+            DT_S32 delta = storage->free_space / elem_size;
 
             delta = Min(delta, delta_elems) * elem_size;
             seq->block_max += delta;
-            storage->free_space = ((MI_S32)(((MI_S8*)storage->top + storage->block_size) -
+            storage->free_space = ((DT_S32)(((DT_S8*)storage->top + storage->block_size) -
                                               seq->block_max)) & (-AURA_CONTOURS_STRUCT_ALIGN);
             return Status::OK;
         }
         else
         {
-            MI_S32 delta = elem_size * delta_elems + ALIGNED_SEQ_BLOCK_SIZE;
+            DT_S32 delta = elem_size * delta_elems + ALIGNED_SEQ_BLOCK_SIZE;
             if (storage->free_space < delta)
             {
-                MI_S32 small_block_size = Max((MI_S32)1, delta_elems / 3)*elem_size + ALIGNED_SEQ_BLOCK_SIZE;
+                DT_S32 small_block_size = Max((DT_S32)1, delta_elems / 3)*elem_size + ALIGNED_SEQ_BLOCK_SIZE;
 
                 if (storage->free_space >= small_block_size + AURA_CONTOURS_STRUCT_ALIGN)
                 {
@@ -386,13 +386,13 @@ static Status GrowSeq(Context *ctx, ContoursSeq *seq, MI_S32 in_front_of)
 
             block = (SeqBlock*)MemStorageAlloc(ctx, storage, delta, ret);
 
-            if ((MI_NULL == block) || (ret != Status::OK))
+            if ((DT_NULL == block) || (ret != Status::OK))
             {
                 AURA_ADD_ERROR_STRING(ctx, "MemStorageAlloc failed..");
                 return Status::ERROR;
             }
 
-            block->data = (MI_S8*)AURA_ALIGN((size_t)(block + 1), AURA_CONTOURS_STRUCT_ALIGN);
+            block->data = (DT_S8*)AURA_ALIGN((size_t)(block + 1), AURA_CONTOURS_STRUCT_ALIGN);
             block->count = delta - ALIGNED_SEQ_BLOCK_SIZE;
             block->prev = block->next = 0;
         }
@@ -428,7 +428,7 @@ static Status GrowSeq(Context *ctx, ContoursSeq *seq, MI_S32 in_front_of)
     }
     else
     {
-        MI_S32 delta = block->count / seq->elem_size;
+        DT_S32 delta = block->count / seq->elem_size;
         block->data += block->count;
 
         if (block != block->prev)
@@ -503,10 +503,10 @@ template<typename Tp> AURA_INLINE Status WriteSeqElem(Context *ctx, Tp &elem, Se
     return Status::OK;
 }
 
-static Status CreateSeq(Context *ctx, MI_S32 seq_flags, size_t header_size, size_t elem_size,
+static Status CreateSeq(Context *ctx, DT_S32 seq_flags, size_t header_size, size_t elem_size,
                         ContoursMemStorage *storage, ContoursSeq **seq)
 {
-    if ((MI_NULL == ctx) || (MI_NULL == storage))
+    if ((DT_NULL == ctx) || (DT_NULL == storage))
     {
         AURA_ADD_ERROR_STRING(ctx, "nullptr...");
         return Status::ERROR;
@@ -521,28 +521,28 @@ static Status CreateSeq(Context *ctx, MI_S32 seq_flags, size_t header_size, size
     }
 
     *seq = (ContoursSeq*)MemStorageAlloc(ctx, storage, header_size, ret);
-    if ((MI_NULL == seq) || (ret != Status::OK))
+    if ((DT_NULL == seq) || (ret != Status::OK))
     {
         AURA_ADD_ERROR_STRING(ctx, "MemStorageAlloc failed..");
         return Status::ERROR;
     }
 
     memset(*seq, 0, header_size);
-    (*seq)->header_size = (MI_S32)header_size;
+    (*seq)->header_size = (DT_S32)header_size;
     (*seq)->flags       = (seq_flags & ~AURA_CONTOURS_MAGIC_MASK) | AURA_CONTOURS_SEQ_MAGIC_VAL;
-    (*seq)->elem_size   = (MI_S32)elem_size;
+    (*seq)->elem_size   = (DT_S32)elem_size;
     (*seq)->storage     = storage;
-    ret = SetSeqBlockSize(ctx, *seq, (MI_S32)((1 << 10) / elem_size));
+    ret = SetSeqBlockSize(ctx, *seq, (DT_S32)((1 << 10) / elem_size));
     if (ret != Status::OK)
     {
-        AURA_ADD_ERROR_STRING(ctx, "The sequence has MI_NULL storage pointer..");
+        AURA_ADD_ERROR_STRING(ctx, "The sequence has DT_NULL storage pointer..");
         AURA_RETURN(ctx, ret);
     }
 
     AURA_RETURN(ctx, ret);
 }
 
-static AURA_VOID StartReadSeq(const ContoursSeq *seq, SeqOperator *reader)
+static DT_VOID StartReadSeq(const ContoursSeq *seq, SeqOperator *reader)
 {
     reader->seq = 0;
     reader->block = 0;
@@ -559,15 +559,15 @@ static AURA_VOID StartReadSeq(const ContoursSeq *seq, SeqOperator *reader)
 
 static Status SetSeqReaderPos(Context *ctx, SeqOperator *reader)
 {
-    MI_S32 total = reader->seq->total;
-    MI_S32 elem_size = reader->seq->elem_size;
+    DT_S32 total = reader->seq->total;
+    DT_S32 elem_size = reader->seq->elem_size;
 
     if (total < 0)
     {
         AURA_ADD_ERROR_STRING(ctx, "invalid total size");
         return Status::ERROR;
     }
-    MI_S32 index = total, count = 0;
+    DT_S32 index = total, count = 0;
 
     SeqBlock *block = reader->seq->first;
     if (index >= (count = block->count))
@@ -604,9 +604,9 @@ static Status SetSeqReaderPos(Context *ctx, SeqOperator *reader)
     return Status::OK;
 }
 
-static AURA_VOID DestroyMemStorage(Context *ctx, ContoursMemStorage *storage)
+static DT_VOID DestroyMemStorage(Context *ctx, ContoursMemStorage *storage)
 {
-    if (MI_NULL == storage)
+    if (DT_NULL == storage)
     {
         return;
     }
@@ -636,7 +636,7 @@ static AURA_VOID DestroyMemStorage(Context *ctx, ContoursMemStorage *storage)
         else
         {
             AURA_FREE(ctx, temp);
-            temp = MI_NULL;
+            temp = DT_NULL;
         }
     }
 
@@ -648,7 +648,7 @@ static AURA_VOID DestroyMemStorage(Context *ctx, ContoursMemStorage *storage)
 static Status StartFindContoursNone(Context *ctx, const Mat &src, ContoursMemStorage *storage, ContoursMode mode,
                                     ContoursMethod method, Point2i offset, ContourScannerPointer &scanner, Mat &thres_dst)
 {
-    if ((MI_NULL == ctx) || (MI_NULL == storage))
+    if ((DT_NULL == ctx) || (DT_NULL == storage))
     {
         AURA_ADD_ERROR_STRING(ctx, "nullptr..");
         return Status::ERROR;
@@ -657,14 +657,14 @@ static Status StartFindContoursNone(Context *ctx, const Mat &src, ContoursMemSto
     Status ret = Status::ERROR;
 
     scanner = (ContourScannerPointer)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, sizeof(*scanner), 32);
-    if (MI_NULL == scanner)
+    if (DT_NULL == scanner)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed...");
         return Status::ERROR;
     }
-    memset((AURA_VOID*)scanner, 0, sizeof(*scanner));
+    memset((DT_VOID*)scanner, 0, sizeof(*scanner));
 
-    MI_S32 step = src.GetRowStep();
+    DT_S32 step = src.GetRowStep();
 
     if ((step < 0) || (src.GetSizes().m_height < 1))
     {
@@ -690,7 +690,7 @@ static Status StartFindContoursNone(Context *ctx, const Mat &src, ContoursMemSto
     scanner->frame.flags = AURA_CONTOURS_SEQ_FLAG_HOLE;
     scanner->approx_method = method;
     scanner->header_size1  = sizeof(ContoursSeq);
-    scanner->elem_size1    = sizeof(MI_S32) * 2;
+    scanner->elem_size1    = sizeof(DT_S32) * 2;
     scanner->seq_type1     = AURA_CONTOURS_SEQ_POLYGON;
 
     ret = IThreshold(ctx, src, thres_dst, 0.f, 1.f, AURA_THRESH_BINARY, OpTarget::None());
@@ -702,34 +702,34 @@ static Status StartFindContoursNone(Context *ctx, const Mat &src, ContoursMemSto
         return Status::ERROR;
     }
 
-    MI_U8 *p_dst  = (MI_U8*)thres_dst.GetData();
-    scanner->img0 = (MI_S8*)p_dst;
-    scanner->img  = (MI_S8*)(p_dst + step);
+    DT_U8 *p_dst  = (DT_U8*)thres_dst.GetData();
+    scanner->img0 = (DT_S8*)p_dst;
+    scanner->img  = (DT_S8*)(p_dst + step);
 
     AURA_RETURN(ctx, ret);
 }
 
-static Status FetchContour(Context *ctx, MI_S8 *ptr, MI_S32 step, Point2i pt, ContoursSeq *contour, ContoursMethod method_in)
+static Status FetchContour(Context *ctx, DT_S8 *ptr, DT_S32 step, Point2i pt, ContoursSeq *contour, ContoursMethod method_in)
 {
-    if ((MI_NULL == ptr) || (MI_NULL == contour))
+    if ((DT_NULL == ptr) || (DT_NULL == contour))
     {
         AURA_ADD_ERROR_STRING(ctx, "null ptr");
         return Status::ERROR;
     }
 
     Status ret = Status::ERROR;
-    const MI_S8 nbd = 2;
+    const DT_S8 nbd = 2;
     SeqOperator writer;
-    MI_S8  *i0 = ptr;
-    MI_S8  *i1 = MI_NULL;
-    MI_S8  *i3 = MI_NULL;
-    MI_S8  *i4 = MI_NULL;
-    MI_S32 prev_s = -1;
-    MI_S32 s      = 0;
-    MI_S32 s_end  = 0;
-    MI_S32 method = static_cast<MI_S32>(method_in);
+    DT_S8  *i0 = ptr;
+    DT_S8  *i1 = DT_NULL;
+    DT_S8  *i3 = DT_NULL;
+    DT_S8  *i4 = DT_NULL;
+    DT_S32 prev_s = -1;
+    DT_S32 s      = 0;
+    DT_S32 s_end  = 0;
+    DT_S32 method = static_cast<DT_S32>(method_in);
 
-    MI_S32 deltas[FIND_CONTOURS_MAX_SIZE] =
+    DT_S32 deltas[FIND_CONTOURS_MAX_SIZE] =
     {
         1, -step + 1, -step, -step - 1, -1, step - 1, step, step + 1,
         1, -step + 1, -step, -step - 1, -1, step - 1, step, step + 1,
@@ -755,7 +755,7 @@ static Status FetchContour(Context *ctx, MI_S8 *ptr, MI_S32 step, Point2i pt, Co
 
     if (s == s_end)
     {
-        *i0 = (MI_S8)(nbd | -128);
+        *i0 = (DT_S8)(nbd | -128);
         if (method >= 0)
         {
             ret = WriteSeqElem<Point2i>(ctx, pt, writer);
@@ -773,7 +773,7 @@ static Status FetchContour(Context *ctx, MI_S8 *ptr, MI_S32 step, Point2i pt, Co
 
         for (;;)
         {
-            if (MI_NULL == i3)
+            if (DT_NULL == i3)
             {
                 AURA_ADD_ERROR_STRING(ctx, "i3 null...");
                 return Status::ERROR;
@@ -785,7 +785,7 @@ static Status FetchContour(Context *ctx, MI_S8 *ptr, MI_S32 step, Point2i pt, Co
             while (s < (FIND_CONTOURS_MAX_SIZE - 1))
             {
                 i4 = i3 + deltas[++s];
-                if (MI_NULL == i4)
+                if (DT_NULL == i4)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "i4 null...");
                     return Status::ERROR;
@@ -799,9 +799,9 @@ static Status FetchContour(Context *ctx, MI_S8 *ptr, MI_S32 step, Point2i pt, Co
 
             s &= 7;
 
-            if ((MI_U32)(s - 1) < (MI_U32)s_end)
+            if ((DT_U32)(s - 1) < (DT_U32)s_end)
             {
-                *i3 = (MI_S8)(nbd | -128);
+                *i3 = (DT_S8)(nbd | -128);
             }
             else if (*i3 == 1)
             {
@@ -810,8 +810,8 @@ static Status FetchContour(Context *ctx, MI_S8 *ptr, MI_S32 step, Point2i pt, Co
 
             if (method < 0)
             {
-                MI_U8 _s = (MI_U8)s;
-                ret = WriteSeqElem<MI_U8>(ctx, _s, writer);
+                DT_U8 _s = (DT_U8)s;
+                ret = WriteSeqElem<DT_U8>(ctx, _s, writer);
                 if (ret != Status::OK)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "WriteSeqElem failed");
@@ -855,11 +855,11 @@ static Status FetchContour(Context *ctx, MI_S8 *ptr, MI_S32 step, Point2i pt, Co
     if (writer.block && writer.seq->storage)
     {
         ContoursMemStorage *storage = seq->storage;
-        MI_S8 *storage_block_max = (MI_S8*) storage->top + storage->block_size;
+        DT_S8 *storage_block_max = (DT_S8*) storage->top + storage->block_size;
 
-        if ((MI_U32)((storage_block_max - storage->free_space) - seq->block_max) < AURA_CONTOURS_STRUCT_ALIGN)
+        if ((DT_U32)((storage_block_max - storage->free_space) - seq->block_max) < AURA_CONTOURS_STRUCT_ALIGN)
         {
-            storage->free_space = ((MI_S32)(storage_block_max - seq->ptr)) & (-AURA_CONTOURS_STRUCT_ALIGN);
+            storage->free_space = ((DT_S32)(storage_block_max - seq->ptr)) & (-AURA_CONTOURS_STRUCT_ALIGN);
             seq->block_max = seq->ptr;
         }
     }
@@ -892,7 +892,7 @@ static Status EndProcessContour(Context *ctx, ContourScannerPointer scanner)
         node->h_next = parent->v_next;
         parent->v_next = node;
     }
-    memset((AURA_VOID*)&(scanner->l_cinfo), 0, sizeof(scanner->l_cinfo));
+    memset((DT_VOID*)&(scanner->l_cinfo), 0, sizeof(scanner->l_cinfo));
 
     return Status::OK;
 }
@@ -914,22 +914,22 @@ static Status FindNextContourNone(Context *ctx, ContourScannerPointer scanner, C
         return Status::ERROR;
     }
 
-    MI_S8 *img0       = scanner->img0;
-    MI_S8 *img        = scanner->img;
-    MI_S32 step       = scanner->img_step;
-    MI_S32 x          = scanner->pt.m_x;
-    MI_S32 y          = scanner->pt.m_y;
-    MI_S32 width      = scanner->img_size.m_width;
-    MI_S32 height     = scanner->img_size.m_height;
+    DT_S8 *img0       = scanner->img0;
+    DT_S8 *img        = scanner->img;
+    DT_S32 step       = scanner->img_step;
+    DT_S32 x          = scanner->pt.m_x;
+    DT_S32 y          = scanner->pt.m_y;
+    DT_S32 width      = scanner->img_size.m_width;
+    DT_S32 height     = scanner->img_size.m_height;
     ContoursMode mode = scanner->mode;
     Point2i lnbd      = scanner->lnbd;
-    MI_S32 prev       = img[x - 1];
-    const MI_S32 new_mask = -2;
+    DT_S32 prev       = img[x - 1];
+    const DT_S32 new_mask = -2;
 
     for (; y < height; y++, img += step)
     {
-        MI_S32 *img_i  = MI_NULL;
-        MI_S32 p       = 0;
+        DT_S32 *img_i  = DT_NULL;
+        DT_S32 p       = 0;
 
         for (; x < width; x++)
         {
@@ -946,7 +946,7 @@ static Status FindNextContourNone(Context *ctx, ContourScannerPointer scanner, C
 
             {
                 ContoursSeq *seq = 0;
-                MI_S32 is_hole = 0;
+                DT_S32 is_hole = 0;
                 Point2i origin = {0, 0};
 
                 if ((!img_i && !(prev == 0 && p == 1)) ||
@@ -999,7 +999,7 @@ static Status FindNextContourNone(Context *ctx, ContourScannerPointer scanner, C
                     l_cinfo->contour = 0;
                     if (scanner->storage1 == scanner->storage2)
                     {
-                        if (MI_NULL == scanner->storage1->top)
+                        if (DT_NULL == scanner->storage1->top)
                         {
                             scanner->storage1->top = scanner->storage1->bottom;
                             scanner->storage1->free_space = scanner->storage1->top ? scanner->storage1->block_size - sizeof(MemBlock) : 0;
@@ -1025,7 +1025,7 @@ static Status FindNextContourNone(Context *ctx, ContourScannerPointer scanner, C
                 scanner->pt.m_x  = !img_i ? x + 1 : x + 1 - is_hole;
                 scanner->pt.m_y  = y;
                 scanner->lnbd    = lnbd;
-                scanner->img     = (MI_S8*)img;
+                scanner->img     = (DT_S8*)img;
                 *contour         = l_cinfo->contour;
                 AURA_RETURN(ctx, ret);
             }
@@ -1043,7 +1043,7 @@ RESUMESCAN:
         prev = 0;
     }
 
-    *contour = MI_NULL;
+    *contour = DT_NULL;
     AURA_RETURN(ctx, ret);
 }
 
@@ -1063,17 +1063,17 @@ static Status EndFindContoursNone(Context *ctx, ContourScannerPointer *p_scanner
     {
         DestroyMemStorage(ctx, scanner->storage1);
         AURA_FREE(ctx, scanner->storage1);
-        scanner->storage1 = MI_NULL;
+        scanner->storage1 = DT_NULL;
     }
 
     *first_contour = (ContoursSeq*)(scanner->frame.v_next);
 
     AURA_FREE(ctx, *p_scanner);
-    *p_scanner = MI_NULL;
+    *p_scanner = DT_NULL;
     return Status::OK;
 }
 
-static Status TreeToNodeSeq(Context *ctx, const AURA_VOID *first, MI_S32 header_size,
+static Status TreeToNodeSeq(Context *ctx, const DT_VOID *first, DT_S32 header_size,
                             ContoursMemStorage *storage, ContoursSeq **allseq)
 {
     if (!storage)
@@ -1091,12 +1091,12 @@ static Status TreeToNodeSeq(Context *ctx, const AURA_VOID *first, MI_S32 header_
 
     if (first)
     {
-        const AURA_VOID *node_it = (AURA_VOID*)first;
-        MI_S32 level = 0, max_level = INT_MAX;
+        const DT_VOID *node_it = (DT_VOID*)first;
+        DT_S32 level = 0, max_level = INT_MAX;
 
         for (;;)
         {
-            ContoursTreeNode* prev_node = MI_NULL;
+            ContoursTreeNode* prev_node = DT_NULL;
             ContoursTreeNode *node = prev_node = (ContoursTreeNode*)node_it;
 
             if (node)
@@ -1127,11 +1127,11 @@ static Status TreeToNodeSeq(Context *ctx, const AURA_VOID *first, MI_S32 header_
             {
                 break;
             }
-            if (MI_NULL == *allseq)
+            if (DT_NULL == *allseq)
             {
                 continue;
             }
-            MI_S8 *ptr = (*allseq)->ptr;
+            DT_S8 *ptr = (*allseq)->ptr;
 
             if (ptr >= (*allseq)->block_max)
             {
@@ -1153,19 +1153,19 @@ static Status TreeToNodeSeq(Context *ctx, const AURA_VOID *first, MI_S32 header_
     AURA_RETURN(ctx, ret);
 }
 
-static Status CvtSeqToArray(Context *ctx, const ContoursSeq *seq, std::vector<std::vector<Point2i>> &array, MI_S32 index)
+static Status CvtSeqToArray(Context *ctx, const ContoursSeq *seq, std::vector<std::vector<Point2i>> &array, DT_S32 index)
 {
-    if (MI_NULL == seq || 0 == seq->total)
+    if (DT_NULL == seq || 0 == seq->total)
     {
         AURA_ADD_ERROR_STRING(ctx, "nullptr...");
         return Status::ERROR;
     }
 
     SeqOperator reader;
-    MI_CHAR *dst = (MI_CHAR*)(array[index].data());
-    MI_S32 elem_size = seq->elem_size;
+    DT_CHAR *dst = (DT_CHAR*)(array[index].data());
+    DT_S32 elem_size = seq->elem_size;
 
-    MI_S32 total = seq->total * elem_size;
+    DT_S32 total = seq->total * elem_size;
 
     StartReadSeq(seq, &reader);
     if (SetSeqReaderPos(ctx, &reader) != Status::OK)
@@ -1176,7 +1176,7 @@ static Status CvtSeqToArray(Context *ctx, const ContoursSeq *seq, std::vector<st
 
     do
     {
-        MI_S32 count = Min(total, (MI_S32)(reader.block_max - reader.ptr));
+        DT_S32 count = Min(total, (DT_S32)(reader.block_max - reader.ptr));
 
         memcpy(dst, reader.ptr, count);
 
@@ -1193,7 +1193,7 @@ static Status CvtSeqToArray(Context *ctx, const ContoursSeq *seq, std::vector<st
 static Status FindContoursU8C1None(Context *ctx, const Mat &src, std::vector<std::vector<Point2i>> &contours,
                                    std::vector<Scalari> &hierarchy, ContoursMode mode, ContoursMethod method, const Point2i &offset)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         AURA_ADD_ERROR_STRING(ctx, "ctx nullptr..");
         return Status::ERROR;
@@ -1224,7 +1224,7 @@ static Status FindContoursU8C1None(Context *ctx, const Mat &src, std::vector<std
 
     // 2.allocate contours mem
     ContoursMemStorage *mem_storage = (ContoursMemStorage*)AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, sizeof(ContoursMemStorage), 32);
-    if (MI_NULL == mem_storage)
+    if (DT_NULL == mem_storage)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed...");
         return Status::ERROR;
@@ -1232,11 +1232,11 @@ static Status FindContoursU8C1None(Context *ctx, const Mat &src, std::vector<std
     memset(mem_storage, 0, sizeof(*mem_storage));
     mem_storage->block_size = AURA_ALIGN(AURA_CONTOURS_STORAGE_BLOCK_SIZE, AURA_CONTOURS_STRUCT_ALIGN);
     MemStorage storage(mem_storage);
-    ContoursSeq *p_contours = MI_NULL, *p_start_node = MI_NULL;
+    ContoursSeq *p_contours = DT_NULL, *p_start_node = DT_NULL;
 
     // 3.main algo body
-    ContourScannerPointer scanner = MI_NULL;
-    ContoursSeq *contour = MI_NULL;
+    ContourScannerPointer scanner = DT_NULL;
+    ContoursSeq *contour = DT_NULL;
     hierarchy.clear();
 
     Mat dst_thresd = src_border.Clone();
@@ -1261,7 +1261,7 @@ static Status FindContoursU8C1None(Context *ctx, const Mat &src, std::vector<std
             AURA_ADD_ERROR_STRING(ctx, "FineNextContourNone fail..");
             goto EXIT;
         }
-    } while (MI_NULL != contour);
+    } while (DT_NULL != contour);
 
     ret = EndFindContoursNone(ctx, &scanner, &p_contours);
     if (ret != Status::OK)
@@ -1286,7 +1286,7 @@ static Status FindContoursU8C1None(Context *ctx, const Mat &src, std::vector<std
         SeqOperator seq_operator;
         StartReadSeq(p_start_node, &seq_operator);
 
-        for (MI_S32 i = 0; i < p_start_node->total; i++)
+        for (DT_S32 i = 0; i < p_start_node->total; i++)
         {
             ContoursSeq *c = *(ContoursSeq **)(seq_operator.ptr);
             c->color = i;
@@ -1305,10 +1305,10 @@ static Status FindContoursU8C1None(Context *ctx, const Mat &src, std::vector<std
                 seq_operator.ptr = seq_operator.block->data;
             }
 
-            MI_S32 h_next = c->h_next ? ((c->h_next)->color) : -1;
-            MI_S32 h_prev = c->h_prev ? ((c->h_prev)->color) : -1;
-            MI_S32 v_next = c->v_next ? ((c->v_next)->color) : -1;
-            MI_S32 v_prev = c->v_prev ? ((c->v_prev)->color) : -1;
+            DT_S32 h_next = c->h_next ? ((c->h_next)->color) : -1;
+            DT_S32 h_prev = c->h_prev ? ((c->h_prev)->color) : -1;
+            DT_S32 v_next = c->v_next ? ((c->v_next)->color) : -1;
+            DT_S32 v_prev = c->v_prev ? ((c->v_prev)->color) : -1;
 
             hierarchy.emplace_back(h_next, h_prev, v_next, v_prev);
         }
@@ -1317,7 +1317,7 @@ static Status FindContoursU8C1None(Context *ctx, const Mat &src, std::vector<std
 EXIT:
     DestroyMemStorage(ctx, storage);
     AURA_FREE(ctx, storage);
-    storage = MI_NULL;
+    storage = DT_NULL;
     AURA_RETURN(ctx, ret);
 }
 

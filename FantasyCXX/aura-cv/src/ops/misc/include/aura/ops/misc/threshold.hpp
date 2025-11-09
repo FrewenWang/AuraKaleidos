@@ -37,7 +37,7 @@ namespace aura
  * @{
  */
 
-AURA_INLINE const std::string ThresholdTypeToString(MI_S32 type)
+AURA_INLINE const std::string ThresholdTypeToString(DT_S32 type)
 {
     std::ostringstream ss;
 
@@ -136,7 +136,7 @@ public:
      *
      * For more details, please refer to @ref threshold_details
      */
-    Status SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type);
+    Status SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type);
 };
 
 /**
@@ -165,7 +165,7 @@ public:
  * @note N is positive integer.
  */
 AURA_EXPORTS Status IThreshold(Context *ctx, const Mat &src, Mat &dst,
-                               MI_F32 thresh, MI_F32 max_val, MI_S32 type,
+                               DT_F32 thresh, DT_F32 max_val, DT_S32 type,
                                const OpTarget &target = OpTarget::Default());
 
 /**

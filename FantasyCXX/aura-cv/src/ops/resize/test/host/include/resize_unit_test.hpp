@@ -29,9 +29,9 @@ AURA_TEST_PARAM(ResizeParam,
                 InterpType, interp_type,
                 OpTarget,   target);
 #if !defined(AURA_BUILD_XPLORER)
-static MI_S32 ResizeInterpTypeToOpencv(InterpType method)
+static DT_S32 ResizeInterpTypeToOpencv(InterpType method)
 {
-    MI_S32 cv_type = -1;
+    DT_S32 cv_type = -1;
 
     switch (method)
     {
@@ -74,10 +74,10 @@ static Status CvResize(Context *ctx, Mat &src, Mat &dst, InterpType type)
     Status ret = Status::OK;
 
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 cv_method = ResizeInterpTypeToOpencv(type);
+    DT_S32 cv_method = ResizeInterpTypeToOpencv(type);
 
-    MI_S32 cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
-    MI_S32 cn = src.GetSizes().m_channel;
+    DT_S32 cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 cn = src.GetSizes().m_channel;
 
     if ((((CV_32SC(cn) == cv_type) || (CV_8SC(cn)  == cv_type)) && (InterpType::AREA   == type)) ||
         (((CV_8SC(cn)  == cv_type) || (CV_32SC(cn) == cv_type)) && (InterpType::CUBIC  == type)) ||
@@ -92,8 +92,8 @@ static Status CvResize(Context *ctx, Mat &src, Mat &dst, InterpType type)
         cv::Mat cv_src = MatToOpencv(src);
         cv::Mat cv_dst = MatToOpencv(dst);
 
-        MI_S32 owidth  = dst.GetSizes().m_width;
-        MI_S32 oheight = dst.GetSizes().m_height;
+        DT_S32 owidth  = dst.GetSizes().m_width;
+        DT_S32 oheight = dst.GetSizes().m_height;
         cv::resize(cv_src, cv_dst, cv::Size(owidth, oheight), 0, 0, cv_method);
     }
     else
@@ -113,10 +113,10 @@ static Status CvResize(Context *ctx, Mat &src, Mat &dst, InterpType type)
 
 AURA_INLINE Sizes DefaultStride(Sizes3 mat_size, ElemType type)
 {
-    MI_S32 elem_size = ElemTypeSize(type);
-    MI_S32 width   = mat_size.m_width;
-    MI_S32 height  = mat_size.m_height;
-    MI_S32 channel = mat_size.m_channel;
+    DT_S32 elem_size = ElemTypeSize(type);
+    DT_S32 width   = mat_size.m_width;
+    DT_S32 height  = mat_size.m_height;
+    DT_S32 channel = mat_size.m_channel;
 
     return Sizes(height, width * channel * elem_size);
 }
@@ -140,7 +140,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         ResizeParam run_param(GetParam((index)));
 
@@ -193,7 +193,7 @@ public:
         return ret;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         ResizeParam run_param(GetParam((index)));
@@ -205,14 +205,14 @@ public:
         Sizes omat_strides = DefaultStride(omat_sizes.m_sizes, elem_type) + (imat_sizes.m_strides.m_width > 0 ? Sizes(1, 4): Sizes());
 
         // creat iauras
-        MI_BOOL promote_fp16 = (ElemType::F16 == elem_type) && (TargetType::NONE == run_param.target.m_type);
+        DT_BOOL promote_fp16 = (ElemType::F16 == elem_type) && (TargetType::NONE == run_param.target.m_type);
         ElemType ref_elem_type = promote_fp16 ? ElemType::F32 : elem_type;
 
         Mat src = m_factory.GetDerivedMat(1.0f, 0.0f, elem_type, imat_sizes.m_sizes, AURA_MEM_DEFAULT, imat_sizes.m_strides);
         Mat dst = m_factory.GetEmptyMat(elem_type,     omat_sizes.m_sizes, AURA_MEM_DEFAULT, omat_strides);
         Mat ref = m_factory.GetEmptyMat(ref_elem_type, omat_sizes.m_sizes, AURA_MEM_DEFAULT, omat_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;
@@ -279,7 +279,7 @@ public:
             // float compute error because none impl use -Ofast flag
             if (!cmp_result.status)
             {
-                MI_F32 ratio = cmp_result.hist.back().second * 1.0f / cmp_result.total;
+                DT_F32 ratio = cmp_result.hist.back().second * 1.0f / cmp_result.total;
 
                 if (ratio > 0.995f)
                 {

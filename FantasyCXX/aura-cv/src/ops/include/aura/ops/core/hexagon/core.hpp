@@ -20,22 +20,22 @@ namespace aura
 /**
  * @brief External declaration of vrdelta_reverse_d8 with alignment attribute.
  */
-extern const MI_U8 vrdelta_reverse_d8[]  __attribute__((aligned(128)));
+extern const DT_U8 vrdelta_reverse_d8[]  __attribute__((aligned(128)));
 
 /**
  * @brief External declaration of vrdelta_reverse_d16 with alignment attribute.
  */
-extern const MI_U8 vrdelta_reverse_d16[] __attribute__((aligned(128)));
+extern const DT_U8 vrdelta_reverse_d16[] __attribute__((aligned(128)));
 
 /**
  * @brief External declaration of vrdelta_reverse_d32 with alignment attribute.
  */
-extern const MI_U8 vrdelta_reverse_d32[] __attribute__((aligned(128)));
+extern const DT_U8 vrdelta_reverse_d32[] __attribute__((aligned(128)));
 
 /**
  * @brief External declaration of vrdelta_replicate_last_d32 with alignment attribute.
  */
-extern const MI_U32 vrdelta_replicate_last_d32[] __attribute__((aligned(128)));
+extern const DT_U32 vrdelta_replicate_last_d32[] __attribute__((aligned(128)));
 
 /**
  * @brief Get a border vector for the specified type, border type, and border area.
@@ -52,7 +52,7 @@ extern const MI_U32 vrdelta_replicate_last_d32[] __attribute__((aligned(128)));
  *
  * @return The resulting border vector.
  */
-template <typename St, BorderType BORDER_TYPE, BorderArea BORDER_AREA, typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE>::type* = MI_NULL>
+template <typename St, BorderType BORDER_TYPE, BorderArea BORDER_AREA, typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE>::type* = DT_NULL>
 AURA_INLINE HVX_Vector GetBorderVector(const HVX_Vector &v_src, St replicate, St constant)
 {
     AURA_UNUSED(replicate);
@@ -62,7 +62,7 @@ AURA_INLINE HVX_Vector GetBorderVector(const HVX_Vector &v_src, St replicate, St
     return v_result;
 }
 
-template <typename St, BorderType BORDER_TYPE, BorderArea BORDER_AREA, typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE>::type* = MI_NULL>
+template <typename St, BorderType BORDER_TYPE, BorderArea BORDER_AREA, typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE>::type* = DT_NULL>
 AURA_INLINE HVX_Vector GetBorderVector(const HVX_Vector &v_src, St replicate, St constant)
 {
     AURA_UNUSED(constant);
@@ -72,18 +72,18 @@ AURA_INLINE HVX_Vector GetBorderVector(const HVX_Vector &v_src, St replicate, St
     return v_result;
 }
 
-template <typename St, BorderType BORDER_TYPE, BorderArea BORDER_AREA, typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE>::type* = MI_NULL>
+template <typename St, BorderType BORDER_TYPE, BorderArea BORDER_AREA, typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE>::type* = DT_NULL>
 AURA_INLINE HVX_Vector GetBorderVector(const HVX_Vector &v_src, St replicate, St constant)
 {
     AURA_UNUSED(replicate);
     AURA_UNUSED(constant);
 
     HVX_Vector v_reverse;
-    if (std::is_same<St, MI_U8>::value || std::is_same<St, MI_S8>::value)
+    if (std::is_same<St, DT_U8>::value || std::is_same<St, DT_S8>::value)
     {
         v_reverse = Q6_V_vdelta_VV(v_src, vmemu(vrdelta_reverse_d8));
     }
-    else if (std::is_same<St, MI_U16>::value || std::is_same<St, MI_S16>::value)
+    else if (std::is_same<St, DT_U16>::value || std::is_same<St, DT_S16>::value)
     {
         v_reverse = Q6_V_vdelta_VV(v_src, vmemu(vrdelta_reverse_d16));
     }

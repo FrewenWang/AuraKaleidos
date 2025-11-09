@@ -49,7 +49,7 @@ static Status CvRemap(Mat &src, Mat &dst, Mat &map,
     cv::Mat cv_m1  = cv::Mat();
     cv::Scalar cv_border_value(border_value.m_val[0], border_value.m_val[1], border_value.m_val[2], border_value.m_val[3]);
 
-    cv::remap(cv_src, cv_dst, cv_m0, cv_m1, static_cast<MI_S32>(interp_type), BorderTypeToOpencv(border_type), cv_border_value);
+    cv::remap(cv_src, cv_dst, cv_m0, cv_m1, static_cast<DT_S32>(interp_type), BorderTypeToOpencv(border_type), cv_border_value);
 #else
     AURA_UNUSED(src);
     AURA_UNUSED(dst);
@@ -67,49 +67,49 @@ static Status CreateMap(MatFactory &factory, Sizes3 src_sizes, ElemType map_elem
     Sizes3 map_c2_sizes;
     map_c2_sizes           = src_sizes;
     map_c2_sizes.m_channel = 2;
-    MI_F32 max_val_f32     = Min(Max(src_sizes.m_width, src_sizes.m_height) * 15.2f + 200.f, 32767.f);
+    DT_F32 max_val_f32     = Min(Max(src_sizes.m_width, src_sizes.m_height) * 15.2f + 200.f, 32767.f);
 
     if (map_elem_type == ElemType::F32)
     {
         map = factory.GetRandomMat(0, max_val_f32, ElemType::F32, map_c2_sizes, AURA_MEM_DEFAULT);
 
-        for (MI_S32 h = 0; h < src_sizes.m_height; h++)
+        for (DT_S32 h = 0; h < src_sizes.m_height; h++)
         {
-            MI_S32 h_group = h / 13;
-            for (MI_S32 w = 0; w < src_sizes.m_width; w++)
+            DT_S32 h_group = h / 13;
+            for (DT_S32 w = 0; w < src_sizes.m_width; w++)
             {
-                MI_S32 w_group = w / 253;
-                MI_F32 w_val   = (rand()% (int)max_val_f32) / 253.f;
-                MI_F32 w_index = (w_val + w_group - ((MI_S32)w_val)) * 253.f;
-                map.Ptr<MI_F32>(h)[2 * w] = w_index;
-                MI_F32  h_val   = (rand()% (int)max_val_f32) / 13.f;
-                MI_F32  h_index = (h_val + h_group - ((MI_S32)h_val)) * 13.f;
+                DT_S32 w_group = w / 253;
+                DT_F32 w_val   = (rand()% (int)max_val_f32) / 253.f;
+                DT_F32 w_index = (w_val + w_group - ((DT_S32)w_val)) * 253.f;
+                map.Ptr<DT_F32>(h)[2 * w] = w_index;
+                DT_F32  h_val   = (rand()% (int)max_val_f32) / 13.f;
+                DT_F32  h_index = (h_val + h_group - ((DT_S32)h_val)) * 13.f;
                 h_index = pow(-1, rand()) * h_index;
-                map.Ptr<MI_F32>(h)[2 * w + 1] = h_index;
+                map.Ptr<DT_F32>(h)[2 * w + 1] = h_index;
             }
-            map.Ptr<MI_F32>(h)[2 * src_sizes.m_width - 2] = pow(-1, rand()) * (rand()% (int)max_val_f32);
-            map.Ptr<MI_F32>(h)[2 * src_sizes.m_width - 1] = pow(-1, rand()) * (rand()% (int)max_val_f32);
+            map.Ptr<DT_F32>(h)[2 * src_sizes.m_width - 2] = pow(-1, rand()) * (rand()% (int)max_val_f32);
+            map.Ptr<DT_F32>(h)[2 * src_sizes.m_width - 1] = pow(-1, rand()) * (rand()% (int)max_val_f32);
         }
     }
     else if (map_elem_type == ElemType::S16)
     {
         map = factory.GetRandomMat(0, max_val_f32, ElemType::S16, map_c2_sizes, AURA_MEM_DEFAULT);
-        for(MI_S32 h = 0; h < src_sizes.m_height; h++)
+        for(DT_S32 h = 0; h < src_sizes.m_height; h++)
         {
-            MI_S32 h_group = h / 13;
-            for(MI_S32 w = 0; w < src_sizes.m_width; w++)
+            DT_S32 h_group = h / 13;
+            for(DT_S32 w = 0; w < src_sizes.m_width; w++)
             {
-                MI_S32 w_group = w / 253;
-                MI_F32 w_val   = (rand() % (int)max_val_f32) / 253.f;
-                MI_S16 w_index = SaturateCast<MI_S16>((w_val + w_group - ((MI_S32)w_val)) * 253.f);
-                map.Ptr<MI_S16>(h)[2 * w] = w_index;
-                MI_S16  h_val   = (rand() % (int)max_val_f32) / 13;
-                MI_S16  h_index = SaturateCast<MI_S16>((h_val + h_group - ((MI_S32)h_val)) * 13);
+                DT_S32 w_group = w / 253;
+                DT_F32 w_val   = (rand() % (int)max_val_f32) / 253.f;
+                DT_S16 w_index = SaturateCast<DT_S16>((w_val + w_group - ((DT_S32)w_val)) * 253.f);
+                map.Ptr<DT_S16>(h)[2 * w] = w_index;
+                DT_S16  h_val   = (rand() % (int)max_val_f32) / 13;
+                DT_S16  h_index = SaturateCast<DT_S16>((h_val + h_group - ((DT_S32)h_val)) * 13);
                 h_index = pow(-1, rand()) * h_index;
-                map.Ptr<MI_S16>(h)[2 * w + 1] = h_index;
+                map.Ptr<DT_S16>(h)[2 * w + 1] = h_index;
             }
-            map.Ptr<MI_S16>(h)[2 * src_sizes.m_width - 2] = pow(-1, rand()) * (rand() % (int)max_val_f32);
-            map.Ptr<MI_S16>(h)[2 * src_sizes.m_width - 1] = pow(-1, rand()) * (rand() % (int)max_val_f32);
+            map.Ptr<DT_S16>(h)[2 * src_sizes.m_width - 2] = pow(-1, rand()) * (rand() % (int)max_val_f32);
+            map.Ptr<DT_S16>(h)[2 * src_sizes.m_width - 1] = pow(-1, rand()) * (rand() % (int)max_val_f32);
         }
     }
     else
@@ -139,7 +139,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         RemapParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -162,7 +162,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         RemapParam run_param(GetParam((index)));
         if (run_param.map_elem_type == ElemType::S16 && run_param.interp_type != InterpType::NEAREST)
@@ -188,7 +188,7 @@ public:
                                         omat_sizes.m_sizes, AURA_MEM_DEFAULT, omat_sizes.m_strides);
         Scalar border_value = {10.2, 20.2, 13.2, 14.2};
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;

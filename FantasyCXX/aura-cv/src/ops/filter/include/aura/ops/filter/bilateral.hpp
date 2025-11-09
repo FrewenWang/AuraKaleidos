@@ -55,8 +55,8 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_F32 sigma_color, MI_F32 sigma_space,
-                   MI_S32 ksize, BorderType border_type = BorderType::REFLECT_101,
+    Status SetArgs(const Array *src, Array *dst, DT_F32 sigma_color, DT_F32 sigma_space,
+                   DT_S32 ksize, BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar());
 
     /**
@@ -67,7 +67,7 @@ public:
      * @param ksize The size of the bilateral kernel.
      * @param border_type The border type for handling border pixels.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type);
 };
 
 /**
@@ -99,8 +99,8 @@ public:
  *
  * @note N is odd positive integer; And the above implementations supported all BorderType(CONSTANT/REPLICATE/REFLECT_101).
  */
-AURA_EXPORTS Status IBilateral(Context *ctx, const Mat &src, Mat &dst, MI_F32 sigma_color, MI_F32 sigma_space,
-                               MI_S32 ksize, BorderType border_type = BorderType::REFLECT_101,
+AURA_EXPORTS Status IBilateral(Context *ctx, const Mat &src, Mat &dst, DT_F32 sigma_color, DT_F32 sigma_space,
+                               DT_S32 ksize, BorderType border_type = BorderType::REFLECT_101,
                                const Scalar &border_value = Scalar(),
                                const OpTarget &target = OpTarget::Default());
 

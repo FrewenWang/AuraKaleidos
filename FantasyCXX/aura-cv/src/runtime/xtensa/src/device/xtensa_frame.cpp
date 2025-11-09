@@ -13,16 +13,16 @@ FrameWrapper::FrameWrapper() : buffer(0), buffer_size(0), data(0), width(0), hei
                                top_edge_pad_height(0), right_edge_pad_width(0), bottom_edge_pad_height(0), padding_type(0), padding_val(0)
 {}
 
-FrameWrapper::FrameWrapper(MI_U64 buffer, MI_U32 buffer_size, MI_U64 data, MI_S32 width, MI_S32 height, MI_S32 pitch, MI_U8 pixel_res, MI_U8 num_channels,
-                           MI_U8 left_edge_pad_width, MI_U8 top_edge_pad_height, MI_U8 right_edge_pad_width, MI_U8 bottom_edge_pad_height,
-                           MI_U8 padding_type, MI_U32 padding_val)
+FrameWrapper::FrameWrapper(DT_U64 buffer, DT_U32 buffer_size, DT_U64 data, DT_S32 width, DT_S32 height, DT_S32 pitch, DT_U8 pixel_res, DT_U8 num_channels,
+                           DT_U8 left_edge_pad_width, DT_U8 top_edge_pad_height, DT_U8 right_edge_pad_width, DT_U8 bottom_edge_pad_height,
+                           DT_U8 padding_type, DT_U32 padding_val)
                            : buffer(buffer), buffer_size(buffer_size), data(data), width(width), height(height),pitch(pitch), pixel_res(pixel_res),
                            num_channels(num_channels), left_edge_pad_width(left_edge_pad_width), top_edge_pad_height(top_edge_pad_height),
                            right_edge_pad_width(right_edge_pad_width), bottom_edge_pad_height(bottom_edge_pad_height), padding_type(padding_type),
                            padding_val(padding_val)
 {}
 
-MI_BOOL FrameWrapper::IsValid() const
+DT_BOOL FrameWrapper::IsValid() const
 {
     return (buffer != 0) && (data != 0) && (width >= 0) && (height >= 0) && (pitch >= 0) && (pixel_res != 0) && (num_channels != 0);
 }
@@ -40,7 +40,7 @@ FrameWrapper::FrameWrapper(TileManager tm, const Mat *mat, BorderType border_typ
             break;
         }
 
-        if (MI_NULL == mat)
+        if (DT_NULL == mat)
         {
             AURA_XTENSA_LOG("mat is null");
             break;
@@ -55,11 +55,11 @@ FrameWrapper::FrameWrapper(TileManager tm, const Mat *mat, BorderType border_typ
         Sizes3 src_sizes   = mat->GetSizes();
         Sizes3 src_strides = mat->GetStrides();
         ElemType elem_type = mat->GetElemType();
-        uint64_t data      = (MI_U64)((MI_UPTR_T)(mat->GetData()));
+        uint64_t data      = (DT_U64)((DT_UPTR_T)(mat->GetData()));
 
-        MI_S32 ret = AURA_XTENSA_ERROR;
+        DT_S32 ret = AURA_XTENSA_ERROR;
         ret = xvSetupFrame(xv_tm, reinterpret_cast<xvFrame*>(this), data, src_sizes.m_width, src_sizes.m_height, src_strides.m_width / ElemTypeSize(elem_type),
-                           ElemTypeSize(elem_type), src_sizes.m_channel, (MI_U8)(border_type), border_value.m_val[0]);
+                           ElemTypeSize(elem_type), src_sizes.m_channel, (DT_U8)(border_type), border_value.m_val[0]);
         if (ret != AURA_XTENSA_OK)
         {
             AURA_XTENSA_LOG("xvSetupFrame failed");

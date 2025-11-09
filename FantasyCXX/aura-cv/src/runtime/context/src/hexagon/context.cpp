@@ -4,7 +4,7 @@
 namespace aura
 {
 
-Context::Impl::Impl() : m_flag(MI_FALSE)
+Context::Impl::Impl() : m_flag(DT_FALSE)
 {}
 
 Context::Impl::~Impl()
@@ -19,36 +19,36 @@ Status Context::Impl::Initialize(Context *ctx, LogOutput output, LogLevel level,
     }
 
     m_logger.reset(new Logger(output, level, file));
-    if (MI_NULL == m_logger.get())
+    if (DT_NULL == m_logger.get())
     {
         AURA_ADD_ERROR_STRING(ctx, "m_logger null ptr");
         return Status::ERROR;
     }
 
     m_mem_pool.reset(new MemPool(ctx));
-    if (MI_NULL == m_mem_pool.get())
+    if (DT_NULL == m_mem_pool.get())
     {
         AURA_ADD_ERROR_STRING(ctx, "m_mem_pool null ptr");
         return Status::ERROR;
     }
 
     m_wp.reset(new WorkerPool(ctx));
-    if (MI_NULL == m_wp.get())
+    if (DT_NULL == m_wp.get())
     {
         AURA_ADD_ERROR_STRING(ctx, "m_wp null ptr");
         return Status::ERROR;
     }
 
 #if defined(AURA_ENABLE_NN)
-    m_nn_engine.reset(new NNEngine(ctx, MI_TRUE));
-    if (MI_NULL == m_nn_engine.get())
+    m_nn_engine.reset(new NNEngine(ctx, DT_TRUE));
+    if (DT_NULL == m_nn_engine.get())
     {
         AURA_ADD_ERROR_STRING(ctx, "m_nn_engine null ptr");
         return Status::ERROR;
     }
 #endif // AURA_ENABLE_NN
 
-    m_flag = MI_TRUE;
+    m_flag = DT_TRUE;
 
     return Status::OK;
 }
@@ -152,7 +152,7 @@ Logger* Context::GetLogger() const
     {
         return m_impl->GetLogger();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 MemPool* Context::GetMemPool() const
@@ -161,7 +161,7 @@ MemPool* Context::GetMemPool() const
     {
         return m_impl->GetMemPool();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 WorkerPool* Context::GetWorkerPool() const
@@ -170,7 +170,7 @@ WorkerPool* Context::GetWorkerPool() const
     {
         return m_impl->GetWorkerPool();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 #if defined(AURA_ENABLE_NN)
@@ -180,7 +180,7 @@ NNEngine* Context::GetNNEngine() const
     {
         return m_impl->GetNNEngine();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // AURA_ENABLE_NN
 

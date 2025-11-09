@@ -28,28 +28,28 @@ if (!value.empty())                       \
 #pragma pack(push, 1)
 struct MinnDataV1
 {
-    MI_S16 framework;
+    DT_S16 framework;
     struct FrameVersion
     {
-        MI_S16 major;
-        MI_S16 minor;
-        MI_S16 patch;
+        DT_S16 major;
+        DT_S16 minor;
+        DT_S16 patch;
     } framework_version;
     struct ModelVersion
     {
-        MI_S16 major;
-        MI_S16 minor;
+        DT_S16 major;
+        DT_S16 minor;
     } model_version;
-    MI_S16 backend_type;
+    DT_S16 backend_type;
 };
 
 struct MinnHeader
 {
-    MI_S32 magic_num;
+    DT_S32 magic_num;
     struct Version
     {
-        MI_S16 major;
-        MI_S16 minor;
+        DT_S16 major;
+        DT_S16 minor;
     } version;
 };
 #pragma pack(pop)
@@ -66,7 +66,7 @@ AURA_INLINE Status NNDeserialize(FILE *handle, Tp &val)
     return Status::OK;
 }
 
-AURA_INLINE std::vector<std::string> NNSplit(const std::string &src, MI_CHAR separator)
+AURA_INLINE std::vector<std::string> NNSplit(const std::string &src, DT_CHAR separator)
 {
     std::vector<std::string> result;
     std::string value;
@@ -152,7 +152,7 @@ AURA_INLINE ElemType GetType(const std::string &type)
     return elem_type;
 }
 
-AURA_INLINE std::vector<std::string> Split(const std::string &tokenized_string, MI_CHAR separator)
+AURA_INLINE std::vector<std::string> Split(const std::string &tokenized_string, DT_CHAR separator)
 {
     std::vector<std::string> split_string;
     std::istringstream tokenized_string_stream(tokenized_string);
@@ -178,7 +178,7 @@ AURA_INLINE std::string SanitizeName(const std::string &name)
     return sanitized_name;
 }
 
-AURA_INLINE AURA_VOID DumpOut(const CommandParam &param, const std::string &input_file_name, const MatMap &mat_map)
+AURA_INLINE DT_VOID DumpOut(const CommandParam &param, const std::string &input_file_name, const MatMap &mat_map)
 {
     size_t last_slash_idx = input_file_name.rfind('/');
     std::string file_with_extension = (last_slash_idx != std::string::npos) ?
@@ -213,40 +213,40 @@ AURA_INLINE AURA_VOID DumpOut(const CommandParam &param, const std::string &inpu
     }
 }
 
-AURA_INLINE AURA_VOID InferenceDelay(MI_S32 ms)
+AURA_INLINE DT_VOID InferenceDelay(DT_S32 ms)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
-AURA_INLINE MI_BOOL CheckParamValid(const std::string &options, const std::vector<std::vector<std::string>> &command_set)
+AURA_INLINE DT_BOOL CheckParamValid(const std::string &options, const std::vector<std::vector<std::string>> &command_set)
 {
-    for (MI_S32 idx = 0; idx < (MI_S32)command_set.size(); idx++)
+    for (DT_S32 idx = 0; idx < (DT_S32)command_set.size(); idx++)
     {
-        MI_BOOL is_valid_set = MI_TRUE;
-        for (MI_S32 idy = 0; idy < (MI_S32)command_set[idx].size(); idy++)
+        DT_BOOL is_valid_set = DT_TRUE;
+        for (DT_S32 idy = 0; idy < (DT_S32)command_set[idx].size(); idy++)
         {
             if (options.find(command_set[idx][idy]) == std::string::npos)
             {
-                is_valid_set = MI_FALSE;
+                is_valid_set = DT_FALSE;
                 break;
             }
         }
 
         if (is_valid_set)
         {
-            return MI_TRUE;
+            return DT_TRUE;
         }
     }
 
-    return MI_FALSE;
+    return DT_FALSE;
 }
 
-AURA_INLINE MI_BOOL StringContains(const std::string &str, const std::string &sub_str)
+AURA_INLINE DT_BOOL StringContains(const std::string &str, const std::string &sub_str)
 {
     return str.compare(0, str.size(), sub_str) == 0;
 }
 
-AURA_INLINE MI_BOOL IsModelContainer(const std::string &model_name)
+AURA_INLINE DT_BOOL IsModelContainer(const std::string &model_name)
 {
     return (model_name.substr(model_name.rfind('.') + 1) == "minb");
 }
@@ -320,7 +320,7 @@ static Status ReadInputList(Context *ctx, const std::string &input_list, const T
     }
 
     std::string separator = ":=";
-    for (MI_S32 i = 0; i < (MI_S32)lines.size(); i++)
+    for (DT_S32 i = 0; i < (DT_S32)lines.size(); i++)
     {
         std::vector<InputDataInfo> tenor_file_names_vec;
         std::vector<std::string> tenor_file_names = Split(lines[i], ' ');
@@ -347,7 +347,7 @@ static Status ReadInputList(Context *ctx, const std::string &input_list, const T
         if (tenor_file_names_vec.size() != input_tensor_desc.size())
         {
             AURA_LOGE(ctx, AURA_TAG, "tensor num in input list is different from tensor num in model, model input tensor is %d, but input list get %d\n",
-                      (MI_S32)input_tensor_desc.size(), (MI_S32)tenor_file_names_vec.size());
+                      (DT_S32)input_tensor_desc.size(), (DT_S32)tenor_file_names_vec.size());
             file_list_stream.close();
             return Status::ERROR;
         }
@@ -436,13 +436,13 @@ static Status ParsePlatform(Context *ctx, const std::string &model_path, std::st
         }
 
         FILE *handle = fopen(model_path.c_str(), "rb");
-        if (MI_NULL == handle)
+        if (DT_NULL == handle)
         {
             AURA_LOGE(ctx, AURA_TAG, "fail to open model %s\n", model_path.c_str());
             break;
         }
 
-        constexpr MI_S32 AURA_NN_MODEL_MAGIC = 0x4D694E4E; // MiNN
+        constexpr DT_S32 AURA_NN_MODEL_MAGIC = 0x4D694E4E; // MiNN
 
         MinnHeader header;
         memset(&header, 0, sizeof(MinnHeader));
@@ -578,14 +578,14 @@ static Status ParsePlatform(Context *ctx, const std::string &model_path, const s
 
 static Status GetTensorInfo(Context *ctx, const CommandParam &param)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         AURA_LOGE(ctx, AURA_TAG, "bad args, ctx is nullptr...\n");
         return Status::ERROR;
     }
 
     NNEngine *nn_engine = ctx->GetNNEngine();
-    if (MI_NULL == nn_engine)
+    if (DT_NULL == nn_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_engine is null\n");
         return Status::ERROR;
@@ -600,7 +600,7 @@ static Status GetTensorInfo(Context *ctx, const CommandParam &param)
         config["backend"] = param.backend;
     }
 
-    std::shared_ptr<NNExecutor> nn_executor = MI_NULL;
+    std::shared_ptr<NNExecutor> nn_executor = DT_NULL;
     if (!param.model_path.empty())
     {
         nn_executor = nn_engine->CreateNNExecutor(param.model_path, param.password, config);
@@ -615,7 +615,7 @@ static Status GetTensorInfo(Context *ctx, const CommandParam &param)
         return ret;
     }
 
-    if (MI_NULL == nn_executor)
+    if (DT_NULL == nn_executor)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_executor is null\n");
         return ret;
@@ -655,7 +655,7 @@ static Status GetTensorInfo(Context *ctx, const CommandParam &param)
 
 static Status GetMinbInfo(Context *ctx, const CommandParam &param)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         AURA_LOGE(ctx, AURA_TAG, "bad args, ctx is nullptr...\n");
         return Status::ERROR;
@@ -664,9 +664,9 @@ static Status GetMinbInfo(Context *ctx, const CommandParam &param)
     Status ret = Status::ERROR;
     size_t minn_num = 0;
     std::vector<std::string> minn_names;
-    std::shared_ptr<NBModel> nb_model = MI_NULL;
+    std::shared_ptr<NBModel> nb_model = DT_NULL;
     NNEngine *nn_engine = ctx->GetNNEngine();
-    if (MI_NULL == nn_engine)
+    if (DT_NULL == nn_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_engine is null\n");
         return Status::ERROR;
@@ -711,14 +711,14 @@ static Status GetMinbInfo(Context *ctx, const CommandParam &param)
 
 Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         AURA_LOGE(ctx, AURA_TAG, "bad args, ctx is nullptr...\n");
         return Status::ERROR;
     }
 
     NNEngine *nn_engine = ctx->GetNNEngine();
-    if (MI_NULL == nn_engine)
+    if (DT_NULL == nn_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_engine is null\n");
         return Status::ERROR;
@@ -726,11 +726,11 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
 
     Status ret = Status::ERROR;
 
-    static std::vector<MI_F32> init_time;
-    static std::vector<MI_F32> forward_time;
+    static std::vector<DT_F32> init_time;
+    static std::vector<DT_F32> forward_time;
 
-    static MI_F32 consume_time = 0.f;
-    static MI_S32 count = 0;
+    static DT_F32 consume_time = 0.f;
+    static DT_S32 count = 0;
 
     // 1. model init
     aura::Time start = aura::Time::Now();
@@ -756,7 +756,7 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
     ASSGIN_VALUE(config, "mnn_tuning",        param.mnn_tuning);
     ASSGIN_VALUE(config, "mnn_clmem",         param.mnn_clmem);
 
-    std::shared_ptr<NNExecutor> nn_executor = MI_NULL;
+    std::shared_ptr<NNExecutor> nn_executor = DT_NULL;
 
     if (!param.model_path.empty())
     {
@@ -772,7 +772,7 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
         return ret;
     }
 
-    if (MI_NULL == nn_executor)
+    if (DT_NULL == nn_executor)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_executor is null\n");
         return ret;
@@ -802,7 +802,7 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
     std::vector<TensorDescMap> input_tensor_info  = nn_executor->GetInputs();
     std::vector<TensorDescMap> output_tensro_info = nn_executor->GetOutputs();
 
-    MI_S8 qnn_graph_ids = std::atoi(param.qnn_graph_ids.c_str());
+    DT_S8 qnn_graph_ids = std::atoi(param.qnn_graph_ids.c_str());
     TensorDescMap &input_tensor_desc  = input_tensor_info[qnn_graph_ids];
     TensorDescMap &output_tensor_desc = output_tensro_info[qnn_graph_ids];
 
@@ -815,7 +815,7 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
     MatFactory factory(ctx);
 
     // create input and output mat map
-    auto prepare_io_mat = [&ctx, &param, &factory](const TensorDescMap &tensor_desc_map, MatMap &matmap, std::vector<Mat> &mat_vec, MI_BOOL is_input) -> Status
+    auto prepare_io_mat = [&ctx, &param, &factory](const TensorDescMap &tensor_desc_map, MatMap &matmap, std::vector<Mat> &mat_vec, DT_BOOL is_input) -> Status
     {
         for (const auto &tensor_desc : tensor_desc_map)
         {
@@ -828,13 +828,13 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
                 return Status::ERROR;
             }
 
-            const std::vector<MI_S32> &sizes = tensor_desc.second.sizes;
-            MI_S32 elem_counts = std::accumulate(sizes.begin(), sizes.end(), 1, std::multiplies<MI_S32>());
+            const std::vector<DT_S32> &sizes = tensor_desc.second.sizes;
+            DT_S32 elem_counts = std::accumulate(sizes.begin(), sizes.end(), 1, std::multiplies<DT_S32>());
 
             if ((param.use_random_inputs) && (is_input))
             {
-                MI_F32 min = 0.f;
-                MI_F32 max = 255.f;
+                DT_F32 min = 0.f;
+                DT_F32 max = 255.f;
                 mat_vec.push_back(factory.GetRandomMat(min, max, elem_type, {1, 1, elem_counts}, AURA_MEM_DEFAULT));
             }
             else
@@ -853,13 +853,13 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
         return Status::OK;
     };
 
-    if (prepare_io_mat(input_tensor_desc, input_mat_map, input_mat_vec, MI_TRUE) != Status::OK)
+    if (prepare_io_mat(input_tensor_desc, input_mat_map, input_mat_vec, DT_TRUE) != Status::OK)
     {
         AURA_LOGE(ctx, AURA_TAG, "prepare input mat failed\n");
         return Status::ERROR;
     }
 
-    if (prepare_io_mat(output_tensor_desc, output_mat_map, output_mat_vec, MI_FALSE) != Status::OK)
+    if (prepare_io_mat(output_tensor_desc, output_mat_map, output_mat_vec, DT_FALSE) != Status::OK)
     {
         AURA_LOGE(ctx, AURA_TAG, "prepare output mat failed\n");
         return Status::ERROR;
@@ -876,9 +876,9 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
         }
     }
 
-    MI_S32 batch_num = param.use_random_inputs ? 1 : input_list_data_info.size();
+    DT_S32 batch_num = param.use_random_inputs ? 1 : input_list_data_info.size();
 
-    for (MI_S32 batch_cnt = 0; batch_cnt < batch_num; batch_cnt++)
+    for (DT_S32 batch_cnt = 0; batch_cnt < batch_num; batch_cnt++)
     {
         // read mat data from file
         if (!param.use_random_inputs)
@@ -913,7 +913,7 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
             }
         }
 
-        for (MI_S32 loop_inner_cnt = 0; loop_inner_cnt < param.loop_num_inner; loop_inner_cnt++)
+        for (DT_S32 loop_inner_cnt = 0; loop_inner_cnt < param.loop_num_inner; loop_inner_cnt++)
         {
             // forward
             if (param.memory_tag_info)
@@ -975,27 +975,27 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
         }
     }
 
-    if ((MI_TRUE == param.show_time) && (count == (param.loop_num * batch_num)))
+    if ((DT_TRUE == param.show_time) && (count == (param.loop_num * batch_num)))
     {
         std::sort(init_time.begin(), init_time.end());
         std::sort(forward_time.begin(), forward_time.end());
 
-        MI_F32 init_min_time = init_time.front();
-        MI_F32 init_max_time = init_time.back();
-        MI_F32 init_avr_time = 0.f;
-        MI_F32 forward_min_time = forward_time.front();
-        MI_F32 forward_max_time = forward_time.back();
-        MI_F32 forward_avr_time = 0.f;
+        DT_F32 init_min_time = init_time.front();
+        DT_F32 init_max_time = init_time.back();
+        DT_F32 init_avr_time = 0.f;
+        DT_F32 forward_min_time = forward_time.front();
+        DT_F32 forward_max_time = forward_time.back();
+        DT_F32 forward_avr_time = 0.f;
 
-        MI_F64 sum = 0.0;
-        for (MI_S32 i = 0; i < (MI_S32)init_time.size(); i++)
+        DT_F64 sum = 0.0;
+        for (DT_S32 i = 0; i < (DT_S32)init_time.size(); i++)
         {
             sum += init_time[i];
         }
         init_avr_time = sum / init_time.size();
 
         sum = 0.0;
-        for (MI_S32 i = 0; i < (MI_S32)forward_time.size(); i++)
+        for (DT_S32 i = 0; i < (DT_S32)forward_time.size(); i++)
         {
             sum += forward_time[i];
         }
@@ -1009,12 +1009,12 @@ Status AuraNnRun::NetRun(Context *ctx, const CommandParam &param)
     return ret;
 }
 
-Status AuraNnRun::ParseCommandLine(MI_S32 argc, MI_CHAR *argv[])
+Status AuraNnRun::ParseCommandLine(DT_S32 argc, DT_CHAR *argv[])
 {
     // check required options
     std::string check_opt;
     std::vector<std::string> options;
-    for (MI_S32 i = 1; i < argc; ++i)
+    for (DT_S32 i = 1; i < argc; ++i)
     {
         options.emplace_back(argv[i]);
         check_opt += std::string(argv[i]) + " ";
@@ -1111,12 +1111,12 @@ Status AuraNnRun::ParseCommandLine(MI_S32 argc, MI_CHAR *argv[])
     m_commond_param.loop_type          = (loop_type_str.empty())                                      ? 0        : std::stoi(loop_type_str);
     m_commond_param.loop_num           = (loop_num_str.empty())                                       ? 1        : std::stoi(loop_num_str);
     m_commond_param.inference_interval = (loop_duration_str.empty())                                  ? 0        : std::stoi(loop_duration_str);
-    m_commond_param.memory_tag_info    = (check_opt.find("--memory_tag_info")   == std::string::npos) ? MI_FALSE : MI_TRUE;
-    m_commond_param.show_time          = (check_opt.find("--show_time_info")    == std::string::npos) ? MI_FALSE : MI_TRUE;
-    m_commond_param.get_tensor_info    = (check_opt.find("--get_tensor_info")   == std::string::npos) ? MI_FALSE : MI_TRUE;
-    m_commond_param.get_minb_info      = (check_opt.find("--get_minb_info")     == std::string::npos) ? MI_FALSE : MI_TRUE;
-    m_commond_param.register_mem       = (check_opt.find("--register_mem")      == std::string::npos) ? MI_FALSE : MI_TRUE;
-    m_commond_param.use_random_inputs  = (check_opt.find("--use_random_inputs") == std::string::npos) ? MI_FALSE : MI_TRUE;
+    m_commond_param.memory_tag_info    = (check_opt.find("--memory_tag_info")   == std::string::npos) ? DT_FALSE : DT_TRUE;
+    m_commond_param.show_time          = (check_opt.find("--show_time_info")    == std::string::npos) ? DT_FALSE : DT_TRUE;
+    m_commond_param.get_tensor_info    = (check_opt.find("--get_tensor_info")   == std::string::npos) ? DT_FALSE : DT_TRUE;
+    m_commond_param.get_minb_info      = (check_opt.find("--get_minb_info")     == std::string::npos) ? DT_FALSE : DT_TRUE;
+    m_commond_param.register_mem       = (check_opt.find("--register_mem")      == std::string::npos) ? DT_FALSE : DT_TRUE;
+    m_commond_param.use_random_inputs  = (check_opt.find("--use_random_inputs") == std::string::npos) ? DT_FALSE : DT_TRUE;
 
     if (m_commond_param.memory_tag_info)
     {
@@ -1219,7 +1219,7 @@ Status AuraNnRun::Run()
         }
     }
 
-    for (MI_S32 i = 0; i < m_commond_param.loop_num_outer; i++)
+    for (DT_S32 i = 0; i < m_commond_param.loop_num_outer; i++)
     {
         ret = NetRun(m_ctx.get(), m_commond_param);
         if (ret != Status::OK)

@@ -173,7 +173,7 @@ public:
      * @param cl_ch_order OpenCL iaura channel order.
      * @param is_norm Flag indicating normalization.
      */
-    CLMemParam(cl_mem_flags cl_flags, cl_channel_order cl_ch_order, MI_BOOL is_norm = MI_FALSE)
+    CLMemParam(cl_mem_flags cl_flags, cl_channel_order cl_ch_order, DT_BOOL is_norm = DT_FALSE)
                : m_type(CLMemType::IAURA2D)
     {
         m_param.iaura2d.cl_flags    = cl_flags;
@@ -189,7 +189,7 @@ public:
      * @param depth Depth of the 3D iaura.
      * @param is_norm Flag indicating normalization.
      */
-    CLMemParam(cl_mem_flags cl_flags, cl_channel_order cl_ch_order, MI_S32 depth, MI_BOOL is_norm = MI_FALSE)
+    CLMemParam(cl_mem_flags cl_flags, cl_channel_order cl_ch_order, DT_S32 depth, DT_BOOL is_norm = DT_FALSE)
                : m_type(CLMemType::IAURA3D)
     {
         m_param.iaura3d.cl_flags    = cl_flags;
@@ -243,11 +243,11 @@ public:
         return os;
     }
 
-    MI_BOOL operator==(const CLMemParam &param) const
+    DT_BOOL operator==(const CLMemParam &param) const
     {
         if (m_type != param.m_type)
         {
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         switch (m_type)
@@ -271,11 +271,11 @@ public:
             }
             case CLMemType::INVALID:
             {
-                return MI_TRUE;
+                return DT_TRUE;
             }
         }
 
-        return MI_FALSE;
+        return DT_FALSE;
     }
 
     std::string ToString()
@@ -299,14 +299,14 @@ public:
         {
             cl_mem_flags     cl_flags;
             cl_channel_order cl_ch_order;
-            MI_BOOL          is_norm;
+            DT_BOOL          is_norm;
         } iaura2d;
 
         struct Iaura3DParam
         {
             cl_mem_flags     cl_flags;
             cl_channel_order cl_ch_order;
-            MI_BOOL          is_norm;
+            DT_BOOL          is_norm;
             size_t           depth;
         } iaura3d;
     } m_param;
@@ -388,7 +388,7 @@ public:
      *
      * Deallocates the OpenCL memory and releases associated resources.
      */
-    AURA_VOID Release() override;
+    DT_VOID Release() override;
 
     /**
      * @brief Create a CLMem object from an Array, such as `Mat` object or `CLMem` object.
@@ -410,16 +410,16 @@ public:
      *
      * Verifies whether the CLMem object is properly initialized and associated with valid OpenCL memory.
      *
-     * @return MI_TRUE if the CLMem is valid, MI_FALSE otherwise.
+     * @return DT_TRUE if the CLMem is valid, DT_FALSE otherwise.
      */
-    MI_BOOL IsValid() const override;
+    DT_BOOL IsValid() const override;
 
     /**
      * @brief Display information about the CLMem object.
      *
      * Prints information such as OpenCL memory type, dimensions, element type, and associated buffer (if any).
      */
-    AURA_VOID Show() const override;
+    DT_VOID Show() const override;
 
     /**
     * @brief Dumps the CLMem contents to a file in binary format.
@@ -428,7 +428,7 @@ public:
     *
     * @param fname The name of the file to write the CLMem dump.
     */
-    AURA_VOID Dump(const std::string &fname) const override;
+    DT_VOID Dump(const std::string &fname) const override;
 
     /**
      * @brief Synchronize the CLMem with a specified synchronization type.
@@ -503,7 +503,7 @@ public:
      *
      * @return The number of channel.
      */
-    static MI_S32 GetCLIauraChannelNum(cl_channel_order cl_ch_order);
+    static DT_S32 GetCLIauraChannelNum(cl_channel_order cl_ch_order);
 
     /**
      * @brief Get the OpenCL channel data type for a specified element type and normalization flag.
@@ -515,7 +515,7 @@ public:
      *
      * @return The OpenCL channel data type.
      */
-    static cl_channel_type GetCLIauraChannelDataType(ElemType elem_type, MI_BOOL is_norm = MI_FALSE);
+    static cl_channel_type GetCLIauraChannelDataType(ElemType elem_type, DT_BOOL is_norm = DT_FALSE);
 
     /**
      * @brief Get the width of an OpenCL iaura with a specified element count and channel order.
@@ -527,7 +527,7 @@ public:
      *
      * @return The width of the OpenCL iaura.
      */
-    static size_t GetCLIauraWidth(MI_S32 elem_count, cl_channel_order cl_ch_order);
+    static size_t GetCLIauraWidth(DT_S32 elem_count, cl_channel_order cl_ch_order);
 
 private:
     /**
@@ -535,7 +535,7 @@ private:
     *
     * This method is used to reset properties of member vaiables.
     */
-    AURA_VOID Clear();
+    DT_VOID Clear();
 
     /**
      * @brief Initialize the CLMem object.

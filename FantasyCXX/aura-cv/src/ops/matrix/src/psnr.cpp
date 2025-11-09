@@ -30,14 +30,14 @@ static std::shared_ptr<PsnrImpl> CreatePsnrImpl(Context *ctx, const OpTarget &ta
 Psnr::Psnr(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Psnr::SetArgs(const Array *src0, const Array *src1, MI_F64 coef_r, MI_F64 *result)
+Status Psnr::SetArgs(const Array *src0, const Array *src1, DT_F64 coef_r, DT_F64 *result)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src0) || (MI_NULL == src1))
+    if ((DT_NULL == src0) || (DT_NULL == src1))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -46,14 +46,14 @@ Status Psnr::SetArgs(const Array *src0, const Array *src1, MI_F64 coef_r, MI_F64
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreatePsnrImpl(m_ctx, impl_target);
     }
 
     // run initialize
     PsnrImpl *psnr_impl = dynamic_cast<PsnrImpl*>(m_impl.get());
-    if (MI_NULL == psnr_impl)
+    if (DT_NULL == psnr_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "psnr_impl is null ptr");
         return Status::ERROR;
@@ -64,31 +64,31 @@ Status Psnr::SetArgs(const Array *src0, const Array *src1, MI_F64 coef_r, MI_F64
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status IPsnr(Context *ctx, const Mat &src0, const Mat &src1, MI_F64 coef_r, MI_F64 *result, const OpTarget &target)
+AURA_EXPORTS Status IPsnr(Context *ctx, const Mat &src0, const Mat &src1, DT_F64 coef_r, DT_F64 *result, const OpTarget &target)
 {
     Psnr psnr(ctx, target);
 
     return OpCall(ctx, psnr, &src0, &src1, coef_r, result);
 }
 
-PsnrImpl::PsnrImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Psnr", target), m_src0(MI_NULL),
-                                                           m_src1(MI_NULL), m_coef_r(0), m_result(MI_NULL)
+PsnrImpl::PsnrImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Psnr", target), m_src0(DT_NULL),
+                                                           m_src1(DT_NULL), m_coef_r(0), m_result(DT_NULL)
 {}
 
-Status PsnrImpl::SetArgs(const Array *src0, const Array *src1, MI_F64 coef_r, MI_F64 *result)
+Status PsnrImpl::SetArgs(const Array *src0, const Array *src1, DT_F64 coef_r, DT_F64 *result)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src0) || (MI_NULL == src1))
+    if ((DT_NULL == src0) || (DT_NULL == src1))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
     }
 
-    if (MI_NULL == result)
+    if (DT_NULL == result)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "result is null ptr");
         return Status::ERROR;
@@ -128,7 +128,7 @@ std::string PsnrImpl::ToString() const
     return str;
 }
 
-AURA_VOID PsnrImpl::Dump(const std::string &prefix) const
+DT_VOID PsnrImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

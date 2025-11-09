@@ -37,15 +37,15 @@ static std::shared_ptr<AdaptiveThresholdImpl> CreateAdaptiveThresholdImpl(Contex
 AdaptiveThreshold::AdaptiveThreshold(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status AdaptiveThreshold::SetArgs(const Array *src, Array *dst, MI_F32 max_val, AdaptiveThresholdMethod method,
-                                  MI_S32 type, MI_S32 block_size, MI_F32 delta)
+Status AdaptiveThreshold::SetArgs(const Array *src, Array *dst, DT_F32 max_val, AdaptiveThresholdMethod method,
+                                  DT_S32 type, DT_S32 block_size, DT_F32 delta)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -54,14 +54,14 @@ Status AdaptiveThreshold::SetArgs(const Array *src, Array *dst, MI_F32 max_val, 
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateAdaptiveThresholdImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     AdaptiveThresholdImpl *adaptive_threshold_impl = dynamic_cast<AdaptiveThresholdImpl *>(m_impl.get());
-    if (MI_NULL == adaptive_threshold_impl)
+    if (DT_NULL == adaptive_threshold_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "adaptive_threshold_impl is null ptr");
         return Status::ERROR;
@@ -72,8 +72,8 @@ Status AdaptiveThreshold::SetArgs(const Array *src, Array *dst, MI_F32 max_val, 
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status IAdaptiveThreshold(Context *ctx, const Mat &src, Mat &dst, MI_F32 max_val, AdaptiveThresholdMethod method,
-                                       MI_S32 type, MI_S32 block_size, MI_F32 delta, const OpTarget &target)
+AURA_EXPORTS Status IAdaptiveThreshold(Context *ctx, const Mat &src, Mat &dst, DT_F32 max_val, AdaptiveThresholdMethod method,
+                                       DT_S32 type, DT_S32 block_size, DT_F32 delta, const OpTarget &target)
 {
     AdaptiveThreshold adaptive_threshold(ctx, target);
 
@@ -83,13 +83,13 @@ AURA_EXPORTS Status IAdaptiveThreshold(Context *ctx, const Mat &src, Mat &dst, M
 AdaptiveThresholdImpl::AdaptiveThresholdImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "AdaptiveThreshold", target),
                                                                                      m_method(AdaptiveThresholdMethod::ADAPTIVE_THRESH_MEAN_C),
                                                                                      m_max_val(0.f), m_type(0), m_block_size(0), m_delta(0.f),
-                                                                                     m_src(MI_NULL), m_dst(MI_NULL)
+                                                                                     m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status AdaptiveThresholdImpl::SetArgs(const Array *src, Array *dst, MI_F32 max_val, AdaptiveThresholdMethod method,
-                                      MI_S32 type, MI_S32 block_size, MI_F32 delta)
+Status AdaptiveThresholdImpl::SetArgs(const Array *src, Array *dst, DT_F32 max_val, AdaptiveThresholdMethod method,
+                                      DT_S32 type, DT_S32 block_size, DT_F32 delta)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -152,7 +152,7 @@ std::string AdaptiveThresholdImpl::ToString() const
     return str;
 }
 
-AURA_VOID AdaptiveThresholdImpl::Dump(const std::string &prefix) const
+DT_VOID AdaptiveThresholdImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

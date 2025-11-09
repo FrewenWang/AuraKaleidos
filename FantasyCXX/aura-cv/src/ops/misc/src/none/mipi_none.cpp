@@ -5,26 +5,26 @@
 namespace aura
 {
 
-static Status MipiPackNoneImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status MipiPackNoneImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width = dst.GetSizes().m_width;
+    DT_S32 width = dst.GetSizes().m_width;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U16 *src_row = src.Ptr<MI_U16>(y);
-        MI_U8        *dst_row = dst.Ptr<MI_U8>(y);
+        const DT_U16 *src_row = src.Ptr<DT_U16>(y);
+        DT_U8        *dst_row = dst.Ptr<DT_U8>(y);
 
-        for (MI_S32 x = 0; x < width; x += 5)
+        for (DT_S32 x = 0; x < width; x += 5)
         {
             dst_row[0] = src_row[0] >> 2;
             dst_row[1] = src_row[1] >> 2;
             dst_row[2] = src_row[2] >> 2;
             dst_row[3] = src_row[3] >> 2;
 
-            MI_U8 t0 = (src_row[0] & 0x03);
-            MI_U8 t1 = (src_row[1] & 0x03) << 2;
-            MI_U8 t2 = (src_row[2] & 0x03) << 4;
-            MI_U8 t3 = (src_row[3] & 0x03) << 6;
+            DT_U8 t0 = (src_row[0] & 0x03);
+            DT_U8 t1 = (src_row[1] & 0x03) << 2;
+            DT_U8 t2 = (src_row[2] & 0x03) << 4;
+            DT_U8 t3 = (src_row[3] & 0x03) << 6;
 
             dst_row[4] = t0 + t1 + t2 + t3;
             src_row += 4;
@@ -64,24 +64,24 @@ Status MipiPackNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat       *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return ret;
     }
 
-    MI_S32 height = dst->GetSizes().m_height;
+    DT_S32 height = dst->GetSizes().m_height;
 
     if (m_target.m_data.none.enable_mt)
     {
         WorkerPool *wp = m_ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetWorkerpool failed");
             return ret;
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), height, MipiPackNoneImpl, *src, *dst);
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), height, MipiPackNoneImpl, *src, *dst);
     }
     else
     {
@@ -91,17 +91,17 @@ Status MipiPackNone::Run()
     AURA_RETURN(m_ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-static Status MipiUnpackNoneImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+static Status MipiUnpackNoneImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width = dst.GetSizes().m_width;
+    DT_S32 width = dst.GetSizes().m_width;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         const Tp *src_row = src.Ptr<Tp>(y);
         Tp       *dst_row = dst.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < width; x += 4)
+        for (DT_S32 x = 0; x < width; x += 4)
         {
             *(dst_row    ) = *(src_row);
             *(dst_row + 1) = *(src_row + 1);
@@ -116,17 +116,17 @@ static Status MipiUnpackNoneImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_
     return Status::OK;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-static Status MipiUnpackNoneImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+static Status MipiUnpackNoneImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width = dst.GetSizes().m_width;
+    DT_S32 width = dst.GetSizes().m_width;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < width; x += 4)
+        for (DT_S32 x = 0; x < width; x += 4)
         {
             Tp data0 = *(src_row + 0);
             Tp data1 = *(src_row + 1);
@@ -174,25 +174,25 @@ Status MipiUnPackNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat       *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return ret;
     }
 
-    MI_S32 height = dst->GetSizes().m_height;
+    DT_S32 height = dst->GetSizes().m_height;
 
 #define UNPACK_NONE_IMPL(type)                                                                          \
     if (m_target.m_data.none.enable_mt)                                                                 \
     {                                                                                                   \
         WorkerPool *wp = m_ctx->GetWorkerPool();                                                        \
-        if (MI_NULL == wp)                                                                              \
+        if (DT_NULL == wp)                                                                              \
         {                                                                                               \
             AURA_ADD_ERROR_STRING(m_ctx, "GetWorkerpool failed");                                       \
             return Status::ERROR;                                                                       \
         }                                                                                               \
                                                                                                         \
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), height, MipiUnpackNoneImpl<type>, *src, *dst);    \
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), height, MipiUnpackNoneImpl<type>, *src, *dst);    \
     }                                                                                                   \
     else                                                                                                \
     {                                                                                                   \
@@ -200,7 +200,7 @@ Status MipiUnPackNone::Run()
     }                                                                                                   \
     if (ret != Status::OK)                                                                              \
     {                                                                                                   \
-        MI_CHAR error_msg[128];                                                                         \
+        DT_CHAR error_msg[128];                                                                         \
         std::snprintf(error_msg, sizeof(error_msg), "MipiUnpackNoneImpl<%s> failed", #type);            \
         AURA_ADD_ERROR_STRING(m_ctx, error_msg);                                                        \
     }
@@ -209,13 +209,13 @@ Status MipiUnPackNone::Run()
     {
         case ElemType::U8:
         {
-            UNPACK_NONE_IMPL(MI_U8);
+            UNPACK_NONE_IMPL(DT_U8);
             break;
         }
 
         case ElemType::U16:
         {
-            UNPACK_NONE_IMPL(MI_U16);
+            UNPACK_NONE_IMPL(DT_U16);
             break;
         }
 

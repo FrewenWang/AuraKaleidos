@@ -81,7 +81,7 @@ static Status CvArithm(Mat &src0, Mat &src1, Mat &dst, ArithmOpType op)
     cv::Mat cv_src0 = MatToOpencv(src0);
     cv::Mat cv_src1 = MatToOpencv(src1);
     cv::Mat cv_dst  = MatToOpencv(dst);
-    MI_S32 cv_depth = GetCVDepth(dst.GetElemType());
+    DT_S32 cv_depth = GetCVDepth(dst.GetElemType());
 
     cv::Mat mask = cv::Mat();
     switch (op)
@@ -145,14 +145,14 @@ static AuraArithmFunc GetAuraArithmOpFunc(ArithmOpType op)
         }
         default:
         {
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 }
 
 static Status CheckNeonIsSupport(ArithmOpType op, ElemType elem_type_src, ElemType elem_type_dst)
 {
-    MI_S32 pattern = AURA_MAKE_PATTERN(elem_type_src, elem_type_dst);
+    DT_S32 pattern = AURA_MAKE_PATTERN(elem_type_src, elem_type_dst);
 
     switch (op)
     {
@@ -247,12 +247,12 @@ public:
     ArithmeticTest(Context *ctx, ArithmeticParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         ArithmeticParam run_param(GetParam((index)));
         if (TargetType::HVX == run_param.target.m_type)
         {
-            MI_S32 pattern = AURA_MAKE_PATTERN(run_param.op, run_param.elem_type_src, run_param.elem_type_dst);
+            DT_S32 pattern = AURA_MAKE_PATTERN(run_param.op, run_param.elem_type_src, run_param.elem_type_dst);
             switch (pattern)
             {
                 case AURA_MAKE_PATTERN(ArithmOpType::ADD, ElemType::U8,  ElemType::U8):
@@ -293,7 +293,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         /// get next param set
         ArithmeticParam run_param(GetParam((index)));
@@ -318,13 +318,13 @@ public:
         AURA_LOGI(m_ctx, AURA_TAG, "\n\n######################### Arithmetic Test Param: %s\n", run_param.ToString().c_str());
 
         /// Create src mats
-        MI_S32 mem_type = AURA_MEM_DEFAULT;
+        DT_S32 mem_type = AURA_MEM_DEFAULT;
         Mat src0 = m_factory.GetRandomMat(1, 1024, elem_type_src, sizes, mem_type, strides);
         Mat src1 = m_factory.GetRandomMat(1, 1024, elem_type_src, sizes, mem_type, strides);
         Mat dst  = m_factory.GetEmptyMat(elem_type_dst, sizes, mem_type, strides);
         Mat ref  = m_factory.GetEmptyMat(elem_type_dst, sizes, mem_type, strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
+        DT_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
@@ -335,7 +335,7 @@ public:
         result.output = mat_size.ToString() + " " + ElemTypesToString(elem_type_dst);
 
         AuraArithmFunc aura_func = GetAuraArithmOpFunc(op);
-        if (MI_NULL == aura_func)
+        if (DT_NULL == aura_func)
         {
             AURA_LOGE(m_ctx, AURA_TAG, "function pointer not found\n");
             result.perf_status = TestStatus::FAILED;

@@ -5,7 +5,7 @@
 namespace aura
 {
 
-static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, MI_S32 elem_counts)
+static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, DT_S32 elem_counts)
 {
     CLBuildOptions cl_build_opt(ctx);
 
@@ -38,7 +38,7 @@ static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, MI_S32 el
     return cl_build_opt.ToString(elem_type);
 }
 
-static AURA_VOID GetCLGlobalSize(MI_S32 height, MI_S32 width, MI_S32 elem_counts, cl::NDRange &cl_range)
+static DT_VOID GetCLGlobalSize(DT_S32 height, DT_S32 width, DT_S32 elem_counts, cl::NDRange &cl_range)
 {
     // main global size
     cl_range = cl::NDRange((width + elem_counts - 1) / elem_counts, (height + elem_counts - 1) / elem_counts);
@@ -72,7 +72,7 @@ Status TransposeCL::Initialize()
         return Status::ERROR;
     }
 
-    MI_S32 ochannel = m_dst->GetSizes().m_channel;
+    DT_S32 ochannel = m_dst->GetSizes().m_channel;
 
     if (TransposeImpl::Initialize() != Status::OK)
     {
@@ -132,10 +132,10 @@ Status TransposeCL::DeInitialize()
 
 Status TransposeCL::Run()
 {
-    MI_S32 istep  = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep  = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 height = m_dst->GetSizes().m_height;
-    MI_S32 width  = m_dst->GetSizes().m_width;
+    DT_S32 istep  = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep  = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 height = m_dst->GetSizes().m_height;
+    DT_S32 width  = m_dst->GetSizes().m_width;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -148,7 +148,7 @@ Status TransposeCL::Run()
     Status ret    = Status::ERROR;
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                  width, height,
@@ -161,7 +161,7 @@ Status TransposeCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -170,7 +170,7 @@ Status TransposeCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -191,10 +191,10 @@ std::string TransposeCL::ToString() const
     return TransposeImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> TransposeCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 ochannel)
+std::vector<CLKernel> TransposeCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 ochannel)
 {
     std::vector<CLKernel> cl_kernels;
-    MI_S32 elem_counts    = (ochannel <= 2) ? 8 : 4;
+    DT_S32 elem_counts    = (ochannel <= 2) ? 8 : 4;
     std::string build_opt = GetCLBuildOptions(ctx, elem_type, elem_counts);
 
     std::string program_name = "aura_transpose_c" + std::to_string(ochannel);

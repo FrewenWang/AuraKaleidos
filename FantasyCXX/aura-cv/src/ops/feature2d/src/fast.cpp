@@ -45,17 +45,17 @@ static std::shared_ptr<FastImpl> CreateFastImpl(Context *ctx, const OpTarget &ta
 Fast::Fast(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Fast::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 threshold,
-                     MI_BOOL nonmax_suppression, FastDetectorType type, MI_U32 max_num_corners)
+Status Fast::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 threshold,
+                     DT_BOOL nonmax_suppression, FastDetectorType type, DT_U32 max_num_corners)
 {
 
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "m_ctx is NULL");
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -94,14 +94,14 @@ Status Fast::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateFastImpl(m_ctx, impl_target);
     }
 
     // run initialize
     FastImpl *fast_impl = dynamic_cast<FastImpl *>(m_impl.get());
-    if (MI_NULL == fast_impl)
+    if (DT_NULL == fast_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "fast_impl is null ptr");
         return Status::ERROR;
@@ -112,8 +112,8 @@ Status Fast::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status IFast(Context *ctx, const Mat &src, std::vector<KeyPoint> &key_points, MI_S32 threshold,
-                          MI_BOOL nonmax_suppression, FastDetectorType type, MI_U32 max_num_corners, const OpTarget &target)
+AURA_EXPORTS Status IFast(Context *ctx, const Mat &src, std::vector<KeyPoint> &key_points, DT_S32 threshold,
+                          DT_BOOL nonmax_suppression, FastDetectorType type, DT_U32 max_num_corners, const OpTarget &target)
 {
     Fast fast(ctx, target);
 
@@ -122,15 +122,15 @@ AURA_EXPORTS Status IFast(Context *ctx, const Mat &src, std::vector<KeyPoint> &k
 
 FastImpl::FastImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Fast", target),
                                                            m_threshold(0), m_max_num_corners(0),
-                                                           m_nonmax_suppression(MI_FALSE),
+                                                           m_nonmax_suppression(DT_FALSE),
                                                            m_detector_type(FastDetectorType::FAST_9_16),
-                                                           m_src(MI_NULL)
+                                                           m_src(DT_NULL)
 {}
 
-Status FastImpl::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 threshold,
-                         MI_BOOL nonmax_suppression, FastDetectorType type, MI_U32 max_num_corners)
+Status FastImpl::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 threshold,
+                         DT_BOOL nonmax_suppression, FastDetectorType type, DT_U32 max_num_corners)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -196,7 +196,7 @@ std::string FastImpl::ToString() const
     return str;
 }
 
-AURA_VOID FastImpl::Dump(const std::string &prefix) const
+DT_VOID FastImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

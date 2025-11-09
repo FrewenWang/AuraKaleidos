@@ -5,20 +5,20 @@
 namespace aura
 {
 
-static Status MulSpectrumsNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, MI_BOOL conj_src1, MI_S32 start_row, MI_S32 end_row)
+static Status MulSpectrumsNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, DT_BOOL conj_src1, DT_S32 start_row, DT_S32 end_row)
 {
     Sizes3 sz = src0.GetSizes();
-    MI_S32 width  = sz.m_width;
-    MI_S32 elem_count = width * sz.m_channel;
-    MI_S32 elem_count_align8 = elem_count & (-8);
+    DT_S32 width  = sz.m_width;
+    DT_S32 elem_count = width * sz.m_channel;
+    DT_S32 elem_count_align8 = elem_count & (-8);
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        const MI_F32 *src0_c = src0.Ptr<MI_F32>(y);
-        const MI_F32 *src1_c = src1.Ptr<MI_F32>(y);
-        MI_F32 *dst_c = dst.Ptr<MI_F32>(y);
+        const DT_F32 *src0_c = src0.Ptr<DT_F32>(y);
+        const DT_F32 *src1_c = src1.Ptr<DT_F32>(y);
+        DT_F32 *dst_c = dst.Ptr<DT_F32>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         if (conj_src1)
         {
             for (; x < elem_count_align8; x += 8)
@@ -52,11 +52,11 @@ static Status MulSpectrumsNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, M
 
         for (; x < elem_count; x += 2)
         {
-            MI_F32 real0 = src0_c[x];
-            MI_F32 imag0 = src0_c[x + 1];
+            DT_F32 real0 = src0_c[x];
+            DT_F32 imag0 = src0_c[x + 1];
 
-            MI_F32 real1 = src1_c[x];
-            MI_F32 imag1 = conj_src1 ? -src1_c[x + 1] : src1_c[x + 1];
+            DT_F32 real1 = src1_c[x];
+            DT_F32 imag1 = conj_src1 ? -src1_c[x + 1] : src1_c[x + 1];
 
             dst_c[x] = real0 * real1 - imag0 * imag1;
             dst_c[x + 1] = real0 * imag1 + real1 * imag0;
@@ -69,7 +69,7 @@ static Status MulSpectrumsNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, M
 MulSpectrumsNeon::MulSpectrumsNeon(Context *ctx, const OpTarget &target) : MulSpectrumsImpl(ctx, target)
 {}
 
-Status MulSpectrumsNeon::SetArgs(const Array *src0, const Array *src1, Array *dst, MI_BOOL conj_src1)
+Status MulSpectrumsNeon::SetArgs(const Array *src0, const Array *src1, Array *dst, DT_BOOL conj_src1)
 {
     if (MulSpectrumsImpl::SetArgs(src0, src1, dst, conj_src1) != Status::OK)
     {
@@ -100,14 +100,14 @@ Status MulSpectrumsNeon::Run()
 
     WorkerPool *wp = m_ctx->GetWorkerPool();
 
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "Get WorkerPool Failed.");
         return Status::ERROR;
     }
 
     Sizes3 sz     = src0->GetSizes();
-    MI_S32 height = sz.m_height;
+    DT_S32 height = sz.m_height;
 
     Status ret = wp->ParallelFor(0, height, MulSpectrumsNeonImpl, std::cref(*src0), std::cref(*src1), std::ref(*dst), m_conj_src1);
 

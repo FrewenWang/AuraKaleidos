@@ -8,30 +8,30 @@ namespace aura
 {
 
 template <typename Tp> struct MatrixSumTraits;// Get accumulation dst Type
-template <> struct MatrixSumTraits<MI_U8>  { using PartSumType = MI_U32; using SumType = MI_U64; };
-template <> struct MatrixSumTraits<MI_S8>  { using PartSumType = MI_S32; using SumType = MI_S64; };
-template <> struct MatrixSumTraits<MI_U16> { using PartSumType = MI_U32; using SumType = MI_U64; };
-template <> struct MatrixSumTraits<MI_S16> { using PartSumType = MI_S32; using SumType = MI_S64; };
+template <> struct MatrixSumTraits<DT_U8>  { using PartSumType = DT_U32; using SumType = DT_U64; };
+template <> struct MatrixSumTraits<DT_S8>  { using PartSumType = DT_S32; using SumType = DT_S64; };
+template <> struct MatrixSumTraits<DT_U16> { using PartSumType = DT_U32; using SumType = DT_U64; };
+template <> struct MatrixSumTraits<DT_S16> { using PartSumType = DT_S32; using SumType = DT_S64; };
 
-// using St = MI_U8
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow2Core(HVX_Vector &vu8_src_c, HVX_Vector &vu8_src_n, HVX_VectorPair &wu32_dst)
+// using St = DT_U8
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow2Core(HVX_Vector &vu8_src_c, HVX_Vector &vu8_src_n, HVX_VectorPair &wu32_dst)
 {
     HVX_VectorPair wu16_sum = Q6_Wh_vadd_VubVub(vu8_src_c, vu8_src_n);
     wu32_dst = Q6_Ww_vaddacc_WwVuhVuh(wu32_dst, Q6_V_lo_W(wu16_sum), Q6_V_hi_W(wu16_sum));
 }
 
-// using St = MI_U8
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow1Core(HVX_Vector &vu8_src_c, HVX_VectorPair &wu32_dst)
+// using St = DT_U8
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow1Core(HVX_Vector &vu8_src_c, HVX_VectorPair &wu32_dst)
 {
     HVX_VectorPair wu16_sum = Q6_Wuh_vzxt_Vub(vu8_src_c);
     wu32_dst = Q6_Ww_vaddacc_WwVuhVuh(wu32_dst, Q6_V_lo_W(wu16_sum), Q6_V_hi_W(wu16_sum));
 }
 
-// using St = MI_S8
-template <typename St, typename std::enable_if<std::is_same<St, MI_S8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow2Core(HVX_Vector &vs8_src_c, HVX_Vector &vs8_src_n, HVX_VectorPair &ws32_dst)
+// using St = DT_S8
+template <typename St, typename std::enable_if<std::is_same<St, DT_S8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow2Core(HVX_Vector &vs8_src_c, HVX_Vector &vs8_src_n, HVX_VectorPair &ws32_dst)
 {
     HVX_VectorPair ws16_src_c = Q6_Wh_vsxt_Vb(vs8_src_c);
     HVX_VectorPair ws16_src_n = Q6_Wh_vsxt_Vb(vs8_src_n);
@@ -39,57 +39,57 @@ AURA_ALWAYS_INLINE AURA_VOID CalSumRow2Core(HVX_Vector &vs8_src_c, HVX_Vector &v
     ws32_dst = Q6_Ww_vaddacc_WwVhVh(ws32_dst, Q6_V_lo_W(ws16_sum), Q6_V_hi_W(ws16_sum));
 }
 
-// using St = MI_S8
-template <typename St, typename std::enable_if<std::is_same<St, MI_S8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow1Core(HVX_Vector &vs8_src_c, HVX_VectorPair &ws32_dst)
+// using St = DT_S8
+template <typename St, typename std::enable_if<std::is_same<St, DT_S8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow1Core(HVX_Vector &vs8_src_c, HVX_VectorPair &ws32_dst)
 {
     HVX_VectorPair ws16_sum = Q6_Wh_vsxt_Vb(vs8_src_c);
     ws32_dst = Q6_Ww_vaddacc_WwVhVh(ws32_dst, Q6_V_lo_W(ws16_sum), Q6_V_hi_W(ws16_sum));
 }
 
-// using St = MI_U16
-template <typename St, typename std::enable_if<std::is_same<St, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow2Core(HVX_Vector &vu16_src_c, HVX_Vector &vu16_src_n, HVX_VectorPair &wu32_dst)
+// using St = DT_U16
+template <typename St, typename std::enable_if<std::is_same<St, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow2Core(HVX_Vector &vu16_src_c, HVX_Vector &vu16_src_n, HVX_VectorPair &wu32_dst)
 {
     wu32_dst = Q6_Ww_vaddacc_WwVuhVuh(wu32_dst, vu16_src_c, vu16_src_n);
 }
 
-// using St = MI_U16
-template <typename St, typename std::enable_if<std::is_same<St, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow1Core(HVX_Vector &vu16_src_c, HVX_VectorPair &wu32_dst)
+// using St = DT_U16
+template <typename St, typename std::enable_if<std::is_same<St, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow1Core(HVX_Vector &vu16_src_c, HVX_VectorPair &wu32_dst)
 {
     HVX_VectorPair wu32_sum = Q6_Wuw_vzxt_Vuh(vu16_src_c);
     wu32_dst = Q6_Wuw_vadd_WuwWuw_sat(wu32_dst, wu32_sum);
 }
 
-// using St = MI_S16
-template <typename St, typename std::enable_if<std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow2Core(HVX_Vector &vs16_src_c, HVX_Vector &vs16_src_n, HVX_VectorPair &ws32_dst)
+// using St = DT_S16
+template <typename St, typename std::enable_if<std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow2Core(HVX_Vector &vs16_src_c, HVX_Vector &vs16_src_n, HVX_VectorPair &ws32_dst)
 {
     ws32_dst = Q6_Ww_vaddacc_WwVhVh(ws32_dst, vs16_src_c, vs16_src_n);
 }
 
-// using St = MI_S16
-template <typename St, typename std::enable_if<std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow1Core(HVX_Vector &vs16_src_c, HVX_VectorPair &ws32_dst)
+// using St = DT_S16
+template <typename St, typename std::enable_if<std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow1Core(HVX_Vector &vs16_src_c, HVX_VectorPair &ws32_dst)
 {
     HVX_VectorPair ws32_sum = Q6_Ww_vsxt_Vh(vs16_src_c);
     ws32_dst = Q6_Ww_vadd_WwWw_sat(ws32_dst, ws32_sum);
 }
 
-template <typename St, typename MVType, typename MWType, MI_S32 C>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow2(const St *src_c, const St *src_n, MWType &mwd32_sum, HVX_VectorPred &q, MI_S32 back_offset,
-                                      MI_S32 elem_counts, MI_S32 width, MI_S32 rest)
+template <typename St, typename MVType, typename MWType, DT_S32 C>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow2(const St *src_c, const St *src_n, MWType &mwd32_sum, HVX_VectorPred &q, DT_S32 back_offset,
+                                      DT_S32 elem_counts, DT_S32 width, DT_S32 rest)
 {
     MVType mv_src_c, mv_src_n;
 
-    for (MI_S32 x = 0; x <= back_offset; x += elem_counts)
+    for (DT_S32 x = 0; x <= back_offset; x += elem_counts)
     {
         vload(src_c + x * C, mv_src_c);
         vload(src_n + x * C, mv_src_n);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             CalSumRow2Core<St>(mv_src_c.val[ch], mv_src_n.val[ch], mwd32_sum.val[ch]);
         }
@@ -101,7 +101,7 @@ AURA_ALWAYS_INLINE AURA_VOID CalSumRow2(const St *src_c, const St *src_n, MWType
         vload(src_n + (width - elem_counts) * C, mv_src_n);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_c.val[ch] = Q6_V_vmux_QVV(q, Q6_V_vzero(), mv_src_c.val[ch]);
             mv_src_n.val[ch] = Q6_V_vmux_QVV(q, Q6_V_vzero(), mv_src_n.val[ch]);
@@ -110,17 +110,17 @@ AURA_ALWAYS_INLINE AURA_VOID CalSumRow2(const St *src_c, const St *src_n, MWType
     }
 }
 
-template <typename St, typename MVType, typename MWType, MI_S32 C>
-AURA_ALWAYS_INLINE AURA_VOID CalSumRow1(const St *src_c, MWType &mwd32_sum, HVX_VectorPred &q, MI_S32 back_offset,
-                                      MI_S32 elem_counts, MI_S32 width, MI_S32 rest)
+template <typename St, typename MVType, typename MWType, DT_S32 C>
+AURA_ALWAYS_INLINE DT_VOID CalSumRow1(const St *src_c, MWType &mwd32_sum, HVX_VectorPred &q, DT_S32 back_offset,
+                                      DT_S32 elem_counts, DT_S32 width, DT_S32 rest)
 {
     MVType mv_src_c;
 
-    for (MI_S32 x = 0; x <= back_offset; x += elem_counts)
+    for (DT_S32 x = 0; x <= back_offset; x += elem_counts)
     {
         vload(src_c + x * C, mv_src_c);
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             CalSumRow1Core<St>(mv_src_c.val[ch], mwd32_sum.val[ch]);
         }
@@ -130,7 +130,7 @@ AURA_ALWAYS_INLINE AURA_VOID CalSumRow1(const St *src_c, MWType &mwd32_sum, HVX_
     {
         vload(src_c + (width - elem_counts) * C, mv_src_c);
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_c.val[ch] = Q6_V_vmux_QVV(q, Q6_V_vzero(), mv_src_c.val[ch]);
             CalSumRow1Core<St>(mv_src_c.val[ch], mwd32_sum.val[ch]);
@@ -138,69 +138,69 @@ AURA_ALWAYS_INLINE AURA_VOID CalSumRow1(const St *src_c, MWType &mwd32_sum, HVX_
     }
 }
 
-template <typename PartSumType, typename SumType, typename MWType, MI_S32 C>
-AURA_NO_INLINE AURA_VOID ProcessPartSum(SumType *final_sum, MI_U32 *vec_buf, MWType &mwd32_sum, MI_S32 len)
+template <typename PartSumType, typename SumType, typename MWType, DT_S32 C>
+AURA_NO_INLINE DT_VOID ProcessPartSum(SumType *final_sum, DT_U32 *vec_buf, MWType &mwd32_sum, DT_S32 len)
 {
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         HVX_Vector vd32_sum = Q6_Vw_vadd_VwVw(Q6_V_lo_W(mwd32_sum.val[ch]), Q6_V_hi_W(mwd32_sum.val[ch]));
         *(HVX_Vector*)vec_buf = vd32_sum;
 
-        for (MI_S32 i = 0; i < len; i++)
+        for (DT_S32 i = 0; i < len; i++)
         {
             final_sum[ch] += static_cast<PartSumType>(vec_buf[i]);
         }
     }
 }
 
-template <typename St, typename SumType, MI_S32 C>
-static Status SumHvxImpl(Context *ctx, const Mat &src, std::vector<SumType> &dst_buffer, MI_S32 start_row, MI_S32 end_row)
+template <typename St, typename SumType, DT_S32 C>
+static Status SumHvxImpl(Context *ctx, const Mat &src, std::vector<SumType> &dst_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     using MVType      = typename MVHvxVector<C>::Type;
     using MWType      = typename MWHvxVector<C>::Type;
     using PartSumType = typename MatrixSumTraits<St>::PartSumType;
 
-    constexpr MI_S32 VEC_LEN = AURA_HVLEN / sizeof(PartSumType);
+    constexpr DT_S32 VEC_LEN = AURA_HVLEN / sizeof(PartSumType);
 
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 height = end_row - start_row;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 height = end_row - start_row;
 
-    MI_S32 num_vec_per_row = (width + VEC_LEN - 1) / VEC_LEN;
-    MI_S32 height_block    = ((1 << ((sizeof(PartSumType) - sizeof(St)) * 8)) / num_vec_per_row) & (-2); // height_block = 2 minimum
+    DT_S32 num_vec_per_row = (width + VEC_LEN - 1) / VEC_LEN;
+    DT_S32 height_block    = ((1 << ((sizeof(PartSumType) - sizeof(St)) * 8)) / num_vec_per_row) & (-2); // height_block = 2 minimum
     if (height_block < 1)
     {
         AURA_ADD_ERROR_STRING(ctx, "height_block too small");
         return Status::ERROR;
     }
 
-    MI_S32 stride = src.GetStrides().m_width;
-    MI_U32 vec_buf[32] __attribute__((aligned(AURA_HVLEN)));
+    DT_S32 stride = src.GetStrides().m_width;
+    DT_U32 vec_buf[32] __attribute__((aligned(AURA_HVLEN)));
     SumType final_sum[C] = {0};
 
     const St *src_c = NULL;
     const St *src_n = NULL;
-    MI_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 2, 0);
-    L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<St>(start_row)), L2fetch_param);
+    DT_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 2, 0);
+    L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<St>(start_row)), L2fetch_param);
 
-    MI_S32 elem_counts = AURA_HVLEN / sizeof(St);
-    MI_S32 back_offset = width - elem_counts;
-    MI_S32 rest        = (width % elem_counts) * sizeof(St);
+    DT_S32 elem_counts = AURA_HVLEN / sizeof(St);
+    DT_S32 back_offset = width - elem_counts;
+    DT_S32 rest        = (width % elem_counts) * sizeof(St);
     HVX_VectorPred q   = Q6_Q_vsetq_R(AURA_HVLEN - rest);
     MWType mwd32_sum;
 
-    MI_S32 y = 0;
+    DT_S32 y = 0;
     for (; y <= (height - height_block); y += height_block)
     {
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mwd32_sum.val[ch] = Q6_W_vcombine_VV(Q6_V_vzero(), Q6_V_vzero());
         }
 
-        for (MI_S32 z = y; z < y + height_block; z += 2)
+        for (DT_S32 z = y; z < y + height_block; z += 2)
         {
-            MI_S32 r = Min(z + 2, height - 2);
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<St>(start_row + r)), L2fetch_param);
+            DT_S32 r = Min(z + 2, height - 2);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<St>(start_row + r)), L2fetch_param);
             src_c = src.Ptr<St>(start_row + z);
             src_n = src.Ptr<St>(start_row + z + 1);
 
@@ -213,17 +213,17 @@ static Status SumHvxImpl(Context *ctx, const Mat &src, std::vector<SumType> &dst
     if (y < height)
     {
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mwd32_sum.val[ch] = Q6_W_vcombine_VV(Q6_V_vzero(), Q6_V_vzero());
         }
 
-        MI_S32 height_align = height & (-2);
+        DT_S32 height_align = height & (-2);
 
         for (; y < height_align; y += 2)
         {
-            MI_S32 r = Min(y + 2, height - 2);
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<St>(start_row + r)), L2fetch_param);
+            DT_S32 r = Min(y + 2, height - 2);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<St>(start_row + r)), L2fetch_param);
             src_c = src.Ptr<St>(start_row + y);
             src_n = src.Ptr<St>(start_row + y + 1);
 
@@ -239,9 +239,9 @@ static Status SumHvxImpl(Context *ctx, const Mat &src, std::vector<SumType> &dst
         ProcessPartSum<PartSumType, SumType, MWType, C>(final_sum, vec_buf, mwd32_sum, VEC_LEN);
     }
 
-    MI_S32 thread_id = ctx->GetWorkerPool()->GetComputeThreadIdx();
+    DT_S32 thread_id = ctx->GetWorkerPool()->GetComputeThreadIdx();
     #pragma unroll(C)
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         dst_buffer[thread_id * C + ch] += static_cast<SumType>(final_sum[ch]);
     }
@@ -255,49 +255,49 @@ static Status SumHvxHelper(Context *ctx, const Mat &src, Scalar &result)
     using SumType = typename MatrixSumTraits<St>::SumType;
 
     Status ret = Status::ERROR;
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     result = Scalar(); // clear result
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return Status::ERROR;
     }
 
-    MI_S32 task_nums = wp->GetComputeThreadNum();
+    DT_S32 task_nums = wp->GetComputeThreadNum();
     std::vector<SumType> row_buffer(channel * task_nums, 0);
 
     switch (channel)
     {
         case 1:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, SumHvxImpl<St, SumType, 1>, ctx, std::cref(src), std::ref(row_buffer));
-            for (MI_S32 i = 0; i < task_nums; i++)
+            ret = wp->ParallelFor((DT_S32)0, height, SumHvxImpl<St, SumType, 1>, ctx, std::cref(src), std::ref(row_buffer));
+            for (DT_S32 i = 0; i < task_nums; i++)
             {
-                result.m_val[0] += static_cast<MI_F64>(row_buffer[i]);
+                result.m_val[0] += static_cast<DT_F64>(row_buffer[i]);
             }
             break;
         }
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, SumHvxImpl<St, SumType, 2>, ctx, std::cref(src), std::ref(row_buffer));
-            for (MI_S32 i = 0; i < task_nums; i++)
+            ret = wp->ParallelFor((DT_S32)0, height, SumHvxImpl<St, SumType, 2>, ctx, std::cref(src), std::ref(row_buffer));
+            for (DT_S32 i = 0; i < task_nums; i++)
             {
-                result.m_val[0] += static_cast<MI_F64>(row_buffer[2 * i]);
-                result.m_val[1] += static_cast<MI_F64>(row_buffer[2 * i + 1]);
+                result.m_val[0] += static_cast<DT_F64>(row_buffer[2 * i]);
+                result.m_val[1] += static_cast<DT_F64>(row_buffer[2 * i + 1]);
             }
             break;
         }
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, SumHvxImpl<St, SumType, 3>, ctx, std::cref(src), std::ref(row_buffer));
-            for (MI_S32 i = 0; i < task_nums; i++)
+            ret = wp->ParallelFor((DT_S32)0, height, SumHvxImpl<St, SumType, 3>, ctx, std::cref(src), std::ref(row_buffer));
+            for (DT_S32 i = 0; i < task_nums; i++)
             {
-                result.m_val[0] += static_cast<MI_F64>(row_buffer[3 * i]);
-                result.m_val[1] += static_cast<MI_F64>(row_buffer[3 * i + 1]);
-                result.m_val[2] += static_cast<MI_F64>(row_buffer[3 * i + 2]);
+                result.m_val[0] += static_cast<DT_F64>(row_buffer[3 * i]);
+                result.m_val[1] += static_cast<DT_F64>(row_buffer[3 * i + 1]);
+                result.m_val[2] += static_cast<DT_F64>(row_buffer[3 * i + 2]);
             }
             break;
         }
@@ -322,8 +322,8 @@ Status SumHvx::SetArgs(const Array *src, Scalar *result)
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
-    MI_S32 width = src->GetSizes().m_width;
+    DT_S32 ch = src->GetSizes().m_channel;
+    DT_S32 width = src->GetSizes().m_width;
     if (ch != 1 && ch != 2 && ch != 3)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2/3");
@@ -337,7 +337,7 @@ Status SumHvx::SetArgs(const Array *src, Scalar *result)
         return Status::ERROR;
     }
 
-    MI_S32 shift = (elem_type == ElemType::U8 || elem_type == ElemType::S8) ? 24 : 16;
+    DT_S32 shift = (elem_type == ElemType::U8 || elem_type == ElemType::S8) ? 24 : 16;
     if (width > ((1 << shift) * 16)) //at least accumulate 2 rows
     {
         AURA_ADD_ERROR_STRING(m_ctx, "mat width too large");
@@ -351,7 +351,7 @@ Status SumHvx::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is nullptr");
         return Status::ERROR;
@@ -363,25 +363,25 @@ Status SumHvx::Run()
     {
         case ElemType::U8:
         {
-            ret = SumHvxHelper<MI_U8>(m_ctx, *src, *m_result);
+            ret = SumHvxHelper<DT_U8>(m_ctx, *src, *m_result);
             break;
         }
 
         case ElemType::S8:
         {
-            ret = SumHvxHelper<MI_S8>(m_ctx, *src, *m_result);
+            ret = SumHvxHelper<DT_S8>(m_ctx, *src, *m_result);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = SumHvxHelper<MI_U16>(m_ctx, *src, *m_result);
+            ret = SumHvxHelper<DT_U16>(m_ctx, *src, *m_result);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = SumHvxHelper<MI_S16>(m_ctx, *src, *m_result);
+            ret = SumHvxHelper<DT_S16>(m_ctx, *src, *m_result);
             break;
         }
 
@@ -445,9 +445,9 @@ Status MeanHvx::Run()
         return Status::ERROR;
     }
 
-    const MI_S32 height = m_src->GetSizes().m_height;
-    const MI_S32 width  = m_src->GetSizes().m_width;
-    *m_result           = (*m_result) / static_cast<MI_F64>(height * width);
+    const DT_S32 height = m_src->GetSizes().m_height;
+    const DT_S32 width  = m_src->GetSizes().m_width;
+    *m_result           = (*m_result) / static_cast<DT_F64>(height * width);
 
     AURA_RETURN(m_ctx, ret);
 }

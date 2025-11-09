@@ -18,12 +18,12 @@ using VecMatSizePair = std::pair<std::vector<MatSize>, std::vector<MatSize>>;
 
 AURA_INLINE std::ostream& operator<<(std::ostream &os, std::vector<MatSize> mat_sizes)
 {
-    MI_S32 n = mat_sizes.size();
+    DT_S32 n = mat_sizes.size();
     if (n > 0)
     {
         auto iter = mat_sizes.begin();
 
-        for (MI_S32 i = 0; i < (n - 1); i++)
+        for (DT_S32 i = 0; i < (n - 1); i++)
         {
             os << *iter << " ";
             iter++;
@@ -47,7 +47,7 @@ AURA_TEST_PARAM(CvtColorParam,
                 OpTarget,       target);
 
 #if !defined(AURA_BUILD_XPLORER)
-static MI_S32 CvtColorTypeToOpencv(CvtColorType cvt_type)
+static DT_S32 CvtColorTypeToOpencv(CvtColorType cvt_type)
 {
     switch (cvt_type)
     {
@@ -181,8 +181,8 @@ static MI_S32 CvtColorTypeToOpencv(CvtColorType cvt_type)
 static cv::Mat AuraMatToOpencvMat(std::vector<Mat> &mats)
 {
     Mat    mat    = mats[0];
-    MI_S32 width  = mat.GetSizes().m_width;
-    MI_S32 height = 0;
+    DT_S32 width  = mat.GetSizes().m_width;
+    DT_S32 height = 0;
 
     switch (mats.size())
     {
@@ -207,17 +207,17 @@ static cv::Mat AuraMatToOpencvMat(std::vector<Mat> &mats)
         }
     }
 
-    MI_S32 cv_type = ElemTypeToOpencv(mat.GetElemType(), mat.GetSizes().m_channel);
+    DT_S32 cv_type = ElemTypeToOpencv(mat.GetElemType(), mat.GetSizes().m_channel);
     cv::Mat result(height, width, cv_type);
 
-    MI_S32 offset = 0;
-    MI_U8 *data   = (MI_U8 *)result.data;
-    for (MI_S32 i = 0; i < (MI_S32)mats.size(); i++)
+    DT_S32 offset = 0;
+    DT_U8 *data   = (DT_U8 *)result.data;
+    for (DT_S32 i = 0; i < (DT_S32)mats.size(); i++)
     {
-        MI_S32 row_bytes = mats[i].GetSizes().m_width * mats[i].GetSizes().m_channel * ElemTypeSize(mats[i].GetElemType());
-        for (MI_S32 h = 0; h < mats[i].GetSizes().m_height; h++)
+        DT_S32 row_bytes = mats[i].GetSizes().m_width * mats[i].GetSizes().m_channel * ElemTypeSize(mats[i].GetElemType());
+        for (DT_S32 h = 0; h < mats[i].GetSizes().m_height; h++)
         {
-            memcpy(data + offset, mats[i].Ptr<MI_U8>(h), row_bytes);
+            memcpy(data + offset, mats[i].Ptr<DT_U8>(h), row_bytes);
             offset += row_bytes;
         }
     }
@@ -248,17 +248,17 @@ static std::string VecMatSizeToString(std::vector<MatSize> mat_sizes)
 #define CVTCOLOR_601_RGB2U(Tp, R, G, B, SHIFT, UC)  SaturateCast<Tp>((-0.1687f * R - 0.3313f * G + 0.5f    * B + UC) * (1 << SHIFT))
 #define CVTCOLOR_601_RGB2V(Tp, R, G, B, SHIFT, UC)  SaturateCast<Tp>(( 0.5f    * R - 0.4187f * G - 0.0813f * B + UC) * (1 << SHIFT))
 
-template <typename Tp, MI_S32 SHIFT>
+template <typename Tp, DT_S32 SHIFT>
 static Status Cvt601Rgb2Yuv420Benchmark(std::vector<Mat> &src, std::vector<Mat> &dst, CvtColorType type)
 {
-    MI_S32 height = src[0].GetSizes().m_height;
-    MI_S32 width  = src[0].GetSizes().m_width;
-    MI_S32 u_idx  = SwapUv(type);
-    MI_S32 v_idx  = 1 - u_idx;
+    DT_S32 height = src[0].GetSizes().m_height;
+    DT_S32 width  = src[0].GetSizes().m_width;
+    DT_S32 u_idx  = SwapUv(type);
+    DT_S32 v_idx  = 1 - u_idx;
 
-    for (MI_S32 h = 0; h < height; h++)
+    for (DT_S32 h = 0; h < height; h++)
     {
-        for (MI_S32 w = 0; w < width; w++)
+        for (DT_S32 w = 0; w < width; w++)
         {
             Tp R = src[0].At<Tp>(h, w, 0);
             Tp G = src[0].At<Tp>(h, w, 1);
@@ -303,16 +303,16 @@ static Status Cvt601Rgb2Yuv420Benchmark(std::vector<Mat> &src, std::vector<Mat> 
     return Status::OK;
 }
 
-template <typename Tp, MI_S32 SHIFT>
+template <typename Tp, DT_S32 SHIFT>
 static Status Cvt601Rgb2Yuv444Benchmark(std::vector<Mat> &src, std::vector<Mat> &dst, CvtColorType type)
 {
     AURA_UNUSED(type);
-    MI_S32 height = src[0].GetSizes().m_height;
-    MI_S32 width  = src[0].GetSizes().m_width;
+    DT_S32 height = src[0].GetSizes().m_height;
+    DT_S32 width  = src[0].GetSizes().m_width;
 
-    for (MI_S32 h = 0; h < height; h++)
+    for (DT_S32 h = 0; h < height; h++)
     {
-        for (MI_S32 w = 0; w < width; w++)
+        for (DT_S32 w = 0; w < width; w++)
         {
             Tp R = src[0].At<Tp>(h, w, 0);
             Tp G = src[0].At<Tp>(h, w, 1);
@@ -338,18 +338,18 @@ static Status Cvt601Rgb2YuvBenchmark(Context *ctx, std::vector<Mat> &src, std::v
         case CvtColorType::RGB2YUV_YU12_601:
         case CvtColorType::RGB2YUV_YV12_601:
         {
-            ret = Cvt601Rgb2Yuv420Benchmark<MI_U8, 0>(src, dst, type);
+            ret = Cvt601Rgb2Yuv420Benchmark<DT_U8, 0>(src, dst, type);
             break;
         }
         case CvtColorType::RGB2YUV_Y444_601:
         {
-            ret = Cvt601Rgb2Yuv444Benchmark<MI_U8, 0>(src, dst, type);
+            ret = Cvt601Rgb2Yuv444Benchmark<DT_U8, 0>(src, dst, type);
             break;
         }
         case CvtColorType::RGB2YUV_NV12_P010:
         case CvtColorType::RGB2YUV_NV21_P010:
         {
-            ret = Cvt601Rgb2Yuv420Benchmark<MI_U16, 6>(src, dst, type);
+            ret = Cvt601Rgb2Yuv420Benchmark<DT_U16, 6>(src, dst, type);
             break;
         }
         default:
@@ -392,7 +392,7 @@ static Status CvCvtColor(Context *ctx, std::vector<Mat> &src, std::vector<Mat> &
     }
 
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 cv_method = CvtColorTypeToOpencv(type);
+    DT_S32 cv_method = CvtColorTypeToOpencv(type);
     if (-1 == cv_method)
     {
         AURA_LOGD(ctx, AURA_TAG, "Opencv is not supprot cvtcolor type\n");
@@ -403,14 +403,14 @@ static Status CvCvtColor(Context *ctx, std::vector<Mat> &src, std::vector<Mat> &
     cv::Mat cv_dst = AuraMatToOpencvMat(dst);
     cv::cvtColor(cv_src, cv_dst, cv_method);
 
-    MI_S32 offset = 0;
-    MI_U8 *data   = (MI_U8 *)cv_dst.data;
-    for (MI_S32 i = 0; i < (MI_S32)dst.size(); i++)
+    DT_S32 offset = 0;
+    DT_U8 *data   = (DT_U8 *)cv_dst.data;
+    for (DT_S32 i = 0; i < (DT_S32)dst.size(); i++)
     {
-        MI_S32 row_bytes = dst[i].GetSizes().m_width * dst[i].GetSizes().m_channel * ElemTypeSize(dst[i].GetElemType());
-        for (MI_S32 h = 0; h < dst[i].GetSizes().m_height; h++)
+        DT_S32 row_bytes = dst[i].GetSizes().m_width * dst[i].GetSizes().m_channel * ElemTypeSize(dst[i].GetElemType());
+        for (DT_S32 h = 0; h < dst[i].GetSizes().m_height; h++)
         {
-            memcpy(dst[i].Ptr<MI_U8>(h), data + offset, row_bytes);
+            memcpy(dst[i].Ptr<DT_U8>(h), data + offset, row_bytes);
             offset += row_bytes;
         }
     }
@@ -442,7 +442,7 @@ public:
         }
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         CvtColorParam run_param(GetParam(index));
@@ -454,8 +454,8 @@ public:
                   ElemTypesToString(run_param.elem_type).c_str(), imat_sizes[0].m_sizes.m_height, imat_sizes[0].m_sizes.m_width,
                   CvtColorTypeToString(run_param.cvt_type).c_str());
 
-        MI_S32 src_len = imat_sizes.size();
-        MI_S32 dst_len = omat_sizes.size();
+        DT_S32 src_len = imat_sizes.size();
+        DT_S32 dst_len = omat_sizes.size();
 
         // creat iauras
         std::vector<Mat> src, dst, ref;
@@ -463,12 +463,12 @@ public:
         dst.reserve(dst_len);
         ref.reserve(dst_len);
 
-        for (MI_S32 i = 0; i < src_len; i++)
+        for (DT_S32 i = 0; i < src_len; i++)
         {
             Mat src_tmp = m_factory.GetDerivedMat(1.0f, 0.0f, run_param.elem_type, imat_sizes[i].m_sizes, AURA_MEM_DEFAULT, imat_sizes[i].m_strides);
             src.push_back(src_tmp);
         }
-        for (MI_S32 i = 0; i < dst_len; i++)
+        for (DT_S32 i = 0; i < dst_len; i++)
         {
             Mat dst_tmp = m_factory.GetEmptyMat(run_param.elem_type, omat_sizes[i].m_sizes, AURA_MEM_DEFAULT, omat_sizes[i].m_strides);
             Mat ref_tmp = m_factory.GetEmptyMat(run_param.elem_type, omat_sizes[i].m_sizes, AURA_MEM_DEFAULT, omat_sizes[i].m_strides);
@@ -476,7 +476,7 @@ public:
             ref.push_back(ref_tmp);
         }
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;
@@ -536,11 +536,11 @@ public:
 EXIT:
         test_case->AddTestResult(result.accu_status && result.perf_status, result);
         // release mat
-        for (MI_S32 i = 0; i < src_len; i++)
+        for (DT_S32 i = 0; i < src_len; i++)
         {
             m_factory.PutMats(src[i]);
         }
-        for (MI_S32 i = 0; i < dst_len; i++)
+        for (DT_S32 i = 0; i < dst_len; i++)
         {
             m_factory.PutMats(dst[i], ref[i]);
         }

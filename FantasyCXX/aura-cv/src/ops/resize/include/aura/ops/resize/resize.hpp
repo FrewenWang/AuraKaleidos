@@ -68,7 +68,7 @@ public:
      * @param oheight The height of the dst.
      * @param type The interpolation method.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 iwidth, MI_S32 iheight, MI_S32 owidth, MI_S32 oheight,
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 iwidth, DT_S32 iheight, DT_S32 owidth, DT_S32 oheight,
                                InterpType interp_type);
 };
 

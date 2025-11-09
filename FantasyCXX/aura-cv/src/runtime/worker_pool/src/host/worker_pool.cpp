@@ -33,7 +33,7 @@ Status SetCpuAffinity(CpuAffinity affinity)
 #    define CPU_SET_SIZE        (1024)
     struct CpuSet
     {
-        MI_U64 __bits[CPU_SET_SIZE / AURA_NCPUBITS];
+        DT_U64 __bits[CPU_SET_SIZE / AURA_NCPUBITS];
     };
 #    define CPU_SET_MASK(cpu, cpusetp)      ((cpusetp)->__bits[(cpu) / AURA_NCPUBITS] |= (1UL << ((cpu) % AURA_NCPUBITS)))
 #    define CPU_ZERO_MASK(cpusetp)           memset((cpusetp), 0, sizeof(CpuSet))
@@ -46,7 +46,7 @@ Status SetCpuAffinity(CpuAffinity affinity)
     pid_t pid = gettid();
 #  endif // __GLIBC__
 
-    std::vector<MI_S32> cpu_core_idxs = CpuInfo::Get().GetCpuIdxs(affinity);
+    std::vector<DT_S32> cpu_core_idxs = CpuInfo::Get().GetCpuIdxs(affinity);
 
     if (!cpu_core_idxs.empty())
     {
@@ -69,16 +69,16 @@ Status SetCpuAffinity(CpuAffinity affinity)
     return status;
 }
 
-WorkerPool::WorkerPool(Context *ctx, const std::string &tag, CpuAffinity compute_affinity, CpuAffinity async_affinity, MI_S32 compute_threads, MI_S32 async_threads)
+WorkerPool::WorkerPool(Context *ctx, const std::string &tag, CpuAffinity compute_affinity, CpuAffinity async_affinity, DT_S32 compute_threads, DT_S32 async_threads)
                        :m_ctx(ctx), m_tag(tag), m_compute_affinity(compute_affinity), m_async_affinity(async_affinity),
-                        m_stopped(MI_FALSE), m_async_running_count(0), m_async_thread_idx(0), m_compute_thread_idx(0)
+                        m_stopped(DT_FALSE), m_async_running_count(0), m_async_thread_idx(0), m_compute_thread_idx(0)
 {
     // define maximum number of threads
-    std::vector<MI_S32> compute_core_idxs = CpuInfo::Get().GetCpuIdxs(compute_affinity);
-    std::vector<MI_S32> async_core_idxs   = CpuInfo::Get().GetCpuIdxs(async_affinity);
+    std::vector<DT_S32> compute_core_idxs = CpuInfo::Get().GetCpuIdxs(compute_affinity);
+    std::vector<DT_S32> async_core_idxs   = CpuInfo::Get().GetCpuIdxs(async_affinity);
 
-    m_max_compute_threads = static_cast<MI_S32>(compute_core_idxs.size());
-    m_max_async_threads   = static_cast<MI_S32>(async_core_idxs.size());
+    m_max_compute_threads = static_cast<DT_S32>(compute_core_idxs.size());
+    m_max_async_threads   = static_cast<DT_S32>(async_core_idxs.size());
     m_max_compute_threads = Clamp(m_max_compute_threads, AURA_MIN_COMPUTE_THREADS, AURA_MAX_COMPUTE_THREADS);
     m_max_async_threads   = Clamp(m_max_async_threads,   AURA_MIN_ASYNC_THREADS,   AURA_MAX_ASYNC_THREADS);
 
@@ -92,9 +92,9 @@ WorkerPool::WorkerPool(Context *ctx, const std::string &tag, CpuAffinity compute
     // if explicit number of thread is set, launch threads
     if (compute_threads > 0)
     {
-        for (MI_S32 n = 0; n < compute_threads; ++n)
+        for (DT_S32 n = 0; n < compute_threads; ++n)
         {
-            std::function<AURA_VOID(AURA_VOID)> compute_thread_run = std::bind(&WorkerPool::ComputeThreadRun, this, m_compute_affinity);
+            std::function<DT_VOID(DT_VOID)> compute_thread_run = std::bind(&WorkerPool::ComputeThreadRun, this, m_compute_affinity);
             m_compute_threads.emplace_back(std::move(compute_thread_run));
             m_compute_tid_map[m_compute_threads.back().get_id()] = n + 1; // 0 is reserved for main thread
         }
@@ -102,41 +102,41 @@ WorkerPool::WorkerPool(Context *ctx, const std::string &tag, CpuAffinity compute
 
     if (async_threads > 0)
     {
-        for (MI_S32 n = 0; n < async_threads; ++n)
+        for (DT_S32 n = 0; n < async_threads; ++n)
         {
-            std::function<AURA_VOID(AURA_VOID)> async_thread_run = std::bind(&WorkerPool::AsyncThreadRun, this, async_affinity);
+            std::function<DT_VOID(DT_VOID)> async_thread_run = std::bind(&WorkerPool::AsyncThreadRun, this, async_affinity);
             m_async_threads.emplace_back(std::move(async_thread_run));
             m_async_tid_map[m_async_threads.back().get_id()] =  n + 1; // 0 is reserved for main thread
         }
     }
 }
 
-AURA_VOID WorkerPool::CheckComputeThreads()
+DT_VOID WorkerPool::CheckComputeThreads()
 {
     // if compute threads are empty, relaunch
     if (m_compute_threads.empty())
     {
         std::unique_lock<std::mutex> lock(m_compute_mutex);
 
-        for (MI_S32 n = 0; n < m_max_compute_threads; ++n)
+        for (DT_S32 n = 0; n < m_max_compute_threads; ++n)
         {
-            std::function<AURA_VOID(AURA_VOID)> compute_thread_run = std::bind(&WorkerPool::ComputeThreadRun, this, m_compute_affinity);
+            std::function<DT_VOID(DT_VOID)> compute_thread_run = std::bind(&WorkerPool::ComputeThreadRun, this, m_compute_affinity);
             m_compute_threads.emplace_back(std::move(compute_thread_run));
             m_compute_tid_map[m_compute_threads.back().get_id()] = n + 1; // 0 is reserved for main thread
         }
     }
 }
 
-AURA_VOID WorkerPool::CheckAsyncThreads()
+DT_VOID WorkerPool::CheckAsyncThreads()
 {
-    MI_S32 num_async_threads = static_cast<MI_S32>(m_async_threads.size());
+    DT_S32 num_async_threads = static_cast<DT_S32>(m_async_threads.size());
 
     if (num_async_threads == m_max_async_threads)
     {
         return;
     }
 
-    if (num_async_threads > static_cast<MI_S32>(m_async_running_count.load()))
+    if (num_async_threads > static_cast<DT_S32>(m_async_running_count.load()))
     {
         return;
     }
@@ -146,10 +146,10 @@ AURA_VOID WorkerPool::CheckAsyncThreads()
         std::unique_lock<std::mutex> lock(m_async_mutex);
 
         // double check
-        num_async_threads = static_cast<MI_S32>(m_async_threads.size());
+        num_async_threads = static_cast<DT_S32>(m_async_threads.size());
         if (num_async_threads < m_max_async_threads)
         {
-            std::function<AURA_VOID(AURA_VOID)> async_thread_run = std::bind(&WorkerPool::AsyncThreadRun, this, m_async_affinity);
+            std::function<DT_VOID(DT_VOID)> async_thread_run = std::bind(&WorkerPool::AsyncThreadRun, this, m_async_affinity);
             m_async_threads.emplace_back(std::move(async_thread_run));
             m_async_tid_map[m_async_threads.back().get_id()] =  num_async_threads + 1;
         }
@@ -177,14 +177,14 @@ WorkerPool::~WorkerPool()
     }
 }
 
-Status WorkerPool::SetThreadName(const std::string &tag, MI_CHAR type, MI_S32 idx)
+Status WorkerPool::SetThreadName(const std::string &tag, DT_CHAR type, DT_S32 idx)
 {
     // 16 bytes: [tag][type][idx]['\0']; 12 + 1 + 2 + 1
     std::string thread_name = tag.size() > 12 ? tag.substr(0, 12) : tag;
     thread_name += type;
 
 #if defined(ANDROID)
-    MI_CHAR name_buf[16] = {0};
+    DT_CHAR name_buf[16] = {0};
     sprintf(name_buf, "%s%02d", thread_name.c_str(), idx % 100);
     prctl(PR_SET_NAME, name_buf);
 #else
@@ -194,7 +194,7 @@ Status WorkerPool::SetThreadName(const std::string &tag, MI_CHAR type, MI_S32 id
     return Status::OK;
 }
 
-AURA_VOID WorkerPool::AsyncThreadRun(CpuAffinity async_affinity)
+DT_VOID WorkerPool::AsyncThreadRun(CpuAffinity async_affinity)
 {
     if (SetThreadName(m_tag, 'A', m_async_thread_idx++) != Status::OK)
     {
@@ -203,9 +203,9 @@ AURA_VOID WorkerPool::AsyncThreadRun(CpuAffinity async_affinity)
 
     SetCpuAffinity(async_affinity);
 
-    while (MI_TRUE)
+    while (DT_TRUE)
     {
-        std::function<AURA_VOID()> task;
+        std::function<DT_VOID()> task;
 
         {
             std::unique_lock<std::mutex> lock(m_async_mutex);
@@ -226,7 +226,7 @@ AURA_VOID WorkerPool::AsyncThreadRun(CpuAffinity async_affinity)
     }
 }
 
-AURA_VOID WorkerPool::ComputeThreadRun(CpuAffinity compute_affinity)
+DT_VOID WorkerPool::ComputeThreadRun(CpuAffinity compute_affinity)
 {
     if (SetThreadName(m_tag, 'C', m_compute_thread_idx++) != Status::OK)
     {
@@ -235,9 +235,9 @@ AURA_VOID WorkerPool::ComputeThreadRun(CpuAffinity compute_affinity)
 
     SetCpuAffinity(compute_affinity);
 
-    while (MI_TRUE)
+    while (DT_TRUE)
     {
-        std::function<AURA_VOID()> task;
+        std::function<DT_VOID()> task;
 
         {
             std::unique_lock<std::mutex> lock(m_compute_mutex);
@@ -256,7 +256,7 @@ AURA_VOID WorkerPool::ComputeThreadRun(CpuAffinity compute_affinity)
     }
 }
 
-AURA_VOID WorkerPool::Stop()
+DT_VOID WorkerPool::Stop()
 {
     if (m_stopped)
     {
@@ -264,7 +264,7 @@ AURA_VOID WorkerPool::Stop()
         return;
     }
 
-    m_stopped = MI_TRUE;
+    m_stopped = DT_TRUE;
 
     {
         std::unique_lock<std::mutex> lock(m_async_mutex);

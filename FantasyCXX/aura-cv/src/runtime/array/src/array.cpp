@@ -5,21 +5,21 @@
 namespace aura
 {
 
-Array::Array() : m_ctx(MI_NULL), m_elem_type(ElemType::INVALID), m_array_type(ArrayType::INVALID),
-                 m_total_bytes(0), m_refcount(MI_NULL)
+Array::Array() : m_ctx(DT_NULL), m_elem_type(ElemType::INVALID), m_array_type(ArrayType::INVALID),
+                 m_total_bytes(0), m_refcount(DT_NULL)
 {}
 
 Array::Array(Context *ctx, ElemType elem_type, const Sizes3 &sizes, const Sizes &strides, const Buffer &buffer)
              : m_ctx(ctx), m_elem_type(elem_type), m_array_type(ArrayType::INVALID), m_sizes(sizes),
-               m_strides(strides), m_total_bytes(0), m_refcount(MI_NULL), m_buffer(buffer)
+               m_strides(strides), m_total_bytes(0), m_refcount(DT_NULL), m_buffer(buffer)
 {
     if (m_ctx)
     {
         /// 这个就是一行数据的字节数
-        MI_S32 pitch = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
+        DT_S32 pitch = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
         m_strides = m_strides.Max(Sizes(m_sizes.m_height, pitch));
         /// 这个就是行字节数 * 宽字节数
-        m_total_bytes = static_cast<MI_S64>(m_strides.m_width) * m_strides.m_height;
+        m_total_bytes = static_cast<DT_S64>(m_strides.m_width) * m_strides.m_height;
         //// TODO 没看懂，这句话有事他妈的什么意思？？
         if (m_buffer.m_size == (m_sizes.m_height - 1) * m_strides.m_width + m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type))
         {
@@ -75,19 +75,19 @@ Sizes Array::GetStrides() const
     return m_strides;
 }
 
-MI_S64 Array::GetTotalBytes() const
+DT_S64 Array::GetTotalBytes() const
 {
     return m_total_bytes;
 }
 
-MI_S32 Array::GetRowPitch() const
+DT_S32 Array::GetRowPitch() const
 {
     return m_strides.m_width;
 }
 
-MI_S32 Array::GetRowStep() const
+DT_S32 Array::GetRowStep() const
 {
-    MI_S32 pixels = ElemTypeSize(m_elem_type) * m_sizes.m_channel;
+    DT_S32 pixels = ElemTypeSize(m_elem_type) * m_sizes.m_channel;
 
     if (0 == pixels)
     {
@@ -99,7 +99,7 @@ MI_S32 Array::GetRowStep() const
     }
 }
 
-MI_S32 Array::GetRefCount() const
+DT_S32 Array::GetRefCount() const
 {
     return AddRefCount(0);
 }
@@ -109,27 +109,27 @@ const Buffer& Array::GetBuffer() const
     return m_buffer;
 }
 
-MI_S32 Array::GetMemType() const
+DT_S32 Array::GetMemType() const
 {
     return m_buffer.m_type;
 }
 
-MI_BOOL Array::IsValid() const
+DT_BOOL Array::IsValid() const
 {
     return (m_ctx && (m_elem_type != ElemType::INVALID) && (m_array_type != ArrayType::INVALID) && (m_total_bytes > 0));
 }
 
-MI_BOOL Array::IsEqual(const Array &array) const
+DT_BOOL Array::IsEqual(const Array &array) const
 {
     return ((array.m_elem_type == m_elem_type) && (array.m_sizes == m_sizes));
 }
 
-MI_BOOL Array::IsSizesEqual(const Array &array) const
+DT_BOOL Array::IsSizesEqual(const Array &array) const
 {
     return (array.m_sizes == m_sizes);
 }
 
-MI_BOOL Array::IsChannelEqual(const Array &array) const
+DT_BOOL Array::IsChannelEqual(const Array &array) const
 {
     return (array.m_sizes.m_channel == m_sizes.m_channel);
 }
@@ -151,8 +151,8 @@ std::string Array::ToString() const
 
 Status Array::InitRefCount()
 {
-    m_refcount = static_cast<MI_S32*>(AURA_ALLOC_PARAM(m_ctx, AURA_MEM_HEAP, sizeof(MI_S32), 0));
-    if (m_refcount != MI_NULL)
+    m_refcount = static_cast<DT_S32*>(AURA_ALLOC_PARAM(m_ctx, AURA_MEM_HEAP, sizeof(DT_S32), 0));
+    if (m_refcount != DT_NULL)
     {
         *m_refcount = 1;
     }
@@ -164,7 +164,7 @@ Status Array::InitRefCount()
     return Status::OK;
 }
 
-MI_S32 Array::AddRefCount(MI_S32 num) const
+DT_S32 Array::AddRefCount(DT_S32 num) const
 {
     if (m_refcount)
     {
@@ -173,14 +173,14 @@ MI_S32 Array::AddRefCount(MI_S32 num) const
     return 0;
 }
 
-AURA_VOID Array::Clear()
+DT_VOID Array::Clear()
 {
-    m_ctx         = MI_NULL;
+    m_ctx         = DT_NULL;
     m_elem_type   = ElemType::INVALID;
     m_sizes       = Sizes3();
     m_strides     = Sizes();
     m_total_bytes = 0;
-    m_refcount    = MI_NULL;
+    m_refcount    = DT_NULL;
     m_buffer      = Buffer();
 }
 

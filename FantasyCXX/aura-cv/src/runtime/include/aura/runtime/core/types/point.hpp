@@ -189,7 +189,7 @@ public:
      *
      *  @return true if both Point2_ objects have the same x and y coordinates, false otherwise.
      */
-    MI_BOOL operator==(const Point2_ &b) const
+    DT_BOOL operator==(const Point2_ &b) const
     {
         return m_x == b.m_x && m_y == b.m_y;
     }
@@ -201,7 +201,7 @@ public:
      *
      * @return true if Point2_ objects have different x or y coordinates, false if they are equal.
      */
-    MI_BOOL operator!=(const Point2_ &b) const
+    DT_BOOL operator!=(const Point2_ &b) const
     {
         return m_x != b.m_x || m_y != b.m_y;
     }
@@ -259,9 +259,9 @@ public:
      *
      * @return The double precision dot product value between this Point2_ and `pt`.
      */
-    MI_F64 DDot(const Point2_ &pt) const
+    DT_F64 DDot(const Point2_ &pt) const
     {
-        return (MI_F64)m_x * pt.m_x + (MI_F64)m_y * pt.m_y;
+        return (DT_F64)m_x * pt.m_x + (DT_F64)m_y * pt.m_y;
     }
 
     /**
@@ -271,9 +271,9 @@ public:
      *
      * @return The cross product value between this Point2_ and `pt`.
      */
-    MI_F64 Cross(const Point2_ &pt) const
+    DT_F64 Cross(const Point2_ &pt) const
     {
-        return (MI_F64)m_x * pt.m_y + (MI_F64)m_y * pt.m_x;
+        return (DT_F64)m_x * pt.m_y + (DT_F64)m_y * pt.m_x;
     }
 
     /**
@@ -281,9 +281,9 @@ public:
      *
      * @return The Euclidean norm value (magnitude) of this Point2_ object.
      */
-    MI_F64 Norm() const
+    DT_F64 Norm() const
     {
-        MI_F64 tmp = m_x * m_x + m_y * m_y;
+        DT_F64 tmp = m_x * m_x + m_y * m_y;
         return Sqrt(tmp);
     }
 
@@ -376,44 +376,44 @@ template<typename Tp0, typename Tp1>
 AURA_INLINE Tp0 NormL2Sqr(const Point2_<Tp1> &pt);
 
 template<>
-inline MI_S32 NormL2Sqr<MI_S32, MI_S32>(const Point2_<MI_S32> &pt)
+inline DT_S32 NormL2Sqr<DT_S32, DT_S32>(const Point2_<DT_S32> &pt)
 {
     return pt.Dot(pt);
 }
 
 template<>
-inline MI_S64 NormL2Sqr<MI_S64, MI_S64>(const Point2_<MI_S64> &pt)
+inline DT_S64 NormL2Sqr<DT_S64, DT_S64>(const Point2_<DT_S64> &pt)
 {
     return pt.Dot(pt);
 }
 
 template<>
-inline MI_F32 NormL2Sqr<MI_F32, MI_F32>(const Point2_<MI_F32> &pt)
+inline DT_F32 NormL2Sqr<DT_F32, DT_F32>(const Point2_<DT_F32> &pt)
 {
     return pt.Dot(pt);
 }
 
 template<>
-inline MI_F64 NormL2Sqr<MI_F64, MI_S32>(const Point2_<MI_S32> &pt)
+inline DT_F64 NormL2Sqr<DT_F64, DT_S32>(const Point2_<DT_S32> &pt)
 {
     return pt.Dot(pt);
 }
 
 template<>
-inline MI_F64 NormL2Sqr<MI_F64, MI_F32>(const Point2_<MI_F32> &pt)
+inline DT_F64 NormL2Sqr<DT_F64, DT_F32>(const Point2_<DT_F32> &pt)
 {
     return pt.DDot(pt);
 }
 
 template<>
-inline MI_F64 NormL2Sqr<MI_F64, MI_F64>(const Point2_<MI_F64> &pt)
+inline DT_F64 NormL2Sqr<DT_F64, DT_F64>(const Point2_<DT_F64> &pt)
 {
     return pt.DDot(pt);
 }
 
-typedef Point2_<MI_S32> Point2i;
-typedef Point2_<MI_F32> Point2f;
-typedef Point2_<MI_F64> Point2d;
+typedef Point2_<DT_S32> Point2i;
+typedef Point2_<DT_F32> Point2f;
+typedef Point2_<DT_F64> Point2d;
 typedef Point2f Point2;
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -591,7 +591,7 @@ public:
      *
      *  @return true if both Point3_ objects have the same x, y and x coordinates, false otherwise.
      */
-    MI_BOOL operator==(const Point3_ &b) const
+    DT_BOOL operator==(const Point3_ &b) const
     {
         return m_x == b.m_x && m_y == b.m_y && m_z == b.m_z;
     }
@@ -603,7 +603,7 @@ public:
      *
      * @return true if Point3_ objects have different x, y or z coordinates, false if they are equal.
      */
-    MI_BOOL operator!=(const Point3_ &b) const
+    DT_BOOL operator!=(const Point3_ &b) const
     {
         return m_x != b.m_x || m_y != b.m_y || m_z != b.m_z;
     }
@@ -663,9 +663,9 @@ public:
      *
      * @return The double precision dot product value between this Point3_ and `pt`.
      */
-    MI_F64 DDot(const Point3_ &pt) const
+    DT_F64 DDot(const Point3_ &pt) const
     {
-        return (MI_F64)m_x * pt.m_x + (MI_F64)m_y * pt.m_y + (MI_F64)m_z * pt.m_z;
+        return (DT_F64)m_x * pt.m_x + (DT_F64)m_y * pt.m_y + (DT_F64)m_z * pt.m_z;
     }
 
     /**
@@ -686,9 +686,9 @@ public:
      *
      * @return The Euclidean norm value (magnitude) of this Point3_ object.
      */
-    MI_F64 Norm() const
+    DT_F64 Norm() const
     {
-        MI_F64 tmp = m_x * m_x + m_y * m_y + m_z * m_z;
+        DT_F64 tmp = m_x * m_x + m_y * m_y + m_z * m_z;
         return Sqrt(tmp);
     }
 
@@ -769,9 +769,9 @@ AURA_INLINE Point3_<Tp0> operator/(Tp1 b, const Point3_<Tp0> &a)
                         SaturateCast<Tp0>(b / a.m_z));
 }
 
-typedef Point3_<MI_S32> Point3i;
-typedef Point3_<MI_F32> Point3f;
-typedef Point3_<MI_F64> Point3d;
+typedef Point3_<DT_S32> Point3i;
+typedef Point3_<DT_F32> Point3f;
+typedef Point3_<DT_F64> Point3d;
 typedef Point3f Point3;
 
 /**

@@ -5,9 +5,9 @@
 namespace aura
 {
 
-// using St = MI_U8
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vu8_src_p1_x0, const HVX_Vector &vu8_src_p1_x1, const HVX_Vector &vu8_src_p1_x2,
+// using St = DT_U8
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian5x5Core(const HVX_Vector &vu8_src_p1_x0, const HVX_Vector &vu8_src_p1_x1, const HVX_Vector &vu8_src_p1_x2,
                                             const HVX_Vector &vu8_src_p0_x0, const HVX_Vector &vu8_src_p0_x1, const HVX_Vector &vu8_src_p0_x2,
                                             const HVX_Vector &vu8_src_c_x0,  const HVX_Vector &vu8_src_c_x1,  const HVX_Vector &vu8_src_c_x2,
                                             const HVX_Vector &vu8_src_n0_x0, const HVX_Vector &vu8_src_n0_x1, const HVX_Vector &vu8_src_n0_x2,
@@ -88,9 +88,9 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vu8_src_p1_x0, c
     vs16_dst_hi    = Q6_V_hi_W(ws16_sum);
 }
 
-// using St = MI_U16
-template <typename St, typename std::enable_if<std::is_same<St, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vu16_src_p1_x0, const HVX_Vector &vu16_src_p1_x1, const HVX_Vector &vu16_src_p1_x2,
+// using St = DT_U16
+template <typename St, typename std::enable_if<std::is_same<St, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian5x5Core(const HVX_Vector &vu16_src_p1_x0, const HVX_Vector &vu16_src_p1_x1, const HVX_Vector &vu16_src_p1_x2,
                                             const HVX_Vector &vu16_src_p0_x0, const HVX_Vector &vu16_src_p0_x1, const HVX_Vector &vu16_src_p0_x2,
                                             const HVX_Vector &vu16_src_c_x0,  const HVX_Vector &vu16_src_c_x1,  const HVX_Vector &vu16_src_c_x2,
                                             const HVX_Vector &vu16_src_n0_x0, const HVX_Vector &vu16_src_n0_x1, const HVX_Vector &vu16_src_n0_x2,
@@ -170,9 +170,9 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vu16_src_p1_x0, 
     vu16_dst       = Q6_Vuh_vpack_VwVw_sat(Q6_V_hi_W(ws32_sum), Q6_V_lo_W(ws32_sum));
 }
 
-// using St = MI_S16
-template <typename St, typename std::enable_if<std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vs16_src_p1_x0, const HVX_Vector &vs16_src_p1_x1, const HVX_Vector &vs16_src_p1_x2,
+// using St = DT_S16
+template <typename St, typename std::enable_if<std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian5x5Core(const HVX_Vector &vs16_src_p1_x0, const HVX_Vector &vs16_src_p1_x1, const HVX_Vector &vs16_src_p1_x2,
                                             const HVX_Vector &vs16_src_p0_x0, const HVX_Vector &vs16_src_p0_x1, const HVX_Vector &vs16_src_p0_x2,
                                             const HVX_Vector &vs16_src_c_x0,  const HVX_Vector &vs16_src_c_x1,  const HVX_Vector &vs16_src_c_x2,
                                             const HVX_Vector &vs16_src_n0_x0, const HVX_Vector &vs16_src_n0_x1, const HVX_Vector &vs16_src_n0_x2,
@@ -253,15 +253,15 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vs16_src_p1_x0, 
     vs16_dst       = Q6_Vh_vpack_VwVw_sat(Q6_V_hi_W(ws32_sum), Q6_V_lo_W(ws32_sum));
 }
 
-// using St = MI_U8
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vu8_src_p1_x0, const HVX_Vector &vu8_src_p1_x1, const HVX_Vector &vu8_src_p1_x2, const HVX_Vector &vu8_border_p1,
+// using St = DT_U8
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian5x5Core(const HVX_Vector &vu8_src_p1_x0, const HVX_Vector &vu8_src_p1_x1, const HVX_Vector &vu8_src_p1_x2, const HVX_Vector &vu8_border_p1,
                                             const HVX_Vector &vu8_src_p0_x0, const HVX_Vector &vu8_src_p0_x1, const HVX_Vector &vu8_src_p0_x2, const HVX_Vector &vu8_border_p0,
                                             const HVX_Vector &vu8_src_c_x0,  const HVX_Vector &vu8_src_c_x1,  const HVX_Vector &vu8_src_c_x2,  const HVX_Vector &vu8_border_c,
                                             const HVX_Vector &vu8_src_n0_x0, const HVX_Vector &vu8_src_n0_x1, const HVX_Vector &vu8_src_n0_x2, const HVX_Vector &vu8_border_n0,
                                             const HVX_Vector &vu8_src_n1_x0, const HVX_Vector &vu8_src_n1_x1, const HVX_Vector &vu8_src_n1_x2, const HVX_Vector &vu8_border_n1,
                                             HVX_Vector &vs16_dst_x0_l, HVX_Vector &vs16_dst_x0_h, HVX_Vector &vs16_dst_x1_lo, HVX_Vector &vs16_dst_x1_hi,
-                                            MI_S32 align_size)
+                                            DT_S32 align_size)
 {
     HVX_Vector vu8_src_p1_r = Q6_V_vlalign_VVR(vu8_border_p1, vu8_src_p1_x2, align_size);
     HVX_Vector vu8_src_p0_r = Q6_V_vlalign_VVR(vu8_border_p0, vu8_src_p0_x2, align_size);
@@ -288,15 +288,15 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vu8_src_p1_x0, c
                          vs16_dst_x1_lo, vs16_dst_x1_hi);
 }
 
-// using St = MI_U16 / MI_S16
-template <typename St, typename std::enable_if<std::is_same<St, MI_U16>::value || std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vd16_p1_x0, const HVX_Vector &vd16_p1_x1, const HVX_Vector &vd16_p1_x2, const HVX_Vector &vd16_border_p1,
+// using St = DT_U16 / DT_S16
+template <typename St, typename std::enable_if<std::is_same<St, DT_U16>::value || std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Laplacian5x5Core(const HVX_Vector &vd16_p1_x0, const HVX_Vector &vd16_p1_x1, const HVX_Vector &vd16_p1_x2, const HVX_Vector &vd16_border_p1,
                                             const HVX_Vector &vd16_p0_x0, const HVX_Vector &vd16_p0_x1, const HVX_Vector &vd16_p0_x2, const HVX_Vector &vd16_border_p0,
                                             const HVX_Vector &vd16_c_x0,  const HVX_Vector &vd16_c_x1,  const HVX_Vector &vd16_c_x2,  const HVX_Vector &vd16_border_c,
                                             const HVX_Vector &vd16_n0_x0, const HVX_Vector &vd16_n0_x1, const HVX_Vector &vd16_n0_x2, const HVX_Vector &vd16_border_n0,
                                             const HVX_Vector &vd16_n1_x0, const HVX_Vector &vd16_n1_x1, const HVX_Vector &vd16_n1_x2, const HVX_Vector &vd16_border_n1,
                                             HVX_Vector &vd16_dst_x0, HVX_Vector &vd16_dst_x1,
-                                            MI_S32 align_size)
+                                            DT_S32 align_size)
 {
     HVX_Vector vd16_src_p1_r = Q6_V_vlalign_VVR(vd16_border_p1, vd16_p1_x2, align_size);
     HVX_Vector vd16_src_p0_r = Q6_V_vlalign_VVR(vd16_border_p0, vd16_p0_x2, align_size);
@@ -323,15 +323,15 @@ AURA_ALWAYS_INLINE AURA_VOID Laplacian5x5Core(const HVX_Vector &vd16_p1_x0, cons
                          vd16_dst_x1);
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *src_c, const St *src_n0, const St *src_n1,
-                               Dt *dst_c, const std::vector<St> &border_value, MI_S32 width)
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+static DT_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *src_c, const St *src_n0, const St *src_n1,
+                               Dt *dst_c, const std::vector<St> &border_value, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(St);
-    MI_S32 back_offset = width - ELEM_COUNTS;
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(St);
+    DT_S32 back_offset = width - ELEM_COUNTS;
 
     MVType mvu8_src_p1[3], mvu8_src_p0[3], mvu8_src_c[3], mvu8_src_n0[3], mvu8_src_n1[3];
     MVType mvs16_dst_lo, mvs16_dst_hi;
@@ -345,7 +345,7 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
         vload(src_n1, mvu8_src_n1[1]);
 
         #pragma unroll
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvu8_src_p1[0].val[ch] = GetBorderVector<St, BORDER_TYPE, BorderArea::LEFT>(mvu8_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
             mvu8_src_p0[0].val[ch] = GetBorderVector<St, BORDER_TYPE, BorderArea::LEFT>(mvu8_src_p0[1].val[ch], src_p0[ch], border_value[ch]);
@@ -357,7 +357,7 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
 
     // main(0 ~ n-2)
     {
-        for (MI_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
+        for (DT_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
         {
             vload(src_p1 + C * x, mvu8_src_p1[2]);
             vload(src_p0 + C * x, mvu8_src_p0[2]);
@@ -366,7 +366,7 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
             vload(src_n1 + C * x, mvu8_src_n1[2]);
 
             #pragma unroll
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Laplacian5x5Core<St>(mvu8_src_p1[0].val[ch], mvu8_src_p1[1].val[ch], mvu8_src_p1[2].val[ch],
                                      mvu8_src_p0[0].val[ch], mvu8_src_p0[1].val[ch], mvu8_src_p0[2].val[ch],
@@ -395,8 +395,8 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
 
     // remain
     {
-        MI_S32 last = (width - 1) * C;
-        MI_S32 rest = width % ELEM_COUNTS;
+        DT_S32 last = (width - 1) * C;
+        DT_S32 rest = width % ELEM_COUNTS;
         MVType mvs16_last_lo, mvs16_last_hi;
 
         vload(src_p1 + C * back_offset, mvu8_src_p1[2]);
@@ -406,7 +406,7 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
         vload(src_n1 + C * back_offset, mvu8_src_n1[2]);
 
         #pragma unroll
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector vu8_border_p1 = GetBorderVector<St, BORDER_TYPE, BorderArea::RIGHT>(mvu8_src_p1[2].val[ch], src_p1[last + ch], border_value[ch]);
             HVX_Vector vu8_border_p0 = GetBorderVector<St, BORDER_TYPE, BorderArea::RIGHT>(mvu8_src_p0[2].val[ch], src_p0[last + ch], border_value[ch]);
@@ -430,15 +430,15 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
     }
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<std::is_same<St, MI_U16>::value || std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *src_c, const St *src_n0, const St *src_n1,
-                               Dt *dst_c, const std::vector<St> &border_value, MI_S32 width)
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<std::is_same<St, DT_U16>::value || std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+static DT_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *src_c, const St *src_n0, const St *src_n1,
+                               Dt *dst_c, const std::vector<St> &border_value, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(St);
-    MI_S32 back_offset = width - ELEM_COUNTS;
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(St);
+    DT_S32 back_offset = width - ELEM_COUNTS;
 
     MVType mvd16_src_p1[3], mvd16_src_p0[3], mvd16_src_c[3], mvd16_src_n0[3], mvd16_src_n1[3];
     MVType mvd16_dst;
@@ -452,7 +452,7 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
         vload(src_n1, mvd16_src_n1[1]);
 
         #pragma unroll
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvd16_src_p1[0].val[ch] = GetBorderVector<St, BORDER_TYPE, BorderArea::LEFT>(mvd16_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
             mvd16_src_p0[0].val[ch] = GetBorderVector<St, BORDER_TYPE, BorderArea::LEFT>(mvd16_src_p0[1].val[ch], src_p0[ch], border_value[ch]);
@@ -464,7 +464,7 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
 
     // main(0 ~ n-2)
     {
-        for (MI_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
+        for (DT_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
         {
             vload(src_p1 + C * x, mvd16_src_p1[2]);
             vload(src_p0 + C * x, mvd16_src_p0[2]);
@@ -473,7 +473,7 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
             vload(src_n1 + C * x, mvd16_src_n1[2]);
 
             #pragma unroll
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Laplacian5x5Core<St>(mvd16_src_p1[0].val[ch], mvd16_src_p1[1].val[ch], mvd16_src_p1[2].val[ch],
                                      mvd16_src_p0[0].val[ch], mvd16_src_p0[1].val[ch], mvd16_src_p0[2].val[ch],
@@ -501,8 +501,8 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
 
     // remain
     {
-        MI_S32 last = (width - 1) * C;
-        MI_S32 rest = width % ELEM_COUNTS;
+        DT_S32 last = (width - 1) * C;
+        DT_S32 rest = width % ELEM_COUNTS;
         MVType mvd16_last;
 
         vload(src_p1 + C * back_offset, mvd16_src_p1[2]);
@@ -512,7 +512,7 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
         vload(src_n1 + C * back_offset, mvd16_src_n1[2]);
 
         #pragma unroll
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector vd16_border_p1 = GetBorderVector<St, BORDER_TYPE, BorderArea::RIGHT>(mvd16_src_p1[2].val[ch], src_p1[last + ch], border_value[ch]);
             HVX_Vector vd16_border_p0 = GetBorderVector<St, BORDER_TYPE, BorderArea::RIGHT>(mvd16_src_p0[2].val[ch], src_p0[last + ch], border_value[ch]);
@@ -534,13 +534,13 @@ static AURA_VOID Laplacian5x5Row(const St *src_p1, const St *src_p0, const St *s
     }
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C>
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C>
 static Status Laplacian5x5HvxImpl(const Mat &src, Mat &dst, const std::vector<St> &border_value,
-                                  const St *border_buffer, MI_S32 start_row, MI_S32 end_row)
+                                  const St *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width   = src.GetSizes().m_width;
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 width   = src.GetSizes().m_width;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
 
     const St *src_p1 = src.Ptr<St, BORDER_TYPE>(start_row - 2, border_buffer);
     const St *src_p0 = src.Ptr<St, BORDER_TYPE>(start_row - 1, border_buffer);
@@ -548,12 +548,12 @@ static Status Laplacian5x5HvxImpl(const Mat &src, Mat &dst, const std::vector<St
     const St *src_n0 = src.Ptr<St, BORDER_TYPE>(start_row + 1, border_buffer);
     const St *src_n1 = src.Ptr<St, BORDER_TYPE>(start_row + 2, border_buffer);
 
-    MI_U64 L2fetch_row_param = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 L2fetch_row_param = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 3 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<St>(y + 3)), L2fetch_row_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<St>(y + 3)), L2fetch_row_param);
         }
 
         Dt *dst_c = dst.Ptr<Dt>(y);
@@ -575,34 +575,34 @@ static Status Laplacian5x5HvxHelper(Context *ctx, const Mat &src, Mat &dst, cons
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
         case 1:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Laplacian5x5HvxImpl<St, Dt, BORDER_TYPE, 1>,
+            ret = wp->ParallelFor((DT_S32)0, height, Laplacian5x5HvxImpl<St, Dt, BORDER_TYPE, 1>,
                                   std::cref(src), std::ref(dst), std::cref(border_value), border_buffer);
             break;
         }
 
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Laplacian5x5HvxImpl<St, Dt, BORDER_TYPE, 2>,
+            ret = wp->ParallelFor((DT_S32)0, height, Laplacian5x5HvxImpl<St, Dt, BORDER_TYPE, 2>,
                                   std::cref(src), std::ref(dst), std::cref(border_value), border_buffer);
             break;
         }
 
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Laplacian5x5HvxImpl<St, Dt, BORDER_TYPE, 3>,
+            ret = wp->ParallelFor((DT_S32)0, height, Laplacian5x5HvxImpl<St, Dt, BORDER_TYPE, 3>,
                                   std::cref(src), std::ref(dst), std::cref(border_value), border_buffer);
             break;
         }
@@ -622,18 +622,18 @@ static Status Laplacian5x5HvxHelper(Context *ctx, const Mat &src, Mat &dst, Bord
 {
     Status ret = Status::ERROR;
 
-    St *border_buffer = MI_NULL;
+    St *border_buffer = DT_NULL;
     std::vector<St> vec_border_value = border_value.ToVector<St>();
 
-    MI_S32 width   = src.GetSizes().m_width;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 width   = src.GetSizes().m_width;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (border_type)
     {
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -671,25 +671,25 @@ Status Laplacian5x5Hvx(Context *ctx, const Mat &src, Mat &dst, BorderType border
 {
     Status ret = Status::ERROR;
 
-    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
 
     switch (pattern)
     {
         case AURA_MAKE_PATTERN(ElemType::U8, ElemType::S16):
         {
-            ret = Laplacian5x5HvxHelper<MI_U8, MI_S16>(ctx, src, dst, border_type, border_value);
+            ret = Laplacian5x5HvxHelper<DT_U8, DT_S16>(ctx, src, dst, border_type, border_value);
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::U16, ElemType::U16):
         {
-            ret = Laplacian5x5HvxHelper<MI_U16, MI_U16>(ctx, src, dst, border_type, border_value);
+            ret = Laplacian5x5HvxHelper<DT_U16, DT_U16>(ctx, src, dst, border_type, border_value);
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::S16, ElemType::S16):
         {
-            ret = Laplacian5x5HvxHelper<MI_S16, MI_S16>(ctx, src, dst, border_type, border_value);
+            ret = Laplacian5x5HvxHelper<DT_S16, DT_S16>(ctx, src, dst, border_type, border_value);
             break;
         }
 

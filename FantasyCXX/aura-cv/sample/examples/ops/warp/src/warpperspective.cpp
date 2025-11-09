@@ -27,14 +27,14 @@ aura::Status WarpPerspectiveSampleTest(aura::Context *ctx, aura::TargetType type
     }
 
     // set matrix mat value
-    MI_F64 *data = reinterpret_cast<MI_F64*>(matrix.GetData());
-    MI_S32 n = matrix.GetTotalBytes() / sizeof(MI_F64);
-    for (MI_S32 i = 0; i < n; i++)
+    DT_F64 *data = reinterpret_cast<DT_F64*>(matrix.GetData());
+    DT_S32 n = matrix.GetTotalBytes() / sizeof(DT_F64);
+    for (DT_S32 i = 0; i < n; i++)
     {
         data[i] = 0.3;
     }
 
-    matrix.At<MI_F64>(2, 2, 0) = 1.0;
+    matrix.At<DT_F64>(2, 2, 0) = 1.0;
 
     // ---------------------
     //     run interface

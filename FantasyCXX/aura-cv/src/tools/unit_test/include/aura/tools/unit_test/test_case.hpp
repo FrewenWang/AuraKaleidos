@@ -236,7 +236,7 @@ public:
      * @param status The status of the test result.
      * @param result The detailed result information (default is an empty result).
      */
-    AURA_VOID AddTestResult(const TestStatus &status, const TestResult &result = TestResult())
+    DT_VOID AddTestResult(const TestStatus &status, const TestResult &result = TestResult())
     {
         if (TestStatus::UNTESTED == status)
         {
@@ -272,12 +272,12 @@ public:
      *
      * This function should be implemented by derived classes to define the actual test logic.
      */
-    virtual AURA_VOID Run() = 0;
+    virtual DT_VOID Run() = 0;
 
     /**
      * @brief Clear all test results associated with the test case.
      */
-    AURA_VOID Clear()
+    DT_VOID Clear()
     {
         this->m_results.clear();
     }
@@ -297,7 +297,7 @@ public:
      *
      * @param status The status to set for the test case.
      */
-    AURA_VOID SetStatus(const TestStatus &status)
+    DT_VOID SetStatus(const TestStatus &status)
     {
         this->m_status = status;
     }
@@ -367,7 +367,7 @@ public:
      *
      * @param module The module name.
      */
-    AURA_VOID SetModule(const std::string &module)
+    DT_VOID SetModule(const std::string &module)
     {
         this->m_module = module;
     }
@@ -377,7 +377,7 @@ public:
      *
      * @param interface The interface name.
      */
-    AURA_VOID SetInterface(const std::string &interface)
+    DT_VOID SetInterface(const std::string &interface)
     {
         this->m_interface = interface;
     }
@@ -387,7 +387,7 @@ public:
      *
      * @param impl The implementation name.
      */
-    AURA_VOID SetImpl(const std::string &impl)
+    DT_VOID SetImpl(const std::string &impl)
     {
         this->m_impl = impl;
     }
@@ -401,7 +401,7 @@ public:
      * @param interface The interface name.
      * @param impl The implementation name.
      */
-    AURA_VOID SetName(const std::string &module, const std::string &interface, const std::string &impl)
+    DT_VOID SetName(const std::string &module, const std::string &interface, const std::string &impl)
     {
         if (std::string("Undef") == interface && std::string("Undef") == impl)
         {

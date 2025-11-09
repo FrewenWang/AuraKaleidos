@@ -4,13 +4,13 @@
 namespace aura
 {
 
-NBModel::NBModel(Context *ctx, const std::string &minb_file) : m_ctx(ctx), m_minb_file(minb_file), m_minb_file_offset(0), m_minb_version(0), m_is_valid(MI_FALSE), m_minn_num(0)
+NBModel::NBModel(Context *ctx, const std::string &minb_file) : m_ctx(ctx), m_minb_file(minb_file), m_minb_file_offset(0), m_minb_version(0), m_is_valid(DT_FALSE), m_minn_num(0)
 {
-    FILE *fp = MI_NULL;
+    FILE *fp = DT_NULL;
 
     do
     {
-        if (MI_NULL == m_ctx)
+        if (DT_NULL == m_ctx)
         {
             break;
         }
@@ -19,7 +19,7 @@ NBModel::NBModel(Context *ctx, const std::string &minb_file) : m_ctx(ctx), m_min
         size_t header_bytes = 0;
 
         fp = fopen(m_minb_file.c_str(), "rb");
-        if (MI_NULL == fp)
+        if (DT_NULL == fp)
         {
             std::string info = "open model container: " + m_minb_file + " failed";
             AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -46,8 +46,8 @@ NBModel::NBModel(Context *ctx, const std::string &minb_file) : m_ctx(ctx), m_min
         if (0x010000 == m_minb_version)
         {
             size_t packinfo_bytes                  = 0;
-            MI_BOOL minn_infos_valid               = MI_TRUE;
-            MI_S64 minn_packinfo_offset            = 0;
+            DT_BOOL minn_infos_valid               = DT_TRUE;
+            DT_S64 minn_packinfo_offset            = 0;
             std::string minb_packinfo_deccrypt_key = "MiNB";
 
             m_minb_buffer = m_ctx->GetMemPool()->GetBuffer(AURA_ALLOC_PARAM(m_ctx, AURA_MEM_HEAP, minb_header.packinfo_len, 0));
@@ -58,8 +58,8 @@ NBModel::NBModel(Context *ctx, const std::string &minb_file) : m_ctx(ctx), m_min
                 break;
             }
 
-            packinfo_bytes = fread(static_cast<MI_U8*>(m_minb_buffer.m_data), 1, minb_header.packinfo_len, fp);
-            if (static_cast<MI_U32>(packinfo_bytes) != minb_header.packinfo_len)
+            packinfo_bytes = fread(static_cast<DT_U8*>(m_minb_buffer.m_data), 1, minb_header.packinfo_len, fp);
+            if (static_cast<DT_U32>(packinfo_bytes) != minb_header.packinfo_len)
             {
                 std::string info = "file fread size(" + std::to_string(packinfo_bytes) + "," + std::to_string(minb_header.packinfo_len) + ") not match";
                 AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -103,13 +103,13 @@ NBModel::NBModel(Context *ctx, const std::string &minb_file) : m_ctx(ctx), m_min
             }
 
             m_minn_infos.resize(m_minn_num);
-            for (MI_S32 idx = 0; idx < m_minn_num; idx++)
+            for (DT_S32 idx = 0; idx < m_minn_num; idx++)
             {
                 if (NNDeserialize(m_ctx, m_minb_buffer, minn_packinfo_offset, m_minn_infos[idx].minn_model_name) != Status::OK)
                 {
                     std::string info = "NNDeserialize get minn_model_name(" + std::to_string(idx) + " / " + std::to_string(m_minn_num) + ") failed";
                     AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
-                    minn_infos_valid = MI_FALSE;
+                    minn_infos_valid = DT_FALSE;
                     break;
                 }
 
@@ -117,7 +117,7 @@ NBModel::NBModel(Context *ctx, const std::string &minb_file) : m_ctx(ctx), m_min
                 {
                     std::string info = "NNDeserialize get minn_model_size(" + std::to_string(idx) + " / " + std::to_string(m_minn_num) + ") failed";
                     AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
-                    minn_infos_valid = MI_FALSE;
+                    minn_infos_valid = DT_FALSE;
                     break;
                 }
             }
@@ -136,10 +136,10 @@ NBModel::NBModel(Context *ctx, const std::string &minb_file) : m_ctx(ctx), m_min
             break;
         }
 
-        m_is_valid = MI_TRUE;
+        m_is_valid = DT_TRUE;
     } while (0);
 
-    if (fp != MI_NULL)
+    if (fp != DT_NULL)
     {
         fclose(fp);
     }
@@ -148,10 +148,10 @@ NBModel::NBModel(Context *ctx, const std::string &minb_file) : m_ctx(ctx), m_min
 NBModel::~NBModel()
 {
     Release();
-    m_is_valid = MI_FALSE;
+    m_is_valid = DT_FALSE;
 }
 
-AURA_VOID NBModel::Release()
+DT_VOID NBModel::Release()
 {
     if (m_minb_buffer.IsValid())
     {
@@ -160,7 +160,7 @@ AURA_VOID NBModel::Release()
     }
 }
 
-MI_U32 NBModel::GetMinbVersion() const
+DT_U32 NBModel::GetMinbVersion() const
 {
     return m_minb_version;
 }
@@ -194,7 +194,7 @@ std::string NBModel::GetVersion() const
 std::vector<std::string> NBModel::GetMinnModelNames() const
 {
     std::vector<std::string> minn_model_names;
-    for (MI_S32 idx = 0; idx < m_minn_num; idx++)
+    for (DT_S32 idx = 0; idx < m_minn_num; idx++)
     {
         minn_model_names.push_back(m_minn_infos[idx].minn_model_name);
     }
@@ -209,10 +209,10 @@ Buffer NBModel::GetModelBuffer(const std::string minn_model_name)
         return Buffer();
     }
 
-    MI_S64 minb_model_offset   = m_minb_file_offset;
-    MI_U64 dst_minn_model_size = 0;
+    DT_S64 minb_model_offset   = m_minb_file_offset;
+    DT_U64 dst_minn_model_size = 0;
 
-    for (MI_S32 idx = 0; idx < m_minn_num; idx++)
+    for (DT_S32 idx = 0; idx < m_minn_num; idx++)
     {
         if (m_minn_infos[idx].minn_model_name == minn_model_name)
         {
@@ -271,8 +271,8 @@ std::string NBModel::GetMinnModelInfo(const std::string minn_model_name, const s
     std::string backend_str;
     std::string framework_str;
     std::string minn_model_info;
-    MI_S64 data_offset  = 0;
-    MI_U32 minn_version = 0;
+    DT_S64 data_offset  = 0;
+    DT_U32 minn_version = 0;
 
     minn_buffer = this->GetModelBuffer(minn_model_name);
     if (!minn_buffer.IsValid())
@@ -390,7 +390,7 @@ EXIT:
     return minn_model_info;
 }
 
-MI_BOOL NBModel::IsValid() const
+DT_BOOL NBModel::IsValid() const
 {
     return m_is_valid;
 }

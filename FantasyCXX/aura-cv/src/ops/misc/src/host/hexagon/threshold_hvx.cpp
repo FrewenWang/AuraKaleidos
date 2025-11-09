@@ -7,7 +7,7 @@ namespace aura
 ThresholdHvx::ThresholdHvx(Context *ctx, const OpTarget &target) : ThresholdImpl(ctx, target)
 {}
 
-Status ThresholdHvx::SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type)
+Status ThresholdHvx::SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type)
 {
     if (ThresholdImpl::SetArgs(src, dst, thresh, max_val, type) != Status::OK)
     {
@@ -36,7 +36,7 @@ Status ThresholdHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -46,7 +46,7 @@ Status ThresholdHvx::Run()
 
     if ((1 == src->GetSizes().m_channel) && (ElemType::U8 == src->GetElemType()))
     {
-        MI_S32 thresh = Floor(m_thresh);
+        DT_S32 thresh = Floor(m_thresh);
         ret = ReCalcThresh(thresh);
         if (ret != Status::OK)
         {
@@ -54,7 +54,7 @@ Status ThresholdHvx::Run()
             return ret;
         }
 
-        m_thresh = static_cast<MI_F32>(thresh);
+        m_thresh = static_cast<DT_F32>(thresh);
     }
 
     HexagonRpcParam rpc_param(m_ctx);
@@ -70,7 +70,7 @@ Status ThresholdHvx::Run()
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
     ret = engine->Run(AURA_OPS_MISC_PACKAGE_NAME, AURA_OPS_MISC_THRESHOLD_OP_NAME, rpc_param, &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }

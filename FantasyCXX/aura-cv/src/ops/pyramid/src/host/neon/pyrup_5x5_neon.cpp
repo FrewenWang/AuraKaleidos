@@ -5,12 +5,12 @@
 namespace aura
 {
 
-AURA_ALWAYS_INLINE AURA_VOID PyrUp5x5VCore(uint8x8_t &vdu8_src_p, uint8x8_t &vdu8_src_c, uint8x8_t &vdu8_src_n,
+AURA_ALWAYS_INLINE DT_VOID PyrUp5x5VCore(uint8x8_t &vdu8_src_p, uint8x8_t &vdu8_src_c, uint8x8_t &vdu8_src_n,
                                          uint32x4_t &vqu32_esum_lo, uint32x4_t &vqu32_esum_hi,
                                          uint32x4_t &vqu32_osum_lo, uint32x4_t &vqu32_osum_hi,
-                                         const MI_U16 *kernel)
+                                         const DT_U16 *kernel)
 {
-    MI_U16 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
+    DT_U16 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
 
     uint16x8_t vqu16_src_c  = neon::vmovl(vdu8_src_c);
     uint16x8_t vqu16_sum0   = neon::vaddl(vdu8_src_p, vdu8_src_n);
@@ -23,19 +23,19 @@ AURA_ALWAYS_INLINE AURA_VOID PyrUp5x5VCore(uint8x8_t &vdu8_src_p, uint8x8_t &vdu
     vqu32_osum_hi           = neon::vmull(neon::vgethigh(vqu16_sum1), k1);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID PyrUp5x5HCore(uint32x4_t &vqu32_sum_cx0_hi,  uint32x4_t &vqu32_sum_n0x0_hi,
+AURA_ALWAYS_INLINE DT_VOID PyrUp5x5HCore(uint32x4_t &vqu32_sum_cx0_hi,  uint32x4_t &vqu32_sum_n0x0_hi,
                                          uint32x4_t &vqu32_sum_cx1_lo,  uint32x4_t &vqu32_sum_cx1_hi,
                                          uint32x4_t &vqu32_sum_n0x1_lo, uint32x4_t &vqu32_sum_n0x1_hi,
                                          uint32x4_t &vqu32_sum_cx2_lo,  uint32x4_t &vqu32_sum_cx2_hi,
                                          uint32x4_t &vqu32_sum_n0x2_lo, uint32x4_t &vqu32_sum_n0x2_hi,
                                          uint8x8x2_t &v2du8_dst_c0,     uint8x8x2_t &v2du8_dst_c1,
-                                         const MI_U16 *kernel)
+                                         const DT_U16 *kernel)
 {
-    MI_U16 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
+    DT_U16 k0 = kernel[0], k1 = kernel[1], k2 = kernel[2];
 
-    const MI_U32 u32_k0 = static_cast<MI_U32>(k0);
-    const MI_U32 u32_k1 = static_cast<MI_U32>(k1);
-    const MI_U32 u32_k2 = static_cast<MI_U32>(k2);
+    const DT_U32 u32_k0 = static_cast<DT_U32>(k0);
+    const DT_U32 u32_k1 = static_cast<DT_U32>(k1);
+    const DT_U32 u32_k2 = static_cast<DT_U32>(k2);
 
     // current line
     uint32x4_t vqu32_sum_cl0, vqu32_sum_cl1, vqu32_sum_cr0, vqu32_sum_cr1;
@@ -93,7 +93,7 @@ AURA_ALWAYS_INLINE AURA_VOID PyrUp5x5HCore(uint32x4_t &vqu32_sum_cx0_hi,  uint32
 }
 
 template <typename d16x8_t, typename d32x4_t, typename Kt, typename D16 = typename neon::Scalar<d16x8_t>::SType>
-AURA_ALWAYS_INLINE AURA_VOID PyrUp5x5VCore(d16x8_t &vd16_p_src,   d16x8_t &vd16_src_c, d16x8_t &vd16_src_n,
+AURA_ALWAYS_INLINE DT_VOID PyrUp5x5VCore(d16x8_t &vd16_p_src,   d16x8_t &vd16_src_c, d16x8_t &vd16_src_n,
                                          d32x4_t &vq32_esum_lo, d32x4_t &vq32_esum_hi, d32x4_t &vq32_osum_lo,
                                          d32x4_t &vq32_osum_hi, const Kt *kernel)
 {
@@ -115,7 +115,7 @@ AURA_ALWAYS_INLINE AURA_VOID PyrUp5x5VCore(d16x8_t &vd16_p_src,   d16x8_t &vd16_
 
 template <typename d32x4_t, typename d16x8x2_t, typename Kt,
           typename d64x2_t = typename neon::QVector<typename Promote<Kt>::Type>::VType>
-AURA_ALWAYS_INLINE AURA_VOID PyrUp5x5HCore(d32x4_t &vq32_sum_cx0_hi, d32x4_t &vq32_sum_nx0_hi,
+AURA_ALWAYS_INLINE DT_VOID PyrUp5x5HCore(d32x4_t &vq32_sum_cx0_hi, d32x4_t &vq32_sum_nx0_hi,
                                          d32x4_t &vq32_sum_cx1_lo, d32x4_t &vq32_sum_cx1_hi,
                                          d32x4_t &vq32_sum_nx1_lo, d32x4_t &vq32_sum_nx1_hi,
                                          d32x4_t &vq32_sum_cx2_lo, d32x4_t &vq32_sum_cx2_hi,
@@ -212,20 +212,20 @@ AURA_ALWAYS_INLINE AURA_VOID PyrUp5x5HCore(d32x4_t &vq32_sum_cx0_hi, d32x4_t &vq
 }
 
 template <typename Tp, BorderType BORDER_TYPE, typename Kt>
-static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_n, Tp *dst_c0, Tp *dst_c1, MI_S32 width, const Kt *kernel)
+static DT_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_n, Tp *dst_c0, Tp *dst_c1, DT_S32 width, const Kt *kernel)
 {
-    using VSt       = typename std::conditional<std::is_same<Tp, MI_U8>::value, typename neon::DVector<Tp>::VType,
+    using VSt       = typename std::conditional<std::is_same<Tp, DT_U8>::value, typename neon::DVector<Tp>::VType,
                                                 typename neon::QVector<Tp>::VType>::type; // 8x8 or 16x8
-    using VDt       = typename std::conditional<std::is_same<Tp, MI_U8>::value, typename neon::MDVector<Tp, 2>::MVType,
+    using VDt       = typename std::conditional<std::is_same<Tp, DT_U8>::value, typename neon::MDVector<Tp, 2>::MVType,
                                                 typename neon::MQVector<Tp, 2>::MVType>::type;
-    using VqSumType = typename std::conditional<std::is_same<Tp, MI_U8>::value, typename neon::QVector<MI_U32>::VType,
+    using VqSumType = typename std::conditional<std::is_same<Tp, DT_U8>::value, typename neon::QVector<DT_U32>::VType,
                                                 typename neon::QVector<typename Promote<Tp>::Type>::VType>::type; // 32x4_t
 
 
-    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(sizeof(VSt) / sizeof(Tp)); // src
-    constexpr MI_S32 VOFFSET     = ELEM_COUNTS;
+    constexpr DT_S32 ELEM_COUNTS = static_cast<DT_S32>(sizeof(VSt) / sizeof(Tp)); // src
+    constexpr DT_S32 VOFFSET     = ELEM_COUNTS;
 
-    const MI_S32 width_align = width & -ELEM_COUNTS; // src_width
+    const DT_S32 width_align = width & -ELEM_COUNTS; // src_width
     const Tp border_value    = 0;
 
     VSt v_src_p[3], v_src_c[3], v_src_n[3];
@@ -257,9 +257,9 @@ static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_
     }
 
     // middle
-    for (MI_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
+    for (DT_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
     {
-        MI_S32 dx = x << 1;
+        DT_S32 dx = x << 1;
         neon::vload(src_p + x + VOFFSET, v_src_p[2]);
         neon::vload(src_c + x + VOFFSET, v_src_c[2]);
         neon::vload(src_n + x + VOFFSET, v_src_n[2]);
@@ -277,8 +277,8 @@ static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_
     {
         if (width_align != width)
         {
-            MI_S32 x = width - (VOFFSET << 1);
-            MI_S32 dx = x << 1;
+            DT_S32 x = width - (VOFFSET << 1);
+            DT_S32 dx = x << 1;
 
             neon::vload(src_p + x - VOFFSET, v_src_p[0]);
             neon::vload(src_p + x,           v_src_p[1]);
@@ -304,9 +304,9 @@ static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_
 
     // right
     {
-        MI_S32 x    = width - VOFFSET;
-        MI_S32 dx   = x << 1;
-        MI_S32 last = width - 1;
+        DT_S32 x    = width - VOFFSET;
+        DT_S32 dx   = x << 1;
+        DT_S32 last = width - 1;
 
         v_src_p[2] = GetBorderVector<BorderType::REPLICATE, BorderArea::RIGHT>(v_src_p[2], src_p[last], border_value);
         v_src_c[2] = GetBorderVector<BorderType::REPLICATE, BorderArea::RIGHT>(v_src_c[2], src_c[last], border_value);
@@ -324,23 +324,23 @@ static AURA_VOID PyrUp5x5TwoRow(const Tp *src_p, const Tp *src_c, const Tp *src_
 
 template <typename Tp, BorderType BORDER_TYPE>
 static Status PyrUp5x5NeonImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat,
-                               MI_S32 start_row, MI_S32 end_row)
+                               DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using Kt = typename PyrUpTraits<Tp>::KernelType;
 
-    MI_S32 width = src.GetSizes().m_width;
+    DT_S32 width = src.GetSizes().m_width;
 
-    const Tp *src_p = src.Ptr<Tp, BORDER_TYPE>(start_row - 1, MI_NULL);
+    const Tp *src_p = src.Ptr<Tp, BORDER_TYPE>(start_row - 1, DT_NULL);
     const Tp *src_c = src.Ptr<Tp>(start_row);
-    const Tp *src_n = src.Ptr<Tp, BorderType::REPLICATE>(start_row + 1, MI_NULL);
+    const Tp *src_n = src.Ptr<Tp, BorderType::REPLICATE>(start_row + 1, DT_NULL);
 
-    MI_S32 dy = 0;
+    DT_S32 dy = 0;
     const Kt *kernel = kmat.Ptr<Kt>(0);
 
     // cal row
-    for (MI_S32 sy = start_row; sy < end_row; sy++)
+    for (DT_S32 sy = start_row; sy < end_row; sy++)
     {
         dy = sy << 1;
 
@@ -351,7 +351,7 @@ static Status PyrUp5x5NeonImpl(Context *ctx, const Mat &src, Mat &dst, const Mat
 
         src_p = src_c;
         src_c = src_n;
-        src_n = src.Ptr<Tp, BorderType::REPLICATE>(sy + 2, MI_NULL);
+        src_n = src.Ptr<Tp, BorderType::REPLICATE>(sy + 2, DT_NULL);
     }
 
     return Status::OK;
@@ -365,13 +365,13 @@ static Status PyrUp5x5NeonHelper(Context *ctx, const Mat &src, Mat &dst, const M
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 height = src.GetSizes().m_height;
 
     switch (border_type)
     {
@@ -415,30 +415,30 @@ Status PyrUp5x5Neon(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat, Bor
     {
         case ElemType::U8:
         {
-            ret = PyrUp5x5NeonHelper<MI_U8>(ctx, src, dst, kmat, border_type, target);
+            ret = PyrUp5x5NeonHelper<DT_U8>(ctx, src, dst, kmat, border_type, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "PyrUp5x5NeonHelper<MI_U8> failed");
+                AURA_ADD_ERROR_STRING(ctx, "PyrUp5x5NeonHelper<DT_U8> failed");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = PyrUp5x5NeonHelper<MI_U16>(ctx, src, dst, kmat, border_type, target);
+            ret = PyrUp5x5NeonHelper<DT_U16>(ctx, src, dst, kmat, border_type, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "PyrUp5x5NeonHelper<MI_U16> failed");
+                AURA_ADD_ERROR_STRING(ctx, "PyrUp5x5NeonHelper<DT_U16> failed");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = PyrUp5x5NeonHelper<MI_S16>(ctx, src, dst, kmat, border_type, target);
+            ret = PyrUp5x5NeonHelper<DT_S16>(ctx, src, dst, kmat, border_type, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "PyrUp5x5NeonHelper<MI_S16> failed");
+                AURA_ADD_ERROR_STRING(ctx, "PyrUp5x5NeonHelper<DT_S16> failed");
             }
             break;
         }

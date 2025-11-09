@@ -492,14 +492,14 @@ private:
 
     AURA_DISABLE_COPY_AND_ASSIGN(CLLibrary);
 
-    AURA_VOID* LoadSymbols(const std::string &path);
+    DT_VOID* LoadSymbols(const std::string &path);
 
     Status Load();
 
     Status UnLoad();
 
 private:
-    AURA_VOID *m_handle;
+    DT_VOID *m_handle;
 };
 
 /**

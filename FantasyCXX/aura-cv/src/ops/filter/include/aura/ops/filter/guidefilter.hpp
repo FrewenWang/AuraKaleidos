@@ -118,7 +118,7 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent.
      */
-    Status SetArgs(const Array *src0, const Array *src1, Array *dst, MI_S32 ksize, MI_F32 eps,
+    Status SetArgs(const Array *src0, const Array *src1, Array *dst, DT_S32 ksize, DT_F32 eps,
                    GuideFilterType type = GuideFilterType::NORMAL,
                    BorderType border_type = BorderType::REPLICATE,
                    const Scalar &border_value = Scalar());
@@ -153,7 +153,7 @@ public:
  *       2.The above implementations supported all BorderType(CONSTANT/REPLICATE/REFLECT_101).
  */
 AURA_EXPORTS Status IGuideFilter(Context *ctx, const Mat &src0, const Mat &src1,
-                                 Mat &dst, MI_S32 ksize, MI_F32 eps,
+                                 Mat &dst, DT_S32 ksize, DT_F32 eps,
                                  GuideFilterType type = GuideFilterType::NORMAL,
                                  BorderType border_type = BorderType::REPLICATE,
                                  const Scalar &border_value = Scalar(),

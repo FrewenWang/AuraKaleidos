@@ -38,16 +38,16 @@ static std::shared_ptr<TomasiImpl> CreateTomasiImpl(Context *ctx, const OpTarget
 Tomasi::Tomasi(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Tomasi::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 max_num_corners,
-                       MI_F64 quality_level, MI_F64 min_distance, MI_S32 block_size, MI_S32 gradient_size,
-                       MI_BOOL use_harris, MI_F64 harris_k)
+Status Tomasi::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 max_num_corners,
+                       DT_F64 quality_level, DT_F64 min_distance, DT_S32 block_size, DT_S32 gradient_size,
+                       DT_BOOL use_harris, DT_F64 harris_k)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -76,14 +76,14 @@ Status Tomasi::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateTomasiImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     TomasiImpl *tomasi_impl = dynamic_cast<TomasiImpl *>(m_impl.get());
-    if (MI_NULL == tomasi_impl)
+    if (DT_NULL == tomasi_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "gaussian_impl is null ptr");
         return Status::ERROR;
@@ -95,8 +95,8 @@ Status Tomasi::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status GoodFeaturesToTrack(Context *ctx, const Mat &src, std::vector<KeyPoint> &corners, MI_S32 max_corners, MI_F64 quality_level,
-                                         MI_F64 min_distance, MI_S32 block_size, MI_S32 gradient_size, MI_BOOL use_harris, MI_F64 harris_k,
+AURA_EXPORTS Status GoodFeaturesToTrack(Context *ctx, const Mat &src, std::vector<KeyPoint> &corners, DT_S32 max_corners, DT_F64 quality_level,
+                                         DT_F64 min_distance, DT_S32 block_size, DT_S32 gradient_size, DT_BOOL use_harris, DT_F64 harris_k,
                                          const OpTarget &target)
 {
     Tomasi tomasi(ctx, target);
@@ -107,15 +107,15 @@ AURA_EXPORTS Status GoodFeaturesToTrack(Context *ctx, const Mat &src, std::vecto
 TomasiImpl::TomasiImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Tomasi", target),
                                                                m_max_corners(0), m_quality_level(0.0),
                                                                m_min_distance(0.0), m_block_size(0),
-                                                               m_gradient_size(0), m_use_harris(MI_FALSE),
-                                                               m_harris_k(0.0), m_src(MI_NULL)
+                                                               m_gradient_size(0), m_use_harris(DT_FALSE),
+                                                               m_harris_k(0.0), m_src(DT_NULL)
 {}
 
-Status TomasiImpl::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 max_num_corners,
-                           MI_F64 quality_level, MI_F64 min_distance, MI_S32 block_size, MI_S32 gradient_size,
-                           MI_BOOL use_harris, MI_F64 harris_k)
+Status TomasiImpl::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 max_num_corners,
+                           DT_F64 quality_level, DT_F64 min_distance, DT_S32 block_size, DT_S32 gradient_size,
+                           DT_BOOL use_harris, DT_F64 harris_k)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -131,7 +131,7 @@ Status TomasiImpl::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, 
         key_points.clear();
     }
 
-    if(key_points.capacity() < (MI_U32)max_num_corners)
+    if(key_points.capacity() < (DT_U32)max_num_corners)
     {
         key_points.reserve(max_num_corners);
     }
@@ -164,7 +164,7 @@ std::string TomasiImpl::ToString() const
 {
     std::string str;
 
-    MI_CHAR quality_level_str[20], min_distance_str[20], harris_k_str[20];
+    DT_CHAR quality_level_str[20], min_distance_str[20], harris_k_str[20];
     snprintf(quality_level_str, sizeof(quality_level_str), "%.2f", m_quality_level);
     snprintf(min_distance_str, sizeof(min_distance_str), "%.2f", m_min_distance);
     snprintf(harris_k_str, sizeof(harris_k_str), "%.2f", m_harris_k);
@@ -179,7 +179,7 @@ std::string TomasiImpl::ToString() const
     return str;
 }
 
-AURA_VOID TomasiImpl::Dump(const std::string &prefix) const
+DT_VOID TomasiImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

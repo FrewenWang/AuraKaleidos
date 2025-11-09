@@ -18,7 +18,7 @@ public:
 
     Status DeInitialize();
 
-    MI_U32 GetDeviceAddr();
+    DT_U32 GetDeviceAddr();
 
     std::vector<TensorDescMap> GetInputs();
 
@@ -30,7 +30,7 @@ private:
 
 private:
     Context *m_ctx;
-    MI_U32 m_device_addr;
+    DT_U32 m_device_addr;
     std::vector<TensorDescMap> m_input_tensor_desc;
     std::vector<TensorDescMap> m_output_tensor_desc;
     std::string m_version;

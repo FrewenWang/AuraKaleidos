@@ -15,9 +15,9 @@
 namespace aura
 {
 
-AURA_INLINE MI_BOOL GetSnpeUnsignedPd(const NNConfig &config)
+AURA_INLINE DT_BOOL GetSnpeUnsignedPd(const NNConfig &config)
 {
-    MI_BOOL snpe_unsigned_pd = MI_TRUE;
+    DT_BOOL snpe_unsigned_pd = DT_TRUE;
 
     if (config.count("snpe_unsigned_pd"))
     {
@@ -27,7 +27,7 @@ AURA_INLINE MI_BOOL GetSnpeUnsignedPd(const NNConfig &config)
 
         if (value == std::string("false"))
         {
-            snpe_unsigned_pd = MI_FALSE;
+            snpe_unsigned_pd = DT_FALSE;
         }
     }
 
@@ -36,11 +36,11 @@ AURA_INLINE MI_BOOL GetSnpeUnsignedPd(const NNConfig &config)
 
 struct SnpeExecutorConfig
 {
-    SnpeExecutorConfig(const NNConfig &config) : unsigned_pd(MI_TRUE),
+    SnpeExecutorConfig(const NNConfig &config) : unsigned_pd(DT_TRUE),
                                                  perf_level(NNPerfLevel::PERF_HIGH),
                                                  profiling_level(NNProfilingLevel::PROFILING_OFF),
                                                  log_level(NNLogLevel::LOG_ERROR),
-                                                 async_call(MI_TRUE),
+                                                 async_call(DT_TRUE),
                                                  mem_step_size(0),
                                                  profiling_path(std::string())
     {
@@ -54,12 +54,12 @@ struct SnpeExecutorConfig
         unsigned_pd     = GetSnpeUnsignedPd(config);
     }
 
-    MI_BOOL unsigned_pd;
+    DT_BOOL unsigned_pd;
     NNPerfLevel perf_level;
     NNProfilingLevel profiling_level;
     NNLogLevel log_level;
-    MI_BOOL async_call;
-    MI_S32 mem_step_size;
+    DT_BOOL async_call;
+    DT_S32 mem_step_size;
     std::string profiling_path;
     NNBackend backend;
 };
@@ -84,7 +84,7 @@ protected:
 
 using SnpeExecutorImplCreator = SnpeExecutorImpl*(*)(Context*, const std::shared_ptr<SnpeModel>&, const NNConfig&);
 
-template<typename Tp, typename std::enable_if<std::is_base_of<SnpeExecutorImpl, Tp>::value>::type* = MI_NULL>
+template<typename Tp, typename std::enable_if<std::is_base_of<SnpeExecutorImpl, Tp>::value>::type* = DT_NULL>
 SnpeExecutorImpl* SnpeExecutorImplHelper(Context *ctx, const std::shared_ptr<SnpeModel> &model, const NNConfig &config)
 {
     return new Tp(ctx, model, config);

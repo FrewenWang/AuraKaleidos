@@ -25,13 +25,13 @@ HVX_VECTOR_TYPE(HVX_VectorPair, 2);
 HVX_VECTOR_TYPE(HVX_VectorPair, 3);
 HVX_VECTOR_TYPE(HVX_VectorPair, 4);
 
-template <MI_S32 C> struct MVHvxVector;
+template <DT_S32 C> struct MVHvxVector;
 template <> struct MVHvxVector<1>   { using Type = HVX_VectorX1; };
 template <> struct MVHvxVector<2>   { using Type = HVX_VectorX2; };
 template <> struct MVHvxVector<3>   { using Type = HVX_VectorX3; };
 template <> struct MVHvxVector<4>   { using Type = HVX_VectorX4; };
 
-template <MI_S32 C> struct MWHvxVector;
+template <DT_S32 C> struct MWHvxVector;
 template <> struct MWHvxVector<1>   { using Type = HVX_VectorPairX1; };
 template <> struct MWHvxVector<2>   { using Type = HVX_VectorPairX2; };
 template <> struct MWHvxVector<3>   { using Type = HVX_VectorPairX3; };

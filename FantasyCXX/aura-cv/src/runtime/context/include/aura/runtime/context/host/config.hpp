@@ -96,11 +96,11 @@ public:
                m_async_affinity(CpuAffinity::ALL),
                m_compute_threads(0),
                m_async_threads(0),
-               m_enable_systrace(MI_FALSE),
-               m_enable_cl(MI_FALSE),
-               m_enable_hexagon(MI_FALSE),
-               m_enable_nn(MI_FALSE),
-               m_enable_xtensa(MI_FALSE)
+               m_enable_systrace(DT_FALSE),
+               m_enable_cl(DT_FALSE),
+               m_enable_hexagon(DT_FALSE),
+               m_enable_nn(DT_FALSE),
+               m_enable_xtensa(DT_FALSE)
     {}
 
     ~Config() = default;
@@ -136,7 +136,7 @@ public:
      * @return Reference to the modified Config object.
      */
     Config& SetWorkerPool(const std::string &thread_tag, CpuAffinity compute_affinity = CpuAffinity::ALL,
-                          CpuAffinity async_affinity = CpuAffinity::ALL, MI_S32 compute_threads = 0, MI_S32 async_threads = 0)
+                          CpuAffinity async_affinity = CpuAffinity::ALL, DT_S32 compute_threads = 0, DT_S32 async_threads = 0)
     {
         // max_16 bytes: [thread_tag][A/C(thread_type)][idx]['\0']; [12] + [1 + 2 + 1](reserved)
         m_thread_tag       = thread_tag.size() > 12 ? thread_tag.substr(0, 12) : thread_tag;
@@ -155,7 +155,7 @@ public:
      * 
      * @return Reference to the modified Config object.
      */
-    Config& SetSysTrace(MI_BOOL enable_syatrace)
+    Config& SetSysTrace(DT_BOOL enable_syatrace)
     {
         m_enable_systrace = enable_syatrace;
 
@@ -176,7 +176,7 @@ public:
      * 
      * @return Reference to the modified Config object.
      */
-    Config& SetCLConf(MI_BOOL enable_cl, const std::string &cache_path, const std::string &cache_prefix,
+    Config& SetCLConf(DT_BOOL enable_cl, const std::string &cache_path, const std::string &cache_prefix,
                       CLPrecompiledType cl_precompiled_type = CLPrecompiledType::INVALID,
                       const std::string &precompiled_sources = std::string(),
                       const std::string &extern_version = std::string(),
@@ -207,7 +207,7 @@ public:
      * 
      * @return Reference to the modified Config object.
      */
-    Config& SetHexagonConf(MI_BOOL enable_hexagon, MI_BOOL unsigned_pd, const std::string &lib_prefix, MI_BOOL async_call = MI_TRUE,
+    Config& SetHexagonConf(DT_BOOL enable_hexagon, DT_BOOL unsigned_pd, const std::string &lib_prefix, DT_BOOL async_call = DT_TRUE,
                            LogOutput output = LogOutput::FARF, LogLevel level = LogLevel::DEBUG, const std::string &file = std::string())
     {
         m_enable_hexagon     = enable_hexagon;
@@ -228,7 +228,7 @@ public:
      * 
      * @return Reference to the modified Config object.
      */
-    Config& SetNNConf(MI_BOOL enable_nn)
+    Config& SetNNConf(DT_BOOL enable_nn)
     {
         m_enable_nn = enable_nn;
 
@@ -243,7 +243,7 @@ public:
      * 
      * @return Reference to the modified Config object.
      */
-    Config& SetXtensaConf(MI_BOOL enable_xtensa, const std::string &pil_name = std::string(), 
+    Config& SetXtensaConf(DT_BOOL enable_xtensa, const std::string &pil_name = std::string(), 
                           XtensaPriorityLevel xtensa_priority_level = XtensaPriorityLevel::PRIORITY_LOW)
     {
         m_enable_xtensa         = enable_xtensa;
@@ -259,11 +259,11 @@ public:
     std::string         m_thread_tag;             /*!< Thread tag. */
     CpuAffinity         m_compute_affinity;       /*!< CPU affinity for compute threads. */
     CpuAffinity         m_async_affinity;         /*!< CPU affinity for asynchronous threads. */
-    MI_S32              m_compute_threads;        /*!< number of compute threads. */
-    MI_S32              m_async_threads;          /*!< number of async   threads. */
-    MI_BOOL             m_enable_systrace;        /*!< Flag to enable system trace. */
+    DT_S32              m_compute_threads;        /*!< number of compute threads. */
+    DT_S32              m_async_threads;          /*!< number of async   threads. */
+    DT_BOOL             m_enable_systrace;        /*!< Flag to enable system trace. */
 
-    MI_BOOL             m_enable_cl;              /*!< Flag to enable OpenCL. */
+    DT_BOOL             m_enable_cl;              /*!< Flag to enable OpenCL. */
     std::string         m_cl_cache_path;          /*!< Cache path for OpenCL. */
     std::string         m_cl_cache_prefix;        /*!< Cache prefix for OpenCL. */
     CLPrecompiledType   m_cl_precompiled_type;    /*!< Type of OpenCL precompiled sources. */
@@ -272,17 +272,17 @@ public:
     CLPerfLevel         m_cl_perf_level;          /*!< Performance level for OpenCL. */
     CLPriorityLevel     m_cl_priority_level;      /*!< Priority level for OpenCL. */
 
-    MI_BOOL             m_enable_hexagon;         /*!< Flag to enable Hexagon. */
-    MI_BOOL             m_async_call;             /*!< Flag to enable use async thread call fastrpc. */
+    DT_BOOL             m_enable_hexagon;         /*!< Flag to enable Hexagon. */
+    DT_BOOL             m_async_call;             /*!< Flag to enable use async thread call fastrpc. */
     LogOutput           m_hexagon_log_output;     /*!< Log output destination for Hexagon. */
     LogLevel            m_hexagon_log_level;      /*!< Log level for Hexagon. */
     std::string         m_hexagon_log_file;       /*!< Log file path for Hexagon. */
-    MI_BOOL             m_unsigned_pd;            /*!< Unsigned PD for Hexagon signature. */
+    DT_BOOL             m_unsigned_pd;            /*!< Unsigned PD for Hexagon signature. */
     std::string         m_hexagon_lib_prefix;     /*!< Library prefix for Hexagon. */
 
-    MI_BOOL             m_enable_nn;              /*!< Flag to enable NN. */
+    DT_BOOL             m_enable_nn;              /*!< Flag to enable NN. */
 
-    MI_BOOL             m_enable_xtensa;          /*!< Flag to enable Xtensa. */
+    DT_BOOL             m_enable_xtensa;          /*!< Flag to enable Xtensa. */
     std::string         m_pil_name;               /*!< Pil name for Xtensa. */
     XtensaPriorityLevel m_xtensa_priority_level;  /*!< Task priority level for VDSP. */
 };

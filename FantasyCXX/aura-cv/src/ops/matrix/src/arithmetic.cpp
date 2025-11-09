@@ -58,7 +58,7 @@ Arithmetic::Arithmetic(Context *ctx, const OpTarget &target) : Op(ctx, target)
 Status Arithmetic::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, ArithmOpType op_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -82,12 +82,12 @@ Status Arithmetic::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType d
 
 Status Arithmetic::SetArgs(const Array *src0, const Array *src1, Array *dst, ArithmOpType op)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -137,13 +137,13 @@ Status Arithmetic::SetArgs(const Array *src0, const Array *src1, Array *dst, Ari
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateArithmeticImpl(m_ctx, impl_target);
     }
 
     ArithmeticImpl *arithmetic_impl = dynamic_cast<ArithmeticImpl*>(m_impl.get());
-    if (MI_NULL == arithmetic_impl)
+    if (DT_NULL == arithmetic_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "arithmetic_impl is null ptr");
         return Status::ERROR;
@@ -191,16 +191,16 @@ static std::shared_ptr<ScalarDivideImpl> CreateScalarDivideImpl(Context *ctx, co
 ScalarDivide::ScalarDivide(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status ScalarDivide::SetArgs(MI_F32 scalar, const Array *src, Array *dst)
+Status ScalarDivide::SetArgs(DT_F32 scalar, const Array *src, Array *dst)
 {
     Status ret = Status::ERROR;
 
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -209,13 +209,13 @@ Status ScalarDivide::SetArgs(MI_F32 scalar, const Array *src, Array *dst)
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateScalarDivideImpl(m_ctx, impl_target);
     }
 
     ScalarDivideImpl *scalar_divide_impl = dynamic_cast<ScalarDivideImpl*>(m_impl.get());
-    if (MI_NULL == scalar_divide_impl)
+    if (DT_NULL == scalar_divide_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "scalar_divide_impl is null ptr");
         return Status::ERROR;
@@ -259,7 +259,7 @@ AURA_EXPORTS Status IDivide(Context *ctx, const Mat &src0, const Mat &src1, Mat 
     return OpCall(ctx, arithmetic, &src0, &src1, &dst, ArithmOpType::DIV);
 }
 
-AURA_EXPORTS Status IAdd(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, const OpTarget &target)
+AURA_EXPORTS Status IAdd(Context *ctx, const Mat &src, DT_F32 scalar, Mat &dst, const OpTarget &target)
 {
     Status ret = IConvertTo(ctx, src, dst, 1.f, scalar, target);
     if (ret != Status::OK)
@@ -269,7 +269,7 @@ AURA_EXPORTS Status IAdd(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, 
     return ret;
 }
 
-AURA_EXPORTS Status ISubtract(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, const OpTarget &target)
+AURA_EXPORTS Status ISubtract(Context *ctx, const Mat &src, DT_F32 scalar, Mat &dst, const OpTarget &target)
 {
     Status ret = IConvertTo(ctx, src, dst, 1.f, -scalar, target);
     if (ret != Status::OK)
@@ -279,7 +279,7 @@ AURA_EXPORTS Status ISubtract(Context *ctx, const Mat &src, MI_F32 scalar, Mat &
     return ret;
 }
 
-AURA_EXPORTS Status IMultiply(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, const OpTarget &target)
+AURA_EXPORTS Status IMultiply(Context *ctx, const Mat &src, DT_F32 scalar, Mat &dst, const OpTarget &target)
 {
     Status ret = IConvertTo(ctx, src, dst, scalar, 0.f, target);
     if (ret != Status::OK)
@@ -289,7 +289,7 @@ AURA_EXPORTS Status IMultiply(Context *ctx, const Mat &src, MI_F32 scalar, Mat &
     return ret;
 }
 
-AURA_EXPORTS Status IDivide(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, const OpTarget &target)
+AURA_EXPORTS Status IDivide(Context *ctx, const Mat &src, DT_F32 scalar, Mat &dst, const OpTarget &target)
 {
     Status ret = IConvertTo(ctx, src, dst, 1.f / scalar, 0.f, target);
     if (ret != Status::OK)
@@ -299,7 +299,7 @@ AURA_EXPORTS Status IDivide(Context *ctx, const Mat &src, MI_F32 scalar, Mat &ds
     return ret;
 }
 
-AURA_EXPORTS Status ISubtract(Context *ctx, MI_F32 scalar, const Mat &src, Mat &dst, const OpTarget &target)
+AURA_EXPORTS Status ISubtract(Context *ctx, DT_F32 scalar, const Mat &src, Mat &dst, const OpTarget &target)
 {
     Status ret = IConvertTo(ctx, src, dst, -1.f, scalar, target);
     if (ret != Status::OK)
@@ -309,7 +309,7 @@ AURA_EXPORTS Status ISubtract(Context *ctx, MI_F32 scalar, const Mat &src, Mat &
     return ret;
 }
 
-AURA_EXPORTS Status IDivide(Context *ctx, MI_F32 scalar, const Mat &src, Mat &dst, const OpTarget &target)
+AURA_EXPORTS Status IDivide(Context *ctx, DT_F32 scalar, const Mat &src, Mat &dst, const OpTarget &target)
 {
     ScalarDivide scalar_divide(ctx, target);
 
@@ -317,13 +317,13 @@ AURA_EXPORTS Status IDivide(Context *ctx, MI_F32 scalar, const Mat &src, Mat &ds
 }
 
 ArithmeticImpl::ArithmeticImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Arithmetic", target),
-                                                                       m_op_type(ArithmOpType::ADD), m_src0(MI_NULL),
-                                                                       m_src1(MI_NULL), m_dst(MI_NULL)
+                                                                       m_op_type(ArithmOpType::ADD), m_src0(DT_NULL),
+                                                                       m_src1(DT_NULL), m_dst(DT_NULL)
 {}
 
 Status ArithmeticImpl::SetArgs(const Array *src0, const Array *src1, Array *dst, ArithmOpType op)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -369,7 +369,7 @@ std::string ArithmeticImpl::ToString() const
     return str;
 }
 
-AURA_VOID ArithmeticImpl::Dump(const std::string &prefix) const
+DT_VOID ArithmeticImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -386,13 +386,13 @@ AURA_VOID ArithmeticImpl::Dump(const std::string &prefix) const
 }
 
 ScalarDivideImpl::ScalarDivideImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "ScalarDivide", target),
-                                                                           m_src(MI_NULL), m_dst(MI_NULL),
+                                                                           m_src(DT_NULL), m_dst(DT_NULL),
                                                                            m_scalar(1)
 {}
 
-Status ScalarDivideImpl::SetArgs(MI_F32 scalar, const Array *src, Array *dst)
+Status ScalarDivideImpl::SetArgs(DT_F32 scalar, const Array *src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -436,7 +436,7 @@ std::string ScalarDivideImpl::ToString() const
     return str;
 }
 
-AURA_VOID ScalarDivideImpl::Dump(const std::string &prefix) const
+DT_VOID ScalarDivideImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

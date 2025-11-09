@@ -16,7 +16,7 @@ class ConvertToImpl : public OpImpl
 public:
     ConvertToImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta);
+    virtual Status SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -24,13 +24,13 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src;
     Array       *m_dst;
-    MI_F32       m_alpha;
-    MI_F32       m_beta;
+    DT_F32       m_alpha;
+    DT_F32       m_beta;
 };
 
 class ConvertToNone : public ConvertToImpl
@@ -38,7 +38,7 @@ class ConvertToNone : public ConvertToImpl
 public:
     ConvertToNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta) override;
+    Status SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta) override;
 
     Status Run() override;
 
@@ -50,7 +50,7 @@ class ConvertToNeon : public ConvertToImpl
 public:
     ConvertToNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta) override;
+    Status SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta) override;
 
     Status Run() override;
 };
@@ -70,13 +70,13 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, MI_BOOL scale);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, DT_BOOL scale);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
     CLMem    m_cl_src;
     CLMem    m_cl_dst;
-    MI_BOOL  m_is_same_mat;
+    DT_BOOL  m_is_same_mat;
 
     std::string m_profiling_string;
 };

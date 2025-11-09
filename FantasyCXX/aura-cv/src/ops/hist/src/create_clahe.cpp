@@ -30,16 +30,16 @@ static std::shared_ptr<CreateClAHEImpl> CreateCreateClAHEImpl(Context *ctx, cons
 CreateClAHE::CreateClAHE(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status CreateClAHE::SetArgs(const Array *src, Array *dst, MI_F64 clip_limit, const Sizes &tile_grid_size)
+Status CreateClAHE::SetArgs(const Array *src, Array *dst, DT_F64 clip_limit, const Sizes &tile_grid_size)
 {
     Status ret = Status::ERROR;
 
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return ret;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return ret;
@@ -48,14 +48,14 @@ Status CreateClAHE::SetArgs(const Array *src, Array *dst, MI_F64 clip_limit, con
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateCreateClAHEImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     CreateClAHEImpl *create_clahe_impl = dynamic_cast<CreateClAHEImpl *>(m_impl.get());
-    if (MI_NULL == create_clahe_impl)
+    if (DT_NULL == create_clahe_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "create_clahe_impl is null ptr");
         return ret;
@@ -66,7 +66,7 @@ Status CreateClAHE::SetArgs(const Array *src, Array *dst, MI_F64 clip_limit, con
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status ICreateClAHE(Context *ctx, const Mat &src, Mat &dst, MI_F64 clip_limit,
+AURA_EXPORTS Status ICreateClAHE(Context *ctx, const Mat &src, Mat &dst, DT_F64 clip_limit,
                                  const Sizes &tile_grid_size, const OpTarget &target)
 {
     CreateClAHE create_clahe(ctx, target);
@@ -75,14 +75,14 @@ AURA_EXPORTS Status ICreateClAHE(Context *ctx, const Mat &src, Mat &dst, MI_F64 
 }
 
 CreateClAHEImpl::CreateClAHEImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "CreateClAHE", target),
-                                                                         m_clip_limit(0.0), m_src(MI_NULL), m_dst(MI_NULL)
+                                                                         m_clip_limit(0.0), m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status CreateClAHEImpl::SetArgs(const Array *src, Array *dst, MI_F64 clip_limit, const Sizes &tile_grid_size)
+Status CreateClAHEImpl::SetArgs(const Array *src, Array *dst, DT_F64 clip_limit, const Sizes &tile_grid_size)
 {
     Status ret = Status::ERROR;
 
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return ret;
     }
@@ -141,7 +141,7 @@ std::string CreateClAHEImpl::ToString() const
     return str;
 }
 
-AURA_VOID CreateClAHEImpl::Dump(const std::string &prefix) const
+DT_VOID CreateClAHEImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

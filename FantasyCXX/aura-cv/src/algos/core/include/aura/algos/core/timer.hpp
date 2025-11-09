@@ -16,9 +16,9 @@ public:
 #endif // AURA_BUILD_HEXAGON
 
     Time Now() const;
-    MI_BOOL IsTimedOut() const;
+    DT_BOOL IsTimedOut() const;
 #if defined(AURA_BUILD_HOST)
-    AURA_VOID SetTimeout(MI_S32 timeout_ms);
+    DT_VOID SetTimeout(DT_S32 timeout_ms);
 #endif // AURA_BUILD_HOST
 
     Time m_end_time;

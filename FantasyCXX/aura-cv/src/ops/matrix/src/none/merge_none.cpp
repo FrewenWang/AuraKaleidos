@@ -8,19 +8,19 @@ namespace aura
 {
 
 template <typename Tp>
-AURA_INLINE AURA_VOID MergeRow(MI_S32 width, const std::vector<const Tp*> &src_rows, const std::vector<MI_S32> &src_chs,
-                             Tp *dst_row, MI_S32 dst_ch, const std::vector<MI_S32> &dst_ch_offsets)
+AURA_INLINE DT_VOID MergeRow(DT_S32 width, const std::vector<const Tp*> &src_rows, const std::vector<DT_S32> &src_chs,
+                             Tp *dst_row, DT_S32 dst_ch, const std::vector<DT_S32> &dst_ch_offsets)
 {
-    MI_S32 src_count = src_rows.size();
+    DT_S32 src_count = src_rows.size();
 
-    for (MI_S32 x = 0; x < width; ++x)
+    for (DT_S32 x = 0; x < width; ++x)
     {
-        for (MI_S32 n = 0; n < src_count; ++n)
+        for (DT_S32 n = 0; n < src_count; ++n)
         {
             const Tp *src_ptr = src_rows[n] + x * src_chs[n];
             Tp *dst_ptr       = dst_row + x * dst_ch + dst_ch_offsets[n];
 
-            for (MI_S32 ch = 0; ch < src_chs[n]; ++ch)
+            for (DT_S32 ch = 0; ch < src_chs[n]; ++ch)
             {
                 dst_ptr[ch] = src_ptr[ch];
             }
@@ -29,18 +29,18 @@ AURA_INLINE AURA_VOID MergeRow(MI_S32 width, const std::vector<const Tp*> &src_r
 }
 
 template <typename Tp>
-static Status MergeNoneImpl(Context *ctx, std::vector<const Array*> &src, Mat &dst, const std::vector<MI_S32> &src_chs,
-                            const std::vector<MI_S32> &dst_ch_offsets, MI_S32 src_count, MI_S32 start_row, MI_S32 end_row)
+static Status MergeNoneImpl(Context *ctx, std::vector<const Array*> &src, Mat &dst, const std::vector<DT_S32> &src_chs,
+                            const std::vector<DT_S32> &dst_ch_offsets, DT_S32 src_count, DT_S32 start_row, DT_S32 end_row)
 {
-    std::vector<const Tp*> src_rows(src_count, MI_NULL);
+    std::vector<const Tp*> src_rows(src_count, DT_NULL);
 
     const Sizes3 dst_sz = dst.GetSizes();
-    const MI_S32 width  = dst_sz.m_width;
-    const MI_S32 dst_ch = dst_sz.m_channel;
+    const DT_S32 width  = dst_sz.m_width;
+    const DT_S32 dst_ch = dst_sz.m_channel;
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        for (MI_S32 n = 0; n < src_count; ++n)
+        for (DT_S32 n = 0; n < src_count; ++n)
         {
             const Mat *src_mat = dynamic_cast<const Mat*>(src[n]);
             if (NULL == src_mat)
@@ -62,7 +62,7 @@ static Status MergeNoneImpl(Context *ctx, std::vector<const Array*> &src, Mat &d
 template<typename Tp>
 static Status MergeNoneHelper(Context *ctx, std::vector<const Array*> &src, Mat &dst, OpTarget &target)
 {
-    MI_S32 src_count = src.size();
+    DT_S32 src_count = src.size();
 
     if (1 == src_count)
     {
@@ -77,38 +77,38 @@ static Status MergeNoneHelper(Context *ctx, std::vector<const Array*> &src, Mat 
     }
 
 
-    std::vector<MI_S32> src_chs;
+    std::vector<DT_S32> src_chs;
 
-    for (MI_S32 n = 0; n < src_count; ++n)
+    for (DT_S32 n = 0; n < src_count; ++n)
     {
         src_chs.emplace_back(src[n]->GetSizes().m_channel);
     }
 
-    std::vector<MI_S32> dst_ch_offsets(src_count, 0);
-    for (MI_S32 n = 1; n < src_count; ++n)
+    std::vector<DT_S32> dst_ch_offsets(src_count, 0);
+    for (DT_S32 n = 1; n < src_count; ++n)
     {
         dst_ch_offsets[n] = dst_ch_offsets[n - 1] + src_chs[n - 1];
     }
 
     Status ret = Status::ERROR;
 
-    const MI_S32 height = dst.GetSizes().m_height;
+    const DT_S32 height = dst.GetSizes().m_height;
 
     if (target.m_data.none.enable_mt)
     {
         WorkerPool *wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
             return Status::ERROR;
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), height, MergeNoneImpl<Tp>, ctx, src, dst,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), height, MergeNoneImpl<Tp>, ctx, src, dst,
                               src_chs, dst_ch_offsets, src_count);
     }
     else
     {
-        ret = MergeNoneImpl<Tp>(ctx, src, dst, src_chs, dst_ch_offsets, src_count, static_cast<MI_S32>(0), height);
+        ret = MergeNoneImpl<Tp>(ctx, src, dst, src_chs, dst_ch_offsets, src_count, static_cast<DT_S32>(0), height);
     }
 
     AURA_RETURN(ctx, ret);
@@ -147,7 +147,7 @@ Status MergeNone::Run()
 {
     Mat *dst = dynamic_cast<Mat*>(m_dst);
 
-    if (MI_NULL == dst)
+    if (DT_NULL == dst)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dst is null");
         return Status::ERROR;
@@ -160,10 +160,10 @@ Status MergeNone::Run()
         case ElemType::U8:
         case ElemType::S8:
         {
-            ret = MergeNoneHelper<MI_U8>(m_ctx, m_src, *dst, m_target);
+            ret = MergeNoneHelper<DT_U8>(m_ctx, m_src, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MergeNoneHelper<MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MergeNoneHelper<DT_U8> failed.");
             }
             break;
         }
@@ -174,10 +174,10 @@ Status MergeNone::Run()
         case ElemType::F16:
 #endif
         {
-            ret = MergeNoneHelper<MI_U16>(m_ctx, m_src, *dst, m_target);
+            ret = MergeNoneHelper<DT_U16>(m_ctx, m_src, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MergeNoneHelper<MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MergeNoneHelper<DT_U16> failed.");
             }
             break;
         }
@@ -188,10 +188,10 @@ Status MergeNone::Run()
         case ElemType::F32:
 #endif
         {
-            ret = MergeNoneHelper<MI_U32>(m_ctx, m_src, *dst, m_target);
+            ret = MergeNoneHelper<DT_U32>(m_ctx, m_src, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MergeNoneHelper<MI_U32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "MergeNoneHelper<DT_U32> failed.");
             }
             break;
         }

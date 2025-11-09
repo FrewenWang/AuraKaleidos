@@ -4,7 +4,7 @@
 namespace aura
 {
 
-static Status GetCLName(MI_S32 channel, MI_S32 ksize, std::string program_name[2], std::string kernel_name[2])
+static Status GetCLName(DT_S32 channel, DT_S32 ksize, std::string program_name[2], std::string kernel_name[2])
 {
     std::string program_postfix = std::to_string(ksize) + "x" + std::to_string(ksize) + "_c" + std::to_string(channel);
     std::string kernel_postfix  = std::to_string(ksize) + "x" + std::to_string(ksize) + "C"  + std::to_string(channel);
@@ -18,7 +18,7 @@ static Status GetCLName(MI_S32 channel, MI_S32 ksize, std::string program_name[2
     return Status::OK;
 }
 
-static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, BorderType border_type, MI_S32 valid_num)
+static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, BorderType border_type, DT_S32 valid_num)
 {
     const std::vector<std::string> tbl =
     {
@@ -55,13 +55,13 @@ static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, BorderTyp
     return cl_build_opt.ToString(elem_type);
 }
 
-static AURA_VOID GetCLGlobalSize(MI_S32 height, MI_S32 width, MI_S32 ksize, cl::NDRange cl_range[2], MI_S32 &main_width)
+static DT_VOID GetCLGlobalSize(DT_S32 height, DT_S32 width, DT_S32 ksize, cl::NDRange cl_range[2], DT_S32 &main_width)
 {
-    MI_S32 elem_counts = 4;
-    MI_S32 border      = (ksize >> 1) << 1;
+    DT_S32 elem_counts = 4;
+    DT_S32 border      = (ksize >> 1) << 1;
 
-    MI_S32 main_size = (width - border) / elem_counts;
-    MI_S32 main_rest = (width - border) % elem_counts;
+    DT_S32 main_size = (width - border) / elem_counts;
+    DT_S32 main_rest = (width - border) % elem_counts;
 
     // main global size
     cl_range[0] = cl::NDRange(main_size, height);
@@ -74,7 +74,7 @@ static AURA_VOID GetCLGlobalSize(MI_S32 height, MI_S32 width, MI_S32 ksize, cl::
 BilateralCL::BilateralCL(Context *ctx, const OpTarget &target) : BilateralImpl(ctx, target), m_profiling_string()
 {}
 
-Status BilateralCL::SetArgs(const Array *src, Array *dst, MI_F32 sigma_color, MI_F32 sigma_space, MI_S32 ksize,
+Status BilateralCL::SetArgs(const Array *src, Array *dst, DT_F32 sigma_color, DT_F32 sigma_space, DT_S32 ksize,
                             BorderType border_type, const Scalar &border_value)
 {
     if (BilateralImpl::SetArgs(src, dst, sigma_color, sigma_space, ksize, border_type, border_value) != Status::OK)
@@ -95,7 +95,7 @@ Status BilateralCL::SetArgs(const Array *src, Array *dst, MI_F32 sigma_color, MI
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1 && ch != 3)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/3");
@@ -196,17 +196,17 @@ Status BilateralCL::DeInitialize()
 
 Status BilateralCL::Run()
 {
-    MI_S32 istep  = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep  = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 height = m_dst->GetSizes().m_height;
-    MI_S32 width  = m_dst->GetSizes().m_width;
+    DT_S32 istep  = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep  = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 height = m_dst->GetSizes().m_height;
+    DT_S32 width  = m_dst->GetSizes().m_width;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
     CLScalar cl_border_value = clScalar(m_border_value);
 
     // 1. get center_area and cl_global_size
     cl::NDRange cl_global_size[2];
-    MI_S32 main_width = 0;
+    DT_S32 main_width = 0;
 
     GetCLGlobalSize(height, width, m_ksize, cl_global_size, main_width);
 
@@ -215,13 +215,13 @@ Status BilateralCL::Run()
     cl_int cl_ret = CL_SUCCESS;
     Status ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, cl::Buffer,
-                                 cl::Iaura2D, MI_S32, MI_F32, CLScalar>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, cl::Buffer,
+                                 cl::Iaura2D, DT_S32, DT_F32, CLScalar>(
                                  m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                  width, height,
-                                 (MI_S32)(cl_global_size[0].get()[0]),
-                                 (MI_S32)(cl_global_size[0].get()[1]),
+                                 (DT_S32)(cl_global_size[0].get()[0]),
+                                 (DT_S32)(cl_global_size[0].get()[1]),
                                  m_cl_space.GetCLMemRef<cl::Buffer>(),
                                  m_cl_color.GetCLMemRef<cl::Iaura2D>(), m_color_weight.GetSizes().m_width,
                                  m_scale_index, cl_border_value,
@@ -233,13 +233,13 @@ Status BilateralCL::Run()
         goto EXIT;
     }
 
-    cl_ret |= m_cl_kernels[1].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, cl::Buffer,
-                                  cl::Iaura2D, MI_S32, MI_F32, MI_S32, CLScalar>(
+    cl_ret |= m_cl_kernels[1].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, cl::Buffer,
+                                  cl::Iaura2D, DT_S32, DT_F32, DT_S32, CLScalar>(
                                   m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                   m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                   width, height,
-                                  (MI_S32)(cl_global_size[1].get()[0]),
-                                  (MI_S32)(cl_global_size[1].get()[1]),
+                                  (DT_S32)(cl_global_size[1].get()[0]),
+                                  (DT_S32)(cl_global_size[1].get()[1]),
                                   m_cl_space.GetCLMemRef<cl::Buffer>(),
                                   m_cl_color.GetCLMemRef<cl::Iaura2D>(), m_color_weight.GetSizes().m_width,
                                   m_scale_index, main_width, cl_border_value,
@@ -253,7 +253,7 @@ Status BilateralCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event[1].wait();
         if (cl_ret != CL_SUCCESS)
@@ -262,7 +262,7 @@ Status BilateralCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event[0]) +
                                        GetCLProfilingInfo(m_cl_kernels[1].GetKernelName(), cl_event[1]);
@@ -284,7 +284,7 @@ std::string BilateralCL::ToString() const
     return BilateralImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> BilateralCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type, MI_S32 valid_num)
+std::vector<CLKernel> BilateralCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type, DT_S32 valid_num)
 {
     std::vector<CLKernel> cl_kernels;
     std::string build_opt = GetCLBuildOptions(ctx, elem_type, border_type, valid_num);
@@ -308,7 +308,7 @@ Sizes BilateralCL::GetColorMatStride(Sizes3 color_size)
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
-    color_stride.m_width = AURA_ALIGN(color_size.m_width * sizeof(MI_F32), cl_rt->GetCLLengthAlignSize());
+    color_stride.m_width = AURA_ALIGN(color_size.m_width * sizeof(DT_F32), cl_rt->GetCLLengthAlignSize());
 
     return color_stride;
 }

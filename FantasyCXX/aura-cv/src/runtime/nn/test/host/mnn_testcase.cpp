@@ -4,14 +4,14 @@
 using namespace aura;
 
 static Status MnnTest(Context *ctx, Mat &src, Mat &dst, const std::string &minn_file,
-                      MI_S32 forward_count, MI_S32 &cur_count, MI_S32 total_count)
+                      DT_S32 forward_count, DT_S32 &cur_count, DT_S32 total_count)
 {
     Status ret = Status::ERROR;
 
-    NNEngine *nn_engine = MI_NULL;
-    std::shared_ptr<NNExecutor> nn_executor = MI_NULL;
-    FILE *fp = MI_NULL;
-    MI_U8 *minn_data = MI_NULL;
+    NNEngine *nn_engine = DT_NULL;
+    std::shared_ptr<NNExecutor> nn_executor = DT_NULL;
+    FILE *fp = DT_NULL;
+    DT_U8 *minn_data = DT_NULL;
     size_t minn_size = 0;
     MatMap input;
     MatMap output;
@@ -20,7 +20,7 @@ static Status MnnTest(Context *ctx, Mat &src, Mat &dst, const std::string &minn_
     if (cur_count > total_count / 2)
     {
         fp = fopen(minn_file.c_str(), "rb");
-        if (MI_NULL == fp)
+        if (DT_NULL == fp)
         {
             AURA_LOGE(ctx, AURA_TAG, "fopen %s failed\n", minn_file.c_str());
             return ret;
@@ -29,8 +29,8 @@ static Status MnnTest(Context *ctx, Mat &src, Mat &dst, const std::string &minn_
         fseek(fp, 0, SEEK_END);
         minn_size = ftell(fp);
 
-        minn_data = static_cast<MI_U8*>(AURA_ALLOC(ctx, minn_size));
-        if (MI_NULL == minn_data)
+        minn_data = static_cast<DT_U8*>(AURA_ALLOC(ctx, minn_size));
+        if (DT_NULL == minn_data)
         {
             AURA_LOGE(ctx, AURA_TAG, "alloc %ld memory failed\n", minn_size);
             fclose(fp);
@@ -51,7 +51,7 @@ static Status MnnTest(Context *ctx, Mat &src, Mat &dst, const std::string &minn_
     }
 
     nn_engine = ctx->GetNNEngine();
-    if (MI_NULL == nn_engine)
+    if (DT_NULL == nn_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "GetNNEngine failed\n");
         return ret;
@@ -75,7 +75,7 @@ static Status MnnTest(Context *ctx, Mat &src, Mat &dst, const std::string &minn_
         nn_executor = nn_engine->CreateNNExecutor(minn_file, "abcdefg", config);
     }
 
-    if (MI_NULL == nn_executor)
+    if (DT_NULL == nn_executor)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_executor is null\n");
         goto EXIT;
@@ -101,7 +101,7 @@ static Status MnnTest(Context *ctx, Mat &src, Mat &dst, const std::string &minn_
     input.insert(std::make_pair("input", &src));
     output.insert(std::make_pair("InceptionV3/Predictions/Reshape_1", &dst));
 
-    for (MI_S32 i = 0; i < forward_count; i++)
+    for (DT_S32 i = 0; i < forward_count; i++)
     {
         start_time = Time::Now();
         ret = nn_executor->Forward(input, output);
@@ -136,7 +136,7 @@ NEW_TESTCASE(runtime_nn_mnn_test)
     std::string model_names = "inception_v3_mnn_gpu_v271.minn";
     std::string minn_file   = data_path + "mnn/" + model_names;
 
-    MI_S32 forward_count = 5;
+    DT_S32 forward_count = 5;
 
     Mat src = factory.GetFileMat(input_file, ElemType::F32, {299, 299, 3});
     Mat dst(ctx, ElemType::F32, {1, 1, 1001});
@@ -144,8 +144,8 @@ NEW_TESTCASE(runtime_nn_mnn_test)
 
     {
         TestTime time_val;
-        MI_S32 cur_count = 0;
-        MI_S32 loop_count  = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
+        DT_S32 cur_count = 0;
+        DT_S32 loop_count  = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
         Status status_exec = Executor(loop_count, 2, time_val, MnnTest, ctx, src, dst, minn_file, forward_count, cur_count, loop_count);
         if (Status::OK == status_exec)
         {
@@ -160,16 +160,16 @@ NEW_TESTCASE(runtime_nn_mnn_test)
             goto EXIT;
         }
 
-        MI_S32 id    = -1;
-        MI_F32 max_p = 0;
-        MI_F32 sum_p = 0;
-        for (MI_S32 i = 0; i < 1001; i++)
+        DT_S32 id    = -1;
+        DT_F32 max_p = 0;
+        DT_F32 sum_p = 0;
+        for (DT_S32 i = 0; i < 1001; i++)
         {
-            sum_p += exp(dst.Ptr<MI_F32>(0)[i]);
+            sum_p += exp(dst.Ptr<DT_F32>(0)[i]);
         }
-        for (MI_S32 i = 0; i < 1001; i++)
+        for (DT_S32 i = 0; i < 1001; i++)
         {
-            MI_F32 p = exp(dst.Ptr<MI_F32>(0)[i]) / sum_p;
+            DT_F32 p = exp(dst.Ptr<DT_F32>(0)[i]) / sum_p;
             if (max_p < p)
             {
                 max_p = p;

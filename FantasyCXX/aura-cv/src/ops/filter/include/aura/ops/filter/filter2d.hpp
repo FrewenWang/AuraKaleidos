@@ -67,7 +67,7 @@ public:
      * @param ksize The size of the filter2d kernel.
      * @param border_type The border type for handling border pixels.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type);
 };
 
 /**

@@ -4,16 +4,16 @@
 namespace aura
 {
 
-// Tp = MI_U8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value, Status>::type
-ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
+// Tp = DT_U8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value, Status>::type
+ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    MI_S32 width_align = width & (~(elem_counts - 1));
-    MI_S32 i = 0;
+    DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    DT_S32 width_align = width & (~(elem_counts - 1));
+    DT_S32 i = 0;
 
     auto resize_downx2_func = [&]()
     {
@@ -23,7 +23,7 @@ ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_c  + i * 2 + elem_counts, mv_c_x1_src);
         vload(src_n0 + i * 2 + elem_counts, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair wu16_sum0 = Q6_Wh_vadd_VubVub(mv_c_x0_src.val[ch],  mv_n0_x0_src.val[ch]);
             HVX_VectorPair wu16_sum1 = Q6_Wh_vadd_VubVub(mv_c_x1_src.val[ch], mv_n0_x1_src.val[ch]);
@@ -50,16 +50,16 @@ ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
     return Status::OK;
 }
 
-// Tp = MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_S8, Tp>::value, Status>::type
-ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
+// Tp = DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_S8, Tp>::value, Status>::type
+ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    MI_S32 width_align = width & (~(elem_counts - 1));
-    MI_S32 i = 0;
+    DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    DT_S32 width_align = width & (~(elem_counts - 1));
+    DT_S32 i = 0;
 
     auto resize_downx2_func = [&]()
     {
@@ -69,7 +69,7 @@ ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_c  + i * 2 + elem_counts, mv_c_x1_src);
         vload(src_n0 + i * 2 + elem_counts, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair ws16_c_c_src   = Q6_Wh_vsxt_Vb(mv_c_x0_src.val[ch]);
             HVX_VectorPair ws16_c_r0_src  = Q6_Wh_vsxt_Vb(mv_c_x1_src.val[ch]);
@@ -103,16 +103,16 @@ ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
     return Status::OK;
 }
 
-// Tp = MI_U16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value, Status>::type
-ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
+// Tp = DT_U16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value, Status>::type
+ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    MI_S32 width_align = width & (~(elem_counts - 1));
-    MI_S32 i = 0;
+    DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    DT_S32 width_align = width & (~(elem_counts - 1));
+    DT_S32 i = 0;
 
     auto resize_downx2_func = [&]()
     {
@@ -122,7 +122,7 @@ ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_c  + i * 2 + elem_counts, mv_c_x1_src);
         vload(src_n0 + i * 2 + elem_counts, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_c_result  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -2);
             HVX_VectorPair w_n0_result = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -2);
@@ -150,16 +150,16 @@ ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
     return Status::OK;
 }
 
-// Tp = MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_S16, Tp>::value, Status>::type
-ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
+// Tp = DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_S16, Tp>::value, Status>::type
+ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    MI_S32 width_align = width & (~(elem_counts - 1));
-    MI_S32 i = 0;
+    DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    DT_S32 width_align = width & (~(elem_counts - 1));
+    DT_S32 i = 0;
 
     auto resize_downx2_func = [&]()
     {
@@ -169,7 +169,7 @@ ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_c  + i * 2 + elem_counts, mv_c_x1_src);
         vload(src_n0 + i * 2 + elem_counts, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_c_result  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -2);
             HVX_VectorPair w_n0_result = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -2);
@@ -197,17 +197,17 @@ ResizeBnDownX2Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
     return Status::OK;
 }
 
-// Tp = MI_U8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value, Status>::type
-ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
+// Tp = DT_U8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value, Status>::type
+ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
     using MWType = typename MWHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    MI_S32 width_align = width & (~(elem_counts - 1));
-    MI_S32 i = 0;
+    DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    DT_S32 width_align = width & (~(elem_counts - 1));
+    DT_S32 i = 0;
 
     auto resize_downx4_func = [&]()
     {
@@ -222,7 +222,7 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_n0_row, mv_n0_x0_src);
         vload(src_n0_row + elem_counts, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mw_c_result.val[ch]  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -1);
             mw_n0_result.val[ch] = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -1);
@@ -233,7 +233,7 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_n0_row + elem_counts * 2, mv_n0_x0_src);
         vload(src_n0_row + elem_counts * 3, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_c_result  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -1);
             HVX_VectorPair w_n0_result = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -1);
@@ -267,17 +267,17 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
     return Status::OK;
 }
 
-// Tp = MI_S8
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_S8, Tp>::value, Status>::type
-ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
+// Tp = DT_S8
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_S8, Tp>::value, Status>::type
+ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
     using MWType = typename MWHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    MI_S32 width_align = width & (~(elem_counts - 1));
-    MI_S32 i = 0;
+    DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    DT_S32 width_align = width & (~(elem_counts - 1));
+    DT_S32 i = 0;
 
     auto resize_downx4_func = [&]()
     {
@@ -292,7 +292,7 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_n0_row, mv_n0_x0_src);
         vload(src_n0_row + elem_counts, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mw_c_x01_src.val[ch]  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -2);
             mw_n0_x01_src.val[ch] = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -2);
@@ -303,7 +303,7 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_n0_row + elem_counts * 2, mv_n0_x0_src);
         vload(src_n0_row + elem_counts * 3, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_c_x23_src  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -2);
             HVX_VectorPair w_n0_x23_src = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -2);
@@ -338,17 +338,17 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
     return Status::OK;
 }
 
-// Tp = MI_U16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value, Status>::type
-ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
+// Tp = DT_U16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value, Status>::type
+ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
     using MWType = typename MWHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    MI_S32 width_align = width & (~(elem_counts - 1));
-    MI_S32 i = 0;
+    DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    DT_S32 width_align = width & (~(elem_counts - 1));
+    DT_S32 i = 0;
 
     auto resize_downx4_func = [&]()
     {
@@ -363,7 +363,7 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_n0_row, mv_n0_x0_src);
         vload(src_n0_row + elem_counts, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mw_c_result.val[ch]  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -2);
             mw_n0_result.val[ch] = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -2);
@@ -374,7 +374,7 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_n0_row + elem_counts * 2, mv_n0_x0_src);
         vload(src_n0_row + elem_counts * 3, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_c_result  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -2);
             HVX_VectorPair w_n0_result = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -2);
@@ -408,17 +408,17 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
     return Status::OK;
 }
 
-// Tp = MI_S16
-template<typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_S16, Tp>::value, Status>::type
-ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
+// Tp = DT_S16
+template<typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_S16, Tp>::value, Status>::type
+ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
     using MWType = typename MWHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
-    MI_S32 width_align = width & (~(elem_counts - 1));
-    MI_S32 i = 0;
+    DT_S32 elem_counts = AURA_HVLEN * C / sizeof(Tp);
+    DT_S32 width_align = width & (~(elem_counts - 1));
+    DT_S32 i = 0;
 
     auto resize_downx4_func = [&]()
     {
@@ -433,7 +433,7 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_n0_row, mv_n0_x0_src);
         vload(src_n0_row + elem_counts, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mw_c_result.val[ch]  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -2);
             mw_n0_result.val[ch] = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -2);
@@ -444,7 +444,7 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
         vload(src_n0_row + elem_counts * 2, mv_n0_x0_src);
         vload(src_n0_row + elem_counts * 3, mv_n0_x1_src);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_VectorPair w_c_result  = Q6_W_vdeal_VVR(mv_c_x1_src.val[ch],  mv_c_x0_src.val[ch],  -2);
             HVX_VectorPair w_n0_result = Q6_W_vdeal_VVR(mv_n0_x1_src.val[ch], mv_n0_x0_src.val[ch], -2);
@@ -478,19 +478,19 @@ ResizeBnDownX4Row(const Tp *src_c, const Tp *src_n0, Tp *dst_c, MI_S32 width)
     return Status::OK;
 }
 
-template<typename Tp, MI_S32 C>
-static Status ResizeBnDnX2HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template<typename Tp, DT_S32 C>
+static Status ResizeBnDnX2HvxImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
 
-    MI_U64 l2fetch_param = L2PfParam(istride, src.GetSizes().m_width * sizeof(Tp) * C, 2, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 l2fetch_param = L2PfParam(istride, src.GetSizes().m_width * sizeof(Tp) * C, 2, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 1 < oheight)
         {
-            L2Fetch(reinterpret_cast<MI_U64>(src.Ptr<Tp>(y * 2 + 2)), l2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U64>(src.Ptr<Tp>(y * 2 + 2)), l2fetch_param);
         }
 
         const Tp *src_c  = src.Ptr<Tp>(y * 2);
@@ -502,19 +502,19 @@ static Status ResizeBnDnX2HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI
     return Status::OK;
 }
 
-template<typename Tp, MI_S32 C>
-static Status ResizeBnDnX4HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template<typename Tp, DT_S32 C>
+static Status ResizeBnDnX4HvxImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
 
-    MI_U64 l2fetch_param = L2PfParam(istride, src.GetSizes().m_width * sizeof(Tp) * C, 2, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 l2fetch_param = L2PfParam(istride, src.GetSizes().m_width * sizeof(Tp) * C, 2, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 1 < oheight)
         {
-            L2Fetch(reinterpret_cast<MI_U64>(src.Ptr<Tp>(y * 4 + 5)), l2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U64>(src.Ptr<Tp>(y * 4 + 5)), l2fetch_param);
         }
 
         const Tp *src_c  = src.Ptr<Tp>(y * 4 + 1);
@@ -526,19 +526,19 @@ static Status ResizeBnDnX4HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI
     return Status::OK;
 }
 
-template<typename Tp, MI_S32 C>
-static Status ResizeBnDnX2Y4HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template<typename Tp, DT_S32 C>
+static Status ResizeBnDnX2Y4HvxImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
 
-    MI_U64 l2fetch_param = L2PfParam(istride, src.GetSizes().m_width * sizeof(Tp) * C, 2, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 l2fetch_param = L2PfParam(istride, src.GetSizes().m_width * sizeof(Tp) * C, 2, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 1 < oheight)
         {
-            L2Fetch(reinterpret_cast<MI_U64>(src.Ptr<Tp>(y * 4 + 5)), l2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U64>(src.Ptr<Tp>(y * 4 + 5)), l2fetch_param);
         }
 
         const Tp *src_c  = src.Ptr<Tp>(y * 4 + 1);
@@ -550,19 +550,19 @@ static Status ResizeBnDnX2Y4HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, 
     return Status::OK;
 }
 
-template<typename Tp, MI_S32 C>
-static Status ResizeBnDnX4Y2HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template<typename Tp, DT_S32 C>
+static Status ResizeBnDnX4Y2HvxImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
 
-    MI_U64 l2fetch_param = L2PfParam(istride, src.GetSizes().m_width * sizeof(Tp) * C, 2, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 l2fetch_param = L2PfParam(istride, src.GetSizes().m_width * sizeof(Tp) * C, 2, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 1 < oheight)
         {
-            L2Fetch(reinterpret_cast<MI_U64>(src.Ptr<Tp>(y * 2 + 2)), l2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U64>(src.Ptr<Tp>(y * 2 + 2)), l2fetch_param);
         }
 
         const Tp *src_c  = src.Ptr<Tp>(y * 2);
@@ -574,37 +574,37 @@ static Status ResizeBnDnX4Y2HvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, 
     return Status::OK;
 }
 
-template<typename Tp, MI_S32 C>
+template<typename Tp, DT_S32 C>
 static Status ResizeBnFastDnHvxHelper(Context *ctx, const Mat &src, Mat &dst)
 {
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool fail");
         return Status::ERROR;
     }
 
     Status ret     = Status::ERROR;
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 iheight = src.GetSizes().m_height;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 iheight = src.GetSizes().m_height;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     if ((iwidth == 2 * owidth) && (iheight == 2 * oheight))
     {
-        ret = wp->ParallelFor((MI_S32)0, dst.GetSizes().m_height, ResizeBnDnX2HvxImpl<Tp, C>, std::cref(src), std::ref(dst));
+        ret = wp->ParallelFor((DT_S32)0, dst.GetSizes().m_height, ResizeBnDnX2HvxImpl<Tp, C>, std::cref(src), std::ref(dst));
     }
     else if ((iwidth == 4 * owidth) && (iheight == 4 * oheight))
     {
-        ret = wp->ParallelFor((MI_S32)0, dst.GetSizes().m_height, ResizeBnDnX4HvxImpl<Tp, C>, std::cref(src), std::ref(dst));
+        ret = wp->ParallelFor((DT_S32)0, dst.GetSizes().m_height, ResizeBnDnX4HvxImpl<Tp, C>, std::cref(src), std::ref(dst));
     }
     else if ((iwidth == 2 * owidth) && (iheight == 4 * oheight))
     {
-        ret = wp->ParallelFor((MI_S32)0, dst.GetSizes().m_height, ResizeBnDnX2Y4HvxImpl<Tp, C>, std::cref(src), std::ref(dst));
+        ret = wp->ParallelFor((DT_S32)0, dst.GetSizes().m_height, ResizeBnDnX2Y4HvxImpl<Tp, C>, std::cref(src), std::ref(dst));
     }
     else if ((iwidth == 4 * owidth) && (iheight == 2 * oheight))
     {
-        ret = wp->ParallelFor((MI_S32)0, dst.GetSizes().m_height, ResizeBnDnX4Y2HvxImpl<Tp, C>, std::cref(src), std::ref(dst));
+        ret = wp->ParallelFor((DT_S32)0, dst.GetSizes().m_height, ResizeBnDnX4Y2HvxImpl<Tp, C>, std::cref(src), std::ref(dst));
     }
     else
     {
@@ -619,7 +619,7 @@ template <typename Tp>
 static Status ResizeBnFastDnHvxHelper(Context *ctx, const Mat &src, Mat &dst)
 {
     Status ret     = Status::ERROR;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
@@ -671,40 +671,40 @@ Status ResizeBnFastDnHvx(Context *ctx, const Mat &src, Mat &dst)
     {
         case ElemType::U8:
         {
-            ret = ResizeBnFastDnHvxHelper<MI_U8>(ctx, src, dst);
+            ret = ResizeBnFastDnHvxHelper<DT_U8>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastDnHvxHelper run failed, type: MI_U8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastDnHvxHelper run failed, type: DT_U8");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            ret = ResizeBnFastDnHvxHelper<MI_S8>(ctx, src, dst);
+            ret = ResizeBnFastDnHvxHelper<DT_S8>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastDnHvxHelper run failed, type: MI_S8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastDnHvxHelper run failed, type: DT_S8");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = ResizeBnFastDnHvxHelper<MI_U16>(ctx, src, dst);
+            ret = ResizeBnFastDnHvxHelper<DT_U16>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastDnHvxHelper run failed, type: MI_U16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastDnHvxHelper run failed, type: DT_U16");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = ResizeBnFastDnHvxHelper<MI_S16>(ctx, src, dst);
+            ret = ResizeBnFastDnHvxHelper<DT_S16>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastDnHvxHelper run failed, type: MI_S16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnFastDnHvxHelper run failed, type: DT_S16");
             }
             break;
         }

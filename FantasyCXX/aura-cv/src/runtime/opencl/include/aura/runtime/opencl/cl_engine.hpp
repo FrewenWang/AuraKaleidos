@@ -44,7 +44,7 @@ public:
      * @param cl_perf_level Performance level of OpenCL.
      * @param cl_priority_level Priority level of OpenCL.
      */
-    CLEngine(Context *ctx, MI_BOOL enable_cl, 
+    CLEngine(Context *ctx, DT_BOOL enable_cl, 
              const std::string &cache_path,
              const std::string &cache_prefix,
              CLPrecompiledType cl_precompiled_type,

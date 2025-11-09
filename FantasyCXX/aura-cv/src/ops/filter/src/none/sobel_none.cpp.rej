@@ -1,7 +1,7 @@
 diff a/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/sobel_none.cpp b/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/sobel_none.cpp	(rejected hunks)
 @@ -44,6 +44,7 @@
  
- static Status SobelKernelMat(Context *ctx, Mat &kx, Mat &ky, MI_S32 dx, MI_S32 dy, MI_S32 ksize)
+ static Status SobelKernelMat(Context *ctx, Mat &kx, Mat &ky, DT_S32 dx, DT_S32 dy, DT_S32 ksize)
  {
 +    ///
      if (ksize <= 0)
@@ -14,16 +14,16 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/sobel_none.cpp b/AuraFan
 -
 +    
 +    ///
-     const MI_S32 ksx = (1 == ksize && dx > 0) ? 3 : ksize;
-     const MI_S32 ksy = (1 == ksize && dy > 0) ? 3 : ksize;
+     const DT_S32 ksx = (1 == ksize && dx > 0) ? 3 : ksize;
+     const DT_S32 ksy = (1 == ksize && dy > 0) ? 3 : ksize;
  
 @@ -140,6 +142,7 @@
  template <typename St, typename Dt>
- static Status SobelNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &kx, const Mat &ky, MI_S32 start_row, MI_S32 end_row)
+ static Status SobelNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &kx, const Mat &ky, DT_S32 start_row, DT_S32 end_row)
  {
 +    ///
-     MI_S32 ksx = kx.GetSizes().m_width;
-     MI_S32 ksy = ky.GetSizes().m_width;
+     DT_S32 ksx = kx.GetSizes().m_width;
+     DT_S32 ksy = ky.GetSizes().m_width;
  
 @@ -224,6 +227,12 @@
      return Status::OK;
@@ -53,6 +53,6 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/sobel_none.cpp b/AuraFan
      }
 -
 +    ///
-     const MI_S32 kshx = m_kx.GetSizes().m_width >> 1;
-     const MI_S32 kshy = m_ky.GetSizes().m_width >> 1;
+     const DT_S32 kshx = m_kx.GetSizes().m_width >> 1;
+     const DT_S32 kshy = m_ky.GetSizes().m_width >> 1;
      if (IMakeBorder(m_ctx, *src, m_src_border, kshy, kshy, kshx, kshx, m_border_type, m_border_value) != Status::OK)

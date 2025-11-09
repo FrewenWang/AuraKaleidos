@@ -15,8 +15,8 @@ namespace neon
         return vqdmlsl_n_##postfix(v, u, p);                                \
     }
 
-DECLFUN(int32x4_t,  int16x4_t, MI_S16, s16)
-DECLFUN(int64x2_t,  int32x2_t, MI_S32, s32)
+DECLFUN(int32x4_t,  int16x4_t, DT_S16, s16)
+DECLFUN(int64x2_t,  int32x2_t, DT_S32, s32)
 #undef DECLFUN
 
 } // namespace neon

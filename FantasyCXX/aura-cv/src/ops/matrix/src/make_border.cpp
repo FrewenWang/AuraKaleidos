@@ -27,7 +27,7 @@ static std::shared_ptr<MakeBorderImpl> CreateMakeBorderImpl(Context *ctx, const 
     return impl;
 }
 
-static Status CheckMakeBorderMatSize(Context *ctx, const Array *src, Array *dst, MI_S32 top, MI_S32 bottom, MI_S32 left, MI_S32 right)
+static Status CheckMakeBorderMatSize(Context *ctx, const Array *src, Array *dst, DT_S32 top, DT_S32 bottom, DT_S32 left, DT_S32 right)
 {
     Sizes3 border_size(top + bottom, left + right, 0);
 
@@ -52,15 +52,15 @@ static Status CheckMakeBorderMatSize(Context *ctx, const Array *src, Array *dst,
 MakeBorder::MakeBorder(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status MakeBorder::SetArgs(const Array *src, Array *dst, MI_S32 top, MI_S32 bottom,
-                           MI_S32 left, MI_S32 right, BorderType type, const Scalar &border_value)
+Status MakeBorder::SetArgs(const Array *src, Array *dst, DT_S32 top, DT_S32 bottom,
+                           DT_S32 left, DT_S32 right, BorderType type, const Scalar &border_value)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -69,14 +69,14 @@ Status MakeBorder::SetArgs(const Array *src, Array *dst, MI_S32 top, MI_S32 bott
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateMakeBorderImpl(m_ctx, impl_target);
     }
 
     // run initialize
     MakeBorderImpl *make_border_impl = dynamic_cast<MakeBorderImpl*>(m_impl.get());
-    if (MI_NULL == make_border_impl)
+    if (DT_NULL == make_border_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "make_border_impl is null ptr");
         return Status::ERROR;
@@ -87,8 +87,8 @@ Status MakeBorder::SetArgs(const Array *src, Array *dst, MI_S32 top, MI_S32 bott
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status IMakeBorder(Context *ctx, const Mat &src, Mat &dst, MI_S32 top, MI_S32 bottom,
-                                MI_S32 left, MI_S32 right, BorderType type, const Scalar &border_value,
+AURA_EXPORTS Status IMakeBorder(Context *ctx, const Mat &src, Mat &dst, DT_S32 top, DT_S32 bottom,
+                                DT_S32 left, DT_S32 right, BorderType type, const Scalar &border_value,
                                 const OpTarget &target)
 {
     MakeBorder make_border(ctx, target);
@@ -102,15 +102,15 @@ MakeBorderImpl::MakeBorderImpl(Context *ctx, const OpTarget &target) : OpImpl(ct
 
 {}
 
-Status MakeBorderImpl::SetArgs(const Array *src, Array *dst, MI_S32 top, MI_S32 bottom,
-                               MI_S32 left, MI_S32 right, BorderType type, const Scalar &border_value)
+Status MakeBorderImpl::SetArgs(const Array *src, Array *dst, DT_S32 top, DT_S32 bottom,
+                               DT_S32 left, DT_S32 right, BorderType type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -175,7 +175,7 @@ std::string MakeBorderImpl::ToString() const
     return str;
 }
 
-AURA_VOID MakeBorderImpl::Dump(const std::string &prefix) const
+DT_VOID MakeBorderImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

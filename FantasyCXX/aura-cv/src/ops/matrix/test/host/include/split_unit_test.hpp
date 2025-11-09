@@ -40,7 +40,7 @@ public:
     SplitMultiMatTest(Context *ctx, SplitParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         SplitParam run_param(GetParam((index)));
@@ -53,7 +53,7 @@ public:
 
         Sizes3 src_sz  = mat_sizes[0].m_sizes;
 
-        MI_S32 total_ch_count = 0;
+        DT_S32 total_ch_count = 0;
         for (size_t i = 0; i < run_param.mat_sizes.size(); ++i)
         {
             total_ch_count += run_param.mat_sizes[i].m_sizes.m_channel;
@@ -78,7 +78,7 @@ public:
         }
 
         // run interface
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
         Status status_exec = Executor(loop_count, 2, time_val, ISplit, m_ctx, src, dsts, run_param.target);
 
         if (Status::OK == status_exec)

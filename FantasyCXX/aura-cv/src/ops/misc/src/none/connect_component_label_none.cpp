@@ -15,10 +15,10 @@ namespace aura
 class UnionFindSolver
 {
 public:
-    UnionFindSolver(Context *ctx, const MI_U32 max_length, const MI_S32 mem_type = AURA_MEM_HEAP)
+    UnionFindSolver(Context *ctx, const DT_U32 max_length, const DT_S32 mem_type = AURA_MEM_HEAP)
     {
         m_ctx    = ctx;
-        m_buffer = ctx->GetMemPool()->GetBuffer(AURA_ALLOC_PARAM(ctx, mem_type, max_length * sizeof(MI_U32), 0));
+        m_buffer = ctx->GetMemPool()->GetBuffer(AURA_ALLOC_PARAM(ctx, mem_type, max_length * sizeof(DT_U32), 0));
         if (!m_buffer.IsValid())
         {
             AURA_ADD_ERROR_STRING(ctx, "alloc buffer failed");
@@ -27,7 +27,7 @@ public:
         }
         else
         {
-            m_table = m_buffer.GetData<MI_U32*>();
+            m_table = m_buffer.GetData<DT_U32*>();
             m_table[0] = 0;
             m_length = 1;
         }
@@ -39,24 +39,24 @@ public:
         m_buffer.Clear();
     }
 
-    virtual MI_U32 NewLabel()
+    virtual DT_U32 NewLabel()
     {
         m_table[m_length] = m_length;
         return m_length++;
     }
 
-    virtual MI_U32 NewChunkLabel(MI_U32 label)
+    virtual DT_U32 NewChunkLabel(DT_U32 label)
     {
         m_table[label] = label;
         return label;
     }
 
-    MI_U32 GetLabel(MI_U32 index)
+    DT_U32 GetLabel(DT_U32 index)
     {
         return m_table[index];
     }
 
-    MI_U32 FindRoot(MI_U32 root)
+    DT_U32 FindRoot(DT_U32 root)
     {
         while (m_table[root] < root)
         {
@@ -65,7 +65,7 @@ public:
         return root;
     }
 
-    virtual MI_U32 Merge(MI_U32 i, MI_U32 j)
+    virtual DT_U32 Merge(DT_U32 i, DT_U32 j)
     {
         // FindRoot(i)
         while (m_table[i] < i)
@@ -87,10 +87,10 @@ public:
         return m_table[i] = j;
     }
 
-    MI_U32 Flatten()
+    DT_U32 Flatten()
     {
-        MI_U32 k = 1;
-        for (MI_U32 i = 1; i < m_length; ++i)
+        DT_U32 k = 1;
+        for (DT_U32 i = 1; i < m_length; ++i)
         {
             if (m_table[i] < i)
             {
@@ -104,9 +104,9 @@ public:
         return k;
     }
 
-    AURA_VOID FlattenChunk(const MI_U32 start_row, const MI_U32 elem_nums)
+    DT_VOID FlattenChunk(const DT_U32 start_row, const DT_U32 elem_nums)
     {
-        for (MI_U32 i = start_row; i < (start_row + elem_nums); ++i)
+        for (DT_U32 i = start_row; i < (start_row + elem_nums); ++i)
         {
             if (m_table[i] < i)
             {
@@ -122,20 +122,20 @@ public:
 protected:
     Context *m_ctx;
     Buffer   m_buffer;
-    MI_U32  *m_table;
-    MI_U32   m_length;
+    DT_U32  *m_table;
+    DT_U32   m_length;
 };
 
 class UFPCSolver : public UnionFindSolver
 {
 public:
-    UFPCSolver(Context *ctx, const MI_U32 max_length, const MI_S32 mem_type = AURA_MEM_HEAP) : UnionFindSolver(ctx, max_length, mem_type)
+    UFPCSolver(Context *ctx, const DT_U32 max_length, const DT_S32 mem_type = AURA_MEM_HEAP) : UnionFindSolver(ctx, max_length, mem_type)
     {}
 
-    MI_U32 Merge(MI_U32 i, MI_U32 j) override
+    DT_U32 Merge(DT_U32 i, DT_U32 j) override
     {
         // FindRoot(i)
-        MI_U32 root = i;
+        DT_U32 root = i;
         while (m_table[root] < root)
         {
             root = m_table[root];
@@ -143,7 +143,7 @@ public:
         if (i != j)
         {
             // FindRoot(j)
-            MI_U32 root_j = j;
+            DT_U32 root_j = j;
             while (m_table[root_j] < root_j)
             {
                 root_j = m_table[root_j];
@@ -157,7 +157,7 @@ public:
             // SetRoot(j, root);
             while (m_table[j] < j)
             {
-                MI_U32 t = m_table[j];
+                DT_U32 t = m_table[j];
                 m_table[j] = root;
                 j = t;
             }
@@ -167,7 +167,7 @@ public:
         // SetRoot(i, root);
         while (m_table[i] < i)
         {
-            MI_U32 t = m_table[i];
+            DT_U32 t = m_table[i];
             m_table[i] = root;
             i = t;
         }
@@ -181,12 +181,12 @@ public:
 class RemSpliceSolver : public UnionFindSolver
 {
 public:
-    RemSpliceSolver(Context *ctx, const MI_U32 max_length, const MI_S32 mem_type = AURA_MEM_HEAP) : UnionFindSolver(ctx, max_length, mem_type)
+    RemSpliceSolver(Context *ctx, const DT_U32 max_length, const DT_S32 mem_type = AURA_MEM_HEAP) : UnionFindSolver(ctx, max_length, mem_type)
     {}
 
-    MI_U32 Merge(MI_U32 i, MI_U32 j) override
+    DT_U32 Merge(DT_U32 i, DT_U32 j) override
     {
-        MI_U32 root_i = i, root_j = j;
+        DT_U32 root_i = i, root_j = j;
 
         while (m_table[root_i] != m_table[root_j])
         {
@@ -197,7 +197,7 @@ public:
                     m_table[root_i] = m_table[root_j];
                     return m_table[root_i];
                 }
-                MI_U32 z = m_table[root_i];
+                DT_U32 z = m_table[root_i];
                 m_table[root_i] = m_table[root_j];
                 root_i = z;
             }
@@ -208,7 +208,7 @@ public:
                     m_table[root_j] = m_table[root_i];
                     return m_table[root_i];
                 }
-                MI_U32 z = m_table[root_j];
+                DT_U32 z = m_table[root_j];
                 m_table[root_j] = m_table[root_i];
                 root_j = z;
             }
@@ -221,9 +221,9 @@ public:
 class TTASolver : public UnionFindSolver
 {
 public:
-    TTASolver(Context *ctx, const MI_U32 max_length, const MI_S32 mem_type = AURA_MEM_HEAP) : UnionFindSolver(ctx, max_length, mem_type)
+    TTASolver(Context *ctx, const DT_U32 max_length, const DT_S32 mem_type = AURA_MEM_HEAP) : UnionFindSolver(ctx, max_length, mem_type)
     {
-        m_buffer_new = ctx->GetMemPool()->GetBuffer(AURA_ALLOC_PARAM(ctx, mem_type, max_length * sizeof(MI_U32) * 2, 0));
+        m_buffer_new = ctx->GetMemPool()->GetBuffer(AURA_ALLOC_PARAM(ctx, mem_type, max_length * sizeof(DT_U32) * 2, 0));
         if (!m_buffer_new.IsValid())
         {
             AURA_ADD_ERROR_STRING(ctx, "alloc buffer failed");
@@ -232,8 +232,8 @@ public:
         }
         else
         {
-            m_table    = m_buffer.GetData<MI_U32*>();
-            m_next     = m_buffer_new.GetData<MI_U32*>();
+            m_table    = m_buffer.GetData<DT_U32*>();
+            m_next     = m_buffer_new.GetData<DT_U32*>();
             m_tail     = m_next + max_length;
             m_table[0] = 0;	 // First label is for background pixels
             m_length   = 1;
@@ -246,7 +246,7 @@ public:
         m_buffer_new.Clear();
     }
 
-    MI_U32 NewLabel() override
+    DT_U32 NewLabel() override
     {
         m_table[m_length] = m_length;
         m_next[m_length]  = UINT_MAX;
@@ -254,7 +254,7 @@ public:
         return m_length++;
     }
 
-    MI_U32 NewChunkLabel(MI_U32 label) override
+    DT_U32 NewChunkLabel(DT_U32 label) override
     {
         m_table[label] = label;
         m_next[label]  = UINT_MAX;
@@ -262,7 +262,7 @@ public:
         return label;
     }
 
-    MI_U32 Merge(MI_U32 u, MI_U32 v) override
+    DT_U32 Merge(DT_U32 u, DT_U32 v) override
     {
         // FindRoot(u);
         u = m_table[u];
@@ -271,7 +271,7 @@ public:
 
         if (u < v)
         {
-            MI_U32 i = v;
+            DT_U32 i = v;
             while (i != UINT_MAX)
             {
                 m_table[i] = u;
@@ -284,7 +284,7 @@ public:
         }
         else if (u > v)
         {
-            MI_U32 i = u;
+            DT_U32 i = u;
             while (i != UINT_MAX)
             {
                 m_table[i] = v;
@@ -301,12 +301,12 @@ public:
 
 private:
     Buffer  m_buffer_new;
-    MI_U32 *m_next;
-    MI_U32 *m_tail;
+    DT_U32 *m_next;
+    DT_U32 *m_tail;
 
 };
 
-static std::shared_ptr<UnionFindSolver> CreateSolver(Context *ctx, EquivalenceSolver solver_type, MI_U32 max_length)
+static std::shared_ptr<UnionFindSolver> CreateSolver(Context *ctx, EquivalenceSolver solver_type, DT_U32 max_length)
 {
     std::shared_ptr<UnionFindSolver> impl;
 
@@ -349,7 +349,7 @@ template <typename LabelType>
 class ScanPlusUnionFindNone
 {
 public:
-    ScanPlusUnionFindNone(Context *ctx, EquivalenceSolver solver_type, MI_U32 max_length)
+    ScanPlusUnionFindNone(Context *ctx, EquivalenceSolver solver_type, DT_U32 max_length)
     {
         m_solver = CreateSolver(ctx, solver_type, max_length);
     }
@@ -403,20 +403,20 @@ protected:
 
     virtual Status FirstScan4C(const Mat &img, Mat &label)
     {
-        const MI_S32 height = img.GetSizes().m_height;
-        const MI_S32 width  = img.GetSizes().m_width;
+        const DT_S32 height = img.GetSizes().m_height;
+        const DT_S32 width  = img.GetSizes().m_width;
         //   +-+
         //   |q|
         // +-+-+
         // |s|x|
         // +-+-+
-        for (MI_S32 y = 0; y < height; ++y)
+        for (DT_S32 y = 0; y < height; ++y)
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-            const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+            const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType   *const dst_p0 = label.Ptr<LabelType>(y - 1);
-            for (MI_S32 x = 0; x < width; ++x)
+            for (DT_S32 x = 0; x < width; ++x)
             {
 #define CONDITION_Q (y > 0 && src_p0[x] > 0)
 #define CONDITION_S (x > 0 && src_c0[x - 1] > 0)
@@ -445,8 +445,8 @@ protected:
 
     Status SecondScan(Mat &label)
     {
-        const MI_S32 height = label.GetSizes().m_height;
-        for (MI_S32 y = 0; y < height; ++y)
+        const DT_S32 height = label.GetSizes().m_height;
+        for (DT_S32 y = 0; y < height; ++y)
         {
             LabelType *dst_start_row     = label.Ptr<LabelType>(y);
             LabelType *const dst_end_row = dst_start_row + label.GetRowStep();
@@ -461,21 +461,21 @@ protected:
 private:
     Status FirstScan8C(const Mat &img, Mat &label)
     {
-        const MI_S32 height = img.GetSizes().m_height;
-        const MI_S32 width  = img.GetSizes().m_width;
+        const DT_S32 height = img.GetSizes().m_height;
+        const DT_S32 width  = img.GetSizes().m_width;
 
         // +-+-+-+
         // |P|Q|R|
         // +-+-+-+
         // |S|X|
         // +-+-+
-        for (MI_S32 y = 0; y < height; ++y)
+        for (DT_S32 y = 0; y < height; ++y)
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-            const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+            const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType   *const dst_p0 = label.Ptr<LabelType>(y - 1);
-            for (MI_S32 x = 0; x < width; ++x)
+            for (DT_S32 x = 0; x < width; ++x)
             {
 #define CONDITION_P    (x > 0 && y > 0 && src_p0[x - 1] > 0)
 #define CONDITION_Q    (y > 0 && src_p0[x] > 0)
@@ -518,7 +518,7 @@ template <typename LabelType>
 class BlockBasedDecisionTreeNone
 {
 public:
-    BlockBasedDecisionTreeNone(Context *ctx, EquivalenceSolver solver_type, MI_U32 max_length)
+    BlockBasedDecisionTreeNone(Context *ctx, EquivalenceSolver solver_type, DT_U32 max_length)
     {
         m_solver = CreateSolver(ctx, solver_type, max_length);
     }
@@ -554,10 +554,10 @@ protected:
 
     virtual Status FirstScan(const Mat &img, Mat &label)
     {
-        const MI_S32 height = label.GetSizes().m_height;
-        const MI_S32 width  = label.GetSizes().m_width;
+        const DT_S32 height = label.GetSizes().m_height;
+        const DT_S32 width  = label.GetSizes().m_width;
 
-        MI_S32 y = 0;
+        DT_S32 y = 0;
 
         // fisrt forward scan
         // +---+---+---+
@@ -569,13 +569,13 @@ protected:
         // +---+---+
         for (y = 0; y < height; y += 2)
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-            const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
-            const MI_U8 *const src_p1 = img.Ptr<MI_U8>(y - 2);
-            const MI_U8 *const src_n0 = img.Ptr<MI_U8>(y + 1);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+            const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
+            const DT_U8 *const src_p1 = img.Ptr<DT_U8>(y - 2);
+            const DT_U8 *const src_n0 = img.Ptr<DT_U8>(y + 1);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType   *const dst_p1 = label.Ptr<LabelType>(y - 2);
-            for (MI_S32 x = 0; x < width; x += 2)
+            for (DT_S32 x = 0; x < width; x += 2)
             {
 #define CONDITION_B ((x - 1) >= 0 && (y - 2) >= 0 && src_p1[x - 1] > 0)
 #define CONDITION_C ((y - 2) >= 0 && src_p1[x] > 0)
@@ -655,21 +655,21 @@ protected:
 
     Status SecondScan(const Mat &img, Mat &label)
     {
-        const MI_S32 height  = label.GetSizes().m_height;
-        const MI_S32 width   = label.GetSizes().m_width;
-        const MI_S32 e_rows  = height & 0xfffffffe;
-        const MI_BOOL o_rows = (height & 1) == 1;
-        const MI_S32 e_cols  = width & 0xfffffffe;
-        const MI_BOOL o_cols = (width & 1) == 1;
-        MI_S32 y = 0;
+        const DT_S32 height  = label.GetSizes().m_height;
+        const DT_S32 width   = label.GetSizes().m_width;
+        const DT_S32 e_rows  = height & 0xfffffffe;
+        const DT_BOOL o_rows = (height & 1) == 1;
+        const DT_S32 e_cols  = width & 0xfffffffe;
+        const DT_BOOL o_cols = (width & 1) == 1;
+        DT_S32 y = 0;
         
         for (; y < e_rows; y += 2)
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-            const MI_U8 *const src_n0 = src_c0 + img.GetRowStep();
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+            const DT_U8 *const src_n0 = src_c0 + img.GetRowStep();
             LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType   *const dst_n0 = dst_c0 + label.GetRowStep();
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < e_cols; x += 2)
             {
                 LabelType label_val = dst_c0[x];
@@ -721,7 +721,7 @@ protected:
             // Last column if the number of columns is odd
             if (o_cols)
             {
-                MI_S32 label_val = dst_c0[x];
+                DT_S32 label_val = dst_c0[x];
                 if (label_val > 0)
                 {
                     label_val = static_cast<LabelType>(this->m_solver->GetLabel(label_val));
@@ -753,12 +753,12 @@ protected:
         // Last row if the number of rows is odd
         if (o_rows)
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
             LabelType *const dst_c0 = label.Ptr<LabelType>(y);
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < e_cols; x += 2)
             {
-                MI_S32 label_val = dst_c0[x];
+                DT_S32 label_val = dst_c0[x];
                 if (label_val > 0)
                 {
                     label_val = static_cast<LabelType>(this->m_solver->GetLabel(label_val));
@@ -789,7 +789,7 @@ protected:
             // Last column if the number of columns is odd
             if (o_cols)
             {
-                MI_S32 label_val = dst_c0[x];
+                DT_S32 label_val = dst_c0[x];
                 if (label_val > 0)
                 {
                     label_val = static_cast<LabelType>(this->m_solver->GetLabel(label_val));
@@ -818,14 +818,14 @@ template <typename LabelType>
 class Spaghetti4CNone : public ScanPlusUnionFindNone<LabelType>
 {
 public:
-    Spaghetti4CNone(Context *ctx, EquivalenceSolver solver_type, MI_U32 max_length) : ScanPlusUnionFindNone<LabelType>(ctx, solver_type, max_length)
+    Spaghetti4CNone(Context *ctx, EquivalenceSolver solver_type, DT_U32 max_length) : ScanPlusUnionFindNone<LabelType>(ctx, solver_type, max_length)
     {}
 
 private:
     Status FirstScan4C(const Mat &img, Mat &label) override
     {
-        const MI_S32 height = img.GetSizes().m_height;
-        const MI_S32 width = img.GetSizes().m_width;
+        const DT_S32 height = img.GetSizes().m_height;
+        const DT_S32 width = img.GetSizes().m_width;
 
 #define CONDITION_Q (src_p0[x] > 0)
 #define CONDITION_S (src_c0[x - 1] > 0)
@@ -839,21 +839,21 @@ private:
 
         // first row
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(0);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(0);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(0);
-            MI_S32 x = -1;
+            DT_S32 x = -1;
 
 #include "connect_component_label/spaghetti_4c_firstline_graph.hpp"
         }
 
         // rest rows
-        for (MI_S32 y = 1; y < height; ++y)
+        for (DT_S32 y = 1; y < height; ++y)
         {
-            const MI_U8 *src_c0     = img.Ptr<MI_U8>(y);
-            const MI_U8 *src_p0     = img.Ptr<MI_U8>(y - 1);
+            const DT_U8 *src_c0     = img.Ptr<DT_U8>(y);
+            const DT_U8 *src_p0     = img.Ptr<DT_U8>(y - 1);
             LabelType *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType *const dst_p0 = label.Ptr<LabelType>(y - 1);
-            MI_S32 x = -1;
+            DT_S32 x = -1;
 
 #include "connect_component_label/spaghetti_4c_singleline_graph.hpp"
         }
@@ -874,17 +874,17 @@ template <typename LabelType>
 class Spaghetti8CNone : public BlockBasedDecisionTreeNone<LabelType>
 {
 public:
-    Spaghetti8CNone(Context *ctx, EquivalenceSolver solver_type, MI_U32 max_length) : BlockBasedDecisionTreeNone<LabelType>(ctx, solver_type, max_length)
+    Spaghetti8CNone(Context *ctx, EquivalenceSolver solver_type, DT_U32 max_length) : BlockBasedDecisionTreeNone<LabelType>(ctx, solver_type, max_length)
     {}
 
 private:
     Status FirstScan(const Mat &img, Mat &label) override
     {
-        const MI_S32 height = img.GetSizes().m_height;
-        const MI_S32 width  = img.GetSizes().m_width;
+        const DT_S32 height = img.GetSizes().m_height;
+        const DT_S32 width  = img.GetSizes().m_width;
 
-        const MI_S32  e_rows = height & 0xfffffffe;
-        const MI_BOOL o_rows = (height & 1) == 1;
+        const DT_S32  e_rows = height & 0xfffffffe;
+        const DT_BOOL o_rows = (height & 1) == 1;
 
         // first scan
         // +---+---+---+
@@ -931,32 +931,32 @@ private:
         if (1 == height)
         {
             // Single line
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(0);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(0);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(0);
-            MI_S32 x = -2;
+            DT_S32 x = -2;
 #include "connect_component_label/spaghetti_8c_singleline_graph.hpp"
         }
         else
         {
             // First couple of lines
             {
-                const MI_U8 *const src_c0 = img.Ptr<MI_U8>(0);
-                const MI_U8 *const src_n0 = img.Ptr<MI_U8>(1);
+                const DT_U8 *const src_c0 = img.Ptr<DT_U8>(0);
+                const DT_U8 *const src_n0 = img.Ptr<DT_U8>(1);
                 LabelType   *const dst_c0 = label.Ptr<LabelType>(0);
-                MI_S32 x = -2;
+                DT_S32 x = -2;
 #include "connect_component_label/spaghetti_8c_firstline_graph.hpp"
             }
 
-            for (MI_S32 y = 2; y < e_rows; y += 2)
+            for (DT_S32 y = 2; y < e_rows; y += 2)
             {
-                const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-                const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
-                const MI_U8 *const src_p1 = img.Ptr<MI_U8>(y - 2);
-                const MI_U8 *const src_n0 = img.Ptr<MI_U8>(y + 1);
+                const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+                const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
+                const DT_U8 *const src_p1 = img.Ptr<DT_U8>(y - 2);
+                const DT_U8 *const src_n0 = img.Ptr<DT_U8>(y + 1);
                 LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
                 LabelType   *const dst_p1 = label.Ptr<LabelType>(y - 2);
 
-                MI_S32 x = -2;
+                DT_S32 x = -2;
                 goto tree_0;
 
 #include "connect_component_label/spaghetti_8c_graph.hpp"
@@ -965,13 +965,13 @@ private:
             // Last line (in case the rows are odd)
             if (o_rows)
             {
-                MI_S32 y = height - 1;
-                const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-                const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
-                const MI_U8 *const src_p1 = img.Ptr<MI_U8>(y - 2);
+                DT_S32 y = height - 1;
+                const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+                const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
+                const DT_U8 *const src_p1 = img.Ptr<DT_U8>(y - 2);
                 LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
                 LabelType   *const dst_p1 = label.Ptr<LabelType>(y - 2);
-                MI_S32 x = -2;
+                DT_S32 x = -2;
 #include "connect_component_label/spaghetti_8c_lastline_graph.hpp"
             }
         }
@@ -1018,7 +1018,7 @@ template <typename LabelType>
 class ScanPlusUnionFindParallel
 {
 public:
-    ScanPlusUnionFindParallel(Context *ctx, EquivalenceSolver solver_type, MI_U32 max_length)
+    ScanPlusUnionFindParallel(Context *ctx, EquivalenceSolver solver_type, DT_U32 max_length)
     {
         m_solver = CreateSolver(ctx, solver_type, max_length);
     }
@@ -1028,58 +1028,58 @@ public:
         WorkerPool *wp = ctx->GetWorkerPool();
         Status ret = Status::ERROR;
 
-        const MI_S32 height = img.GetSizes().m_height;
-        const MI_S32 width  = img.GetSizes().m_width;
+        const DT_S32 height = img.GetSizes().m_height;
+        const DT_S32 width  = img.GetSizes().m_width;
 
-        MI_S32 step = height >> 5;
-        step = Clamp<MI_S32>(step, 16, 256);
+        DT_S32 step = height >> 5;
+        step = Clamp<DT_S32>(step, 16, 256);
         step = ((step & 1) == 1) ? (step + 1) : step; // make sure even
-        std::vector<MI_S32> chunks(ROUND_UP(height, step));
+        std::vector<DT_S32> chunks(ROUND_UP(height, step));
 
         if (ConnectivityType::CROSS == type)
         {
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), (height + step - 1) / step, std::bind(&ScanPlusUnionFindParallel::FirstScan4C,
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), (height + step - 1) / step, std::bind(&ScanPlusUnionFindParallel::FirstScan4C,
                                   this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                                   std::placeholders::_4, std::placeholders::_5, std::placeholders::_6), std::cref(img),
-                                  std::ref(label), (MI_S32*)(chunks.data()), step);
+                                  std::ref(label), (DT_S32*)(chunks.data()), step);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(ctx, "FirstScan4C parallel_for fail");
                 goto EXIT;
             }
 
-            ret = this->MergeLabels4C(label, (MI_S32*)(chunks.data()));
+            ret = this->MergeLabels4C(label, (DT_S32*)(chunks.data()));
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(ctx, "MergeLabels4C parallel_for fail");
                 goto EXIT;
             }
 
-            for (MI_S32 i = 0; i < height; i = chunks[i])
+            for (DT_S32 i = 0; i < height; i = chunks[i])
             {
                 this->m_solver->FlattenChunk(CHUNK_LABEL_INIT_4C(i, width), chunks[i + 1]);
             }
         }
         else if (ConnectivityType::SQUARE == type)
         {
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), (height + step - 1) / step, std::bind(&ScanPlusUnionFindParallel::FirstScan8C,
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), (height + step - 1) / step, std::bind(&ScanPlusUnionFindParallel::FirstScan8C,
                                   this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                                   std::placeholders::_4, std::placeholders::_5, std::placeholders::_6), std::cref(img),
-                                  std::ref(label), (MI_S32*)(chunks.data()), step);
+                                  std::ref(label), (DT_S32*)(chunks.data()), step);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(ctx, "FirstScan8C parallel_for fail");
                 goto EXIT;
             }
 
-            ret = this->MergeLabels8C(label, (MI_S32*)(chunks.data()));
+            ret = this->MergeLabels8C(label, (DT_S32*)(chunks.data()));
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(ctx, "MergeLabels8C parallel_for fail");
                 goto EXIT;
             }
 
-            for (MI_S32 i = 0; i < height; i = chunks[i])
+            for (DT_S32 i = 0; i < height; i = chunks[i])
             {
                 this->m_solver->FlattenChunk(CHUNK_LABEL_INIT_8C(i, width), chunks[i + 1]);
             }
@@ -1091,7 +1091,7 @@ public:
             goto EXIT;
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), (height + step - 1) / step, std::bind(&ScanPlusUnionFindParallel::SecondScan,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), (height + step - 1) / step, std::bind(&ScanPlusUnionFindParallel::SecondScan,
                               this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                               std::placeholders::_4), std::ref(label), step);
         if (ret != Status::OK)
@@ -1107,23 +1107,23 @@ public:
 protected:
     std::shared_ptr<UnionFindSolver> m_solver;
 
-    virtual Status FirstScan4C(const Mat &img, Mat &label, MI_S32 *chunks, MI_S32 step, MI_S32 start_blk, MI_S32 end_blk)
+    virtual Status FirstScan4C(const Mat &img, Mat &label, DT_S32 *chunks, DT_S32 step, DT_S32 start_blk, DT_S32 end_blk)
     {
-        const MI_S32 width     = img.GetSizes().m_width;
-        const MI_S32 start_row = start_blk * step;
-        const MI_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
+        const DT_S32 width     = img.GetSizes().m_width;
+        const DT_S32 start_row = start_blk * step;
+        const DT_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
 
         chunks[start_row] = end_row;
         const LabelType label_init = CHUNK_LABEL_INIT_4C(start_row, width);
         LabelType label_last = label_init;
 
-        for (MI_S32 y = start_row; y != end_row; ++y)
+        for (DT_S32 y = start_row; y != end_row; ++y)
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-            const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+            const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType   *const dst_p0 = label.Ptr<LabelType>(y - 1);
-            for (MI_S32 x = 0; x < width; ++x)
+            for (DT_S32 x = 0; x < width; ++x)
             {
 #define CONDITION_Q (y > start_row && src_p0[x] > 0)
 #define CONDITION_S (x > 0 && src_c0[x - 1] > 0)
@@ -1139,7 +1139,7 @@ protected:
             }
         }
 
-        chunks[start_row + 1] = (MI_S32)label_last - (MI_S32)label_init;
+        chunks[start_row + 1] = (DT_S32)label_last - (DT_S32)label_init;
 
 #undef CONDITION_Q
 #undef CONDITION_S
@@ -1153,17 +1153,17 @@ protected:
         return Status::OK;
     }
 
-    Status MergeLabels4C(Mat &label, const MI_S32 *chunks)
+    Status MergeLabels4C(Mat &label, const DT_S32 *chunks)
     {
-        const MI_S32 height = label.GetSizes().m_height;
-        const MI_S32 width  = label.GetSizes().m_width;
+        const DT_S32 height = label.GetSizes().m_height;
+        const DT_S32 width  = label.GetSizes().m_width;
 
-        for (MI_S32 y = chunks[0]; y < height; y = chunks[y])
+        for (DT_S32 y = chunks[0]; y < height; y = chunks[y])
         {
             LabelType *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType *const dst_p0 = label.Ptr<LabelType>(y - 1);
 
-            for (MI_S32 x = 0; x < width; ++x)
+            for (DT_S32 x = 0; x < width; ++x)
             {
                 if (dst_c0[x] > 0 && dst_p0[x] > 0)
                 {
@@ -1174,12 +1174,12 @@ protected:
         return Status::OK;
     }
 
-    Status SecondScan(Mat &label, MI_S32 step, MI_S32 start_blk, MI_S32 end_blk)
+    Status SecondScan(Mat &label, DT_S32 step, DT_S32 start_blk, DT_S32 end_blk)
     {
-        const MI_S32 start_row = start_blk * step;
-        const MI_S32 end_row   = Min(end_blk * step, label.GetSizes().m_height);
+        const DT_S32 start_row = start_blk * step;
+        const DT_S32 end_row   = Min(end_blk * step, label.GetSizes().m_height);
 
-        for (MI_S32 y = start_row; y < end_row; ++y)
+        for (DT_S32 y = start_row; y < end_row; ++y)
         {
             LabelType *dst_start_row     = label.Ptr<LabelType>(y);
             LabelType *const dst_end_row = dst_start_row + label.GetRowStep();
@@ -1192,23 +1192,23 @@ protected:
     }
 
 private:
-    Status FirstScan8C(const Mat &img, Mat &label, MI_S32 *chunks, MI_S32 step, MI_S32 start_blk, MI_S32 end_blk)
+    Status FirstScan8C(const Mat &img, Mat &label, DT_S32 *chunks, DT_S32 step, DT_S32 start_blk, DT_S32 end_blk)
     {
-        const MI_S32 width     = img.GetSizes().m_width;
-        const MI_S32 start_row = start_blk * step;
-        const MI_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
+        const DT_S32 width     = img.GetSizes().m_width;
+        const DT_S32 start_row = start_blk * step;
+        const DT_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
 
         chunks[start_row] = end_row;
         const LabelType label_init = CHUNK_LABEL_INIT_8C(start_row, width);
         LabelType label_last = label_init;
 
-        for (MI_S32 y = start_row; y < end_row; ++y)
+        for (DT_S32 y = start_row; y < end_row; ++y)
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-            const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+            const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType   *const dst_p0 = label.Ptr<LabelType>(y - 1);
-            for (MI_S32 x = 0; x < width; ++x)
+            for (DT_S32 x = 0; x < width; ++x)
             {
 #define CONDITION_P    (x > 0 && y > start_row && src_p0[x - 1] > 0)
 #define CONDITION_Q    (y > start_row && src_p0[x] > 0)
@@ -1228,7 +1228,7 @@ private:
 #include "connect_component_label/sauf_8c_decision_tree.hpp"
             }
         }
-        chunks[start_row + 1] = (MI_S32)label_last - (MI_S32)label_init;
+        chunks[start_row + 1] = (DT_S32)label_last - (DT_S32)label_init;
 #undef ACTION_1
 #undef ACTION_2
 #undef ACTION_3
@@ -1246,17 +1246,17 @@ private:
         return Status::OK;
     }
 
-    Status MergeLabels8C(Mat &label, const MI_S32 *chunks)
+    Status MergeLabels8C(Mat &label, const DT_S32 *chunks)
     {
-        const MI_S32 height = label.GetSizes().m_height;
-        const MI_S32 width  = label.GetSizes().m_width;
+        const DT_S32 height = label.GetSizes().m_height;
+        const DT_S32 width  = label.GetSizes().m_width;
 
-        for (MI_S32 y = chunks[0]; y < height; y = chunks[y])
+        for (DT_S32 y = chunks[0]; y < height; y = chunks[y])
         {
             LabelType *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType *const dst_p0 = label.Ptr<LabelType>(y - 1);
 
-            for (MI_S32 x = 0; x < width; ++x)
+            for (DT_S32 x = 0; x < width; ++x)
             {
                 if (dst_c0[x] > 0)
                 {
@@ -1284,7 +1284,7 @@ template <typename LabelType>
 class BlockBasedDecisionTreeParallel
 {
 public:
-    BlockBasedDecisionTreeParallel(Context *ctx, EquivalenceSolver solver_type, MI_U32 max_length)
+    BlockBasedDecisionTreeParallel(Context *ctx, EquivalenceSolver solver_type, DT_U32 max_length)
     {
         m_solver = CreateSolver(ctx, solver_type, max_length);
     }
@@ -1294,37 +1294,37 @@ public:
         WorkerPool *wp = ctx->GetWorkerPool();
         Status ret = Status::ERROR;
 
-        const MI_S32 height = img.GetSizes().m_height;
-        const MI_S32 width  = img.GetSizes().m_width;
+        const DT_S32 height = img.GetSizes().m_height;
+        const DT_S32 width  = img.GetSizes().m_width;
 
-        MI_S32 step = height >> 5;
-        step = Clamp<MI_S32>(step, 16, 256);
+        DT_S32 step = height >> 5;
+        step = Clamp<DT_S32>(step, 16, 256);
         step = ((step & 1) == 1) ? (step + 1) : step; // make sure even
-        std::vector<MI_S32> chunks(ROUND_UP(height, step));
+        std::vector<DT_S32> chunks(ROUND_UP(height, step));
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), (height + step - 1) / step, std::bind(&BlockBasedDecisionTreeParallel::FirstScan,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), (height + step - 1) / step, std::bind(&BlockBasedDecisionTreeParallel::FirstScan,
                               this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                               std::placeholders::_4, std::placeholders::_5, std::placeholders::_6), std::cref(img),
-                              std::ref(label), (MI_S32*)(chunks.data()), step);
+                              std::ref(label), (DT_S32*)(chunks.data()), step);
         if (ret != Status::OK)
         {
             AURA_ADD_ERROR_STRING(ctx, "FirstScan parallel_for fail");
             goto EXIT;
         }
 
-        ret = this->MergeLabels(img, label, (MI_S32*)(chunks.data()));
+        ret = this->MergeLabels(img, label, (DT_S32*)(chunks.data()));
         if (ret != Status::OK)
         {
             AURA_ADD_ERROR_STRING(ctx, "MergeLabels parallel_for fail");
             goto EXIT;
         }
 
-        for (MI_S32 i = 0; i < height; i = chunks[i])
+        for (DT_S32 i = 0; i < height; i = chunks[i])
         {
             this->m_solver->FlattenChunk(CHUNK_LABEL_INIT_8C(i, width), chunks[i + 1]);
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), (height + step - 1) / step, std::bind(&BlockBasedDecisionTreeParallel::SecondScan,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), (height + step - 1) / step, std::bind(&BlockBasedDecisionTreeParallel::SecondScan,
                               this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                               std::placeholders::_4, std::placeholders::_5), std::cref(img), std::ref(label), step);
         if (ret != Status::OK)
@@ -1340,26 +1340,26 @@ public:
 protected:
     std::shared_ptr<UnionFindSolver> m_solver;
 
-    virtual Status FirstScan(const Mat &img, Mat &label, MI_S32 *chunks, MI_S32 step, MI_S32 start_blk, MI_S32 end_blk)
+    virtual Status FirstScan(const Mat &img, Mat &label, DT_S32 *chunks, DT_S32 step, DT_S32 start_blk, DT_S32 end_blk)
     {
-        const MI_S32 width     = img.GetSizes().m_width;
-        const MI_S32 start_row = start_blk * step;
-        const MI_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
+        const DT_S32 width     = img.GetSizes().m_width;
+        const DT_S32 start_row = start_blk * step;
+        const DT_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
 
-        MI_S32 y = start_row;
+        DT_S32 y = start_row;
         chunks[start_row] = end_row;
         const LabelType label_init = CHUNK_LABEL_INIT_8C(start_row, width);
         LabelType label_last = label_init;
 
         for (; y < end_row; y += 2)
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-            const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
-            const MI_U8 *const src_p1 = img.Ptr<MI_U8>(y - 2);
-            const MI_U8 *const src_n0 = img.Ptr<MI_U8>(y + 1);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+            const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
+            const DT_U8 *const src_p1 = img.Ptr<DT_U8>(y - 2);
+            const DT_U8 *const src_n0 = img.Ptr<DT_U8>(y + 1);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType   *const dst_p1 = label.Ptr<LabelType>(y - 2);
-            for (MI_S32 x = 0; x < width; x += 2)
+            for (DT_S32 x = 0; x < width; x += 2)
             {
 #define CONDITION_B ((x - 1) >= 0 && (y - 2) >= start_row && src_p1[x - 1] > 0)
 #define CONDITION_C ((y - 2) >= start_row && src_p1[x] > 0)
@@ -1401,7 +1401,7 @@ protected:
 #include "connect_component_label/bbdt_8c_decision_tree.hpp"
             }
         }
-        chunks[start_row + 1] = (MI_S32)label_last - (MI_S32)label_init;
+        chunks[start_row + 1] = (DT_S32)label_last - (DT_S32)label_init;
 #undef ACTION_1
 #undef ACTION_2
 #undef ACTION_3
@@ -1438,19 +1438,19 @@ protected:
         return Status::OK;
     }
 
-    Status MergeLabels(const Mat &img, Mat &label, const MI_S32 *chunks)
+    Status MergeLabels(const Mat &img, Mat &label, const DT_S32 *chunks)
     {
-        const MI_S32 height = label.GetSizes().m_height;
-        const MI_S32 width  = label.GetSizes().m_width;
+        const DT_S32 height = label.GetSizes().m_height;
+        const DT_S32 width  = label.GetSizes().m_width;
 
-        for (MI_S32 y = chunks[0]; y < height; y = chunks[y])
+        for (DT_S32 y = chunks[0]; y < height; y = chunks[y])
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-            const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+            const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType   *const dst_p1 = label.Ptr<LabelType>(y - 2);
 
-            for (MI_S32 x = 0; x < width; x += 2)
+            for (DT_S32 x = 0; x < width; x += 2)
             {
                 if (dst_c0[x] > 0)
                 {
@@ -1487,21 +1487,21 @@ protected:
         return Status::OK;
     }
 
-    Status SecondScan(const Mat &img, Mat &label, MI_S32 step, MI_S32 start_blk, MI_S32 end_blk)
+    Status SecondScan(const Mat &img, Mat &label, DT_S32 step, DT_S32 start_blk, DT_S32 end_blk)
     {
-        const MI_S32 height    = label.GetSizes().m_height;
-        const MI_S32 width     = label.GetSizes().m_width;
-        const MI_S32 start_row = start_blk * step;
-        const MI_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
+        const DT_S32 height    = label.GetSizes().m_height;
+        const DT_S32 width     = label.GetSizes().m_width;
+        const DT_S32 start_row = start_blk * step;
+        const DT_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
 
         // only both even
-        for (MI_S32 y = start_row; y < Min(end_row, height & -2); y += 2)
+        for (DT_S32 y = start_row; y < Min(end_row, height & -2); y += 2)
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-            const MI_U8 *const src_n0 = img.Ptr<MI_U8>(y + 1);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+            const DT_U8 *const src_n0 = img.Ptr<DT_U8>(y + 1);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType   *const dst_n0 = label.Ptr<LabelType>(y + 1);
-            for (MI_S32 x = 0; x < (width & -2); x += 2)
+            for (DT_S32 x = 0; x < (width & -2); x += 2)
             {
                 LabelType label_val = dst_c0[x];
                 if (label_val > 0)
@@ -1555,10 +1555,10 @@ protected:
             {
                 if (width & 1) // handle rest odd row and col
                 {
-                    for (MI_S32 y = 0; y < (height & -2); y += 2)
+                    for (DT_S32 y = 0; y < (height & -2); y += 2)
                     {
-                        const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-                        const MI_U8 *const src_n0 = img.Ptr<MI_U8>(y + 1);
+                        const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+                        const DT_U8 *const src_n0 = img.Ptr<DT_U8>(y + 1);
                         LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
                         LabelType   *const dst_n0 = label.Ptr<LabelType>(y + 1);
                         LabelType label_val = dst_c0[width - 1];
@@ -1588,9 +1588,9 @@ protected:
                         }
                     }
 
-                    const MI_U8 *const src_c0 = img.Ptr<MI_U8>(height - 1);
+                    const DT_U8 *const src_c0 = img.Ptr<DT_U8>(height - 1);
                     LabelType   *const dst_c0 = label.Ptr<LabelType>(height - 1);
-                    for (MI_S32 x = 0; x < (width & -2); x += 2)
+                    for (DT_S32 x = 0; x < (width & -2); x += 2)
                     {
                         LabelType label_val = dst_c0[x];
                         if (label_val > 0)
@@ -1619,7 +1619,7 @@ protected:
                         }
                     }
 
-                    const MI_S32 x = width - 1;
+                    const DT_S32 x = width - 1;
                     LabelType label_val = label.Ptr<LabelType>(height - 1)[x];
                     if (label_val > 0)
                     {
@@ -1640,9 +1640,9 @@ protected:
                 }
                 else // handle only rest odd row
                 {
-                    const MI_U8 *const src_c0 = img.Ptr<MI_U8>(height - 1);
+                    const DT_U8 *const src_c0 = img.Ptr<DT_U8>(height - 1);
                     LabelType   *const dst_c0 = label.Ptr<LabelType>(height - 1);
-                    for (MI_S32 x = 0; x < width; x += 2)
+                    for (DT_S32 x = 0; x < width; x += 2)
                     {
                         LabelType label_val = dst_c0[x];
                         if (label_val > 0)
@@ -1677,11 +1677,11 @@ protected:
             {
                 if (width & 1) // handle only rest odd cols
                 {
-                    const MI_S32 x = width - 1;
-                    for (MI_S32 y = 0; y < height; y += 2)
+                    const DT_S32 x = width - 1;
+                    for (DT_S32 y = 0; y < height; y += 2)
                     {
-                        const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-                        const MI_U8 *const src_n0 = img.Ptr<MI_U8>(y + 1);
+                        const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+                        const DT_U8 *const src_n0 = img.Ptr<DT_U8>(y + 1);
                         LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
                         LabelType   *const dst_n0 = label.Ptr<LabelType>(y + 1);
                         LabelType label_val = dst_c0[x];
@@ -1722,7 +1722,7 @@ template <typename LabelType>
 class Spaghetti4CParallel : public ScanPlusUnionFindParallel<LabelType>
 {
 public:
-    Spaghetti4CParallel(Context *ctx, EquivalenceSolver solver_type, MI_U32 max_length) : ScanPlusUnionFindParallel<LabelType>(ctx, solver_type, max_length)
+    Spaghetti4CParallel(Context *ctx, EquivalenceSolver solver_type, DT_U32 max_length) : ScanPlusUnionFindParallel<LabelType>(ctx, solver_type, max_length)
     {}
 
     Status operator()(Context *ctx, const Mat &img, Mat &label)
@@ -1730,36 +1730,36 @@ public:
         WorkerPool *wp = ctx->GetWorkerPool();
         Status ret = Status::ERROR;
 
-        const MI_S32 height = img.GetSizes().m_height;
-        const MI_S32 width  = img.GetSizes().m_width;
+        const DT_S32 height = img.GetSizes().m_height;
+        const DT_S32 width  = img.GetSizes().m_width;
 
-        MI_S32 step = height >> 5;
-        step = Clamp<MI_S32>(step, 16, 256);
+        DT_S32 step = height >> 5;
+        step = Clamp<DT_S32>(step, 16, 256);
         step = ((step & 1) == 1) ? (step + 1) : step; // make sure even
-        std::vector<MI_S32> chunks(ROUND_UP(height, step));
+        std::vector<DT_S32> chunks(ROUND_UP(height, step));
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), (height + step - 1) / step, std::bind(&Spaghetti4CParallel::FirstScan4C,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), (height + step - 1) / step, std::bind(&Spaghetti4CParallel::FirstScan4C,
                               this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                               std::placeholders::_4, std::placeholders::_5, std::placeholders::_6), std::cref(img),
-                              std::ref(label), (MI_S32*)(chunks.data()), step);
+                              std::ref(label), (DT_S32*)(chunks.data()), step);
         if (ret != Status::OK)
         {
             AURA_ADD_ERROR_STRING(ctx, "FirstScan4C parallel_for fail");
             goto EXIT;
         }
-        ret = this->MergeLabels4C(label, (MI_S32*)(chunks.data()));
+        ret = this->MergeLabels4C(label, (DT_S32*)(chunks.data()));
         if (ret != Status::OK)
         {
             AURA_ADD_ERROR_STRING(ctx, "MergeLabels4C parallel_for fail");
             goto EXIT;
         }
 
-        for (MI_S32 i = 0; i < height; i = chunks[i])
+        for (DT_S32 i = 0; i < height; i = chunks[i])
         {
             this->m_solver->FlattenChunk(CHUNK_LABEL_INIT_4C(i, width), chunks[i + 1]);
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), (height + step - 1) / step, std::bind(&Spaghetti4CParallel::SecondScan,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), (height + step - 1) / step, std::bind(&Spaghetti4CParallel::SecondScan,
                               this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                               std::placeholders::_4),std::ref(label), step);
         if (ret != Status::OK)
@@ -1773,11 +1773,11 @@ public:
     }
 
 private:
-    Status FirstScan4C(const Mat &img, Mat &label, MI_S32 *chunks, MI_S32 step, MI_S32 start_blk, MI_S32 end_blk) override
+    Status FirstScan4C(const Mat &img, Mat &label, DT_S32 *chunks, DT_S32 step, DT_S32 start_blk, DT_S32 end_blk) override
     {
-        const MI_S32 width     = img.GetSizes().m_width;
-        const MI_S32 start_row = start_blk * step;
-        const MI_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
+        const DT_S32 width     = img.GetSizes().m_width;
+        const DT_S32 start_row = start_blk * step;
+        const DT_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
 
         chunks[start_row] = end_row;
         const LabelType label_init = CHUNK_LABEL_INIT_4C(start_row, width);
@@ -1795,25 +1795,25 @@ private:
 
         // first row
         {
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(start_row);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(start_row);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(start_row);
-            MI_S32 x = -1;
+            DT_S32 x = -1;
 
 #include "connect_component_label/spaghetti_4c_firstline_graph.hpp"
         }
 
         // rest rows
-        for (MI_S32 y = 1 + start_row; y < end_row; ++y)
+        for (DT_S32 y = 1 + start_row; y < end_row; ++y)
         {
-            const MI_U8 *src_c0     = img.Ptr<MI_U8>(y);
-            const MI_U8 *src_p0     = img.Ptr<MI_U8>(y - 1);
+            const DT_U8 *src_c0     = img.Ptr<DT_U8>(y);
+            const DT_U8 *src_p0     = img.Ptr<DT_U8>(y - 1);
             LabelType *const dst_c0 = label.Ptr<LabelType>(y);
             LabelType *const dst_p0 = label.Ptr<LabelType>(y - 1);
-            MI_S32 x = -1;
+            DT_S32 x = -1;
 
 #include "connect_component_label/spaghetti_4c_singleline_graph.hpp"
         }
-        chunks[start_row + 1] = (MI_S32)label_last - (MI_S32)label_init;
+        chunks[start_row + 1] = (DT_S32)label_last - (DT_S32)label_init;
 #undef ACTION_1
 #undef ACTION_2
 #undef ACTION_3
@@ -1832,7 +1832,7 @@ template <typename LabelType>
 class Spaghetti8CParallel : public BlockBasedDecisionTreeParallel<LabelType>
 {
 public:
-    Spaghetti8CParallel(Context *ctx, EquivalenceSolver solver_type, MI_U32 max_length) : BlockBasedDecisionTreeParallel<LabelType>(ctx, solver_type, max_length)
+    Spaghetti8CParallel(Context *ctx, EquivalenceSolver solver_type, DT_U32 max_length) : BlockBasedDecisionTreeParallel<LabelType>(ctx, solver_type, max_length)
     {}
 
     Status operator()(Context *ctx, const Mat &img, Mat &label) override
@@ -1840,37 +1840,37 @@ public:
         WorkerPool *wp = ctx->GetWorkerPool();
         Status ret = Status::ERROR;
 
-        const MI_S32 height = img.GetSizes().m_height;
-        const MI_S32 width = img.GetSizes().m_width;
+        const DT_S32 height = img.GetSizes().m_height;
+        const DT_S32 width = img.GetSizes().m_width;
 
-        MI_S32 step = height >> 5;
-        step = Clamp<MI_S32>(step, 16, 256);
+        DT_S32 step = height >> 5;
+        step = Clamp<DT_S32>(step, 16, 256);
         step = ((step & 1) == 1) ? (step + 1) : step; // make sure even
-        std::vector<MI_S32> chunks(ROUND_UP(height, step));
+        std::vector<DT_S32> chunks(ROUND_UP(height, step));
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), (height + step - 1) / step, std::bind(&Spaghetti8CParallel::FirstScan,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), (height + step - 1) / step, std::bind(&Spaghetti8CParallel::FirstScan,
                               this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                               std::placeholders::_4, std::placeholders::_5, std::placeholders::_6), std::cref(img),
-                              std::ref(label), (MI_S32*)(chunks.data()), step);
+                              std::ref(label), (DT_S32*)(chunks.data()), step);
         if (ret != Status::OK)
         {
             AURA_ADD_ERROR_STRING(ctx, "FirstScan parallel_for fail");
             goto EXIT;
         }
 
-        ret = this->MergeLabels(img, label, (MI_S32*)(chunks.data()));
+        ret = this->MergeLabels(img, label, (DT_S32*)(chunks.data()));
         if (ret != Status::OK)
         {
             AURA_ADD_ERROR_STRING(ctx, "MergeLabels parallel_for fail");
             goto EXIT;
         }
 
-        for (MI_S32 i = 0; i < height; i = chunks[i])
+        for (DT_S32 i = 0; i < height; i = chunks[i])
         {
             this->m_solver->FlattenChunk(CHUNK_LABEL_INIT_8C(i, width), chunks[i + 1]);
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), (height + step - 1) / step, std::bind(&Spaghetti8CParallel::SecondScan,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), (height + step - 1) / step, std::bind(&Spaghetti8CParallel::SecondScan,
                               this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
                               std::placeholders::_4,std::placeholders::_5), std::cref(img), std::ref(label), step);
         if (ret != Status::OK)
@@ -1884,17 +1884,17 @@ EXIT:
     }
 
 private:
-    Status FirstScan(const Mat &img, Mat &label, MI_S32 *chunks, MI_S32 step, MI_S32 start_blk, MI_S32 end_blk) override
+    Status FirstScan(const Mat &img, Mat &label, DT_S32 *chunks, DT_S32 step, DT_S32 start_blk, DT_S32 end_blk) override
     {
-        const MI_S32 width     = img.GetSizes().m_width;
-        const MI_S32 start_row = start_blk * step;
-        const MI_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
+        const DT_S32 width     = img.GetSizes().m_width;
+        const DT_S32 start_row = start_blk * step;
+        const DT_S32 end_row   = Min(end_blk * step, img.GetSizes().m_height);
 
         const LabelType label_init = CHUNK_LABEL_INIT_8C(start_row, width);
         LabelType label_last       = label_init;
-        MI_S32 step_true           = end_row - start_row;
-        MI_S32 e_rows              = step_true & 0xfffffffe;
-        MI_BOOL o_rows             = (step_true & 1) == 1;
+        DT_S32 step_true           = end_row - start_row;
+        DT_S32 e_rows              = step_true & 0xfffffffe;
+        DT_BOOL o_rows             = (step_true & 1) == 1;
         chunks[start_row]          = end_row;
 
 #define CONDITION_B (src_p1[x - 1] > 0)
@@ -1933,32 +1933,32 @@ private:
         if (1 == step_true)
         {
             // Single line
-            const MI_U8 *const src_c0 = img.Ptr<MI_U8>(start_row);
+            const DT_U8 *const src_c0 = img.Ptr<DT_U8>(start_row);
             LabelType   *const dst_c0 = label.Ptr<LabelType>(start_row);
-            MI_S32 x = -2;
+            DT_S32 x = -2;
 #include "connect_component_label/spaghetti_8c_singleline_graph.hpp"
         }
         else
         {
             // First couple of lines
             {
-                const MI_U8 *const src_c0 = img.Ptr<MI_U8>(start_row);
-                const MI_U8 *const src_n0 = img.Ptr<MI_U8>(start_row + 1);
+                const DT_U8 *const src_c0 = img.Ptr<DT_U8>(start_row);
+                const DT_U8 *const src_n0 = img.Ptr<DT_U8>(start_row + 1);
                 LabelType   *const dst_c0 = label.Ptr<LabelType>(start_row);
-                MI_S32 x = -2;
+                DT_S32 x = -2;
 #include "connect_component_label/spaghetti_8c_firstline_graph.hpp"
             }
 
-            for (MI_S32 y = 2 + start_row; y < e_rows + start_row; y += 2)
+            for (DT_S32 y = 2 + start_row; y < e_rows + start_row; y += 2)
             {
-                const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-                const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
-                const MI_U8 *const src_p1 = img.Ptr<MI_U8>(y - 2);
-                const MI_U8 *const src_n0 = img.Ptr<MI_U8>(y + 1);
+                const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+                const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
+                const DT_U8 *const src_p1 = img.Ptr<DT_U8>(y - 2);
+                const DT_U8 *const src_n0 = img.Ptr<DT_U8>(y + 1);
                 LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
                 LabelType   *const dst_p1 = label.Ptr<LabelType>(y - 2);
 
-                MI_S32 x = -2;
+                DT_S32 x = -2;
                 goto tree_0;
 
 #include "connect_component_label/spaghetti_8c_graph.hpp"
@@ -1967,17 +1967,17 @@ private:
             // Last line (in case the rows are odd)
             if (o_rows)
             {
-                MI_S32 y = end_row - 1;
-                const MI_U8 *const src_c0 = img.Ptr<MI_U8>(y);
-                const MI_U8 *const src_p0 = img.Ptr<MI_U8>(y - 1);
-                const MI_U8 *const src_p1 = img.Ptr<MI_U8>(y - 2);
+                DT_S32 y = end_row - 1;
+                const DT_U8 *const src_c0 = img.Ptr<DT_U8>(y);
+                const DT_U8 *const src_p0 = img.Ptr<DT_U8>(y - 1);
+                const DT_U8 *const src_p1 = img.Ptr<DT_U8>(y - 2);
                 LabelType   *const dst_c0 = label.Ptr<LabelType>(y);
                 LabelType   *const dst_p1 = label.Ptr<LabelType>(y - 2);
-                MI_S32 x = -2;
+                DT_S32 x = -2;
 #include "connect_component_label/spaghetti_8c_lastline_graph.hpp"
             }
         }
-        chunks[start_row + 1] = (MI_S32)label_last - (MI_S32)label_init;
+        chunks[start_row + 1] = (DT_S32)label_last - (DT_S32)label_init;
 #undef ACTION_1
 #undef ACTION_2
 #undef ACTION_3
@@ -2020,9 +2020,9 @@ template <typename LabelType>
 static Status ScanPlusUnionFindImpl(Context *ctx, const Mat &img, Mat &label, EquivalenceSolver solver_type, ConnectivityType type, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    const MI_S32 height = img.GetSizes().m_height;
-    const MI_S32 width  = img.GetSizes().m_width;
-    const MI_S32 upper_bound = ConnectivityType::CROSS == type ? UPPER_BOUND_4_CONNECTIVITY(height, width) : UPPER_BOUND_8_CONNECTIVITY(height, width);
+    const DT_S32 height = img.GetSizes().m_height;
+    const DT_S32 width  = img.GetSizes().m_width;
+    const DT_S32 upper_bound = ConnectivityType::CROSS == type ? UPPER_BOUND_4_CONNECTIVITY(height, width) : UPPER_BOUND_8_CONNECTIVITY(height, width);
 
     if (target.m_data.none.enable_mt)
     {
@@ -2050,8 +2050,8 @@ template <typename LabelType>
 static Status BlockBasedDecisionTreeImpl(Context *ctx, const Mat &img, Mat &label, EquivalenceSolver solver_type, ConnectivityType type, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    const MI_S32 height = img.GetSizes().m_height;
-    const MI_S32 width  = img.GetSizes().m_width;
+    const DT_S32 height = img.GetSizes().m_height;
+    const DT_S32 width  = img.GetSizes().m_width;
     if (type != ConnectivityType::SQUARE)
     {
         ret = Status::ERROR;
@@ -2085,8 +2085,8 @@ template <typename LabelType>
 static Status SpaghettiImpl(Context *ctx, const Mat &img, Mat &label, EquivalenceSolver solver_type, ConnectivityType type, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    const MI_S32 height = img.GetSizes().m_height;
-    const MI_S32 width  = img.GetSizes().m_width;
+    const DT_S32 height = img.GetSizes().m_height;
+    const DT_S32 width  = img.GetSizes().m_width;
     if (target.m_data.none.enable_mt)
     {
         switch (type)
@@ -2194,7 +2194,7 @@ Status ConnectComponentLabelNone::Run()
     const Mat *img = dynamic_cast<const Mat*>(m_src);
     Mat *label = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == img) || (MI_NULL == label))
+    if ((DT_NULL == img) || (DT_NULL == label))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -2212,21 +2212,21 @@ Status ConnectComponentLabelNone::Run()
     std::unordered_map<std::string, std::pair<std::string,
                       Status (*)(Context*, const Mat&, Mat&, EquivalenceSolver, ConnectivityType, const OpTarget&)>> ccl_algos
     {
-        {"0_1", std::make_pair("SAUF_U8",       ScanPlusUnionFindImpl<MI_U8>)},
-        {"0_3", std::make_pair("SAUF_U16",      ScanPlusUnionFindImpl<MI_U16>)},
-        {"0_5", std::make_pair("SAUF_U32",      ScanPlusUnionFindImpl<MI_U32>)},
-        {"0_6", std::make_pair("SAUF_S32",      ScanPlusUnionFindImpl<MI_S32>)},
-        {"1_1", std::make_pair("BBDT_U8",       BlockBasedDecisionTreeImpl<MI_U8>)},
-        {"1_3", std::make_pair("BBDT_U16",      BlockBasedDecisionTreeImpl<MI_U16>)},
-        {"1_5", std::make_pair("BBDT_U32",      BlockBasedDecisionTreeImpl<MI_U32>)},
-        {"1_6", std::make_pair("BBDT_S32",      BlockBasedDecisionTreeImpl<MI_S32>)},
-        {"2_1", std::make_pair("SPAGHETTI_U8",  SpaghettiImpl<MI_U8>)},
-        {"2_3", std::make_pair("SPAGHETTI_U16", SpaghettiImpl<MI_U16>)},
-        {"2_5", std::make_pair("SPAGHETTI_U32", SpaghettiImpl<MI_U32>)},
-        {"2_6", std::make_pair("SPAGHETTI_S32", SpaghettiImpl<MI_S32>)},
+        {"0_1", std::make_pair("SAUF_U8",       ScanPlusUnionFindImpl<DT_U8>)},
+        {"0_3", std::make_pair("SAUF_U16",      ScanPlusUnionFindImpl<DT_U16>)},
+        {"0_5", std::make_pair("SAUF_U32",      ScanPlusUnionFindImpl<DT_U32>)},
+        {"0_6", std::make_pair("SAUF_S32",      ScanPlusUnionFindImpl<DT_S32>)},
+        {"1_1", std::make_pair("BBDT_U8",       BlockBasedDecisionTreeImpl<DT_U8>)},
+        {"1_3", std::make_pair("BBDT_U16",      BlockBasedDecisionTreeImpl<DT_U16>)},
+        {"1_5", std::make_pair("BBDT_U32",      BlockBasedDecisionTreeImpl<DT_U32>)},
+        {"1_6", std::make_pair("BBDT_S32",      BlockBasedDecisionTreeImpl<DT_S32>)},
+        {"2_1", std::make_pair("SPAGHETTI_U8",  SpaghettiImpl<DT_U8>)},
+        {"2_3", std::make_pair("SPAGHETTI_U16", SpaghettiImpl<DT_U16>)},
+        {"2_5", std::make_pair("SPAGHETTI_U32", SpaghettiImpl<DT_U32>)},
+        {"2_6", std::make_pair("SPAGHETTI_S32", SpaghettiImpl<DT_S32>)},
     };
 
-    std::string ccl_func_nums = std::to_string((MI_S32)m_algo_type) + "_" + std::to_string((MI_S32)label->GetElemType());
+    std::string ccl_func_nums = std::to_string((DT_S32)m_algo_type) + "_" + std::to_string((DT_S32)label->GetElemType());
     if (ccl_algos.count(ccl_func_nums) > 0)
     {
         ret = (ccl_algos[ccl_func_nums].second)(m_ctx, *img, *label, m_solver_type, m_connectivity_type, m_target);

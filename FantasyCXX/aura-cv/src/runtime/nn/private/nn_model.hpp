@@ -17,29 +17,29 @@ namespace aura
 #pragma pack(push, 1)
 struct MinnHeader
 {
-    MI_S32 magic_num = 0;
+    DT_S32 magic_num = 0;
     struct
     {
-        MI_S16 major = 0;
-        MI_S16 minor = 0;
+        DT_S16 major = 0;
+        DT_S16 minor = 0;
     } version;
 };
 
 struct MinnDataV1
 {
-    MI_S16 framework    = 0;
+    DT_S16 framework    = 0;
     struct
     {
-        MI_S16 major    = 0;
-        MI_S16 minor    = 0;
-        MI_S16 patch    = 0;
+        DT_S16 major    = 0;
+        DT_S16 minor    = 0;
+        DT_S16 patch    = 0;
     } framework_version;
     struct
     {
-        MI_S16 major    = 0;
-        MI_S16 minor    = 0;
+        DT_S16 major    = 0;
+        DT_S16 minor    = 0;
     } model_version;
-    MI_S16 backend_type = 0;
+    DT_S16 backend_type = 0;
 };
 #pragma pack(pop)
 
@@ -65,17 +65,17 @@ public:
 
     AURA_DISABLE_COPY_AND_ASSIGN(NNModel);
 
-    MI_U32 GetMinnVersion() const;
+    DT_U32 GetMinnVersion() const;
     std::string GetFrameWorkVersion() const;
     std::string GetModelVersion() const;
     std::string GetBackendType() const;
     std::string GetVersion() const;
     std::string GetModelName() const;
     Buffer GetModelBuffer();
-    AURA_VOID ReleaseModelBuffer();
-    MI_BOOL IsValid() const;
-    MatMap MapMatNames(const MatMap &mat_map, MI_BOOL is_input) const;
-    TensorDescMap MapTensorDescNames(const TensorDescMap &tensor_desc_map, MI_BOOL is_input) const;
+    DT_VOID ReleaseModelBuffer();
+    DT_BOOL IsValid() const;
+    MatMap MapMatNames(const MatMap &mat_map, DT_BOOL is_input) const;
+    TensorDescMap MapTensorDescNames(const TensorDescMap &tensor_desc_map, DT_BOOL is_input) const;
 
     static Buffer CreateModelBufferFromFile(Context *ctx, const std::string &minn_file);
 #if defined(AURA_BUILD_HOST)
@@ -84,14 +84,14 @@ public:
 
 protected:
     Context     *m_ctx;
-    MI_U32      m_minn_version;
+    DT_U32      m_minn_version;
     std::string m_framework_version;
     std::string m_model_version;
     std::string m_backend_type;
-    MI_S64      m_data_offset;
+    DT_S64      m_data_offset;
     Buffer      m_model_buffer;
     ModelInfo   m_model_info;
-    MI_BOOL     m_is_valid;
+    DT_BOOL     m_is_valid;
     std::unordered_map<std::string, std::string> m_input_names_map;
     std::unordered_map<std::string, std::string> m_output_names_map;
 };

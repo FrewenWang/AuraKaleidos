@@ -18,14 +18,14 @@ Status HtpNNExecutor::Initialize(const Buffer &minn_buffer, const std::string &d
     Status ret = Status::ERROR;
 
     NNEngine *nn_engine = m_ctx->GetNNEngine();
-    if (MI_NULL == nn_engine)
+    if (DT_NULL == nn_engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "nn_engine is null");
         return ret;
     }
 
-    m_nn_executor = nn_engine->CreateNNExecutor(static_cast<const MI_U8*>(minn_buffer.m_data), minn_buffer.m_size, decrypt_key, config);
-    if (MI_NULL == m_nn_executor)
+    m_nn_executor = nn_engine->CreateNNExecutor(static_cast<const DT_U8*>(minn_buffer.m_data), minn_buffer.m_size, decrypt_key, config);
+    if (DT_NULL == m_nn_executor)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "nn_executor is null\n");
         return ret;
@@ -85,7 +85,7 @@ std::string HtpNNExecutor::GetVersion()
     return version;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, TensorDesc>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, TensorDesc>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &tensor_desc)
 {
     Status ret = rpc_param->Set(tensor_desc.elem_type, tensor_desc.sizes, tensor_desc.scale, tensor_desc.zero_point, tensor_desc.graph_id);
@@ -108,7 +108,7 @@ static Status HtpNNExecutorInitializeRpc(Context *ctx, HexagonRpcParam &rpc_para
     }
 
     HtpNNExecutor *htp_nn_excutor = new HtpNNExecutor(ctx);
-    if (MI_NULL == htp_nn_excutor)
+    if (DT_NULL == htp_nn_excutor)
     {
         AURA_ADD_ERROR_STRING(ctx, "htp_nn_excutor new failed");
         return ret;
@@ -121,7 +121,7 @@ static Status HtpNNExecutorInitializeRpc(Context *ctx, HexagonRpcParam &rpc_para
         return ret;
     }
 
-    MI_U32 device_addr = reinterpret_cast<MI_U32>(htp_nn_excutor);
+    DT_U32 device_addr = reinterpret_cast<DT_U32>(htp_nn_excutor);
 
     std::vector<TensorDescMap> input_tensor_desc = htp_nn_excutor->GetInputs();
     std::vector<TensorDescMap> output_tensor_desc = htp_nn_excutor->GetOutputs();
@@ -141,8 +141,8 @@ static Status HtpNNExecutorDeInitializeRpc(Context *ctx, HexagonRpcParam &rpc_pa
 {
     Status ret = Status::ERROR;
 
-    MI_U32 device_addr;
-    HtpNNExecutor *htp_nn_excutor = MI_NULL;
+    DT_U32 device_addr;
+    HtpNNExecutor *htp_nn_excutor = DT_NULL;
 
     ret = rpc_param.Get(device_addr);
     if (ret != Status::OK)
@@ -152,7 +152,7 @@ static Status HtpNNExecutorDeInitializeRpc(Context *ctx, HexagonRpcParam &rpc_pa
     }
 
     htp_nn_excutor = reinterpret_cast<HtpNNExecutor*>(device_addr);
-    if (MI_NULL == htp_nn_excutor)
+    if (DT_NULL == htp_nn_excutor)
     {
         return ret;
     }
@@ -165,8 +165,8 @@ static Status HtpNNExecutorTestRunRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
     Status ret = Status::ERROR;
 
-    MI_U32 device_addr;
-    HtpNNExecutor *htp_nn_excutor = MI_NULL;
+    DT_U32 device_addr;
+    HtpNNExecutor *htp_nn_excutor = DT_NULL;
     std::unordered_map<std::string, Mat> input_map;
     std::unordered_map<std::string, Mat> output_map;
 
@@ -178,14 +178,14 @@ static Status HtpNNExecutorTestRunRpc(Context *ctx, HexagonRpcParam &rpc_param)
     }
 
     htp_nn_excutor = reinterpret_cast<HtpNNExecutor*>(device_addr);
-    if (MI_NULL == htp_nn_excutor)
+    if (DT_NULL == htp_nn_excutor)
     {
         AURA_ADD_ERROR_STRING(ctx, "htp_nn_excutor is null");
         return ret;
     }
 
     std::shared_ptr<NNExecutor> nn_executor = htp_nn_excutor->GetNNExecutor();
-    if (MI_NULL == nn_executor)
+    if (DT_NULL == nn_executor)
     {
         AURA_ADD_ERROR_STRING(ctx, "nn_executor is null");
         return ret;

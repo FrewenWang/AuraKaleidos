@@ -9,17 +9,17 @@
 namespace aura
 {
 
-static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &offset,
+static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, DT_S64 &offset,
                             std::unordered_map<std::string, std::string> &names_map)
 {
-    MI_U32 map_len = 0;
+    DT_U32 map_len = 0;
     if (NNDeserialize(ctx, minn_buffer, offset, map_len) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "NNDeserialize failed");
         return Status::ERROR;
     }
 
-    for (MI_U32 i = 0; i < map_len; i++)
+    for (DT_U32 i = 0; i < map_len; i++)
     {
         std::string ori_name, mapped_name;
 
@@ -40,9 +40,9 @@ static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &off
     return Status::OK;
 }
 
-static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &offset, Buffer &buffer)
+static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, DT_S64 &offset, Buffer &buffer)
 {
-    MI_S64 size = 0;
+    DT_S64 size = 0;
 
     if (NNDeserialize(ctx, minn_buffer, offset, size) != Status::OK)
     {
@@ -71,11 +71,11 @@ static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &off
     return Status::OK;
 }
 
-NNModel::NNModel(Context *ctx, const ModelInfo &model_info) : m_ctx(ctx), m_data_offset(0), m_model_info(model_info), m_is_valid(MI_FALSE)
+NNModel::NNModel(Context *ctx, const ModelInfo &model_info) : m_ctx(ctx), m_data_offset(0), m_model_info(model_info), m_is_valid(DT_FALSE)
 {
     do
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             break;
         }
@@ -184,18 +184,18 @@ NNModel::NNModel(Context *ctx, const ModelInfo &model_info) : m_ctx(ctx), m_data
             }
         }
 
-        m_is_valid = MI_TRUE;
+        m_is_valid = DT_TRUE;
     } while (0);
 }
 
 NNModel::~NNModel()
 {
     ReleaseModelBuffer();
-    m_is_valid = MI_FALSE;
+    m_is_valid = DT_FALSE;
     m_model_info = ModelInfo();
 }
 
-MI_U32 NNModel::GetMinnVersion() const
+DT_U32 NNModel::GetMinnVersion() const
 {
     return m_minn_version;
 }
@@ -250,14 +250,14 @@ Buffer NNModel::GetModelBuffer()
     }
 
 #if defined(AURA_BUILD_HEXAGON)
-    MI_U32 addr_offset = AURA_ALIGN(reinterpret_cast<MI_U64>(minn_buffer.m_origin), 32) - reinterpret_cast<MI_U64>(minn_buffer.m_origin);
+    DT_U32 addr_offset = AURA_ALIGN(reinterpret_cast<DT_U64>(minn_buffer.m_origin), 32) - reinterpret_cast<DT_U64>(minn_buffer.m_origin);
     m_model_buffer = m_model_info.minn_buffer;
     m_model_buffer.Resize(minn_buffer.m_size, addr_offset);
 #else
     m_model_buffer = minn_buffer;
 #endif // AURA_BUILD_HEXAGON
 
-    MI_U64 decrypt_size = ((m_minn_version < 0x010002) || (minn_buffer.m_size < AURA_NN_MODEL_ENCRYPT_LENGTH)) ? minn_buffer.m_size : AURA_NN_MODEL_ENCRYPT_LENGTH;
+    DT_U64 decrypt_size = ((m_minn_version < 0x010002) || (minn_buffer.m_size < AURA_NN_MODEL_ENCRYPT_LENGTH)) ? minn_buffer.m_size : AURA_NN_MODEL_ENCRYPT_LENGTH;
     if (NNDecrypt(m_ctx, minn_buffer, m_model_buffer, m_model_info.decrypt_key, decrypt_size) != Status::OK)
     {
         ReleaseModelBuffer();
@@ -268,7 +268,7 @@ Buffer NNModel::GetModelBuffer()
     return m_model_buffer;
 }
 
-AURA_VOID NNModel::ReleaseModelBuffer()
+DT_VOID NNModel::ReleaseModelBuffer()
 {
     if (!m_model_info.minn_file_name.empty())
     {
@@ -287,7 +287,7 @@ AURA_VOID NNModel::ReleaseModelBuffer()
     m_model_info = ModelInfo();
 }
 
-MI_BOOL NNModel::IsValid() const
+DT_BOOL NNModel::IsValid() const
 {
     return m_is_valid;
 }
@@ -323,7 +323,7 @@ static MatMap MapMatNamesImpl(Context *ctx, const MatMap &mat_map, const std::un
     return mapped;
 }
 
-MatMap NNModel::MapMatNames(const MatMap &mat_map, MI_BOOL is_input) const
+MatMap NNModel::MapMatNames(const MatMap &mat_map, DT_BOOL is_input) const
 {
     if (is_input)
     {
@@ -355,18 +355,18 @@ static TensorDescMap MapTensorDescNamesImpl(Context *ctx, const TensorDescMap &t
     {
         std::string mapped_name = pair.first;
 
-        MI_BOOL find_flag = MI_FALSE;
+        DT_BOOL find_flag = DT_FALSE;
         for (const auto &name_pair : names_map)
         {
             if (name_pair.second == mapped_name)
             {
                 mapped[name_pair.first] = pair.second;
-                find_flag = MI_TRUE;
+                find_flag = DT_TRUE;
                 break;
             }
         }
 
-        if (MI_FALSE == find_flag)
+        if (DT_FALSE == find_flag)
         {
             AURA_ADD_ERROR_STRING(ctx, ("mapped name: " + mapped_name + " not exist in names map").c_str());
             return TensorDescMap();
@@ -376,7 +376,7 @@ static TensorDescMap MapTensorDescNamesImpl(Context *ctx, const TensorDescMap &t
     return mapped;
 }
 
-TensorDescMap NNModel::MapTensorDescNames(const TensorDescMap &tensor_desc_map, MI_BOOL is_input) const
+TensorDescMap NNModel::MapTensorDescNames(const TensorDescMap &tensor_desc_map, DT_BOOL is_input) const
 {
     if (is_input)
     {
@@ -390,7 +390,7 @@ TensorDescMap NNModel::MapTensorDescNames(const TensorDescMap &tensor_desc_map, 
 
 Buffer NNModel::CreateModelBufferFromFile(Context *ctx, const std::string &minn_file)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Buffer();
     }
@@ -409,7 +409,7 @@ Buffer NNModel::CreateModelBufferFromFile(Context *ctx, const std::string &minn_
     }
 
     FILE *fp = fopen(minn_file.c_str(), "rb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         AURA_ADD_ERROR_STRING(ctx, ("open model: " + minn_file + " failed").c_str());
         return Buffer();
@@ -423,7 +423,7 @@ Buffer NNModel::CreateModelBufferFromFile(Context *ctx, const std::string &minn_
         return Buffer();
     }
 
-    MI_S64 bytes = fread(buffer.m_data, 1, st.st_size, fp);
+    DT_S64 bytes = fread(buffer.m_data, 1, st.st_size, fp);
     if (bytes != st.st_size)
     {
         fclose(fp);
@@ -439,7 +439,7 @@ Buffer NNModel::CreateModelBufferFromFile(Context *ctx, const std::string &minn_
 #if defined(AURA_BUILD_HOST)
 Buffer NNModel::MapModelBufferFromFile(Context *ctx, const std::string &minn_file)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Buffer();
     }
@@ -457,14 +457,14 @@ Buffer NNModel::MapModelBufferFromFile(Context *ctx, const std::string &minn_fil
         return Buffer();
     }
 
-    MI_S32 fd = open(minn_file.c_str(), O_RDONLY);
+    DT_S32 fd = open(minn_file.c_str(), O_RDONLY);
     if (fd < 0)
     {
         AURA_ADD_ERROR_STRING(ctx, ("open model: " + minn_file + " failed").c_str());
         return Buffer();
     }
 
-    AURA_VOID *map_addr = mmap(MI_NULL, st.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+    DT_VOID *map_addr = mmap(DT_NULL, st.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
     if (MAP_FAILED == map_addr)
     {
         close(fd);

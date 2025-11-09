@@ -48,12 +48,12 @@ Binary::Binary(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Binary::SetArgs(const Array *src0, const Array *src1, Array *dst, BinaryOpType type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -94,14 +94,14 @@ Status Binary::SetArgs(const Array *src0, const Array *src1, Array *dst, BinaryO
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateBinaryImpl(m_ctx, impl_target);
     }
 
     // run initialize
     BinaryImpl *binary_impl = dynamic_cast<BinaryImpl*>(m_impl.get());
-    if (MI_NULL == binary_impl)
+    if (DT_NULL == binary_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "binary_impl is null ptr");
         return Status::ERROR;
@@ -115,7 +115,7 @@ Status Binary::SetArgs(const Array *src0, const Array *src1, Array *dst, BinaryO
 Status Binary::CLPrecompile(Context *ctx, ElemType elem_type, BinaryOpType op_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -151,13 +151,13 @@ AURA_EXPORTS Status IMax(Context *ctx, const Mat &src0, const Mat &src1, Mat &ds
 }
 
 BinaryImpl::BinaryImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Binary", target),
-                                                               m_src0(MI_NULL), m_src1(MI_NULL),
-                                                               m_dst(MI_NULL),  m_type(BinaryOpType::MIN)
+                                                               m_src0(DT_NULL), m_src1(DT_NULL),
+                                                               m_dst(DT_NULL),  m_type(BinaryOpType::MIN)
 {}
 
 Status BinaryImpl::SetArgs(const Array *src0, const Array *src1, Array *dst, BinaryOpType type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -201,7 +201,7 @@ std::string BinaryImpl::ToString() const
     return str;
 }
 
-AURA_VOID BinaryImpl::Dump(const std::string &prefix) const
+DT_VOID BinaryImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

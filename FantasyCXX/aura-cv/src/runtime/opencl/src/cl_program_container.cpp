@@ -11,25 +11,25 @@ namespace aura
 {
 
 template<typename Tp> 
-AURA_INLINE AURA_VOID Serialize(std::stringstream &ss, const Tp &val)
+AURA_INLINE DT_VOID Serialize(std::stringstream &ss, const Tp &val)
 {
-    ss.write((MI_CHAR *)(&val), sizeof(Tp));
+    ss.write((DT_CHAR *)(&val), sizeof(Tp));
 }
 
 template<> 
-AURA_NO_STATIC_INLINE AURA_VOID Serialize<std::string>(std::stringstream &ss, const std::string &val)
+AURA_NO_STATIC_INLINE DT_VOID Serialize<std::string>(std::stringstream &ss, const std::string &val)
 {
-    Serialize<MI_U32>(ss, val.size());
+    Serialize<DT_U32>(ss, val.size());
     ss.write(val.c_str(), val.size());
 }
 
 template<>
-AURA_NO_STATIC_INLINE AURA_VOID Serialize<std::vector<std::vector<MI_UCHAR>>>(std::stringstream &ss, const std::vector<std::vector<MI_UCHAR>> &val)
+AURA_NO_STATIC_INLINE DT_VOID Serialize<std::vector<std::vector<DT_UCHAR>>>(std::stringstream &ss, const std::vector<std::vector<DT_UCHAR>> &val)
 {
-    MI_U32 nums = val.size();
-    Serialize<MI_U32>(ss, nums);
+    DT_U32 nums = val.size();
+    Serialize<DT_U32>(ss, nums);
 
-    for (MI_U32 i = 0; i < nums; ++i)
+    for (DT_U32 i = 0; i < nums; ++i)
     {
         Serialize<std::string>(ss, std::string(val[i].begin(), val[i].end()));
     }
@@ -39,7 +39,7 @@ template<typename Tp>
 AURA_INLINE Tp Deserialize(std::stringstream &str)
 {
     Tp num = 0;
-    str.read((MI_CHAR *)(&num), sizeof(Tp));
+    str.read((DT_CHAR *)(&num), sizeof(Tp));
 
     return num;
 }
@@ -47,28 +47,28 @@ AURA_INLINE Tp Deserialize(std::stringstream &str)
 template<> 
 AURA_NO_STATIC_INLINE std::string Deserialize<std::string>(std::stringstream &str)
 {
-    MI_U32 num = Deserialize<MI_U32>(str);
+    DT_U32 num = Deserialize<DT_U32>(str);
 
     std::string str_sub;
     str_sub.resize(num);
 
-    str.read((MI_CHAR *)(str_sub.c_str()), num);
+    str.read((DT_CHAR *)(str_sub.c_str()), num);
 
     return str_sub;
 }
 
 template<> 
-AURA_NO_STATIC_INLINE std::vector<std::vector<MI_UCHAR>> Deserialize<std::vector<std::vector<MI_UCHAR>>>(std::stringstream &str)
+AURA_NO_STATIC_INLINE std::vector<std::vector<DT_UCHAR>> Deserialize<std::vector<std::vector<DT_UCHAR>>>(std::stringstream &str)
 {
-    MI_U32 nums = Deserialize<MI_U32>(str);
+    DT_U32 nums = Deserialize<DT_U32>(str);
 
-    std::vector<std::vector<MI_UCHAR> > vecs;
+    std::vector<std::vector<DT_UCHAR> > vecs;
     vecs.reserve(nums);
 
-    for (MI_U32 i = 0; i < nums; ++i)
+    for (DT_U32 i = 0; i < nums; ++i)
     {
         std::string s = Deserialize<std::string>(str);
-        vecs.push_back(std::vector<MI_UCHAR>(s.begin(), s.end()));
+        vecs.push_back(std::vector<DT_UCHAR>(s.begin(), s.end()));
     }
 
     return vecs;
@@ -87,8 +87,8 @@ CLProgramContainer::CLProgramContainer(Context *ctx,
                                          m_aura_version(aura_version),
                                          m_external_version(external_version),
                                          m_cl_programs_list(),
-                                         m_cache_header_valid(MI_FALSE),
-                                         m_is_update_cache(MI_FALSE)
+                                         m_cache_header_valid(DT_FALSE),
+                                         m_is_update_cache(DT_FALSE)
 {
     m_cache_bin_fname = m_cl_conf->m_cache_path;
 
@@ -128,8 +128,8 @@ Status CLProgramContainer::Initialize()
         if ((!m_cache_bin_fname.empty()) && (!m_cl_conf->m_cache_prefix.empty()))
         {
             // remove last "/" or "\\"
-            MI_S32 last_pos = m_cache_bin_fname.size() - 1;
-            const MI_CHAR last_char = m_cache_bin_fname[last_pos];
+            DT_S32 last_pos = m_cache_bin_fname.size() - 1;
+            const DT_CHAR last_char = m_cache_bin_fname[last_pos];
             last_pos = (last_char == '/' || last_char == '\\') ? (last_pos) : (last_pos + 1);
 
             m_cache_bin_fname = m_cache_bin_fname.substr(0, last_pos) + "/" + m_cl_conf->m_cache_prefix + std::string(".cache");
@@ -159,7 +159,7 @@ CLProgramContainer::~CLProgramContainer()
     }
     else
     {
-        AURA_LOGD(m_ctx, AURA_TAG, "cache bin path is invalid\n", MI_TRUE);
+        AURA_LOGD(m_ctx, AURA_TAG, "cache bin path is invalid\n", DT_TRUE);
     }
 }
 
@@ -190,8 +190,8 @@ std::shared_ptr<cl::Program> CLProgramContainer::GetCLProgram(const std::string 
     std::shared_ptr<cl::Program> cl_program;
 
     std::string program_key_str = name + build_options_str;
-    MI_U32 hash_value = GetHash(program_key_str);
-    MI_U32 crc_val = GetHash(source);
+    DT_U32 hash_value = GetHash(program_key_str);
+    DT_U32 crc_val = GetHash(source);
 
     std::lock_guard<std::mutex> guard(m_container_mutex);
 
@@ -239,8 +239,8 @@ std::shared_ptr<cl::Program> CLProgramContainer::GetCLProgram(const std::string 
 std::shared_ptr<cl::Program> CLProgramContainer::BuildProgramFromSource(const std::string &name,
                                                                         const std::string &source,
                                                                         const CLProgramType cl_type,
-                                                                        MI_U32 hash_value,
-                                                                        MI_U32 crc_value,
+                                                                        DT_U32 hash_value,
+                                                                        DT_U32 crc_value,
                                                                         const std::string &build_options)
 {
     Status ret = Status::OK;
@@ -251,7 +251,7 @@ std::shared_ptr<cl::Program> CLProgramContainer::BuildProgramFromSource(const st
     if (ret != Status::OK)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "source build failed");
-        return MI_NULL;
+        return DT_NULL;
     }
     else
     {
@@ -269,15 +269,15 @@ std::shared_ptr<cl::Program> CLProgramContainer::BuildProgramFromSource(const st
 
         if ((CLProgramType::CACHED == cl_type) || (CLProgramType::PRECOMPILED == cl_type))
         {
-            m_cache_header_valid = MI_FALSE;
+            m_cache_header_valid = DT_FALSE;
         }
 
-        m_is_update_cache = MI_TRUE;
+        m_is_update_cache = DT_TRUE;
 
         return cl_program->m_cl_program;
     }
 
-    return MI_NULL;
+    return DT_NULL;
 }
 
 Status CLProgramContainer::LoadBinaryCLProgram(const std::string &fname, CLProgramType cl_type)
@@ -291,21 +291,21 @@ Status CLProgramContainer::LoadBinaryCLProgram(const std::string &fname, CLProgr
 
     // load cache bin
     FILE *fp = fopen(fname.c_str(), "rb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         return ret;
     }
 
     fseek(fp, 0, SEEK_END);
-    MI_S32 file_length = ftell(fp);
+    DT_S32 file_length = ftell(fp);
 
     fseek(fp, 0, SEEK_SET);
 
     std::string cl_program_str;
     cl_program_str.resize(file_length);
 
-    size_t bytes = fread((AURA_VOID*)(cl_program_str.data()), 1, file_length, fp);
-    if (static_cast<MI_S32>(bytes) != file_length)
+    size_t bytes = fread((DT_VOID*)(cl_program_str.data()), 1, file_length, fp);
+    if (static_cast<DT_S32>(bytes) != file_length)
     {
         goto EXIT;
     }
@@ -337,7 +337,7 @@ Status CLProgramContainer::CreateCacheCLProgram(const std::string &fname)
 
         if (m_is_update_cache)
         {
-            MI_BOOL is_append_flag = m_cache_header_valid ? MI_TRUE : MI_FALSE;
+            DT_BOOL is_append_flag = m_cache_header_valid ? DT_TRUE : DT_FALSE;
 
             EncodeProgramsType encode_type = m_cache_header_valid ? EncodeProgramsType::CACHE_APPEND : EncodeProgramsType::CACHE_ALL;
             ret = EncodeBinaryCLProgram(str, encode_type);
@@ -355,7 +355,7 @@ Status CLProgramContainer::CreateCacheCLProgram(const std::string &fname)
     return ret;
 }
 
-Status CLProgramContainer::WriteBinaryFile(const std::string &fname, const std::string &str, MI_BOOL is_append_flag)
+Status CLProgramContainer::WriteBinaryFile(const std::string &fname, const std::string &str, DT_BOOL is_append_flag)
 {
     Status ret = Status::ERROR;
 
@@ -363,7 +363,7 @@ Status CLProgramContainer::WriteBinaryFile(const std::string &fname, const std::
     {
         std::string mode_flag = is_append_flag ? "a+" : "wb";
         FILE *fp = fopen(fname.c_str(), mode_flag.c_str());
-        if (MI_NULL == fp)
+        if (DT_NULL == fp)
         {
             AURA_LOGE(m_ctx, AURA_TAG, "open file %s failed\n", fname.c_str());
             return ret;
@@ -407,9 +407,9 @@ Status CLProgramContainer::WriteHppFile(const std::string &fname, const std::str
         {
             ofs << str_start;
             ofs << "    ";
-            for (MI_U32 i = 0; i < (MI_U32)(str.size()); i++)
+            for (DT_U32 i = 0; i < (DT_U32)(str.size()); i++)
             {
-                ofs << "0x"<<std::setbase(16) << std::setw(2) << std::setfill('0') << static_cast<MI_U16>(str[i]) << ", ";
+                ofs << "0x"<<std::setbase(16) << std::setw(2) << std::setfill('0') << static_cast<DT_U16>(str[i]) << ", ";
                 if ((i + 1) % 16 == 0)
                 {
                     ofs << "\n";
@@ -441,8 +441,8 @@ Status CLProgramContainer::CreatePrecompiledCLProgram(const std::string &file_pa
     if (!file_path.empty())
     {
         // remove last "/" or "\\"
-        MI_S32 last_pos = file_path.size() - 1;
-        const MI_CHAR last_char = file_path[last_pos];
+        DT_S32 last_pos = file_path.size() - 1;
+        const DT_CHAR last_char = file_path[last_pos];
         last_pos = (last_char == '/' || last_char == '\\') ? (last_pos) : (last_pos + 1);
 
         std::string bin_file = file_path.substr(0, last_pos) + "/" + prefix + std::string("_precompiled.bin");
@@ -455,7 +455,7 @@ Status CLProgramContainer::CreatePrecompiledCLProgram(const std::string &file_pa
             return ret;
         }
 
-        ret = WriteBinaryFile(bin_file, str, MI_FALSE);
+        ret = WriteBinaryFile(bin_file, str, DT_FALSE);
         if (ret != Status::OK)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "WriteBinaryFile failed");
@@ -487,10 +487,10 @@ Status CLProgramContainer::DecodeBinaryCLProgram(const std::string &bin_str, CLP
     ss.write(bin_str.c_str(), bin_str.size());
 
     // decode header
-    MI_U32 magic_num = Deserialize<MI_U32>(ss);
+    DT_U32 magic_num = Deserialize<DT_U32>(ss);
     if (magic_num != AURA_CL_PROG_MAGIC)
     {
-        MI_CHAR info[256];
+        DT_CHAR info[256];
         snprintf(info, sizeof(info), "program cl_type is : %s, magic_num(%x, %x) is not matched\n", 
                  GetCLProgramTypeToString(cl_type).c_str(), magic_num, AURA_CL_PROG_MAGIC);
         AURA_ADD_ERROR_STRING(m_ctx, info);
@@ -526,11 +526,11 @@ Status CLProgramContainer::DecodeBinaryCLProgram(const std::string &bin_str, CLP
     }
 
     std::lock_guard<std::mutex> guard(m_container_mutex);
-    MI_U32 hash_value = 0;
+    DT_U32 hash_value = 0;
     // decode program
     while (1)
     {
-        hash_value = Deserialize<MI_U32>(ss);
+        hash_value = Deserialize<DT_U32>(ss);
         if (!ss.good())
         {
             break;
@@ -551,14 +551,14 @@ Status CLProgramContainer::DecodeBinaryCLProgram(const std::string &bin_str, CLP
         }
 
         // program crc
-        MI_U32 crc_val = Deserialize<MI_U32>(ss);
+        DT_U32 crc_val = Deserialize<DT_U32>(ss);
         if (!ss.good())
         {
             break;
         }
 
         // program binaries
-        std::vector<std::vector<MI_UCHAR> > binaries_vecs = Deserialize<std::vector<std::vector<MI_UCHAR>>>(ss);
+        std::vector<std::vector<DT_UCHAR> > binaries_vecs = Deserialize<std::vector<std::vector<DT_UCHAR>>>(ss);
         if (!ss.good())
         {
             break;
@@ -582,7 +582,7 @@ Status CLProgramContainer::DecodeBinaryCLProgram(const std::string &bin_str, CLP
 
     if (CLProgramType::CACHED == cl_type)
     {
-        m_cache_header_valid = MI_TRUE;
+        m_cache_header_valid = DT_TRUE;
     }
 
     return Status::OK;
@@ -608,7 +608,7 @@ Status CLProgramContainer::EncodeBinaryCLProgram(std::string &output, EncodeProg
         (EncodeProgramsType::PRECOMMPILED_ALL == encode_type)) //write cache header infomation
     {
         // magic num
-        Serialize<MI_U32>(stream, AURA_CL_PROG_MAGIC);
+        Serialize<DT_U32>(stream, AURA_CL_PROG_MAGIC);
 
         // driver version
         Serialize<std::string>(stream, m_cl_driver_version);
@@ -627,7 +627,7 @@ Status CLProgramContainer::EncodeBinaryCLProgram(std::string &output, EncodeProg
     {
         std::stringstream prog_stream;
 
-        MI_BOOL ecode_flag = MI_FALSE;
+        DT_BOOL ecode_flag = DT_FALSE;
 
         if (EncodeProgramsType::CACHE_ALL == encode_type)
         {
@@ -639,13 +639,13 @@ Status CLProgramContainer::EncodeBinaryCLProgram(std::string &output, EncodeProg
         }
         else if (EncodeProgramsType::PRECOMMPILED_ALL == encode_type)
         {
-            ecode_flag = MI_TRUE;
+            ecode_flag = DT_TRUE;
         }
 
         if (ecode_flag && bprog.second->m_cl_program)
         {
             //name+build options hash
-            Serialize<MI_U32>(prog_stream, bprog.first);
+            Serialize<DT_U32>(prog_stream, bprog.first);
 
             // name
             Serialize<std::string>(prog_stream, bprog.second->m_name);
@@ -654,9 +654,9 @@ Status CLProgramContainer::EncodeBinaryCLProgram(std::string &output, EncodeProg
             Serialize<std::string>(prog_stream, bprog.second->m_build_options);
 
             // crc
-            Serialize<MI_U32>(prog_stream, bprog.second->m_crc_val);
+            Serialize<DT_U32>(prog_stream, bprog.second->m_crc_val);
 
-            std::vector<std::vector<MI_UCHAR>> binaries_vec;
+            std::vector<std::vector<DT_UCHAR>> binaries_vec;
             cl_int cl_err = bprog.second->m_cl_program->getInfo(CL_PROGRAM_BINARIES, &binaries_vec);
 
             if (cl_err != CL_SUCCESS)
@@ -667,7 +667,7 @@ Status CLProgramContainer::EncodeBinaryCLProgram(std::string &output, EncodeProg
                 break;
             }
 
-            Serialize<std::vector<std::vector<MI_UCHAR>>>(prog_stream, binaries_vec);
+            Serialize<std::vector<std::vector<DT_UCHAR>>>(prog_stream, binaries_vec);
 
             // stream << prog_stream.str();
             output += prog_stream.str();
@@ -677,16 +677,16 @@ Status CLProgramContainer::EncodeBinaryCLProgram(std::string &output, EncodeProg
     return ret;
 }
 
-MI_U32 CLProgramContainer::GetHash(const std::string &str)
+DT_U32 CLProgramContainer::GetHash(const std::string &str)
 {
-    MI_U32 hash = 0;
+    DT_U32 hash = 0;
 
-    const MI_S32 length = str.length();
-    const MI_U8 *ptr    = reinterpret_cast<const MI_U8*>(str.c_str());
+    const DT_S32 length = str.length();
+    const DT_U8 *ptr    = reinterpret_cast<const DT_U8*>(str.c_str());
 
-    for (MI_S32 i = 0; i < length; i++)
+    for (DT_S32 i = 0; i < length; i++)
     {
-        hash += (MI_U32)(ptr[i]);
+        hash += (DT_U32)(ptr[i]);
         hash += (hash << 10);
         hash ^= (hash >> 6);
     }

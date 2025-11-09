@@ -5,7 +5,7 @@
 namespace aura
 {
 
-static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, MI_S32 channel, std::string &build_opt)
+static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, DT_S32 channel, std::string &build_opt)
 {
     CLBuildOptions cl_build_opt(ctx);
     cl_build_opt.AddOption("Tp", CLTypeString(elem_type));
@@ -24,7 +24,7 @@ static Status GetCLName(std::string &program_name, std::string &kernel_name)
     return Status::OK;
 }
 
-static AURA_VOID GetCLGlobalSize(MI_S32 width, MI_S32 height, cl::NDRange &cl_range)
+static DT_VOID GetCLGlobalSize(DT_S32 width, DT_S32 height, cl::NDRange &cl_range)
 {
     cl_range = cl::NDRange((width + 3) / 4, height);
 }
@@ -66,21 +66,21 @@ Status ResizeNnCL::Run()
     Sizes3 src_sz = m_cl_src.GetSizes();
     Sizes3 dst_sz = m_cl_dst.GetSizes();
 
-    MI_S32 iwidth  = src_sz.m_width;
-    MI_S32 iheight = src_sz.m_height;
-    MI_S32 owidth  = dst_sz.m_width;
-    MI_S32 oheight = dst_sz.m_height;
-    MI_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 iwidth  = src_sz.m_width;
+    DT_S32 iheight = src_sz.m_height;
+    DT_S32 owidth  = dst_sz.m_width;
+    DT_S32 oheight = dst_sz.m_height;
+    DT_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
 
-    MI_F32 scale_x = MI_F32(owidth) / MI_F32(iwidth);
-    MI_F32 scale_y = MI_F32(oheight) / MI_F32(iheight);
+    DT_F32 scale_x = DT_F32(owidth) / DT_F32(iwidth);
+    DT_F32 scale_y = DT_F32(oheight) / DT_F32(iheight);
 
-    MI_F32 inv_scale_x = 1.0f / scale_x;
-    MI_F32 inv_scale_y = 1.0f / scale_y;
+    DT_F32 inv_scale_x = 1.0f / scale_x;
+    DT_F32 inv_scale_y = 1.0f / scale_y;
 
-    MI_S32 x_max = Min(Ceil((iwidth - 1) * scale_x), owidth);
-    MI_S32 y_max = Min(Ceil((iheight - 1) * scale_y), oheight);
+    DT_S32 x_max = Min(Ceil((iwidth - 1) * scale_x), owidth);
+    DT_S32 y_max = Min(Ceil((iheight - 1) * scale_y), oheight);
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -93,7 +93,7 @@ Status ResizeNnCL::Run()
     cl_int cl_ret = CL_SUCCESS;
 
     // 2. opencl run
-     cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_F32, MI_F32, MI_S32, MI_S32>(
+     cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_F32, DT_F32, DT_S32, DT_S32>(
                                  m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                  iwidth, iheight, owidth, oheight,
@@ -146,7 +146,7 @@ Status ResizeNnCL::DeInitialize()
     return Status::OK;
 }
 
-std::vector<CLKernel> ResizeNnCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel)
+std::vector<CLKernel> ResizeNnCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel)
 {
     std::vector<CLKernel> cl_kernels;
 

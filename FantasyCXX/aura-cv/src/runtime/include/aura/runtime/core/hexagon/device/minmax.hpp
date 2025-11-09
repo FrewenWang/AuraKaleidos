@@ -7,7 +7,7 @@
 namespace aura
 {
 
-AURA_ALWAYS_INLINE AURA_VOID Q6_vminmax_VubVub(HVX_Vector &vu8_u, HVX_Vector &vu8_v)
+AURA_ALWAYS_INLINE DT_VOID Q6_vminmax_VubVub(HVX_Vector &vu8_u, HVX_Vector &vu8_v)
 {
     HVX_Vector vu8_min = Q6_Vub_vmin_VubVub(vu8_u, vu8_v);
     HVX_Vector vu8_max = Q6_Vub_vmax_VubVub(vu8_u, vu8_v);
@@ -15,7 +15,7 @@ AURA_ALWAYS_INLINE AURA_VOID Q6_vminmax_VubVub(HVX_Vector &vu8_u, HVX_Vector &vu
     vu8_v = vu8_max;
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Q6_vminmax_VbVb(HVX_Vector &vs8_u, HVX_Vector &vs8_v)
+AURA_ALWAYS_INLINE DT_VOID Q6_vminmax_VbVb(HVX_Vector &vs8_u, HVX_Vector &vs8_v)
 {
     HVX_Vector vs8_min = Q6_Vb_vmin_VbVb(vs8_u, vs8_v);
     HVX_Vector vs8_max = Q6_Vb_vmax_VbVb(vs8_u, vs8_v);
@@ -23,7 +23,7 @@ AURA_ALWAYS_INLINE AURA_VOID Q6_vminmax_VbVb(HVX_Vector &vs8_u, HVX_Vector &vs8_
     vs8_v = vs8_max;
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Q6_vminmax_VuhVuh(HVX_Vector &vu16_u, HVX_Vector &vu16_v)
+AURA_ALWAYS_INLINE DT_VOID Q6_vminmax_VuhVuh(HVX_Vector &vu16_u, HVX_Vector &vu16_v)
 {
     HVX_Vector vu16_min = Q6_Vuh_vmin_VuhVuh(vu16_u, vu16_v);
     HVX_Vector vu16_max = Q6_Vuh_vmax_VuhVuh(vu16_u, vu16_v);
@@ -31,7 +31,7 @@ AURA_ALWAYS_INLINE AURA_VOID Q6_vminmax_VuhVuh(HVX_Vector &vu16_u, HVX_Vector &v
     vu16_v = vu16_max;
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Q6_vminmax_VhVh(HVX_Vector &vs16_u, HVX_Vector &vs16_v)
+AURA_ALWAYS_INLINE DT_VOID Q6_vminmax_VhVh(HVX_Vector &vs16_u, HVX_Vector &vs16_v)
 {
     HVX_Vector vs16_min = Q6_Vh_vmin_VhVh(vs16_u, vs16_v);
     HVX_Vector vs16_max = Q6_Vh_vmax_VhVh(vs16_u, vs16_v);

@@ -14,20 +14,20 @@
 
 using namespace aura;
 
-static Status CheckVectorEqual(Context *ctx, void *dst, void *ref, MI_S32 size,
-                               const MI_CHAR *file, const MI_CHAR *func, MI_S32 line)
+static Status CheckVectorEqual(Context *ctx, void *dst, void *ref, DT_S32 size,
+                               const DT_CHAR *file, const DT_CHAR *func, DT_S32 line)
 {
     Status ret = Status::OK;
 
-    MI_U8 *dst_u8 = static_cast<MI_U8*>(dst);
-    MI_U8 *ref_u8 = static_cast<MI_U8*>(ref);
+    DT_U8 *dst_u8 = static_cast<DT_U8*>(dst);
+    DT_U8 *ref_u8 = static_cast<DT_U8*>(ref);
 
-    for (MI_S32 i = 0; i < size; i++)
+    for (DT_S32 i = 0; i < size; i++)
     {
         ret |= TestCheckEQ(ctx, dst_u8[i], ref_u8[i], "CheckVectorEqual failed\n", file, func, line);
         if (ret != Status::OK)
         {
-            AURA_LOGD(ctx, AURA_TAG, "error %d != %d\n", static_cast<MI_S32>(dst_u8[i]), static_cast<MI_S32>(ref_u8[i]));
+            AURA_LOGD(ctx, AURA_TAG, "error %d != %d\n", static_cast<DT_S32>(dst_u8[i]), static_cast<DT_S32>(ref_u8[i]));
             return ret;
         }
     }

@@ -16,20 +16,20 @@ class FastImpl : public OpImpl
 public:
     FastImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 threshold,
-                           MI_BOOL nonmax_suppression, FastDetectorType type = FastDetectorType::FAST_9_16,
-                           MI_U32 max_num_corners = 3000);
+    virtual Status SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 threshold,
+                           DT_BOOL nonmax_suppression, FastDetectorType type = FastDetectorType::FAST_9_16,
+                           DT_U32 max_num_corners = 3000);
 
     std::vector<const Array*> GetInputArrays() const override;
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    MI_S32           m_threshold;
-    MI_U32           m_max_num_corners;
-    MI_BOOL          m_nonmax_suppression;
+    DT_S32           m_threshold;
+    DT_U32           m_max_num_corners;
+    DT_BOOL          m_nonmax_suppression;
     FastDetectorType m_detector_type;
 
     const Array *m_src;
@@ -42,9 +42,9 @@ public:
     FastNone(Context *ctx, const OpTarget &target);
 
     Status SetArgs(const Array *src, std::vector<KeyPoint> &key_points,
-                   MI_S32 threshold, MI_BOOL nonmax_suppression,
+                   DT_S32 threshold, DT_BOOL nonmax_suppression,
                    FastDetectorType type = FastDetectorType::FAST_9_16,
-                   MI_U32 max_num_corners = 3000) override;
+                   DT_U32 max_num_corners = 3000) override;
 
     Status Run() override;
 
@@ -59,9 +59,9 @@ public:
     FastNeon(Context *ctx, const OpTarget &target);
 
     Status SetArgs(const Array *src, std::vector<KeyPoint> &key_points,
-                   MI_S32 threshold, MI_BOOL nonmax_suppression,
+                   DT_S32 threshold, DT_BOOL nonmax_suppression,
                    FastDetectorType type = FastDetectorType::FAST_9_16,
-                   MI_U32 max_num_corners = 3000) override;
+                   DT_U32 max_num_corners = 3000) override;
 
     Status Run() override;
 };
@@ -74,9 +74,9 @@ public:
     FastHvx(Context *ctx, const OpTarget &target);
 
     Status SetArgs(const Array *src, std::vector<KeyPoint> &key_points,
-                   MI_S32 threshold, MI_BOOL nonmax_suppression,
+                   DT_S32 threshold, DT_BOOL nonmax_suppression,
                    FastDetectorType type = FastDetectorType::FAST_9_16,
-                   MI_U32 max_num_corners = 3000) override;
+                   DT_U32 max_num_corners = 3000) override;
 
     Status Run() override;
 
@@ -87,11 +87,11 @@ private:
 };
 
 #  if  defined(AURA_BUILD_HEXAGON)
-Status Fast9Hvx(Context *ctx, const Mat &src, std::vector<KeyPoint> *key_points, MI_S32 threshold,
-                MI_BOOL nonmax_suppression, MI_U32 max_num_corners);
+Status Fast9Hvx(Context *ctx, const Mat &src, std::vector<KeyPoint> *key_points, DT_S32 threshold,
+                DT_BOOL nonmax_suppression, DT_U32 max_num_corners);
 #  endif // AURA_BUILD_HEXAGON
 
-using FastInParam = HexagonRpcParamType<Mat, MI_S32, MI_BOOL, FastDetectorType, MI_U32>;
+using FastInParam = HexagonRpcParamType<Mat, DT_S32, DT_BOOL, FastDetectorType, DT_U32>;
 using FastOutParam = HexagonRpcParamType<std::vector<KeyPoint>>;
 
 #  define AURA_OPS_FEATURE2D_FAST_OP_NAME          "Fast"

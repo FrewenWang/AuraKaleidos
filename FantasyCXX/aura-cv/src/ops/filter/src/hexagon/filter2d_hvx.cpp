@@ -23,7 +23,7 @@ Status Filter2dHvx::SetArgs(const Array *src, Array *dst, const Array *kmat,
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1 && ch != 2 && ch != 3)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2/3");
@@ -52,7 +52,7 @@ Status Filter2dHvx::Run()
     Mat *dst = dynamic_cast<Mat*>(m_dst);
     const Mat *kmat = dynamic_cast<const Mat*>(m_kmat);
 
-    if ((MI_NULL == src) || (MI_NULL == dst) || (MI_NULL == kmat))
+    if ((DT_NULL == src) || (DT_NULL == dst) || (DT_NULL == kmat))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst/kmat is nullptr");
         return Status::ERROR;
@@ -60,13 +60,13 @@ Status Filter2dHvx::Run()
 
     Status ret = Status::ERROR;
 
-    std::vector<MI_S16> kdata(kmat->GetSizes().Total());
-    for (MI_S32 y = 0; y < m_ksize; y++)
+    std::vector<DT_S16> kdata(kmat->GetSizes().Total());
+    for (DT_S32 y = 0; y < m_ksize; y++)
     {
-        const MI_F32 *kernel = kmat->Ptr<MI_F32>(y);
-        for (MI_S32 x = 0; x < m_ksize; x++)
+        const DT_F32 *kernel = kmat->Ptr<DT_F32>(y);
+        for (DT_S32 x = 0; x < m_ksize; x++)
         {
-            kdata[y * m_ksize + x] = static_cast<MI_S16>(kernel[x] * 4096);
+            kdata[y * m_ksize + x] = static_cast<DT_S16>(kernel[x] * 4096);
         }
     }
 

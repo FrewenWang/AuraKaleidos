@@ -48,12 +48,12 @@ Dft::Dft(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Dft::SetArgs(const Array *src, Array *dst)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -94,14 +94,14 @@ Status Dft::SetArgs(const Array *src, Array *dst)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateDftImpl(m_ctx, impl_target);
     }
 
     // run initialize
     DftImpl *dft_impl = dynamic_cast<DftImpl*>(m_impl.get());
-    if (MI_NULL == dft_impl)
+    if (DT_NULL == dft_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dft_impl is null ptr");
         return Status::ERROR;
@@ -115,7 +115,7 @@ Status Dft::SetArgs(const Array *src, Array *dst)
 Status Dft::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -143,12 +143,12 @@ AURA_EXPORTS Status IDft(Context *ctx, const Mat &src, Mat &dst, const OpTarget 
     return OpCall(ctx, dft, &src, &dst);
 }
 
-DftImpl::DftImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Dft", target), m_src(MI_NULL), m_dst(MI_NULL)
+DftImpl::DftImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Dft", target), m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
 Status DftImpl::SetArgs(const Array *src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -161,13 +161,13 @@ Status DftImpl::SetArgs(const Array *src, Array *dst)
 
     if (src->GetElemType() == ElemType::F64)
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "current src does not support MI_F64 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "current src does not support DT_F64 type.");
         return Status::ERROR;
     }
 
     if (dst->GetElemType() != ElemType::F32)
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "current dst only support MI_F32 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "current dst only support DT_F32 type.");
         return Status::ERROR;
     }
 
@@ -211,7 +211,7 @@ std::string DftImpl::ToString() const
     return str;
 }
 
-AURA_VOID DftImpl::Dump(const std::string &prefix) const
+DT_VOID DftImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -267,14 +267,14 @@ static std::shared_ptr<InverseDftImpl> CreateInverseDftImpl(Context *ctx, const 
 InverseDft::InverseDft(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status InverseDft::SetArgs(const Array *src, Array *dst, MI_BOOL with_scale)
+Status InverseDft::SetArgs(const Array *src, Array *dst, DT_BOOL with_scale)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -315,14 +315,14 @@ Status InverseDft::SetArgs(const Array *src, Array *dst, MI_BOOL with_scale)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateInverseDftImpl(m_ctx, impl_target);
     }
 
     // run initialize
     InverseDftImpl *idft_impl = dynamic_cast<InverseDftImpl*>(m_impl.get());
-    if (MI_NULL == idft_impl)
+    if (DT_NULL == idft_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "idft_impl is null ptr");
         return Status::ERROR;
@@ -333,10 +333,10 @@ Status InverseDft::SetArgs(const Array *src, Array *dst, MI_BOOL with_scale)
     AURA_RETURN(m_ctx, ret);
 }
 
-Status InverseDft::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, MI_BOOL with_scale, MI_BOOL is_dst_c1)
+Status InverseDft::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, DT_BOOL with_scale, DT_BOOL is_dst_c1)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -359,7 +359,7 @@ Status InverseDft::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType d
     return Status::OK;
 }
 
-AURA_EXPORTS Status IInverseDft(Context *ctx, const Mat &src, Mat &dst, MI_BOOL with_scale, const OpTarget &target)
+AURA_EXPORTS Status IInverseDft(Context *ctx, const Mat &src, Mat &dst, DT_BOOL with_scale, const OpTarget &target)
 {
     InverseDft idft(ctx, target);
 
@@ -367,18 +367,18 @@ AURA_EXPORTS Status IInverseDft(Context *ctx, const Mat &src, Mat &dst, MI_BOOL 
 }
 
 InverseDftImpl::InverseDftImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "InverseDft", target),
-                                                                       m_src(MI_NULL), m_dst(MI_NULL),
+                                                                       m_src(DT_NULL), m_dst(DT_NULL),
                                                                        m_with_scale(0)
 {}
 
-Status InverseDftImpl::SetArgs(const Array *src, Array *dst, MI_BOOL with_scale)
+Status InverseDftImpl::SetArgs(const Array *src, Array *dst, DT_BOOL with_scale)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -407,19 +407,19 @@ Status InverseDftImpl::SetArgs(const Array *src, Array *dst, MI_BOOL with_scale)
 
     if (ElemType::F32 != src->GetElemType())
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "InverseDft only support input MI_F32 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "InverseDft only support input DT_F32 type.");
         return Status::ERROR;
     }
 
     if (ElemType::F64 == dst->GetElemType())
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "currently dst does not support MI_F64 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "currently dst does not support DT_F64 type.");
         return Status::ERROR;
     }
 
     if ((2 == dst_sz.m_channel) && (ElemType::F32 != dst->GetElemType()))
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "if the dst is C2, only support MI_F32 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "if the dst is C2, only support DT_F32 type.");
         return Status::ERROR;
     }
 
@@ -431,7 +431,7 @@ Status InverseDftImpl::SetArgs(const Array *src, Array *dst, MI_BOOL with_scale)
 
 Status InverseDftImpl::Initialize()
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -502,7 +502,7 @@ std::string InverseDftImpl::ToString() const
     return str;
 }
 
-AURA_VOID InverseDftImpl::Dump(const std::string &prefix) const
+DT_VOID InverseDftImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

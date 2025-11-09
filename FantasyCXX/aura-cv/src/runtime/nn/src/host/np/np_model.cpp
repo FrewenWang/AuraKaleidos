@@ -4,7 +4,7 @@
 namespace aura
 {
 
-static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &offset, std::vector<MI_S32> &sizes)
+static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, DT_S64 &offset, std::vector<DT_S32> &sizes)
 {
     if (!minn_buffer.IsValid())
     {
@@ -12,7 +12,7 @@ static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &off
         return Status::ERROR;
     }
 
-    MI_S32 size = 0;
+    DT_S32 size = 0;
 
     if (NNDeserialize(ctx, minn_buffer, offset, size) != Status::OK)
     {
@@ -35,13 +35,13 @@ static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &off
     }
 
     sizes.resize(size);
-    memcpy(sizes.data(), static_cast<MI_CHAR*>(minn_buffer.m_data) + offset, size * sizeof(MI_S32));
-    offset += size * sizeof(MI_S32);
+    memcpy(sizes.data(), static_cast<DT_CHAR*>(minn_buffer.m_data) + offset, size * sizeof(DT_S32));
+    offset += size * sizeof(DT_S32);
 
     return Status::OK;
 }
 
-static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &offset, NpModel::TensorAttr &tensor_attr)
+static Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, DT_S64 &offset, NpModel::TensorAttr &tensor_attr)
 {
     if (!minn_buffer.IsValid())
     {
@@ -86,7 +86,7 @@ NpModel::NpModel(Context *ctx, const ModelInfo &model_info) : NNModel(ctx, model
             break;
         }
 
-        m_is_valid = MI_FALSE;
+        m_is_valid = DT_FALSE;
 
         if (std::string::npos == m_framework_version.find("np"))
         {
@@ -132,7 +132,7 @@ NpModel::NpModel(Context *ctx, const ModelInfo &model_info) : NNModel(ctx, model
             m_output_attrs.emplace_back(output_attr_name[i], tensor_attr);
         }
 
-        m_is_valid = MI_TRUE;
+        m_is_valid = DT_TRUE;
     } while (0);
 }
 

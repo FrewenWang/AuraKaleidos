@@ -37,7 +37,7 @@ struct ResizeFloatPtCastFunctor
     }
 };
 
-template<typename St, typename Dt, MI_S32 BITS>
+template<typename St, typename Dt, DT_S32 BITS>
 struct ResizeFixedPtCastFunctor
 {
     enum { SHIFT = BITS, DELTA = 1 << (BITS - 1) };
@@ -57,7 +57,7 @@ struct ResizeNoShiftFunctor
     }
 };
 
-template<typename St, typename Dt, MI_S32 SCALE>
+template<typename St, typename Dt, DT_S32 SCALE>
 struct ResizeFixedPtShiftFunctor
 {
     St operator()(Dt value) const
@@ -67,97 +67,97 @@ struct ResizeFixedPtShiftFunctor
 };
 
 template <typename Tp>
-struct ResizeAreaTraits { using FastSumType = MI_F32; };
-template <> struct ResizeAreaTraits<MI_U8>  { using FastSumType = MI_S32; };
-template <> struct ResizeAreaTraits<MI_S8>  { using FastSumType = MI_S32; };
+struct ResizeAreaTraits { using FastSumType = DT_F32; };
+template <> struct ResizeAreaTraits<DT_U8>  { using FastSumType = DT_S32; };
+template <> struct ResizeAreaTraits<DT_S8>  { using FastSumType = DT_S32; };
 
 template<typename Tp>
 struct ResizeBnCuTraits
 {
-    using BufType            = MI_F32;
-    using AlphaType          = MI_F32;
-    using MovlType           = MI_F32;
-    using ResizeShiftFunctor = ResizeNoShiftFunctor<MI_F32, MI_F32>;
-    using ResizeCastFunctor  = ResizeFloatPtCastFunctor<MI_F32, Tp>;
+    using BufType            = DT_F32;
+    using AlphaType          = DT_F32;
+    using MovlType           = DT_F32;
+    using ResizeShiftFunctor = ResizeNoShiftFunctor<DT_F32, DT_F32>;
+    using ResizeCastFunctor  = ResizeFloatPtCastFunctor<DT_F32, Tp>;
 };
-template <> struct ResizeBnCuTraits<MI_U8>
+template <> struct ResizeBnCuTraits<DT_U8>
 {
-    using BufType            = MI_S32;
-    using AlphaType          = MI_S16;
-    using MovlType           = MI_U16;
-    using ResizeShiftFunctor = ResizeFixedPtShiftFunctor<MI_S16, MI_F32, INTER_RESIZE_COEF_SCALE>;
-    using ResizeCastFunctor  = ResizeFixedPtCastFunctor<MI_S32, MI_U8, INTER_RESIZE_COEF_BITS * 2>;
+    using BufType            = DT_S32;
+    using AlphaType          = DT_S16;
+    using MovlType           = DT_U16;
+    using ResizeShiftFunctor = ResizeFixedPtShiftFunctor<DT_S16, DT_F32, INTER_RESIZE_COEF_SCALE>;
+    using ResizeCastFunctor  = ResizeFixedPtCastFunctor<DT_S32, DT_U8, INTER_RESIZE_COEF_BITS * 2>;
 };
-template <> struct ResizeBnCuTraits<MI_S8>
+template <> struct ResizeBnCuTraits<DT_S8>
 {
-    using BufType            = MI_S32;
-    using AlphaType          = MI_S16;
-    using MovlType           = MI_S16;
-    using ResizeShiftFunctor = ResizeFixedPtShiftFunctor<MI_S16, MI_F32, INTER_RESIZE_COEF_SCALE>;
-    using ResizeCastFunctor  = ResizeFixedPtCastFunctor<MI_S32, MI_S8, INTER_RESIZE_COEF_BITS * 2>;
+    using BufType            = DT_S32;
+    using AlphaType          = DT_S16;
+    using MovlType           = DT_S16;
+    using ResizeShiftFunctor = ResizeFixedPtShiftFunctor<DT_S16, DT_F32, INTER_RESIZE_COEF_SCALE>;
+    using ResizeCastFunctor  = ResizeFixedPtCastFunctor<DT_S32, DT_S8, INTER_RESIZE_COEF_BITS * 2>;
 };
-template <> struct ResizeBnCuTraits<MI_U16>
+template <> struct ResizeBnCuTraits<DT_U16>
 {
-    using BufType            = MI_F32;
-    using AlphaType          = MI_F32;
-    using MovlType           = MI_U32;
-    using ResizeShiftFunctor = ResizeNoShiftFunctor<MI_F32, MI_F32>;
-    using ResizeCastFunctor  = ResizeFloatPtCastFunctor<MI_F32, MI_U16>;
+    using BufType            = DT_F32;
+    using AlphaType          = DT_F32;
+    using MovlType           = DT_U32;
+    using ResizeShiftFunctor = ResizeNoShiftFunctor<DT_F32, DT_F32>;
+    using ResizeCastFunctor  = ResizeFloatPtCastFunctor<DT_F32, DT_U16>;
 };
 
-template <> struct ResizeBnCuTraits<MI_S16>
+template <> struct ResizeBnCuTraits<DT_S16>
 {
-    using BufType            = MI_F32;
-    using AlphaType          = MI_F32;
-    using MovlType           = MI_S32;
-    using ResizeShiftFunctor = ResizeNoShiftFunctor<MI_F32, MI_F32>;
-    using ResizeCastFunctor  = ResizeFloatPtCastFunctor<MI_F32, MI_S16>;
+    using BufType            = DT_F32;
+    using AlphaType          = DT_F32;
+    using MovlType           = DT_S32;
+    using ResizeShiftFunctor = ResizeNoShiftFunctor<DT_F32, DT_F32>;
+    using ResizeCastFunctor  = ResizeFloatPtCastFunctor<DT_F32, DT_S16>;
 };
 
 struct AreaDecimateAlpha
 {
-    MI_S32 si;
-    MI_S32 di;
-    MI_F32 alpha;
+    DT_S32 si;
+    DT_S32 di;
+    DT_F32 alpha;
 };
 
 struct ResizeCuFastVtcmBuffer
 {
-    MI_U8 *row0_ptr;
-    MI_U8 *row1_ptr;
-    MI_U8 *row2_ptr;
-    MI_U8 *row3_ptr;
-    MI_U8 *row_head;
+    DT_U8 *row0_ptr;
+    DT_U8 *row1_ptr;
+    DT_U8 *row2_ptr;
+    DT_U8 *row3_ptr;
+    DT_U8 *row_head;
 };
 
 template <typename Tp>
-AURA_VOID GetBnOffset(MI_S32 *buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 iheight, MI_S32 oheight, MI_BOOL is_area)
+DT_VOID GetBnOffset(DT_S32 *buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 iheight, DT_S32 oheight, DT_BOOL is_area)
 {
     using AlphaType = typename ResizeBnCuTraits<Tp>::AlphaType;
     auto  ResizeShiftFunctor = typename ResizeBnCuTraits<Tp>::ResizeShiftFunctor();
 
-    MI_F32 scale_x = static_cast<MI_F32>(iwidth) / owidth;
-    MI_F32 scale_y = static_cast<MI_F32>(iheight) / oheight;
+    DT_F32 scale_x = static_cast<DT_F32>(iwidth) / owidth;
+    DT_F32 scale_y = static_cast<DT_F32>(iheight) / oheight;
 
-    MI_S32 *xofs = buffer;
-    MI_S32 *yofs = xofs + owidth;
+    DT_S32 *xofs = buffer;
+    DT_S32 *yofs = xofs + owidth;
     AlphaType *alpha = reinterpret_cast<AlphaType*>(yofs + oheight);
     AlphaType *beta  = alpha + 2 * owidth;
 
-    for (MI_S32 x = 0; x < owidth; x++)
+    for (DT_S32 x = 0; x < owidth; x++)
     {
-        MI_F32 fx;
-        MI_S32 sx;
+        DT_F32 fx;
+        DT_S32 sx;
         if (!is_area)
         {
-            fx = static_cast<MI_F32>((x + 0.5) * scale_x - 0.5);
-            sx = static_cast<MI_S32>(Floor(fx));
+            fx = static_cast<DT_F32>((x + 0.5) * scale_x - 0.5);
+            sx = static_cast<DT_S32>(Floor(fx));
             fx -= sx;
         }
         else
         {
-            sx = static_cast<MI_S32>(Floor(x * scale_x));
-            fx = static_cast<MI_F32>((x + 1) - (sx + 1) / scale_x);
+            sx = static_cast<DT_S32>(Floor(x * scale_x));
+            fx = static_cast<DT_F32>((x + 1) - (sx + 1) / scale_x);
             fx = fx <= 0 ? 0.f : fx - Floor(fx);
         }
 
@@ -177,20 +177,20 @@ AURA_VOID GetBnOffset(MI_S32 *buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 iheig
         alpha[x * 2 + 1] = ResizeShiftFunctor(fx);
     }
 
-    for (MI_S32 y = 0; y < oheight; y++)
+    for (DT_S32 y = 0; y < oheight; y++)
     {
-        MI_F32 fy;
-        MI_S32 sy;
+        DT_F32 fy;
+        DT_S32 sy;
         if (!is_area)
         {
-            fy = static_cast<MI_F32>((y + 0.5) * scale_y - 0.5);
-            sy = static_cast<MI_S32>(Floor(fy));
+            fy = static_cast<DT_F32>((y + 0.5) * scale_y - 0.5);
+            sy = static_cast<DT_S32>(Floor(fy));
             fy -= sy;
         }
         else
         {
-            sy = static_cast<MI_S32>(Floor(y * scale_y));
-            fy = static_cast<MI_F32>((y + 1) - (sy + 1) / scale_y);
+            sy = static_cast<DT_S32>(Floor(y * scale_y));
+            fy = static_cast<DT_F32>((y + 1) - (sy + 1) / scale_y);
             fy = fy <= 0 ? 0.f : fy - Floor(fy);
         }
 
@@ -211,45 +211,45 @@ AURA_VOID GetBnOffset(MI_S32 *buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 iheig
     }
 }
 
-AURA_INLINE MI_F32 GetCuOffsetCore(MI_F32 x)
+AURA_INLINE DT_F32 GetCuOffsetCore(DT_F32 x)
 {
-    const MI_F32 bicubic_a = -0.75f;
-    const MI_F32 bicubic_lut[5] =
+    const DT_F32 bicubic_a = -0.75f;
+    const DT_F32 bicubic_lut[5] =
     {
         (bicubic_a + 3.f), (bicubic_a + 2.f), ((-4.f) * bicubic_a),
         (bicubic_a * 8.f), (bicubic_a * 5.f)
     };
 
-    const MI_F32 xx       = x * x;
-    const MI_F32 xxx      = xx * x;
-    const MI_F32 *lut_ptr = bicubic_lut;
+    const DT_F32 xx       = x * x;
+    const DT_F32 xxx      = xx * x;
+    const DT_F32 *lut_ptr = bicubic_lut;
 
     return (x) <= (1.f) ? (1.0f - (lut_ptr[0] * xx) + (lut_ptr[1] * xxx))
                         : (lut_ptr[2] + (lut_ptr[3] * x) - (lut_ptr[4] * xx) + (bicubic_a * xxx));
 }
 
 template <typename Tp>
-AURA_VOID GetCuOffset(MI_S32 *buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 iheight, MI_S32 oheight)
+DT_VOID GetCuOffset(DT_S32 *buffer, DT_S32 iwidth, DT_S32 owidth, DT_S32 iheight, DT_S32 oheight)
 {
     using AlphaType         = typename ResizeBnCuTraits<Tp>::AlphaType;
     auto ResizeShiftFunctor = typename ResizeBnCuTraits<Tp>::ResizeShiftFunctor();
 
-    MI_F64 scale_x = static_cast<MI_F64>(iwidth) / owidth;
-    MI_F64 scale_y = static_cast<MI_F64>(iheight) / oheight;
+    DT_F64 scale_x = static_cast<DT_F64>(iwidth) / owidth;
+    DT_F64 scale_y = static_cast<DT_F64>(iheight) / oheight;
 
-    MI_S32 *xofs     = buffer;
-    MI_S32 *yofs     = xofs + owidth;
+    DT_S32 *xofs     = buffer;
+    DT_S32 *yofs     = xofs + owidth;
     AlphaType *alpha = reinterpret_cast<AlphaType*>(yofs + oheight);
     AlphaType *beta  = reinterpret_cast<AlphaType*>(alpha + (owidth * 4));
 
-    MI_F32    fx[4], fy[4];
-    MI_S32    sx, sy;
+    DT_F32    fx[4], fy[4];
+    DT_S32    sx, sy;
     AlphaType coe_x[4], coe_y[4];
 
-    for (MI_S32 dx = 0; dx < owidth; dx++)
+    for (DT_S32 dx = 0; dx < owidth; dx++)
     {
-        fx[0] = static_cast<MI_F32>(((dx + 0.5) * scale_x - 0.5));
-        sx    = static_cast<MI_S32>(Floor(fx[0])) - 1;
+        fx[0] = static_cast<DT_F32>(((dx + 0.5) * scale_x - 0.5));
+        sx    = static_cast<DT_S32>(Floor(fx[0])) - 1;
 
         fx[0] -= sx;
         fx[1] = fx[0] - 1.0f;
@@ -307,10 +307,10 @@ AURA_VOID GetCuOffset(MI_S32 *buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 iheig
         }
     }
 
-    for (MI_S32 dy = 0; dy < oheight; dy++)
+    for (DT_S32 dy = 0; dy < oheight; dy++)
     {
-        fy[0] = static_cast<MI_F32>(((dy + 0.5) * scale_y - 0.5));
-        sy    = static_cast<MI_S32>(Floor(fy[0])) - 1;
+        fy[0] = static_cast<DT_F32>(((dy + 0.5) * scale_y - 0.5));
+        sy    = static_cast<DT_S32>(Floor(fy[0])) - 1;
 
         fy[0] -= sy;
         fy[1] = fy[0] - 1.0f;
@@ -369,17 +369,17 @@ AURA_VOID GetCuOffset(MI_S32 *buffer, MI_S32 iwidth, MI_S32 owidth, MI_S32 iheig
     }
 }
 
-AURA_INLINE MI_S32 GetAreaOffset(MI_S32 isize, MI_S32 osize, MI_S32 channel, MI_F32 scale, AreaDecimateAlpha *tab)
+AURA_INLINE DT_S32 GetAreaOffset(DT_S32 isize, DT_S32 osize, DT_S32 channel, DT_F32 scale, AreaDecimateAlpha *tab)
 {
-    MI_S32 k = 0; /**< table size */
+    DT_S32 k = 0; /**< table size */
 
-    for (MI_S32 dx = 0; dx < osize; dx++)
+    for (DT_S32 dx = 0; dx < osize; dx++)
     {
-        MI_F32 fsx1 = dx * scale;
-        MI_F32 fsx2 = fsx1 + scale;
-        MI_F32 cell_width = Min(scale, isize - fsx1);
+        DT_F32 fsx1 = dx * scale;
+        DT_F32 fsx2 = fsx1 + scale;
+        DT_F32 cell_width = Min(scale, isize - fsx1);
 
-        MI_S32 sx1 = Ceil(fsx1), sx2 = Floor(fsx2);
+        DT_S32 sx1 = Ceil(fsx1), sx2 = Floor(fsx2);
 
         sx2 = Min(sx2, isize - 1);
         sx1 = Min(sx1, sx2);
@@ -391,7 +391,7 @@ AURA_INLINE MI_S32 GetAreaOffset(MI_S32 isize, MI_S32 osize, MI_S32 channel, MI_
             tab[k++].alpha = (sx1 - fsx1) / cell_width;
         }
 
-        for (MI_S32 sx = sx1; sx < sx2; sx++)
+        for (DT_S32 sx = sx1; sx < sx2; sx++)
         {
             tab[k].di = dx * channel;
             tab[k].si = sx * channel;
@@ -410,21 +410,21 @@ AURA_INLINE MI_S32 GetAreaOffset(MI_S32 isize, MI_S32 osize, MI_S32 channel, MI_
 }
 
 template <typename Tp>
-Status ResizeBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area = MI_FALSE)
+Status ResizeBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, DT_BOOL is_area = DT_FALSE)
 {
     using BufType   = typename ResizeBnCuTraits<Tp>::BufType;
     using AlphaType = typename ResizeBnCuTraits<Tp>::AlphaType;
     auto  ResizeCastFunctor = typename ResizeBnCuTraits<Tp>::ResizeCastFunctor();
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 iheight = src.GetSizes().m_height;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 iheight = src.GetSizes().m_height;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
-    MI_S32 buffer_size = (owidth + oheight) * sizeof(MI_S32) + (owidth + oheight) * 2 * sizeof(AlphaType);
-    MI_S32 *buffer = static_cast<MI_S32*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, buffer_size, 0));
-    if (MI_NULL == buffer)
+    DT_S32 buffer_size = (owidth + oheight) * sizeof(DT_S32) + (owidth + oheight) * 2 * sizeof(AlphaType);
+    DT_S32 *buffer = static_cast<DT_S32*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, buffer_size, 0));
+    if (DT_NULL == buffer)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM fail");
         return Status::ERROR;
@@ -432,14 +432,14 @@ Status ResizeBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area 
 
     GetBnOffset<Tp>(buffer, iwidth, owidth, iheight, oheight, is_area);
 
-    MI_S32 *xofs  = buffer;
-    MI_S32 *yofs  = xofs + owidth;
+    DT_S32 *xofs  = buffer;
+    DT_S32 *yofs  = xofs + owidth;
     AlphaType *alpha = reinterpret_cast<AlphaType*>(yofs + oheight);
     AlphaType *beta  = reinterpret_cast<AlphaType*>(alpha + (owidth * 2));
 
-    MI_S32 rows_size = owidth * channel * 2 * sizeof(BufType);
+    DT_S32 rows_size = owidth * channel * 2 * sizeof(BufType);
     BufType *rows = static_cast<BufType*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, rows_size, 0));
-    if (MI_NULL == rows)
+    if (DT_NULL == rows)
     {
         AURA_FREE(ctx, buffer);
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM fail");
@@ -449,11 +449,11 @@ Status ResizeBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area 
     BufType *rows0 = rows;
     BufType *rows1 = rows + owidth * channel;
 
-    MI_S32 prev_sy1 = -1;
+    DT_S32 prev_sy1 = -1;
 
-    for (MI_S32 dy = 0; dy < oheight; dy++ )
+    for (DT_S32 dy = 0; dy < oheight; dy++ )
     {
-        MI_S32 sy = yofs[dy];
+        DT_S32 sy = yofs[dy];
 
         if (sy == prev_sy1)
         {
@@ -464,16 +464,16 @@ Status ResizeBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area 
             const Tp *src_c1 = src.Ptr<Tp>(sy + 1);
             const AlphaType *alpha_ptr = alpha;
 
-            for (MI_S32 dx = 0; dx < owidth; dx++ )
+            for (DT_S32 dx = 0; dx < owidth; dx++ )
             {
-                MI_S32 sx = xofs[dx] * channel;
-                MI_S32 x_id = dx * channel;
+                DT_S32 sx = xofs[dx] * channel;
+                DT_S32 x_id = dx * channel;
                 const Tp *src_c1_ptr = src_c1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
 
-                for (MI_S32 ch = 0; ch < channel; ch++)
+                for (DT_S32 ch = 0; ch < channel; ch++)
                 {
                     rows1[x_id + ch] = src_c1_ptr[ch] * a0 + src_c1_ptr[ch + channel] * a1;
                 }
@@ -487,17 +487,17 @@ Status ResizeBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area 
             const Tp *src_c1 = src.Ptr<Tp>(sy + 1);
             const AlphaType *alpha_ptr = alpha;
 
-            for (MI_S32 dx = 0; dx < owidth; dx++ )
+            for (DT_S32 dx = 0; dx < owidth; dx++ )
             {
-                MI_S32 sx = xofs[dx] * channel;
-                MI_S32 x_id = dx * channel;
+                DT_S32 sx = xofs[dx] * channel;
+                DT_S32 x_id = dx * channel;
                 const Tp *src_c0_ptr = src_c0 + sx;
                 const Tp *src_c1_ptr = src_c1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
 
-                for (MI_S32 ch = 0; ch < channel; ch++)
+                for (DT_S32 ch = 0; ch < channel; ch++)
                 {
                     rows0[x_id + ch] = src_c0_ptr[ch] * a0 + src_c0_ptr[ch + channel] * a1;
                     rows1[x_id + ch] = src_c1_ptr[ch] * a0 + src_c1_ptr[ch + channel] * a1;
@@ -512,7 +512,7 @@ Status ResizeBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area 
         AlphaType b1 = beta[1];
         Tp *dst_c_ptr = dst.Ptr<Tp>(dy);
 
-        for (MI_S32 dx = 0; dx < owidth * channel; dx++)
+        for (DT_S32 dx = 0; dx < owidth * channel; dx++)
         {
             dst_c_ptr[dx] = ResizeCastFunctor(static_cast<BufType>((rows0[dx] * b0 + rows1[dx] * b1)));
         }
@@ -526,14 +526,14 @@ Status ResizeBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area 
 }
 
 template <typename Tp>
-Status ResizeAreaCommNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, AreaDecimateAlpha *x_tab, MI_S32 x_tab_size,
-                              AreaDecimateAlpha *y_tab, MI_S32 *tab_offset, MI_S32 start_row, MI_S32 end_row)
+Status ResizeAreaCommNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, AreaDecimateAlpha *x_tab, DT_S32 x_tab_size,
+                              AreaDecimateAlpha *y_tab, DT_S32 *tab_offset, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 channel     = src.GetSizes().m_channel;
-    MI_S32 owidth      = dst.GetSizes().m_width;
-    MI_S32 owidth_x_cn = owidth * channel;
+    DT_S32 channel     = src.GetSizes().m_channel;
+    DT_S32 owidth      = dst.GetSizes().m_width;
+    DT_S32 owidth_x_cn = owidth * channel;
 
-    MI_F32 *buffer = thread_buffer.GetThreadData<MI_F32>();
+    DT_F32 *buffer = thread_buffer.GetThreadData<DT_F32>();
 
     if (!buffer)
     {
@@ -541,55 +541,55 @@ Status ResizeAreaCommNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuff
         return Status::ERROR;
     }
 
-    MI_F32 *sum = buffer + owidth_x_cn;
-    MI_S32 start = tab_offset[start_row];
-    MI_S32 end   = tab_offset[end_row];
-    MI_S32 prev_dy = y_tab[start].di;
+    DT_F32 *sum = buffer + owidth_x_cn;
+    DT_S32 start = tab_offset[start_row];
+    DT_S32 end   = tab_offset[end_row];
+    DT_S32 prev_dy = y_tab[start].di;
 
-    for (MI_S32 dx = 0; dx < owidth_x_cn; dx++)
+    for (DT_S32 dx = 0; dx < owidth_x_cn; dx++)
     {
-        sum[dx] = static_cast<MI_F32>(0);
+        sum[dx] = static_cast<DT_F32>(0);
     }
 
-    for (MI_S32 j = start; j < end; j++)
+    for (DT_S32 j = start; j < end; j++)
     {
-        MI_F32 beta = y_tab[j].alpha;
-        MI_S32 dy   = y_tab[j].di;
-        MI_S32 sy   = y_tab[j].si;
+        DT_F32 beta = y_tab[j].alpha;
+        DT_S32 dy   = y_tab[j].di;
+        DT_S32 sy   = y_tab[j].si;
 
         const Tp *src_c = src.Ptr<Tp>(sy);
 
-        for (MI_S32 dx = 0; dx < owidth_x_cn; dx++)
+        for (DT_S32 dx = 0; dx < owidth_x_cn; dx++)
         {
-            buffer[dx] = static_cast<MI_F32>(0);
+            buffer[dx] = static_cast<DT_F32>(0);
         }
         if (1 == channel)
         {
-            for (MI_S32 k = 0; k < x_tab_size; k++)
+            for (DT_S32 k = 0; k < x_tab_size; k++)
             {
-                MI_S32 dxn   = x_tab[k].di;
-                MI_F32 alpha = x_tab[k].alpha;
+                DT_S32 dxn   = x_tab[k].di;
+                DT_F32 alpha = x_tab[k].alpha;
                 buffer[dxn] += src_c[x_tab[k].si] * alpha;
             }
         }
         else if (2 == channel)
         {
-            for (MI_S32 k = 0; k < x_tab_size; k++)
+            for (DT_S32 k = 0; k < x_tab_size; k++)
             {
-                MI_S32 sxn   = x_tab[k].si;
-                MI_S32 dxn   = x_tab[k].di;
-                MI_F32 alpha = x_tab[k].alpha;
+                DT_S32 sxn   = x_tab[k].si;
+                DT_S32 dxn   = x_tab[k].di;
+                DT_F32 alpha = x_tab[k].alpha;
                 buffer[dxn]     += src_c[sxn]     * alpha;
                 buffer[dxn + 1] += src_c[sxn + 1] * alpha;
             }
         }
         else if (3 == channel)
         {
-            for (MI_S32 k = 0; k < x_tab_size; k++)
+            for (DT_S32 k = 0; k < x_tab_size; k++)
             {
-                MI_S32 sxn   = x_tab[k].si;
-                MI_S32 dxn   = x_tab[k].di;
-                MI_F32 alpha = x_tab[k].alpha;
+                DT_S32 sxn   = x_tab[k].si;
+                DT_S32 dxn   = x_tab[k].di;
+                DT_F32 alpha = x_tab[k].alpha;
                 buffer[dxn]     += src_c[sxn]     * alpha;
                 buffer[dxn + 1] += src_c[sxn + 1] * alpha;
                 buffer[dxn + 2] += src_c[sxn + 2] * alpha;
@@ -597,12 +597,12 @@ Status ResizeAreaCommNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuff
         }
         else
         {
-            for (MI_S32 k = 0; k < x_tab_size; k++)
+            for (DT_S32 k = 0; k < x_tab_size; k++)
             {
-                MI_S32 sxn   = x_tab[k].si;
-                MI_S32 dxn   = x_tab[k].di;
-                MI_F32 alpha = x_tab[k].alpha;
-                for (MI_S32 ch = 0; ch < channel; ch++)
+                DT_S32 sxn   = x_tab[k].si;
+                DT_S32 dxn   = x_tab[k].di;
+                DT_F32 alpha = x_tab[k].alpha;
+                for (DT_S32 ch = 0; ch < channel; ch++)
                 {
                     buffer[dxn + ch] += src_c[sxn + ch] * alpha;
                 }
@@ -613,7 +613,7 @@ Status ResizeAreaCommNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuff
         {
             Tp *dst_c = dst.Ptr<Tp>(prev_dy);
 
-            for (MI_S32 dx = 0; dx < owidth_x_cn; dx++)
+            for (DT_S32 dx = 0; dx < owidth_x_cn; dx++)
             {
                 dst_c[dx] = SaturateCast<Tp>(sum[dx]);
                 sum[dx] = beta * buffer[dx];
@@ -622,7 +622,7 @@ Status ResizeAreaCommNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuff
         }
         else
         {
-            for (MI_S32 dx = 0; dx < owidth_x_cn; dx++)
+            for (DT_S32 dx = 0; dx < owidth_x_cn; dx++)
             {
                 sum[dx] += beta * buffer[dx];
             }
@@ -631,7 +631,7 @@ Status ResizeAreaCommNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuff
 
     Tp *dst_c = dst.Ptr<Tp>(prev_dy);
 
-    for (MI_S32 dx = 0; dx < owidth_x_cn; dx++)
+    for (DT_S32 dx = 0; dx < owidth_x_cn; dx++)
     {
         dst_c[dx] = SaturateCast<Tp>(sum[dx]);
     }
@@ -652,7 +652,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src;
@@ -693,7 +693,7 @@ Status ResizeAreaNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &ta
 Status ResizeBnFastC1Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
 Status ResizeBnFastC2Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
 Status ResizeBnFastC3Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
-Status ResizeBnCommNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area, const OpTarget &target);
+Status ResizeBnCommNeon(Context *ctx, const Mat &src, Mat &dst, DT_BOOL is_area, const OpTarget &target);
 Status ResizeBnNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
 
 Status ResizeNnNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &target);
@@ -731,7 +731,7 @@ public:
     Status Run() override;
     Status DeInitialize() override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
@@ -746,7 +746,7 @@ public:
     Status Run() override;
     Status DeInitialize() override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
@@ -761,11 +761,11 @@ public:
     Status Run() override;
     Status DeInitialize() override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 iwidth, MI_S32 iheight,
-                                              MI_S32 owidth, MI_S32 oheight, MI_S32 channel);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 iwidth, DT_S32 iheight,
+                                              DT_S32 owidth, DT_S32 oheight, DT_S32 channel);
 
 private:
-    MI_S32 m_border;
+    DT_S32 m_border;
     std::vector<CLKernel> m_cl_kernels;
 };
 
@@ -778,23 +778,23 @@ public:
     Status Run() override;
     Status DeInitialize() override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 iwidth, MI_S32 iheight,
-                                              MI_S32 owidth, MI_S32 oheight, MI_S32 channel);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 iwidth, DT_S32 iheight,
+                                              DT_S32 owidth, DT_S32 oheight, DT_S32 channel);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
-    MI_S32 m_elem_x;
-    MI_S32 m_elem_y;
+    DT_S32 m_elem_x;
+    DT_S32 m_elem_y;
 };
 #endif  // AURA_ENABLE_OPENCL
 
 #if (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))
 
 template <typename Tp> struct ResizeAreaHvxTraits;
-template <> struct ResizeAreaHvxTraits<MI_U8>  { using PromoteType = MI_U16; };
-template <> struct ResizeAreaHvxTraits<MI_S8>  { using PromoteType = MI_U16; };
-template <> struct ResizeAreaHvxTraits<MI_U16> { using PromoteType = MI_U32; };
-template <> struct ResizeAreaHvxTraits<MI_S16> { using PromoteType = MI_U32; };
+template <> struct ResizeAreaHvxTraits<DT_U8>  { using PromoteType = DT_U16; };
+template <> struct ResizeAreaHvxTraits<DT_S8>  { using PromoteType = DT_U16; };
+template <> struct ResizeAreaHvxTraits<DT_U16> { using PromoteType = DT_U32; };
+template <> struct ResizeAreaHvxTraits<DT_S16> { using PromoteType = DT_U32; };
 
 class ResizeHvx : public ResizeImpl
 {
@@ -818,7 +818,7 @@ Status ResizeNnHvx(Context *ctx, const Mat &src, Mat &dst);
 
 Status ResizeBnFastDnHvx(Context *ctx, const Mat &src, Mat &dst);
 Status ResizeBnFastUpHvx(Context *ctx, const Mat &src, Mat &dst);
-Status ResizeBnCommHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area);
+Status ResizeBnCommHvx(Context *ctx, const Mat &src, Mat &dst, DT_BOOL is_area);
 Status ResizeBnHvx(Context *ctx, const Mat &src, Mat &dst);
 
 Status ResizeCuCommHvx(Context *ctx, const Mat &src, Mat &dst);

@@ -7,8 +7,8 @@
 namespace aura
 {
 
-static std::string GetCLBuildOptions(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, MI_BOOL with_scale,
-                                     MI_BOOL is_dst_c1)
+static std::string GetCLBuildOptions(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, DT_BOOL with_scale,
+                                     DT_BOOL is_dst_c1)
 {
     CLBuildOptions cl_build_opt(ctx);
 
@@ -20,23 +20,23 @@ static std::string GetCLBuildOptions(Context *ctx, ElemType src_elem_type, ElemT
     return cl_build_opt.ToString();
 }
 
-static AURA_VOID GetCLSize(Context *ctx, std::vector<CLKernel> &cl_kernels, MI_S32 width, MI_S32 height, cl::NDRange cl_global_size[2],
+static DT_VOID GetCLSize(Context *ctx, std::vector<CLKernel> &cl_kernels, DT_S32 width, DT_S32 height, cl::NDRange cl_global_size[2],
                          cl::NDRange cl_local_size[2])
 {
     auto device = ctx->GetCLEngine()->GetCLRuntime()->GetDevice();
-    MI_S32 max_group_sz_row = cl_kernels[0].GetClKernel()->getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(*device);
-    MI_S32 max_group_sz_col = cl_kernels[1].GetClKernel()->getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(*device);
+    DT_S32 max_group_sz_row = cl_kernels[0].GetClKernel()->getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(*device);
+    DT_S32 max_group_sz_col = cl_kernels[1].GetClKernel()->getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(*device);
 
     // Row Param
     {
-        MI_S32 local_size_x = Min(width / 2, max_group_sz_row);
-        MI_S32 local_size_y = 1;
+        DT_S32 local_size_x = Min(width / 2, max_group_sz_row);
+        DT_S32 local_size_y = 1;
 
-        const MI_S32 group_size_x = 1; // because we use local memory for compute, x direction only has one group
-        const MI_S32 group_size_y = (height + local_size_y - 1) / local_size_y;
+        const DT_S32 group_size_x = 1; // because we use local memory for compute, x direction only has one group
+        const DT_S32 group_size_y = (height + local_size_y - 1) / local_size_y;
 
-        const MI_S32 global_size_x = local_size_x * group_size_x;
-        const MI_S32 global_size_y = local_size_y * group_size_y;
+        const DT_S32 global_size_x = local_size_x * group_size_x;
+        const DT_S32 global_size_y = local_size_y * group_size_y;
 
         cl_global_size[0] = cl::NDRange(global_size_x, global_size_y);
         cl_local_size[0]  = cl::NDRange(local_size_x,  local_size_y);
@@ -72,7 +72,7 @@ Status DftCL::SetArgs(const Array *src, Array *dst)
 
     if (src->GetElemType() == ElemType::S32 || src->GetElemType() == ElemType::U32 || src->GetElemType() == ElemType::F64)
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "currently src does not support MI_S32/MI_U32/MI_F64 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "currently src does not support DT_S32/DT_U32/DT_F64 type.");
         return Status::ERROR;
     }
 
@@ -101,20 +101,20 @@ Status DftCL::Initialize()
     }
 
     Sizes3 sz     = m_src->GetSizes();
-    MI_S32 width  = sz.m_width;
-    MI_S32 height = sz.m_height;
+    DT_S32 width  = sz.m_width;
+    DT_S32 height = sz.m_height;
 
     // Cpu get exp tables and index table
-    MI_S32 idx_total_bytes = Max(width, height) * sizeof(MI_U16);
-    m_exp_total_bytes      = Max(width, height) * sizeof(MI_F32);
-    m_local_buffer_bytes   = Max(width, height) * 2 * sizeof(MI_F32);
+    DT_S32 idx_total_bytes = Max(width, height) * sizeof(DT_U16);
+    m_exp_total_bytes      = Max(width, height) * sizeof(DT_F32);
+    m_local_buffer_bytes   = Max(width, height) * 2 * sizeof(DT_F32);
 
-    MI_S32 buffer_sz = AURA_ALIGN(idx_total_bytes + m_exp_total_bytes, 64);
+    DT_S32 buffer_sz = AURA_ALIGN(idx_total_bytes + m_exp_total_bytes, 64);
     m_buffer_pitch   = buffer_sz;
 
     // query device info
     auto   device             = m_ctx->GetCLEngine()->GetCLRuntime()->GetDevice();
-    MI_S32 max_local_mem_size = device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+    DT_S32 max_local_mem_size = device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
 
     if (m_exp_total_bytes + m_local_buffer_bytes > max_local_mem_size)
     {
@@ -131,13 +131,13 @@ Status DftCL::Initialize()
 
     // 0. compute m_param in cpu
     {
-        MI_U16 *idx_table = m_param.Ptr<MI_U16>(0);
-        auto exp_table = reinterpret_cast<std::complex<MI_F32>*>(idx_table + width);
+        DT_U16 *idx_table = m_param.Ptr<DT_U16>(0);
+        auto exp_table = reinterpret_cast<std::complex<DT_F32>*>(idx_table + width);
         GetReverseIndex(idx_table, width);
         GetDftExpTable<0>(exp_table, width);
 
-        idx_table = m_param.Ptr<MI_U16>(1);
-        exp_table = reinterpret_cast<std::complex<MI_F32>*>(idx_table + height);
+        idx_table = m_param.Ptr<DT_U16>(1);
+        exp_table = reinterpret_cast<std::complex<DT_F32>*>(idx_table + height);
         GetReverseIndex(idx_table, height);
         GetDftExpTable<0>(exp_table, height);
     }
@@ -209,10 +209,10 @@ Status DftCL::DeInitialize()
 
 Status DftCL::Run()
 {
-    MI_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 height  = m_src->GetSizes().m_height;
-    MI_S32 width   = m_src->GetSizes().m_width;
+    DT_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 height  = m_src->GetSizes().m_height;
+    DT_S32 width   = m_src->GetSizes().m_width;
 
     // 1. get cl_global_size and cl_local_size
     cl::NDRange cl_global_size[2];
@@ -224,7 +224,7 @@ Status DftCL::Run()
     Status ret    = Status::ERROR;
 
     // 2. CL run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::LocalSpaceArg, cl::LocalSpaceArg, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::LocalSpaceArg, cl::LocalSpaceArg, DT_S32, DT_S32>(
                                  m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                  m_cl_param.GetCLMemRef<cl::Buffer>(), m_buffer_pitch,
@@ -240,7 +240,7 @@ Status DftCL::Run()
         goto EXIT;
     }
 
-    cl_ret = m_cl_kernels[1].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::LocalSpaceArg, cl::LocalSpaceArg, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[1].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::LocalSpaceArg, cl::LocalSpaceArg, DT_S32, DT_S32>(
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                  m_cl_param.GetCLMemRef<cl::Buffer>(), m_buffer_pitch,
                                  cl::Local(m_local_buffer_bytes * 1),
@@ -257,7 +257,7 @@ Status DftCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event[1].wait();
         if (cl_ret != CL_SUCCESS)
@@ -266,7 +266,7 @@ Status DftCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event[0]) +
                                  GetCLProfilingInfo(m_cl_kernels[1].GetKernelName(), cl_event[1]);
@@ -291,7 +291,7 @@ std::string DftCL::ToString() const
 std::vector<CLKernel> DftCL::GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type)
 {
     std::vector<CLKernel> cl_kernels;
-    std::string build_opt = GetCLBuildOptions(ctx, src_elem_type, dst_elem_type, MI_FALSE, MI_FALSE);
+    std::string build_opt = GetCLBuildOptions(ctx, src_elem_type, dst_elem_type, DT_FALSE, DT_FALSE);
 
     std::string program_name[2] = {"aura_dft_row_process", "aura_dft_col_process"};
     std::string kernel_name[2]  = {"DftRowProcess", "DftColProcess"};
@@ -306,7 +306,7 @@ InverseDftCL::InverseDftCL(Context *ctx, const OpTarget &target) : InverseDftImp
                                                                    m_profiling_string()
 {}
 
-Status InverseDftCL::SetArgs(const Array *src, Array *dst, MI_BOOL with_scale)
+Status InverseDftCL::SetArgs(const Array *src, Array *dst, DT_BOOL with_scale)
 {
     if (InverseDftImpl::SetArgs(src, dst, with_scale) != Status::OK)
     {
@@ -340,20 +340,20 @@ Status InverseDftCL::Initialize()
 
     Sizes3 sz       = m_src->GetSizes();
     Sizes3 dst_size = m_dst->GetSizes();
-    MI_S32 width    = sz.m_width;
-    MI_S32 height   = sz.m_height;
+    DT_S32 width    = sz.m_width;
+    DT_S32 height   = sz.m_height;
 
     // Cpu get exp tables and index table
-    MI_S32 idx_total_bytes = Max(width, height) * sizeof(MI_U16);
-    m_exp_total_bytes      = Max(width, height) * sizeof(MI_F32);
-    m_local_buffer_bytes   = Max(width, height) * 2 * sizeof(MI_F32);
+    DT_S32 idx_total_bytes = Max(width, height) * sizeof(DT_U16);
+    m_exp_total_bytes      = Max(width, height) * sizeof(DT_F32);
+    m_local_buffer_bytes   = Max(width, height) * 2 * sizeof(DT_F32);
 
-    MI_S32 buffer_sz = AURA_ALIGN(idx_total_bytes + m_exp_total_bytes, 64);
+    DT_S32 buffer_sz = AURA_ALIGN(idx_total_bytes + m_exp_total_bytes, 64);
     m_buffer_pitch   = buffer_sz;
 
     // query device info
     auto   device             = m_ctx->GetCLEngine()->GetCLRuntime()->GetDevice();
-    MI_S32 max_local_mem_size = device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+    DT_S32 max_local_mem_size = device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
 
     if (m_exp_total_bytes + m_local_buffer_bytes > max_local_mem_size)
     {
@@ -370,13 +370,13 @@ Status InverseDftCL::Initialize()
 
     // 0. compute m_param in cpu
     {
-        MI_U16 *idx_table = m_param.Ptr<MI_U16>(0);
-        auto exp_table = reinterpret_cast<std::complex<MI_F32>*>(idx_table + width);
+        DT_U16 *idx_table = m_param.Ptr<DT_U16>(0);
+        auto exp_table = reinterpret_cast<std::complex<DT_F32>*>(idx_table + width);
         GetReverseIndex(idx_table, width);
         GetDftExpTable<1>(exp_table, width);
 
-        idx_table = m_param.Ptr<MI_U16>(1);
-        exp_table = reinterpret_cast<std::complex<MI_F32>*>(idx_table + height);
+        idx_table = m_param.Ptr<DT_U16>(1);
+        exp_table = reinterpret_cast<std::complex<DT_F32>*>(idx_table + height);
         GetReverseIndex(idx_table, height);
         GetDftExpTable<1>(exp_table, height);
     }
@@ -403,7 +403,7 @@ Status InverseDftCL::Initialize()
         return Status::ERROR;
     }
 
-    MI_BOOL is_dst_c1 = (1 == dst_size.m_channel) ? MI_TRUE : MI_FALSE;
+    DT_BOOL is_dst_c1 = (1 == dst_size.m_channel) ? DT_TRUE : DT_FALSE;
 
     if (is_dst_c1 || (ElemType::F32 != m_dst->GetElemType()))
     {
@@ -465,11 +465,11 @@ Status InverseDftCL::DeInitialize()
 
 Status InverseDftCL::Run()
 {
-    MI_S32 istep    = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep    = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 step_mid = m_cl_mid.GetRowPitch() / ElemTypeSize(m_cl_mid.GetElemType());
-    MI_S32 height   = m_src->GetSizes().m_height;
-    MI_S32 width    = m_src->GetSizes().m_width;
+    DT_S32 istep    = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep    = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 step_mid = m_cl_mid.GetRowPitch() / ElemTypeSize(m_cl_mid.GetElemType());
+    DT_S32 height   = m_src->GetSizes().m_height;
+    DT_S32 width    = m_src->GetSizes().m_width;
 
     // 1. get cl_global_size and cl_local_size
     cl::NDRange cl_global_size[2];
@@ -481,7 +481,7 @@ Status InverseDftCL::Run()
     Status ret    = Status::ERROR;
 
     // 2. CL run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::LocalSpaceArg, cl::LocalSpaceArg, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::LocalSpaceArg, cl::LocalSpaceArg, DT_S32, DT_S32>(
                                  m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_mid.GetCLMemRef<cl::Buffer>(), step_mid,
                                  m_cl_param.GetCLMemRef<cl::Buffer>(), m_buffer_pitch,
@@ -497,7 +497,7 @@ Status InverseDftCL::Run()
         goto EXIT;
     }
 
-    cl_ret = m_cl_kernels[1].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32 ,cl::LocalSpaceArg, cl::LocalSpaceArg, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[1].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32 ,cl::LocalSpaceArg, cl::LocalSpaceArg, DT_S32, DT_S32>(
                                  m_cl_mid.GetCLMemRef<cl::Buffer>(), step_mid,
                                  m_cl_param.GetCLMemRef<cl::Buffer>(), m_buffer_pitch,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
@@ -515,7 +515,7 @@ Status InverseDftCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event[1].wait();
         if (cl_ret != CL_SUCCESS)
@@ -524,7 +524,7 @@ Status InverseDftCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event[0]) +
                                  GetCLProfilingInfo(m_cl_kernels[1].GetKernelName(), cl_event[1]);
@@ -546,7 +546,7 @@ std::string InverseDftCL::ToString() const
     return InverseDftImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> InverseDftCL::GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, MI_S32 with_scale, MI_BOOL is_dst_c1)
+std::vector<CLKernel> InverseDftCL::GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, DT_S32 with_scale, DT_BOOL is_dst_c1)
 {
     std::vector<CLKernel> cl_kernels;
     std::string build_opt = GetCLBuildOptions(ctx, src_elem_type, dst_elem_type, with_scale, is_dst_c1);

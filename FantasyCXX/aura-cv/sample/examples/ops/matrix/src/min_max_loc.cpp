@@ -24,8 +24,8 @@ aura::Status MinMaxLocSampleTest(aura::Context *ctx, aura::TargetType type)
         return status;
     }
 
-    MI_F64 res_min = 0.0;
-    MI_F64 res_max = 0.0;
+    DT_F64 res_min = 0.0;
+    DT_F64 res_max = 0.0;
 
     aura::Point3i res_min_pos = {-1, -1, -1};
     aura::Point3i res_max_pos = {-1, -1, -1};

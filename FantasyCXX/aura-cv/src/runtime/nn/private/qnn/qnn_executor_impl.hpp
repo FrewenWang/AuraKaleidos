@@ -8,7 +8,7 @@
 namespace aura
 {
 
-AURA_INLINE MI_S32 GetQnnBudget(const NNConfig &config)
+AURA_INLINE DT_S32 GetQnnBudget(const NNConfig &config)
 {
     if (config.count("qnn_budget"))
     {
@@ -20,9 +20,9 @@ AURA_INLINE MI_S32 GetQnnBudget(const NNConfig &config)
     return 0;
 }
 
-AURA_INLINE std::vector<MI_S8> GetQnnGraphIds(const NNConfig &config)
+AURA_INLINE std::vector<DT_S8> GetQnnGraphIds(const NNConfig &config)
 {
-    std::vector<MI_S8> qnn_graph_ids;
+    std::vector<DT_S8> qnn_graph_ids;
 
     if (config.count("qnn_graph_ids"))
     {
@@ -125,11 +125,11 @@ struct QnnExecutorConfig
                                                 hmx_perf_level(NNPerfLevel::PERF_HIGH),
                                                 profiling_level(NNProfilingLevel::PROFILING_OFF),
                                                 log_level(NNLogLevel::LOG_ERROR),
-                                                async_call(MI_TRUE),
+                                                async_call(DT_TRUE),
                                                 profiling_path(std::string()),
                                                 mem_step_size(0),
                                                 budget(0),
-                                                graph_ids(std::vector<MI_S8>(1, -1)),
+                                                graph_ids(std::vector<DT_S8>(1, -1)),
                                                 udo_path(std::string())
     {
         htp_perf_level  = GetNNPerfLevel(config);
@@ -148,11 +148,11 @@ struct QnnExecutorConfig
     NNPerfLevel hmx_perf_level;
     NNProfilingLevel profiling_level;
     NNLogLevel log_level;
-    MI_BOOL async_call;
+    DT_BOOL async_call;
     std::string profiling_path;
-    MI_S32 mem_step_size;
-    MI_S32 budget;
-    std::vector<MI_S8> graph_ids;
+    DT_S32 mem_step_size;
+    DT_S32 budget;
+    std::vector<DT_S8> graph_ids;
     std::string udo_path;
 };
 
@@ -176,7 +176,7 @@ protected:
 
 using QnnExecutorImplCreator = QnnExecutorImpl* (*)(Context*, const std::shared_ptr<QnnModel>&, const NNConfig&);
 
-template<typename Tp, typename std::enable_if<std::is_base_of<QnnExecutorImpl, Tp>::value>::type* = MI_NULL>
+template<typename Tp, typename std::enable_if<std::is_base_of<QnnExecutorImpl, Tp>::value>::type* = DT_NULL>
 QnnExecutorImpl* QnnExecutorImplHelper(Context *ctx, const std::shared_ptr<QnnModel> &model, const NNConfig &config)
 {
     return new Tp(ctx, model, config);

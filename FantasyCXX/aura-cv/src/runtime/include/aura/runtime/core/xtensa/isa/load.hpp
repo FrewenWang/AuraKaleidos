@@ -10,19 +10,19 @@ namespace aura
 namespace xtensa
 {
 
-extern const MI_U8 sel_deinterleave_d16_c3_step_0[]     __attribute__((aligned(128)));
-extern const MI_U8 sel_deinterleave_d16_c3_step_1[]     __attribute__((aligned(128)));
-extern const MI_U8 sel_deinterleave_d16_c3_step_1_msk[] __attribute__((aligned(128)));
-extern const MI_U8 dsel_deinterleave_d8_1[]             __attribute__((aligned(128)));
-extern const MI_U8 dsel_deinterleave_d16_1[]            __attribute__((aligned(128)));
-extern const MI_U8 sel_interleave_d16_c3_step_0[]       __attribute__((aligned(128)));
-extern const MI_U8 sel_interleave_d16_c3_step_1[]       __attribute__((aligned(128)));
-extern const MI_U8 sel_interleave_d16_c3_step_1_msk[]   __attribute__((aligned(128)));
-extern const MI_U8 dsel_interleave_d8_1[]               __attribute__((aligned(128)));
-extern const MI_U8 dsel_interleave_d16_1[]              __attribute__((aligned(128)));
+extern const DT_U8 sel_deinterleave_d16_c3_step_0[]     __attribute__((aligned(128)));
+extern const DT_U8 sel_deinterleave_d16_c3_step_1[]     __attribute__((aligned(128)));
+extern const DT_U8 sel_deinterleave_d16_c3_step_1_msk[] __attribute__((aligned(128)));
+extern const DT_U8 dsel_deinterleave_d8_1[]             __attribute__((aligned(128)));
+extern const DT_U8 dsel_deinterleave_d16_1[]            __attribute__((aligned(128)));
+extern const DT_U8 sel_interleave_d16_c3_step_0[]       __attribute__((aligned(128)));
+extern const DT_U8 sel_interleave_d16_c3_step_1[]       __attribute__((aligned(128)));
+extern const DT_U8 sel_interleave_d16_c3_step_1_msk[]   __attribute__((aligned(128)));
+extern const DT_U8 dsel_interleave_d8_1[]               __attribute__((aligned(128)));
+extern const DT_U8 dsel_interleave_d16_1[]              __attribute__((aligned(128)));
 
 #define DECLFUN(vtype, postfix)                                                                      \
-    inline AURA_VOID align(valign &align, vtype *__restrict addr)                                      \
+    inline DT_VOID align(valign &align, vtype *__restrict addr)                                      \
     {                                                                                                \
         align = IVP_LA##postfix##_PP(addr);                                                          \
     }
@@ -38,7 +38,7 @@ DECLFUN(xb_vecN_2x32v,  N_2X32)
 #undef DECLFUN
 
 #define DECLFUN(vtype, postfix)                                                                      \
-    inline AURA_VOID vflush(valign &align, vtype *__restrict addr)                                     \
+    inline DT_VOID vflush(valign &align, vtype *__restrict addr)                                     \
     {                                                                                                \
         IVP_SAPOS##postfix##_FP(align, addr);                                                        \
     }
@@ -54,7 +54,7 @@ DECLFUN(xb_vecN_2x32v,  N_2X32)
 #undef DECLFUN
 
 #define DECLFUN(vtype, postfix)                                                                       \
-    inline AURA_VOID vload(vtype *__restrict &addr, vtype &v_out, MI_S32 byte_num)                      \
+    inline DT_VOID vload(vtype *__restrict &addr, vtype &v_out, DT_S32 byte_num)                      \
     {                                                                                                 \
         valign v_load;                                                                                \
         align(v_load, addr);                                                                          \
@@ -70,7 +70,7 @@ DECLFUN(xb_vecN_2x32v,  N_2X32)
 #undef DECLFUN
 
 #define DECLFUN(vtype, postfix)                                                                       \
-    inline AURA_VOID vstore(vtype *__restrict &addr, valign &v_store, vtype &v_in, MI_S32 byte_num)     \
+    inline DT_VOID vstore(vtype *__restrict &addr, valign &v_store, vtype &v_in, DT_S32 byte_num)     \
     {                                                                                                 \
         IVP_SAV##postfix##_XP(v_in, v_store, addr, byte_num);                                         \
     }
@@ -84,7 +84,7 @@ DECLFUN(xb_vecN_2x32v,  N_2X32)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                               \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &v_out, MI_S32 byte_num)                     \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &v_out, DT_S32 byte_num)                     \
     {                                                                                                 \
         valign v_load;                                                                                \
         align(v_load, addr);                                                                          \
@@ -98,7 +98,7 @@ DECLFUN(VdspVectorS16X1, xb_vecNx16,  NX16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                              \
-    inline AURA_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, MI_S32 byte_num)   \
+    inline DT_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, DT_S32 byte_num)   \
     {                                                                                                \
         IVP_SAV##postfix##_XP(v_in.val[0], v_store, addr, byte_num);                                 \
     }
@@ -110,7 +110,7 @@ DECLFUN(VdspVectorS16X1, xb_vecNx16,  NX16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                         \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, MI_S32 len_x0, MI_S32 len_x1)   \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, DT_S32 len_x0, DT_S32 len_x1)   \
     {                                                                                                           \
         valign v_load;                                                                                          \
         align(v_load, addr);                                                                                    \
@@ -125,7 +125,7 @@ DECLFUN(VdspVectorS16X1, xb_vecNx16,  NX16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix, byte)                                                                 \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, MI_S32 len_x0, MI_S32 len_x1) \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, DT_S32 len_x0, DT_S32 len_x1) \
     {                                                                                                         \
         valign v_load;                                                                                        \
         align(v_load, addr);                                                                                  \
@@ -145,7 +145,7 @@ DECLFUN(VdspVectorS16X2, xb_vecNx16,  NX16,  16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix, byte)                                                                \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &v_out, MI_S32 byte_num)                            \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &v_out, DT_S32 byte_num)                            \
     {                                                                                                        \
         valign v_load;                                                                                       \
         align(v_load, addr);                                                                                 \
@@ -162,7 +162,7 @@ DECLFUN(VdspVectorS16X2, xb_vecNx16,  NX16,  16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                             \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, MI_S32 len_x0, MI_S32 len_x1)       \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, DT_S32 len_x0, DT_S32 len_x1)       \
     {                                                                                                               \
         valign v_load;                                                                                              \
         align(v_load, addr);                                                                                        \
@@ -187,7 +187,7 @@ DECLFUN(VdspVectorS8X3, xb_vec2Nx8,  2NX8)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                    \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &v_out, MI_S32 byte_num)                          \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &v_out, DT_S32 byte_num)                          \
     {                                                                                                      \
         valign v_load;                                                                                     \
         align(v_load, addr);                                                                               \
@@ -206,7 +206,7 @@ DECLFUN(VdspVectorS8X3, xb_vec2Nx8,  2NX8)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                          \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, MI_S32 len_x0, MI_S32 len_x1)    \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, DT_S32 len_x0, DT_S32 len_x1)    \
     {                                                                                                            \
         valign v_load;                                                                                           \
         align(v_load, addr);                                                                                     \
@@ -233,7 +233,7 @@ DECLFUN(VdspVectorS16X3, xb_vecNx16,  NX16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                            \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &v_out, MI_S32 byte_num)                                  \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &v_out, DT_S32 byte_num)                                  \
     {                                                                                                              \
         valign v_load;                                                                                             \
         align(v_load, addr);                                                                                       \
@@ -253,7 +253,7 @@ DECLFUN(VdspVectorS16X3, xb_vecNx16,  NX16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                          \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, MI_S32 len_x0, MI_S32 len_x1)    \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, DT_S32 len_x0, DT_S32 len_x1)    \
     {                                                                                                            \
         valign v_load;                                                                                           \
         align(v_load, addr);                                                                                     \
@@ -282,7 +282,7 @@ DECLFUN(VdspVectorS8X4, xb_vec2Nx8,  2NX8)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                    \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &v_out, MI_S32 byte_num)                          \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &v_out, DT_S32 byte_num)                          \
     {                                                                                                      \
         valign v_load;                                                                                     \
         align(v_load, addr);                                                                               \
@@ -303,7 +303,7 @@ DECLFUN(VdspVectorS8X4, xb_vec2Nx8,  2NX8)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                            \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, MI_S32 len_x0, MI_S32 len_x1)      \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &mv_x0, mvtype &mv_x1, DT_S32 len_x0, DT_S32 len_x1)      \
     {                                                                                                              \
         valign v_load;                                                                                             \
         align(v_load, addr);                                                                                       \
@@ -332,7 +332,7 @@ DECLFUN(VdspVectorS16X4, xb_vecNx16,  NX16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                            \
-    inline AURA_VOID vload(vtype *__restrict &addr, mvtype &v_out, MI_S32 byte_num)                                  \
+    inline DT_VOID vload(vtype *__restrict &addr, mvtype &v_out, DT_S32 byte_num)                                  \
     {                                                                                                              \
         valign v_load;                                                                                             \
         align(v_load, addr);                                                                                       \
@@ -353,7 +353,7 @@ DECLFUN(VdspVectorS16X4, xb_vecNx16,  NX16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix, bit)                                                             \
-    inline AURA_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, MI_S32 byte_num)       \
+    inline DT_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, DT_S32 byte_num)       \
     {                                                                                                    \
         vtype vrg_lo, vrg_hi;                                                                            \
         IVP_DSEL##postfix##I(vrg_hi, vrg_lo, v_in.val[1], v_in.val[0], IVP_DSELI_##bit##B_INTERLEAVE_1); \
@@ -368,7 +368,7 @@ DECLFUN(VdspVectorS16X2, xb_vecNx16,  NX16,  16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                 \
-    inline AURA_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, MI_S32 byte_num)      \
+    inline DT_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, DT_S32 byte_num)      \
     {                                                                                                   \
         vtype vrg0, vrg1;                                                                               \
         vtype vrgb0, vrgb1, vrgb2;                                                                      \
@@ -385,7 +385,7 @@ DECLFUN(VdspVectorS8X3, xb_vec2Nx8,  2NX8)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                       \
-    inline AURA_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, MI_S32 byte_num)            \
+    inline DT_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, DT_S32 byte_num)            \
     {                                                                                                         \
         vtype vrg0, vrg1;                                                                                     \
         vtype vrgb0, vrgb1, vrgb2;                                                                            \
@@ -403,7 +403,7 @@ DECLFUN(VdspVectorS16X3, xb_vecNx16,  NX16)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                             \
-    inline AURA_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, MI_S32 byte_num)  \
+    inline DT_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, DT_S32 byte_num)  \
     {                                                                                               \
         vtype vrg_lo, vba_lo, vrg_hi, vba_hi;                                                       \
         vtype vrgba0, vrgba1, vrgba2, vrgba3;                                                       \
@@ -422,7 +422,7 @@ DECLFUN(VdspVectorS8X4, xb_vec2Nx8,  2NX8)
 #undef DECLFUN
 
 #define DECLFUN(mvtype, vtype, postfix)                                                                      \
-    inline AURA_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, MI_S32 byte_num)           \
+    inline DT_VOID vstore(vtype *__restrict &addr, valign &v_store, mvtype &v_in, DT_S32 byte_num)           \
     {                                                                                                        \
         vtype vrg_lo, vba_lo, vrg_hi, vba_hi;                                                                \
         vtype vrgba0, vrgba1, vrgba2, vrgba3;                                                                \

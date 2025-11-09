@@ -19,7 +19,7 @@ class BoxFilterImpl : public OpImpl
 public:
     BoxFilterImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    virtual Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                            BorderType border_type = BorderType::REFLECT_101,
                            const Scalar &border_value = Scalar());
 
@@ -29,10 +29,10 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    MI_S32      m_ksize;
+    DT_S32      m_ksize;
     BorderType  m_border_type;
     Scalar      m_border_value;
 
@@ -45,7 +45,7 @@ class BoxFilterNone : public BoxFilterImpl
 public:
     BoxFilterNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -65,7 +65,7 @@ class BoxFilterNeon : public BoxFilterImpl
 public:
     BoxFilterNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -78,7 +78,7 @@ Status BoxFilter5x5Neon(Context *ctx, const Mat &src, Mat &dst, BorderType borde
                         const Scalar &border_value, const OpTarget &target);
 Status BoxFilter7x7Neon(Context *ctx, const Mat &src, Mat &dst, BorderType border_type,
                         const Scalar &border_value, const OpTarget &target);
-Status BoxFilterKxKNeon(Context *ctx, const Mat &src, Mat &dst, const MI_S32 ksize,
+Status BoxFilterKxKNeon(Context *ctx, const Mat &src, Mat &dst, const DT_S32 ksize,
                         BorderType border_type, const Scalar &border_value, const OpTarget &target);
 #endif // AURA_ENABLE_NEON
 
@@ -88,7 +88,7 @@ class BoxFilterCL : public BoxFilterImpl
 public:
     BoxFilterCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -100,7 +100,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
@@ -117,7 +117,7 @@ class BoxFilterHvx : public BoxFilterImpl
 public:
     BoxFilterHvx(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -135,10 +135,10 @@ Status BoxFilter5x5Hvx(Context *ctx, const Mat &src, Mat &dst, BorderType border
 Status BoxFilter7x7Hvx(Context *ctx, const Mat &src, Mat &dst, BorderType border_type, const Scalar &border_value);
 Status BoxFilter9x9Hvx(Context *ctx, const Mat &src, Mat &dst, BorderType border_type, const Scalar &border_value);
 Status BoxFilter11x11Hvx(Context *ctx, const Mat &src, Mat &dst, BorderType border_type, const Scalar &border_value);
-Status BoxFilterKxKHvx(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, BorderType border_type, const Scalar &border_value);
+Status BoxFilterKxKHvx(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, BorderType border_type, const Scalar &border_value);
 #  endif // AURA_BUILD_HEXAGON
 
-using BoxFilterInParam = HexagonRpcParamType<Mat, Mat, MI_S32, BorderType, Scalar>;
+using BoxFilterInParam = HexagonRpcParamType<Mat, Mat, DT_S32, BorderType, Scalar>;
 #  define AURA_OPS_FILTER_BOXFILTER_OP_NAME          "BoxFilter"
 
 #endif // (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))

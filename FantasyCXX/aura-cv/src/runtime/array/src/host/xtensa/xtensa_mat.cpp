@@ -4,23 +4,23 @@
 namespace aura
 {
 
-XtensaMat::XtensaMat() : Array(), m_xtensa_engine(MI_NULL), m_is_external_buffer(MI_TRUE)
+XtensaMat::XtensaMat() : Array(), m_xtensa_engine(DT_NULL), m_is_external_buffer(DT_TRUE)
 {
     m_array_type = ArrayType::XTENSA_MAT;
 }
 
 XtensaMat::XtensaMat(Context *ctx, ElemType elem_type, const Sizes3 &sizes, const Sizes &strides) 
-                     : Array(ctx, elem_type, sizes, strides), m_xtensa_engine(MI_NULL), m_is_external_buffer(MI_FALSE)
+                     : Array(ctx, elem_type, sizes, strides), m_xtensa_engine(DT_NULL), m_is_external_buffer(DT_FALSE)
 {
     Status ret = Status::ERROR;
 
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         goto EXIT;
     }
 
     m_xtensa_engine = m_ctx->GetXtensaEngine();
-    if (MI_NULL == m_xtensa_engine)
+    if (DT_NULL == m_xtensa_engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "GetXtensaEngine failed, m_xtensa_engine is null ptr");
         goto EXIT;
@@ -56,17 +56,17 @@ EXIT:
 }
 
 XtensaMat::XtensaMat(Context *ctx, ElemType elem_type, const Sizes3 &sizes, const Buffer &buffer, const Sizes &strides)
-                     : Array(ctx, elem_type, sizes, strides, buffer), m_xtensa_engine(MI_NULL), m_is_external_buffer(MI_TRUE)
+                     : Array(ctx, elem_type, sizes, strides, buffer), m_xtensa_engine(DT_NULL), m_is_external_buffer(DT_TRUE)
 {
     Status ret = Status::ERROR;
 
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         goto EXIT;
     }
 
     m_xtensa_engine = m_ctx->GetXtensaEngine();
-    if (MI_NULL == m_xtensa_engine)
+    if (DT_NULL == m_xtensa_engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "GetXtensaEngine failed, m_xtensa_engine is null ptr");
         goto EXIT;
@@ -135,9 +135,9 @@ XtensaMat::~XtensaMat()
     Release();
 }
 
-AURA_VOID XtensaMat::Release()
+DT_VOID XtensaMat::Release()
 {
-    if (m_refcount != MI_NULL)
+    if (m_refcount != DT_NULL)
     {
         if (AddRefCount(-1) == 0)
         {
@@ -147,7 +147,7 @@ AURA_VOID XtensaMat::Release()
             }
 
             AURA_FREE(m_ctx, m_refcount);
-            if (MI_FALSE == m_is_external_buffer)
+            if (DT_FALSE == m_is_external_buffer)
             {
                 AURA_FREE(m_ctx, m_buffer.m_origin);
             }
@@ -181,7 +181,7 @@ XtensaMat& XtensaMat::operator=(const XtensaMat &xtensa_mat)
 
 XtensaMat XtensaMat::FromArray(Context *ctx, const Array &array)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return XtensaMat();
     }
@@ -216,12 +216,12 @@ XtensaMat XtensaMat::FromArray(Context *ctx, const Array &array)
     }
 }
 
-MI_BOOL XtensaMat::IsValid() const
+DT_BOOL XtensaMat::IsValid() const
 {
     return (Array::IsValid() && m_buffer.IsValid() && ArrayType::XTENSA_MAT == m_array_type);
 }
 
-AURA_VOID XtensaMat::Show() const
+DT_VOID XtensaMat::Show() const
 {
     if (m_ctx)
     {
@@ -231,7 +231,7 @@ AURA_VOID XtensaMat::Show() const
     }
 }
 
-AURA_VOID XtensaMat::Dump(const std::string &fname) const
+DT_VOID XtensaMat::Dump(const std::string &fname) const
 {
     if (!IsValid())
     {
@@ -246,18 +246,18 @@ AURA_VOID XtensaMat::Dump(const std::string &fname) const
     }
 
     FILE *fp = fopen(fname.c_str(), "wb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open " + fname + " failed";
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
         return;
     }
 
-    MI_S32 row_bytes = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
-    for (MI_S32 i = 0; i < m_sizes.m_height; i++)
+    DT_S32 row_bytes = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
+    for (DT_S32 i = 0; i < m_sizes.m_height; i++)
     {
-        size_t bytes = fwrite(static_cast<MI_U8*>(m_buffer.m_data) + i * m_strides.m_width, 1, row_bytes, fp);
-        if (static_cast<MI_S32>(bytes) != row_bytes)
+        size_t bytes = fwrite(static_cast<DT_U8*>(m_buffer.m_data) + i * m_strides.m_width, 1, row_bytes, fp);
+        if (static_cast<DT_S32>(bytes) != row_bytes)
         {
             std::string info = "fwrite size(" + std::to_string(bytes) + "," + std::to_string(row_bytes) + ") not match";
             AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -274,7 +274,7 @@ EXIT:
 
 Status XtensaMat::Sync(XtensaSyncType xtensa_sync_type)
 {
-    if (MI_NULL == m_xtensa_engine)
+    if (DT_NULL == m_xtensa_engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "m_xtensa_engine is null ptr");
         return Status::ERROR;
@@ -296,12 +296,12 @@ Status XtensaMat::Sync(XtensaSyncType xtensa_sync_type)
     return Status::OK;
 }
 
-AURA_VOID XtensaMat::Clear()
+DT_VOID XtensaMat::Clear()
 {
     Array::Clear();
     m_array_type = ArrayType::INVALID;
-    m_xtensa_engine = MI_NULL;
-    m_is_external_buffer = MI_TRUE;
+    m_xtensa_engine = DT_NULL;
+    m_is_external_buffer = DT_TRUE;
 }
 
 } // namespace aura

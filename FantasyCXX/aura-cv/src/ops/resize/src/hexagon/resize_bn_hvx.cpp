@@ -7,10 +7,10 @@ namespace aura
 Status ResizeBnHvx(Context *ctx, const Mat &src, Mat &dst)
 {
     Status ret = Status::ERROR;
-    const MI_S32 iwidth  = src.GetSizes().m_width;
-    const MI_S32 owidth  = dst.GetSizes().m_width;
-    const MI_S32 iheight = src.GetSizes().m_height;
-    const MI_S32 oheight = dst.GetSizes().m_height;
+    const DT_S32 iwidth  = src.GetSizes().m_width;
+    const DT_S32 owidth  = dst.GetSizes().m_width;
+    const DT_S32 iheight = src.GetSizes().m_height;
+    const DT_S32 oheight = dst.GetSizes().m_height;
 
     if (((iwidth  == 2 * owidth)  || (iwidth  == 4 * owidth)) &&
         ((iheight == 2 * oheight) || (iheight == 4 * oheight)))
@@ -24,7 +24,7 @@ Status ResizeBnHvx(Context *ctx, const Mat &src, Mat &dst)
     }
     else
     {
-        ret = ResizeBnCommHvx(ctx, src, dst, MI_FALSE);
+        ret = ResizeBnCommHvx(ctx, src, dst, DT_FALSE);
     }
 
     AURA_RETURN(ctx, ret);

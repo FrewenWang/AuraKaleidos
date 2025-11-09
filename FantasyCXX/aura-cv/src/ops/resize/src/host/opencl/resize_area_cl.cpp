@@ -4,8 +4,8 @@
 namespace aura
 {
 
-static Status GetKernelParamStr(Context *ctx, MI_S32 iwidth, MI_S32 iheight, MI_S32 owidth, MI_S32 oheight,
-                                MI_S32 &elem_x, MI_S32 &elem_y)
+static Status GetKernelParamStr(Context *ctx, DT_S32 iwidth, DT_S32 iheight, DT_S32 owidth, DT_S32 oheight,
+                                DT_S32 &elem_x, DT_S32 &elem_y)
 {
     if ((iwidth == 2 * owidth) && (iheight == 2 * oheight))
     {
@@ -57,10 +57,10 @@ static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, std::string &b
     return Status::OK;
 }
 
-static Status GetCLName(Context *ctx, MI_S32 iwidth, MI_S32 iheight, MI_S32 owidth, MI_S32 oheight, MI_S32 channel,
+static Status GetCLName(Context *ctx, DT_S32 iwidth, DT_S32 iheight, DT_S32 owidth, DT_S32 oheight, DT_S32 channel,
                         std::string &program_name, std::string &kernel_name)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -105,7 +105,7 @@ static Status GetCLName(Context *ctx, MI_S32 iwidth, MI_S32 iheight, MI_S32 owid
     return Status::OK;
 }
 
-static AURA_VOID GetGlobalSize(MI_S32 width, MI_S32 height, MI_S32 elem_x, MI_S32 elem_y, cl::NDRange &range)
+static DT_VOID GetGlobalSize(DT_S32 width, DT_S32 height, DT_S32 elem_x, DT_S32 elem_y, cl::NDRange &range)
 {
     range = cl::NDRange((width + elem_x - 1) / elem_x, height / elem_y);
 }
@@ -121,11 +121,11 @@ Status ResizeAreaCL::Initialize()
         return Status::ERROR;
     }
 
-    MI_S32 iwidth  = m_src->GetSizes().m_width;
-    MI_S32 iheight = m_src->GetSizes().m_height;
-    MI_S32 channel = m_src->GetSizes().m_channel;
-    MI_S32 owidth  = m_dst->GetSizes().m_width;
-    MI_S32 oheight = m_dst->GetSizes().m_height;
+    DT_S32 iwidth  = m_src->GetSizes().m_width;
+    DT_S32 iheight = m_src->GetSizes().m_height;
+    DT_S32 channel = m_src->GetSizes().m_channel;
+    DT_S32 owidth  = m_dst->GetSizes().m_width;
+    DT_S32 oheight = m_dst->GetSizes().m_height;
 
     if (GetKernelParamStr(m_ctx, iwidth, iheight, owidth, oheight, m_elem_x, m_elem_y) != Status::OK)
     {
@@ -154,14 +154,14 @@ Status ResizeAreaCL::Initialize()
 
 Status ResizeAreaCL::Run()
 {
-    MI_S32 iwidth  = m_src->GetSizes().m_width;
-    MI_S32 iheight = m_src->GetSizes().m_height;
-    MI_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 owidth  = m_dst->GetSizes().m_width;
-    MI_S32 oheight = m_dst->GetSizes().m_height;
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_F32 scale_x = static_cast<MI_F32>(iwidth) / owidth;
-    MI_F32 scale_y = static_cast<MI_F32>(iheight) / oheight;
+    DT_S32 iwidth  = m_src->GetSizes().m_width;
+    DT_S32 iheight = m_src->GetSizes().m_height;
+    DT_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 owidth  = m_dst->GetSizes().m_width;
+    DT_S32 oheight = m_dst->GetSizes().m_height;
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_F32 scale_x = static_cast<DT_F32>(iwidth) / owidth;
+    DT_F32 scale_y = static_cast<DT_F32>(iheight) / oheight;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -175,7 +175,7 @@ Status ResizeAreaCL::Run()
     Status ret_sync = Status::ERROR;
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_F32, MI_F32, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_F32, DT_F32, DT_S32, DT_S32, DT_S32, DT_S32>(
                          m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                          m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                          scale_x, scale_y, iwidth, iheight, owidth, oheight,
@@ -228,8 +228,8 @@ Status ResizeAreaCL::DeInitialize()
     return Status::OK;
 }
 
-std::vector<CLKernel> ResizeAreaCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 iwidth, MI_S32 iheight,
-                                                 MI_S32 owidth, MI_S32 oheight, MI_S32 channel)
+std::vector<CLKernel> ResizeAreaCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 iwidth, DT_S32 iheight,
+                                                 DT_S32 owidth, DT_S32 oheight, DT_S32 channel)
 {
     std::vector<CLKernel> cl_kernels;
     std::string build_opt;

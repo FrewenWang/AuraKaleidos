@@ -30,28 +30,28 @@ struct FrameWrapper
 {
     FrameWrapper();
 
-    FrameWrapper(MI_U64 buffer, MI_U32 buffer_size, MI_U64 data, MI_S32 width, MI_S32 height, MI_S32 pitch, MI_U8 pixel_res, MI_U8 num_channels,
-                 MI_U8 left_edge_pad_width, MI_U8 top_edge_pad_height, MI_U8 right_edge_pad_width, MI_U8 bottom_edge_pad_height,
-                 MI_U8 padding_type, MI_U32 padding_val);
+    FrameWrapper(DT_U64 buffer, DT_U32 buffer_size, DT_U64 data, DT_S32 width, DT_S32 height, DT_S32 pitch, DT_U8 pixel_res, DT_U8 num_channels,
+                 DT_U8 left_edge_pad_width, DT_U8 top_edge_pad_height, DT_U8 right_edge_pad_width, DT_U8 bottom_edge_pad_height,
+                 DT_U8 padding_type, DT_U32 padding_val);
 
     FrameWrapper(TileManager tm, const Mat *mat, BorderType border_type, const Scalar &border_value);
 
-    MI_BOOL IsValid() const;
+    DT_BOOL IsValid() const;
 
-    MI_U64 buffer;                    /*!< The buffer of Frame. */
-    MI_U32 buffer_size;               /*!< The size of buffer. */
-    MI_U64 data;                      /*!< The data of Frame. */
-    MI_S32 width;                     /*!< The width of Frame. */
-    MI_S32 height;                    /*!< The height of Frame. */
-    MI_S32 pitch;                     /*!< The pitch of Frame. */
-    MI_U8  pixel_res;                 /*!< The pixel resolution of Frame. */
-    MI_U8  num_channels;              /*!< The number of channels of Frame. */
-    MI_U8  left_edge_pad_width;       /*!< The width of left edge for padding. */
-    MI_U8  top_edge_pad_height;       /*!< The height of top edge for padding. */
-    MI_U8  right_edge_pad_width;      /*!< The width of right edge for padding. */
-    MI_U8  bottom_edge_pad_height;    /*!< The height of bottom edge for padding. */
-    MI_U8  padding_type;              /*!< The type of padding, such as reflect, constant, zero. */
-    MI_U32 padding_val;               /*!< The value of padding. */
+    DT_U64 buffer;                    /*!< The buffer of Frame. */
+    DT_U32 buffer_size;               /*!< The size of buffer. */
+    DT_U64 data;                      /*!< The data of Frame. */
+    DT_S32 width;                     /*!< The width of Frame. */
+    DT_S32 height;                    /*!< The height of Frame. */
+    DT_S32 pitch;                     /*!< The pitch of Frame. */
+    DT_U8  pixel_res;                 /*!< The pixel resolution of Frame. */
+    DT_U8  num_channels;              /*!< The number of channels of Frame. */
+    DT_U8  left_edge_pad_width;       /*!< The width of left edge for padding. */
+    DT_U8  top_edge_pad_height;       /*!< The height of top edge for padding. */
+    DT_U8  right_edge_pad_width;      /*!< The width of right edge for padding. */
+    DT_U8  bottom_edge_pad_height;    /*!< The height of bottom edge for padding. */
+    DT_U8  padding_type;              /*!< The type of padding, such as reflect, constant, zero. */
+    DT_U32 padding_val;               /*!< The value of padding. */
 };
 
 /**

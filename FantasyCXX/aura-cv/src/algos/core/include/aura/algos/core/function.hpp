@@ -42,7 +42,7 @@ public:
         return m_output_arrays;
     }
 
-    AURA_VOID Dump(const std::string &prefix) const override
+    DT_VOID Dump(const std::string &prefix) const override
     {
         if (m_dump_func)
         {
@@ -95,7 +95,7 @@ private:
 
 private:
     std::function<Status()> m_run_func;
-    std::function<AURA_VOID(const std::string&)> m_dump_func;
+    std::function<DT_VOID(const std::string&)> m_dump_func;
 
     std::vector<const Array*> m_input_arrays;
     std::vector<const Array*> m_output_arrays;
@@ -117,7 +117,7 @@ public:
 
         FunctionImpl *func_impl = dynamic_cast<FunctionImpl*>(m_impl.get());
 
-        if (MI_NULL == func_impl)
+        if (DT_NULL == func_impl)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "func_impl is null");
             return Status::ERROR;
@@ -131,7 +131,7 @@ public:
     {
         FunctionImpl *func_impl = dynamic_cast<FunctionImpl*>(m_impl.get());
 
-        if (MI_NULL == func_impl)
+        if (DT_NULL == func_impl)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "func_impl is null");
             return Status::ERROR;
@@ -145,7 +145,7 @@ public:
     {
         FunctionImpl *func_impl = dynamic_cast<FunctionImpl*>(m_impl.get());
 
-        if (MI_NULL == func_impl)
+        if (DT_NULL == func_impl)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "func_impl is null");
             return Status::ERROR;
@@ -159,7 +159,7 @@ public:
     {
         FunctionImpl *func_impl = dynamic_cast<FunctionImpl*>(m_impl.get());
 
-        if (MI_NULL == func_impl)
+        if (DT_NULL == func_impl)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "func_impl is null");
             return Status::ERROR;

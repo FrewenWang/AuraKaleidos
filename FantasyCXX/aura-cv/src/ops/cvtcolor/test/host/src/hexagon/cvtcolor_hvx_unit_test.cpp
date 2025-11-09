@@ -804,7 +804,7 @@ static CvtColorParam::TupleTable g_cvtcolor_bayer2bgr_table_hvx
 NEW_TESTCASE(cvtcolor, cvtcolor, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     // RGB <-> BGRA
     {
@@ -890,5 +890,5 @@ NEW_TESTCASE(cvtcolor, cvtcolor, hvx)
         test_bayer2bgr.RunTest(this, UnitTest::GetInstance()->GetStressCount());
     }
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

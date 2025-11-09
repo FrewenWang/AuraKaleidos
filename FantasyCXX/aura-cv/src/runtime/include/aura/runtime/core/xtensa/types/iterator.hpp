@@ -40,7 +40,7 @@ public:
      * @param data Pointer to the array of key-value pairs.
      * @param index Index of the current element in the array.
      */
-    Iterator(Tp *data, MI_S32 index) : m_data(data), m_index(index)
+    Iterator(Tp *data, DT_S32 index) : m_data(data), m_index(index)
     {}
 
     /**
@@ -69,7 +69,7 @@ public:
      * @param other The iterator to compare with.
      * @return True if the iterators are equal, otherwise False.
      */
-    MI_BOOL operator==(const Iterator &other)
+    DT_BOOL operator==(const Iterator &other)
     {
         return m_index == other.m_index;
     }
@@ -79,7 +79,7 @@ public:
      * @param other The iterator to compare with.
      * @return True if the iterators are not equal, otherwise False.
      */
-    MI_BOOL operator!=(const Iterator &other)
+    DT_BOOL operator!=(const Iterator &other)
     {
         return m_index != other.m_index;
     }
@@ -132,7 +132,7 @@ public:
 
 private:
     Tp     *m_data;  /*!< Pointer to the array of key-value pairs. */
-    MI_S32 m_index;  /*!< Index of the current element in the array. */
+    DT_S32 m_index;  /*!< Index of the current element in the array. */
 };
 
 template <typename Tp>
@@ -145,7 +145,7 @@ public:
      * @param data Pointer to the array of key-value pairs.
      * @param index Index of the current element in the array.
      */
-    ReverseIterator(Tp *data, MI_S32 index) : m_data(data), m_index(index)
+    ReverseIterator(Tp *data, DT_S32 index) : m_data(data), m_index(index)
     {}
 
     /**
@@ -174,7 +174,7 @@ public:
      * @param other The iterator to compare with.
      * @return True if the iterators are equal, otherwise False.
      */
-    MI_BOOL operator==(const ReverseIterator &other)
+    DT_BOOL operator==(const ReverseIterator &other)
     {
         return m_index == other.m_index;
     }
@@ -184,7 +184,7 @@ public:
      * @param other The iterator to compare with.
      * @return True if the iterators are not equal, otherwise False.
      */
-    MI_BOOL operator!=(const ReverseIterator &other)
+    DT_BOOL operator!=(const ReverseIterator &other)
     {
         return m_index != other.m_index;
     }
@@ -237,7 +237,7 @@ public:
 
 private:
     Tp     *m_data;  /*!< Pointer to the array of key-value pairs. */
-    MI_S32 m_index;  /*!< Index of the current element in the array. */
+    DT_S32 m_index;  /*!< Index of the current element in the array. */
 };
 
 /**

@@ -6,11 +6,11 @@
 namespace aura
 {
 
-// Tp = MI_U8, MI_S8
-template <typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, Status>::type
+// Tp = DT_U8, DT_S8
+template <typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, Status>::type
 ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
-                     const MI_S32 *buffer, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+                     const DT_S32 *buffer, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
@@ -22,12 +22,12 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     using VType            = typename neon::QVector<BufType>::VType;
     auto ResizeCastFunctor = typename ResizeBnCuTraits<Tp>::ResizeCastFunctor();
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
-    const MI_S32 *xofs     = buffer;
-    const MI_S32 *yofs     = xofs + owidth;
+    const DT_S32 *xofs     = buffer;
+    const DT_S32 *yofs     = xofs + owidth;
     const AlphaType *alpha = reinterpret_cast<const AlphaType*>(yofs + oheight);
     const AlphaType *beta  = alpha + 2 * owidth + 2 * start_row;
 
@@ -42,14 +42,14 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     BufType *rows0 = rows;
     BufType *rows1 = rows + C * owidth;
 
-    MI_F64 scale_x         = static_cast<MI_F64>(iwidth) / owidth;
-    MI_S32 loop_end_owidth = Ceil(((iwidth - 8) + 0.5) / scale_x - 0.5);
-    MI_S32 end_x           = loop_end_owidth & (-2);
+    DT_F64 scale_x         = static_cast<DT_F64>(iwidth) / owidth;
+    DT_S32 loop_end_owidth = Ceil(((iwidth - 8) + 0.5) / scale_x - 0.5);
+    DT_S32 end_x           = loop_end_owidth & (-2);
 
-    MI_S32 prev_sy1 = -1;
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_S32 prev_sy1 = -1;
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy                  = yofs[y];
+        DT_S32 sy                  = yofs[y];
         const AlphaType *alpha_ptr = alpha;
 
         if (sy == prev_sy1)
@@ -61,11 +61,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             const Tp *src_row1 = src.Ptr<Tp>(sy + 1);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < end_x; x += 2)
             {
-                MI_S32 sx_x0    = C * xofs[x];
-                MI_S32 sx_x1    = C * xofs[x + 1];
+                DT_S32 sx_x0    = C * xofs[x];
+                DT_S32 sx_x1    = C * xofs[x + 1];
                 const Tp *r1_x0 = src_row1 + sx_x0;
                 const Tp *r1_x1 = src_row1 + sx_x1;
 
@@ -75,7 +75,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
                 auto vq32_a = neon::vmovl(neon::vload1(alpha_ptr));
 
                 MVTypeD32 mvd32_result;
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     int32x2_t vds32_x0 = neon::vgetlow(neon::vmovl(neon::vgetlow(neon::vmovl(mvd8_x0.val[ch]))));
                     int32x2_t vds32_x1 = neon::vgetlow(neon::vmovl(neon::vgetlow(neon::vmovl(mvd8_x1.val[ch]))));
@@ -92,13 +92,13 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             for (; x < owidth; x++)
             {
-                MI_S32 sx    = C * xofs[x];
+                DT_S32 sx    = C * xofs[x];
                 const Tp *r1 = src_row1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
 
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     rows1_tmp[ch] = r1[ch] * a0 + r1[ch + C] * a1;
                 }
@@ -115,11 +115,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
             BufType *rows0_tmp = rows0;
             BufType *rows1_tmp = rows1;
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < end_x; x += 2)
             {
-                MI_S32 sx_x0    = C * xofs[x];
-                MI_S32 sx_x1    = C * xofs[x + 1];
+                DT_S32 sx_x0    = C * xofs[x];
+                DT_S32 sx_x1    = C * xofs[x + 1];
                 const Tp *r0_x0 = src_row0 + sx_x0;
                 const Tp *r0_x1 = src_row0 + sx_x1;
                 const Tp *r1_x0 = src_row1 + sx_x0;
@@ -131,7 +131,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
                 auto vq32_a = neon::vmovl(neon::vload1(alpha_ptr));
 
                 MVTypeD32 mvd32_result;
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     int32x2_t vds32_x0 = neon::vgetlow(neon::vmovl(neon::vgetlow(neon::vmovl(mvd8_x0.val[ch]))));
                     int32x2_t vds32_x1 = neon::vgetlow(neon::vmovl(neon::vgetlow(neon::vmovl(mvd8_x1.val[ch]))));
@@ -144,7 +144,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
                 neon::vload(r0_x0, mvd8_x0);
                 neon::vload(r0_x1, mvd8_x1);
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     int32x2_t vsd32_x0 = neon::vgetlow(neon::vmovl(neon::vgetlow(neon::vmovl(mvd8_x0.val[ch]))));
                     int32x2_t vsd32_x1 = neon::vgetlow(neon::vmovl(neon::vgetlow(neon::vmovl(mvd8_x1.val[ch]))));
@@ -162,14 +162,14 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             for (; x < owidth; x++)
             {
-                MI_S32 sx    = C * xofs[x];
+                DT_S32 sx    = C * xofs[x];
                 const Tp *r0 = src_row0 + sx;
                 const Tp *r1 = src_row1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
 
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     rows0_tmp[ch] = r0[ch] * a0 + r0[ch + C] * a1;
                     rows1_tmp[ch] = r1[ch] * a0 + r1[ch + C] * a1;
@@ -193,9 +193,9 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
         neon::vdup(vq32_b0, static_cast<BufType>(b0));
         neon::vdup(vq32_b1, static_cast<BufType>(b1));
 
-        MI_S32 owidth_xc        = owidth * C;
-        MI_S32 owidth_xc_align8 = owidth_xc & (-8);
-        MI_S32 x                = 0;
+        DT_S32 owidth_xc        = owidth * C;
+        DT_S32 owidth_xc_align8 = owidth_xc & (-8);
+        DT_S32 x                = 0;
         for (; x < owidth_xc_align8; x += 8)
         {
             auto vq32_cx0  = neon::vload1q(rows0_tmp);
@@ -208,7 +208,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
             vq32_x0      = neon::vmla(vq32_x0, vq32_n0x0, vq32_b1);
             vq32_x1      = neon::vmla(vq32_x1, vq32_n0x1, vq32_b1);
             MVTypeD8 vd8_result;
-            if (std::is_same<Tp, MI_U8>::value)
+            if (std::is_same<Tp, DT_U8>::value)
             {
                 uint32x4_t vqu32_x0     = neon::vreinterpret(vq32_x0);
                 uint32x4_t vqu32_x1     = neon::vreinterpret(vq32_x1);
@@ -239,11 +239,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     AURA_RETURN(ctx, ret);
 }
 
-// Tp = MI_U16, MI_S16
-template <typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, Status>::type
+// Tp = DT_U16, DT_S16
+template <typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, Status>::type
 ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
-                     const MI_S32 *buffer, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+                     const DT_S32 *buffer, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
@@ -253,12 +253,12 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     using MVType    = typename neon::MDVector<Tp, C>::MVType;
     using MVTypeF32 = typename neon::MDVector<BufType, C>::MVType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
-    const MI_S32 *xofs     = buffer;
-    const MI_S32 *yofs     = xofs + owidth;
+    const DT_S32 *xofs     = buffer;
+    const DT_S32 *yofs     = xofs + owidth;
     const AlphaType *alpha = reinterpret_cast<const AlphaType*>(yofs + oheight);
     const AlphaType *beta  = alpha + 2 * owidth + 2 * start_row;
 
@@ -273,14 +273,14 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     BufType *rows0 = rows;
     BufType *rows1 = rows + C * owidth;
 
-    MI_F64 scale_x         = static_cast<MI_F64>(iwidth) / owidth;
-    MI_S32 loop_end_owidth = Ceil(((iwidth - 8) + 0.5) / scale_x - 0.5);
-    MI_S32 end_x           = loop_end_owidth & (-2);
+    DT_F64 scale_x         = static_cast<DT_F64>(iwidth) / owidth;
+    DT_S32 loop_end_owidth = Ceil(((iwidth - 8) + 0.5) / scale_x - 0.5);
+    DT_S32 end_x           = loop_end_owidth & (-2);
 
-    MI_S32 prev_sy1 = -1;
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_S32 prev_sy1 = -1;
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy                  = yofs[y];
+        DT_S32 sy                  = yofs[y];
         const AlphaType *alpha_ptr = alpha;
 
         if (sy == prev_sy1)
@@ -292,11 +292,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             const Tp *src_row1 = src.Ptr<Tp>(sy + 1);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < end_x; x += 2)
             {
-                MI_S32 sx_x0    = C * xofs[x];
-                MI_S32 sx_x1    = C * xofs[x + 1];
+                DT_S32 sx_x0    = C * xofs[x];
+                DT_S32 sx_x1    = C * xofs[x + 1];
                 const Tp *r1_x0 = src_row1 + sx_x0;
                 const Tp *r1_x1 = src_row1 + sx_x1;
 
@@ -306,7 +306,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
                 float32x4_t vqf32_a = neon::vload1q(alpha_ptr);
 
                 MVTypeF32 mvdf32_result;
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     auto vq32_result         = neon::vcombine(neon::vgetlow(neon::vmovl(mvd16_x0.val[ch])),
                                                               neon::vgetlow(neon::vmovl(mvd16_x1.val[ch])));
@@ -322,13 +322,13 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             for (; x < owidth; x++)
             {
-                MI_S32 sx    = C * xofs[x];
+                DT_S32 sx    = C * xofs[x];
                 const Tp *r1 = src_row1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
 
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     rows1_tmp[ch] = r1[ch] * a0 + r1[ch + C] * a1;
                 }
@@ -345,11 +345,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
             BufType *rows0_tmp = rows0;
             BufType *rows1_tmp = rows1;
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < end_x; x += 2)
             {
-                MI_S32 sx_x0    = C * xofs[x];
-                MI_S32 sx_x1    = C * xofs[x + 1];
+                DT_S32 sx_x0    = C * xofs[x];
+                DT_S32 sx_x1    = C * xofs[x + 1];
                 const Tp *r0_x0 = src_row0 + sx_x0;
                 const Tp *r1_x0 = src_row1 + sx_x0;
                 const Tp *r0_x1 = src_row0 + sx_x1;
@@ -361,7 +361,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
                 float32x4_t vqf32_a = neon::vload1q(alpha_ptr);
 
                 MVTypeF32 mvdf32_result;
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     auto vq32_result         = neon::vcombine(neon::vgetlow(neon::vmovl(mvd16_x0.val[ch])),
                                                               neon::vgetlow(neon::vmovl(mvd16_x1.val[ch])));
@@ -373,7 +373,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
                 neon::vload(r0_x0, mvd16_x0);
                 neon::vload(r0_x1, mvd16_x1);
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     auto vq32_result         = neon::vcombine(neon::vgetlow(neon::vmovl(mvd16_x0.val[ch])),
                                                               neon::vgetlow(neon::vmovl(mvd16_x1.val[ch])));
@@ -390,13 +390,13 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             for (; x < owidth; x++)
             {
-                MI_S32 sx    = C * xofs[x];
+                DT_S32 sx    = C * xofs[x];
                 const Tp *r0 = src_row0 + sx;
                 const Tp *r1 = src_row1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     rows0_tmp[ch] = r0[ch] * a0 + r0[ch + C] * a1;
                     rows1_tmp[ch] = r1[ch] * a0 + r1[ch + C] * a1;
@@ -420,9 +420,9 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
         neon::vdup(vqf32_b0, b0);
         neon::vdup(vqf32_b1, b1);
 
-        MI_S32 owidth_xc        = owidth * C;
-        MI_S32 owidth_xc_align8 = owidth_xc & (-8);
-        MI_S32 x                = 0;
+        DT_S32 owidth_xc        = owidth * C;
+        DT_S32 owidth_xc_align8 = owidth_xc & (-8);
+        DT_S32 x                = 0;
         for (; x < owidth_xc_align8; x += 8)
         {
             float32x4_t vqf32_cx0  = neon::vload1q(rows0_tmp);
@@ -458,11 +458,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     AURA_RETURN(ctx, ret);
 }
 
-// Tp = MI_F32
-template <typename Tp, MI_S32 C>
-static typename std::enable_if<std::is_same<MI_F32, Tp>::value, Status>::type
+// Tp = DT_F32
+template <typename Tp, DT_S32 C>
+static typename std::enable_if<std::is_same<DT_F32, Tp>::value, Status>::type
 ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
-                     const MI_S32 *buffer, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+                     const DT_S32 *buffer, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
@@ -471,12 +471,12 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     using MVType    = typename neon::MDVector<Tp, C>::MVType;
     using MVTypeF32 = typename neon::MDVector<BufType, C>::MVType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
-    const MI_S32 *xofs     = buffer;
-    const MI_S32 *yofs     = xofs + owidth;
+    const DT_S32 *xofs     = buffer;
+    const DT_S32 *yofs     = xofs + owidth;
     const AlphaType *alpha = reinterpret_cast<const AlphaType*>(yofs + oheight);
     const AlphaType *beta  = alpha + 2 * owidth + 2 * start_row;
 
@@ -491,14 +491,14 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     BufType *rows0 = rows;
     BufType *rows1 = rows + C * owidth;
 
-    MI_F64 scale_x         = static_cast<MI_F64>(iwidth) / owidth;
-    MI_S32 loop_end_owidth = Ceil(((iwidth - 8) + 0.5) / scale_x - 0.5);
-    MI_S32 end_x           = loop_end_owidth & (-2);
+    DT_F64 scale_x         = static_cast<DT_F64>(iwidth) / owidth;
+    DT_S32 loop_end_owidth = Ceil(((iwidth - 8) + 0.5) / scale_x - 0.5);
+    DT_S32 end_x           = loop_end_owidth & (-2);
 
-    MI_S32 prev_sy1 = -1;
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_S32 prev_sy1 = -1;
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy                  = yofs[y];
+        DT_S32 sy                  = yofs[y];
         const AlphaType *alpha_ptr = alpha;
 
         if (sy == prev_sy1)
@@ -510,11 +510,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             const Tp *src_row1 = src.Ptr<Tp>(sy + 1);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < end_x; x += 2)
             {
-                MI_S32 sx_x0    = C * xofs[x];
-                MI_S32 sx_x1    = C * xofs[x + 1];
+                DT_S32 sx_x0    = C * xofs[x];
+                DT_S32 sx_x1    = C * xofs[x + 1];
                 const Tp *r1_x0 = src_row1 + sx_x0;
                 const Tp *r1_x1 = src_row1 + sx_x1;
 
@@ -524,7 +524,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
                 float32x4_t vqf32_a = neon::vload1q(alpha_ptr);
 
                 MVTypeF32 mvdf32_result;
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     float32x4_t vqf32_result = neon::vcombine(mvdf32_x0.val[ch], mvdf32_x1.val[ch]);
                     vqf32_result             = neon::vmul(vqf32_result, vqf32_a);
@@ -538,13 +538,13 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             for (; x < owidth; x++)
             {
-                MI_S32 sx    = C * xofs[x];
+                DT_S32 sx    = C * xofs[x];
                 const Tp *r1 = src_row1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
 
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     rows1_tmp[ch] = r1[ch] * a0 + r1[ch + C] * a1;
                 }
@@ -561,11 +561,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
             BufType *rows0_tmp = rows0;
             BufType *rows1_tmp = rows1;
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < end_x; x += 2)
             {
-                MI_S32 sx_x0    = C * xofs[x];
-                MI_S32 sx_x1    = C * xofs[x + 1];
+                DT_S32 sx_x0    = C * xofs[x];
+                DT_S32 sx_x1    = C * xofs[x + 1];
                 const Tp *r0_x0 = src_row0 + sx_x0;
                 const Tp *r1_x0 = src_row1 + sx_x0;
                 const Tp *r0_x1 = src_row0 + sx_x1;
@@ -577,7 +577,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
                 float32x4_t vqf32_a = neon::vload1q(alpha_ptr);
 
                 MVTypeF32 mvdf32_result;
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     float32x4_t vqf32_result = neon::vcombine(mvdf32_x0.val[ch], mvdf32_x1.val[ch]);
                     vqf32_result             = neon::vmul(vqf32_result, vqf32_a);
@@ -587,7 +587,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
                 neon::vload(r0_x0, mvdf32_x0);
                 neon::vload(r0_x1, mvdf32_x1);
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     float32x4_t vqf32_result = neon::vcombine(mvdf32_x0.val[ch], mvdf32_x1.val[ch]);
                     vqf32_result             = neon::vmul(vqf32_result, vqf32_a);
@@ -602,13 +602,13 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             for (; x < owidth; x++)
             {
-                MI_S32 sx    = C * xofs[x];
+                DT_S32 sx    = C * xofs[x];
                 const Tp *r0 = src_row0 + sx;
                 const Tp *r1 = src_row1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     rows0_tmp[ch] = r0[ch] * a0 + r0[ch + C] * a1;
                     rows1_tmp[ch] = r1[ch] * a0 + r1[ch + C] * a1;
@@ -632,9 +632,9 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
         neon::vdup(vqf32_b0, b0);
         neon::vdup(vqf32_b1, b1);
 
-        MI_S32 owidth_xc        = owidth * C;
-        MI_S32 owidth_xc_align4 = owidth_xc & (-4);
-        MI_S32 x                = 0;
+        DT_S32 owidth_xc        = owidth * C;
+        DT_S32 owidth_xc_align4 = owidth_xc & (-4);
+        DT_S32 x                = 0;
         for (; x < owidth_xc_align4; x += 4)
         {
             float32x4_t vqf32_x0 = neon::vload1q(rows0_tmp);
@@ -663,10 +663,10 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
 // Tp = MI_F16
 #if defined(AURA_ENABLE_NEON_FP16)
-template <typename Tp, MI_S32 C>
+template <typename Tp, DT_S32 C>
 static typename std::enable_if<std::is_same<MI_F16, Tp>::value, Status>::type
 ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
-                     const MI_S32 *buffer, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+                     const DT_S32 *buffer, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::OK;
 
@@ -676,12 +676,12 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     using MVType    = typename neon::MDVector<Tp, C>::MVType;
     using MVTypeF32 = typename neon::MDVector<BufType, C>::MVType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
-    const MI_S32 *xofs     = buffer;
-    const MI_S32 *yofs     = xofs + owidth;
+    const DT_S32 *xofs     = buffer;
+    const DT_S32 *yofs     = xofs + owidth;
     const AlphaType *alpha = reinterpret_cast<const AlphaType*>(yofs + oheight);
     const AlphaType *beta  = alpha + 2 * owidth + 2 * start_row;
 
@@ -696,14 +696,14 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
     BufType *rows0 = rows;
     BufType *rows1 = rows + C * owidth;
 
-    MI_F64 scale_x         = static_cast<MI_F64>(iwidth) / owidth;
-    MI_S32 loop_end_owidth = Ceil(((iwidth - 8) + 0.5) / scale_x - 0.5);
-    MI_S32 end_x           = loop_end_owidth & (-2);
+    DT_F64 scale_x         = static_cast<DT_F64>(iwidth) / owidth;
+    DT_S32 loop_end_owidth = Ceil(((iwidth - 8) + 0.5) / scale_x - 0.5);
+    DT_S32 end_x           = loop_end_owidth & (-2);
 
-    MI_S32 prev_sy1 = -1;
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_S32 prev_sy1 = -1;
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        MI_S32 sy                  = yofs[y];
+        DT_S32 sy                  = yofs[y];
         const AlphaType *alpha_ptr = alpha;
 
         if (sy == prev_sy1)
@@ -715,11 +715,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             const Tp *src_row1 = src.Ptr<Tp>(sy + 1);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < end_x; x += 2)
             {
-                MI_S32 sx_x0    = C * xofs[x];
-                MI_S32 sx_x1    = C * xofs[x + 1];
+                DT_S32 sx_x0    = C * xofs[x];
+                DT_S32 sx_x1    = C * xofs[x + 1];
                 const Tp *r1_x0 = src_row1 + sx_x0;
                 const Tp *r1_x1 = src_row1 + sx_x1;
 
@@ -729,7 +729,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
                 float32x4_t vqf32_a = neon::vload1q(alpha_ptr);
 
                 MVTypeF32 mvdf32_result;
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     float32x4_t vqf32_result = neon::vcombine(neon::vgetlow(neon::vcvt<MovlType>(mvdf16_x0.val[ch])),
                                                               neon::vgetlow(neon::vcvt<MovlType>(mvdf16_x1.val[ch])));
@@ -744,13 +744,13 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             for (; x < owidth; x++)
             {
-                MI_S32 sx    = C * xofs[x];
+                DT_S32 sx    = C * xofs[x];
                 const Tp *r1 = src_row1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
 
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     rows1_tmp[ch] = r1[ch] * a0 + r1[ch + C] * a1;
                 }
@@ -767,11 +767,11 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
             BufType *rows0_tmp = rows0;
             BufType *rows1_tmp = rows1;
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < end_x; x += 2)
             {
-                MI_S32 sx_x0    = C * xofs[x];
-                MI_S32 sx_x1    = C * xofs[x + 1];
+                DT_S32 sx_x0    = C * xofs[x];
+                DT_S32 sx_x1    = C * xofs[x + 1];
                 const Tp *r0_x0 = src_row0 + sx_x0;
                 const Tp *r1_x0 = src_row1 + sx_x0;
                 const Tp *r0_x1 = src_row0 + sx_x1;
@@ -783,7 +783,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
                 float32x4_t vqf32_a = neon::vload1q(alpha_ptr);
 
                 MVTypeF32 mvdf32_result;
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     float32x4_t vqf32_result = neon::vcombine(neon::vgetlow(neon::vcvt<MovlType>(mvdf16_x0.val[ch])),
                                                               neon::vgetlow(neon::vcvt<MovlType>(mvdf16_x1.val[ch])));
@@ -794,7 +794,7 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
                 neon::vload(r0_x0, mvdf16_x0);
                 neon::vload(r0_x1, mvdf16_x1);
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     float32x4_t vqf32_result = neon::vcombine(neon::vgetlow(neon::vcvt<MovlType>(mvdf16_x0.val[ch])),
                                                               neon::vgetlow(neon::vcvt<MovlType>(mvdf16_x1.val[ch])));
@@ -810,13 +810,13 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 
             for (; x < owidth; x++)
             {
-                MI_S32 sx    = C * xofs[x];
+                DT_S32 sx    = C * xofs[x];
                 const Tp *r0 = src_row0 + sx;
                 const Tp *r1 = src_row1 + sx;
 
                 AlphaType a0 = alpha_ptr[0];
                 AlphaType a1 = alpha_ptr[1];
-                for (MI_S32 ch = 0; ch < C; ++ch)
+                for (DT_S32 ch = 0; ch < C; ++ch)
                 {
                     rows0_tmp[ch] = r0[ch] * a0 + r0[ch + C] * a1;
                     rows1_tmp[ch] = r1[ch] * a0 + r1[ch + C] * a1;
@@ -840,9 +840,9 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
         neon::vdup(vqf32_b0, b0);
         neon::vdup(vqf32_b1, b1);
 
-        MI_S32 owidth_xc        = owidth * C;
-        MI_S32 owidth_xc_align8 = owidth_xc & (-8);
-        MI_S32 x                = 0;
+        DT_S32 owidth_xc        = owidth * C;
+        DT_S32 owidth_xc_align8 = owidth_xc & (-8);
+        DT_S32 x                = 0;
         for (; x < owidth_xc_align8; x += 8)
         {
             float32x4_t vqf32_cx0  = neon::vload1q(rows0_tmp);
@@ -880,21 +880,21 @@ ResizeBnCommNeonImpl(Context *ctx, const Mat &src, Mat &dst,
 #endif
 
 template <typename Tp>
-static Status ResizeBnCommNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area, const OpTarget &target)
+static Status ResizeBnCommNeonHelper(Context *ctx, const Mat &src, Mat &dst, DT_BOOL is_area, const OpTarget &target)
 {
     AURA_UNUSED(target);
     Status ret = Status::ERROR;
 
     using AlphaType = typename ResizeBnCuTraits<Tp>::AlphaType;
 
-    MI_S32 iheight = src.GetSizes().m_height;
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 iheight = src.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 owidth  = dst.GetSizes().m_width;
 
-    MI_S32 buffer_size = (owidth + oheight) * sizeof(MI_S32) + (owidth + oheight) * 2 * sizeof(AlphaType);
-    MI_S32 *buffer     = reinterpret_cast<MI_S32*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, buffer_size, 0));
-    if (MI_NULL == buffer)
+    DT_S32 buffer_size = (owidth + oheight) * sizeof(DT_S32) + (owidth + oheight) * 2 * sizeof(AlphaType);
+    DT_S32 *buffer     = reinterpret_cast<DT_S32*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, buffer_size, 0));
+    if (DT_NULL == buffer)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
         return Status::ERROR;
@@ -903,7 +903,7 @@ static Status ResizeBnCommNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_
     GetBnOffset<Tp>(buffer, iwidth, owidth, iheight, oheight, is_area);
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         return Status::ERROR;
     }
@@ -912,7 +912,7 @@ static Status ResizeBnCommNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_
     {
         case 1:
         {
-            ThreadBuffer thread_buffer(ctx, owidth * 2 * sizeof(MI_S32));
+            ThreadBuffer thread_buffer(ctx, owidth * 2 * sizeof(DT_S32));
 
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, ResizeBnCommNeonImpl<Tp, 1>, ctx, std::cref(src),
                                   std::ref(dst), buffer, std::ref(thread_buffer));
@@ -925,7 +925,7 @@ static Status ResizeBnCommNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_
 
         case 2:
         {
-            ThreadBuffer thread_buffer(ctx, owidth * 2 * 2 * sizeof(MI_S32));
+            ThreadBuffer thread_buffer(ctx, owidth * 2 * 2 * sizeof(DT_S32));
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, ResizeBnCommNeonImpl<Tp, 2>, ctx, std::cref(src),
                                   std::ref(dst), buffer, std::ref(thread_buffer));
             if (ret != Status::OK)
@@ -937,7 +937,7 @@ static Status ResizeBnCommNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_
 
         case 3:
         {
-            ThreadBuffer thread_buffer(ctx, owidth * 2 * 3 * sizeof(MI_S32));
+            ThreadBuffer thread_buffer(ctx, owidth * 2 * 3 * sizeof(DT_S32));
 
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, ResizeBnCommNeonImpl<Tp, 3>, ctx, std::cref(src),
                                   std::ref(dst), buffer, std::ref(thread_buffer));
@@ -961,7 +961,7 @@ static Status ResizeBnCommNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_
     AURA_RETURN(ctx, ret);
 }
 
-Status ResizeBnCommNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area, const OpTarget &target)
+Status ResizeBnCommNeon(Context *ctx, const Mat &src, Mat &dst, DT_BOOL is_area, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
@@ -969,40 +969,40 @@ Status ResizeBnCommNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area,
     {
         case ElemType::U8:
         {
-            ret = ResizeBnCommNeonHelper<MI_U8>(ctx, src, dst, is_area, target);
+            ret = ResizeBnCommNeonHelper<DT_U8>(ctx, src, dst, is_area, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: MI_U8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: DT_U8");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            ret = ResizeBnCommNeonHelper<MI_S8>(ctx, src, dst, is_area, target);
+            ret = ResizeBnCommNeonHelper<DT_S8>(ctx, src, dst, is_area, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: MI_S8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: DT_S8");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = ResizeBnCommNeonHelper<MI_U16>(ctx, src, dst, is_area, target);
+            ret = ResizeBnCommNeonHelper<DT_U16>(ctx, src, dst, is_area, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: MI_U16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: DT_U16");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = ResizeBnCommNeonHelper<MI_S16>(ctx, src, dst, is_area, target);
+            ret = ResizeBnCommNeonHelper<DT_S16>(ctx, src, dst, is_area, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: MI_S16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: DT_S16");
             }
             break;
         }
@@ -1021,10 +1021,10 @@ Status ResizeBnCommNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL is_area,
 
         case ElemType::F32:
         {
-            ret = ResizeBnCommNeonHelper<MI_F32>(ctx, src, dst, is_area, target);
+            ret = ResizeBnCommNeonHelper<DT_F32>(ctx, src, dst, is_area, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: MI_F32");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnCommNeonHelper run failed, type: DT_F32");
             }
             break;
         }

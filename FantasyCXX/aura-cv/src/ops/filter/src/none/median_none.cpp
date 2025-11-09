@@ -7,11 +7,11 @@ namespace aura
 {
 
 template <typename Tp>
-AURA_ALWAYS_INLINE Tp MedianFilterQuickSelect(std::vector<Tp> &arr, MI_S32 nums)
+AURA_ALWAYS_INLINE Tp MedianFilterQuickSelect(std::vector<Tp> &arr, DT_S32 nums)
 {
-    MI_S32 low = 0;
-    MI_S32 high = nums - 1;
-    MI_S32 median = (low + high) / 2;
+    DT_S32 low = 0;
+    DT_S32 high = nums - 1;
+    DT_S32 median = (low + high) / 2;
 
     for (;;)
     {
@@ -29,7 +29,7 @@ AURA_ALWAYS_INLINE Tp MedianFilterQuickSelect(std::vector<Tp> &arr, MI_S32 nums)
             return arr[median];
         }
 
-        MI_S32 middle = (low + high) / 2;
+        DT_S32 middle = (low + high) / 2;
         if (arr[middle] > arr[high])
         {
             Swap(arr[middle], arr[high]);
@@ -47,8 +47,8 @@ AURA_ALWAYS_INLINE Tp MedianFilterQuickSelect(std::vector<Tp> &arr, MI_S32 nums)
 
         Swap(arr[middle], arr[low + 1]);
 
-        MI_S32 low_pointer = low + 1;
-        MI_S32 high_pointer = high;
+        DT_S32 low_pointer = low + 1;
+        DT_S32 high_pointer = high;
         for (;;)
         {
             do
@@ -83,33 +83,33 @@ AURA_ALWAYS_INLINE Tp MedianFilterQuickSelect(std::vector<Tp> &arr, MI_S32 nums)
 }
 
 template <typename Tp>
-static Status MedianNoneImpl(const Mat &src, Mat &dst, MI_S32 ksize, MI_S32 start_row, MI_S32 end_row)
+static Status MedianNoneImpl(const Mat &src, Mat &dst, DT_S32 ksize, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 ksh = ksize >> 1;
-    MI_S32 y_index = 0, x_index = 0;
+    DT_S32 ksh = ksize >> 1;
+    DT_S32 y_index = 0, x_index = 0;
 
     std::vector<Tp> data;
     data.resize(ksize * ksize, 0);
 
-    MI_S32 channel = dst.GetSizes().m_channel;
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 height  = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 height  = dst.GetSizes().m_height;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         Tp *dst_row = dst.Ptr<Tp>(y);
-        for (MI_S32 x = 0; x < width; x++)
+        for (DT_S32 x = 0; x < width; x++)
         {
-            for (MI_S32 c = 0; c < channel; c++)
+            for (DT_S32 c = 0; c < channel; c++)
             {
-                for (MI_S32 j = -ksh; j <= ksh; j++)
+                for (DT_S32 j = -ksh; j <= ksh; j++)
                 {
-                    y_index = Clamp(y + j, static_cast<MI_S32>(0), height - 1);
+                    y_index = Clamp(y + j, static_cast<DT_S32>(0), height - 1);
                     const Tp *src_row = src.Ptr<Tp>(y_index);
 
-                    for (MI_S32 i = -ksh; i <= ksh; i++)
+                    for (DT_S32 i = -ksh; i <= ksh; i++)
                     {
-                        x_index = Clamp(x + i, static_cast<MI_S32>(0), width - 1);
+                        x_index = Clamp(x + i, static_cast<DT_S32>(0), width - 1);
                         data[(j + ksh) * ksize + (i + ksh)] = src_row[x_index * channel + c];
                     }
                 }
@@ -123,7 +123,7 @@ static Status MedianNoneImpl(const Mat &src, Mat &dst, MI_S32 ksize, MI_S32 star
 MedianNone::MedianNone(Context *ctx, const OpTarget &target) : MedianImpl(ctx, target)
 {}
 
-Status MedianNone::SetArgs(const Array *src, Array *dst, MI_S32 ksize)
+Status MedianNone::SetArgs(const Array *src, Array *dst, DT_S32 ksize)
 {
     if (MedianImpl::SetArgs(src, dst, ksize) != Status::OK)
     {
@@ -149,7 +149,7 @@ Status MedianNone::Initialize()
     }
 
     // Get border mat sizes
-    MI_S32 ksh          = m_ksize >> 1;
+    DT_S32 ksh          = m_ksize >> 1;
     Sizes3 border_sizes = m_src->GetSizes() + Sizes3(ksh << 1, ksh << 1, 0);
     m_src_border        = Mat(m_ctx, m_src->GetElemType(), border_sizes);
 
@@ -162,20 +162,20 @@ Status MedianNone::Initialize()
 }
 
 template <typename Tp>
-static Status MedianNoneHepler(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MI_S32 oheight, const OpTarget &target)
+static Status MedianNoneHepler(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, DT_S32 oheight, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
     if (target.m_data.none.enable_mt)
     {
         WorkerPool *wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
             return ret;
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), oheight, MedianNoneImpl<Tp>, std::cref(src), std::ref(dst), ksize);
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), oheight, MedianNoneImpl<Tp>, std::cref(src), std::ref(dst), ksize);
     }
     else
     {
@@ -189,50 +189,50 @@ Status MedianNone::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
     }
 
-    MI_S32 oheight = dst->GetSizes().m_height;
+    DT_S32 oheight = dst->GetSizes().m_height;
     Status ret = Status::ERROR;
 
     switch (src->GetElemType())
     {
         case ElemType::U8:
         {
-            ret = MedianNoneHepler<MI_U8>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
+            ret = MedianNoneHepler<DT_U8>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
             break;
         }
 
         case ElemType::S8:
         {
-            ret = MedianNoneHepler<MI_S8>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
+            ret = MedianNoneHepler<DT_S8>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = MedianNoneHepler<MI_U16>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
+            ret = MedianNoneHepler<DT_U16>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = MedianNoneHepler<MI_S16>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
+            ret = MedianNoneHepler<DT_S16>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
             break;
         }
 
         case ElemType::U32:
         {
-            ret = MedianNoneHepler<MI_U32>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
+            ret = MedianNoneHepler<DT_U32>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
             break;
         }
 
         case ElemType::S32:
         {
-            ret = MedianNoneHepler<MI_S32>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
+            ret = MedianNoneHepler<DT_S32>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
             break;
         }
 
@@ -245,7 +245,7 @@ Status MedianNone::Run()
 
         case ElemType::F32:
         {
-            ret = MedianNoneHepler<MI_F32>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
+            ret = MedianNoneHepler<DT_F32>(m_ctx, *src, *dst, m_ksize, oheight, m_target);
             break;
         }
 #endif

@@ -9,7 +9,7 @@ namespace aura
 LaplacianNone::LaplacianNone(Context *ctx, const OpTarget &target) : LaplacianImpl(ctx, target)
 {}
 
-Status LaplacianNone::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+Status LaplacianNone::SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                               BorderType border_type, const Scalar &border_value)
 {
     if (LaplacianImpl::SetArgs(src, dst, ksize, border_type, border_value) != Status::OK)
@@ -32,7 +32,7 @@ Status LaplacianNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat       *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "input null ptr");
         return Status::ERROR;

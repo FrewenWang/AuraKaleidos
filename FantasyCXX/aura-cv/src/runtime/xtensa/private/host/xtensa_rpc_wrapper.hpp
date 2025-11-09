@@ -11,7 +11,7 @@ namespace aura
 class XtensaRpcWrapper
 {
 public:
-    XtensaRpcWrapper(Context *ctx, AURA_VOID *handle, MI_U32 op_id, std::string &name, XtensaRpcParam *param);
+    XtensaRpcWrapper(Context *ctx, DT_VOID *handle, DT_U32 op_id, std::string &name, XtensaRpcParam *param);
 
     ~XtensaRpcWrapper();
 
@@ -21,7 +21,7 @@ private:
     struct XtensaRpcData
     {
     public:
-        XtensaRpcData(MI_U32 full_name_addr, MI_U32 full_name_len, MI_U32 rpc_param_addr, MI_U32 rpc_param_len)
+        XtensaRpcData(DT_U32 full_name_addr, DT_U32 full_name_len, DT_U32 rpc_param_addr, DT_U32 rpc_param_len)
         {
             m_data[0] = full_name_addr;
             m_data[1] = full_name_len;
@@ -29,19 +29,19 @@ private:
             m_data[3] = rpc_param_len;
         }
 
-        MI_U32* GetData(MI_U32 &len)
+        DT_U32* GetData(DT_U32 &len)
         {
             len = sizeof(m_data);
             return m_data;
         }
 
     private:
-        MI_U32 m_data[4];
+        DT_U32 m_data[4];
     };
 
     Context *m_ctx;
     void *m_handle;
-    MI_U32 m_op_id;
+    DT_U32 m_op_id;
     std::string m_name;
     XtensaRpcParam *m_param;
     XtensaEngine *m_xtensa_engine;

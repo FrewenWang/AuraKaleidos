@@ -31,7 +31,7 @@ namespace xtensa
  *
  * @tparam MAX_SIZE  The maximum size of the string.
  */
-template <MI_S32 MAX_SIZE = AURA_STRING_DEFAULT_MAX_SIZE>
+template <DT_S32 MAX_SIZE = AURA_STRING_DEFAULT_MAX_SIZE>
 class string_
 {
 public:
@@ -48,7 +48,7 @@ public:
      *
      * @param s The char array to initialize the string object with.
      */
-    string_(const MI_CHAR *s)
+    string_(const DT_CHAR *s)
     {
         Memset(m_data, '\0', MAX_SIZE);
         assign(s);
@@ -70,7 +70,7 @@ public:
      *
      * @return The length of the string.
      */
-    MI_S32 size() const
+    DT_S32 size() const
     {
         return m_size;
     }
@@ -80,7 +80,7 @@ public:
      *
      * @return True if the string is empty, otherwise False.
      */
-    MI_BOOL empty() const
+    DT_BOOL empty() const
     {
         return 0 == m_size;
     }
@@ -90,7 +90,7 @@ public:
      *
      * @return The maximum capacity of the string.
      */
-    MI_S32 capacity() const
+    DT_S32 capacity() const
     {
         return MAX_SIZE;
     }
@@ -100,7 +100,7 @@ public:
      *
      * @return A pointer to the string.
      */
-    const MI_CHAR* c_str() const
+    const DT_CHAR* c_str() const
     {
         return m_data;
     }
@@ -113,7 +113,7 @@ public:
      * @return An integer less than, equal to, or greater than zero if string is found,
      *         respectively, to be less than, to match, or be greater than string.
      */
-    MI_S32 compare(const MI_CHAR *s) const
+    DT_S32 compare(const DT_CHAR *s) const
     {
         return Strcmp(m_data, s);
     }
@@ -126,12 +126,12 @@ public:
      * @return An integer less than, equal to, or greater than zero if string is found,
      *         respectively, to be less than, to match, or be greater than string.
      */
-    MI_S32 compare(const string_ &s) const
+    DT_S32 compare(const string_ &s) const
     {
         return Strcmp(m_data, s.c_str());
     }
 
-    MI_BOOL operator==(const string_ &other) const
+    DT_BOOL operator==(const string_ &other) const
     {
         return compare(other);
     }
@@ -141,22 +141,22 @@ public:
      *
      * @param s The char array to append to the string object.
      *
-     * @return MI_TRUE if the append operation was successful, MI_FALSE if the combined length exceeds the maximum size.
+     * @return DT_TRUE if the append operation was successful, DT_FALSE if the combined length exceeds the maximum size.
      */
-    MI_BOOL append(const MI_CHAR *s)
+    DT_BOOL append(const DT_CHAR *s)
     {
-        MI_S32 len = Strlen(s);
+        DT_S32 len = Strlen(s);
         if (m_size + len >= MAX_SIZE)
         {
             AURA_XTENSA_LOG("input str len + m_size need less than MAX_SIZE!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         Strcpy(m_data + m_size, s);
         m_size += len;
         m_data[m_size] = '\0';
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -164,9 +164,9 @@ public:
      *
      * @param s The string object which need to append.
      *
-     * @return MI_TRUE if the append operation was successful, MI_FALSE if the combined length exceeds the maximum size.
+     * @return DT_TRUE if the append operation was successful, DT_FALSE if the combined length exceeds the maximum size.
      */
-    MI_BOOL append(const string_ &s)
+    DT_BOOL append(const string_ &s)
     {
         return append(s.c_str());
     }
@@ -176,22 +176,22 @@ public:
      *
      * @param s The char array which assign to the string object.
      *
-     * @return MI_TRUE if the assignment operation was successful, MI_FALSE if the input string length exceeds the maximum size.
+     * @return DT_TRUE if the assignment operation was successful, DT_FALSE if the input string length exceeds the maximum size.
      */
-    MI_BOOL assign(const MI_CHAR *s)
+    DT_BOOL assign(const DT_CHAR *s)
     {
-        MI_S32 len = Strlen(s);
+        DT_S32 len = Strlen(s);
         if (len >= MAX_SIZE)
         {
             AURA_XTENSA_LOG("input str len need less than MAX_SIZE!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         Strcpy(m_data, s);
         m_size = len;
         m_data[m_size] = '\0';
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -199,9 +199,9 @@ public:
      *
      * @param s The string object which assign to this string object.
      *
-     * @return MI_TRUE if the assignment operation was successful, MI_FALSE if the input string length exceeds the maximum size.
+     * @return DT_TRUE if the assignment operation was successful, DT_FALSE if the input string length exceeds the maximum size.
      */
-    MI_BOOL assign(const string_ &s)
+    DT_BOOL assign(const string_ &s)
     {
         return assign(s.c_str());
     }
@@ -223,7 +223,7 @@ public:
      *
      * @return The character which is retrieved.
      */
-    MI_CHAR at(MI_S32 index) const
+    DT_CHAR at(DT_S32 index) const
     {
         return m_data[index];
     }
@@ -235,7 +235,7 @@ public:
      *
      * @return The reference of string object
      */
-    string_& operator=(const MI_CHAR *s)
+    string_& operator=(const DT_CHAR *s)
     {
         assign(s);
         return *this;
@@ -261,7 +261,7 @@ public:
      *
      * @return The reference of string object
      */
-    string_& operator+(const MI_CHAR *s)
+    string_& operator+(const DT_CHAR *s)
     {
         append(s);
         return *this;
@@ -287,7 +287,7 @@ public:
      *
      * @return The reference of string object
      */
-    string_& operator+=(const MI_CHAR *s)
+    string_& operator+=(const DT_CHAR *s)
     {
         append(s);
         return *this;
@@ -313,7 +313,7 @@ public:
     *
     * @return The character which is retrieved.
     */
-    MI_CHAR operator[](int index)
+    DT_CHAR operator[](int index)
     {
         return m_data[index];
     }
@@ -324,21 +324,21 @@ public:
      * @param index The position index where the string will be inserted.
      * @param s The char array to insert.
      *
-     * @return MI_TRUE if the insert operation was successful, MI_FALSE if the combined length exceeds the maximum size.
+     * @return DT_TRUE if the insert operation was successful, DT_FALSE if the combined length exceeds the maximum size.
      */
-    MI_BOOL insert(MI_S32 index, const MI_CHAR *s)
+    DT_BOOL insert(DT_S32 index, const DT_CHAR *s)
     {
         if (index < 0 || index > m_size)
         {
             AURA_XTENSA_LOG("invalid input index!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
-        MI_S32 len = Strlen(s);
+        DT_S32 len = Strlen(s);
         if (m_size + len >= MAX_SIZE)
         {
             AURA_XTENSA_LOG("input str len + m_size need less than MAX_SIZE!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         Memmove(m_data + index + len, m_data + index, m_size - index);
@@ -346,7 +346,7 @@ public:
         m_size += len;
         m_data[m_size] = '\0';
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -355,9 +355,9 @@ public:
      * @param index The position index where the string will be inserted.
      * @param s The string to insert.
      *
-     * @return MI_TRUE if the insert operation was successful, MI_FALSE if the combined length exceeds the maximum size.
+     * @return DT_TRUE if the insert operation was successful, DT_FALSE if the combined length exceeds the maximum size.
      */
-    MI_BOOL insert(MI_S32 index, const string_ &s)
+    DT_BOOL insert(DT_S32 index, const string_ &s)
     {
         return insert(index, s.c_str());
     }
@@ -368,14 +368,14 @@ public:
      * @param index The starting index of the characters to remove.
      * @param count The number of characters to remove, default is 1.
      *
-     * @return MI_TRUE if the removal was successful, MI_FALSE if the index is invalid or the resulting string is empty.
+     * @return DT_TRUE if the removal was successful, DT_FALSE if the index is invalid or the resulting string is empty.
      */
-    MI_BOOL erase(MI_S32 index, MI_S32 count = 1)
+    DT_BOOL erase(DT_S32 index, DT_S32 count = 1)
     {
         if (index < 0 || index >= m_size)
         {
             AURA_XTENSA_LOG("invalid input index!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         if (index + count > m_size)
@@ -388,7 +388,7 @@ public:
 
         Memset(m_data + m_size, '\0', count);
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -398,14 +398,14 @@ public:
      *
      * @return The index of the first occurrence of the substring, or -1 if not found.
      */
-    MI_S32 find(const MI_CHAR *s) const
+    DT_S32 find(const DT_CHAR *s) const
     {
         const char* result = Strstr(m_data, s);
-        if (MI_NULL == result)
+        if (DT_NULL == result)
         {
             return -1;
         }
-        return static_cast<MI_S32>(result - m_data);
+        return static_cast<DT_S32>(result - m_data);
     }
 
     /**
@@ -415,7 +415,7 @@ public:
      *
      * @return The index of the first occurrence of the string, or -1 if not found.
      */
-    MI_S32 find(const string_ &s) const
+    DT_S32 find(const string_ &s) const
     {
         return find(s.c_str());
     }
@@ -427,24 +427,24 @@ public:
      * @param length The length of the substring.
      * @param str The extracted substring.
      *
-     * @return MI_TRUE if the substring was extracted successfully, MI_FALSE if the start or length is invalid.
+     * @return DT_TRUE if the substring was extracted successfully, DT_FALSE if the start or length is invalid.
      */
-    MI_BOOL substr(MI_S32 start, MI_S32 length, string_ &str)
+    DT_BOOL substr(DT_S32 start, DT_S32 length, string_ &str)
     {
         if ((start < 0) || (start >= m_size))
         {
             AURA_XTENSA_LOG("invalid input index!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
-        MI_CHAR data[MAX_SIZE];
+        DT_CHAR data[MAX_SIZE];
         Memset(data, '\0', MAX_SIZE);
-        MI_S32 len = length > m_size - start ? m_size - start : length;
+        DT_S32 len = length > m_size - start ? m_size - start : length;
         Memcpy(data, m_data + start, len);
 
         str.assign(data);
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -454,12 +454,12 @@ public:
      * @param len The number of characters to replace.
      * @param str The string to replace with.
      */
-    MI_BOOL replace(MI_S32 pos, MI_S32 len, const string_ &str)
+    DT_BOOL replace(DT_S32 pos, DT_S32 len, const string_ &str)
     {
         if (pos > m_size)
         {
             AURA_XTENSA_LOG("invalid input index!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         if (pos + len > m_size)
@@ -467,8 +467,8 @@ public:
             len = m_size - pos;
         }
 
-        MI_S32 str_len = str.size();
-        MI_S32 new_len = m_size - len + str_len;
+        DT_S32 str_len = str.size();
+        DT_S32 new_len = m_size - len + str_len;
 
         Memmove(m_data + pos + str_len, m_data + pos + len, m_size - pos - len + 1);
         Memcpy(m_data + pos, str.c_str(), str_len);
@@ -476,12 +476,12 @@ public:
         m_size = new_len;
         m_data[m_size] = '\0';
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
 private:
-    MI_CHAR m_data[MAX_SIZE];
-    MI_S32  m_size;
+    DT_CHAR m_data[MAX_SIZE];
+    DT_S32  m_size;
 };
 
 using string = string_<AURA_STRING_DEFAULT_MAX_SIZE>;

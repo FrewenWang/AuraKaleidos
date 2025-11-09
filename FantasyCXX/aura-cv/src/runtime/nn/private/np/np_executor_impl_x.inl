@@ -46,35 +46,35 @@ public:
     }
 
 public:
-    AURA_API_DEF(NeuronRuntimeV2_createFromBuffer) = MI_S32 (*)(const AURA_VOID*, size_t, size_t, AURA_VOID**, size_t);
+    AURA_API_DEF(NeuronRuntimeV2_createFromBuffer) = DT_S32 (*)(const DT_VOID*, size_t, size_t, DT_VOID**, size_t);
     AURA_API_PTR(NeuronRuntimeV2_createFromBuffer);
 
-    AURA_API_DEF(NeuronRuntimeV2_release) = AURA_VOID (*)(AURA_VOID*);
+    AURA_API_DEF(NeuronRuntimeV2_release) = DT_VOID (*)(DT_VOID*);
     AURA_API_PTR(NeuronRuntimeV2_release);
 
-    AURA_API_DEF(NeuronRuntimeV2_run) = MI_S32 (*)(AURA_VOID*, SyncInferenceRequest);
+    AURA_API_DEF(NeuronRuntimeV2_run) = DT_S32 (*)(DT_VOID*, SyncInferenceRequest);
     AURA_API_PTR(NeuronRuntimeV2_run);
 
-    AURA_API_DEF(NeuronRuntimeV2_getInputNumber) = MI_S32 (*)(AURA_VOID*, size_t*);
+    AURA_API_DEF(NeuronRuntimeV2_getInputNumber) = DT_S32 (*)(DT_VOID*, size_t*);
     AURA_API_PTR(NeuronRuntimeV2_getInputNumber);
 
-    AURA_API_DEF(NeuronRuntimeV2_getOutputNumber) = MI_S32 (*)(AURA_VOID*, size_t*);
+    AURA_API_DEF(NeuronRuntimeV2_getOutputNumber) = DT_S32 (*)(DT_VOID*, size_t*);
     AURA_API_PTR(NeuronRuntimeV2_getOutputNumber);
 
-    AURA_API_DEF(NeuronRuntimeV2_getInputSize) = MI_S32 (*)(AURA_VOID*, MI_U64, size_t*);
+    AURA_API_DEF(NeuronRuntimeV2_getInputSize) = DT_S32 (*)(DT_VOID*, DT_U64, size_t*);
     AURA_API_PTR(NeuronRuntimeV2_getInputSize);
 
-    AURA_API_DEF(NeuronRuntimeV2_getOutputSize) = MI_S32 (*)(AURA_VOID*, MI_U64, size_t*);
+    AURA_API_DEF(NeuronRuntimeV2_getOutputSize) = DT_S32 (*)(DT_VOID*, DT_U64, size_t*);
     AURA_API_PTR(NeuronRuntimeV2_getOutputSize);
 
-    AURA_API_DEF(NeuronRuntimeV2_setQoSOption) = MI_S32 (*)(AURA_VOID*, const QoSOptions*);
+    AURA_API_DEF(NeuronRuntimeV2_setQoSOption) = DT_S32 (*)(DT_VOID*, const QoSOptions*);
     AURA_API_PTR(NeuronRuntimeV2_setQoSOption);
 
-    AURA_API_DEF(NeuronRuntime_getVersion) = MI_S32 (*)(NeuronVersion*);
+    AURA_API_DEF(NeuronRuntime_getVersion) = DT_S32 (*)(NeuronVersion*);
     AURA_API_PTR(NeuronRuntime_getVersion);
 
 private:
-    NpLibrary() : NNLibrary(), m_handle(MI_NULL)
+    NpLibrary() : NNLibrary(), m_handle(DT_NULL)
     {
         Load();
     }
@@ -92,7 +92,7 @@ private:
 
         dlerror();
         m_handle = dlopen(g_np_lib_name.c_str(), RTLD_LAZY | RTLD_LOCAL);
-        if (MI_NULL == m_handle)
+        if (DT_NULL == m_handle)
         {
             std::string info = "dlopen libneuron_runtime.so failed, err : " + std::string(dlerror());
             AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
@@ -129,18 +129,18 @@ private:
                 AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
                 ret = Status::ERROR;
             }
-            m_handle = MI_NULL;
+            m_handle = DT_NULL;
         }
 
         return ret;
     }
 
 private:
-    AURA_VOID *m_handle;
+    DT_VOID *m_handle;
 };
 
-static MI_S32 NeuronRuntimeV2_createFromBuffer(Context *ctx, const AURA_VOID *buffer, size_t len, size_t num_threads,
-                                               AURA_VOID **runtime, size_t backlog)
+static DT_S32 NeuronRuntimeV2_createFromBuffer(Context *ctx, const DT_VOID *buffer, size_t len, size_t num_threads,
+                                               DT_VOID **runtime, size_t backlog)
 {
     auto func = NpLibrary::Get().NeuronRuntimeV2_createFromBuffer;
     if (func)
@@ -154,7 +154,7 @@ static MI_S32 NeuronRuntimeV2_createFromBuffer(Context *ctx, const AURA_VOID *bu
     }
 }
 
-static MI_S32 NeuronRuntimeV2_release(Context *ctx, AURA_VOID* runtime)
+static DT_S32 NeuronRuntimeV2_release(Context *ctx, DT_VOID* runtime)
 {
     auto func = NpLibrary::Get().NeuronRuntimeV2_release;
     if (func)
@@ -169,7 +169,7 @@ static MI_S32 NeuronRuntimeV2_release(Context *ctx, AURA_VOID* runtime)
     }
 }
 
-static MI_S32 NeuronRuntimeV2_run(Context *ctx, AURA_VOID *runtime, SyncInferenceRequest request)
+static DT_S32 NeuronRuntimeV2_run(Context *ctx, DT_VOID *runtime, SyncInferenceRequest request)
 {
     auto func = NpLibrary::Get().NeuronRuntimeV2_run;
     if (func)
@@ -183,7 +183,7 @@ static MI_S32 NeuronRuntimeV2_run(Context *ctx, AURA_VOID *runtime, SyncInferenc
     }
 }
 
-static MI_S32 NeuronRuntimeV2_getInputNumber(Context *ctx, AURA_VOID *runtime, size_t *size)
+static DT_S32 NeuronRuntimeV2_getInputNumber(Context *ctx, DT_VOID *runtime, size_t *size)
 {
     auto func = NpLibrary::Get().NeuronRuntimeV2_getInputNumber;
     if (func)
@@ -197,7 +197,7 @@ static MI_S32 NeuronRuntimeV2_getInputNumber(Context *ctx, AURA_VOID *runtime, s
     }
 }
 
-static MI_S32 NeuronRuntimeV2_getOutputNumber(Context *ctx, AURA_VOID *runtime, size_t *size)
+static DT_S32 NeuronRuntimeV2_getOutputNumber(Context *ctx, DT_VOID *runtime, size_t *size)
 {
     auto func = NpLibrary::Get().NeuronRuntimeV2_getOutputNumber;
     if (func)
@@ -211,7 +211,7 @@ static MI_S32 NeuronRuntimeV2_getOutputNumber(Context *ctx, AURA_VOID *runtime, 
     }
 }
 
-static MI_S32 NeuronRuntimeV2_getInputSize(Context *ctx, AURA_VOID *runtime, MI_U64 idx, size_t *size)
+static DT_S32 NeuronRuntimeV2_getInputSize(Context *ctx, DT_VOID *runtime, DT_U64 idx, size_t *size)
 {
     auto func = NpLibrary::Get().NeuronRuntimeV2_getInputSize;
     if (func)
@@ -225,7 +225,7 @@ static MI_S32 NeuronRuntimeV2_getInputSize(Context *ctx, AURA_VOID *runtime, MI_
     }
 }
 
-static MI_S32 NeuronRuntimeV2_getOutputSize(Context *ctx, AURA_VOID *runtime, MI_U64 idx, size_t *size)
+static DT_S32 NeuronRuntimeV2_getOutputSize(Context *ctx, DT_VOID *runtime, DT_U64 idx, size_t *size)
 {
     auto func = NpLibrary::Get().NeuronRuntimeV2_getOutputSize;
     if (func)
@@ -239,7 +239,7 @@ static MI_S32 NeuronRuntimeV2_getOutputSize(Context *ctx, AURA_VOID *runtime, MI
     }
 }
 
-static MI_S32 NeuronRuntimeV2_setQoSOption(Context *ctx, AURA_VOID *runtime, const QoSOptions *options)
+static DT_S32 NeuronRuntimeV2_setQoSOption(Context *ctx, DT_VOID *runtime, const QoSOptions *options)
 {
     auto func = NpLibrary::Get().NeuronRuntimeV2_setQoSOption;
     if (func)
@@ -253,7 +253,7 @@ static MI_S32 NeuronRuntimeV2_setQoSOption(Context *ctx, AURA_VOID *runtime, con
     }
 }
 
-static MI_S32 NeuronRuntime_getVersion(Context *ctx, NeuronVersion *version)
+static DT_S32 NeuronRuntime_getVersion(Context *ctx, NeuronVersion *version)
 {
     auto func = NpLibrary::Get().NeuronRuntime_getVersion;
     if (func)
@@ -272,7 +272,7 @@ class NpUtils
 public:
     static std::string GetLibraryVersion(Context *ctx)
     {
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             return std::string();
         }
@@ -280,7 +280,7 @@ public:
         NeuronVersion version;
         memset(&version, 0, sizeof(version));
 
-        MI_S32 ret = NeuronRuntime_getVersion(ctx, &version);
+        DT_S32 ret = NeuronRuntime_getVersion(ctx, &version);
         if (ret != NEURONRUNTIME_NO_ERROR)
         {
             std::string info = "NeuronRuntime_getVersion failed, err : " + std::to_string(ret);
@@ -295,12 +295,12 @@ public:
 class NpIOBufferMap
 {
 public:
-    NpIOBufferMap(Context *ctx, AURA_VOID *np_handle, const std::vector<std::pair<std::string, NpModel::TensorAttr>> &attrs, MI_BOOL is_input)
-                  : m_ctx(ctx), m_is_valid(MI_FALSE), m_is_input(is_input)
+    NpIOBufferMap(Context *ctx, DT_VOID *np_handle, const std::vector<std::pair<std::string, NpModel::TensorAttr>> &attrs, DT_BOOL is_input)
+                  : m_ctx(ctx), m_is_valid(DT_FALSE), m_is_input(is_input)
     {
         do
         {
-            if (MI_NULL == m_ctx || MI_NULL == np_handle)
+            if (DT_NULL == m_ctx || DT_NULL == np_handle)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
                 break;
@@ -309,7 +309,7 @@ public:
             size_t num = 0;
             if (m_is_input)
             {
-                MI_S32 ret = NeuronRuntimeV2_getInputNumber(m_ctx, np_handle, &num);
+                DT_S32 ret = NeuronRuntimeV2_getInputNumber(m_ctx, np_handle, &num);
                 if (ret != NEURONRUNTIME_NO_ERROR)
                 {
                     std::string info = "NeuronRuntimeV2_getInputNumber failed, err : " + std::to_string(ret);
@@ -319,7 +319,7 @@ public:
             }
             else
             {
-                MI_S32 ret = NeuronRuntimeV2_getOutputNumber(m_ctx, np_handle, &num);
+                DT_S32 ret = NeuronRuntimeV2_getOutputNumber(m_ctx, np_handle, &num);
                 if (ret != NEURONRUNTIME_NO_ERROR)
                 {
                     std::string info = "NeuronRuntimeV2_getOutputNumber failed, err : " + std::to_string(ret);
@@ -329,13 +329,13 @@ public:
             }
             m_tensor_attrs = attrs;
 
-            m_io_buffers = std::vector<IOBuffer>(num, IOBuffer(MI_NULL, 0, -1, 0));
+            m_io_buffers = std::vector<IOBuffer>(num, IOBuffer(DT_NULL, 0, -1, 0));
             for (size_t i = 0; i < num; i++)
             {
                 size_t size = 0;
                 if (is_input)
                 {
-                    MI_S32 ret = NeuronRuntimeV2_getInputSize(m_ctx, np_handle, i, &size);
+                    DT_S32 ret = NeuronRuntimeV2_getInputSize(m_ctx, np_handle, i, &size);
                     if (ret != NEURONRUNTIME_NO_ERROR)
                     {
                         std::string info = "NeuronRuntimeV2_getInputSize failed, err : " + std::to_string(ret);
@@ -345,7 +345,7 @@ public:
                 }
                 else
                 {
-                    MI_S32 ret = NeuronRuntimeV2_getOutputSize(m_ctx, np_handle, i, &size);
+                    DT_S32 ret = NeuronRuntimeV2_getOutputSize(m_ctx, np_handle, i, &size);
                     if (ret != NEURONRUNTIME_NO_ERROR)
                     {
                         std::string info = "NeuronRuntimeV2_getOutputSize failed, err : " + std::to_string(ret);
@@ -356,7 +356,7 @@ public:
                 m_buffer_sizes.push_back(size);
             }
 
-            m_is_valid = MI_TRUE;
+            m_is_valid = DT_TRUE;
         } while (0);
     }
 
@@ -373,7 +373,7 @@ public:
             return Status::ERROR;
         }
 
-        if (MI_NULL == mat_map || mat_map->size() != m_io_buffers.size())
+        if (DT_NULL == mat_map || mat_map->size() != m_io_buffers.size())
         {
             AURA_ADD_ERROR_STRING(m_ctx, "size match error");
             return Status::ERROR;
@@ -425,8 +425,8 @@ public:
 
             if (m_quant_map.count(name))
             {
-                MI_S32 zero_point = m_tensor_attrs[i].second.zero_point;
-                MI_F32 scale = m_tensor_attrs[i].second.scale;
+                DT_S32 zero_point = m_tensor_attrs[i].second.zero_point;
+                DT_F32 scale = m_tensor_attrs[i].second.scale;
 
                 Status ret = NNQuantize(m_ctx, *(m_mat_map[name]), *(m_quant_map[name]), zero_point, scale);
                 if (ret != Status::OK)
@@ -453,8 +453,8 @@ public:
 
             if (m_quant_map.count(name))
             {
-                MI_S32 zero_point = m_tensor_attrs[i].second.zero_point;
-                MI_F32 scale = m_tensor_attrs[i].second.scale;
+                DT_S32 zero_point = m_tensor_attrs[i].second.zero_point;
+                DT_F32 scale = m_tensor_attrs[i].second.scale;
 
                 Status ret = NNDeQuantize(m_ctx, *(m_quant_map[name]), *(m_mat_map[name]), zero_point, scale);
                 if (ret != Status::OK)
@@ -474,11 +474,11 @@ public:
     }
 
 private:
-    Status InitIOBuffers(MI_S32 id, const std::string &tensor_name)
+    Status InitIOBuffers(DT_S32 id, const std::string &tensor_name)
     {
         Mat *mat = m_mat_map[tensor_name];
 
-        MI_BOOL is_quant = MI_FALSE;
+        DT_BOOL is_quant = DT_FALSE;
         ElemType src_elem_type = mat->GetElemType();
         ElemType dst_elem_type = m_tensor_attrs[id].second.elem_type;
         if ((src_elem_type != ElemType::INVALID) && (src_elem_type == dst_elem_type))
@@ -494,7 +494,7 @@ private:
                                                       (ElemType::U16 == dst_elem_type) ||
                                                       (ElemType::S16 == dst_elem_type)))
         {
-            is_quant = MI_TRUE;
+            is_quant = DT_TRUE;
         }
         else
         {
@@ -518,7 +518,7 @@ private:
             mat = m_quant_map[tensor_name];
         }
 
-        MI_S32 elem_counts = static_cast<MI_S32>(m_buffer_sizes[id]) / ElemTypeSize(dst_elem_type);
+        DT_S32 elem_counts = static_cast<DT_S32>(m_buffer_sizes[id]) / ElemTypeSize(dst_elem_type);
         if (elem_counts != mat->GetSizes().Total())
         {
             std::string info = "tensor " + std::string(tensor_name) + ": expected " + std::to_string(m_buffer_sizes[id]) + " bytes, "
@@ -537,18 +537,18 @@ private:
     Context *m_ctx;
     MatMap  m_mat_map;
     MatMap  m_quant_map;
-    MI_BOOL m_is_valid;
-    MI_BOOL m_is_input;
+    DT_BOOL m_is_valid;
+    DT_BOOL m_is_input;
     std::vector<IOBuffer> m_io_buffers;
     std::vector<std::pair<std::string, NpModel::TensorAttr>> m_tensor_attrs;
-    std::vector<MI_U64> m_buffer_sizes;
+    std::vector<DT_U64> m_buffer_sizes;
 };
 
 class NpExecutorImplVx : public NpExecutorImpl
 {
 public:
     NpExecutorImplVx(Context *ctx, const std::shared_ptr<NpModel> &model, const NNConfig &config)
-                     : NpExecutorImpl(ctx, model, config), m_np_handle(MI_NULL)
+                     : NpExecutorImpl(ctx, model, config), m_np_handle(DT_NULL)
     {
         do
         {
@@ -590,7 +590,7 @@ public:
                     return Status::ERROR;
                 }
 
-                m_is_valid = MI_TRUE;
+                m_is_valid = DT_TRUE;
                 return Status::OK;
             };
 
@@ -612,10 +612,10 @@ public:
             m_token.wait();
         }
 
-        if (m_np_handle != MI_NULL)
+        if (m_np_handle != DT_NULL)
         {
             NeuronRuntimeV2_release(m_ctx, m_np_handle);
-            m_np_handle = MI_NULL;
+            m_np_handle = DT_NULL;
         }
     }
 
@@ -633,8 +633,8 @@ public:
         }
 
         //create NpIOBufferMap
-        m_input_map = std::make_shared<NpIOBufferMap>(m_ctx, m_np_handle, m_model->GetInputAttrs(), MI_TRUE);
-        m_output_map = std::make_shared<NpIOBufferMap>(m_ctx, m_np_handle, m_model->GetOutputAttrs(), MI_FALSE);
+        m_input_map = std::make_shared<NpIOBufferMap>(m_ctx, m_np_handle, m_model->GetInputAttrs(), DT_TRUE);
+        m_output_map = std::make_shared<NpIOBufferMap>(m_ctx, m_np_handle, m_model->GetOutputAttrs(), DT_FALSE);
 
         return Status::OK;
     }
@@ -660,13 +660,13 @@ public:
         return (m_model->GetVersion() + " device(np." + m_version + ")");
     }
 
-    Status Forward(const MatMap &input, MatMap &output, MI_S32 graph_id) override
+    Status Forward(const MatMap &input, MatMap &output, DT_S32 graph_id) override
     {
         AURA_UNUSED(graph_id);
         Status ret = Status::ERROR;
 
-        MatMap input_mapped = m_model->MapMatNames(input, MI_TRUE);
-        MatMap output_mapped = m_model->MapMatNames(output, MI_FALSE);
+        MatMap input_mapped = m_model->MapMatNames(input, DT_TRUE);
+        MatMap output_mapped = m_model->MapMatNames(output, DT_FALSE);
 
         if (input_mapped.empty() || output_mapped.empty())
         {
@@ -696,7 +696,7 @@ public:
         }
 
         SyncInferenceRequest sync_data = {m_input_map->Get(), m_output_map->Get()};
-        MI_S32 err_code = NeuronRuntimeV2_run(m_ctx, m_np_handle, sync_data);
+        DT_S32 err_code = NeuronRuntimeV2_run(m_ctx, m_np_handle, sync_data);
         if (err_code != NEURONRUNTIME_NO_ERROR)
         {
             std::string info = "NeuronRuntimeV2_run failed, err : " + std::to_string(err_code);
@@ -728,7 +728,7 @@ public:
             result[input_attr.first] = desc;
         }
 
-        result = m_model->MapTensorDescNames(result, MI_TRUE);
+        result = m_model->MapTensorDescNames(result, DT_TRUE);
         return {result};
     }
 
@@ -747,7 +747,7 @@ public:
             result[output_attr.first] = desc;
         }
 
-        result = m_model->MapTensorDescNames(result, MI_FALSE);
+        result = m_model->MapTensorDescNames(result, DT_FALSE);
         return {result};
     }
 
@@ -755,7 +755,7 @@ private:
     Status CreateRuntime()
     {
         Status ret = Status::ERROR;
-        MI_S32 err_code = NEURONRUNTIME_NO_ERROR;
+        DT_S32 err_code = NEURONRUNTIME_NO_ERROR;
 
         Buffer buffer = m_model->GetModelBuffer();
         if (!buffer.IsValid())
@@ -782,7 +782,7 @@ EXIT:
     {
         QoSOptions qos_option = GetNpPerfLevel(m_config.perf_level);
 
-        MI_S32 ret = NeuronRuntimeV2_setQoSOption(m_ctx, m_np_handle, &qos_option);
+        DT_S32 ret = NeuronRuntimeV2_setQoSOption(m_ctx, m_np_handle, &qos_option);
         if (ret != NEURONRUNTIME_NO_ERROR)
         {
             std::string info = "NeuronRuntime_setQoSOption failed, err : " + std::to_string(ret);
@@ -820,7 +820,7 @@ EXIT:
     }
 
     std::string m_version;
-    AURA_VOID *m_np_handle;
+    DT_VOID *m_np_handle;
     std::shared_ptr<NpIOBufferMap> m_input_map;
     std::shared_ptr<NpIOBufferMap> m_output_map;
 };

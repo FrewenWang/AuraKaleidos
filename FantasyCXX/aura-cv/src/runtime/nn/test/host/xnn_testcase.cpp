@@ -11,14 +11,14 @@ struct ModelList
 };
 
 static Status XnnRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_file, const std::string &type_str,
-                     MI_S32 forward_count, MI_S32 &cur_count, MI_S32 total_count, MI_F32 &forward_time, MI_BOOL do_register = MI_FALSE)
+                     DT_S32 forward_count, DT_S32 &cur_count, DT_S32 total_count, DT_F32 &forward_time, DT_BOOL do_register = DT_FALSE)
 {
     Status ret = Status::ERROR;
 
-    NNEngine *nn_engine = MI_NULL;
+    NNEngine *nn_engine = DT_NULL;
     std::shared_ptr<NNExecutor> nn_executor;
-    FILE *fp = MI_NULL;
-    MI_U8 *minn_data = MI_NULL;
+    FILE *fp = DT_NULL;
+    DT_U8 *minn_data = DT_NULL;
     size_t minn_size = 0;
     MatMap input;
     MatMap output;
@@ -27,7 +27,7 @@ static Status XnnRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_f
     if (cur_count > total_count / 2)
     {
         fp = fopen(minn_file.c_str(), "rb");
-        if (MI_NULL == fp)
+        if (DT_NULL == fp)
         {
             AURA_LOGE(ctx, AURA_TAG, "fopen %s failed\n", minn_file.c_str());
             return ret;
@@ -36,8 +36,8 @@ static Status XnnRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_f
         fseek(fp, 0, SEEK_END);
         minn_size = ftell(fp);
 
-        minn_data = static_cast<MI_U8*>(AURA_ALLOC(ctx, minn_size));
-        if (MI_NULL == minn_data)
+        minn_data = static_cast<DT_U8*>(AURA_ALLOC(ctx, minn_size));
+        if (DT_NULL == minn_data)
         {
             AURA_LOGE(ctx, AURA_TAG, "alloc %ld memory failed\n", minn_size);
             fclose(fp);
@@ -58,7 +58,7 @@ static Status XnnRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_f
     }
 
     nn_engine = ctx->GetNNEngine();
-    if (MI_NULL == nn_engine)
+    if (DT_NULL == nn_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "GetNNEngine failed\n");
         goto EXIT;
@@ -74,7 +74,7 @@ static Status XnnRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_f
         nn_executor = nn_engine->CreateNNExecutor(minn_file, "abcdefg");
     }
 
-    if (MI_NULL == nn_executor)
+    if (DT_NULL == nn_executor)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_executor is null\n");
         goto EXIT;
@@ -100,7 +100,7 @@ static Status XnnRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_f
     input.insert(std::make_pair("input", &src));
     output.insert(std::make_pair("InceptionV3/Predictions/Reshape_1", &dst));
 
-    if (MI_TRUE == do_register)
+    if (DT_TRUE == do_register)
     {
         AnyParams params;
         params["input_matmap"] = input;
@@ -113,7 +113,7 @@ static Status XnnRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_f
         }
     }
 
-    for (MI_S32 i = 0; i < forward_count; i++)
+    for (DT_S32 i = 0; i < forward_count; i++)
     {
         start_time = Time::Now();
         ret = nn_executor->Forward(input, output);
@@ -123,11 +123,11 @@ static Status XnnRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_f
             goto EXIT;
         }
         exe_time = Time::Now() - start_time;
-        forward_time += (MI_F32)exe_time.AsMilliSec();
+        forward_time += (DT_F32)exe_time.AsMilliSec();
         AURA_LOGD(ctx, AURA_TAG, "quantization type = %s, forward time = %s\n", type_str.c_str(), exe_time.ToString().c_str());
     }
 
-    if (MI_TRUE == do_register)
+    if (DT_TRUE == do_register)
     {
         AnyParams params;
         params["input_matmap"] = input;
@@ -161,23 +161,23 @@ static TestResult XnnTest(ModelList &model_list)
     std::string xnn_path   = data_path + "xnn/";
     std::string input_file = data_path + "trash_1x299x299x3_u8.bin";
 
-    MI_U32 forward_count = 5;
+    DT_U32 forward_count = 5;
     Mat src = factory.GetFileMat(input_file, ElemType::U8, {299, 299, 3}, AURA_MEM_DMA_BUF_HEAP);
     Mat dst(ctx, ElemType::U8, {1, 1001}, AURA_MEM_DMA_BUF_HEAP);
     Mat ref = factory.GetFileMat(xnn_path + model_list.ref_file, ElemType::U8, {1, 1001});
 
     TestTime time_val;
 
-    MI_F32 time_do_register = 0;
-    MI_F32 time_no_register = 0;
+    DT_F32 time_do_register = 0;
+    DT_F32 time_no_register = 0;
 
     TestResult result;
     MatCmpResult cmp_result;
-    MI_S32 cur_count = 0;
-    MI_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
+    DT_S32 cur_count = 0;
+    DT_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
 
     Status status_exec = Executor(loop_count, 2, time_val, XnnRun, ctx, src, dst, xnn_path + model_list.minn_file, model_list.quant_type,
-                                  forward_count, cur_count, loop_count, time_no_register, MI_FALSE);
+                                  forward_count, cur_count, loop_count, time_no_register, DT_FALSE);
     if (Status::OK == status_exec)
     {
         result.perf_result[model_list.quant_type] = time_val;
@@ -196,7 +196,7 @@ static TestResult XnnTest(ModelList &model_list)
     result.accu_result = cmp_result.ToString();
 
     status_exec = Executor(loop_count, 2, time_val, XnnRun, ctx, src, dst, xnn_path + model_list.minn_file, model_list.quant_type,
-                                  forward_count, cur_count, loop_count, time_do_register, MI_TRUE);
+                                  forward_count, cur_count, loop_count, time_do_register, DT_TRUE);
     if (Status::OK == status_exec)
     {
         result.perf_result[model_list.quant_type] = time_val;

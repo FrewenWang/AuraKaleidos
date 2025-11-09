@@ -44,70 +44,70 @@ AURA_VDSP_VECTOR_TYPE(VdspVectorS32, 2, xb_vecN_2x32v);
 AURA_VDSP_VECTOR_TYPE(VdspVectorS32, 3, xb_vecN_2x32v);
 AURA_VDSP_VECTOR_TYPE(VdspVectorS32, 4, xb_vecN_2x32v);
 
-template <typename Tp, MI_S32 C> struct MDVector;
-template <> struct MDVector<MI_U8, 1>    { using MVType = VdspVectorU16X1; };
-template <> struct MDVector<MI_U8, 2>    { using MVType = VdspVectorU16X2; };
-template <> struct MDVector<MI_U8, 3>    { using MVType = VdspVectorU16X3; };
-template <> struct MDVector<MI_U8, 4>    { using MVType = VdspVectorU16X4; };
+template <typename Tp, DT_S32 C> struct MDVector;
+template <> struct MDVector<DT_U8, 1>    { using MVType = VdspVectorU16X1; };
+template <> struct MDVector<DT_U8, 2>    { using MVType = VdspVectorU16X2; };
+template <> struct MDVector<DT_U8, 3>    { using MVType = VdspVectorU16X3; };
+template <> struct MDVector<DT_U8, 4>    { using MVType = VdspVectorU16X4; };
 
-template <> struct MDVector<MI_S8, 1>    { using MVType = VdspVectorS16X1; };
-template <> struct MDVector<MI_S8, 2>    { using MVType = VdspVectorS16X2; };
-template <> struct MDVector<MI_S8, 3>    { using MVType = VdspVectorS16X3; };
-template <> struct MDVector<MI_S8, 4>    { using MVType = VdspVectorS16X4; };
+template <> struct MDVector<DT_S8, 1>    { using MVType = VdspVectorS16X1; };
+template <> struct MDVector<DT_S8, 2>    { using MVType = VdspVectorS16X2; };
+template <> struct MDVector<DT_S8, 3>    { using MVType = VdspVectorS16X3; };
+template <> struct MDVector<DT_S8, 4>    { using MVType = VdspVectorS16X4; };
 
-template <typename Tp, MI_S32 C> struct MQVector;
-template <> struct MQVector<MI_U8, 1>    { using MVType = VdspVectorU8X1; };
-template <> struct MQVector<MI_U8, 2>    { using MVType = VdspVectorU8X2; };
-template <> struct MQVector<MI_U8, 3>    { using MVType = VdspVectorU8X3; };
-template <> struct MQVector<MI_U8, 4>    { using MVType = VdspVectorU8X4; };
+template <typename Tp, DT_S32 C> struct MQVector;
+template <> struct MQVector<DT_U8, 1>    { using MVType = VdspVectorU8X1; };
+template <> struct MQVector<DT_U8, 2>    { using MVType = VdspVectorU8X2; };
+template <> struct MQVector<DT_U8, 3>    { using MVType = VdspVectorU8X3; };
+template <> struct MQVector<DT_U8, 4>    { using MVType = VdspVectorU8X4; };
 
-template <> struct MQVector<MI_S8, 1>    { using MVType = VdspVectorS8X1; };
-template <> struct MQVector<MI_S8, 2>    { using MVType = VdspVectorS8X2; };
-template <> struct MQVector<MI_S8, 3>    { using MVType = VdspVectorS8X3; };
-template <> struct MQVector<MI_S8, 4>    { using MVType = VdspVectorS8X4; };
+template <> struct MQVector<DT_S8, 1>    { using MVType = VdspVectorS8X1; };
+template <> struct MQVector<DT_S8, 2>    { using MVType = VdspVectorS8X2; };
+template <> struct MQVector<DT_S8, 3>    { using MVType = VdspVectorS8X3; };
+template <> struct MQVector<DT_S8, 4>    { using MVType = VdspVectorS8X4; };
 
-template <> struct MQVector<MI_U16, 1>   { using MVType = VdspVectorU16X1; };
-template <> struct MQVector<MI_U16, 2>   { using MVType = VdspVectorU16X2; };
-template <> struct MQVector<MI_U16, 3>   { using MVType = VdspVectorU16X3; };
-template <> struct MQVector<MI_U16, 4>   { using MVType = VdspVectorU16X4; };
+template <> struct MQVector<DT_U16, 1>   { using MVType = VdspVectorU16X1; };
+template <> struct MQVector<DT_U16, 2>   { using MVType = VdspVectorU16X2; };
+template <> struct MQVector<DT_U16, 3>   { using MVType = VdspVectorU16X3; };
+template <> struct MQVector<DT_U16, 4>   { using MVType = VdspVectorU16X4; };
 
-template <> struct MQVector<MI_S16, 1>   { using MVType = VdspVectorS16X1; };
-template <> struct MQVector<MI_S16, 2>   { using MVType = VdspVectorS16X2; };
-template <> struct MQVector<MI_S16, 3>   { using MVType = VdspVectorS16X3; };
-template <> struct MQVector<MI_S16, 4>   { using MVType = VdspVectorS16X4; };
+template <> struct MQVector<DT_S16, 1>   { using MVType = VdspVectorS16X1; };
+template <> struct MQVector<DT_S16, 2>   { using MVType = VdspVectorS16X2; };
+template <> struct MQVector<DT_S16, 3>   { using MVType = VdspVectorS16X3; };
+template <> struct MQVector<DT_S16, 4>   { using MVType = VdspVectorS16X4; };
 
-template <> struct MQVector<MI_U32, 1>   { using MVType = VdspVectorU32X1; };
-template <> struct MQVector<MI_U32, 2>   { using MVType = VdspVectorU32X2; };
-template <> struct MQVector<MI_U32, 3>   { using MVType = VdspVectorU32X3; };
-template <> struct MQVector<MI_U32, 4>   { using MVType = VdspVectorU32X4; };
+template <> struct MQVector<DT_U32, 1>   { using MVType = VdspVectorU32X1; };
+template <> struct MQVector<DT_U32, 2>   { using MVType = VdspVectorU32X2; };
+template <> struct MQVector<DT_U32, 3>   { using MVType = VdspVectorU32X3; };
+template <> struct MQVector<DT_U32, 4>   { using MVType = VdspVectorU32X4; };
 
-template <> struct MQVector<MI_S32, 1>   { using MVType = VdspVectorS32X1; };
-template <> struct MQVector<MI_S32, 2>   { using MVType = VdspVectorS32X2; };
-template <> struct MQVector<MI_S32, 3>   { using MVType = VdspVectorS32X3; };
-template <> struct MQVector<MI_S32, 4>   { using MVType = VdspVectorS32X4; };
+template <> struct MQVector<DT_S32, 1>   { using MVType = VdspVectorS32X1; };
+template <> struct MQVector<DT_S32, 2>   { using MVType = VdspVectorS32X2; };
+template <> struct MQVector<DT_S32, 3>   { using MVType = VdspVectorS32X3; };
+template <> struct MQVector<DT_S32, 4>   { using MVType = VdspVectorS32X4; };
 
 template <typename Tp> struct DVector;
-template <> struct DVector<MI_U8>        { using VType = xb_vecNx8U;     };
-template <> struct DVector<MI_S8>        { using VType = xb_vecNx8;      };
+template <> struct DVector<DT_U8>        { using VType = xb_vecNx8U;     };
+template <> struct DVector<DT_S8>        { using VType = xb_vecNx8;      };
 
 template <typename Tp> struct QVector;
-template <> struct QVector<MI_U8>        { using VType = xb_vec2Nx8U;    };
-template <> struct QVector<MI_S8>        { using VType = xb_vec2Nx8;     };
-template <> struct QVector<MI_U16>       { using VType = xb_vecNx16U;    };
-template <> struct QVector<MI_S16>       { using VType = xb_vecNx16;     };
-template <> struct QVector<MI_U32>       { using VType = xb_vecN_2x32Uv; };
-template <> struct QVector<MI_S32>       { using VType = xb_vecN_2x32v;  };
+template <> struct QVector<DT_U8>        { using VType = xb_vec2Nx8U;    };
+template <> struct QVector<DT_S8>        { using VType = xb_vec2Nx8;     };
+template <> struct QVector<DT_U16>       { using VType = xb_vecNx16U;    };
+template <> struct QVector<DT_S16>       { using VType = xb_vecNx16;     };
+template <> struct QVector<DT_U32>       { using VType = xb_vecN_2x32Uv; };
+template <> struct QVector<DT_S32>       { using VType = xb_vecN_2x32v;  };
 
 template <typename Tp> struct WDVector;
-template <> struct WDVector<MI_U16>      { using WVType = xb_vec2Nx16Uw; };
-template <> struct WDVector<MI_S16>      { using WVType = xb_vec2Nx16w;  };
-template <> struct WDVector<MI_U32>      { using WVType = xb_vecNx32U;   };
-template <> struct WDVector<MI_S32>      { using WVType = xb_vecNx32;    };
-template <> struct WDVector<MI_S64>      { using WVType = xb_vecN_2x64w; };
+template <> struct WDVector<DT_U16>      { using WVType = xb_vec2Nx16Uw; };
+template <> struct WDVector<DT_S16>      { using WVType = xb_vec2Nx16w;  };
+template <> struct WDVector<DT_U32>      { using WVType = xb_vecNx32U;   };
+template <> struct WDVector<DT_S32>      { using WVType = xb_vecNx32;    };
+template <> struct WDVector<DT_S64>      { using WVType = xb_vecN_2x64w; };
 
 template <typename Tp> struct WQVector;
-template <> struct WQVector<MI_S32>      { using WVType = xb_vec2Nx32w;  };
-template <> struct WQVector<MI_S64>      { using WVType = xb_vecNx64w;   };
+template <> struct WQVector<DT_S32>      { using WVType = xb_vec2Nx32w;  };
+template <> struct WQVector<DT_S64>      { using WVType = xb_vecNx64w;   };
 
 } // namespace xtensa
 } // namespace aura

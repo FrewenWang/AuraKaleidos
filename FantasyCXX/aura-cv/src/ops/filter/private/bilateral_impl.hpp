@@ -15,8 +15,8 @@ class BilateralImpl : public OpImpl
 public:
     BilateralImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_F32 sigma_color,
-                           MI_F32 sigma_space, MI_S32 ksize,
+    virtual Status SetArgs(const Array *src, Array *dst, DT_F32 sigma_color,
+                           DT_F32 sigma_space, DT_S32 ksize,
                            BorderType border_type = BorderType::REFLECT_101,
                            const Scalar &border_value = Scalar());
 
@@ -30,7 +30,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     Status PrepareSpaceMat();
@@ -42,13 +42,13 @@ private:
 
 protected:
     // 高斯核的大小
-    MI_S32     m_ksize;
+    DT_S32     m_ksize;
     BorderType m_border_type;
     Scalar     m_border_value;
-    MI_F32     m_sigma_color;
-    MI_F32     m_sigma_space;
-    MI_S32     m_valid_num;
-    MI_F32     m_scale_index;
+    DT_F32     m_sigma_color;
+    DT_F32     m_sigma_space;
+    DT_S32     m_valid_num;
+    DT_F32     m_scale_index;
 
     const Array *m_src;
     Array       *m_dst;
@@ -63,8 +63,8 @@ class BilateralNone : public BilateralImpl
 public:
     BilateralNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 sigma_color,
-                   MI_F32 sigma_space, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_F32 sigma_color,
+                   DT_F32 sigma_space, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -78,8 +78,8 @@ class BilateralNeon : public BilateralImpl
 public:
     BilateralNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 sigma_color,
-                   MI_F32 sigma_space, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_F32 sigma_color,
+                   DT_F32 sigma_space, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -87,7 +87,7 @@ public:
 };
 
 Status Bilateral3x3Neon(Context *ctx, const Mat &src, Mat &dst, const Mat &space_weight, const Mat &color_weight,
-                        MI_S32 valid_num, BorderType border_type, const Scalar &border_value, const OpTarget &target);
+                        DT_S32 valid_num, BorderType border_type, const Scalar &border_value, const OpTarget &target);
 #endif// AURA_ENABLE_NEON
 
 #if defined(AURA_ENABLE_OPENCL)
@@ -96,8 +96,8 @@ class BilateralCL : public BilateralImpl
 public:
     BilateralCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 sigma_color,
-                   MI_F32 sigma_space, MI_S32 ksize,
+    Status SetArgs(const Array *src, Array *dst, DT_F32 sigma_color,
+                   DT_F32 sigma_space, DT_S32 ksize,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar()) override;
 
@@ -109,7 +109,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type, MI_S32 valid_num);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type, DT_S32 valid_num);
 
 private:
     Sizes GetColorMatStride(Sizes3 color_size) override;

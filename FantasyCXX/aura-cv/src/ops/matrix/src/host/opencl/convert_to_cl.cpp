@@ -15,12 +15,12 @@ static std::string GetCLBuildOptions(Context *ctx, ElemType src_type, ElemType d
     return cl_build_opt.ToString();
 }
 
-static AURA_VOID GetCLGlobalSize(MI_S32 height, MI_S32 width, MI_S32 channel, MI_S32 elem_counts, cl::NDRange &cl_range)
+static DT_VOID GetCLGlobalSize(DT_S32 height, DT_S32 width, DT_S32 channel, DT_S32 elem_counts, cl::NDRange &cl_range)
 {
     cl_range = cl::NDRange((width * channel + elem_counts - 1) / elem_counts, height);
 }
 
-ConvertToCL::ConvertToCL(Context *ctx, const OpTarget &target) : ConvertToImpl(ctx, target), m_is_same_mat(MI_FALSE), m_profiling_string()
+ConvertToCL::ConvertToCL(Context *ctx, const OpTarget &target) : ConvertToImpl(ctx, target), m_is_same_mat(DT_FALSE), m_profiling_string()
 {}
 
 Status ConvertToCL::Initialize()
@@ -32,7 +32,7 @@ Status ConvertToCL::Initialize()
     }
 
     // 0. special case
-    MI_BOOL no_scale = (Abs(m_alpha - 1.0) < DBL_EPSILON) && (Abs(m_beta) < DBL_EPSILON);
+    DT_BOOL no_scale = (Abs(m_alpha - 1.0) < DBL_EPSILON) && (Abs(m_beta) < DBL_EPSILON);
     m_is_same_mat    = 0;
     if (no_scale && (m_src->GetElemType() == m_dst->GetElemType()) &&
         (ArrayType::MAT == m_src->GetArrayType()) && (ArrayType::MAT == m_dst->GetArrayType()))
@@ -107,23 +107,23 @@ Status ConvertToCL::Run()
         AURA_RETURN(m_ctx, ret);
     }
 
-    MI_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 height  = m_src->GetSizes().m_height;
-    MI_S32 width   = m_src->GetSizes().m_width;
-    MI_S32 channel = m_src->GetSizes().m_channel;
+    DT_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 height  = m_src->GetSizes().m_height;
+    DT_S32 width   = m_src->GetSizes().m_width;
+    DT_S32 channel = m_src->GetSizes().m_channel;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
     // 1. get cl_global_size
     cl::NDRange cl_global_size;
-    constexpr MI_S32 ELEM_COUNTS = 4;
+    constexpr DT_S32 ELEM_COUNTS = 4;
     GetCLGlobalSize(height, width, channel, ELEM_COUNTS, cl_global_size);
     cl_int cl_ret = CL_SUCCESS;
     cl::Event cl_event;
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_F32, MI_F32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_F32, DT_F32>(
                                   m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                   m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                   width * channel, height,
@@ -137,7 +137,7 @@ Status ConvertToCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -146,7 +146,7 @@ Status ConvertToCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -167,7 +167,7 @@ std::string ConvertToCL::ToString() const
     return ConvertToImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> ConvertToCL::GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, MI_BOOL scale)
+std::vector<CLKernel> ConvertToCL::GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, DT_BOOL scale)
 {
     std::vector<CLKernel> cl_kernels;
     std::string build_opt = GetCLBuildOptions(ctx, src_elem_type, dst_elem_type);

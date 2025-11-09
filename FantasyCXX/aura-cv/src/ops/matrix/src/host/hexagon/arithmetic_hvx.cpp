@@ -22,7 +22,7 @@ Status ArithmeticHvx::SetArgs(const Array *src0, const Array *src1, Array *dst, 
         return Status::ERROR;
     }
 
-    MI_S32 pattern = AURA_MAKE_PATTERN(op, src0->GetElemType(), dst->GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(op, src0->GetElemType(), dst->GetElemType());
 
     switch (pattern)
     {
@@ -70,7 +70,7 @@ Status ArithmeticHvx::Run()
     const Mat *src1 = dynamic_cast<const Mat*>(m_src1);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -91,7 +91,7 @@ Status ArithmeticHvx::Run()
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
     ret = engine->Run(AURA_OPS_MATRIX_PACKAGE_NAME, AURA_OPS_MATRIX_ARITHMETIC_OP_NAME, rpc_param, &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }

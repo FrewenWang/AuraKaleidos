@@ -10,18 +10,18 @@ struct ModelList
 };
 
 static Status NpRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_file, const std::string &type_str,
-                    MI_S32 forward_count, MI_S32 &cur_count, MI_S32 total_count)
+                    DT_S32 forward_count, DT_S32 &cur_count, DT_S32 total_count)
 {
     Status ret = Status::ERROR;
 
-    NNEngine *nn_engine = MI_NULL;
+    NNEngine *nn_engine = DT_NULL;
     std::shared_ptr<NNExecutor> nn_executor;
-    FILE *fp = MI_NULL;
-    MI_U8 *minn_data = MI_NULL;
+    FILE *fp = DT_NULL;
+    DT_U8 *minn_data = DT_NULL;
     size_t minn_size = 0;
     MatMap input;
     MatMap output;
-    MI_S32 step = forward_count / 3 + 1;
+    DT_S32 step = forward_count / 3 + 1;
     Time start_time, create_exe_time, init_time, exe_time, delete_time;
 
     std::vector<std::string> perf_level = {"perf_low", "perf_normal", "perf_high"};
@@ -29,7 +29,7 @@ static Status NpRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_fi
     if (cur_count > total_count / 2)
     {
         fp = fopen(minn_file.c_str(), "rb");
-        if (MI_NULL == fp)
+        if (DT_NULL == fp)
         {
             AURA_LOGE(ctx, AURA_TAG, "fopen %s failed\n", minn_file.c_str());
             return ret;
@@ -38,8 +38,8 @@ static Status NpRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_fi
         fseek(fp, 0, SEEK_END);
         minn_size = ftell(fp);
 
-        minn_data = static_cast<MI_U8*>(AURA_ALLOC(ctx, minn_size));
-        if (MI_NULL == minn_data)
+        minn_data = static_cast<DT_U8*>(AURA_ALLOC(ctx, minn_size));
+        if (DT_NULL == minn_data)
         {
             AURA_LOGE(ctx, AURA_TAG, "alloc %ld memory failed\n", minn_size);
             fclose(fp);
@@ -60,7 +60,7 @@ static Status NpRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_fi
     }
 
     nn_engine = ctx->GetNNEngine();
-    if (MI_NULL == nn_engine)
+    if (DT_NULL == nn_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "GetNNEngine failed\n");
         goto EXIT;
@@ -77,7 +77,7 @@ static Status NpRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_fi
         nn_executor = nn_engine->CreateNNExecutor(minn_file, "abcdefg");
     }
 
-    if (MI_NULL == nn_executor)
+    if (DT_NULL == nn_executor)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_executor is null\n");
         goto EXIT;
@@ -103,7 +103,7 @@ static Status NpRun(Context *ctx, Mat &src, Mat &dst, const std::string &minn_fi
     input.insert(std::make_pair("input", &src));
     output.insert(std::make_pair("InceptionV3/Predictions/Reshape_1", &dst));
 
-    for (MI_S32 i = 0; i < forward_count; i++)
+    for (DT_S32 i = 0; i < forward_count; i++)
     {
         AnyParams params;
         params["perf_level"] = std::ref(perf_level[i / step]);
@@ -147,7 +147,7 @@ static TestResult NpTest(ModelList &model_list)
     std::string np_path    = data_path + "np/";
     std::string input_file = data_path + "trash_1x299x299x3_u8.bin";
 
-    MI_S32 forward_count = 5;
+    DT_S32 forward_count = 5;
 
     Mat src = factory.GetFileMat(input_file, ElemType::U8, {299, 299, 3}, AURA_MEM_HEAP);
     Mat dst(ctx, ElemType::U8, {1, 1001}, AURA_MEM_HEAP);
@@ -157,8 +157,8 @@ static TestResult NpTest(ModelList &model_list)
     MatCmpResult cmp_result;
     TestResult result;
 
-    MI_S32 cur_count = 0;
-    MI_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
+    DT_S32 cur_count = 0;
+    DT_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
     Status status_exec = Executor(loop_count, 2, time_val, NpRun, ctx, src, dst, np_path + model_list.minn_file, model_list.quant_type,
                                   forward_count, cur_count, loop_count);
     if (Status::OK == status_exec)

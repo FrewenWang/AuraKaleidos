@@ -21,7 +21,7 @@ static std::ostream& operator << (std::ostream &os, MatSizePair size_pair)
 
 struct MixedDiff
 {
-    MI_F64 operator()(const MI_F64 val0, const MI_F64 val1) const
+    DT_F64 operator()(const DT_F64 val0, const DT_F64 val1) const
     {
         RelativeDiff relative_diff;
         AbsDiff abs_diff;
@@ -43,7 +43,7 @@ AURA_TEST_PARAM(DftParam,
 AURA_TEST_PARAM(IDftParam,
                 ElemType,   elem_type,
                 MatSize,    mat_size,
-                MI_S32,     dst_channels,
+                DT_S32,     dst_channels,
                 OpTarget,   target);
 
 AURA_INLINE Status OpenCVDft(Mat &src, Mat &dst)
@@ -68,7 +68,7 @@ AURA_INLINE Status OpenCVIDft(Mat &src, Mat &dst)
 {
 #if !defined(AURA_BUILD_XPLORER)
     Sizes3 dst_size = dst.GetSizes();
-    MI_S32 height   = dst_size.m_height;
+    DT_S32 height   = dst_size.m_height;
 
     cv::Mat cv_src = MatToOpencv(src);
     cv::Mat cv_dst;
@@ -79,10 +79,10 @@ AURA_INLINE Status OpenCVIDft(Mat &src, Mat &dst)
         cv::idft(cv_src, cv_dst, cv::DFT_SCALE);
         cv::split(cv_dst, channels);
 
-        for(MI_S32 h = 0; h < height; h++)
+        for(DT_S32 h = 0; h < height; h++)
         {
-            MI_F32 *dst_row = dst.Ptr<MI_F32>(h);
-            MI_F32 *cv_row  = (MI_F32 *)(channels[0].data + channels[0].step * h);
+            DT_F32 *dst_row = dst.Ptr<DT_F32>(h);
+            DT_F32 *cv_row  = (DT_F32 *)(channels[0].data + channels[0].step * h);
 
             memcpy(dst_row, cv_row, channels[0].step);
         }
@@ -106,7 +106,7 @@ public:
     MatrixDftTest(Context *ctx, DftParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         DftParam run_param(GetParam((index)));
@@ -118,7 +118,7 @@ public:
         Mat dst = m_factory.GetEmptyMat(ElemType::F32, run_param.mat_size.second.m_sizes, AURA_MEM_DEFAULT, run_param.mat_size.second.m_strides);
         Mat ref = m_factory.GetEmptyMat(ElemType::F32, run_param.mat_size.second.m_sizes, AURA_MEM_DEFAULT, run_param.mat_size.second.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
+        DT_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
@@ -206,7 +206,7 @@ public:
     MatrixIDftTest(Context *ctx, IDftParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         IDftParam run_param(GetParam((index)));
         if (2 == run_param.dst_channels && run_param.elem_type != ElemType::F32)
@@ -217,7 +217,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         IDftParam run_param(GetParam((index)));
@@ -233,7 +233,7 @@ public:
         Mat dst = m_factory.GetEmptyMat(run_param.elem_type, run_param.mat_size.m_sizes, AURA_MEM_DEFAULT, dst_strides);
         Mat ref = m_factory.GetEmptyMat(run_param.elem_type, run_param.mat_size.m_sizes, AURA_MEM_DEFAULT, dst_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 
+        DT_S32 loop_count = stress_count ? stress_count : 
                             (TargetType::NONE == run_param.target.m_type ? 5 : 10);
         TestTime time_val;
         MatCmpResult cmp_result;
@@ -243,7 +243,7 @@ public:
         result.output = dst.GetSizes().ToString() + " " + ElemTypesToString(run_param.elem_type);
 
         // run interface
-        Status status_exec = Executor(loop_count, 2, time_val, IInverseDft, m_ctx, src, dst, MI_TRUE, run_param.target);
+        Status status_exec = Executor(loop_count, 2, time_val, IInverseDft, m_ctx, src, dst, DT_TRUE, run_param.target);
 
         if (Status::OK == status_exec)
         {
@@ -294,7 +294,7 @@ public:
         else
         {
             result.accu_benchmark = "IDft(target::none)";
-            status_exec = IInverseDft(m_ctx, src, ref, MI_TRUE, OpTarget::None());
+            status_exec = IInverseDft(m_ctx, src, ref, DT_TRUE, OpTarget::None());
 
             if (status_exec != Status::OK)
             {

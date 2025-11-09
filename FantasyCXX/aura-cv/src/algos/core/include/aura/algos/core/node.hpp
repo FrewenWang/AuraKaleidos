@@ -34,8 +34,8 @@ public:
     NodeType GetType() const;
     std::string GetName() const;
 
-    AURA_VOID SetPrint(const std::vector<std::string> &print_props);
-    AURA_VOID SetDump(const std::vector<std::string> &dump_props);
+    DT_VOID SetPrint(const std::vector<std::string> &print_props);
+    DT_VOID SetDump(const std::vector<std::string> &dump_props);
 
     template <typename ...ArgsType>
     Status BindDump(ArgsType &&...args);
@@ -47,16 +47,16 @@ public:
     Status SetOutputArrays(ArgsType &&...args);
 
 private:
-    MI_BOOL IsValid() const;
-    MI_BOOL IsMatch(const std::vector<std::string> &props) const;
+    DT_BOOL IsValid() const;
+    DT_BOOL IsMatch(const std::vector<std::string> &props) const;
 
     Context     *m_ctx;
     NodeType    m_type;
     Op          *m_op;
     std::string m_name;
     Graph       *m_graph;
-    MI_BOOL     m_enable_print;
-    MI_BOOL     m_enable_dump;
+    DT_BOOL     m_enable_print;
+    DT_BOOL     m_enable_dump;
 };
 
 template <typename Tp, typename ...ArgsType>
@@ -77,7 +77,7 @@ Status Node::SyncInitialize(ArgsType &&...args)
     }
 
     Tp *op = dynamic_cast<Tp*>(m_op);
-    if (MI_NULL == op)
+    if (DT_NULL == op)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
         return Status::ERROR;
@@ -210,7 +210,7 @@ std::shared_future<Status> Node::AsyncInitialize(ArgsType &&...args)
         return std::shared_future<Status>();
     }
 
-    MI_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
+    DT_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
     m_graph->m_tokens[thread_id].push_back(token);
 
     return token;
@@ -233,7 +233,7 @@ std::shared_future<Status> Node::AsyncCall(ArgsType &&...args)
         return std::shared_future<Status>();
     }
 
-    MI_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
+    DT_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
     m_graph->m_tokens[thread_id].push_back(token);
 
     return token;

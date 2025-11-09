@@ -7,8 +7,8 @@ namespace aura
 CalcHistHvx::CalcHistHvx(Context *ctx, const OpTarget &target) : CalcHistImpl(ctx, target)
 {}
 
-Status CalcHistHvx::SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &hist, MI_S32 hist_size, 
-                            const Scalar &ranges, const Array *mask, MI_BOOL accumulate)
+Status CalcHistHvx::SetArgs(const Array *src, DT_S32 channel, std::vector<DT_U32> &hist, DT_S32 hist_size, 
+                            const Scalar &ranges, const Array *mask, DT_BOOL accumulate)
 {
     Status ret = Status::ERROR;
 
@@ -61,7 +61,7 @@ Status CalcHistHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     const Mat *mask = dynamic_cast<const Mat*>(m_mask);
 
-    if ((MI_NULL == src) || (MI_NULL == mask))
+    if ((DT_NULL == src) || (DT_NULL == mask))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or mask is nullptr");
         return ret;
@@ -82,7 +82,7 @@ Status CalcHistHvx::Run()
 
     if (Status::OK == ret)
     {
-        if (MI_TRUE == m_target.m_data.hvx.profiling)
+        if (DT_TRUE == m_target.m_data.hvx.profiling)
         {
             m_profiling_string = " " + HexagonProfilingToString(profiling);
         }

@@ -22,8 +22,8 @@ struct HoughCirclesTestParam
     HoughCirclesTestParam()
     {}
 
-    HoughCirclesTestParam(HoughCirclesMethod type, MI_F64 dp, MI_F64 min_dist, MI_F64 canny_thresh, MI_F64 acc_thresh,
-                          MI_S32 min_radius, MI_S32 max_radius)
+    HoughCirclesTestParam(HoughCirclesMethod type, DT_F64 dp, DT_F64 min_dist, DT_F64 canny_thresh, DT_F64 acc_thresh,
+                          DT_S32 min_radius, DT_S32 max_radius)
                           : type(type), dp(dp), min_dist(min_dist), canny_thresh(canny_thresh), acc_thresh(acc_thresh), min_radius(min_radius),
                           max_radius(max_radius)
     {}
@@ -45,12 +45,12 @@ struct HoughCirclesTestParam
     }
 
     HoughCirclesMethod type;
-    MI_F64 dp;
-    MI_F64 min_dist;
-    MI_F64 canny_thresh;
-    MI_F64 acc_thresh;
-    MI_S32 min_radius;
-    MI_S32 max_radius;
+    DT_F64 dp;
+    DT_F64 min_dist;
+    DT_F64 canny_thresh;
+    DT_F64 acc_thresh;
+    DT_S32 min_radius;
+    DT_S32 max_radius;
 };
 
 AURA_TEST_PARAM(HoughCirclesParam,
@@ -60,9 +60,9 @@ AURA_TEST_PARAM(HoughCirclesParam,
                 OpTarget,        target);
 
 #if !defined(AURA_BUILD_XPLORER)
-static MI_S32 HoughCirclesTypeToOpencv(HoughCirclesMethod type)
+static DT_S32 HoughCirclesTypeToOpencv(HoughCirclesMethod type)
 {
-    MI_S32 cv_type = -1;
+    DT_S32 cv_type = -1;
 
     switch (type)
     {
@@ -83,14 +83,14 @@ static MI_S32 HoughCirclesTypeToOpencv(HoughCirclesMethod type)
 #endif
 
 static Status CvHoughCircles(Context *ctx, Mat &mat, std::vector<Scalar> &circles, HoughCirclesMethod type,
-                                   MI_F64 dp, MI_F64 min_dist, MI_F64 canny_thresh, MI_F64 acc_thresh, MI_S32 min_radius, MI_S32 max_radius)
+                                   DT_F64 dp, DT_F64 min_dist, DT_F64 canny_thresh, DT_F64 acc_thresh, DT_S32 min_radius, DT_S32 max_radius)
 {
     Status ret = Status::OK;
 
 #if !defined(AURA_BUILD_XPLORER)
     circles.clear();
 
-    MI_S32 cv_method = HoughCirclesTypeToOpencv(type);
+    DT_S32 cv_method = HoughCirclesTypeToOpencv(type);
 
     if (mat.GetElemType() != ElemType::U8)
     {
@@ -98,8 +98,8 @@ static Status CvHoughCircles(Context *ctx, Mat &mat, std::vector<Scalar> &circle
         return Status::ERROR;
     }
 
-    MI_S32 mat_cv_type = ElemTypeToOpencv(mat.GetElemType(), mat.GetSizes().m_channel);
-    MI_S32 cv_type = 0;
+    DT_S32 mat_cv_type = ElemTypeToOpencv(mat.GetElemType(), mat.GetSizes().m_channel);
+    DT_S32 cv_type = 0;
 
     if (CV_8UC1 != mat_cv_type)
     {
@@ -113,7 +113,7 @@ static Status CvHoughCircles(Context *ctx, Mat &mat, std::vector<Scalar> &circle
         std::vector<cv::Vec4f> cv_circles;
         cv::HoughCircles(mat_src, cv_circles, cv_method, dp, min_dist, canny_thresh, acc_thresh, min_radius, max_radius);
 
-        for (MI_U64 i = 0; i < cv_circles.size(); i++)
+        for (DT_U64 i = 0; i < cv_circles.size(); i++)
         {
             circles.emplace_back(cv_circles[i][0], cv_circles[i][1], cv_circles[i][2], cv_circles[i][3]);
         }
@@ -139,7 +139,7 @@ static Status CvHoughCircles(Context *ctx, Mat &mat, std::vector<Scalar> &circle
     return ret;
 }
 
-static AURA_VOID HoughCirclesConvert(const std::vector<Scalar> &circles, std::vector<Scalar> &cvt_circles)
+static DT_VOID HoughCirclesConvert(const std::vector<Scalar> &circles, std::vector<Scalar> &cvt_circles)
 {
     for (auto it = circles.begin(); it != circles.end(); ++it)
     {
@@ -164,7 +164,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         HoughCirclesParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -185,7 +185,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         HoughCirclesParam run_param(GetParam((index)));
@@ -202,7 +202,7 @@ public:
         cvt_circles_dst.reserve(256);
         cvt_circles_ref.reserve(256);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         UnorderedCmpResult<Scalar> cmp_result;

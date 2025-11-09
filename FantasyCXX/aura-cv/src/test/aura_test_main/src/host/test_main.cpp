@@ -62,22 +62,22 @@ Example usage:
 
 using namespace aura;
 
-static const MI_S32 g_split_width = 86;
-static const MI_S32 g_rpc_buffer_size = (1 << (3 + 10)); // 8KB
+static const DT_S32 g_split_width = 86;
+static const DT_S32 g_rpc_buffer_size = (1 << (3 + 10)); // 8KB
 
-static AURA_VOID PrintHeading(const std::string &heading)
+static DT_VOID PrintHeading(const std::string &heading)
 {
   std::cout << std::endl << std::string(g_split_width, '=') << std::endl;
   std::cout << heading << std::endl;
   std::cout << std::string(g_split_width, '=') << std::endl;
 }
 
-static AURA_VOID PrintSplitLine()
+static DT_VOID PrintSplitLine()
 {
   std::cout << std::string(g_split_width, '=') << std::endl;
 }
 
-static MI_S32 PrintHelpInfo()
+static DT_S32 PrintHelpInfo()
 {
     PrintHeading("Aura UnitTest Help Info");
     std::cout << help_info <<std::endl;
@@ -143,7 +143,7 @@ static std::vector<std::string> ListHexagonCaseNames(Context *ctx)
 #if defined(AURA_ENABLE_HEXAGON)
     HexagonEngine *hexagon_engine = ctx->GetHexagonEngine();
 
-    if (MI_NULL == hexagon_engine)
+    if (DT_NULL == hexagon_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "Get hexagon_engine failed.");
         return names;
@@ -204,7 +204,7 @@ static std::vector<std::string> GetAllTestCases(Context *ctx, const std::string 
     return all_cases;
 }
 
-static AURA_VOID ListTestCases(Context *ctx, const std::string &target)
+static DT_VOID ListTestCases(Context *ctx, const std::string &target)
 {
     std::string info = "List all testcases for target: " + target;
     PrintHeading(info);
@@ -284,7 +284,7 @@ static Status RunHexagonTestCases(Context *ctx, UnitTestConfig &cfg, std::vector
 
     HexagonEngine *hexagon_engine = ctx->GetHexagonEngine();
 
-    if (MI_NULL == hexagon_engine)
+    if (DT_NULL == hexagon_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "Get hexagon_engine failed.");
         return Status::ERROR;
@@ -357,13 +357,13 @@ static Status RunTestCases(Context *ctx, UnitTestConfig &cfg, const std::string 
     }
 
     // lambda function to filter test cases
-    auto filter_func = [&filter_keywords, &blacklist_keywords](const std::string &case_name) -> MI_BOOL
+    auto filter_func = [&filter_keywords, &blacklist_keywords](const std::string &case_name) -> DT_BOOL
     {
         for (const auto &keyword : blacklist_keywords)
         {
             if (StringContains(case_name, keyword))
             {
-                return MI_FALSE;
+                return DT_FALSE;
             }
         }
 
@@ -371,7 +371,7 @@ static Status RunTestCases(Context *ctx, UnitTestConfig &cfg, const std::string 
         {
             if (StringContains(case_name, keyword))
             {
-                return MI_TRUE;
+                return DT_TRUE;
             }
         }
 
@@ -431,24 +431,24 @@ static Status RunTestCases(Context *ctx, UnitTestConfig &cfg, const std::string 
     }
 }
 
-static Status ParseArgs(MI_S32 argc, MI_CHAR *argv[], std::map<std::string, std::string> &option_map,
-                        MI_BOOL &is_help_set, MI_BOOL &is_list_set)
+static Status ParseArgs(DT_S32 argc, DT_CHAR *argv[], std::map<std::string, std::string> &option_map,
+                        DT_BOOL &is_help_set, DT_BOOL &is_list_set)
 {
     if (1 == argc)
     {
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 1; i < argc; ++i)
+    for (DT_S32 i = 1; i < argc; ++i)
     {
         if (std::string("-h") == argv[i] || std::string("--help") == argv[i])
         {
-            is_help_set = MI_TRUE;
+            is_help_set = DT_TRUE;
             return Status::OK;
         }
         else if (std::string("-l") == argv[i] || std::string("--list") == argv[i])
         {
-            is_list_set = MI_TRUE;
+            is_list_set = DT_TRUE;
         }
         else if (i + 1 < argc)
         {
@@ -488,32 +488,32 @@ static std::shared_ptr<Context> InitTestMainContext(const UnitTestConfig &cfg, c
     Config config;
     config.SetLog(cfg.m_log_output, cfg.m_log_level, cfg.m_log_file_name);
     config.SetWorkerPool("UnitTest", cfg.m_compute_affinity, cfg.m_async_affinity);
-    config.SetCLConf(MI_TRUE, cfg.m_cache_bin_path, cfg.m_cache_bin_prefix);
-    config.SetHexagonConf(MI_TRUE, MI_TRUE, hexagon_lib_prefix);
-    config.SetNNConf(MI_TRUE);
-    config.SetXtensaConf(MI_TRUE, pil_name);
+    config.SetCLConf(DT_TRUE, cfg.m_cache_bin_path, cfg.m_cache_bin_prefix);
+    config.SetHexagonConf(DT_TRUE, DT_TRUE, hexagon_lib_prefix);
+    config.SetNNConf(DT_TRUE);
+    config.SetXtensaConf(DT_TRUE, pil_name);
 
     std::shared_ptr<Context> ctx = std::make_shared<Context>(config);
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         std::cout << "Context create failed." << std::endl;
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (ctx->Initialize() != Status::OK)
     {
         std::cout << "Context Initialize failed." << std::endl;
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return ctx;
 }
 
-MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
+DT_S32 main(DT_S32 argc, DT_CHAR *argv[])
 {
     std::map<std::string, std::string> option_map;
-    MI_BOOL is_help_set = MI_FALSE;
-    MI_BOOL is_list_set = MI_FALSE;
+    DT_BOOL is_help_set = DT_FALSE;
+    DT_BOOL is_list_set = DT_FALSE;
 
     //----------------------
     //      wrong usage
@@ -550,7 +550,7 @@ MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
 
     // init context
     std::shared_ptr<Context> ctx = InitTestMainContext(unit_test_cfg, option_map);
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         std::cout << "InitTestMainContext failed." << std::endl;
         return -1;

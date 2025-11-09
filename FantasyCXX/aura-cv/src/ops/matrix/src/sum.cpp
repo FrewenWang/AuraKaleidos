@@ -56,12 +56,12 @@ Sum::Sum(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Sum::SetArgs(const Array *src, Scalar &result)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -111,14 +111,14 @@ Status Sum::SetArgs(const Array *src, Scalar &result)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateSumImpl(m_ctx, impl_target);
     }
 
     // run initialize
     SumImpl *sum_impl = dynamic_cast<SumImpl*>(m_impl.get());
-    if (MI_NULL == sum_impl)
+    if (DT_NULL == sum_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "sum_impl is null ptr");
         return Status::ERROR;
@@ -132,7 +132,7 @@ Status Sum::SetArgs(const Array *src, Scalar &result)
 Status Sum::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -210,12 +210,12 @@ Mean::Mean(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Mean::SetArgs(const Array *src, Scalar &result)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -265,14 +265,14 @@ Status Mean::SetArgs(const Array *src, Scalar &result)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateMeanImpl(m_ctx, impl_target);
     }
 
     // run initialize
     SumImpl *sum_impl = dynamic_cast<SumImpl*>(m_impl.get());
-    if (MI_NULL == sum_impl)
+    if (DT_NULL == sum_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "sum_impl is null ptr");
         return Status::ERROR;
@@ -290,24 +290,24 @@ AURA_EXPORTS Status IMean(Context *ctx, const Mat &src, Scalar &result, const Op
     return OpCall(ctx, mean, &src, result);
 }
 
-SumImpl::SumImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Sum", target), m_result(MI_NULL),
-                                                                         m_src(MI_NULL)
+SumImpl::SumImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Sum", target), m_result(DT_NULL),
+                                                                         m_src(DT_NULL)
 {}
 
 Status SumImpl::SetArgs(const Array *src, Scalar *result)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
     }
 
-    if (MI_NULL == result)
+    if (DT_NULL == result)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "result is null ptr");
         return Status::ERROR;
@@ -345,7 +345,7 @@ std::string SumImpl::ToString() const
     return str;
 }
 
-AURA_VOID SumImpl::Dump(const std::string &prefix) const
+DT_VOID SumImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

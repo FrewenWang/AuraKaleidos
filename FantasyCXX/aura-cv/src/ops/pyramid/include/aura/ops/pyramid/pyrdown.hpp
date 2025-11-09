@@ -56,7 +56,7 @@ public:
      * row pitch should be aligned to a stride, which is obtained through the `GetCLLengthAlignSize`
      * function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma, BorderType border_type = BorderType::REFLECT_101);
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma, BorderType border_type = BorderType::REFLECT_101);
 
     /**
      * @brief Generate PyrDown opencl precompiled cache.
@@ -66,7 +66,7 @@ public:
      * @param ksize The PyrUp kernel size.
      * @param border_type The border type for handling border pixels.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type);
 };
 
 /**
@@ -94,7 +94,7 @@ public:
  * HVX       | U8C1/U16C1/S16C1        | 5     | REPLICATE/REFLECT_101
  *
  */
-AURA_EXPORTS Status IPyrDown(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MI_F32 sigma,
+AURA_EXPORTS Status IPyrDown(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, DT_F32 sigma,
                              BorderType border_type = BorderType::REFLECT_101, const OpTarget &target = OpTarget::Default());
 
 /**

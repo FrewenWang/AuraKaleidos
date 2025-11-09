@@ -16,9 +16,9 @@ static TomasiParam::TupleTable g_tomasi_table_neon
 
     // param
     {
-        {0, 0.05, 3., 3, 3, MI_TRUE, 0.04},
-        {0, 0.05, 3., 5, 3, MI_FALSE, 0.04},
-        {10000, 0.05, 5., 5, 3, MI_FALSE, 0.04},
+        {0, 0.05, 3., 3, 3, DT_TRUE, 0.04},
+        {0, 0.05, 3., 5, 3, DT_FALSE, 0.04},
+        {10000, 0.05, 5., 5, 3, DT_FALSE, 0.04},
     },
 
     // target

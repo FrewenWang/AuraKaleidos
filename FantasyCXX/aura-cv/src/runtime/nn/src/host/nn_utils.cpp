@@ -18,7 +18,7 @@ static Status KeyGenerate(Context *ctx, const std::string &main_key, std::string
     return Status::OK;
 }
 
-static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, MI_U64 size)
+static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, DT_U64 size)
 {
     if (src.m_size != dst.m_size)
     {
@@ -26,7 +26,7 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
         return Status::ERROR;
     }
 
-    if (size > static_cast<MI_U64>(dst.m_size))
+    if (size > static_cast<DT_U64>(dst.m_size))
     {
         AURA_ADD_ERROR_STRING(ctx, "size can not be larger than dst's size");
         return Status::ERROR;
@@ -39,7 +39,7 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
     }
 
     std::string gen_key;
-    MI_U64 size_align16  = size & (-16);
+    DT_U64 size_align16  = size & (-16);
 
     if (KeyGenerate(ctx, key, gen_key) != Status::OK)
     {
@@ -47,15 +47,15 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
         return Status::ERROR;
     }
 
-    const MI_U8 *src_data = reinterpret_cast<MI_U8*>(src.m_data);
-    MI_U8 *dst_data = reinterpret_cast<MI_U8*>(dst.m_data);
-    MI_U64 i = 0;
+    const DT_U8 *src_data = reinterpret_cast<DT_U8*>(src.m_data);
+    DT_U8 *dst_data = reinterpret_cast<DT_U8*>(dst.m_data);
+    DT_U64 i = 0;
 
 #if defined(AURA_ENABLE_NEON)
     uint8x16_t vqu8_src[2];
     uint8x16_t vqu8_dst[2];
-    uint8x16_t vqu8_realkey = neon::vload1q((MI_U8 *)(gen_key.data()));
-    MI_U64 size_align32  = size & (-32);
+    uint8x16_t vqu8_realkey = neon::vload1q((DT_U8 *)(gen_key.data()));
+    DT_U64 size_align32  = size & (-32);
 
     for (; i < size_align32; i += 32)
     {
@@ -72,15 +72,15 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
 
     for (; i < size_align16; i += 16)
     {
-        for (MI_S32 k = 0; k < 16; k++)
+        for (DT_S32 k = 0; k < 16; k++)
         {
-            dst_data[i + k] = src_data[i + k] ^ (MI_U8)gen_key[k];
+            dst_data[i + k] = src_data[i + k] ^ (DT_U8)gen_key[k];
         }
     }
 
     if (src_data != dst_data)
     {
-        for (; i < static_cast<MI_U64>(dst.m_size); i++)
+        for (; i < static_cast<DT_U64>(dst.m_size); i++)
         {
             dst_data[i] = src_data[i];
         }
@@ -89,7 +89,7 @@ static Status SymmetricKeyAlgo(Context *ctx, const Buffer &src, Buffer &dst, con
     return Status::OK;
 }
 
-Status NNEncrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, MI_U64 size)
+Status NNEncrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, DT_U64 size)
 {
     if (SymmetricKeyAlgo(ctx, src, dst, key, size) != Status::OK)
     {
@@ -100,7 +100,7 @@ Status NNEncrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string
     return Status::OK;
 }
 
-Status NNDecrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, MI_U64 size)
+Status NNDecrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string &key, DT_U64 size)
 {
     if (SymmetricKeyAlgo(ctx, src, dst, key, size) != Status::OK)
     {
@@ -111,7 +111,7 @@ Status NNDecrypt(Context *ctx, const Buffer &src, Buffer &dst, const std::string
     return Status::OK;
 }
 
-Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_F32 scale)
+Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, DT_S32 zero_point, DT_F32 scale)
 {
     if (!src.IsSizesEqual(dst))
     {
@@ -125,9 +125,9 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
         return Status::ERROR;
     }
 
-    MI_S32 width  = dst.GetSizes().m_width * dst.GetSizes().m_channel;
-    MI_S32 height = dst.GetSizes().m_height;
-    const MI_F32 *src_row = MI_NULL;
+    DT_S32 width  = dst.GetSizes().m_width * dst.GetSizes().m_channel;
+    DT_S32 height = dst.GetSizes().m_height;
+    const DT_F32 *src_row = DT_NULL;
 
 #if defined(AURA_ENABLE_NEON)
     float32x4_t vqf32_scale;
@@ -136,21 +136,21 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
 
     if (dst.GetElemType() == ElemType::U8)
     {
-        MI_U8 *dst_row = MI_NULL;
-        MI_U8 zp = static_cast<MI_U8>(zero_point);
+        DT_U8 *dst_row = DT_NULL;
+        DT_U8 zp = static_cast<DT_U8>(zero_point);
 
 #if defined(AURA_ENABLE_NEON)
-        MI_S32 width_align16 = width & (-16);
+        DT_S32 width_align16 = width & (-16);
         float32x4_t vqf32_src[4];
         int32x4_t vqs32_tmp[4];
         int16x8_t vqs16_zp;
-        neon::vdup(vqs16_zp, (MI_S16)zp);
+        neon::vdup(vqs16_zp, (DT_S16)zp);
 #endif
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
-            src_row = src.Ptr<MI_F32>(y);
-            dst_row = dst.Ptr<MI_U8>(y);
-            MI_S32 x = 0;
+            src_row = src.Ptr<DT_F32>(y);
+            dst_row = dst.Ptr<DT_U8>(y);
+            DT_S32 x = 0;
 
 #if defined(AURA_ENABLE_NEON)
             for (; x < width_align16; x += 16)
@@ -165,10 +165,10 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
                 vqf32_src[2] = neon::vmul(vqf32_src[2], vqf32_scale);
                 vqf32_src[3] = neon::vmul(vqf32_src[3], vqf32_scale);
 
-                vqs32_tmp[0] = neon::vcvtn<MI_S32>(vqf32_src[0]);
-                vqs32_tmp[1] = neon::vcvtn<MI_S32>(vqf32_src[1]);
-                vqs32_tmp[2] = neon::vcvtn<MI_S32>(vqf32_src[2]);
-                vqs32_tmp[3] = neon::vcvtn<MI_S32>(vqf32_src[3]);
+                vqs32_tmp[0] = neon::vcvtn<DT_S32>(vqf32_src[0]);
+                vqs32_tmp[1] = neon::vcvtn<DT_S32>(vqf32_src[1]);
+                vqs32_tmp[2] = neon::vcvtn<DT_S32>(vqf32_src[2]);
+                vqs32_tmp[3] = neon::vcvtn<DT_S32>(vqf32_src[3]);
 
                 int16x8_t vqs16_l = neon::vcombine(neon::vqmovn(vqs32_tmp[0]), neon::vqmovn(vqs32_tmp[1]));
                 int16x8_t vqs16_h = neon::vcombine(neon::vqmovn(vqs32_tmp[2]), neon::vqmovn(vqs32_tmp[3]));
@@ -182,26 +182,26 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
 #endif
             for (; x < width; x++)
             {
-                dst_row[x] = SaturateCast<MI_U8>(Round(src_row[x] / scale + zp));
+                dst_row[x] = SaturateCast<DT_U8>(Round(src_row[x] / scale + zp));
             }
         }
     }
     else if (dst.GetElemType() == ElemType::S8)
     {
-        MI_S8 *dst_row = MI_NULL;
-        MI_S8 zp       = static_cast<MI_S8>(zero_point);
+        DT_S8 *dst_row = DT_NULL;
+        DT_S8 zp       = static_cast<DT_S8>(zero_point);
 #if defined(AURA_ENABLE_NEON)
-        MI_S32 width_align16 = width & (-16);
+        DT_S32 width_align16 = width & (-16);
         float32x4_t vqf32_src[4];
         int32x4_t vqs32_tmp[4];
         int16x8_t vqs16_zp;
-        neon::vdup(vqs16_zp, (MI_S16)zp);
+        neon::vdup(vqs16_zp, (DT_S16)zp);
 #endif
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
-            src_row = src.Ptr<MI_F32>(y);
-            dst_row = dst.Ptr<MI_S8>(y);
-            MI_S32 x = 0;
+            src_row = src.Ptr<DT_F32>(y);
+            dst_row = dst.Ptr<DT_S8>(y);
+            DT_S32 x = 0;
 
 #if defined(AURA_ENABLE_NEON)
             for (; x < width_align16; x += 16)
@@ -216,10 +216,10 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
                 vqf32_src[2] = neon::vmul(vqf32_src[2], vqf32_scale);
                 vqf32_src[3] = neon::vmul(vqf32_src[3], vqf32_scale);
 
-                vqs32_tmp[0] = neon::vcvtn<MI_S32>(vqf32_src[0]);
-                vqs32_tmp[1] = neon::vcvtn<MI_S32>(vqf32_src[1]);
-                vqs32_tmp[2] = neon::vcvtn<MI_S32>(vqf32_src[2]);
-                vqs32_tmp[3] = neon::vcvtn<MI_S32>(vqf32_src[3]);
+                vqs32_tmp[0] = neon::vcvtn<DT_S32>(vqf32_src[0]);
+                vqs32_tmp[1] = neon::vcvtn<DT_S32>(vqf32_src[1]);
+                vqs32_tmp[2] = neon::vcvtn<DT_S32>(vqf32_src[2]);
+                vqs32_tmp[3] = neon::vcvtn<DT_S32>(vqf32_src[3]);
 
                 int16x8_t vqs16_l = neon::vcombine(neon::vqmovn(vqs32_tmp[0]), neon::vqmovn(vqs32_tmp[1]));
                 int16x8_t vqs16_h = neon::vcombine(neon::vqmovn(vqs32_tmp[2]), neon::vqmovn(vqs32_tmp[3]));
@@ -233,27 +233,27 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
 #endif
             for (; x < width; x++)
             {
-                dst_row[x] = SaturateCast<MI_S8>(Round(src_row[x] / scale + zp));
+                dst_row[x] = SaturateCast<DT_S8>(Round(src_row[x] / scale + zp));
             }
         }
     }
     else if (dst.GetElemType() == ElemType::U16)
     {
-        MI_U16 *dst_row = MI_NULL;
-        MI_U16 zp       = static_cast<MI_U16>(zero_point);
+        DT_U16 *dst_row = DT_NULL;
+        DT_U16 zp       = static_cast<DT_U16>(zero_point);
 
 #if defined(AURA_ENABLE_NEON)
-        MI_S32 width_align8  = width & (-8);
+        DT_S32 width_align8  = width & (-8);
         float32x4_t vqf32_src[2];
         int32x4_t vqs32_zp;
-        neon::vdup(vqs32_zp, (MI_S32)zp);
+        neon::vdup(vqs32_zp, (DT_S32)zp);
 #endif
 
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
-            src_row = src.Ptr<MI_F32>(y);
-            dst_row = dst.Ptr<MI_U16>(y);
-            MI_S32 x = 0;
+            src_row = src.Ptr<DT_F32>(y);
+            dst_row = dst.Ptr<DT_U16>(y);
+            DT_S32 x = 0;
 
 #if defined(AURA_ENABLE_NEON)
             for (; x < width_align8; x += 8)
@@ -264,8 +264,8 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
                 vqf32_src[0] = neon::vmul(vqf32_src[0], vqf32_scale);
                 vqf32_src[1] = neon::vmul(vqf32_src[1], vqf32_scale);
 
-                int32x4_t vqs32_l = neon::vcvtn<MI_S32>(vqf32_src[0]);
-                int32x4_t vqs32_h = neon::vcvtn<MI_S32>(vqf32_src[1]);
+                int32x4_t vqs32_l = neon::vcvtn<DT_S32>(vqf32_src[0]);
+                int32x4_t vqs32_h = neon::vcvtn<DT_S32>(vqf32_src[1]);
 
                 vqs32_l = neon::vqadd(vqs32_l, vqs32_zp);
                 vqs32_h = neon::vqadd(vqs32_h, vqs32_zp);
@@ -277,27 +277,27 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
 #endif
             for (; x < width; x++)
             {
-                dst_row[x] = SaturateCast<MI_U16>(Round(src_row[x] / scale + zp));
+                dst_row[x] = SaturateCast<DT_U16>(Round(src_row[x] / scale + zp));
             }
         }
     }
     else if (dst.GetElemType() == ElemType::S16)
     {
-        MI_S16 *dst_row = MI_NULL;
-        MI_S16 zp       = static_cast<MI_S16>(zero_point);
+        DT_S16 *dst_row = DT_NULL;
+        DT_S16 zp       = static_cast<DT_S16>(zero_point);
 
 #if defined(AURA_ENABLE_NEON)
-        MI_S32 width_align8  = width & (-8);
+        DT_S32 width_align8  = width & (-8);
         float32x4_t vqf32_src[2];
         int32x4_t vqs32_zp;
-        neon::vdup(vqs32_zp, (MI_S32)zp);
+        neon::vdup(vqs32_zp, (DT_S32)zp);
 #endif
 
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
-            src_row = src.Ptr<MI_F32>(y);
-            dst_row = dst.Ptr<MI_S16>(y);
-            MI_S32 x = 0;
+            src_row = src.Ptr<DT_F32>(y);
+            dst_row = dst.Ptr<DT_S16>(y);
+            DT_S32 x = 0;
 
 #if defined(AURA_ENABLE_NEON)
             for (; x < width_align8; x += 8)
@@ -308,8 +308,8 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
                 vqf32_src[0] = neon::vmul(vqf32_src[0], vqf32_scale);
                 vqf32_src[1] = neon::vmul(vqf32_src[1], vqf32_scale);
 
-                int32x4_t vqs32_l = neon::vcvtn<MI_S32>(vqf32_src[0]);
-                int32x4_t vqs32_h = neon::vcvtn<MI_S32>(vqf32_src[1]);
+                int32x4_t vqs32_l = neon::vcvtn<DT_S32>(vqf32_src[0]);
+                int32x4_t vqs32_h = neon::vcvtn<DT_S32>(vqf32_src[1]);
 
                 vqs32_l = neon::vqadd(vqs32_l, vqs32_zp);
                 vqs32_h = neon::vqadd(vqs32_h, vqs32_zp);
@@ -321,7 +321,7 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
 #endif
             for (; x < width; x++)
             {
-                dst_row[x] = SaturateCast<MI_S16>(Round(src_row[x] / scale + zp));
+                dst_row[x] = SaturateCast<DT_S16>(Round(src_row[x] / scale + zp));
             }
         }
     }
@@ -334,7 +334,7 @@ Status NNQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_
     return Status::OK;
 }
 
-Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, MI_F32 scale)
+Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, DT_S32 zero_point, DT_F32 scale)
 {
     if (!src.IsSizesEqual(dst))
     {
@@ -348,17 +348,17 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
         return Status::ERROR;
     }
 
-    MI_S32 width  = dst.GetSizes().m_width * dst.GetSizes().m_channel;
-    MI_S32 height = dst.GetSizes().m_height;
-    MI_F32 *dst_row = MI_NULL;
+    DT_S32 width  = dst.GetSizes().m_width * dst.GetSizes().m_channel;
+    DT_S32 height = dst.GetSizes().m_height;
+    DT_F32 *dst_row = DT_NULL;
 
     if (src.GetElemType() == ElemType::U8)
     {
-        const MI_U8 *src_row = MI_NULL;
-        MI_U8 zp = static_cast<MI_U8>(zero_point);
+        const DT_U8 *src_row = DT_NULL;
+        DT_U8 zp = static_cast<DT_U8>(zero_point);
 
 #if defined(AURA_ENABLE_NEON)
-        MI_S32 width_align16 = width & (-16);
+        DT_S32 width_align16 = width & (-16);
         uint8x16_t vqu8_src;
         float32x4_t vqf32_src[4];
 
@@ -369,11 +369,11 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
         neon::vdup(vqf32_scale, scale);
 #endif
 
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
-            src_row = src.Ptr<MI_U8>(y);
-            dst_row = dst.Ptr<MI_F32>(y);
-            MI_S32 x = 0;
+            src_row = src.Ptr<DT_U8>(y);
+            dst_row = dst.Ptr<DT_F32>(y);
+            DT_S32 x = 0;
 
 #if defined(AURA_ENABLE_NEON)
             for (; x < width_align16; x += 16)
@@ -393,10 +393,10 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
                 vqs16_src_l = neon::vsub(vqs16_src_l, vqs16_zp_l);
                 vqs16_src_h = neon::vsub(vqs16_src_h, vqs16_zp_h);
 
-                vqf32_src[0] = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqs16_src_l)));
-                vqf32_src[1] = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqs16_src_l)));
-                vqf32_src[2] = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqs16_src_h)));
-                vqf32_src[3] = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqs16_src_h)));
+                vqf32_src[0] = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqs16_src_l)));
+                vqf32_src[1] = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqs16_src_l)));
+                vqf32_src[2] = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqs16_src_h)));
+                vqf32_src[3] = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqs16_src_h)));
 
                 vqf32_src[0] = neon::vmul(vqf32_src[0], vqf32_scale);
                 vqf32_src[1] = neon::vmul(vqf32_src[1], vqf32_scale);
@@ -411,17 +411,17 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
 #endif
             for (; x < width; x++)
             {
-                dst_row[x] = static_cast<MI_F32>((src_row[x] - zp) * scale);
+                dst_row[x] = static_cast<DT_F32>((src_row[x] - zp) * scale);
             }
         }
     }
     else if (src.GetElemType() == ElemType::S8)
     {
-        const MI_S8 *src_row = MI_NULL;
-        MI_S8 zp = static_cast<MI_S8>(zero_point);
+        const DT_S8 *src_row = DT_NULL;
+        DT_S8 zp = static_cast<DT_S8>(zero_point);
 
 #if defined(AURA_ENABLE_NEON)
-        MI_S32 width_align16 = width & (-16);
+        DT_S32 width_align16 = width & (-16);
         int8x16_t vqs8_src;
         float32x4_t vqf32_src[4];
 
@@ -432,11 +432,11 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
         neon::vdup(vqf32_scale, scale);
 #endif
 
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
-            src_row = src.Ptr<MI_S8>(y);
-            dst_row = dst.Ptr<MI_F32>(y);
-            MI_S32 x = 0;
+            src_row = src.Ptr<DT_S8>(y);
+            dst_row = dst.Ptr<DT_F32>(y);
+            DT_S32 x = 0;
 
 #if defined(AURA_ENABLE_NEON)
             for (; x < width_align16; x += 16)
@@ -452,10 +452,10 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
                 vqs16_src_l = neon::vsub(vqs16_src_l, vqs16_zp_l);
                 vqs16_src_h = neon::vsub(vqs16_src_h, vqs16_zp_h);
 
-                vqf32_src[0] = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqs16_src_l)));
-                vqf32_src[1] = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqs16_src_l)));
-                vqf32_src[2] = neon::vcvt<MI_F32>(neon::vmovl(neon::vgetlow(vqs16_src_h)));
-                vqf32_src[3] = neon::vcvt<MI_F32>(neon::vmovl(neon::vgethigh(vqs16_src_h)));
+                vqf32_src[0] = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqs16_src_l)));
+                vqf32_src[1] = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqs16_src_l)));
+                vqf32_src[2] = neon::vcvt<DT_F32>(neon::vmovl(neon::vgetlow(vqs16_src_h)));
+                vqf32_src[3] = neon::vcvt<DT_F32>(neon::vmovl(neon::vgethigh(vqs16_src_h)));
 
                 vqf32_src[0] = neon::vmul(vqf32_src[0], vqf32_scale);
                 vqf32_src[1] = neon::vmul(vqf32_src[1], vqf32_scale);
@@ -470,17 +470,17 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
 #endif
             for (; x < width; x++)
             {
-                dst_row[x] = static_cast<MI_F32>((src_row[x] - zp) * scale);
+                dst_row[x] = static_cast<DT_F32>((src_row[x] - zp) * scale);
             }
         }
     }
     else if (src.GetElemType() == ElemType::U16)
     {
-        const MI_U16 *src_row = MI_NULL;
-        MI_U16 zp = zero_point;
+        const DT_U16 *src_row = DT_NULL;
+        DT_U16 zp = zero_point;
 
 #if defined(AURA_ENABLE_NEON)
-        MI_S32 width_align8 = width & (-8);
+        DT_S32 width_align8 = width & (-8);
         uint16x8_t vqu16_src;
         float32x4_t vqf32_src[2];
         int32x4_t vqs32_src[2];
@@ -492,11 +492,11 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
         neon::vdup(vqf32_scale, scale);
 #endif
 
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
-            src_row = src.Ptr<MI_U16>(y);
-            dst_row = dst.Ptr<MI_F32>(y);
-            MI_S32 x = 0;
+            src_row = src.Ptr<DT_U16>(y);
+            dst_row = dst.Ptr<DT_F32>(y);
+            DT_S32 x = 0;
 
 #if defined(AURA_ENABLE_NEON)
             for (; x < width_align8; x += 8)
@@ -508,8 +508,8 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
                 vqs32_src[0] = neon::vsub(vqs32_src[0], vqs32_zp);
                 vqs32_src[1] = neon::vsub(vqs32_src[1], vqs32_zp);
 
-                vqf32_src[0] = neon::vcvt<MI_F32>(vqs32_src[0]);
-                vqf32_src[1] = neon::vcvt<MI_F32>(vqs32_src[1]);
+                vqf32_src[0] = neon::vcvt<DT_F32>(vqs32_src[0]);
+                vqf32_src[1] = neon::vcvt<DT_F32>(vqs32_src[1]);
 
                 vqf32_src[0] = neon::vmul(vqf32_src[0], vqf32_scale);
                 vqf32_src[1] = neon::vmul(vqf32_src[1], vqf32_scale);
@@ -520,17 +520,17 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
 #endif
             for (; x < width; x++)
             {
-                dst_row[x] = static_cast<MI_F32>((src_row[x] - zp) * scale);
+                dst_row[x] = static_cast<DT_F32>((src_row[x] - zp) * scale);
             }
         }
     }
     else if (src.GetElemType() == ElemType::S16)
     {
-        const MI_S16 *src_row = MI_NULL;
-        MI_S16 zp = zero_point;
+        const DT_S16 *src_row = DT_NULL;
+        DT_S16 zp = zero_point;
 
 #if defined(AURA_ENABLE_NEON)
-        MI_S32 width_align8 = width & (-8);
+        DT_S32 width_align8 = width & (-8);
         int16x8_t vqs16_src;
         float32x4_t vqf32_src[2];
         int32x4_t vqs32_src[2];
@@ -542,11 +542,11 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
         neon::vdup(vqf32_scale, scale);
 #endif
 
-        for (MI_S32 y = 0; y < height; y++)
+        for (DT_S32 y = 0; y < height; y++)
         {
-            src_row = src.Ptr<MI_S16>(y);
-            dst_row = dst.Ptr<MI_F32>(y);
-            MI_S32 x = 0;
+            src_row = src.Ptr<DT_S16>(y);
+            dst_row = dst.Ptr<DT_F32>(y);
+            DT_S32 x = 0;
 
 #if defined(AURA_ENABLE_NEON)
             for (; x < width_align8; x += 8)
@@ -558,8 +558,8 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
                 vqs32_src[0] = neon::vsub(vqs32_src[0], vqs32_zp);
                 vqs32_src[1] = neon::vsub(vqs32_src[1], vqs32_zp);
 
-                vqf32_src[0] = neon::vcvt<MI_F32>(vqs32_src[0]);
-                vqf32_src[1] = neon::vcvt<MI_F32>(vqs32_src[1]);
+                vqf32_src[0] = neon::vcvt<DT_F32>(vqs32_src[0]);
+                vqf32_src[1] = neon::vcvt<DT_F32>(vqs32_src[1]);
 
                 vqf32_src[0] = neon::vmul(vqf32_src[0], vqf32_scale);
                 vqf32_src[1] = neon::vmul(vqf32_src[1], vqf32_scale);
@@ -570,7 +570,7 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
 #endif
             for (; x < width; x++)
             {
-                dst_row[x] = static_cast<MI_F32>((src_row[x] - zp) * scale);
+                dst_row[x] = static_cast<DT_F32>((src_row[x] - zp) * scale);
             }
         }
     }
@@ -583,7 +583,7 @@ Status NNDeQuantize(Context *ctx, const Mat &src, Mat &dst, MI_S32 zero_point, M
     return Status::OK;
 }
 
-std::vector<std::string> NNSplit(const std::string &src, MI_CHAR separator)
+std::vector<std::string> NNSplit(const std::string &src, DT_CHAR separator)
 {
     std::vector<std::string> result;
     std::string value;

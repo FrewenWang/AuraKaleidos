@@ -5,7 +5,7 @@
 namespace aura
 {
 
-template <typename Tp = AURA_VOID>
+template <typename Tp = DT_VOID>
 struct BinaryMinNeonFunctor
 {
     using VType = typename neon::QVector<Tp>::VType;
@@ -20,7 +20,7 @@ struct BinaryMinNeonFunctor
     }
 };
 
-template <typename Tp = AURA_VOID>
+template <typename Tp = DT_VOID>
 struct BinaryMaxNeonFunctor
 {
     using VType = typename neon::QVector<Tp>::VType;
@@ -36,23 +36,23 @@ struct BinaryMaxNeonFunctor
 };
 
 template <typename Tp, typename Functor>
-static Status BinaryNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, MI_S32 y_start, MI_S32 y_end)
+static Status BinaryNeonImpl(const Mat &src0, const Mat &src1, Mat &dst, DT_S32 y_start, DT_S32 y_end)
 {
     using VType = typename neon::QVector<Tp>::VType;
-    constexpr MI_S32 VEC_SIZE = 16 / sizeof(Tp);
+    constexpr DT_S32 VEC_SIZE = 16 / sizeof(Tp);
 
-    const MI_S32 width   = src0.GetSizes().m_width;
-    const MI_S32 channel = src0.GetSizes().m_channel;
-    const MI_S32 num_per_row = width * channel;
-    const MI_S32 w_align = num_per_row & (-VEC_SIZE);
+    const DT_S32 width   = src0.GetSizes().m_width;
+    const DT_S32 channel = src0.GetSizes().m_channel;
+    const DT_S32 num_per_row = width * channel;
+    const DT_S32 w_align = num_per_row & (-VEC_SIZE);
 
-    for (MI_S32 y = y_start; y < y_end; y++)
+    for (DT_S32 y = y_start; y < y_end; y++)
     {
         const Tp *src0_row = src0.Ptr<Tp>(y);
         const Tp *src1_row = src1.Ptr<Tp>(y);
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < w_align; x += VEC_SIZE)
         {
             VType vq0    = neon::vload1q(src0_row + x);
@@ -75,7 +75,7 @@ static Status BinaryNeonHelper(Context *ctx, const Mat &src0, const Mat &src1, M
 {
     AURA_UNUSED(target);
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -83,7 +83,7 @@ static Status BinaryNeonHelper(Context *ctx, const Mat &src0, const Mat &src1, M
 
     Status ret = Status::ERROR;
 
-    const MI_S32 height = src0.GetSizes().m_height;
+    const DT_S32 height = src0.GetSizes().m_height;
 
     ret = wp->ParallelFor(0, height, BinaryNeonImpl<Tp, Functor>, std::cref(src0),
                           std::cref(src1), std::ref(dst));
@@ -165,55 +165,55 @@ Status BinaryNeon::Run()
     {
         case ElemType::U8:
         {
-            ret = BinaryNeonHelper<MI_U8>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNeonHelper<DT_U8>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<DT_U8> failed.");
             }
             break;
         }
         case ElemType::S8:
         {
-            ret = BinaryNeonHelper<MI_S8>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNeonHelper<DT_S8>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<MI_S8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<DT_S8> failed.");
             }
             break;
         }
         case ElemType::U16:
         {
-            ret = BinaryNeonHelper<MI_U16>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNeonHelper<DT_U16>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<DT_U16> failed.");
             }
             break;
         }
         case ElemType::S16:
         {
-            ret = BinaryNeonHelper<MI_S16>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNeonHelper<DT_S16>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<MI_S16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<DT_S16> failed.");
             }
             break;
         }
         case ElemType::U32:
         {
-            ret = BinaryNeonHelper<MI_U32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNeonHelper<DT_U32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<MI_U32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<DT_U32> failed.");
             }
             break;
         }
         case ElemType::S32:
         {
-            ret = BinaryNeonHelper<MI_S32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNeonHelper<DT_S32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<MI_S32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<DT_S32> failed.");
             }
             break;
         }
@@ -230,10 +230,10 @@ Status BinaryNeon::Run()
 #endif
         case ElemType::F32:
         {
-            ret = BinaryNeonHelper<MI_F32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNeonHelper<DT_F32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<MI_F32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNeonHelper<DT_F32> failed.");
             }
             break;
         }

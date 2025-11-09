@@ -30,10 +30,10 @@ namespace aura
  * @param max_iters The maximum number of iterations, default is 2000.
  * @param confidence Confidence level, between 0 and 1, default is 0.995.
  *
- * @return The homography matrix(3x3, MI_F64). If the function fails, an empty matrix will be returned.
+ * @return The homography matrix(3x3, DT_F64). If the function fails, an empty matrix will be returned.
  */
 AURA_EXPORTS Mat FindHomography(Context *ctx, const std::vector<Point2> &src_points, const std::vector<Point2> &dst_points,
-                                MI_F64 reproj_threshold = 3.0, MI_S32 max_iters = 2000, MI_F64 confidence = 0.995);
+                                DT_F64 reproj_threshold = 3.0, DT_S32 max_iters = 2000, DT_F64 confidence = 0.995);
 
 /**
  * @}

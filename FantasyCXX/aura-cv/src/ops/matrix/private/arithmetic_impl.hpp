@@ -24,7 +24,7 @@ namespace aura
  *  S32    S32    S32    S32    S32
  */
 
-template <typename Tp, ArithmOpType TYPE, typename Tp1 = AURA_VOID>
+template <typename Tp, ArithmOpType TYPE, typename Tp1 = DT_VOID>
 struct ArithmIntegerTraits
 {
     using WType = typename Promote<Tp>::Type;
@@ -39,13 +39,13 @@ struct ArithmIntegerTraits<Tp, ArithmOpType::ADD, typename std::enable_if<(4 == 
 template <typename Tp>
 struct ArithmIntegerTraits<Tp, ArithmOpType::SUB, typename std::enable_if<(1 == sizeof(Tp))>::type>
 {
-    using WType = MI_S16;
+    using WType = DT_S16;
 };
 
 template <typename Tp>
 struct ArithmIntegerTraits<Tp, ArithmOpType::SUB, typename std::enable_if<(2 <= sizeof(Tp))>::type>
 {
-    using WType = MI_S32;
+    using WType = DT_S32;
 };
 
 template <typename Tp>
@@ -73,7 +73,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
 
@@ -123,7 +123,7 @@ public:
     static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, ArithmOpType op_type);
 
 private:
-    MI_S32 m_elem_counts;
+    DT_S32 m_elem_counts;
     std::vector<CLKernel> m_cl_kernels;
     CLMem m_cl_src0;
     CLMem m_cl_src1;
@@ -159,7 +159,7 @@ class ScalarDivideImpl : public OpImpl
 public:
     ScalarDivideImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(MI_F32 scalar, const Array *src, Array *dst);
+    virtual Status SetArgs(DT_F32 scalar, const Array *src, Array *dst);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -167,12 +167,12 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src;
     Array       *m_dst;
-    MI_F32       m_scalar;
+    DT_F32       m_scalar;
 };
 
 class ScalarDivideNone : public ScalarDivideImpl
@@ -180,7 +180,7 @@ class ScalarDivideNone : public ScalarDivideImpl
 public:
     ScalarDivideNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(MI_F32 scalar, const Array *src, Array *dst) override;
+    Status SetArgs(DT_F32 scalar, const Array *src, Array *dst) override;
 
     Status Run() override;
 
@@ -192,7 +192,7 @@ class ScalarDivideNeon : public ScalarDivideImpl
 public:
     ScalarDivideNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(MI_F32 scalar, const Array *src, Array *dst) override;
+    Status SetArgs(DT_F32 scalar, const Array *src, Array *dst) override;
 
     Status Run() override;
 };

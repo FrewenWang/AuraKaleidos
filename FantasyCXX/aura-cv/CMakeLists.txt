@@ -1,5 +1,7 @@
 # min cmake version
 cmake_minimum_required(VERSION 3.13)
+# project
+project(aura_cv)
 
 set(CMAKE_SYSTEM_NAME "Mac")
 
@@ -40,8 +42,6 @@ if(NOT AURA_VERSION)
     set(AURA_VERSION 1.0.0)
 endif()
 
-# project
-project(aura)
 
 # set c++ standard
 # CMake如何指定C++11标准的基础教程
@@ -63,7 +63,7 @@ set(CMAKE_BUILD_TYPE "release")
 # set lib name
 set(AURA_LIB_NAME "aura_cv")
 
-# target
+# 设置 target 的 编译配置
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(AURA_BUILD_WIN ON)
     set(AURA_BUILD_HOST ON)

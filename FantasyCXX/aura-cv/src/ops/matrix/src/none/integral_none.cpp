@@ -8,21 +8,21 @@ namespace aura
 
 template <typename Tp, typename SumType>
 static Status IntegralBlockNoneImpl(const Mat &src, Mat &dst,
-                                    MI_S32 block_h, MI_S32 block_w,
-                                    MI_S32 idx_h,   MI_S32 idx_w)
+                                    DT_S32 block_h, DT_S32 block_w,
+                                    DT_S32 idx_h,   DT_S32 idx_w)
 {
-    const MI_S32 height  = src.GetSizes().m_height;
-    const MI_S32 width   = src.GetSizes().m_width;
-    const MI_S32 channel = src.GetSizes().m_channel;
+    const DT_S32 height  = src.GetSizes().m_height;
+    const DT_S32 width   = src.GetSizes().m_width;
+    const DT_S32 channel = src.GetSizes().m_channel;
 
-    const MI_S32 start_row = idx_h * block_h + 1;
-    const MI_S32 start_col = idx_w * block_w;
-    MI_S32 end_row = Min(start_row + block_h, height);
-    MI_S32 end_col = Min(start_col + block_w, width);
+    const DT_S32 start_row = idx_h * block_h + 1;
+    const DT_S32 start_col = idx_w * block_w;
+    DT_S32 end_row = Min(start_row + block_h, height);
+    DT_S32 end_col = Min(start_col + block_w, width);
 
     std::vector<SumType> sum_left(channel);
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         const Tp  *src_c = src.Ptr<Tp>(y);
 
@@ -31,23 +31,23 @@ static Status IntegralBlockNoneImpl(const Mat &src, Mat &dst,
 
         if (0 == start_col)
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 sum_left[ch] = 0;
             }
         }
         else
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 sum_left[ch] = dst_c[(start_col - 1) * channel + ch] -
                                dst_p[(start_col - 1) * channel + ch];
             }
         }
 
-        for (MI_S32 x = start_col; x < end_col; ++x)
+        for (DT_S32 x = start_col; x < end_col; ++x)
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 sum_left[ch] += src_c[x * channel + ch];
                 dst_c[x * channel + ch] = dst_p[x * channel + ch] + sum_left[ch];
@@ -60,21 +60,21 @@ static Status IntegralBlockNoneImpl(const Mat &src, Mat &dst,
 
 template <typename Tp, typename SqSumType>
 static Status IntegralSqBlockNoneImpl(const Mat &src, Mat &sqdst,
-                                      MI_S32 block_h, MI_S32 block_w,
-                                      MI_S32 idx_h,   MI_S32 idx_w)
+                                      DT_S32 block_h, DT_S32 block_w,
+                                      DT_S32 idx_h,   DT_S32 idx_w)
 {
-    const MI_S32 height  = src.GetSizes().m_height;
-    const MI_S32 width   = src.GetSizes().m_width;
-    const MI_S32 channel = src.GetSizes().m_channel;
+    const DT_S32 height  = src.GetSizes().m_height;
+    const DT_S32 width   = src.GetSizes().m_width;
+    const DT_S32 channel = src.GetSizes().m_channel;
 
-    const MI_S32 start_row = idx_h * block_h + 1;
-    const MI_S32 start_col = idx_w * block_w;
-    MI_S32 end_row = Min(start_row + block_h, height);
-    MI_S32 end_col = Min(start_col + block_w, width);
+    const DT_S32 start_row = idx_h * block_h + 1;
+    const DT_S32 start_col = idx_w * block_w;
+    DT_S32 end_row = Min(start_row + block_h, height);
+    DT_S32 end_col = Min(start_col + block_w, width);
 
     std::vector<SqSumType> sqsum_left(channel);
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         const Tp  *src_c = src.Ptr<Tp>(y);
 
@@ -83,23 +83,23 @@ static Status IntegralSqBlockNoneImpl(const Mat &src, Mat &sqdst,
 
         if (0 == start_col)
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 sqsum_left[ch] = 0;
             }
         }
         else
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 sqsum_left[ch] = sqdst_c[(start_col - 1) * channel + ch] -
                                  sqdst_p[(start_col - 1) * channel + ch];
             }
         }
 
-        for (MI_S32 x = start_col; x < end_col; ++x)
+        for (DT_S32 x = start_col; x < end_col; ++x)
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 SqSumType src_val = static_cast<SqSumType>(src_c[x * channel + ch]);
                 sqsum_left[ch] += src_val * src_val;
@@ -117,30 +117,30 @@ static Status IntegralNoneImpl(Context *ctx, const Mat &src, Mat &dst, const OpT
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "Get WorkerPool Failed.");
         return Status::ERROR;
     }
 
-    const MI_S32 height       = src.GetSizes().m_height;
-    const MI_S32 width        = src.GetSizes().m_width;
-    const MI_S32 channel      = src.GetSizes().m_channel;
-    const MI_S32 block_height = 256;
-    const MI_S32 block_width  = 256;
+    const DT_S32 height       = src.GetSizes().m_height;
+    const DT_S32 width        = src.GetSizes().m_width;
+    const DT_S32 channel      = src.GetSizes().m_channel;
+    const DT_S32 block_height = 256;
+    const DT_S32 block_width  = 256;
 
     // first row
     const Tp *src_c = src.Ptr<Tp>(0);
     SumType  *dst_c = dst.Ptr<SumType>(0);
 
-    for (MI_S32 ch = 0; ch < channel; ch++)
+    for (DT_S32 ch = 0; ch < channel; ch++)
     {
         dst_c[ch] = src_c[ch];
     }
 
-    for (MI_S32 x = 1; x < width; x++)
+    for (DT_S32 x = 1; x < width; x++)
     {
-        for (MI_S32 ch = 0; ch < channel; ch++)
+        for (DT_S32 ch = 0; ch < channel; ch++)
         {
             dst_c[x * channel + ch] = dst_c[(x - 1) * channel + ch] + src_c[x * channel + ch];
         }
@@ -166,31 +166,31 @@ static Status IntegralSqNoneImpl(Context *ctx, const Mat &src, Mat &dst_sq, cons
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "Get WorkerPool Failed.");
         return Status::ERROR;
     }
 
-    const MI_S32 height       = src.GetSizes().m_height;
-    const MI_S32 width        = src.GetSizes().m_width;
-    const MI_S32 channel      = src.GetSizes().m_channel;
-    const MI_S32 block_height = 256;
-    const MI_S32 block_width  = 256;
+    const DT_S32 height       = src.GetSizes().m_height;
+    const DT_S32 width        = src.GetSizes().m_width;
+    const DT_S32 channel      = src.GetSizes().m_channel;
+    const DT_S32 block_height = 256;
+    const DT_S32 block_width  = 256;
 
     // first row
     const Tp  *src_c = src.Ptr<Tp>(0);
     SqSumType *dst_c = dst_sq.Ptr<SqSumType>(0);
 
-    for (MI_S32 ch = 0; ch < channel; ch++)
+    for (DT_S32 ch = 0; ch < channel; ch++)
     {
         SqSumType src_val = static_cast<SqSumType>(src_c[ch]);
         dst_c[ch] = src_val * src_val;
     }
 
-    for (MI_S32 x = 1; x < width; x++)
+    for (DT_S32 x = 1; x < width; x++)
     {
-        for (MI_S32 ch = 0; ch < channel; ch++)
+        for (DT_S32 ch = 0; ch < channel; ch++)
         {
             SqSumType src_val = static_cast<SqSumType>(src_c[x * channel + ch]);
             dst_c[x * channel + ch] = dst_c[(x - 1) * channel + ch] + src_val * src_val;
@@ -257,72 +257,72 @@ Status IntegralNone::Run()
         {
             case AURA_MAKE_PATTERN(ElemType::U8, ElemType::U32):
             {
-                ret = IntegralNoneImpl<MI_U8, MI_U32>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_U8, DT_U32>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::U8, ElemType::F32):
             {
-                ret = IntegralNoneImpl<MI_U8, MI_F32>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_U8, DT_F32>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::U8, ElemType::F64):
             {
-                ret = IntegralNoneImpl<MI_U8, MI_F64>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_U8, DT_F64>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::S8, ElemType::S32):
             {
-                ret = IntegralNoneImpl<MI_S8, MI_S32>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_S8, DT_S32>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::S8, ElemType::F32):
             {
-                ret = IntegralNoneImpl<MI_S8, MI_F32>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_S8, DT_F32>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::S8, ElemType::F64):
             {
-                ret = IntegralNoneImpl<MI_S8, MI_F64>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_S8, DT_F64>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::U16, ElemType::U32):
             {
-                ret = IntegralNoneImpl<MI_U16, MI_U32>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_U16, DT_U32>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::U16, ElemType::F32):
             {
-                ret = IntegralNoneImpl<MI_U16, MI_F32>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_U16, DT_F32>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::U16, ElemType::F64):
             {
-                ret = IntegralNoneImpl<MI_U16, MI_F64>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_U16, DT_F64>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::S16, ElemType::S32):
             {
-                ret = IntegralNoneImpl<MI_S16, MI_S32>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_S16, DT_S32>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::S16, ElemType::F32):
             {
-                ret = IntegralNoneImpl<MI_S16, MI_F32>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_S16, DT_F32>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::S16, ElemType::F64):
             {
-                ret = IntegralNoneImpl<MI_S16, MI_F64>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_S16, DT_F64>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::F32, ElemType::F32):
             {
-                ret = IntegralNoneImpl<MI_F32, MI_F32>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_F32, DT_F32>(m_ctx, *src, *dst, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::F32, ElemType::F64):
             {
-                ret = IntegralNoneImpl<MI_F32, MI_F64>(m_ctx, *src, *dst, m_target);
+                ret = IntegralNoneImpl<DT_F32, DT_F64>(m_ctx, *src, *dst, m_target);
                 break;
             }
             default:
@@ -339,38 +339,38 @@ Status IntegralNone::Run()
         {
             case AURA_MAKE_PATTERN(ElemType::U8, ElemType::F64):
             {
-                ret = IntegralSqNoneImpl<MI_U8, MI_F64>(m_ctx, *src, *dst_sq, m_target);
+                ret = IntegralSqNoneImpl<DT_U8, DT_F64>(m_ctx, *src, *dst_sq, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::U8, ElemType::U32):
             {
-                ret = IntegralSqNoneImpl<MI_U8, MI_U32>(m_ctx, *src, *dst_sq, m_target);
+                ret = IntegralSqNoneImpl<DT_U8, DT_U32>(m_ctx, *src, *dst_sq, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::S8, ElemType::F64):
             {
-                ret = IntegralSqNoneImpl<MI_S8, MI_F64>(m_ctx, *src, *dst_sq, m_target);
+                ret = IntegralSqNoneImpl<DT_S8, DT_F64>(m_ctx, *src, *dst_sq, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::S8, ElemType::U32):
             {
-                // MI_S32 is not an error, here is for src data conversion, result is exactly the same as MI_U32
-                ret = IntegralSqNoneImpl<MI_S8, MI_S32>(m_ctx, *src, *dst_sq, m_target);
+                // DT_S32 is not an error, here is for src data conversion, result is exactly the same as DT_U32
+                ret = IntegralSqNoneImpl<DT_S8, DT_S32>(m_ctx, *src, *dst_sq, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::U16, ElemType::F64):
             {
-                ret = IntegralSqNoneImpl<MI_U16, MI_F64>(m_ctx, *src, *dst_sq, m_target);
+                ret = IntegralSqNoneImpl<DT_U16, DT_F64>(m_ctx, *src, *dst_sq, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::S16, ElemType::F64):
             {
-                ret = IntegralSqNoneImpl<MI_S16, MI_F64>(m_ctx, *src, *dst_sq, m_target);
+                ret = IntegralSqNoneImpl<DT_S16, DT_F64>(m_ctx, *src, *dst_sq, m_target);
                 break;
             }
             case AURA_MAKE_PATTERN(ElemType::F32, ElemType::F64):
             {
-                ret = IntegralSqNoneImpl<MI_F32, MI_F64>(m_ctx, *src, *dst_sq, m_target);
+                ret = IntegralSqNoneImpl<DT_F32, DT_F64>(m_ctx, *src, *dst_sq, m_target);
                 break;
             }
             default:

@@ -12,42 +12,42 @@ namespace aura
 template<typename Tp>
 struct GuideFilterTraits
 {
-    using SumType     = MI_F32;
-    using SqSumType   = MI_F32;
+    using SumType     = DT_F32;
+    using SqSumType   = DT_F32;
 };
 
 template<>
-struct GuideFilterTraits<MI_U8>
+struct GuideFilterTraits<DT_U8>
 {
-    using SumType   = MI_U32;
-    using SqSumType = MI_U32;
+    using SumType   = DT_U32;
+    using SqSumType = DT_U32;
 };
 
 template<>
-struct GuideFilterTraits<MI_S8>
+struct GuideFilterTraits<DT_S8>
 {
-    using SumType   = MI_S32;
-    using SqSumType = MI_S32;
+    using SumType   = DT_S32;
+    using SqSumType = DT_S32;
 };
 
 template<>
-struct GuideFilterTraits<MI_U16>
+struct GuideFilterTraits<DT_U16>
 {
-    using SumType   = MI_U32;
-    using SqSumType = MI_U64;
+    using SumType   = DT_U32;
+    using SqSumType = DT_U64;
 };
 
 template<>
-struct GuideFilterTraits<MI_S16>
+struct GuideFilterTraits<DT_S16>
 {
-    using SumType   = MI_S32;
-    using SqSumType = MI_S64;
+    using SumType   = DT_S32;
+    using SqSumType = DT_S64;
 };
 
 template <typename Tp>
 static Status GuideFilterCalcABNoneImpl(Context *ctx, const Mat &src_a, const Mat &src_b, Mat &dst_a, Mat &dst_b,
                                         ThreadBuffer &thread_buffer_a, ThreadBuffer &thread_buffer_b, ThreadBuffer &thread_buffer_asq,
-                                        ThreadBuffer &thread_buffer_bsq, MI_S32 ksize, MI_F32 eps, MI_S32 start_row, MI_S32 end_row)
+                                        ThreadBuffer &thread_buffer_bsq, DT_S32 ksize, DT_F32 eps, DT_S32 start_row, DT_S32 end_row)
 {
     Status ret = Status::ERROR;
 
@@ -56,15 +56,15 @@ static Status GuideFilterCalcABNoneImpl(Context *ctx, const Mat &src_a, const Ma
 
     const Sizes3 isizes  = src_a.GetSizes();
     const Sizes3 osizes  = dst_a.GetSizes();
-    const MI_S32 iwidth  = isizes.m_width;
-    const MI_S32 owidth  = osizes.m_width;
-    const MI_S32 channel = isizes.m_channel;
-    MI_S32 ksh = ksize >> 1;
-    MI_S32 ksq = ksize * ksize;
+    const DT_S32 iwidth  = isizes.m_width;
+    const DT_S32 owidth  = osizes.m_width;
+    const DT_S32 channel = isizes.m_channel;
+    DT_S32 ksh = ksize >> 1;
+    DT_S32 ksq = ksize * ksize;
 
     std::vector<const Tp*> src_rows_a(ksize);
     std::vector<const Tp*> src_rows_b(ksize);
-    for (MI_S32 k = 0; k < ksize; k++)
+    for (DT_S32 k = 0; k < ksize; k++)
     {
         src_rows_a[k] = src_a.Ptr<Tp>(start_row + k);
         src_rows_b[k] = src_b.Ptr<Tp>(start_row + k);
@@ -75,26 +75,26 @@ static Status GuideFilterCalcABNoneImpl(Context *ctx, const Mat &src_a, const Ma
     SqSumType *sqsum_aa_row = thread_buffer_asq.GetThreadData<SqSumType>();
     SqSumType *sqsum_ab_row = thread_buffer_bsq.GetThreadData<SqSumType>();
 
-    if (MI_NULL == sum_a_row || MI_NULL == sum_b_row || MI_NULL == sqsum_aa_row || MI_NULL == sqsum_ab_row)
+    if (DT_NULL == sum_a_row || DT_NULL == sum_b_row || DT_NULL == sqsum_aa_row || DT_NULL == sqsum_ab_row)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM failed");
         goto EXIT;
     }
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         // calc vertical sum (iwidth = owidth + ksize/2 * 2)
-        for (MI_S32 x = 0; x < iwidth; x++)
+        for (DT_S32 x = 0; x < iwidth; x++)
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 SumType   sum_a    = 0;
                 SumType   sum_b    = 0;
                 SqSumType sqsum_aa = 0;
                 SqSumType sqsum_ab = 0;
 
-                MI_S32 index = x * channel + ch;
-                for (MI_S32 k = 0; k < ksh; k++)
+                DT_S32 index = x * channel + ch;
+                for (DT_S32 k = 0; k < ksh; k++)
                 {
                     Tp a_top = src_rows_a[k][index];
                     Tp b_top = src_rows_b[k][index];
@@ -121,20 +121,20 @@ static Status GuideFilterCalcABNoneImpl(Context *ctx, const Mat &src_a, const Ma
             }
         }
 
-        MI_F32 *dst_row_a = dst_a.Ptr<MI_F32>(y);
-        MI_F32 *dst_row_b = dst_b.Ptr<MI_F32>(y);
+        DT_F32 *dst_row_a = dst_a.Ptr<DT_F32>(y);
+        DT_F32 *dst_row_b = dst_b.Ptr<DT_F32>(y);
 
         // calc horizontal sum
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 SumType   sum_kernel_a    = 0;
                 SumType   sum_kernel_b    = 0;
                 SqSumType sqsum_kernel_aa = 0;
                 SqSumType sqsum_kernel_ab = 0;
 
-                for (MI_S32 k = 0; k < ksh; k++)
+                for (DT_S32 k = 0; k < ksh; k++)
                 {
                     sum_kernel_a    += (   sum_a_row[(x + k) * channel + ch] +    sum_a_row[(x + ksize - k - 1) * channel + ch]);
                     sum_kernel_b    += (   sum_b_row[(x + k) * channel + ch] +    sum_b_row[(x + ksize - k - 1) * channel + ch]);
@@ -146,18 +146,18 @@ static Status GuideFilterCalcABNoneImpl(Context *ctx, const Mat &src_a, const Ma
                 sqsum_kernel_aa += sqsum_aa_row[(x + ksh) * channel + ch];
                 sqsum_kernel_ab += sqsum_ab_row[(x + ksh) * channel + ch];
 
-                MI_F32 mean_i  = static_cast<MI_F32>(sum_kernel_a) / ksq;
-                MI_F32 mean_p  = static_cast<MI_F32>(sum_kernel_b) / ksq;
-                MI_F32 var     = static_cast<MI_F32>(sqsum_kernel_aa) / ksq - mean_i * mean_i;
-                MI_F32 cov     = static_cast<MI_F32>(sqsum_kernel_ab) / ksq - mean_i * mean_p;
-                MI_F32 var_eps = (Abs(var + eps) < GUIDE_FILTER_EPS) ? GUIDE_FILTER_EPS : (var + eps);
+                DT_F32 mean_i  = static_cast<DT_F32>(sum_kernel_a) / ksq;
+                DT_F32 mean_p  = static_cast<DT_F32>(sum_kernel_b) / ksq;
+                DT_F32 var     = static_cast<DT_F32>(sqsum_kernel_aa) / ksq - mean_i * mean_i;
+                DT_F32 cov     = static_cast<DT_F32>(sqsum_kernel_ab) / ksq - mean_i * mean_p;
+                DT_F32 var_eps = (Abs(var + eps) < GUIDE_FILTER_EPS) ? GUIDE_FILTER_EPS : (var + eps);
 
                 dst_row_a[x * channel + ch] = cov / var_eps;
                 dst_row_b[x * channel + ch] = mean_p - mean_i * dst_row_a[x * channel + ch];
             }
         }
 
-        for (MI_S32 i = 0; i < ksize - 1; i++)
+        for (DT_S32 i = 0; i < ksize - 1; i++)
         {
             src_rows_a[i] = src_rows_a[i + 1];
             src_rows_b[i] = src_rows_b[i + 1];
@@ -175,21 +175,21 @@ EXIT:
 }
 
 template <typename Tp>
-static Status GuideFilterLinearTransImpl(const Mat &src, const Mat &mean_a, const Mat &mean_b, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status GuideFilterLinearTransImpl(const Mat &src, const Mat &mean_a, const Mat &mean_b, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     const Sizes3 sz = mean_a.GetSizes();
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         const Tp     *src_row    = src.Ptr<Tp>(y);
-        const MI_F32 *mean_a_row = mean_a.Ptr<MI_F32>(y);
-        const MI_F32 *mean_b_row = mean_b.Ptr<MI_F32>(y);
+        const DT_F32 *mean_a_row = mean_a.Ptr<DT_F32>(y);
+        const DT_F32 *mean_b_row = mean_b.Ptr<DT_F32>(y);
 
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < sz.m_width * sz.m_channel; ++x)
+        for (DT_S32 x = 0; x < sz.m_width * sz.m_channel; ++x)
         {
-            dst_row[x] = SaturateCast<Tp>(static_cast<MI_F32>(src_row[x]) * mean_a_row[x] + mean_b_row[x]);
+            dst_row[x] = SaturateCast<Tp>(static_cast<DT_F32>(src_row[x]) * mean_a_row[x] + mean_b_row[x]);
         }
     }
 
@@ -198,7 +198,7 @@ static Status GuideFilterLinearTransImpl(const Mat &src, const Mat &mean_a, cons
 
 template <typename Tp>
 static Status GuideFilteNormalNoneImpl(Context *ctx, const Mat &src0, const Mat &border_src0, const Mat &border_src1, Mat &dst,
-                                       MI_S32 ksize, MI_F32 eps, BorderType border_type, const Scalar &border_value, OpTarget &target)
+                                       DT_S32 ksize, DT_F32 eps, BorderType border_type, const Scalar &border_value, OpTarget &target)
 {
     Status ret = Status::ERROR;
 
@@ -212,17 +212,17 @@ static Status GuideFilteNormalNoneImpl(Context *ctx, const Mat &src0, const Mat 
 
     using SumType   = typename GuideFilterTraits<Tp>::SumType;
     using SqSumType = typename GuideFilterTraits<Tp>::SqSumType;
-    MI_S32 iwidth   = border_src0.GetSizes().m_width;
-    MI_S32 ichannel = border_src0.GetSizes().m_channel;
+    DT_S32 iwidth   = border_src0.GetSizes().m_width;
+    DT_S32 ichannel = border_src0.GetSizes().m_channel;
 
-    MI_S32 ab_buffer_size = iwidth * ichannel * sizeof(SumType);
-    MI_S32 sq_buffer_size = iwidth * ichannel * sizeof(SqSumType);
+    DT_S32 ab_buffer_size = iwidth * ichannel * sizeof(SumType);
+    DT_S32 sq_buffer_size = iwidth * ichannel * sizeof(SqSumType);
 
-    WorkerPool *wp = MI_NULL;
+    WorkerPool *wp = DT_NULL;
     if (target.m_data.none.enable_mt)
     {
         wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
             return Status::ERROR;
@@ -233,7 +233,7 @@ static Status GuideFilteNormalNoneImpl(Context *ctx, const Mat &src0, const Mat 
         ThreadBuffer thread_buffer_asq(ctx, sq_buffer_size);
         ThreadBuffer thread_buffer_bsq(ctx, sq_buffer_size);
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), a.GetSizes().m_height, GuideFilterCalcABNoneImpl<Tp>, ctx, std::cref(border_src0), std::cref(border_src1),
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), a.GetSizes().m_height, GuideFilterCalcABNoneImpl<Tp>, ctx, std::cref(border_src0), std::cref(border_src1),
                               std::ref(a), std::ref(b), std::ref(thread_buffer_a), std::ref(thread_buffer_b), std::ref(thread_buffer_asq),
                               std::ref(thread_buffer_bsq), ksize, eps);
     }
@@ -272,13 +272,13 @@ static Status GuideFilteNormalNoneImpl(Context *ctx, const Mat &src0, const Mat 
 
     if (target.m_data.none.enable_mt)
     {
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
             return Status::ERROR;
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), mean_a.GetSizes().m_height, GuideFilterLinearTransImpl<Tp>,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), mean_a.GetSizes().m_height, GuideFilterLinearTransImpl<Tp>,
                               std::cref(src0), std::cref(mean_a), std::cref(mean_b), std::ref(dst));
     }
     else
@@ -297,11 +297,11 @@ static Status GuideFilteNormalNoneImpl(Context *ctx, const Mat &src0, const Mat 
 
 template <typename Tp>
 static Status GuideFilterFastNoneImpl(Context *ctx, const Mat &src0, Mat &sub_src0, Mat &border_src0, Mat &border_src1, Mat &dst,
-                                      MI_S32 ksize, MI_F32 eps, BorderType border_type, const Scalar &border_value, OpTarget &target)
+                                      DT_S32 ksize, DT_F32 eps, BorderType border_type, const Scalar &border_value, OpTarget &target)
 {
     Status ret = Status::ERROR;
 
-    MI_S32 ksize_fast = GetFastKsize(ksize);
+    DT_S32 ksize_fast = GetFastKsize(ksize);
 
     Mat sub_a = Mat(ctx, ElemType::F32, sub_src0.GetSizes());
     Mat sub_b = Mat(ctx, ElemType::F32, sub_src0.GetSizes());
@@ -313,17 +313,17 @@ static Status GuideFilterFastNoneImpl(Context *ctx, const Mat &src0, Mat &sub_sr
 
     using SumType   = typename GuideFilterTraits<Tp>::SumType;
     using SqSumType = typename GuideFilterTraits<Tp>::SqSumType;
-    MI_S32 iwidth   = border_src0.GetSizes().m_width;
-    MI_S32 ichannel = border_src0.GetSizes().m_channel;
+    DT_S32 iwidth   = border_src0.GetSizes().m_width;
+    DT_S32 ichannel = border_src0.GetSizes().m_channel;
 
-    MI_S32 ab_buffer_size = iwidth * ichannel * sizeof(SumType);
-    MI_S32 sq_buffer_size = iwidth * ichannel * sizeof(SqSumType);
+    DT_S32 ab_buffer_size = iwidth * ichannel * sizeof(SumType);
+    DT_S32 sq_buffer_size = iwidth * ichannel * sizeof(SqSumType);
 
-    WorkerPool *wp = MI_NULL;
+    WorkerPool *wp = DT_NULL;
     if (target.m_data.none.enable_mt)
     {
         wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
             return Status::ERROR;
@@ -334,7 +334,7 @@ static Status GuideFilterFastNoneImpl(Context *ctx, const Mat &src0, Mat &sub_sr
         ThreadBuffer thread_buffer_asq(ctx, sq_buffer_size);
         ThreadBuffer thread_buffer_bsq(ctx, sq_buffer_size);
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), sub_a.GetSizes().m_height, GuideFilterCalcABNoneImpl<Tp>, ctx, std::cref(border_src0), std::cref(border_src1),
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), sub_a.GetSizes().m_height, GuideFilterCalcABNoneImpl<Tp>, ctx, std::cref(border_src0), std::cref(border_src1),
                               std::ref(sub_a), std::ref(sub_b), std::ref(thread_buffer_a), std::ref(thread_buffer_b), std::ref(thread_buffer_asq),
                               std::ref(thread_buffer_bsq), ksize_fast, eps);
     }
@@ -389,13 +389,13 @@ static Status GuideFilterFastNoneImpl(Context *ctx, const Mat &src0, Mat &sub_sr
 
     if (target.m_data.none.enable_mt)
     {
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
             return Status::ERROR;
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), mean_a.GetSizes().m_height, GuideFilterLinearTransImpl<Tp>,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), mean_a.GetSizes().m_height, GuideFilterLinearTransImpl<Tp>,
                               std::cref(src0), std::cref(mean_a), std::cref(mean_b), std::ref(dst));
     }
     else
@@ -415,7 +415,7 @@ static Status GuideFilterFastNoneImpl(Context *ctx, const Mat &src0, Mat &sub_sr
 GuideFilterNone::GuideFilterNone(Context *ctx, const OpTarget &target) : GuideFilterImpl(ctx, target)
 {}
 
-Status GuideFilterNone::SetArgs(const Array *src0, const Array *src1, Array *dst, MI_S32 ksize, MI_F32 eps,
+Status GuideFilterNone::SetArgs(const Array *src0, const Array *src1, Array *dst, DT_S32 ksize, DT_F32 eps,
                                 GuideFilterType type, BorderType border_type, const Scalar &border_value)
 {
     if (GuideFilterImpl::SetArgs(src0, src1, dst, ksize, eps, type, border_type, border_value) != Status::OK)
@@ -445,14 +445,14 @@ Status GuideFilterNone::Initialize()
     Sizes3 border_sizes;
     if (GuideFilterType::FAST == m_type)
     {
-        MI_S32 radius = GetFastKsize(m_ksize) >> 1;
+        DT_S32 radius = GetFastKsize(m_ksize) >> 1;
         border_sizes  = {(m_src0->GetSizes().m_height >> 1) + (radius << 1),
                          (m_src0->GetSizes().m_width  >> 1) + (radius << 1),
                           m_src0->GetSizes().m_channel};
     }
     else
     {
-        MI_S32 radius = m_ksize >> 1;
+        DT_S32 radius = m_ksize >> 1;
         border_sizes  = m_src0->GetSizes() + Sizes3(radius << 1, radius << 1, 0);
     }
 
@@ -475,7 +475,7 @@ Status GuideFilterNone::Run()
 
     Status ret = Status::ERROR;
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src0 src1 dst is null");
         return Status::ERROR;
@@ -502,7 +502,7 @@ Status GuideFilterNone::Run()
         }
 
         // Get border mat sizes
-        MI_S32 radius = GetFastKsize(m_ksize) >> 1;
+        DT_S32 radius = GetFastKsize(m_ksize) >> 1;
         if (IMakeBorder(m_ctx, sub_src0, m_src_border0, radius, radius, radius, radius, m_border_type, m_border_value, OpTarget::None()) != Status::OK)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "make border fail..");
@@ -519,25 +519,25 @@ Status GuideFilterNone::Run()
         {
             case ElemType::U8:
             {
-                ret = GuideFilterFastNoneImpl<MI_U8>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilterFastNoneImpl<DT_U8>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                      m_border_type, m_border_value, m_target);
                 break;
             }
             case ElemType::S8:
             {
-                ret = GuideFilterFastNoneImpl<MI_S8>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilterFastNoneImpl<DT_S8>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                      m_border_type, m_border_value, m_target);
                 break;
             }
             case ElemType::U16:
             {
-                ret = GuideFilterFastNoneImpl<MI_U16>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilterFastNoneImpl<DT_U16>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                       m_border_type, m_border_value, m_target);
                 break;
             }
             case ElemType::S16:
             {
-                ret = GuideFilterFastNoneImpl<MI_S16>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilterFastNoneImpl<DT_S16>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                       m_border_type, m_border_value, m_target);
                 break;
             }
@@ -550,7 +550,7 @@ Status GuideFilterNone::Run()
             }
             case ElemType::F32:
             {
-                ret = GuideFilterFastNoneImpl<MI_F32>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilterFastNoneImpl<DT_F32>(m_ctx, *src0, sub_src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                       m_border_type, m_border_value, m_target);
                 break;
             }
@@ -565,7 +565,7 @@ Status GuideFilterNone::Run()
     else // GuideFilterType::NORMAL
     {
         // Get border mat sizes
-        MI_S32 radius = m_ksize >> 1;
+        DT_S32 radius = m_ksize >> 1;
         if (IMakeBorder(m_ctx, *src0, m_src_border0, radius, radius, radius, radius, m_border_type, m_border_value, OpTarget::None()) != Status::OK)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "make border fail..");
@@ -582,25 +582,25 @@ Status GuideFilterNone::Run()
         {
             case ElemType::U8:
             {
-                ret = GuideFilteNormalNoneImpl<MI_U8>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilteNormalNoneImpl<DT_U8>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                       m_border_type, m_border_value, m_target);
                 break;
             }
             case ElemType::S8:
             {
-                ret = GuideFilteNormalNoneImpl<MI_S8>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilteNormalNoneImpl<DT_S8>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                       m_border_type, m_border_value, m_target);
                 break;
             }
             case ElemType::U16:
             {
-                ret = GuideFilteNormalNoneImpl<MI_U16>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilteNormalNoneImpl<DT_U16>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                        m_border_type, m_border_value, m_target);
                 break;
             }
             case ElemType::S16:
             {
-                ret = GuideFilteNormalNoneImpl<MI_S16>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilteNormalNoneImpl<DT_S16>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                        m_border_type, m_border_value, m_target);
                 break;
             }
@@ -613,7 +613,7 @@ Status GuideFilterNone::Run()
             }
             case ElemType::F32:
             {
-                ret = GuideFilteNormalNoneImpl<MI_F32>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
+                ret = GuideFilteNormalNoneImpl<DT_F32>(m_ctx, *src0, m_src_border0, m_src_border1, *dst, m_ksize, m_eps,
                                                        m_border_type, m_border_value, m_target);
                 break;
             }

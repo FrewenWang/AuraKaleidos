@@ -9,7 +9,7 @@ namespace neon
 
 #define DECLFUN(ptype, vtype, prefix, postfix)                                        \
     template <typename T>                                                             \
-    inline typename std::enable_if<std::is_same<T, MI_F32>::value, ptype>::type       \
+    inline typename std::enable_if<std::is_same<T, DT_F32>::value, ptype>::type       \
     vcvt(const vtype &v)                                                              \
     {                                                                                 \
         return prefix##_f32_##postfix(v);                                             \
@@ -39,7 +39,7 @@ DECLFUN(float16x4_t, float32x4_t, vcvt, f32)
 
 #define DECLFUN(ptype, vtype, prefix, postfix)                                        \
     template <typename T>                                                             \
-    inline typename std::enable_if<std::is_same<T, MI_U32>::value, ptype>::type       \
+    inline typename std::enable_if<std::is_same<T, DT_U32>::value, ptype>::type       \
     vcvt(const vtype &v)                                                              \
     {                                                                                 \
         return prefix##_u32_##postfix(v);                                             \
@@ -51,7 +51,7 @@ DECLFUN(uint32x4_t, float32x4_t, vcvtq, f32)
 
 #define DECLFUN(ptype, vtype, prefix, postfix)                                        \
     template <typename T>                                                             \
-    inline typename std::enable_if<std::is_same<T, MI_S32>::value, ptype>::type       \
+    inline typename std::enable_if<std::is_same<T, DT_S32>::value, ptype>::type       \
     vcvt(const vtype &v)                                                              \
     {                                                                                 \
         return prefix##_s32_##postfix(v);                                             \
@@ -81,7 +81,7 @@ inline int32x4_t vcvtnq_s32_f32(float32x4_t v)
 
 #define DECLFUN(ptype, vtype, prefix, postfix)                                        \
     template <typename T>                                                             \
-    inline typename std::enable_if<std::is_same<T, MI_S32>::value, ptype>::type       \
+    inline typename std::enable_if<std::is_same<T, DT_S32>::value, ptype>::type       \
     vcvtn(const vtype &v)                                                             \
     {                                                                                 \
         return prefix##_s32_##postfix(v);                                             \

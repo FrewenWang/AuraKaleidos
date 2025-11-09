@@ -22,11 +22,11 @@ Buffer HtpNNExecutor::ReadMinnFile(const std::string &minn_file)
         return minn_buffer;
     }
 
-    MI_U64 file_length = 0;
+    DT_U64 file_length = 0;
     size_t bytes = 0;
 
     FILE *fp = fopen(minn_file.c_str(), "rb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open model: " + minn_file + " failed";
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -61,7 +61,7 @@ EXIT:
     return minn_buffer;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, TensorDesc>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, TensorDesc>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &tensor_desc)
 {
     Status ret = rpc_param->Get(tensor_desc.elem_type, tensor_desc.sizes, tensor_desc.scale, tensor_desc.zero_point, tensor_desc.graph_id);
@@ -79,7 +79,7 @@ Status HtpNNExecutor::Initialize(const std::string &minn_file, const std::string
         return ret;
     }
 
-    HexagonEngine *engine = MI_NULL;
+    HexagonEngine *engine = DT_NULL;
     HexagonRpcParam rpc_param(m_ctx, 4096);
 
     rpc_param.ResetBuffer();
@@ -91,7 +91,7 @@ Status HtpNNExecutor::Initialize(const std::string &minn_file, const std::string
     }
 
     engine = m_ctx->GetHexagonEngine();
-    if (MI_NULL == engine)
+    if (DT_NULL == engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "GetHexagonEngine failed");
         goto EXIT;
@@ -125,7 +125,7 @@ Status HtpNNExecutor::DeInitialize()
     }
 
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
-    if (MI_NULL == engine)
+    if (DT_NULL == engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "GetHexagonEngine failed");
         return ret;
@@ -151,7 +151,7 @@ EXIT:
     return ret;
 }
 
-MI_U32 HtpNNExecutor::GetDeviceAddr()
+DT_U32 HtpNNExecutor::GetDeviceAddr()
 {
     return m_device_addr;
 }

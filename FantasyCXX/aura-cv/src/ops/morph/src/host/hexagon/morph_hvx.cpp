@@ -7,7 +7,7 @@ namespace aura
 MorphHvx::MorphHvx(Context *ctx, MorphType type, const OpTarget &target) : MorphImpl(ctx, type, target)
 {}
 
-Status MorphHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape, MI_S32 iterations)
+Status MorphHvx::SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape, DT_S32 iterations)
 {
     if (MorphImpl::SetArgs(src, dst, ksize, shape, iterations) != Status::OK)
     {
@@ -33,7 +33,7 @@ Status MorphHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape 
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1 && ch != 2 && ch != 3)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2/3");
@@ -52,7 +52,7 @@ Status MorphHvx::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape 
 
 Status MorphHvx::Initialize()
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -112,7 +112,7 @@ Status MorphHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -133,7 +133,7 @@ Status MorphHvx::Run()
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
     ret = engine->Run(AURA_OPS_MORPH_PACKAGE_NAME, AURA_OPS_MORPH_MORPH_OP_NAME, rpc_param, &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }

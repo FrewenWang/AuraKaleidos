@@ -18,7 +18,7 @@ public:
 
     Status SetArgs(const Array *src0, const Array *src1, const Array *src2, Array *dst)
     {
-        if (MI_NULL == src0 || MI_NULL == src1 || MI_NULL == src2 || MI_NULL == dst)
+        if (DT_NULL == src0 || DT_NULL == src1 || DT_NULL == src2 || DT_NULL == dst)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "nullptr");
             return Status::ERROR;
@@ -48,7 +48,7 @@ public:
     {
         Status ret = Status::OK;
 
-        if (MI_NULL == m_src0 || MI_NULL == m_src1 || MI_NULL == m_src2 || MI_NULL == m_dst)
+        if (DT_NULL == m_src0 || DT_NULL == m_src1 || DT_NULL == m_src2 || DT_NULL == m_dst)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
             return Status::ERROR;
@@ -58,7 +58,7 @@ public:
         Mat *dst_sub1 = m_graph.CreateMat("dst_sub1", m_src0->GetElemType(), m_src0->GetSizes());
         Mat *dst_add  = m_graph.CreateMat("dst_add", m_src0->GetElemType(), m_src0->GetSizes());
 
-        if (MI_NULL == dst_sub0 || MI_NULL == dst_sub1 || MI_NULL == dst_add)
+        if (DT_NULL == dst_sub0 || DT_NULL == dst_sub1 || DT_NULL == dst_add)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
             m_graph.DeleteArray(&dst_sub0, &dst_sub1, &dst_add);
@@ -97,7 +97,7 @@ EXIT:
         return Status::OK;
     }
 
-    AURA_VOID Dump(const std::string &prefix) const override
+    DT_VOID Dump(const std::string &prefix) const override
     {
         JsonWrapper json_wrapper(m_ctx, prefix, m_name);
         std::vector<std::string> names  = {"src0", "src1", "src2", "dst"};
@@ -139,7 +139,7 @@ public:
 
     Status SetArgs(const Array *src0, const Array *src1, const Array *src2, Array *dst)
     {
-        if (MI_NULL == src0 || MI_NULL == src1 || MI_NULL == src2 || MI_NULL == dst)
+        if (DT_NULL == src0 || DT_NULL == src1 || DT_NULL == src2 || DT_NULL == dst)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
             return Status::ERROR;
@@ -153,7 +153,7 @@ public:
         }
 
         AlgoSample0Impl *algo_sample0_impl = dynamic_cast<AlgoSample0Impl*>(m_impl.get());
-        if (MI_NULL == algo_sample0_impl)
+        if (DT_NULL == algo_sample0_impl)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
             return Status::ERROR;
@@ -176,9 +176,9 @@ public:
         m_graph.MakeNode<Function>("add_weighted1", OpTarget::None());
     }
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma)
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma)
     {
-        if (MI_NULL == src || MI_NULL == dst)
+        if (DT_NULL == src || DT_NULL == dst)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "nullptr");
             return Status::ERROR;
@@ -207,7 +207,7 @@ public:
     {
         Status ret = Status::OK;
 
-        if (MI_NULL == m_src || MI_NULL == m_dst)
+        if (DT_NULL == m_src || DT_NULL == m_dst)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
             return Status::ERROR;
@@ -219,15 +219,15 @@ public:
         Mat *dst3 = m_graph.CreateMat("dst3", m_src->GetElemType(), m_src->GetSizes());
         std::vector<const Mat*> add_weighted_srcs = {dst0, dst1};
 
-        if (MI_NULL == dst0 || MI_NULL == dst1 || MI_NULL == dst2 || MI_NULL == dst3)
+        if (DT_NULL == dst0 || DT_NULL == dst1 || DT_NULL == dst2 || DT_NULL == dst3)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
             return Status::ERROR;
         }
 
-        auto func = [&](MI_S32 loop_cnt) -> Status
+        auto func = [&](DT_S32 loop_cnt) -> Status
         {
-            for (MI_S32 i = 0; i < loop_cnt; i++)
+            for (DT_S32 i = 0; i < loop_cnt; i++)
             {
                 ret = m_graph["gaussian_0"].SyncCall<Gaussian>(m_src, dst0, m_ksize, m_sigma);
                 if (ret != Status::OK)
@@ -316,7 +316,7 @@ EXIT:
         return op_string;
     }
 
-    AURA_VOID Dump(const std::string &prefix) const override
+    DT_VOID Dump(const std::string &prefix) const override
     {
         JsonWrapper json_wrapper(m_ctx, prefix, m_name);
         std::vector<std::string> names  = {"src", "dst"};
@@ -342,7 +342,7 @@ EXIT:
     }
 
 private:
-    Status AddWeighted(const std::vector<const Mat*> &srcs, Mat *dst, MI_F32 alpha, MI_F32 beta, MI_F32 gamma)
+    Status AddWeighted(const std::vector<const Mat*> &srcs, Mat *dst, DT_F32 alpha, DT_F32 beta, DT_F32 gamma)
     {
         if (srcs.size() < 2)
         {
@@ -350,20 +350,20 @@ private:
             return Status::ERROR;
         }
 
-        const MI_U8 *src0_data = srcs[0]->Ptr<MI_U8>(0);
-        const MI_U8 *src1_data = srcs[1]->Ptr<MI_U8>(0);
-        MI_U8 *dst_data = dst->Ptr<MI_U8>(0);
+        const DT_U8 *src0_data = srcs[0]->Ptr<DT_U8>(0);
+        const DT_U8 *src1_data = srcs[1]->Ptr<DT_U8>(0);
+        DT_U8 *dst_data = dst->Ptr<DT_U8>(0);
 
-        for (MI_S64 i = 0; i < dst->GetTotalBytes(); i++)
+        for (DT_S64 i = 0; i < dst->GetTotalBytes(); i++)
         {
-            dst_data[i] = SaturateCast<MI_U8>(src0_data[i] * alpha + src1_data[i] * beta + gamma);
+            dst_data[i] = SaturateCast<DT_U8>(src0_data[i] * alpha + src1_data[i] * beta + gamma);
         }
 
         return Status::OK;
     }
 
-    AURA_VOID AddWeightedDump(const std::vector<const Mat*> &srcs, Mat *dst, MI_F64 alpha, MI_F64 beta,
-                            MI_F64 gamma, const std::string &prefix, const std::string &name)
+    DT_VOID AddWeightedDump(const std::vector<const Mat*> &srcs, Mat *dst, DT_F64 alpha, DT_F64 beta,
+                            DT_F64 gamma, const std::string &prefix, const std::string &name)
     {
         JsonWrapper json_wrapper(m_ctx, prefix, name);
 
@@ -387,8 +387,8 @@ private:
 private:
     const Array *m_src;
     Array *m_dst;
-    MI_S32 m_ksize;
-    MI_F32 m_sigma;
+    DT_S32 m_ksize;
+    DT_F32 m_sigma;
 };
 
 class AlgoSample : public Algo
@@ -399,9 +399,9 @@ public:
         m_impl.reset(new AlgoSampleImpl(m_ctx));
     }
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma)
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma)
     {
-        if (MI_NULL == src || MI_NULL == dst)
+        if (DT_NULL == src || DT_NULL == dst)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
             return Status::ERROR;
@@ -414,7 +414,7 @@ public:
         }
 
         AlgoSampleImpl *algo_sample_impl = dynamic_cast<AlgoSampleImpl*>(m_impl.get());
-        if (MI_NULL == algo_sample_impl)
+        if (DT_NULL == algo_sample_impl)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
             return Status::ERROR;
@@ -425,7 +425,7 @@ public:
     }
 };
 
-static AURA_VOID AlgoSampleDeInit(Context *ctx, Graph **graph)
+static DT_VOID AlgoSampleDeInit(Context *ctx, Graph **graph)
 {
     Delete<Graph>(ctx, graph);
 }
@@ -434,7 +434,7 @@ static Graph *AlgoSampleInit(Context *ctx)
 {
     std::unordered_map<std::string, std::vector<std::string>> props;
     Graph *graph = Create<Graph>(ctx, props);
-    if (MI_NULL == graph)
+    if (DT_NULL == graph)
     {
         AURA_LOGE(ctx, AURA_TAG, "nullptr");
     }
@@ -449,7 +449,7 @@ static Graph *AlgoSampleInit(Context *ctx)
     return graph;
 }
 
-static Status AlgoSampleRun(Context *ctx, Graph *graph, const Mat &src, Mat &dst, MI_S32 loop_id)
+static Status AlgoSampleRun(Context *ctx, Graph *graph, const Mat &src, Mat &dst, DT_S32 loop_id)
 {
     Status ret = Status::ERROR;
     MatCmpResult cmp_result;
@@ -489,13 +489,13 @@ NEW_TESTCASE(algos_core_graph_test)
     MatFactory factory(ctx);
 
     Graph *graph = AlgoSampleInit(ctx);
-    if (MI_NULL == graph)
+    if (DT_NULL == graph)
     {
         AURA_LOGE(ctx, AURA_TAG, "graph is null\n");
         goto EXIT;
     }
 
-    for (MI_S32 i = 0; i < 10; i++)
+    for (DT_S32 i = 0; i < 10; i++)
     {
         Mat src = factory.GetRandomMat(0, 255, ElemType::U8, Sizes3(2048, 4096));
         Mat dst(ctx, ElemType::U8, Sizes3(2048, 4096));

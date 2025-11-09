@@ -66,7 +66,7 @@ public:
      * @param elem_type The transpose src/dst array element type.
      * @param ochannel The transpose dst array channel.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 ochannel);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 ochannel);
 };
 
 /**

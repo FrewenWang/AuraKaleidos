@@ -16,9 +16,9 @@ AURA_TEST_PARAM(RotateParam,
                 OpTarget,   target);
 
 #if !defined(AURA_BUILD_XPLORER)
-AURA_INLINE MI_S32 RotateTypeToOpenCV(RotateType type)
+AURA_INLINE DT_S32 RotateTypeToOpenCV(RotateType type)
 {
-    MI_S32 flag;
+    DT_S32 flag;
 
     switch (type)
     {
@@ -73,7 +73,7 @@ public:
     MatrixRotate(Context *ctx, RotateParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         RotateParam run_param(GetParam((index)));
@@ -108,7 +108,7 @@ public:
         result.output = dst_sz.ToString();
 
         // run interface
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
         Status status_exec = Executor(loop_count, 2, time_val, IRotate, m_ctx, src, dst, run_param.rot_type, run_param.target);
 
         if (Status::OK == status_exec)

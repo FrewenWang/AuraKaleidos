@@ -11,54 +11,54 @@ namespace aura
 
 struct FastCorner
 {
-    FastCorner(MI_U16 x, MI_U16 y, MI_U16 score) : x(x), y(y), score(score)
+    FastCorner(DT_U16 x, DT_U16 y, DT_U16 score) : x(x), y(y), score(score)
     {}
 
-    MI_U16 x;
-    MI_U16 y;
-    MI_U16 score;
+    DT_U16 x;
+    DT_U16 y;
+    DT_U16 score;
 };
 
 struct FastParam
 {
-    FastParam(Context *ctx, MI_U32 width, MI_U32 max_num_corners)
+    FastParam(Context *ctx, DT_U32 width, DT_U32 max_num_corners)
     {
         m_ctx = ctx;
 
         do
         {
             // Calculate memory size
-            MI_U32 num_pixels = width - 3;
+            DT_U32 num_pixels = width - 3;
             num_pixels = (num_pixels + 8 * AURA_HVLEN - 1) & (-8 * AURA_HVLEN); // roundup to 8*VLEN
-            MI_U32 num_pixels_32 = num_pixels >> 5;
-            MI_U32 max_num_corners_align128 = (max_num_corners + AURA_HVLEN - 1) & (-AURA_HVLEN);
-            MI_U32 total_mem_u8 = num_pixels_32 * sizeof(MI_U32) + width * sizeof(MI_S16) * 2 +
-                                  width * sizeof(MI_U8) * 3 + max_num_corners_align128 * sizeof(FastCorner);
+            DT_U32 num_pixels_32 = num_pixels >> 5;
+            DT_U32 max_num_corners_align128 = (max_num_corners + AURA_HVLEN - 1) & (-AURA_HVLEN);
+            DT_U32 total_mem_u8 = num_pixels_32 * sizeof(DT_U32) + width * sizeof(DT_S16) * 2 +
+                                  width * sizeof(DT_U8) * 3 + max_num_corners_align128 * sizeof(FastCorner);
 
             //Allocate memory, break on failure
-            data = AURA_ALLOC(ctx, total_mem_u8 * sizeof(MI_U8));
+            data = AURA_ALLOC(ctx, total_mem_u8 * sizeof(DT_U8));
             if (NULL == data)
             {
-                MI_CHAR err_str[64];
+                DT_CHAR err_str[64];
                 snprintf(err_str, sizeof(err_str), "allocation %s byte error", std::to_string(total_mem_u8).c_str());
                 AURA_ADD_ERROR_STRING(ctx, err_str);
                 break;
             }
 
             corners     = (FastCorner *)data;
-            bit_mask    = (MI_U32 *)(corners + max_num_corners_align128);
-            pos_x[0]    = (MI_S16 *)(bit_mask + num_pixels_32);
-            pos_x[1]    = (MI_S16 *)(pos_x[0] + width);
-            score[0]    = (MI_U8 *)(pos_x[1] + width);
-            score[1]    = (MI_U8 *)(score[0] + width);
-            score[2]    = (MI_U8 *)(score[1] + width);
+            bit_mask    = (DT_U32 *)(corners + max_num_corners_align128);
+            pos_x[0]    = (DT_S16 *)(bit_mask + num_pixels_32);
+            pos_x[1]    = (DT_S16 *)(pos_x[0] + width);
+            score[0]    = (DT_U8 *)(pos_x[1] + width);
+            score[1]    = (DT_U8 *)(score[0] + width);
+            score[2]    = (DT_U8 *)(score[1] + width);
 
             // Assignment
-            memset(data, 0, total_mem_u8 * sizeof(MI_U8));
+            memset(data, 0, total_mem_u8 * sizeof(DT_U8));
 
             break;
 
-        } while (MI_TRUE);
+        } while (DT_TRUE);
     }
 
     ~FastParam()
@@ -68,28 +68,28 @@ struct FastParam
     }
 
     Context *m_ctx;
-    MI_S32 num_coarse_p;
-    MI_S32 num_coarse_c;
-    MI_S32 height;
-    MI_S32 width;
-    MI_S32 stride;
-    MI_U32 num_corners;
-    MI_U32 *bit_mask;
-    MI_S16 *pos_x[2];
-    MI_U8 *score[3];
+    DT_S32 num_coarse_p;
+    DT_S32 num_coarse_c;
+    DT_S32 height;
+    DT_S32 width;
+    DT_S32 stride;
+    DT_U32 num_corners;
+    DT_U32 *bit_mask;
+    DT_S16 *pos_x[2];
+    DT_U8 *score[3];
     FastCorner *corners;
 
-    AURA_VOID *data;
+    DT_VOID *data;
 };
 
-AURA_ALWAYS_INLINE MI_U8 CornerScore16(MI_U64 d0_7, MI_U64 d8_15)
+AURA_ALWAYS_INLINE DT_U8 CornerScore16(DT_U64 d0_7, DT_U64 d8_15)
 {
-    MI_U64 q0 = HEXAGON_V64_CREATE_W(Q6_R_vsplatb_R(0), Q6_R_vsplatb_R(0));
+    DT_U64 q0 = HEXAGON_V64_CREATE_W(Q6_R_vsplatb_R(0), Q6_R_vsplatb_R(0));
 
     //k == 0
-    MI_U64 v0k0 = Q6_P_valignb_PPI(d0_7, d8_15, 7);
-    MI_U64 v1k0 = Q6_P_valignb_PPI(d0_7, d8_15, 6);
-    MI_U64 ak0  = Q6_P_vminub_PP(v0k0, v1k0);
+    DT_U64 v0k0 = Q6_P_valignb_PPI(d0_7, d8_15, 7);
+    DT_U64 v1k0 = Q6_P_valignb_PPI(d0_7, d8_15, 6);
+    DT_U64 ak0  = Q6_P_vminub_PP(v0k0, v1k0);
 
     v0k0 = Q6_P_valignb_PPI(d0_7, d8_15, 5);
     ak0  = Q6_P_vminub_PP(ak0, v0k0);
@@ -111,9 +111,9 @@ AURA_ALWAYS_INLINE MI_U8 CornerScore16(MI_U64 d0_7, MI_U64 d8_15)
     v1k0 = Q6_P_valignb_PPI(d8_15, d0_7, 7);
     q0   = Q6_P_vmaxub_PP(q0, Q6_P_vminub_PP(ak0, v1k0));
 
-    MI_U64 v0k8 = v1k0;
-    MI_U64 v1k8 = Q6_P_valignb_PPI(d8_15, d0_7, 6);
-    MI_U64 ak8  = Q6_P_vminub_PP(v0k8, v1k8);
+    DT_U64 v0k8 = v1k0;
+    DT_U64 v1k8 = Q6_P_valignb_PPI(d8_15, d0_7, 6);
+    DT_U64 ak8  = Q6_P_vminub_PP(v0k8, v1k8);
 
     v0k8 = Q6_P_valignb_PPI(d8_15, d0_7, 5);
     ak8  = Q6_P_vminub_PP(ak8, v0k8);
@@ -135,22 +135,22 @@ AURA_ALWAYS_INLINE MI_U8 CornerScore16(MI_U64 d0_7, MI_U64 d8_15)
     v1k8 = Q6_P_valignb_PPI(d0_7, d8_15, 7);
     q0   = Q6_P_vmaxub_PP(q0, Q6_P_vminub_PP(ak8, v1k8));
 
-    MI_U8 score = Max<MI_U8>(HEXAGON_V64_GET_UB0(q0), HEXAGON_V64_GET_UB1(q0));
-    score = Max<MI_U8>(HEXAGON_V64_GET_UB2(q0), score);
-    score = Max<MI_U8>(HEXAGON_V64_GET_UB3(q0), score);
-    score = Max<MI_U8>(HEXAGON_V64_GET_UB4(q0), score);
-    score = Max<MI_U8>(HEXAGON_V64_GET_UB5(q0), score);
-    score = Max<MI_U8>(HEXAGON_V64_GET_UB6(q0), score);
-    score = Max<MI_U8>(HEXAGON_V64_GET_UB7(q0), score);
+    DT_U8 score = Max<DT_U8>(HEXAGON_V64_GET_UB0(q0), HEXAGON_V64_GET_UB1(q0));
+    score = Max<DT_U8>(HEXAGON_V64_GET_UB2(q0), score);
+    score = Max<DT_U8>(HEXAGON_V64_GET_UB3(q0), score);
+    score = Max<DT_U8>(HEXAGON_V64_GET_UB4(q0), score);
+    score = Max<DT_U8>(HEXAGON_V64_GET_UB5(q0), score);
+    score = Max<DT_U8>(HEXAGON_V64_GET_UB6(q0), score);
+    score = Max<DT_U8>(HEXAGON_V64_GET_UB7(q0), score);
 
     return score - 1;
 }
 
-static AURA_VOID Fast9U8DetectCoarse(const MI_U8 *img, MI_U32 iwidth, MI_U32 istride,
-                                   MI_U32 *bitmask, MI_U32 threshold, MI_U32 border)
+static DT_VOID Fast9U8DetectCoarse(const DT_U8 *img, DT_U32 iwidth, DT_U32 istride,
+                                   DT_U32 *bitmask, DT_U32 threshold, DT_U32 border)
 {
-    MI_S32 num, numpixels;
-    MI_U32 idx = 0x80808080;
+    DT_S32 num, numpixels;
+    DT_U32 idx = 0x80808080;
 
     HVX_Vector vu8_pixel00, vu8_pixel04, vu8_pixel08, vu8_pixel12;
     HVX_Vector vu8_pv0, vu8_pv1, vu8_add, vu8_sub, vu8_threshold, vu8_bit_mask;
@@ -168,8 +168,8 @@ static AURA_VOID Fast9U8DetectCoarse(const MI_U8 *img, MI_U32 iwidth, MI_U32 ist
     vu8_mask_ff = Q6_V_vsplat_R(-1);
     vu8_mask_l  = Q6_V_vnot_V(Q6_V_vand_QR(Q6_Q_vsetq_R(border), 0x01010101));
 
-    MI_U32 nb  = (numpixels >> LOG2VLEN) & 7;
-    MI_U32 a   = (numpixels & (8 * AURA_HVLEN - 1)) == 0 ? 0 : ((-1) << nb);
+    DT_U32 nb  = (numpixels >> LOG2VLEN) & 7;
+    DT_U32 a   = (numpixels & (8 * AURA_HVLEN - 1)) == 0 ? 0 : ((-1) << nb);
     vu8_mask_r = Q6_V_vnot_V(Q6_V_vsplat_R(Q6_R_vsplatb_R(a)));
     vu8_mask_r = Q6_V_vandor_VQR(vu8_mask_r, Q6_Q_vsetq_R(numpixels), Q6_R_vsplatb_R(1 << nb));
 
@@ -180,13 +180,13 @@ static AURA_VOID Fast9U8DetectCoarse(const MI_U8 *img, MI_U32 iwidth, MI_U32 ist
 
     num = 8 * AURA_HVLEN;
 
-    for (MI_S32 i = numpixels; i > 0; i -= 8 * AURA_HVLEN)
+    for (DT_S32 i = numpixels; i > 0; i -= 8 * AURA_HVLEN)
     {
         num = (i < num) ? i : num;
 
         vu8_bit_mask = Q6_V_vzero();
 
-        for (MI_S32 j = num; j > 0; j -= AURA_HVLEN)
+        for (DT_S32 j = num; j > 0; j -= AURA_HVLEN)
         {
             vload(vu8_src_p3++, vu8_pixel00);
             vload(vu8_src_n3++, vu8_pixel08);
@@ -224,19 +224,19 @@ static AURA_VOID Fast9U8DetectCoarse(const MI_U8 *img, MI_U32 iwidth, MI_U32 ist
     vstore(vu32_dst, Q6_V_vand_VV(vu32_dst[0], vu8_mask_r));
 }
 
-static MI_U32 Fast9U8DetectFine(const MI_U8 *img, MI_U32 istride, MI_U32 *bitmask,
-                                MI_S16 *x_pos, MI_U8 *score, MI_U32 num_pixels_32, MI_U32 threshold)
+static DT_U32 Fast9U8DetectFine(const DT_U8 *img, DT_U32 istride, DT_U32 *bitmask,
+                                DT_S16 *x_pos, DT_U8 *score, DT_U32 num_pixels_32, DT_U32 threshold)
 {
-    const MI_U8 *p_src = img;
-    MI_S32 num_corners = 0;
-    MI_U32 bit_masks_v32 = 0, pr = 0;
-    MI_U64 pixel_ref = 0, pixel03_12 = 0, pixel11_04 = 0, bright_thr = 0, dark_thr = 0, thresholds = 0;
-    MI_S32 q0 = 0, q1 = 0, q2 = 0, q3 = 0;
-    MI_S32 bitpos = 0, k = 0, m = 0, x = 0;
+    const DT_U8 *p_src = img;
+    DT_S32 num_corners = 0;
+    DT_U32 bit_masks_v32 = 0, pr = 0;
+    DT_U64 pixel_ref = 0, pixel03_12 = 0, pixel11_04 = 0, bright_thr = 0, dark_thr = 0, thresholds = 0;
+    DT_S32 q0 = 0, q1 = 0, q2 = 0, q3 = 0;
+    DT_S32 bitpos = 0, k = 0, m = 0, x = 0;
 
     thresholds = HEXAGON_V64_CREATE_W(Q6_R_vsplatb_R(threshold), Q6_R_vsplatb_R(threshold));
 
-    for (MI_U32 i = 0; i < num_pixels_32; i++)
+    for (DT_U32 i = 0; i < num_pixels_32; i++)
     {
         bit_masks_v32 = *bitmask++;
 
@@ -308,20 +308,20 @@ static MI_U32 Fast9U8DetectFine(const MI_U8 *img, MI_U32 istride, MI_U32 *bitmas
     return num_corners;
 }
 
-static AURA_VOID Fast9U8Row(const MI_U8 *src_row, FastParam *fast_param, MI_U32 max_num_corners,
-                          MI_S32 threshold, MI_BOOL nonmax_suppression, MI_S32 cur_row, MI_S32 start_row)
+static DT_VOID Fast9U8Row(const DT_U8 *src_row, FastParam *fast_param, DT_U32 max_num_corners,
+                          DT_S32 threshold, DT_BOOL nonmax_suppression, DT_S32 cur_row, DT_S32 start_row)
 {
-    MI_S32 pos_x = 0;
-    MI_U8 score  = 0;
-    MI_S32 corners_num = 0, corners_diff = 0;
-    MI_S32 num_fine = 0;
-    MI_S16 *pos_swap_x_ptr = NULL;
-    MI_U8  *score_swap_ptr = NULL;
+    DT_S32 pos_x = 0;
+    DT_U8 score  = 0;
+    DT_S32 corners_num = 0, corners_diff = 0;
+    DT_S32 num_fine = 0;
+    DT_S16 *pos_swap_x_ptr = NULL;
+    DT_U8  *score_swap_ptr = NULL;
 
-    MI_U32 border = 3;
-    MI_U32 num_pixels = fast_param->width - border;
+    DT_U32 border = 3;
+    DT_U32 num_pixels = fast_param->width - border;
     num_pixels = (num_pixels + 8 * AURA_HVLEN - 1) & (-8 * AURA_HVLEN); // roundup to 8*VLEN
-    MI_U32 num_pixels_32 = num_pixels >> 5;
+    DT_U32 num_pixels_32 = num_pixels >> 5;
 
     if (fast_param->num_corners > max_num_corners)
     {
@@ -338,7 +338,7 @@ static AURA_VOID Fast9U8Row(const MI_U8 *src_row, FastParam *fast_param, MI_U32 
 
     if ((cur_row != start_row) && ((cur_row == 4 || cur_row != start_row + 1)))
     {
-        for (MI_S32 i = 0; i < fast_param->num_coarse_p; i++)
+        for (DT_S32 i = 0; i < fast_param->num_coarse_p; i++)
         {
             pos_x = fast_param->pos_x[0][i];
             score = fast_param->score[1][pos_x];
@@ -370,11 +370,11 @@ static AURA_VOID Fast9U8Row(const MI_U8 *src_row, FastParam *fast_param, MI_U32 
     fast_param->pos_x[1]      = pos_swap_x_ptr;
 }
 
-static Status Fast9U8HvxImpl(Context *ctx, const Mat &src, ThreadObject<FastParam> &share_fast_param, MI_U32 max_num_corners, MI_S32 threshold,
-                             MI_BOOL nonmax_suppression, MI_S32 start_row, MI_S32 end_row)
+static Status Fast9U8HvxImpl(Context *ctx, const Mat &src, ThreadObject<FastParam> &share_fast_param, DT_U32 max_num_corners, DT_S32 threshold,
+                             DT_BOOL nonmax_suppression, DT_S32 start_row, DT_S32 end_row)
 {
     FastParam *fast_param = share_fast_param.GetObject();
-    if (MI_NULL == fast_param)
+    if (DT_NULL == fast_param)
     {
         AURA_ADD_ERROR_STRING(ctx, "Get fast_param failed");
         return Status::ERROR;
@@ -387,25 +387,25 @@ static Status Fast9U8HvxImpl(Context *ctx, const Mat &src, ThreadObject<FastPara
     fast_param->num_coarse_p = 0;
     fast_param->num_coarse_c = 0;
 
-    MI_U64 L2fetch_param = L2PfParam(fast_param->stride, fast_param->width, 1, 0);
-    MI_S32 start_y = 0;
-    MI_S32 end_y   = 0;
+    DT_U64 L2fetch_param = L2PfParam(fast_param->stride, fast_param->width, 1, 0);
+    DT_S32 start_y = 0;
+    DT_S32 end_y   = 0;
 
     start_y = (3 == start_row) ? start_row : (start_row - 1);
     end_y = ((fast_param->height - 2) == end_row) ? end_row : (end_row + 1);
 
-    const MI_U8 *src_row = src.Ptr<MI_U8>(start_y);
+    const DT_U8 *src_row = src.Ptr<DT_U8>(start_y);
 
-    for (MI_S32 y = start_y; y < end_y; y++)
+    for (DT_S32 y = start_y; y < end_y; y++)
     {
         if (y + 4 < end_y)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(y + 4)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(y + 4)), L2fetch_param);
         }
 
         Fast9U8Row(src_row, fast_param, max_num_corners, threshold, nonmax_suppression, y, start_y);
 
-        src_row = src.Ptr<MI_U8>(y + 1);
+        src_row = src.Ptr<DT_U8>(y + 1);
     }
 
     fast_param->corners = fast_param->corners - fast_param->num_corners;
@@ -413,29 +413,29 @@ static Status Fast9U8HvxImpl(Context *ctx, const Mat &src, ThreadObject<FastPara
     return Status::OK;
 }
 
-static Status Fast9U8Hvx(Context *ctx, const Mat &src, std::vector<KeyPoint> *key_points, MI_U32 max_num_corners,
-                         MI_S32 threshold, MI_BOOL nonmax_suppression)
+static Status Fast9U8Hvx(Context *ctx, const Mat &src, std::vector<KeyPoint> *key_points, DT_U32 max_num_corners,
+                         DT_S32 threshold, DT_BOOL nonmax_suppression)
 {
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 height = src.GetSizes().m_height;
 
     auto thread_ids = wp->GetComputeThreadIDs();
     ThreadObject<FastParam> share_fast_param(ctx, thread_ids, src.GetSizes().m_width, max_num_corners);
 
-    ret = wp->ParallelFor((MI_S32)3, height - 2, Fast9U8HvxImpl, ctx, std::cref(src), std::ref(share_fast_param), max_num_corners, threshold,
+    ret = wp->ParallelFor((DT_S32)3, height - 2, Fast9U8HvxImpl, ctx, std::cref(src), std::ref(share_fast_param), max_num_corners, threshold,
                            nonmax_suppression);
 
     FastParam *fast_param = NULL;
-    MI_U32 rem_corners = max_num_corners;
-    MI_U32 corners_num = 0;
+    DT_U32 rem_corners = max_num_corners;
+    DT_U32 corners_num = 0;
 
     for (auto &id : thread_ids)
     {
@@ -452,19 +452,19 @@ static Status Fast9U8Hvx(Context *ctx, const Mat &src, std::vector<KeyPoint> *ke
         rem_corners -= corners_num;
         FastCorner *fast_corners = fast_param->corners;
 
-        for (MI_U32 i = 0; i < corners_num; i++)
+        for (DT_U32 i = 0; i < corners_num; i++)
         {
-            key_points->emplace_back(KeyPoint(static_cast<MI_F32>(fast_corners[i].x),
-                                              static_cast<MI_F32>(fast_corners[i].y), 7.f, -1,
-                                              static_cast<MI_F32>(fast_corners[i].score)));
+            key_points->emplace_back(KeyPoint(static_cast<DT_F32>(fast_corners[i].x),
+                                              static_cast<DT_F32>(fast_corners[i].y), 7.f, -1,
+                                              static_cast<DT_F32>(fast_corners[i].score)));
         }
     }
 
     AURA_RETURN(ctx, ret);
 }
 
-Status Fast9Hvx(Context *ctx, const Mat &src, std::vector<KeyPoint> *key_points, MI_S32 threshold,
-                MI_BOOL nonmax_suppression, MI_U32 max_num_corners)
+Status Fast9Hvx(Context *ctx, const Mat &src, std::vector<KeyPoint> *key_points, DT_S32 threshold,
+                DT_BOOL nonmax_suppression, DT_U32 max_num_corners)
 {
     Status ret = Status::ERROR;
 

@@ -28,7 +28,7 @@ Status SumHvx::SetArgs(const Array *src, Scalar *result)
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1 && ch != 2 && ch != 3)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2/3");
@@ -49,7 +49,7 @@ Status SumHvx::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is nullptr");
         return Status::ERROR;
@@ -72,7 +72,7 @@ Status SumHvx::Run()
 
     if (Status::OK == ret)
     {
-        if (MI_TRUE == m_target.m_data.hvx.profiling)
+        if (DT_TRUE == m_target.m_data.hvx.profiling)
         {
             m_profiling_string = " " + HexagonProfilingToString(profiling);
         }
@@ -106,9 +106,9 @@ Status MeanHvx::Run()
         return Status::ERROR;
     }
 
-    const MI_S32 height = m_src->GetSizes().m_height;
-    const MI_S32 width  = m_src->GetSizes().m_width;
-    *m_result           = (*m_result) / static_cast<MI_F64>(height * width);
+    const DT_S32 height = m_src->GetSizes().m_height;
+    const DT_S32 width  = m_src->GetSizes().m_width;
+    *m_result           = (*m_result) / static_cast<DT_F64>(height * width);
 
     AURA_RETURN(m_ctx, ret);
 }

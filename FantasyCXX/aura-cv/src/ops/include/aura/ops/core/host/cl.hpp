@@ -22,7 +22,7 @@ namespace aura
  */
 struct AURA_EXPORTS CLScalar
 {
-    MI_F32 val[4];
+    DT_F32 val[4];
 };
 
 /**
@@ -36,10 +36,10 @@ AURA_INLINE CLScalar clScalar(const Scalar &scaler)
 {
     CLScalar cl_scaler;
 
-    cl_scaler.val[0] = (MI_F32)scaler.m_val[0];
-    cl_scaler.val[1] = (MI_F32)scaler.m_val[1];
-    cl_scaler.val[2] = (MI_F32)scaler.m_val[2];
-    cl_scaler.val[3] = (MI_F32)scaler.m_val[3];
+    cl_scaler.val[0] = (DT_F32)scaler.m_val[0];
+    cl_scaler.val[1] = (DT_F32)scaler.m_val[1];
+    cl_scaler.val[2] = (DT_F32)scaler.m_val[2];
+    cl_scaler.val[3] = (DT_F32)scaler.m_val[3];
 
     return cl_scaler;
 }
@@ -115,42 +115,42 @@ AURA_INLINE std::string CLTypeString()
     return "DefaultType";
 }
 
-template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_U8>()
+template <> AURA_NO_STATIC_INLINE std::string CLTypeString<DT_U8>()
 {
     return "uchar";
 }
 
-template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_S8>()
+template <> AURA_NO_STATIC_INLINE std::string CLTypeString<DT_S8>()
 {
     return "char";
 }
 
-template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_U16>()
+template <> AURA_NO_STATIC_INLINE std::string CLTypeString<DT_U16>()
 {
     return "ushort";
 }
 
-template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_S16>()
+template <> AURA_NO_STATIC_INLINE std::string CLTypeString<DT_S16>()
 {
     return "short";
 }
 
-template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_U32>()
+template <> AURA_NO_STATIC_INLINE std::string CLTypeString<DT_U32>()
 {
     return "uint";
 }
 
-template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_S32>()
+template <> AURA_NO_STATIC_INLINE std::string CLTypeString<DT_S32>()
 {
     return "int";
 }
 
-template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_U64>()
+template <> AURA_NO_STATIC_INLINE std::string CLTypeString<DT_U64>()
 {
     return "ulong";
 }
 
-template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_S64>()
+template <> AURA_NO_STATIC_INLINE std::string CLTypeString<DT_S64>()
 {
     return "long";
 }
@@ -160,7 +160,7 @@ template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_F16>()
     return "half";
 }
 
-template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_F32>()
+template <> AURA_NO_STATIC_INLINE std::string CLTypeString<DT_F32>()
 {
     return "float";
 }
@@ -176,7 +176,7 @@ template <> AURA_NO_STATIC_INLINE std::string CLTypeString<MI_F32>()
  */
 AURA_INLINE Status CheckCLWidth(const Array &array)
 {
-    MI_S32 width = array.GetSizes().m_width;
+    DT_S32 width = array.GetSizes().m_width;
     if (width < 64)
     {
         return Status::ERROR;

@@ -12,14 +12,14 @@ namespace aura
 #define AURA_RUNTIME_QUERY_HW_INFO_OP_NAME     "QueryHWInfo"
 #define AURA_RUNTIME_QUERY_RT_INFO_OP_NAME     "QueryRTInfo"
 
-using SetPowerInParam      = HexagonRpcParamType<HexagonPowerLevel, MI_BOOL, MI_U32>;
+using SetPowerInParam      = HexagonRpcParamType<HexagonPowerLevel, DT_BOOL, DT_U32>;
 using InitContextInParam   = HexagonRpcParamType<LogOutput, LogLevel, std::string>;
 using GetVersionOutParam   = HexagonRpcParamType<std::string>;
 using GetBacktraceOutParam = HexagonRpcParamType<std::string>;
 using QueryHexagonParam    = HexagonRpcParamType<std::string>;
-using QueryHWInfoOutParam  = HexagonRpcParamType<MI_S32, MI_S32, MI_S32, Sequence<MI_S32>, Sequence<MI_S32>>;
+using QueryHWInfoOutParam  = HexagonRpcParamType<DT_S32, DT_S32, DT_S32, Sequence<DT_S32>, Sequence<DT_S32>>;
 using QueryRTInfoInParam   = HexagonRpcParamType<std::string>;
-using QueryRTInfoFreqOutParam = HexagonRpcParamType<MI_F32>;
-using QueryRTInfoVtcmOutParam = HexagonRpcParamType<MI_S32, MI_S32, Sequence<MI_S32>, Sequence<MI_S32>>;
+using QueryRTInfoFreqOutParam = HexagonRpcParamType<DT_F32>;
+using QueryRTInfoVtcmOutParam = HexagonRpcParamType<DT_S32, DT_S32, Sequence<DT_S32>, Sequence<DT_S32>>;
 
 } // namespace aura

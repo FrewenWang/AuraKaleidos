@@ -15,7 +15,7 @@ class MulSpectrumsImpl : public OpImpl
 public:
     MulSpectrumsImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src0, const Array *src1, Array *dst, MI_BOOL conj_src1);
+    virtual Status SetArgs(const Array *src0, const Array *src1, Array *dst, DT_BOOL conj_src1);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -23,13 +23,13 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     const Array *m_src0;
     const Array *m_src1;
     Array *m_dst;
-    MI_BOOL m_conj_src1;
+    DT_BOOL m_conj_src1;
 };
 
 class MulSpectrumsNone : public MulSpectrumsImpl
@@ -37,7 +37,7 @@ class MulSpectrumsNone : public MulSpectrumsImpl
 public:
     MulSpectrumsNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src0, const Array *src1, Array *dst, MI_BOOL conj_src1) override;
+    Status SetArgs(const Array *src0, const Array *src1, Array *dst, DT_BOOL conj_src1) override;
 
     Status Run() override;
 };
@@ -48,7 +48,7 @@ class MulSpectrumsNeon : public MulSpectrumsImpl
 public:
     MulSpectrumsNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src0, const Array *src1, Array *dst, MI_BOOL conj_src1) override;
+    Status SetArgs(const Array *src0, const Array *src1, Array *dst, DT_BOOL conj_src1) override;
 
     Status Run() override;
 };
@@ -60,7 +60,7 @@ class MulSpectrumsCL : public MulSpectrumsImpl
 public:
     MulSpectrumsCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src0, const Array *src1, Array *dst, MI_BOOL conj_src1) override;
+    Status SetArgs(const Array *src0, const Array *src1, Array *dst, DT_BOOL conj_src1) override;
 
     Status Initialize() override;
 
@@ -70,7 +70,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_BOOL conj_src1);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_BOOL conj_src1);
 
 private:
     std::vector<CLKernel> m_cl_kernels;

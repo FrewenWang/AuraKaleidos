@@ -48,10 +48,10 @@ static LaplacianParam::TupleTable g_laplacian_table_hvx
 NEW_TESTCASE(filter, Laplacian, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     LaplacianTest test(UnitTest::GetInstance()->GetContext(), g_laplacian_table_hvx);
     test.RunTest(this);
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

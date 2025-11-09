@@ -5,20 +5,20 @@
 namespace aura
 {
 
-static Status GetKernelParams(MI_S32 iwidth, MI_S32 iheight, MI_S32 owidth, MI_S32 oheight, MI_S32 &border)
+static Status GetKernelParams(DT_S32 iwidth, DT_S32 iheight, DT_S32 owidth, DT_S32 oheight, DT_S32 &border)
 {
-    MI_S32 left = 0, right = 0;
-    MI_F32 scale_x = static_cast<MI_F32>(iwidth) / owidth;
+    DT_S32 left = 0, right = 0;
+    DT_F32 scale_x = static_cast<DT_F32>(iwidth) / owidth;
 
     if (!(((iwidth == 2 * owidth) && (iheight == 2 * oheight))) &&
         !((iwidth == 4 * owidth) && (iheight == 4 * oheight)))
     {
         left = right = 0;
 
-        for (MI_S32 i = 0; i < owidth; i++)
+        for (DT_S32 i = 0; i < owidth; i++)
         {
-            MI_F32 fx = (i + 0.5f) * scale_x - 0.5f;
-            MI_S32 sx = Floor(fx) - 1;
+            DT_F32 fx = (i + 0.5f) * scale_x - 0.5f;
+            DT_S32 sx = Floor(fx) - 1;
 
             if (sx < 0)
             {
@@ -45,7 +45,7 @@ static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, std::string &b
     return Status::OK;
 }
 
-static Status GetCLName(MI_S32 iwidth, MI_S32 iheight, MI_S32 owidth, MI_S32 oheight, MI_S32 channel,
+static Status GetCLName(DT_S32 iwidth, DT_S32 iheight, DT_S32 owidth, DT_S32 oheight, DT_S32 channel,
                         std::vector<std::string> &program_names, std::vector<std::string> &kernel_names)
 {
     std::string kernel_str, program_str;
@@ -75,7 +75,7 @@ static Status GetCLName(MI_S32 iwidth, MI_S32 iheight, MI_S32 owidth, MI_S32 ohe
     return Status::OK;
 }
 
-static AURA_VOID GetGlobalSize(MI_S32 width, MI_S32 height, cl::NDRange *range, MI_S32 border)
+static DT_VOID GetGlobalSize(DT_S32 width, DT_S32 height, cl::NDRange *range, DT_S32 border)
 {
     range[0] = cl::NDRange(width - 2 * border, height);
     range[1] = cl::NDRange(border, height); //calc two output once
@@ -92,11 +92,11 @@ Status ResizeCuCL::Initialize()
         return Status::ERROR;
     }
 
-    MI_S32 iwidth  = m_src->GetSizes().m_width;
-    MI_S32 iheight = m_src->GetSizes().m_height;
-    MI_S32 channel = m_src->GetSizes().m_channel;
-    MI_S32 owidth  = m_dst->GetSizes().m_width;
-    MI_S32 oheight = m_dst->GetSizes().m_height;
+    DT_S32 iwidth  = m_src->GetSizes().m_width;
+    DT_S32 iheight = m_src->GetSizes().m_height;
+    DT_S32 channel = m_src->GetSizes().m_channel;
+    DT_S32 owidth  = m_dst->GetSizes().m_width;
+    DT_S32 oheight = m_dst->GetSizes().m_height;
 
     m_border = 0;
     if (GetKernelParams(iwidth, iheight, owidth, oheight, m_border) != Status::OK)
@@ -126,14 +126,14 @@ Status ResizeCuCL::Initialize()
 
 Status ResizeCuCL::Run()
 {
-    MI_S32 iwidth  = m_src->GetSizes().m_width;
-    MI_S32 iheight = m_src->GetSizes().m_height;
-    MI_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 owidth  = m_dst->GetSizes().m_width;
-    MI_S32 oheight = m_dst->GetSizes().m_height;
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_F32 scale_x = static_cast<MI_F32>(iwidth) / owidth;
-    MI_F32 scale_y = static_cast<MI_F32>(iheight) / oheight;
+    DT_S32 iwidth  = m_src->GetSizes().m_width;
+    DT_S32 iheight = m_src->GetSizes().m_height;
+    DT_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 owidth  = m_dst->GetSizes().m_width;
+    DT_S32 oheight = m_dst->GetSizes().m_height;
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_F32 scale_x = static_cast<DT_F32>(iwidth) / owidth;
+    DT_F32 scale_y = static_cast<DT_F32>(iheight) / oheight;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -147,13 +147,13 @@ Status ResizeCuCL::Run()
     Status ret_sync = Status::ERROR;
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_F32, MI_F32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_F32, DT_F32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32>(
                                 m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                 m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                 scale_x, scale_y, m_border,
                                 iwidth, iheight, owidth, oheight,
-                                (MI_S32)(global_size[0].get()[0]),
-                                (MI_S32)(global_size[0].get()[1]),
+                                (DT_S32)(global_size[0].get()[0]),
+                                (DT_S32)(global_size[0].get()[1]),
                                 global_size[0], cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), global_size[0]),
                                 &event[0]);
 
@@ -165,12 +165,12 @@ Status ResizeCuCL::Run()
 
     if (m_border)
     {
-        cl_ret |= m_cl_kernels[1].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_F32, MI_F32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32>(
+        cl_ret |= m_cl_kernels[1].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_F32, DT_F32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32>(
                                      m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                      m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                      scale_x, scale_y, iwidth, iheight, owidth,
-                                     (MI_S32)(global_size[1].get()[0]),
-                                     (MI_S32)(global_size[1].get()[1]),
+                                     (DT_S32)(global_size[1].get()[0]),
+                                     (DT_S32)(global_size[1].get()[1]),
                                      global_size[1], cl_rt->GetCLDefaultLocalSize(m_cl_kernels[1].GetMaxGroupSize(), global_size[1]),
                                      &event[1], {event[0]});
         if (cl_ret != CL_SUCCESS)
@@ -239,8 +239,8 @@ Status ResizeCuCL::DeInitialize()
     return Status::OK;
 }
 
-std::vector<CLKernel> ResizeCuCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 iwidth, MI_S32 iheight,
-                                               MI_S32 owidth, MI_S32 oheight, MI_S32 channel)
+std::vector<CLKernel> ResizeCuCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 iwidth, DT_S32 iheight,
+                                               DT_S32 owidth, DT_S32 oheight, DT_S32 channel)
 {
     std::vector<CLKernel> cl_kernels;
 
@@ -260,7 +260,7 @@ std::vector<CLKernel> ResizeCuCL::GetCLKernels(Context *ctx, ElemType elem_type,
         return cl_kernels;
     }
 
-    for (MI_S32 i = 0; i < static_cast<MI_S32>(program_names.size()); ++i)
+    for (DT_S32 i = 0; i < static_cast<DT_S32>(program_names.size()); ++i)
     {
         cl_kernels.emplace_back(ctx, program_names.at(i), kernel_names.at(i), "", build_opt);
     }

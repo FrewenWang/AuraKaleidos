@@ -22,10 +22,10 @@ namespace xtensa
 
 class XtensaRpcParam;
 
-template <typename Tp, typename std::enable_if<std::is_arithmetic<Tp>::value || std::is_pointer<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_arithmetic<Tp>::value || std::is_pointer<Tp>::value>::type* = DT_NULL>
 Status Serialize(XtensaRpcParam *rpc_param, const Tp &val)
 {
-    MI_S32 size = sizeof(val);
+    DT_S32 size = sizeof(val);
     if (rpc_param->m_rpc_param.m_size + size > rpc_param->m_rpc_param.m_capacity)
     {
         AURA_XTENSA_LOG("buffer overflow\n");
@@ -33,15 +33,15 @@ Status Serialize(XtensaRpcParam *rpc_param, const Tp &val)
     }
 
     Memcpy(rpc_param->m_rpc_param.m_data, &val, size);
-    rpc_param->m_rpc_param.m_data = static_cast<MI_U8*>(rpc_param->m_rpc_param.m_data) + size;
+    rpc_param->m_rpc_param.m_data = static_cast<DT_U8*>(rpc_param->m_rpc_param.m_data) + size;
     rpc_param->m_rpc_param.m_size += size;
     return Status::OK;
 }
 
-template <typename Tp, typename std::enable_if<std::is_arithmetic<Tp>::value || std::is_pointer<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_arithmetic<Tp>::value || std::is_pointer<Tp>::value>::type* = DT_NULL>
 Status Deserialize(XtensaRpcParam *rpc_param, Tp &val)
 {
-    MI_S32 size = sizeof(val);
+    DT_S32 size = sizeof(val);
     if (rpc_param->m_rpc_param.m_size + size > rpc_param->m_rpc_param.m_capacity)
     {
         AURA_XTENSA_LOG("buffer overflow\n");
@@ -49,29 +49,29 @@ Status Deserialize(XtensaRpcParam *rpc_param, Tp &val)
     }
 
     Memcpy(&val, rpc_param->m_rpc_param.m_data, size);
-    rpc_param->m_rpc_param.m_data = static_cast<MI_U8*>(rpc_param->m_rpc_param.m_data) + size;
+    rpc_param->m_rpc_param.m_data = static_cast<DT_U8*>(rpc_param->m_rpc_param.m_data) + size;
     rpc_param->m_rpc_param.m_size += size;
     return Status::OK;
 }
 
-template <typename Tp, typename std::enable_if<std::is_enum<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_enum<Tp>::value>::type* = DT_NULL>
 Status Serialize(XtensaRpcParam *rpc_param, const Tp &val)
 {
-    MI_S32 tmp = static_cast<MI_S32>(val);
+    DT_S32 tmp = static_cast<DT_S32>(val);
     Status ret = Serialize(rpc_param, tmp);
     return ret;
 }
 
-template <typename Tp, typename std::enable_if<std::is_enum<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_enum<Tp>::value>::type* = DT_NULL>
 Status Deserialize(XtensaRpcParam *rpc_param, Tp &val)
 {
-    MI_S32 tmp = 0;
+    DT_S32 tmp = 0;
     Status ret = Deserialize(rpc_param, tmp);
     val = static_cast<Tp>(tmp);
     return ret;
 }
 
-template <typename Tp, typename std::enable_if<std::is_pod<Tp>::value && !std::is_pointer<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_pod<Tp>::value && !std::is_pointer<Tp>::value>::type* = DT_NULL>
 Status Serialize(XtensaRpcParam *rpc_param, const Sequence<Tp> &seq)
 {
     Status ret = rpc_param->Set(seq.len);
@@ -86,13 +86,13 @@ Status Serialize(XtensaRpcParam *rpc_param, const Sequence<Tp> &seq)
         return Status::OK;
     }
 
-    if (MI_NULL == seq.data)
+    if (DT_NULL == seq.data)
     {
         AURA_XTENSA_LOG("bad data\n");
         return Status::ERROR;
     }
 
-    MI_S32 size = sizeof(Tp) * seq.len;
+    DT_S32 size = sizeof(Tp) * seq.len;
     if (rpc_param->m_rpc_param.m_size + size > rpc_param->m_rpc_param.m_capacity)
     {
         AURA_XTENSA_LOG("buffer overflow\n");
@@ -100,13 +100,13 @@ Status Serialize(XtensaRpcParam *rpc_param, const Sequence<Tp> &seq)
     }
 
     Memcpy(rpc_param->m_rpc_param.m_data, seq.data, size);
-    rpc_param->m_rpc_param.m_data = static_cast<MI_U8*>(rpc_param->m_rpc_param.m_data) + size;
+    rpc_param->m_rpc_param.m_data = static_cast<DT_U8*>(rpc_param->m_rpc_param.m_data) + size;
     rpc_param->m_rpc_param.m_size += size;
 
     return Status::OK;
 }
 
-template <typename Tp, typename std::enable_if<std::is_pod<Tp>::value && !std::is_pointer<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_pod<Tp>::value && !std::is_pointer<Tp>::value>::type* = DT_NULL>
 Status Deserialize(XtensaRpcParam *rpc_param, Sequence<Tp> &seq)
 {
     Status ret = rpc_param->Get(seq.len);
@@ -121,13 +121,13 @@ Status Deserialize(XtensaRpcParam *rpc_param, Sequence<Tp> &seq)
         return Status::OK;
     }
 
-    if (MI_NULL == seq.data)
+    if (DT_NULL == seq.data)
     {
         AURA_XTENSA_LOG("bad data\n");
         return Status::ERROR;
     }
 
-    MI_S32 size = sizeof(Tp) * seq.len;
+    DT_S32 size = sizeof(Tp) * seq.len;
     if (rpc_param->m_rpc_param.m_size + size > rpc_param->m_rpc_param.m_capacity)
     {
         AURA_XTENSA_LOG("buffer overflow\n");
@@ -135,13 +135,13 @@ Status Deserialize(XtensaRpcParam *rpc_param, Sequence<Tp> &seq)
     }
 
     Memcpy(seq.data, rpc_param->m_rpc_param.m_data, size);
-    rpc_param->m_rpc_param.m_data = static_cast<MI_U8*>(rpc_param->m_rpc_param.m_data) + size;
+    rpc_param->m_rpc_param.m_data = static_cast<DT_U8*>(rpc_param->m_rpc_param.m_data) + size;
     rpc_param->m_rpc_param.m_size += size;
 
     return Status::OK;
 }
 
-template <typename Tp, typename std::enable_if<!std::is_pod<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<!std::is_pod<Tp>::value>::type* = DT_NULL>
 Status Serialize(XtensaRpcParam *rpc_param, const Sequence<Tp> &seq)
 {
     Status ret = rpc_param->Set(seq.len);
@@ -156,13 +156,13 @@ Status Serialize(XtensaRpcParam *rpc_param, const Sequence<Tp> &seq)
         return Status::OK;
     }
 
-    if (MI_NULL == seq.data)
+    if (DT_NULL == seq.data)
     {
         AURA_XTENSA_LOG("bad data\n");
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 0; i < seq.len; i++)
+    for (DT_S32 i = 0; i < seq.len; i++)
     {
         ret = rpc_param->Set(seq.data[i]);
     }
@@ -170,7 +170,7 @@ Status Serialize(XtensaRpcParam *rpc_param, const Sequence<Tp> &seq)
     return ret;
 }
 
-template <typename Tp, typename std::enable_if<!std::is_pod<Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<!std::is_pod<Tp>::value>::type* = DT_NULL>
 Status Deserialize(XtensaRpcParam *rpc_param, Sequence<Tp> &seq)
 {
     Status ret = rpc_param->Get(seq.len);
@@ -185,28 +185,28 @@ Status Deserialize(XtensaRpcParam *rpc_param, Sequence<Tp> &seq)
         return Status::OK;
     }
 
-    if (MI_NULL == seq.data)
+    if (DT_NULL == seq.data)
     {
         AURA_XTENSA_LOG("bad data\n");
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 0; i < seq.len; i++)
+    for (DT_S32 i = 0; i < seq.len; i++)
     {
         ret = rpc_param->Get(seq.data[i]);
     }
     return ret;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Buffer>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Buffer>::value>::type* = DT_NULL>
 Status Deserialize(XtensaRpcParam *rpc_param, Tp &buffer)
 {
-    MI_S32 type;
-    MI_S64 capacity;
-    MI_S64 size;
-    AURA_VOID *data = MI_NULL;
-    AURA_VOID *origin = MI_NULL;
-    MI_S32 property;
+    DT_S32 type;
+    DT_S64 capacity;
+    DT_S64 size;
+    DT_VOID *data = DT_NULL;
+    DT_VOID *origin = DT_NULL;
+    DT_S32 property;
 
     Status ret = rpc_param->Get(type, capacity, size, data, origin, property);
     if (ret != Status::OK)
@@ -225,7 +225,7 @@ Status Deserialize(XtensaRpcParam *rpc_param, Tp &buffer)
     return Status::OK;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Mat>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Mat>::value>::type* = DT_NULL>
 Status Deserialize(XtensaRpcParam *rpc_param, Tp &mat)
 {
     ElemType elem_type;
@@ -347,10 +347,10 @@ Status Deserialize(XtensaRpcParam *rpc_param, Rect_<Tp> &rect)
     return ret;
 }
 
-template <MI_S32 STR_MAX_SIZE>
+template <DT_S32 STR_MAX_SIZE>
 Status Serialize(XtensaRpcParam *rpc_param, const string_<STR_MAX_SIZE> &str)
 {
-    MI_S32 size = str.size();
+    DT_S32 size = str.size();
     Status ret = rpc_param->Set(size);
     if (ret != Status::OK)
     {
@@ -363,16 +363,16 @@ Status Serialize(XtensaRpcParam *rpc_param, const string_<STR_MAX_SIZE> &str)
         return Status::OK;
     }
 
-    Sequence<MI_CHAR> seq = {const_cast<MI_CHAR*>(str.c_str()), size};
+    Sequence<DT_CHAR> seq = {const_cast<DT_CHAR*>(str.c_str()), size};
     ret = rpc_param->Set(seq);
 
     return ret;
 }
 
-template <MI_S32 STR_MAX_SIZE>
+template <DT_S32 STR_MAX_SIZE>
 Status Deserialize(XtensaRpcParam *rpc_param, string_<STR_MAX_SIZE> &str)
 {
-    MI_S32 size = 0;
+    DT_S32 size = 0;
     Status ret = rpc_param->Get(size);
     if (ret != Status::OK)
     {
@@ -386,7 +386,7 @@ Status Deserialize(XtensaRpcParam *rpc_param, string_<STR_MAX_SIZE> &str)
         return Status::OK;
     }
 
-    Sequence<MI_CHAR> seq = {const_cast<MI_CHAR*>(str.c_str()), size};
+    Sequence<DT_CHAR> seq = {const_cast<DT_CHAR*>(str.c_str()), size};
     ret = rpc_param->Get(seq);
     if (ret != Status::OK)
     {
@@ -397,10 +397,10 @@ Status Deserialize(XtensaRpcParam *rpc_param, string_<STR_MAX_SIZE> &str)
     return ret;
 }
 
-template <typename Tp, MI_S32 VEC_MAX_SIZE>
+template <typename Tp, DT_S32 VEC_MAX_SIZE>
 Status Serialize(XtensaRpcParam *rpc_param, const vector<Tp, VEC_MAX_SIZE> &vec)
 {
-    MI_S32 size = vec.size();
+    DT_S32 size = vec.size();
     Status ret = rpc_param->Set(size);
     if (ret != Status::OK)
     {
@@ -419,10 +419,10 @@ Status Serialize(XtensaRpcParam *rpc_param, const vector<Tp, VEC_MAX_SIZE> &vec)
     return ret;
 }
 
-template <typename Tp, MI_S32 VEC_MAX_SIZE>
+template <typename Tp, DT_S32 VEC_MAX_SIZE>
 Status Deserialize(XtensaRpcParam *rpc_param, vector<Tp, VEC_MAX_SIZE> &vec)
 {
-    MI_S32 size = 0;
+    DT_S32 size = 0;
     Status ret = rpc_param->Get(size);
     if (ret != Status::OK)
     {
@@ -443,10 +443,10 @@ Status Deserialize(XtensaRpcParam *rpc_param, vector<Tp, VEC_MAX_SIZE> &vec)
     return ret;
 }
 
-template <typename Tp, MI_S32 STR_MAX_SIZE, MI_S32 MAP_MAX_SIZE>
+template <typename Tp, DT_S32 STR_MAX_SIZE, DT_S32 MAP_MAX_SIZE>
 Status Serialize(XtensaRpcParam *rpc_param, const map<Tp, STR_MAX_SIZE, MAP_MAX_SIZE> &map)
 {
-    MI_S32 size = map.size();
+    DT_S32 size = map.size();
     Status ret = rpc_param->Set(size);
     if (ret != Status::OK)
     {
@@ -468,10 +468,10 @@ Status Serialize(XtensaRpcParam *rpc_param, const map<Tp, STR_MAX_SIZE, MAP_MAX_
     return ret;
 }
 
-template <typename Tp, MI_S32 STR_MAX_SIZE, MI_S32 MAP_MAX_SIZE>
+template <typename Tp, DT_S32 STR_MAX_SIZE, DT_S32 MAP_MAX_SIZE>
 Status Deserialize(XtensaRpcParam *rpc_param, map<Tp, STR_MAX_SIZE, MAP_MAX_SIZE> &map)
 {
-    MI_S32 size = 0;
+    DT_S32 size = 0;
     Status ret = rpc_param->Get(size);
     if (ret != Status::OK)
     {
@@ -479,7 +479,7 @@ Status Deserialize(XtensaRpcParam *rpc_param, map<Tp, STR_MAX_SIZE, MAP_MAX_SIZE
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 0; i < size; i++)
+    for (DT_S32 i = 0; i < size; i++)
     {
         string_<STR_MAX_SIZE> key;
         Tp val;
@@ -495,14 +495,14 @@ Status Deserialize(XtensaRpcParam *rpc_param, map<Tp, STR_MAX_SIZE, MAP_MAX_SIZE
     return ret;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Time>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Time>::value>::type* = DT_NULL>
 Status Serialize(XtensaRpcParam *rpc_param, const Tp &time)
 {
     Status ret = rpc_param->Set(time.sec, time.ms, time.us);
     return ret;
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, Time>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, Time>::value>::type* = DT_NULL>
 Status Deserialize(XtensaRpcParam *rpc_param, Tp &time)
 {
     Status ret = rpc_param->Get(time.sec, time.ms, time.us);

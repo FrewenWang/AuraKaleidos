@@ -4,6 +4,6 @@ diff a/AuraFantasyCXX/aura-aura/src/runtime/include/aura/runtime/core/traits.hpp
  template <typename Tp> struct Promote;
  // 声明一个泛型模板 Promote，但未提供实现。这表示该模板的特化版本必须覆盖所有需要用到的类型，否则编译会失败
 +///
- template <> struct Promote<MI_U8>  { using Type = MI_U16; };
- template <> struct Promote<MI_S8>  { using Type = MI_S16; };
- template <> struct Promote<MI_U16> { using Type = MI_U32; };
+ template <> struct Promote<DT_U8>  { using Type = DT_U16; };
+ template <> struct Promote<DT_S8>  { using Type = DT_S16; };
+ template <> struct Promote<DT_U16> { using Type = DT_U32; };

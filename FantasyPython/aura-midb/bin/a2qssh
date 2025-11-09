@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+spawn adb root
+spawn adb remount
+spawn adb shell
+
+expect "e171" { send "busybox telnet 192.168.78.2 ; exit\r" }
+expect "login" { send "root\r" }
+expect "Password" { send "togxuh-8Cyzto-juqven\r" }
+
+interact

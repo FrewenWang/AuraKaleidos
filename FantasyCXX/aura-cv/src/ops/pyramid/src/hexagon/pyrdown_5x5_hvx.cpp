@@ -5,30 +5,30 @@
 namespace aura
 {
 
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5VCore(const HVX_Vector &vu8_src_p1, const HVX_Vector &vu8_src_p0,
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrdown5x5VCore(const HVX_Vector &vu8_src_p1, const HVX_Vector &vu8_src_p0,
                                            const HVX_Vector &vu8_src_c,  const HVX_Vector &vu8_src_n0,
-                                           const HVX_Vector &vu8_src_n1, HVX_VectorPair &wu16_sum, const MI_U16 *kernel)
+                                           const HVX_Vector &vu8_src_n1, HVX_VectorPair &wu16_sum, const DT_U16 *kernel)
 {
-    MI_U32 k0k0k0k0 = Q6_R_vsplatb_R(kernel[0]);
-    MI_U32 k1k1k1k1 = Q6_R_vsplatb_R(kernel[1]);
-    MI_U32 k2k2k2k2 = Q6_R_vsplatb_R(kernel[2]);
+    DT_U32 k0k0k0k0 = Q6_R_vsplatb_R(kernel[0]);
+    DT_U32 k1k1k1k1 = Q6_R_vsplatb_R(kernel[1]);
+    DT_U32 k2k2k2k2 = Q6_R_vsplatb_R(kernel[2]);
 
     wu16_sum = Q6_Wh_vmpa_WubRub(Q6_W_vcombine_VV(vu8_src_p1, vu8_src_n1), k0k0k0k0);
     wu16_sum = Q6_Wh_vmpaacc_WhWubRub(wu16_sum, Q6_W_vcombine_VV(vu8_src_p0, vu8_src_n0), k1k1k1k1);
     wu16_sum = Q6_Wuh_vmpyacc_WuhVubRub(wu16_sum, vu8_src_c, k2k2k2k2);
 }
 
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(const HVX_Vector &vu16_sum_l1, const HVX_Vector &vu16_sum_l0,
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrdown5x5HCore(const HVX_Vector &vu16_sum_l1, const HVX_Vector &vu16_sum_l0,
                                            const HVX_Vector &vu16_sum_c,  const HVX_Vector &vu16_sum_r0,
-                                           const HVX_Vector &vu16_sum_r1, HVX_Vector &vu16_result, const MI_U16 *kernel)
+                                           const HVX_Vector &vu16_sum_r1, HVX_Vector &vu16_result, const DT_U16 *kernel)
 {
-    MI_U32 k0k0k0k0 = Q6_R_vsplatb_R(kernel[0]);
-    MI_U32 k1k1k1k1 = Q6_R_vsplatb_R(kernel[1]);
-    MI_U32 k2k2     = (kernel[2] << 16) | kernel[2];
+    DT_U32 k0k0k0k0 = Q6_R_vsplatb_R(kernel[0]);
+    DT_U32 k1k1k1k1 = Q6_R_vsplatb_R(kernel[1]);
+    DT_U32 k2k2     = (kernel[2] << 16) | kernel[2];
 
     HVX_VectorPair wu32_result;
 
@@ -38,22 +38,22 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(const HVX_Vector &vu16_sum_l1, cons
     vu16_result = Q6_Vuh_vround_VuwVuw_sat(Q6_V_hi_W(wu32_result), Q6_V_lo_W(wu32_result));
 }
 
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE HVX_Vector Pyrdown5x5Pack(const HVX_Vector &vu16_result_hi, const HVX_Vector &vu16_result_lo)
 {
     return Q6_Vub_vpack_VhVh_sat(vu16_result_hi, vu16_result_lo);
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5VCore(const HVX_Vector &vu16_src_p1, const HVX_Vector &vu16_src_p0,
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrdown5x5VCore(const HVX_Vector &vu16_src_p1, const HVX_Vector &vu16_src_p0,
                                            const HVX_Vector &vu16_src_c,  const HVX_Vector &vu16_src_n0,
-                                           const HVX_Vector &vu16_src_n1, HVX_VectorPair &wu32_sum, const MI_U32 *kernel)
+                                           const HVX_Vector &vu16_src_n1, HVX_VectorPair &wu32_sum, const DT_U32 *kernel)
 {
-    MI_U32 k0k0 = (kernel[0] << 16) | kernel[0];
-    MI_U32 k1k1 = (kernel[1] << 16) | kernel[1];
-    MI_U32 k2k2 = (kernel[2] << 16) | kernel[2];
+    DT_U32 k0k0 = (kernel[0] << 16) | kernel[0];
+    DT_U32 k1k1 = (kernel[1] << 16) | kernel[1];
+    DT_U32 k2k2 = (kernel[2] << 16) | kernel[2];
 
     wu32_sum = Q6_Wuw_vmpy_VuhRuh(vu16_src_p1, k0k0);
     wu32_sum = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum, vu16_src_p0, k1k1);
@@ -62,11 +62,11 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5VCore(const HVX_Vector &vu16_src_p1, cons
     wu32_sum = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum, vu16_src_n1, k0k0);
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(const HVX_Vector &vu32_sum_l1, const HVX_Vector &vu32_sum_l0,
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrdown5x5HCore(const HVX_Vector &vu32_sum_l1, const HVX_Vector &vu32_sum_l0,
                                            const HVX_Vector &vu32_sum_c,  const HVX_Vector &vu32_sum_r0,
-                                           const HVX_Vector &vu32_sum_r1, HVX_Vector &vu32_result, const MI_U32 *kernel)
+                                           const HVX_Vector &vu32_sum_r1, HVX_Vector &vu32_result, const DT_U32 *kernel)
 {
     HVX_Vector vu32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vu32_k1 = Q6_V_vsplat_R(kernel[1]);
@@ -83,23 +83,23 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(const HVX_Vector &vu32_sum_l1, cons
     vu32_result = Q6_V_vor_VV(Q6_Vw_vasl_VwR(Q6_V_hi_W(vu64_sum), 4), Q6_Vuw_vlsr_VuwR(Q6_V_lo_W(vu64_sum), 28));
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE HVX_Vector Pyrdown5x5Pack(const HVX_Vector &vu32_result_hi,
                                              const HVX_Vector &vu32_result_lo)
 {
     return Q6_Vuh_vpack_VwVw_sat(vu32_result_hi, vu32_result_lo);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5VCore(const HVX_Vector &vs16_src_p1, const HVX_Vector &vs16_src_p0,
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrdown5x5VCore(const HVX_Vector &vs16_src_p1, const HVX_Vector &vs16_src_p0,
                                            const HVX_Vector &vs16_src_c,  const HVX_Vector &vs16_src_n0,
-                                           const HVX_Vector &vs16_src_n1, HVX_VectorPair &ws32_sum, const MI_S32 *kernel)
+                                           const HVX_Vector &vs16_src_n1, HVX_VectorPair &ws32_sum, const DT_S32 *kernel)
 {
-    MI_S32 k0k0 = (kernel[0] << 16) | kernel[0];
-    MI_S32 k1k1 = (kernel[1] << 16) | kernel[1];
-    MI_S32 k2k2 = (kernel[2] << 16) | kernel[2];
+    DT_S32 k0k0 = (kernel[0] << 16) | kernel[0];
+    DT_S32 k1k1 = (kernel[1] << 16) | kernel[1];
+    DT_S32 k2k2 = (kernel[2] << 16) | kernel[2];
 
     ws32_sum = Q6_Ww_vmpy_VhRh(vs16_src_p1, k0k0);
     ws32_sum = Q6_Ww_vmpyacc_WwVhRh(ws32_sum, vs16_src_p0, k1k1);
@@ -108,11 +108,11 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5VCore(const HVX_Vector &vs16_src_p1, cons
     ws32_sum = Q6_Ww_vmpyacc_WwVhRh(ws32_sum, vs16_src_n1, k0k0);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(const HVX_Vector &vs32_sum_l1, const HVX_Vector &vs32_sum_l0,
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Pyrdown5x5HCore(const HVX_Vector &vs32_sum_l1, const HVX_Vector &vs32_sum_l0,
                                            const HVX_Vector &vs32_sum_c,  const HVX_Vector &vs32_sum_r0,
-                                           const HVX_Vector &vs32_sum_r1, HVX_Vector &vs32_result, const MI_S32 *kernel)
+                                           const HVX_Vector &vs32_sum_r1, HVX_Vector &vs32_result, const DT_S32 *kernel)
 {
     HVX_Vector vs32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vs32_k1 = Q6_V_vsplat_R(kernel[1]);
@@ -129,8 +129,8 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(const HVX_Vector &vs32_sum_l1, cons
     vs32_result = Q6_V_vor_VV(Q6_Vw_vasl_VwR(Q6_V_hi_W(vs64_sum), 4), Q6_Vuw_vlsr_VuwR(Q6_V_lo_W(vs64_sum), 28));
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE HVX_Vector Pyrdown5x5Pack(const HVX_Vector &vs32_result_hi, const HVX_Vector &vs32_result_lo)
 {
     return Q6_Vh_vpack_VwVw_sat(vs32_result_hi, vs32_result_lo);
@@ -145,10 +145,10 @@ AURA_ALWAYS_INLINE HVX_Vector Pyrdown5x5Pack(const HVX_Vector &vs32_result_hi, c
 // High w_sum_x3 257 259 ... 383
 // Low w_sum_x3  256 258 ... 382
 template <typename Tp, typename Kt>
-AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(HVX_VectorPair &w_sum_x0, HVX_VectorPair &w_sum_x1, HVX_VectorPair &w_sum_x2,
+AURA_ALWAYS_INLINE DT_VOID Pyrdown5x5HCore(HVX_VectorPair &w_sum_x0, HVX_VectorPair &w_sum_x1, HVX_VectorPair &w_sum_x2,
                                            HVX_VectorPair &w_sum_x3, HVX_Vector &v_result, const Kt *kernel)
 {
-    MI_S32 align_size = sizeof(Kt);
+    DT_S32 align_size = sizeof(Kt);
     // -2  0 ...
     HVX_Vector v_l1_sum = Q6_V_vlalign_VVR(Q6_V_lo_W(w_sum_x1), Q6_V_lo_W(w_sum_x0), align_size);
     // -1  1 ...
@@ -196,20 +196,20 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(HVX_VectorPair &w_sum_x0, HVX_Vecto
 // High w_sum_x5     w                  +1   ...
 // Low w_sum_x5      w                       ...
 template <typename Tp, typename Kt>
-AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(HVX_VectorPair &w_sum_x0, HVX_VectorPair &w_sum_x1,
+AURA_ALWAYS_INLINE DT_VOID Pyrdown5x5HCore(HVX_VectorPair &w_sum_x0, HVX_VectorPair &w_sum_x1,
                                            HVX_VectorPair &w_sum_x2, HVX_VectorPair &w_sum_x3,
                                            HVX_VectorPair &w_sum_x4, HVX_VectorPair &w_sum_x5,
                                            HVX_Vector &v_result, HVX_Vector &v_last,
-                                           const Kt *kernel, MI_S32 rest)
+                                           const Kt *kernel, DT_S32 rest)
 {
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
     HVX_Vector v_sums_r0[2];
     HVX_Vector v_sums_l0[2];
     HVX_VectorPair w_sum_r0, w_sum_l0;
 
     if (rest < ELEM_COUNTS)
     {
-        MI_S32 align_size = (rest) / 2 * sizeof(Kt);
+        DT_S32 align_size = (rest) / 2 * sizeof(Kt);
         // align between w4 and w5
         v_sums_r0[0] = Q6_V_vlalign_safe_VVR(Q6_V_lo_W(w_sum_x5), Q6_V_lo_W(w_sum_x4), align_size);
         v_sums_r0[1] = Q6_V_vlalign_safe_VVR(Q6_V_hi_W(w_sum_x5), Q6_V_hi_W(w_sum_x4), align_size);
@@ -220,7 +220,7 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(HVX_VectorPair &w_sum_x0, HVX_Vecto
     }
     else
     {
-        MI_S32 align_size = (rest - ELEM_COUNTS) / 2 * sizeof(Kt);
+        DT_S32 align_size = (rest - ELEM_COUNTS) / 2 * sizeof(Kt);
         // align between w3 and w4
         v_sums_r0[0] = Q6_V_vlalign_safe_VVR(Q6_V_lo_W(w_sum_x4), Q6_V_lo_W(w_sum_x3), align_size);
         v_sums_r0[1] = Q6_V_vlalign_safe_VVR(Q6_V_hi_W(w_sum_x4), Q6_V_hi_W(w_sum_x3), align_size);
@@ -238,14 +238,14 @@ AURA_ALWAYS_INLINE AURA_VOID Pyrdown5x5HCore(HVX_VectorPair &w_sum_x0, HVX_Vecto
 }
 
 template <typename Tp, BorderType BORDER_TYPE, typename Kt>
-static AURA_VOID PyrDown5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0,
-                             const Tp *src_n1, MI_S32 iwidth, Tp *dst, MI_S32 owidth, const Kt *kernel)
+static DT_VOID PyrDown5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0,
+                             const Tp *src_n1, DT_S32 iwidth, Tp *dst, DT_S32 owidth, const Kt *kernel)
 {
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
     // Ensure remain can process up to 2 vectors
-    MI_S32 dst_back_offset = owidth - 2 * ELEM_COUNTS;
-    MI_S32 ox              = 0;
-    MI_S32 ix              = 0;
+    DT_S32 dst_back_offset = owidth - 2 * ELEM_COUNTS;
+    DT_S32 ox              = 0;
+    DT_S32 ix              = 0;
 
     HVX_Vector v_src_p1x0, v_src_p1x1;
     HVX_Vector v_src_p0x0, v_src_p0x1;
@@ -300,11 +300,11 @@ static AURA_VOID PyrDown5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src
     // remain
     {
         ix                     = ox * 2 + ELEM_COUNTS;
-        MI_S32 ix_last         = iwidth - 1;
-        MI_S32 ox_last         = owidth - ELEM_COUNTS;
-        MI_S32 is_odd          = iwidth & 1;
-        MI_S32 src_rest        = iwidth + is_odd - ix - ELEM_COUNTS;
-        MI_S32 src_back_offset = iwidth - 2 * ELEM_COUNTS;
+        DT_S32 ix_last         = iwidth - 1;
+        DT_S32 ox_last         = owidth - ELEM_COUNTS;
+        DT_S32 is_odd          = iwidth & 1;
+        DT_S32 src_rest        = iwidth + is_odd - ix - ELEM_COUNTS;
+        DT_S32 src_back_offset = iwidth - 2 * ELEM_COUNTS;
 
         HVX_VectorPair w_sum_x4, w_sum_x5;
         HVX_Vector v_last;
@@ -337,7 +337,7 @@ static AURA_VOID PyrDown5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src
 
         if (is_odd)
         {
-            const MI_S32 align_size = sizeof(Tp);
+            const DT_S32 align_size = sizeof(Tp);
 
             v_src_p1x1 = Q6_V_valign_VVR(v_border_p1, v_src_p1x1, align_size);
             v_src_p0x1 = Q6_V_valign_VVR(v_border_p0, v_src_p0x1, align_size);
@@ -366,32 +366,32 @@ static AURA_VOID PyrDown5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src
 }
 
 template <typename Tp, BorderType BORDER_TYPE>
-static Status PyrDown5x5HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, MI_S32 start_row, MI_S32 end_row)
+static Status PyrDown5x5HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, DT_S32 start_row, DT_S32 end_row)
 {
     using Kt = typename PyrDownTraits<Tp>::KernelType;
 
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 iheight = src.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
-    MI_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 iheight = src.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
+    DT_S32 owidth  = dst.GetSizes().m_width;
 
     const Kt *kernel = kmat.Ptr<Kt>(0);
 
-    MI_S32 sy = start_row << 1;
+    DT_S32 sy = start_row << 1;
 
-    const Tp *src_p1 = src.Ptr<Tp, BORDER_TYPE>(sy - 2, MI_NULL);
-    const Tp *src_p0 = src.Ptr<Tp, BORDER_TYPE>(sy - 1, MI_NULL);
+    const Tp *src_p1 = src.Ptr<Tp, BORDER_TYPE>(sy - 2, DT_NULL);
+    const Tp *src_p0 = src.Ptr<Tp, BORDER_TYPE>(sy - 1, DT_NULL);
     const Tp *src_c  = src.Ptr<Tp>(sy);
-    const Tp *src_n0 = src.Ptr<Tp, BORDER_TYPE>(sy + 1, MI_NULL);
-    const Tp *src_n1 = src.Ptr<Tp, BORDER_TYPE>(sy + 2, MI_NULL);
+    const Tp *src_n0 = src.Ptr<Tp, BORDER_TYPE>(sy + 1, DT_NULL);
+    const Tp *src_n1 = src.Ptr<Tp, BORDER_TYPE>(sy + 2, DT_NULL);
 
-    MI_U64 L2fetch_param = L2PfParam(istride, iwidth * ElemTypeSize(src.GetElemType()), 2, 0);
-    for (MI_S32 dy = start_row; dy < end_row; dy++)
+    DT_U64 L2fetch_param = L2PfParam(istride, iwidth * ElemTypeSize(src.GetElemType()), 2, 0);
+    for (DT_S32 dy = start_row; dy < end_row; dy++)
     {
         sy = dy << 1;
         if (sy + 4 < iheight)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(sy + 3)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(sy + 3)), L2fetch_param);
         }
 
         Tp *dst_row = dst.Ptr<Tp>(dy);
@@ -401,8 +401,8 @@ static Status PyrDown5x5HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, MI_S3
         src_p1 = src_c;
         src_p0 = src_n0;
         src_c  = src_n1;
-        src_n0 = src.Ptr<Tp, BORDER_TYPE>(sy + 3, MI_NULL);
-        src_n1 = src.Ptr<Tp, BORDER_TYPE>(sy + 4, MI_NULL);
+        src_n0 = src.Ptr<Tp, BORDER_TYPE>(sy + 3, DT_NULL);
+        src_n1 = src.Ptr<Tp, BORDER_TYPE>(sy + 4, DT_NULL);
     }
 
     return Status::OK;
@@ -415,26 +415,26 @@ static Status PyrDown5x5HvxHelper(Context *ctx, const Mat &src, Mat &dst, const 
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height = dst.GetSizes().m_height;
+    DT_S32 height = dst.GetSizes().m_height;
 
     switch (border_type)
     {
         case BorderType::REPLICATE:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, PyrDown5x5HvxImpl<Tp, BorderType::REPLICATE>,
+            ret = wp->ParallelFor((DT_S32)0, height, PyrDown5x5HvxImpl<Tp, BorderType::REPLICATE>,
                                   std::cref(src), std::ref(dst), std::cref(kmat));
             break;
         }
 
         case BorderType::REFLECT_101:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, PyrDown5x5HvxImpl<Tp, BorderType::REFLECT_101>,
+            ret = wp->ParallelFor((DT_S32)0, height, PyrDown5x5HvxImpl<Tp, BorderType::REFLECT_101>,
                                   std::cref(src), std::ref(dst), std::cref(kmat));
             break;
         }
@@ -458,19 +458,19 @@ Status PyrDown5x5Hvx(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat,
     {
         case ElemType::U8:
         {
-            ret = PyrDown5x5HvxHelper<MI_U8>(ctx, src, dst, kmat, border_type);
+            ret = PyrDown5x5HvxHelper<DT_U8>(ctx, src, dst, kmat, border_type);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = PyrDown5x5HvxHelper<MI_U16>(ctx, src, dst, kmat, border_type);
+            ret = PyrDown5x5HvxHelper<DT_U16>(ctx, src, dst, kmat, border_type);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = PyrDown5x5HvxHelper<MI_S16>(ctx, src, dst, kmat, border_type);
+            ret = PyrDown5x5HvxHelper<DT_S16>(ctx, src, dst, kmat, border_type);
             break;
         }
 

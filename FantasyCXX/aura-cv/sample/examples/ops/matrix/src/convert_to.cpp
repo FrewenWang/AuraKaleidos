@@ -29,7 +29,7 @@ aura::Status ConvertToSampleTest(aura::Context *ctx, aura::TargetType type)
     //     run interface
     // ---------------------
     // print info
-    MI_F32 alpha = 1.2f, beta = 0.5f;
+    DT_F32 alpha = 1.2f, beta = 0.5f;
     AURA_LOGD(ctx, SAMPLE_TAG, "Test convert_to param detail:\n");
     AURA_LOGD(ctx, SAMPLE_TAG, "src_elem_type(%s), dst_elem_type(%s), mat_size(%s), alpha(%f), beta(%f), target(%s)\n",
               ElemTypesToString(src.GetElemType()).c_str(), ElemTypesToString(dst.GetElemType()).c_str(), 

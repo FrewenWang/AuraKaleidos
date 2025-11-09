@@ -6,7 +6,7 @@ namespace aura
 {
 
 template <typename MVType>
-AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Prepare(MVType *mv_src_p2, MVType *mv_src_p1, MVType *mv_src_p0, MVType *mv_src_c, MVType *mv_src_n0, MVType *mv_src_n1, MVType *mv_src_n2)
+AURA_ALWAYS_INLINE DT_VOID Filter2d7x7Prepare(MVType *mv_src_p2, MVType *mv_src_p1, MVType *mv_src_p0, MVType *mv_src_c, MVType *mv_src_n0, MVType *mv_src_n1, MVType *mv_src_n2)
 {
     mv_src_p2[0] = mv_src_p2[1];
     mv_src_p1[0] = mv_src_p1[1];
@@ -25,20 +25,20 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Prepare(MVType *mv_src_p2, MVType *mv_sr
     mv_src_n2[1] = mv_src_n2[2];
 }
 
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Core(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2,
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Filter2d7x7Core(HVX_Vector &vu8_src_x0, HVX_Vector &vu8_src_x1, HVX_Vector &vu8_src_x2,
                                            HVX_VectorPair &wu32_sum_lo, HVX_VectorPair &wu32_sum_hi,
-                                           const MI_S16 *kernel, MI_S32 line)
+                                           const DT_S16 *kernel, DT_S32 line)
 {
-    const MI_S32 idx = 7 * line;
-    MI_U32 k0k0 = (kernel[idx + 0] << 16) | kernel[idx + 0];
-    MI_U32 k1k1 = (kernel[idx + 1] << 16) | kernel[idx + 1];
-    MI_U32 k2k2 = (kernel[idx + 2] << 16) | kernel[idx + 2];
-    MI_U32 k3k3 = (kernel[idx + 3] << 16) | kernel[idx + 3];
-    MI_U32 k4k4 = (kernel[idx + 4] << 16) | kernel[idx + 4];
-    MI_U32 k5k5 = (kernel[idx + 5] << 16) | kernel[idx + 5];
-    MI_U32 k6k6 = (kernel[idx + 6] << 16) | kernel[idx + 6];
+    const DT_S32 idx = 7 * line;
+    DT_U32 k0k0 = (kernel[idx + 0] << 16) | kernel[idx + 0];
+    DT_U32 k1k1 = (kernel[idx + 1] << 16) | kernel[idx + 1];
+    DT_U32 k2k2 = (kernel[idx + 2] << 16) | kernel[idx + 2];
+    DT_U32 k3k3 = (kernel[idx + 3] << 16) | kernel[idx + 3];
+    DT_U32 k4k4 = (kernel[idx + 4] << 16) | kernel[idx + 4];
+    DT_U32 k5k5 = (kernel[idx + 5] << 16) | kernel[idx + 5];
+    DT_U32 k6k6 = (kernel[idx + 6] << 16) | kernel[idx + 6];
 
     HVX_VectorPair wu16_src_l2 = Q6_Wuh_vzxt_Vub(Q6_V_vlalign_VVR(vu8_src_x1, vu8_src_x0, 3));
     HVX_VectorPair wu16_src_l1 = Q6_Wuh_vzxt_Vub(Q6_V_vlalign_VVR(vu8_src_x1, vu8_src_x0, 2));
@@ -64,8 +64,8 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Core(HVX_Vector &vu8_src_x0, HVX_Vector 
     wu32_sum_hi = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum_hi, Q6_V_hi_W(wu16_src_r2), k6k6);
 }
 
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE HVX_Vector Filter2d7x7Vector(HVX_Vector &vu8_src_p2x0, HVX_Vector &vu8_src_p2x1, HVX_Vector &vu8_src_p2x2,
                                                 HVX_Vector &vu8_src_p1x0, HVX_Vector &vu8_src_p1x1, HVX_Vector &vu8_src_p1x2,
                                                 HVX_Vector &vu8_src_p0x0, HVX_Vector &vu8_src_p0x1, HVX_Vector &vu8_src_p0x2,
@@ -73,7 +73,7 @@ AURA_ALWAYS_INLINE HVX_Vector Filter2d7x7Vector(HVX_Vector &vu8_src_p2x0, HVX_Ve
                                                 HVX_Vector &vu8_src_n0x0, HVX_Vector &vu8_src_n0x1, HVX_Vector &vu8_src_n0x2,
                                                 HVX_Vector &vu8_src_n1x0, HVX_Vector &vu8_src_n1x1, HVX_Vector &vu8_src_n1x2,
                                                 HVX_Vector &vu8_src_n2x0, HVX_Vector &vu8_src_n2x1, HVX_Vector &vu8_src_n2x2,
-                                                const MI_S16 *kernel)
+                                                const DT_S16 *kernel)
 {
     HVX_VectorPair wu32_sum_lo = Q6_W_vcombine_VV(Q6_V_vzero(), Q6_V_vzero());
     HVX_VectorPair wu32_sum_hi = wu32_sum_lo;
@@ -92,19 +92,19 @@ AURA_ALWAYS_INLINE HVX_Vector Filter2d7x7Vector(HVX_Vector &vu8_src_p2x0, HVX_Ve
     return Q6_Vub_vsat_VhVh(vu16_result_hi, vu16_result_lo);
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Core(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2,
-                                           HVX_VectorPair &wu32_sum, const MI_S16 *kernel, MI_S32 line)
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Filter2d7x7Core(HVX_Vector &vu16_src_x0, HVX_Vector &vu16_src_x1, HVX_Vector &vu16_src_x2,
+                                           HVX_VectorPair &wu32_sum, const DT_S16 *kernel, DT_S32 line)
 {
-    const MI_S32 idx = 7 * line;
-    MI_U32 k0k0 = (kernel[idx + 0] << 16) | kernel[idx + 0];
-    MI_U32 k1k1 = (kernel[idx + 1] << 16) | kernel[idx + 1];
-    MI_U32 k2k2 = (kernel[idx + 2] << 16) | kernel[idx + 2];
-    MI_U32 k3k3 = (kernel[idx + 3] << 16) | kernel[idx + 3];
-    MI_U32 k4k4 = (kernel[idx + 4] << 16) | kernel[idx + 4];
-    MI_U32 k5k5 = (kernel[idx + 5] << 16) | kernel[idx + 5];
-    MI_U32 k6k6 = (kernel[idx + 6] << 16) | kernel[idx + 6];
+    const DT_S32 idx = 7 * line;
+    DT_U32 k0k0 = (kernel[idx + 0] << 16) | kernel[idx + 0];
+    DT_U32 k1k1 = (kernel[idx + 1] << 16) | kernel[idx + 1];
+    DT_U32 k2k2 = (kernel[idx + 2] << 16) | kernel[idx + 2];
+    DT_U32 k3k3 = (kernel[idx + 3] << 16) | kernel[idx + 3];
+    DT_U32 k4k4 = (kernel[idx + 4] << 16) | kernel[idx + 4];
+    DT_U32 k5k5 = (kernel[idx + 5] << 16) | kernel[idx + 5];
+    DT_U32 k6k6 = (kernel[idx + 6] << 16) | kernel[idx + 6];
 
     HVX_Vector vu16_src_l2 = Q6_V_vlalign_VVR(vu16_src_x1, vu16_src_x0, 6);
     HVX_Vector vu16_src_l1 = Q6_V_vlalign_VVR(vu16_src_x1, vu16_src_x0, 4);
@@ -122,8 +122,8 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Core(HVX_Vector &vu16_src_x0, HVX_Vector
     wu32_sum = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum, vu16_src_r2, k6k6);
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE HVX_Vector Filter2d7x7Vector(HVX_Vector &vu16_src_p2x0, HVX_Vector &vu16_src_p2x1, HVX_Vector &vu16_src_p2x2,
                                                 HVX_Vector &vu16_src_p1x0, HVX_Vector &vu16_src_p1x1, HVX_Vector &vu16_src_p1x2,
                                                 HVX_Vector &vu16_src_p0x0, HVX_Vector &vu16_src_p0x1, HVX_Vector &vu16_src_p0x2,
@@ -131,7 +131,7 @@ AURA_ALWAYS_INLINE HVX_Vector Filter2d7x7Vector(HVX_Vector &vu16_src_p2x0, HVX_V
                                                 HVX_Vector &vu16_src_n0x0, HVX_Vector &vu16_src_n0x1, HVX_Vector &vu16_src_n0x2,
                                                 HVX_Vector &vu16_src_n1x0, HVX_Vector &vu16_src_n1x1, HVX_Vector &vu16_src_n1x2,
                                                 HVX_Vector &vu16_src_n2x0, HVX_Vector &vu16_src_n2x1, HVX_Vector &vu16_src_n2x2,
-                                                const MI_S16 *kernel)
+                                                const DT_S16 *kernel)
 {
     HVX_VectorPair wu32_sum = Q6_W_vcombine_VV(Q6_V_vzero(), Q6_V_vzero());
 
@@ -146,19 +146,19 @@ AURA_ALWAYS_INLINE HVX_Vector Filter2d7x7Vector(HVX_Vector &vu16_src_p2x0, HVX_V
     return Q6_Vuh_vasr_VuwVuwR_rnd_sat(Q6_V_hi_W(wu32_sum), Q6_V_lo_W(wu32_sum), 12);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Core(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_src_x2,
-                                           HVX_VectorPair &ws32_sum, const MI_S16 *kernel, MI_S32 line)
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Filter2d7x7Core(HVX_Vector &vs16_src_x0, HVX_Vector &vs16_src_x1, HVX_Vector &vs16_src_x2,
+                                           HVX_VectorPair &ws32_sum, const DT_S16 *kernel, DT_S32 line)
 {
-    const MI_S32 idx = 7 * line;
-    MI_U32 k0k0 = (kernel[idx + 0] << 16) | kernel[idx + 0];
-    MI_U32 k1k1 = (kernel[idx + 1] << 16) | kernel[idx + 1];
-    MI_U32 k2k2 = (kernel[idx + 2] << 16) | kernel[idx + 2];
-    MI_U32 k3k3 = (kernel[idx + 3] << 16) | kernel[idx + 3];
-    MI_U32 k4k4 = (kernel[idx + 4] << 16) | kernel[idx + 4];
-    MI_U32 k5k5 = (kernel[idx + 5] << 16) | kernel[idx + 5];
-    MI_U32 k6k6 = (kernel[idx + 6] << 16) | kernel[idx + 6];
+    const DT_S32 idx = 7 * line;
+    DT_U32 k0k0 = (kernel[idx + 0] << 16) | kernel[idx + 0];
+    DT_U32 k1k1 = (kernel[idx + 1] << 16) | kernel[idx + 1];
+    DT_U32 k2k2 = (kernel[idx + 2] << 16) | kernel[idx + 2];
+    DT_U32 k3k3 = (kernel[idx + 3] << 16) | kernel[idx + 3];
+    DT_U32 k4k4 = (kernel[idx + 4] << 16) | kernel[idx + 4];
+    DT_U32 k5k5 = (kernel[idx + 5] << 16) | kernel[idx + 5];
+    DT_U32 k6k6 = (kernel[idx + 6] << 16) | kernel[idx + 6];
 
     HVX_Vector vs16_src_l2 = Q6_V_vlalign_VVR(vs16_src_x1, vs16_src_x0, 6);
     HVX_Vector vs16_src_l1 = Q6_V_vlalign_VVR(vs16_src_x1, vs16_src_x0, 4);
@@ -176,8 +176,8 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Core(HVX_Vector &vs16_src_x0, HVX_Vector
     ws32_sum = Q6_Ww_vmpyacc_WwVhRh(ws32_sum, vs16_src_r2, k6k6);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE HVX_Vector Filter2d7x7Vector(HVX_Vector &vs16_src_p2x0, HVX_Vector &vs16_src_p2x1, HVX_Vector &vs16_src_p2x2,
                                                 HVX_Vector &vs16_src_p1x0, HVX_Vector &vs16_src_p1x1, HVX_Vector &vs16_src_p1x2,
                                                 HVX_Vector &vs16_src_p0x0, HVX_Vector &vs16_src_p0x1, HVX_Vector &vs16_src_p0x2,
@@ -185,7 +185,7 @@ AURA_ALWAYS_INLINE HVX_Vector Filter2d7x7Vector(HVX_Vector &vs16_src_p2x0, HVX_V
                                                 HVX_Vector &vs16_src_n0x0, HVX_Vector &vs16_src_n0x1, HVX_Vector &vs16_src_n0x2,
                                                 HVX_Vector &vs16_src_n1x0, HVX_Vector &vs16_src_n1x1, HVX_Vector &vs16_src_n1x2,
                                                 HVX_Vector &vs16_src_n2x0, HVX_Vector &vs16_src_n2x1, HVX_Vector &vs16_src_n2x2,
-                                                const MI_S16 *kernel)
+                                                const DT_S16 *kernel)
 {
     HVX_VectorPair ws32_sum = Q6_W_vcombine_VV(Q6_V_vzero(), Q6_V_vzero());
 
@@ -201,7 +201,7 @@ AURA_ALWAYS_INLINE HVX_Vector Filter2d7x7Vector(HVX_Vector &vs16_src_p2x0, HVX_V
 }
 
 template <typename Tp>
-AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Vector(HVX_Vector &v_src_p2x0, HVX_Vector &v_src_p2x1, HVX_Vector &v_src_p2x2, HVX_Vector &v_border_p2,
+AURA_ALWAYS_INLINE DT_VOID Filter2d7x7Vector(HVX_Vector &v_src_p2x0, HVX_Vector &v_src_p2x1, HVX_Vector &v_src_p2x2, HVX_Vector &v_border_p2,
                                              HVX_Vector &v_src_p1x0, HVX_Vector &v_src_p1x1, HVX_Vector &v_src_p1x2, HVX_Vector &v_border_p1,
                                              HVX_Vector &v_src_p0x0, HVX_Vector &v_src_p0x1, HVX_Vector &v_src_p0x2, HVX_Vector &v_border_p0,
                                              HVX_Vector &v_src_cx0,  HVX_Vector &v_src_cx1,  HVX_Vector &v_src_cx2,  HVX_Vector &v_border_c,
@@ -209,7 +209,7 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Vector(HVX_Vector &v_src_p2x0, HVX_Vecto
                                              HVX_Vector &v_src_n1x0, HVX_Vector &v_src_n1x1, HVX_Vector &v_src_n1x2, HVX_Vector &v_border_n1,
                                              HVX_Vector &v_src_n2x0, HVX_Vector &v_src_n2x1, HVX_Vector &v_src_n2x2, HVX_Vector &v_border_n2,
                                              HVX_Vector &v_result_x0, HVX_Vector &v_result_x1,
-                                             const MI_S16 *kernel, MI_S32 align_size)
+                                             const DT_S16 *kernel, DT_S32 align_size)
 {
     HVX_Vector v_src_p2r0 = Q6_V_vlalign_VVR(v_border_p2, v_src_p2x2, align_size);
     HVX_Vector v_src_p1r0 = Q6_V_vlalign_VVR(v_border_p1, v_src_p1x2, align_size);
@@ -244,14 +244,14 @@ AURA_ALWAYS_INLINE AURA_VOID Filter2d7x7Vector(HVX_Vector &v_src_p2x0, HVX_Vecto
                                         kernel);
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C>
-static AURA_VOID Filter2d7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0, const Tp *src_n1,
-                              const Tp *src_n2, Tp *dst, MI_S32 width, const MI_S16 *kernel, const std::vector<Tp> &border_value)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C>
+static DT_VOID Filter2d7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0, const Tp *src_n1,
+                              const Tp *src_n2, Tp *dst, DT_S32 width, const DT_S16 *kernel, const std::vector<Tp> &border_value)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
-    MI_S32 back_offset = width - ELEM_COUNTS;
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
+    DT_S32 back_offset = width - ELEM_COUNTS;
 
     MVType mv_src_p2[3], mv_src_p1[3], mv_src_p0[3], mv_src_c[3], mv_src_n0[3], mv_src_n1[3], mv_src_n2[3];
     MVType mv_result;
@@ -267,7 +267,7 @@ static AURA_VOID Filter2d7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *sr
         vload(src_n2, mv_src_n2[1]);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p2[0].val[ch] = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_p2[1].val[ch], src_p2[ch], border_value[ch]);
             mv_src_p1[0].val[ch] = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_p1[1].val[ch], src_p1[ch], border_value[ch]);
@@ -281,7 +281,7 @@ static AURA_VOID Filter2d7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *sr
 
     // main(0 ~ n-2)
     {
-        for (MI_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
+        for (DT_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS)
         {
             vload(src_p2 + C * x, mv_src_p2[2]);
             vload(src_p1 + C * x, mv_src_p1[2]);
@@ -292,7 +292,7 @@ static AURA_VOID Filter2d7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *sr
             vload(src_n2 + C * x, mv_src_n2[2]);
 
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mv_result.val[ch] = Filter2d7x7Vector<Tp>(mv_src_p2[0].val[ch], mv_src_p2[1].val[ch], mv_src_p2[2].val[ch],
                                                           mv_src_p1[0].val[ch], mv_src_p1[1].val[ch], mv_src_p1[2].val[ch],
@@ -311,8 +311,8 @@ static AURA_VOID Filter2d7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *sr
 
     // remain
     {
-        MI_S32 last = C * (width - 1);
-        MI_S32 rest = width % ELEM_COUNTS;
+        DT_S32 last = C * (width - 1);
+        DT_S32 rest = width % ELEM_COUNTS;
         MVType mv_last;
 
         vload(src_p2 + C * back_offset, mv_src_p2[2]);
@@ -324,7 +324,7 @@ static AURA_VOID Filter2d7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *sr
         vload(src_n2 + C * back_offset, mv_src_n2[2]);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p2 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_p2[2].val[ch], src_p2[ch + last], border_value[ch]);
             HVX_Vector v_border_p1 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_p1[2].val[ch], src_p1[ch + last], border_value[ch]);
@@ -350,15 +350,15 @@ static AURA_VOID Filter2d7x7Row(const Tp *src_p2, const Tp *src_p1, const Tp *sr
     }
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C>
-static Status Filter2d7x7HvxImpl(const Mat &src, Mat &dst, const std::vector<MI_S16> &kdata, const std::vector<Tp> &border_value,
-                                 const Tp *border_buffer, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C>
+static Status Filter2d7x7HvxImpl(const Mat &src, Mat &dst, const std::vector<DT_S16> &kdata, const std::vector<Tp> &border_value,
+                                 const Tp *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width   = src.GetSizes().m_width;
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 width   = src.GetSizes().m_width;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
 
-    const MI_S16 *kernel = kdata.data();
+    const DT_S16 *kernel = kdata.data();
 
     const Tp *src_p2 = src.Ptr<Tp, BORDER_TYPE>(start_row - 3, border_buffer);
     const Tp *src_p1 = src.Ptr<Tp, BORDER_TYPE>(start_row - 2, border_buffer);
@@ -368,12 +368,12 @@ static Status Filter2d7x7HvxImpl(const Mat &src, Mat &dst, const std::vector<MI_
     const Tp *src_n1 = src.Ptr<Tp, BORDER_TYPE>(start_row + 2, border_buffer);
     const Tp *src_n2 = src.Ptr<Tp, BORDER_TYPE>(start_row + 3, border_buffer);
 
-    MI_U64 L2fetch_param = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 L2fetch_param = L2PfParam(istride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 4 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 4)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 4)), L2fetch_param);
         }
 
         Tp *dst_row = dst.Ptr<Tp>(y);
@@ -392,33 +392,33 @@ static Status Filter2d7x7HvxImpl(const Mat &src, Mat &dst, const std::vector<MI_
 }
 
 template<typename Tp, BorderType BORDER_TYPE>
-static Status Filter2d7x7HvxHelper(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_S16> &kdata,
+static Status Filter2d7x7HvxHelper(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_S16> &kdata,
                                    const std::vector<Tp> &border_value, const Tp *border_buffer)
 {
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
         case 1:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Filter2d7x7HvxImpl<Tp, BORDER_TYPE, 1>,
+            ret = wp->ParallelFor((DT_S32)0, height, Filter2d7x7HvxImpl<Tp, BORDER_TYPE, 1>,
                                   std::cref(src), std::ref(dst), std::cref(kdata), std::cref(border_value), border_buffer);
             break;
         }
 
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Filter2d7x7HvxImpl<Tp, BORDER_TYPE, 2>,
+            ret = wp->ParallelFor((DT_S32)0, height, Filter2d7x7HvxImpl<Tp, BORDER_TYPE, 2>,
                                   std::cref(src), std::ref(dst), std::cref(kdata), std::cref(border_value), border_buffer);
             break;
         }
@@ -434,23 +434,23 @@ static Status Filter2d7x7HvxHelper(Context *ctx, const Mat &src, Mat &dst, const
 }
 
 template <typename Tp>
-static Status Filter2d7x7HvxHelper(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_S16> &kdata,
+static Status Filter2d7x7HvxHelper(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_S16> &kdata,
                                    BorderType &border_type, const Scalar &border_value)
 {
     Status ret = Status::ERROR;
 
-    Tp *border_buffer = MI_NULL;
+    Tp *border_buffer = DT_NULL;
     std::vector<Tp> vec_border_value = border_value.ToVector<Tp>();
 
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (border_type)
     {
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -484,29 +484,29 @@ static Status Filter2d7x7HvxHelper(Context *ctx, const Mat &src, Mat &dst, const
     AURA_RETURN(ctx, ret);
 }
 
-Status Filter2d7x7Hvx(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_S16> &kdata,
+Status Filter2d7x7Hvx(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_S16> &kdata,
                       BorderType border_type, const Scalar &border_value)
 {
     Status ret = Status::ERROR;
-    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
 
     switch (pattern)
     {
         case AURA_MAKE_PATTERN(ElemType::U8, ElemType::U8):
         {
-            ret = Filter2d7x7HvxHelper<MI_U8>(ctx, src, dst, kdata, border_type, border_value);
+            ret = Filter2d7x7HvxHelper<DT_U8>(ctx, src, dst, kdata, border_type, border_value);
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::U16, ElemType::U16):
         {
-            ret = Filter2d7x7HvxHelper<MI_U16>(ctx, src, dst, kdata, border_type, border_value);
+            ret = Filter2d7x7HvxHelper<DT_U16>(ctx, src, dst, kdata, border_type, border_value);
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::S16, ElemType::S16):
         {
-            ret = Filter2d7x7HvxHelper<MI_S16>(ctx, src, dst, kdata, border_type, border_value);
+            ret = Filter2d7x7HvxHelper<DT_S16>(ctx, src, dst, kdata, border_type, border_value);
             break;
         }
 

@@ -28,12 +28,12 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 private:
 
 protected:
-    MI_S32      m_ksize;
+    DT_S32      m_ksize;
     BorderType  m_border_type;
     Scalar      m_border_value;
 
@@ -74,11 +74,11 @@ public:
     Status Run() override;
 };
 
-Status Filter2d3x3Neon(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_F32> &kdata,
+Status Filter2d3x3Neon(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_F32> &kdata,
                        BorderType border_type, const Scalar &border_value, const OpTarget &target);
-Status Filter2d5x5Neon(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_F32> &kdata,
+Status Filter2d5x5Neon(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_F32> &kdata,
                        BorderType border_type, const Scalar &border_value, const OpTarget &target);
-Status Filter2d7x7Neon(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_F32> &kdata,
+Status Filter2d7x7Neon(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_F32> &kdata,
                        BorderType border_type, const Scalar &border_value, const OpTarget &target);
 #endif
 
@@ -99,7 +99,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
@@ -130,11 +130,11 @@ private:
 };
 
 #  if defined(AURA_BUILD_HEXAGON)
-Status Filter2d3x3Hvx(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_S16> &kdata,
+Status Filter2d3x3Hvx(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_S16> &kdata,
                       BorderType border_type, const Scalar &border_value);
-Status Filter2d5x5Hvx(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_S16> &kdata,
+Status Filter2d5x5Hvx(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_S16> &kdata,
                       BorderType border_type, const Scalar &border_value);
-Status Filter2d7x7Hvx(Context *ctx, const Mat &src, Mat &dst, const std::vector<MI_S16> &kdata,
+Status Filter2d7x7Hvx(Context *ctx, const Mat &src, Mat &dst, const std::vector<DT_S16> &kdata,
                       BorderType border_type, const Scalar &border_value);
 #  endif // AURA_BUILD_HEXAGON
 

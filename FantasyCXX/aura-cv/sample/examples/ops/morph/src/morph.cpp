@@ -46,8 +46,8 @@ aura::Status MorphSampleTest(aura::Context *ctx, aura::TargetType type)
         return status;
     }
 
-    MI_S32 ksize = 3;
-    MI_S32 iter  = 10;
+    DT_S32 ksize = 3;
+    DT_S32 iter  = 10;
     // ---------------------
     //     run interface
     // ---------------------
@@ -84,7 +84,7 @@ aura::Status MorphSampleTest(aura::Context *ctx, aura::TargetType type)
 
 const static std::map<std::string, SampleOpsFunc> g_func_map = {{"morph", MorphSampleTest}};
 
-MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
+DT_S32 main(DT_S32 argc, DT_CHAR *argv[])
 {
     SampleOpsFunc sample_func;
     aura::TargetType type;

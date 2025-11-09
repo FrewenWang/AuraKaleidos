@@ -7,7 +7,7 @@ namespace aura
 {
 
 template <typename MVTp>
-AURA_ALWAYS_INLINE AURA_VOID Bilateral3x3U8Prepare(MVTp *mvdu8_p0_src, MVTp *mvdu8_c_src, MVTp *mvdu8_n0_src)
+AURA_ALWAYS_INLINE DT_VOID Bilateral3x3U8Prepare(MVTp *mvdu8_p0_src, MVTp *mvdu8_c_src, MVTp *mvdu8_n0_src)
 {
     mvdu8_p0_src[0] = mvdu8_p0_src[1];
     mvdu8_c_src[0]  = mvdu8_c_src[1];
@@ -81,18 +81,18 @@ AURA_ALWAYS_INLINE uint8x8x1_t Bilateral3x3U8VectorCore(uint8x8x1_t &vdu8_p0x1_s
     vqu32_sum_l              = neon::vmlal(vqu32_sum_l, neon::vgetlow(vqu16_n0c_src), neon::vgetlow(vqu16_w));
     vqu32_sum_h              = neon::vmlal(vqu32_sum_h, neon::vgethigh(vqu16_n0c_src), neon::vgethigh(vqu16_w));
 
-    float32x4_t vqf32_wei_sum_l = neon::vcvt<MI_F32>(vqu16_w_sum_l);
-    float32x4_t vqf32_wei_sum_h = neon::vcvt<MI_F32>(vqu16_w_sum_h);
-    float32x4_t vqf32_sum_l     = neon::vcvt<MI_F32>(vqu32_sum_l);
-    float32x4_t vqf32_sum_h     = neon::vcvt<MI_F32>(vqu32_sum_h);
+    float32x4_t vqf32_wei_sum_l = neon::vcvt<DT_F32>(vqu16_w_sum_l);
+    float32x4_t vqf32_wei_sum_h = neon::vcvt<DT_F32>(vqu16_w_sum_h);
+    float32x4_t vqf32_sum_l     = neon::vcvt<DT_F32>(vqu32_sum_l);
+    float32x4_t vqf32_sum_h     = neon::vcvt<DT_F32>(vqu32_sum_h);
 
     uint16x4_t  vdu16_dst_l, vdu16_dst_h;
     float32x4_t vqf32_reciprocal;
     vqf32_reciprocal = neon::vreciprocal_newton(vqf32_wei_sum_l);
-    vdu16_dst_l      = neon::vmovn(neon::vcvt<MI_U32>(neon::vrndn(neon::vmul(vqf32_sum_l, vqf32_reciprocal))));
+    vdu16_dst_l      = neon::vmovn(neon::vcvt<DT_U32>(neon::vrndn(neon::vmul(vqf32_sum_l, vqf32_reciprocal))));
 
     vqf32_reciprocal = neon::vreciprocal_newton(vqf32_wei_sum_h);
-    vdu16_dst_h      = neon::vmovn(neon::vcvt<MI_U32>(neon::vrndn(neon::vmul(vqf32_sum_h, vqf32_reciprocal))));
+    vdu16_dst_h      = neon::vmovn(neon::vcvt<DT_U32>(neon::vrndn(neon::vmul(vqf32_sum_h, vqf32_reciprocal))));
 
     uint8x8x1_t vdu8_dst;
     vdu8_dst.val[0]  = neon::vqmovn(neon::vcombine(vdu16_dst_l, vdu16_dst_h));
@@ -212,44 +212,44 @@ AURA_ALWAYS_INLINE uint8x8x3_t Bilateral3x3U8VectorCore(uint8x8x3_t &vdu8_p0x1_s
 
     uint8x8x3_t v3du8_dst;
     // r
-    float32x4_t vqf32_wei_sum_l = neon::vcvt<MI_F32>(vqu16_w_sum_l);
-    float32x4_t vqf32_wei_sum_h = neon::vcvt<MI_F32>(vqu16_w_sum_h);
-    float32x4_t vqf32_sum_l     = neon::vcvt<MI_F32>(vqu32_sum_l_r);
-    float32x4_t vqf32_sum_h     = neon::vcvt<MI_F32>(vqu32_sum_h_r);
+    float32x4_t vqf32_wei_sum_l = neon::vcvt<DT_F32>(vqu16_w_sum_l);
+    float32x4_t vqf32_wei_sum_h = neon::vcvt<DT_F32>(vqu16_w_sum_h);
+    float32x4_t vqf32_sum_l     = neon::vcvt<DT_F32>(vqu32_sum_l_r);
+    float32x4_t vqf32_sum_h     = neon::vcvt<DT_F32>(vqu32_sum_h_r);
 
     uint16x4_t  vdu16_dst_l, vdu16_dst_h;
     float32x4_t vqf32_reciprocal_l, vqf32_reciprocal_h;
     vqf32_reciprocal_l = neon::vreciprocal_newton(vqf32_wei_sum_l);
-    vdu16_dst_l        = neon::vmovn(neon::vcvt<MI_U32>(neon::vrndn(neon::vmul(vqf32_sum_l, vqf32_reciprocal_l))));
+    vdu16_dst_l        = neon::vmovn(neon::vcvt<DT_U32>(neon::vrndn(neon::vmul(vqf32_sum_l, vqf32_reciprocal_l))));
     vqf32_reciprocal_h = neon::vreciprocal_newton(vqf32_wei_sum_h);
-    vdu16_dst_h        = neon::vmovn(neon::vcvt<MI_U32>(neon::vrndn(neon::vmul(vqf32_sum_h, vqf32_reciprocal_h))));
+    vdu16_dst_h        = neon::vmovn(neon::vcvt<DT_U32>(neon::vrndn(neon::vmul(vqf32_sum_h, vqf32_reciprocal_h))));
 
     v3du8_dst.val[0]   = neon::vqmovn(neon::vcombine(vdu16_dst_l, vdu16_dst_h));
 
     // g
-    vqf32_sum_l      = neon::vcvt<MI_F32>(vqu32_sum_l_g);
-    vqf32_sum_h      = neon::vcvt<MI_F32>(vqu32_sum_h_g);
-    vdu16_dst_l      = neon::vmovn(neon::vcvt<MI_U32>(neon::vrndn(neon::vmul(vqf32_sum_l, vqf32_reciprocal_l))));
-    vdu16_dst_h      = neon::vmovn(neon::vcvt<MI_U32>(neon::vrndn(neon::vmul(vqf32_sum_h, vqf32_reciprocal_h))));
+    vqf32_sum_l      = neon::vcvt<DT_F32>(vqu32_sum_l_g);
+    vqf32_sum_h      = neon::vcvt<DT_F32>(vqu32_sum_h_g);
+    vdu16_dst_l      = neon::vmovn(neon::vcvt<DT_U32>(neon::vrndn(neon::vmul(vqf32_sum_l, vqf32_reciprocal_l))));
+    vdu16_dst_h      = neon::vmovn(neon::vcvt<DT_U32>(neon::vrndn(neon::vmul(vqf32_sum_h, vqf32_reciprocal_h))));
     v3du8_dst.val[1] = neon::vqmovn(neon::vcombine(vdu16_dst_l, vdu16_dst_h));
 
     // b
-    vqf32_sum_l      = neon::vcvt<MI_F32>(vqu32_sum_l_b);
-    vqf32_sum_h      = neon::vcvt<MI_F32>(vqu32_sum_h_b);
-    vdu16_dst_l      = neon::vmovn(neon::vcvt<MI_U32>(neon::vrndn(neon::vmul(vqf32_sum_l, vqf32_reciprocal_l))));
-    vdu16_dst_h      = neon::vmovn(neon::vcvt<MI_U32>(neon::vrndn(neon::vmul(vqf32_sum_h, vqf32_reciprocal_h))));
+    vqf32_sum_l      = neon::vcvt<DT_F32>(vqu32_sum_l_b);
+    vqf32_sum_h      = neon::vcvt<DT_F32>(vqu32_sum_h_b);
+    vdu16_dst_l      = neon::vmovn(neon::vcvt<DT_U32>(neon::vrndn(neon::vmul(vqf32_sum_l, vqf32_reciprocal_l))));
+    vdu16_dst_h      = neon::vmovn(neon::vcvt<DT_U32>(neon::vrndn(neon::vmul(vqf32_sum_h, vqf32_reciprocal_h))));
     v3du8_dst.val[2] = neon::vqmovn(neon::vcombine(vdu16_dst_l, vdu16_dst_h));
 
     return v3du8_dst;
 }
 
-template <BorderType BORDER_TYPE, MI_S32 C>
-static AURA_VOID Bilateral3x3U8Row(const MI_U8 *src_p0, const MI_U8 *src_c, const MI_U8 *src_n0, MI_U8 *dst, const std::vector<MI_U8> &space_weight,
-                                 uint8x8x4_t &v4du8_color_weight_tbl, const std::vector<MI_U8> &border_value, MI_S32 width)
+template <BorderType BORDER_TYPE, DT_S32 C>
+static DT_VOID Bilateral3x3U8Row(const DT_U8 *src_p0, const DT_U8 *src_c, const DT_U8 *src_n0, DT_U8 *dst, const std::vector<DT_U8> &space_weight,
+                                 uint8x8x4_t &v4du8_color_weight_tbl, const std::vector<DT_U8> &border_value, DT_S32 width)
 {
-    constexpr MI_S32 elem_counts = 8;
-    constexpr MI_S32 voffset     = elem_counts * C;
-    const MI_S32 width_align8    = (width & -elem_counts) * C;
+    constexpr DT_S32 elem_counts = 8;
+    constexpr DT_S32 voffset     = elem_counts * C;
+    const DT_S32 width_align8    = (width & -elem_counts) * C;
 
     uint8x8_t vdu8_space_scale[5];
     neon::vdup(vdu8_space_scale[0], space_weight[0]);
@@ -258,7 +258,7 @@ static AURA_VOID Bilateral3x3U8Row(const MI_U8 *src_p0, const MI_U8 *src_c, cons
     neon::vdup(vdu8_space_scale[3], space_weight[3]);
     neon::vdup(vdu8_space_scale[4], space_weight[4]);
 
-    using MVType = typename neon::MDVector<MI_U8, C>::MVType;
+    using MVType = typename neon::MDVector<DT_U8, C>::MVType;
 
     MVType mvdu8_p0_src[3], mvdu8_c_src[3], mvdu8_n0_src[3];
     MVType mvdu8_dst;
@@ -272,7 +272,7 @@ static AURA_VOID Bilateral3x3U8Row(const MI_U8 *src_p0, const MI_U8 *src_c, cons
         neon::vload(src_c  + voffset, mvdu8_c_src[2]);
         neon::vload(src_n0 + voffset, mvdu8_n0_src[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvdu8_p0_src[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mvdu8_p0_src[1].val[ch], src_p0[ch], border_value[ch]);
             mvdu8_c_src[0].val[ch]  = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mvdu8_c_src[1].val[ch], src_c[ch], border_value[ch]);
@@ -289,7 +289,7 @@ static AURA_VOID Bilateral3x3U8Row(const MI_U8 *src_p0, const MI_U8 *src_c, cons
 
     // Middle
     {
-        for (MI_S32 x = voffset; x < (width_align8 - voffset); x += voffset)
+        for (DT_S32 x = voffset; x < (width_align8 - voffset); x += voffset)
         {
             neon::vload(src_p0 + x + voffset, mvdu8_p0_src[2]);
             neon::vload(src_c  + x + voffset, mvdu8_c_src[2]);
@@ -308,7 +308,7 @@ static AURA_VOID Bilateral3x3U8Row(const MI_U8 *src_p0, const MI_U8 *src_c, cons
     {
         if (width_align8 != width * C)
         {
-            MI_S32 x = (width - elem_counts * 2) * C;
+            DT_S32 x = (width - elem_counts * 2) * C;
 
             neon::vload(src_p0 + x - voffset, mvdu8_p0_src[0]);
             neon::vload(src_p0 + x, mvdu8_p0_src[1]);
@@ -330,9 +330,9 @@ static AURA_VOID Bilateral3x3U8Row(const MI_U8 *src_p0, const MI_U8 *src_c, cons
     }
     // right
     {
-        MI_S32 x = (width - 8) * C;
-        MI_S32 last = (width - 1) * C;
-        for (MI_S32 ch = 0; ch < C; ch++)
+        DT_S32 x = (width - 8) * C;
+        DT_S32 last = (width - 1) * C;
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mvdu8_p0_src[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mvdu8_p0_src[1].val[ch], src_p0[last], border_value[ch]);
             mvdu8_c_src[2].val[ch]  = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mvdu8_c_src[1].val[ch], src_c[last], border_value[ch]);
@@ -348,48 +348,48 @@ static AURA_VOID Bilateral3x3U8Row(const MI_U8 *src_p0, const MI_U8 *src_c, cons
     }
 }
 
-template <BorderType BORDER_TYPE, MI_S32 C>
-static Status Bilateral3x3U8NeonImpl(const Mat &src, Mat &dst, std::vector<MI_U8> &space_weight, std::vector<MI_U8> &color_weight,
-                                     const std::vector<MI_U8> &border_value, const MI_U8 *border_buffer, MI_S32 start_row, MI_S32 end_row)
+template <BorderType BORDER_TYPE, DT_S32 C>
+static Status Bilateral3x3U8NeonImpl(const Mat &src, Mat &dst, std::vector<DT_U8> &space_weight, std::vector<DT_U8> &color_weight,
+                                     const std::vector<DT_U8> &border_value, const DT_U8 *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width = dst.GetSizes().m_width;
+    DT_S32 width = dst.GetSizes().m_width;
 
     uint8x8x4_t v4du8_color_weight_tbl;
-    for (MI_S32 j = 0; j < 4; j++)
+    for (DT_S32 j = 0; j < 4; j++)
     {
         v4du8_color_weight_tbl.val[j] = neon::vload1(color_weight.data() + j * 8);
     }
 
-    const MI_U8 *src_p = MI_NULL, *src_c = MI_NULL, *src_n = MI_NULL;
-    MI_U8 *dst_c = MI_NULL;
+    const DT_U8 *src_p = DT_NULL, *src_c = DT_NULL, *src_n = DT_NULL;
+    DT_U8 *dst_c = DT_NULL;
 
-    MI_S32 y = start_row;
+    DT_S32 y = start_row;
 
-    src_p = src.Ptr<MI_U8, BORDER_TYPE>(y - 1, border_buffer);
-    src_c = src.Ptr<MI_U8>(y);
-    src_n = src.Ptr<MI_U8, BORDER_TYPE>(y + 1, border_buffer);
+    src_p = src.Ptr<DT_U8, BORDER_TYPE>(y - 1, border_buffer);
+    src_c = src.Ptr<DT_U8>(y);
+    src_n = src.Ptr<DT_U8, BORDER_TYPE>(y + 1, border_buffer);
 
     for (; y < end_row; y++)
     {
-        dst_c = dst.Ptr<MI_U8>(y);
+        dst_c = dst.Ptr<DT_U8>(y);
         Bilateral3x3U8Row<BORDER_TYPE, C>(src_p, src_c, src_n, dst_c, space_weight, v4du8_color_weight_tbl, border_value, width);
 
         src_p = src_c;
         src_c = src_n;
-        src_n = src.Ptr<MI_U8, BORDER_TYPE>(y + 2, border_buffer);
+        src_n = src.Ptr<DT_U8, BORDER_TYPE>(y + 2, border_buffer);
     }
 
     return Status::OK;
 }
 
 template<BorderType BORDER_TYPE>
-static Status Bilateral3x3U8NeonHelper(Context *ctx, const Mat &src, Mat &dst, std::vector<MI_U8> &space_weight, std::vector<MI_U8> &color_weight,
-                                       const std::vector<MI_U8> &border_value, const MI_U8 *border_buffer, const OpTarget &target)
+static Status Bilateral3x3U8NeonHelper(Context *ctx, const Mat &src, Mat &dst, std::vector<DT_U8> &space_weight, std::vector<DT_U8> &color_weight,
+                                       const std::vector<DT_U8> &border_value, const DT_U8 *border_buffer, const OpTarget &target)
 {
     AURA_UNUSED(target);
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -397,8 +397,8 @@ static Status Bilateral3x3U8NeonHelper(Context *ctx, const Mat &src, Mat &dst, s
 
     Status ret = Status::ERROR;
 
-    MI_S32 height  = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 height  = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch(channel)
     {
@@ -426,41 +426,41 @@ static Status Bilateral3x3U8NeonHelper(Context *ctx, const Mat &src, Mat &dst, s
     AURA_RETURN(ctx, ret);
 }
 
-static Status GetBilateral3x3U8Weight(const MI_F32 *space_data, const MI_F32 *color_data, std::vector<MI_U8> &space, std::vector<MI_U8> &color)
+static Status GetBilateral3x3U8Weight(const DT_F32 *space_data, const DT_F32 *color_data, std::vector<DT_U8> &space, std::vector<DT_U8> &color)
 {
-    if ((MI_NULL == space_data) || (MI_NULL == color_data))
+    if ((DT_NULL == space_data) || (DT_NULL == color_data))
     {
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 0; i < static_cast<MI_S32>(space.size()); i++)
+    for (DT_S32 i = 0; i < static_cast<DT_S32>(space.size()); i++)
     {
-        space[i] = static_cast<MI_U8>(255 * space_data[i]);
+        space[i] = static_cast<DT_U8>(255 * space_data[i]);
     }
 
-    for (MI_S32 i = 0; i < static_cast<MI_S32>(color.size()); i++)
+    for (DT_S32 i = 0; i < static_cast<DT_S32>(color.size()); i++)
     {
-        color[i] = static_cast<MI_U8>(255 * color_data[i]);
+        color[i] = static_cast<DT_U8>(255 * color_data[i]);
     }
 
     return Status::OK;
 }
 
 static Status Bilateral3x3U8NeonHelper(Context *ctx, const Mat &src, Mat &dst, const Mat &space_weight, const Mat &color_weight,
-                                       MI_S32 valid_num, BorderType border_type, const Scalar &border_value, const OpTarget &target)
+                                       DT_S32 valid_num, BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
     // weight quant
-    std::vector<MI_U8> vec_space_weight(valid_num, 0);
-    std::vector<MI_U8> vec_color_weight(32, 0);
+    std::vector<DT_U8> vec_space_weight(valid_num, 0);
+    std::vector<DT_U8> vec_color_weight(32, 0);
 
-    MI_U8 *border_buffer                = MI_NULL;
-    std::vector<MI_U8> vec_border_value = border_value.ToVector<MI_U8>();
-    MI_S32 width                        = dst.GetSizes().m_width;
-    MI_S32 channel                      = dst.GetSizes().m_channel;
+    DT_U8 *border_buffer                = DT_NULL;
+    std::vector<DT_U8> vec_border_value = border_value.ToVector<DT_U8>();
+    DT_S32 width                        = dst.GetSizes().m_width;
+    DT_S32 channel                      = dst.GetSizes().m_channel;
 
-    ret = GetBilateral3x3U8Weight(space_weight.Ptr<MI_F32>(0), color_weight.Ptr<MI_F32>(0), vec_space_weight, vec_color_weight);
+    ret = GetBilateral3x3U8Weight(space_weight.Ptr<DT_F32>(0), color_weight.Ptr<DT_F32>(0), vec_space_weight, vec_color_weight);
     if (ret != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetBilateral3x3U8Weight failed");
@@ -472,7 +472,7 @@ static Status Bilateral3x3U8NeonHelper(Context *ctx, const Mat &src, Mat &dst, c
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -520,7 +520,7 @@ static Status Bilateral3x3U8NeonHelper(Context *ctx, const Mat &src, Mat &dst, c
 }
 
 Status Bilateral3x3Neon(Context *ctx, const Mat &src, Mat &dst, const Mat &space_weight, const Mat &color_weight,
-                        MI_S32 valid_num, BorderType border_type, const Scalar &border_value, const OpTarget &target)
+                        DT_S32 valid_num, BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 

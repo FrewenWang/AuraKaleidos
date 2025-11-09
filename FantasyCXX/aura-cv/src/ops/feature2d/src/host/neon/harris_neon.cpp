@@ -5,20 +5,20 @@
 namespace aura
 {
 
-static AURA_VOID CalcHarrisNeon(Context *ctx, const Mat &src, Mat &dst, MI_F64 k)
+static DT_VOID CalcHarrisNeon(Context *ctx, const Mat &src, Mat &dst, DT_F64 k)
 {
     AURA_UNUSED(ctx);
     Sizes3 size = src.GetSizes();
     float32x4_t vqf32_const_k;
-    neon::vdup(vqf32_const_k, static_cast<MI_F32>(k));
+    neon::vdup(vqf32_const_k, static_cast<DT_F32>(k));
 
-    MI_S32 width_align4 = size.m_width & (-4);
-    for (MI_S32 y = 0; y < size.m_height; y++)
+    DT_S32 width_align4 = size.m_width & (-4);
+    for (DT_S32 y = 0; y < size.m_height; y++)
     {
-        const MI_F32 *src_data = src.Ptr<MI_F32>(y);
-        MI_F32       *dst_data = dst.Ptr<MI_F32>(y);
+        const DT_F32 *src_data = src.Ptr<DT_F32>(y);
+        DT_F32       *dst_data = dst.Ptr<DT_F32>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align4; x += 4)
         {
             float32x4x3_t v3qf32_src   = neon::vload3q(src_data);
@@ -33,28 +33,28 @@ static AURA_VOID CalcHarrisNeon(Context *ctx, const Mat &src, Mat &dst, MI_F64 k
         }
         for (; x < size.m_width; x++)
         {
-            MI_F32 a = *src_data++;
-            MI_F32 b = *src_data++;
-            MI_F32 c = *src_data++;
+            DT_F32 a = *src_data++;
+            DT_F32 b = *src_data++;
+            DT_F32 c = *src_data++;
             *dst_data++ = a * c - b * b - k * (a + c) * (a + c);
         }
     }
 }
 
-static AURA_VOID CalcMinEigenValNeon(Context *ctx, const Mat &src, Mat &dst)
+static DT_VOID CalcMinEigenValNeon(Context *ctx, const Mat &src, Mat &dst)
 {
     AURA_UNUSED(ctx);
     Sizes3 size = src.GetSizes();
     float32x4_t vqf32_const;
     neon::vdup(vqf32_const, 0.5f);
 
-    MI_S32 width_align4 = size.m_width & (-4);
-    for (MI_S32 y = 0; y < size.m_height; y++)
+    DT_S32 width_align4 = size.m_width & (-4);
+    for (DT_S32 y = 0; y < size.m_height; y++)
     {
-        const MI_F32 *src_data = src.Ptr<MI_F32>(y);
-        MI_F32       *dst_data = dst.Ptr<MI_F32>(y);
+        const DT_F32 *src_data = src.Ptr<DT_F32>(y);
+        DT_F32       *dst_data = dst.Ptr<DT_F32>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align4; x += 4)
         {
             float32x4x3_t v3qf32_src = neon::vload3q(src_data);
@@ -76,18 +76,18 @@ static AURA_VOID CalcMinEigenValNeon(Context *ctx, const Mat &src, Mat &dst)
         }
         for (; x < size.m_width; x++)
         {
-            MI_F32 a = *src_data++ * 0.5f;
-            MI_F32 b = *src_data++;
-            MI_F32 c = *src_data++ * 0.5f;
+            DT_F32 a = *src_data++ * 0.5f;
+            DT_F32 b = *src_data++;
+            DT_F32 c = *src_data++ * 0.5f;
             *dst_data++ = (a + c) - Sqrt(Pow((a - c), 2) + Pow(b, 2));
         }
     }
 }
 
-Status CornerEigenValsVecsNeon(Context *ctx, const Mat &src, Mat &dst, MI_S32 block_size, MI_S32 aperture_size,
-                               MI_BOOL use_harris, MI_F64 k, BorderType border_type, const Scalar &border_value, const OpTarget &target)
+Status CornerEigenValsVecsNeon(Context *ctx, const Mat &src, Mat &dst, DT_S32 block_size, DT_S32 aperture_size,
+                               DT_BOOL use_harris, DT_F64 k, BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
-    MI_F64 scale = (1 << ((aperture_size > 0 ? aperture_size : 3) - 1)) * block_size;
+    DT_F64 scale = (1 << ((aperture_size > 0 ? aperture_size : 3) - 1)) * block_size;
     if (aperture_size < 0)
     {
         scale *= 2.0;
@@ -121,14 +121,14 @@ Status CornerEigenValsVecsNeon(Context *ctx, const Mat &src, Mat &dst, MI_S32 bl
         return Status::ERROR;
     }
 
-    MI_S32 width_align4 = src_size.m_width & (-4);
-    for (MI_S32 y = 0; y < cov_size.m_height; y++)
+    DT_S32 width_align4 = src_size.m_width & (-4);
+    for (DT_S32 y = 0; y < cov_size.m_height; y++)
     {
-        MI_F32 *cov_data = cov.Ptr<MI_F32>(y);
-        const MI_F32 *dx_data  = dx.Ptr<MI_F32>(y);
-        const MI_F32 *dy_data  = dy.Ptr<MI_F32>(y);
+        DT_F32 *cov_data = cov.Ptr<DT_F32>(y);
+        const DT_F32 *dx_data  = dx.Ptr<DT_F32>(y);
+        const DT_F32 *dy_data  = dy.Ptr<DT_F32>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align4; x += 4)
         {
             float32x4_t vqf32_dx = neon::vload1q(dx_data);
@@ -146,8 +146,8 @@ Status CornerEigenValsVecsNeon(Context *ctx, const Mat &src, Mat &dst, MI_S32 bl
         }
         for (; x < cov_size.m_width; x++)
         {
-            MI_F32 dx = *dx_data++;
-            MI_F32 dy = *dy_data++;
+            DT_F32 dx = *dx_data++;
+            DT_F32 dy = *dy_data++;
 
             *cov_data++ = dx * dx;
             *cov_data++ = dx * dy;
@@ -169,16 +169,16 @@ Status CornerEigenValsVecsNeon(Context *ctx, const Mat &src, Mat &dst, MI_S32 bl
         return Status::ERROR;
     }
 
-    MI_F32 kxk = block_size * block_size;
+    DT_F32 kxk = block_size * block_size;
     float32x4_t vqf32_const_kxk;
     neon::vdup(vqf32_const_kxk, kxk);
 
-    MI_S32 widthx3 = cov_size.m_width * 3;
-    MI_S32 widthx3_align4 = widthx3 & (-4);
-    for (MI_S32 y = 0; y < cov_size.m_height; y++)
+    DT_S32 widthx3 = cov_size.m_width * 3;
+    DT_S32 widthx3_align4 = widthx3 & (-4);
+    for (DT_S32 y = 0; y < cov_size.m_height; y++)
     {
-        MI_F32 *dst_data = cov_dst.Ptr<MI_F32>(y);
-        MI_S32 x = 0;
+        DT_F32 *dst_data = cov_dst.Ptr<DT_F32>(y);
+        DT_S32 x = 0;
         for (; x < widthx3_align4; x += 4)
         {
             float32x4_t vqf32_data = neon::vload1q(dst_data);
@@ -207,7 +207,7 @@ Status CornerEigenValsVecsNeon(Context *ctx, const Mat &src, Mat &dst, MI_S32 bl
 HarrisNeon::HarrisNeon(Context *ctx, const OpTarget &target) : HarrisImpl(ctx, target)
 {}
 
-Status HarrisNeon::SetArgs(const Array *src, Array *dst, MI_S32 block_size, MI_S32 ksize, MI_F64 k,
+Status HarrisNeon::SetArgs(const Array *src, Array *dst, DT_S32 block_size, DT_S32 ksize, DT_F64 k,
                            BorderType border_type, const Scalar &border_value)
 {
     if (HarrisImpl::SetArgs(src, dst, block_size, ksize, k, border_type, border_value) != Status::OK)
@@ -229,7 +229,7 @@ Status HarrisNeon::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
@@ -242,7 +242,7 @@ Status HarrisNeon::Run()
         case ElemType::U8:
         case ElemType::F32:
         {
-            ret = CornerEigenValsVecsNeon(m_ctx, *src, *dst, m_block_size, m_ksize, MI_TRUE,
+            ret = CornerEigenValsVecsNeon(m_ctx, *src, *dst, m_block_size, m_ksize, DT_TRUE,
                                           m_k, m_border_type, m_border_value, m_target);
             if (ret != Status::OK)
             {

@@ -59,7 +59,7 @@ aura::Status DftIDftSampleTest(aura::Context *ctx, aura::TargetType type)
 
     // run and time
     start_time = aura::Time::Now();
-    status = IInverseDft(ctx, dst0, dst1, MI_TRUE, aura::OpTarget(type));
+    status = IInverseDft(ctx, dst0, dst1, DT_TRUE, aura::OpTarget(type));
     end_time = aura::Time::Now();
     
     // ---------------------

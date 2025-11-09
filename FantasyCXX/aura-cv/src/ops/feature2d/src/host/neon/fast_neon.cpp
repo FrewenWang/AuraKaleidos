@@ -6,10 +6,10 @@
 namespace aura
 {
 
-static AURA_VOID MakeOffsets9Neon(MI_S32 pixel[], MI_S32 stride)
+static DT_VOID MakeOffsets9Neon(DT_S32 pixel[], DT_S32 stride)
 {
-    const MI_S32 d_stride = stride + stride;
-    const MI_S32 t_stride = d_stride + stride;
+    const DT_S32 d_stride = stride + stride;
+    const DT_S32 t_stride = d_stride + stride;
     pixel[16] = pixel[0]  = t_stride;
     pixel[17] = pixel[1]  = 1 + t_stride;
     pixel[18] = pixel[2]  = 2 + d_stride;
@@ -28,20 +28,20 @@ static AURA_VOID MakeOffsets9Neon(MI_S32 pixel[], MI_S32 stride)
     pixel[15] = -1 + t_stride;
 }
 
-static MI_U8 CornerScore9Neon(const MI_U8 *src, const MI_S32 pixel[])
+static DT_U8 CornerScore9Neon(const DT_U8 *src, const DT_S32 pixel[])
 {
-    MI_S32 k, center = src[0];
-    MI_S16 diff[32];
+    DT_S32 k, center = src[0];
+    DT_S16 diff[32];
 
     for (k = 0; k < 25; k++)
     {
-        diff[k] = static_cast<MI_S16>(center - src[pixel[k]]);
+        diff[k] = static_cast<DT_S16>(center - src[pixel[k]]);
     }
 
     int16x8_t vqs16_q0;
-    neon::vdup(vqs16_q0, static_cast<MI_S16>(-1000));
+    neon::vdup(vqs16_q0, static_cast<DT_S16>(-1000));
     int16x8_t vqs16_q1;
-    neon::vdup(vqs16_q1, static_cast<MI_S16>(1000));
+    neon::vdup(vqs16_q1, static_cast<DT_S16>(1000));
 
     int16x8_t vqs16_diff0  = neon::vload1q(diff +  0);
     int16x8_t vqs16_diff8  = neon::vload1q(diff +  8);
@@ -121,37 +121,37 @@ static MI_U8 CornerScore9Neon(const MI_U8 *src, const MI_S32 pixel[])
     vqs16_q1       = neon::vmin(vqs16_q1, neon::vmax(vqs16_diff8_max, vqs16_diff8_r1));
 
     // fin
-    int16x8_t vqs16_q    = neon::vmax(vqs16_q0, neon::vsub(neon::vmovq((MI_S16)0), vqs16_q1));
+    int16x8_t vqs16_q    = neon::vmax(vqs16_q0, neon::vsub(neon::vmovq((DT_S16)0), vqs16_q1));
     int16x4_t vqs16_q2   = neon::vmax(neon::vgetlow(vqs16_q), neon::vgethigh(vqs16_q));
     int32x4_t vqs32_q2_w = neon::vmovl(vqs16_q2);
     int32x2_t vds32_q4   = neon::vmax(neon::vgetlow(vqs32_q2_w), neon::vgethigh(vqs32_q2_w));
-    int32x2_t vds32_q8   = neon::vmax(vds32_q4, neon::vreinterpret_64<MI_S32>(neon::vshr_n<32>(neon::vreinterpret_64<MI_S64>(vds32_q4))));
+    int32x2_t vds32_q8   = neon::vmax(vds32_q4, neon::vreinterpret_64<DT_S32>(neon::vshr_n<32>(neon::vreinterpret_64<DT_S64>(vds32_q4))));
 
-    return static_cast<MI_U8>(neon::vgetlane<0>(vds32_q8) - 1);
+    return static_cast<DT_U8>(neon::vgetlane<0>(vds32_q8) - 1);
 }
 
-static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &key_points, MI_S32 threshold, MI_BOOL nonmax_suppression,
-                            ThreadBuffer &thread_buffer, std::mutex &mutex, MI_S32 start_row, MI_S32 end_row)
+static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &key_points, DT_S32 threshold, DT_BOOL nonmax_suppression,
+                            ThreadBuffer &thread_buffer, std::mutex &mutex, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 iwidth  = mat.GetSizes().m_width;
-    MI_S32 iheight = mat.GetSizes().m_height;
-    MI_S32 istride = mat.GetRowPitch();
+    DT_S32 iwidth  = mat.GetSizes().m_width;
+    DT_S32 iheight = mat.GetSizes().m_height;
+    DT_S32 istride = mat.GetRowPitch();
 
-    constexpr MI_S32 KSIZE = 16 / 2;
-    constexpr MI_S32 NSIZE = 16 + KSIZE + 1;
+    constexpr DT_S32 KSIZE = 16 / 2;
+    constexpr DT_S32 NSIZE = 16 + KSIZE + 1;
 
-    MI_S32 x, y, k, pixel[25];
+    DT_S32 x, y, k, pixel[25];
     MakeOffsets9Neon(pixel, istride);
 
     threshold = Clamp(threshold, 0, 255);
 
-    MI_U8 threshold_tab[512];
+    DT_U8 threshold_tab[512];
     for (x = -255; x <= 255; x++)
     {
-        threshold_tab[x + 255] = static_cast<MI_U8>(x < -threshold ? 1 : x > threshold ? 2 : 0);
+        threshold_tab[x + 255] = static_cast<DT_U8>(x < -threshold ? 1 : x > threshold ? 2 : 0);
     }
 
-    MI_U8 *buffer = thread_buffer.GetThreadData<MI_U8>();
+    DT_U8 *buffer = thread_buffer.GetThreadData<DT_U8>();
 
     if (!buffer)
     {
@@ -159,27 +159,27 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
         return Status::ERROR;
     }
 
-    MI_U8 *row_ptr[3];
+    DT_U8 *row_ptr[3];
     row_ptr[0] = buffer;
     row_ptr[1] = row_ptr[0] + iwidth;
     row_ptr[2] = row_ptr[1] + iwidth;
 
-    MI_S32 *cprow[3];
-    cprow[0] = reinterpret_cast<MI_S32*>(((MI_UPTR_T)(row_ptr[2] + iwidth) + sizeof(MI_S32) - 1) & -(sizeof(MI_S32))) + 1;
+    DT_S32 *cprow[3];
+    cprow[0] = reinterpret_cast<DT_S32*>(((DT_UPTR_T)(row_ptr[2] + iwidth) + sizeof(DT_S32) - 1) & -(sizeof(DT_S32))) + 1;
     cprow[1] = cprow[0] + iwidth + 1;
     cprow[2] = cprow[1] + iwidth + 1;
 
     memset(row_ptr[0], 0, iwidth * 3);
 
     uint8x16_t vqu8_delta;
-    neon::vdup(vqu8_delta, static_cast<MI_U8>(128));
+    neon::vdup(vqu8_delta, static_cast<DT_U8>(128));
     uint8x16_t vqu8_thresh;
-    neon::vdup(vqu8_thresh, static_cast<MI_U8>(threshold));
+    neon::vdup(vqu8_thresh, static_cast<DT_U8>(threshold));
 
-    const MI_S32 width_align16 = ((iwidth - 6) & (~15)) + 3;
+    const DT_S32 width_align16 = ((iwidth - 6) & (~15)) + 3;
 
-    MI_S32 start_y = 0;
-    MI_S32 end_y   = 0;
+    DT_S32 start_y = 0;
+    DT_S32 end_y   = 0;
 
     if (3 == start_row)
     {
@@ -204,12 +204,12 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
 
     for (y = start_y; y < end_y; y++)
     {
-        const MI_U8 *src_row = mat.Ptr<MI_U8>(y);
-        MI_U8 *curr          = row_ptr[(y - 3) % 3];
-        MI_S32 *cornerpos    = cprow[(y - 3) % 3];
+        const DT_U8 *src_row = mat.Ptr<DT_U8>(y);
+        DT_U8 *curr          = row_ptr[(y - 3) % 3];
+        DT_S32 *cornerpos    = cprow[(y - 3) % 3];
 
         memset(curr, 0, iwidth);
-        MI_S32 ncorners = 0;
+        DT_S32 ncorners = 0;
 
         if (y < (iheight - 3))
         {
@@ -243,14 +243,14 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
                 vqu8_gt_thresh            = neon::vorr(vqu8_gt_thresh, vqu8_gt_val);
                 vqu8_ls_thresh            = neon::vorr(vqu8_ls_thresh, vqu8_ls_val);
 
-                uint64x2_t mask = neon::vreinterpret_64<MI_U64>(neon::vorr(vqu8_gt_thresh, vqu8_ls_thresh));
+                uint64x2_t mask = neon::vreinterpret_64<DT_U64>(neon::vorr(vqu8_gt_thresh, vqu8_ls_thresh));
 
                 if (mask[0] || mask[1])
                 {
-                    uint8x16_t vqu8_gt_val = neon::vmovq(static_cast<MI_U8>(0));
-                    uint8x16_t vqu8_ls_val = neon::vmovq(static_cast<MI_U8>(0));
-                    uint8x16_t vqu8_gt_result = neon::vmovq(static_cast<MI_U8>(0));
-                    uint8x16_t vqu8_ls_result = neon::vmovq(static_cast<MI_U8>(0));
+                    uint8x16_t vqu8_gt_val = neon::vmovq(static_cast<DT_U8>(0));
+                    uint8x16_t vqu8_ls_val = neon::vmovq(static_cast<DT_U8>(0));
+                    uint8x16_t vqu8_gt_result = neon::vmovq(static_cast<DT_U8>(0));
+                    uint8x16_t vqu8_ls_result = neon::vmovq(static_cast<DT_U8>(0));
 
                     for(k = 0; k < NSIZE; k++)
                     {
@@ -267,7 +267,7 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
                     }
 
                     uint8x16_t vqu8_ksize;
-                    neon::vdup(vqu8_ksize, static_cast<MI_U8>(KSIZE));
+                    neon::vdup(vqu8_ksize, static_cast<DT_U8>(KSIZE));
                     uint8x16_t m = neon::vcgt(neon::vmax(vqu8_gt_result, vqu8_ls_result), vqu8_ksize);
 
                     k = (mask[0] == 0 ? 8 : 0);
@@ -284,11 +284,11 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
 
             for (x = width_align16; x < (iwidth - 3); x++)
             {
-                const MI_U8 *src_ofx = src_row + x;
+                const DT_U8 *src_ofx = src_row + x;
 
-                MI_S32 center    = src_ofx[0];
-                const MI_U8 *tab = &threshold_tab[0] - center + 255;
-                MI_S32 cmp_val   = tab[src_ofx[pixel[0]]] | tab[src_ofx[pixel[8]]];
+                DT_S32 center    = src_ofx[0];
+                const DT_U8 *tab = &threshold_tab[0] - center + 255;
+                DT_S32 cmp_val   = tab[src_ofx[pixel[0]]] | tab[src_ofx[pixel[8]]];
 
                 if (0 == cmp_val)
                 {
@@ -311,10 +311,10 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
 
                 if (cmp_val & 1)
                 {
-                    MI_S32 bound = center - threshold, count = 0;
+                    DT_S32 bound = center - threshold, count = 0;
                     for (k = 0; k < NSIZE; k++)
                     {
-                        MI_S32 neighbor = src_ofx[pixel[k]];
+                        DT_S32 neighbor = src_ofx[pixel[k]];
                         if (neighbor < bound)
                         {
                             if (++count > KSIZE)
@@ -333,10 +333,10 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
 
                 if (cmp_val & 2)
                 {
-                    MI_S32 bound = center + threshold, count = 0;
+                    DT_S32 bound = center + threshold, count = 0;
                     for (k = 0; k < NSIZE; k++)
                     {
-                        MI_S32 neighbor = src_ofx[pixel[k]];
+                        DT_S32 neighbor = src_ofx[pixel[k]];
                         if (neighbor > bound)
                         {
                             if (++count > KSIZE)
@@ -362,8 +362,8 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
             continue;
         }
 
-        const MI_U8 *prev  = row_ptr[(y - 4 + 3) % 3];
-        const MI_U8 *pprev = row_ptr[(y - 5 + 3) % 3];
+        const DT_U8 *prev  = row_ptr[(y - 4 + 3) % 3];
+        const DT_U8 *pprev = row_ptr[(y - 5 + 3) % 3];
 
         cornerpos = cprow[(y - 4 + 3) % 3];
         ncorners  = cornerpos[-1];
@@ -371,13 +371,13 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
         for (k = 0; k < ncorners; k++)
         {
             x = cornerpos[k];
-            MI_S32 score = prev[x];
+            DT_S32 score = prev[x];
 
             if (!nonmax_suppression ||
                (score > prev[x + 1]  && score > prev[x - 1] && score > pprev[x - 1] && score > pprev[x] &&
                 score > pprev[x + 1] && score > curr[x - 1] && score > curr[x]      && score > curr[x + 1]))
             {
-                key_points_tmp.emplace_back(KeyPoint(static_cast<MI_F32>(x), static_cast<MI_F32>(y - 1), 7.f, -1, static_cast<MI_F32>(score)));
+                key_points_tmp.emplace_back(KeyPoint(static_cast<DT_F32>(x), static_cast<DT_F32>(y - 1), 7.f, -1, static_cast<DT_F32>(score)));
             }
         }
     }
@@ -388,17 +388,17 @@ static Status Fast9NeonImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> 
     return Status::OK;
 }
 
-static Status Fast9Neon(Context *ctx, const Mat &src, std::vector<KeyPoint> &key_points, MI_S32 threshold, MI_BOOL nonmax_suppression, const OpTarget &target)
+static Status Fast9Neon(Context *ctx, const Mat &src, std::vector<KeyPoint> &key_points, DT_S32 threshold, DT_BOOL nonmax_suppression, const OpTarget &target)
 {
     AURA_UNUSED(target);
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
-    MI_S32 buffer_size = (src.GetSizes().m_width + 16) * 3 * (sizeof(MI_S32) + sizeof(MI_U8)) + 128;
+    DT_S32 buffer_size = (src.GetSizes().m_width + 16) * 3 * (sizeof(DT_S32) + sizeof(DT_U8)) + 128;
     ThreadBuffer thread_buffer(ctx, buffer_size);
     std::mutex mutex;
 
@@ -413,8 +413,8 @@ static Status Fast9Neon(Context *ctx, const Mat &src, std::vector<KeyPoint> &key
 FastNeon::FastNeon(Context *ctx, const OpTarget &target) : FastImpl(ctx, target)
 {}
 
-Status FastNeon::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 threshold,
-                         MI_BOOL nonmax_suppression, FastDetectorType type, MI_U32 max_num_corners)
+Status FastNeon::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 threshold,
+                         DT_BOOL nonmax_suppression, FastDetectorType type, DT_U32 max_num_corners)
 {
     if (FastImpl::SetArgs(src, key_points, threshold, nonmax_suppression, type, max_num_corners) != Status::OK)
     {

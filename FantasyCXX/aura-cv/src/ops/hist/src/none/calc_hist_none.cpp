@@ -7,16 +7,16 @@ namespace aura
 {
 
 template <typename Tp>
-static Status CalcHistNoneImpl(Context *ctx, const Mat &src, const MI_S32 channel, const Mat &mask, MI_U32 *hist_local,
-                               const MI_S32 max_size, ThreadBuffer &thread_buffer, std::mutex &mutex, MI_S32 start_row, MI_S32 end_row)
+static Status CalcHistNoneImpl(Context *ctx, const Mat &src, const DT_S32 channel, const Mat &mask, DT_U32 *hist_local,
+                               const DT_S32 max_size, ThreadBuffer &thread_buffer, std::mutex &mutex, DT_S32 start_row, DT_S32 end_row)
 {
-    const MI_S32 width        = src.GetSizes().m_width;
-    const MI_S32 ichannel     = src.GetSizes().m_channel;
-    const MI_S32 channel2     = ichannel * 2;
-    const MI_S32 channel3     = ichannel * 3;
-    const MI_S32 width_align4 = width & (-4);
+    const DT_S32 width        = src.GetSizes().m_width;
+    const DT_S32 ichannel     = src.GetSizes().m_channel;
+    const DT_S32 channel2     = ichannel * 2;
+    const DT_S32 channel3     = ichannel * 3;
+    const DT_S32 width_align4 = width & (-4);
 
-    MI_U32 *hist = thread_buffer.GetThreadData<MI_U32>();
+    DT_U32 *hist = thread_buffer.GetThreadData<DT_U32>();
 
     if (!hist)
     {
@@ -24,19 +24,19 @@ static Status CalcHistNoneImpl(Context *ctx, const Mat &src, const MI_S32 channe
         return Status::ERROR;
     }
 
-    memset(hist, 0, max_size * sizeof(MI_U32));
+    memset(hist, 0, max_size * sizeof(DT_U32));
 
     if (mask.IsValid())
     {
-        for (MI_S32 y = start_row; y < end_row; y++)
+        for (DT_S32 y = start_row; y < end_row; y++)
         {
             const Tp    *src_row  = src.Ptr<Tp>(y);
-            const MI_U8 *mask_row = mask.Ptr<MI_U8>(y);
+            const DT_U8 *mask_row = mask.Ptr<DT_U8>(y);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < width_align4; x += 4)
             {
-                MI_S32 index = x * ichannel + channel;
+                DT_S32 index = x * ichannel + channel;
                 Tp t0, t1, t2, t3;
                 t0 = src_row[index];
                 t1 = src_row[index + ichannel];
@@ -50,21 +50,21 @@ static Status CalcHistNoneImpl(Context *ctx, const Mat &src, const MI_S32 channe
             }
             for (; x < width; x++)
             {
-                MI_S32 index = x * ichannel + channel;
+                DT_S32 index = x * ichannel + channel;
                 hist[src_row[index]] = mask_row[x] ? hist[src_row[index]] + 1 : hist[src_row[index]];
             }
         }
     }
     else
     {
-        for (MI_S32 y = start_row; y < end_row; y++)
+        for (DT_S32 y = start_row; y < end_row; y++)
         {
             const Tp *src_row = src.Ptr<Tp>(y);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < width_align4; x += 4)
             {
-                MI_S32 index = x * ichannel + channel;
+                DT_S32 index = x * ichannel + channel;
 
                 Tp t0, t1, t2, t3;
                 t0 = src_row[index];
@@ -79,14 +79,14 @@ static Status CalcHistNoneImpl(Context *ctx, const Mat &src, const MI_S32 channe
             }
             for (; x < width; x++)
             {
-                MI_S32 index = x * ichannel + channel;
+                DT_S32 index = x * ichannel + channel;
                 hist[src_row[index]]++;
             }
         }
     }
 
     std::lock_guard<std::mutex> guard(mutex);
-    for (MI_S32 i = 0; i < max_size; i++)
+    for (DT_S32 i = 0; i < max_size; i++)
     {
         hist_local[i] += hist[i];
     }
@@ -95,20 +95,20 @@ static Status CalcHistNoneImpl(Context *ctx, const Mat &src, const MI_S32 channe
 }
 
 template <typename Tp>
-static Status CalcHistNoneHelper(Context *ctx, const Mat &src, MI_S32 channel, const Mat &mask, std::vector<MI_U32> &dst,
-                                 MI_S32 hist_size, MI_S32 max_size, const Scalar &ranges, MI_BOOL accumulate, const OpTarget &target)
+static Status CalcHistNoneHelper(Context *ctx, const Mat &src, DT_S32 channel, const Mat &mask, std::vector<DT_U32> &dst,
+                                 DT_S32 hist_size, DT_S32 max_size, const Scalar &ranges, DT_BOOL accumulate, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
     AURA_UNUSED(target);
 
-    const MI_S32 height = src.GetSizes().m_height;
+    const DT_S32 height = src.GetSizes().m_height;
 
-    MI_S32 hist_low  = ranges.m_val[0];
-    MI_S32 hist_high = ranges.m_val[1];
+    DT_S32 hist_low  = ranges.m_val[0];
+    DT_S32 hist_high = ranges.m_val[1];
 
-    MI_U32 *hist_local = static_cast<MI_U32*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, max_size * sizeof(MI_U32), 0));
-    if (MI_NULL == hist_local)
+    DT_U32 *hist_local = static_cast<DT_U32*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, max_size * sizeof(DT_U32), 0));
+    if (DT_NULL == hist_local)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM fail");
         return ret;
@@ -119,16 +119,16 @@ static Status CalcHistNoneHelper(Context *ctx, const Mat &src, MI_S32 channel, c
     if (target.m_data.none.enable_mt)
     {
         WorkerPool *wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
             AURA_FREE(ctx, hist_local);
             return ret;
         }
 
-        ThreadBuffer thread_buffer(ctx, max_size * sizeof(MI_U32));
+        ThreadBuffer thread_buffer(ctx, max_size * sizeof(DT_U32));
 
-        if (wp->ParallelFor(static_cast<MI_S32>(0), height, CalcHistNoneImpl<Tp>, ctx, std::cref(src), channel, std::cref(mask),
+        if (wp->ParallelFor(static_cast<DT_S32>(0), height, CalcHistNoneImpl<Tp>, ctx, std::cref(src), channel, std::cref(mask),
                             hist_local, max_size, std::ref(thread_buffer), std::ref(mutex)) != Status::OK)
         {
             AURA_ADD_ERROR_STRING(ctx, "ParallelFor run CalcHistNoneImpl failed");
@@ -138,10 +138,10 @@ static Status CalcHistNoneHelper(Context *ctx, const Mat &src, MI_S32 channel, c
     }
     else
     {
-        ThreadBuffer thread_buffer(ctx, max_size * sizeof(MI_U32));
+        ThreadBuffer thread_buffer(ctx, max_size * sizeof(DT_U32));
 
         if (CalcHistNoneImpl<Tp>(ctx, src, channel, mask, hist_local, max_size, thread_buffer, mutex,
-                                 static_cast<MI_S32>(0), height) != Status::OK)
+                                 static_cast<DT_S32>(0), height) != Status::OK)
         {
             AURA_ADD_ERROR_STRING(ctx, "CalcHistNoneImpl run failed");
             AURA_FREE(ctx, hist_local);
@@ -149,16 +149,16 @@ static Status CalcHistNoneHelper(Context *ctx, const Mat &src, MI_S32 channel, c
         }
     }
 
-    if (MI_FALSE == accumulate)
+    if (DT_FALSE == accumulate)
     {
         std::fill(dst.begin(), dst.end(), 0);
     }
 
-    MI_F64 scale = (MI_F64)(hist_size) / (hist_high - hist_low);
-    MI_S32 j = 0;
-    for (MI_S32 i = hist_low; i < hist_high; i++)
+    DT_F64 scale = (DT_F64)(hist_size) / (hist_high - hist_low);
+    DT_S32 j = 0;
+    for (DT_S32 i = hist_low; i < hist_high; i++)
     {
-        MI_S32 idx = Floor(j * scale);
+        DT_S32 idx = Floor(j * scale);
         dst[idx] += hist_local[i];
         j++;
     }
@@ -170,8 +170,8 @@ static Status CalcHistNoneHelper(Context *ctx, const Mat &src, MI_S32 channel, c
 CalcHistNone::CalcHistNone(Context *ctx, const OpTarget &target) : CalcHistImpl(ctx, target)
 {}
 
-Status CalcHistNone::SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &hist, MI_S32 hist_size,
-                             const Scalar &ranges, const Array *mask, MI_BOOL accumulate)
+Status CalcHistNone::SetArgs(const Array *src, DT_S32 channel, std::vector<DT_U32> &hist, DT_S32 hist_size,
+                             const Scalar &ranges, const Array *mask, DT_BOOL accumulate)
 {
     Status ret = Status::ERROR;
 
@@ -202,7 +202,7 @@ Status CalcHistNone::Run()
 
     const Mat *src = dynamic_cast<const Mat *>(m_src);
     const Mat *mask = dynamic_cast<const Mat *>(m_mask);
-    if ((MI_NULL == src) || (MI_NULL == mask))
+    if ((DT_NULL == src) || (DT_NULL == mask))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src mask is null");
         return ret;
@@ -212,13 +212,13 @@ Status CalcHistNone::Run()
     {
         case ElemType::U8:
         {
-            ret = CalcHistNoneHelper<MI_U8>(m_ctx, *src, m_channel, *mask, *m_hist, m_hist_size, 256, m_ranges, m_accumulate, m_target);
+            ret = CalcHistNoneHelper<DT_U8>(m_ctx, *src, m_channel, *mask, *m_hist, m_hist_size, 256, m_ranges, m_accumulate, m_target);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = CalcHistNoneHelper<MI_U16>(m_ctx, *src, m_channel, *mask, *m_hist, m_hist_size, 65536, m_ranges, m_accumulate, m_target);
+            ret = CalcHistNoneHelper<DT_U16>(m_ctx, *src, m_channel, *mask, *m_hist, m_hist_size, 65536, m_ranges, m_accumulate, m_target);
             break;
         }
 

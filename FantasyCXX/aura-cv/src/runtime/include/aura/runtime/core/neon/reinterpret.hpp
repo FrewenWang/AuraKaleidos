@@ -55,7 +55,7 @@ inline float16x4_t vreinterpret(const float16x4_t &v)
 
 #define DECLFUN(ptype, vtype, prefix, postfix1, postfix2)                                                         \
     template <typename T>                                                                                         \
-    inline typename std::enable_if<std::is_same<T, MI_U64>::value || std::is_same<T, MI_S64>::value, ptype>::type \
+    inline typename std::enable_if<std::is_same<T, DT_U64>::value || std::is_same<T, DT_S64>::value, ptype>::type \
     vreinterpret_64(const vtype &a)                                                                               \
     {                                                                                                             \
         return prefix##_##postfix1##_##postfix2(a);                                                               \
@@ -77,7 +77,7 @@ DECLFUN(uint64x2_t, uint32x4_t, vreinterpretq, u64, u32)
 
 #define DECLFUN(ptype, vtype, prefix, postfix1, postfix2)                                                       \
     template <typename T>                                                                                       \
-    inline typename std::enable_if<std::is_same<T, MI_U8>::value || std::is_same<T, MI_S8>::value, ptype>::type \
+    inline typename std::enable_if<std::is_same<T, DT_U8>::value || std::is_same<T, DT_S8>::value, ptype>::type \
     vreinterpret_64(const vtype &a)                                                                             \
     {                                                                                                           \
         return prefix##_##postfix1##_##postfix2(a);                                                             \
@@ -91,7 +91,7 @@ DECLFUN(uint8x16_t, uint64x2_t, vreinterpretq, u8,  u64)
 
 #define DECLFUN(ptype, vtype, prefix, postfix1, postfix2)                                                         \
     template <typename T>                                                                                         \
-    inline typename std::enable_if<std::is_same<T, MI_U16>::value || std::is_same<T, MI_S16>::value, ptype>::type \
+    inline typename std::enable_if<std::is_same<T, DT_U16>::value || std::is_same<T, DT_S16>::value, ptype>::type \
     vreinterpret_64(const vtype &a)                                                                               \
     {                                                                                                             \
         return prefix##_##postfix1##_##postfix2(a);                                                               \
@@ -105,7 +105,7 @@ DECLFUN(uint16x8_t, uint64x2_t, vreinterpretq, u16, u64)
 
 #define DECLFUN(ptype, vtype, prefix, postfix1, postfix2)                                                         \
     template <typename T>                                                                                         \
-    inline typename std::enable_if<std::is_same<T, MI_U32>::value || std::is_same<T, MI_S32>::value, ptype>::type \
+    inline typename std::enable_if<std::is_same<T, DT_U32>::value || std::is_same<T, DT_S32>::value, ptype>::type \
     vreinterpret_64(const vtype &a)                                                                               \
     {                                                                                                             \
         return prefix##_##postfix1##_##postfix2(a);                                                               \

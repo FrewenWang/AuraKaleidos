@@ -78,41 +78,41 @@ static ElemType GetDstType(ElemType elem_type, NormType norm_type)
     }
 }
 
-static MI_F64 CastIntoF64(AURA_VOID *data, ElemType type)
+static DT_F64 CastIntoF64(DT_VOID *data, ElemType type)
 {
     switch (type)
     {
         case ElemType::U8:
         {
-            return static_cast<MI_F64>(*((MI_U8*)data));
+            return static_cast<DT_F64>(*((DT_U8*)data));
         }
         case ElemType::S8:
         {
-            return static_cast<MI_F64>(*((MI_S8*)data));
+            return static_cast<DT_F64>(*((DT_S8*)data));
         }
         case ElemType::U16:
         {
-            return static_cast<MI_F64>(*((MI_U16*)data));
+            return static_cast<DT_F64>(*((DT_U16*)data));
         }
         case ElemType::S16:
         {
-            return static_cast<MI_F64>(*((MI_S16*)data));
+            return static_cast<DT_F64>(*((DT_S16*)data));
         }
         case ElemType::U32:
         {
-            return static_cast<MI_F64>(*((MI_U32*)data));
+            return static_cast<DT_F64>(*((DT_U32*)data));
         }
         case ElemType::S32:
         {
-            return static_cast<MI_F64>(*((MI_S32*)data));
+            return static_cast<DT_F64>(*((DT_S32*)data));
         }
         case ElemType::F16:
         {
-            return static_cast<MI_F64>(*((MI_F16*)data));
+            return static_cast<DT_F64>(*((MI_F16*)data));
         }
         case ElemType::F32:
         {
-            return static_cast<MI_F64>(*((MI_F32*)data));
+            return static_cast<DT_F64>(*((DT_F32*)data));
         }
         default:
         {
@@ -121,7 +121,7 @@ static MI_F64 CastIntoF64(AURA_VOID *data, ElemType type)
     }
 }
 
-static std::string GetCLMainBuildOptions(Context *ctx, ElemType elem_type, MI_S32 elem_counts)
+static std::string GetCLMainBuildOptions(Context *ctx, ElemType elem_type, DT_S32 elem_counts)
 {
     CLBuildOptions cl_build_opt(ctx);
 
@@ -152,7 +152,7 @@ static std::string GetCLRemainBuildOptions(Context *ctx, ElemType src_type, Elem
     return cl_build_opt.ToString();
 }
 
-static AURA_VOID GetCLName(NormType type, std::string program_name[2], std::string kernel_name[2])
+static DT_VOID GetCLName(NormType type, std::string program_name[2], std::string kernel_name[2])
 {
     switch (type)
     {
@@ -189,21 +189,21 @@ static AURA_VOID GetCLName(NormType type, std::string program_name[2], std::stri
     }
 }
 
-static AURA_VOID GetCLSize(Context *ctx, std::vector<CLKernel> cl_kernels, MI_S32 &m_group_size_x_main, MI_S32 &m_group_size_y_main,
-                         cl::NDRange cl_global_size[2], cl::NDRange cl_local_size[2], MI_S32 &load_length)
+static DT_VOID GetCLSize(Context *ctx, std::vector<CLKernel> cl_kernels, DT_S32 &m_group_size_x_main, DT_S32 &m_group_size_y_main,
+                         cl::NDRange cl_global_size[2], cl::NDRange cl_local_size[2], DT_S32 &load_length)
 {
     std::shared_ptr<cl::Device> cl_device = ctx->GetCLEngine()->GetCLRuntime()->GetDevice();
     size_t preferred_group_size;
     cl_kernels[0].GetClKernel()->getWorkGroupInfo(*cl_device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &preferred_group_size);
-    MI_S32 max_group_size     = cl_kernels[0].GetMaxGroupSize();
-    MI_S32 max_local_mem_size = cl_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+    DT_S32 max_group_size     = cl_kernels[0].GetMaxGroupSize();
+    DT_S32 max_local_mem_size = cl_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
 
-    MI_S32 local_size_x_main  = Min(max_local_mem_size, Min(max_group_size, 2 * (MI_S32)preferred_group_size));
-    MI_S32 local_size_y_main  = 1;
-    MI_S32 group_size_main    = m_group_size_x_main * m_group_size_y_main;
-    MI_S32 global_size_x_main = local_size_x_main * m_group_size_x_main;
-    MI_S32 global_size_y_main = local_size_y_main * m_group_size_y_main;
-    MI_S32 global_size_remain = Min(max_local_mem_size, Min(group_size_main, (MI_S32)cl_kernels[1].GetMaxGroupSize()));
+    DT_S32 local_size_x_main  = Min(max_local_mem_size, Min(max_group_size, 2 * (DT_S32)preferred_group_size));
+    DT_S32 local_size_y_main  = 1;
+    DT_S32 group_size_main    = m_group_size_x_main * m_group_size_y_main;
+    DT_S32 global_size_x_main = local_size_x_main * m_group_size_x_main;
+    DT_S32 global_size_y_main = local_size_y_main * m_group_size_y_main;
+    DT_S32 global_size_remain = Min(max_local_mem_size, Min(group_size_main, (DT_S32)cl_kernels[1].GetMaxGroupSize()));
     load_length               = (group_size_main + global_size_remain - 1) / global_size_remain;
 
     cl_global_size[0] = cl::NDRange(global_size_x_main, global_size_y_main);
@@ -216,7 +216,7 @@ NormCL::NormCL(Context *ctx, const OpTarget &target) : NormImpl(ctx, target), m_
                                                        m_group_size_y_main(0), m_profiling_string()
 {}
 
-Status NormCL::SetArgs(const Array *src, MI_F64 *result, NormType type)
+Status NormCL::SetArgs(const Array *src, DT_F64 *result, NormType type)
 {
     if (NormImpl::SetArgs(src, result, type) != Status::OK)
     {
@@ -242,14 +242,14 @@ Status NormCL::Initialize()
     }
 
     ElemType src_type        = m_src->GetElemType();
-    const MI_S32 elem_counts = 16 / ElemTypeSize(src_type);
-    MI_S32 height            = m_src->GetSizes().m_height;
-    MI_S32 width             = m_src->GetSizes().m_width * m_src->GetSizes().m_channel;
+    const DT_S32 elem_counts = 16 / ElemTypeSize(src_type);
+    DT_S32 height            = m_src->GetSizes().m_height;
+    DT_S32 width             = m_src->GetSizes().m_width * m_src->GetSizes().m_channel;
 
     ElemType dst_type      = GetDstType(src_type, m_type);
     m_group_size_x_main    = (width + m_blk_w * elem_counts - 1) / (m_blk_w * elem_counts);
     m_group_size_y_main    = (height + m_blk_h - 1) / m_blk_h;
-    MI_S32 group_size_main = m_group_size_x_main * m_group_size_y_main;
+    DT_S32 group_size_main = m_group_size_x_main * m_group_size_y_main;
 
     // 1. init cl_mem
     m_cl_src = CLMem::FromArray(m_ctx, *m_src, CLMemParam(CL_MEM_READ_ONLY));
@@ -266,7 +266,7 @@ Status NormCL::Initialize()
         return Status::ERROR;
     }
 
-    dst_mat = Mat(m_ctx, ElemType::U8, {1, static_cast<MI_S32>(ElemTypeSize(dst_type))});
+    dst_mat = Mat(m_ctx, ElemType::U8, {1, static_cast<DT_S32>(ElemTypeSize(dst_type))});
 
     m_cl_dst = CLMem::FromArray(m_ctx, dst_mat, CLMemParam(CL_MEM_WRITE_ONLY));
     if (!m_cl_dst.IsValid())
@@ -313,15 +313,15 @@ Status NormCL::DeInitialize()
 
 Status NormCL::Run()
 {
-    MI_S32 istep      = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 height     = m_src->GetSizes().m_height;
-    MI_S32 width      = m_src->GetSizes().m_width * m_src->GetSizes().m_channel;
+    DT_S32 istep      = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 height     = m_src->GetSizes().m_height;
+    DT_S32 width      = m_src->GetSizes().m_width * m_src->GetSizes().m_channel;
     ElemType src_type = m_src->GetElemType();
     ElemType dst_type = GetDstType(src_type, m_type);
 
     // 1. get center_area and cl_global_size
     cl::NDRange cl_global_size[2], cl_local_size[2];
-    MI_S32 load_length = 0;
+    DT_S32 load_length = 0;
     GetCLSize(m_ctx, m_cl_kernels, m_group_size_x_main, m_group_size_y_main,
               cl_global_size, cl_local_size, load_length);
 
@@ -330,13 +330,13 @@ Status NormCL::Run()
     Status ret      = Status::ERROR;
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32,
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32,
                                  cl::Buffer, cl::LocalSpaceArg,
-                                 MI_S32, MI_S32, MI_S32, MI_S32>(
+                                 DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_partial.GetCLMemRef<cl::Buffer>(),
-                                 cl::Local((MI_S32)(cl_local_size[0].get()[0]) *
-                                 (MI_S32)(cl_local_size[0].get()[1]) * ElemTypeSize(dst_type)),
+                                 cl::Local((DT_S32)(cl_local_size[0].get()[0]) *
+                                 (DT_S32)(cl_local_size[0].get()[1]) * ElemTypeSize(dst_type)),
                                  m_blk_w, m_blk_h, width, height,
                                  cl_global_size[0],
                                  cl_local_size[0],
@@ -349,10 +349,10 @@ Status NormCL::Run()
 
     cl_ret = m_cl_kernels[1].Run<cl::Buffer, cl::Buffer,
                                  cl::LocalSpaceArg,
-                                 MI_S32, MI_S32>(
+                                 DT_S32, DT_S32>(
                                  m_cl_partial.GetCLMemRef<cl::Buffer>(),
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(),
-                                 cl::Local((MI_S32)(cl_global_size[1].get()[0]) * ElemTypeSize(dst_type)),
+                                 cl::Local((DT_S32)(cl_global_size[1].get()[0]) * ElemTypeSize(dst_type)),
                                  load_length, m_group_size_x_main * m_group_size_y_main,
                                  cl_global_size[1],
                                  cl_local_size[1],
@@ -364,7 +364,7 @@ Status NormCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (dst_mat.GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (dst_mat.GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event[1].wait();
         if (cl_ret != CL_SUCCESS)
@@ -373,7 +373,7 @@ Status NormCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event[0]) +
                                  GetCLProfilingInfo(m_cl_kernels[1].GetKernelName(), cl_event[1]);
@@ -404,7 +404,7 @@ std::string NormCL::ToString() const
 
 std::vector<CLKernel> NormCL::GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, NormType type)
 {
-    MI_S32 elem_counts = 16 / ElemTypeSize(src_elem_type);
+    DT_S32 elem_counts = 16 / ElemTypeSize(src_elem_type);
 
     std::vector<CLKernel> cl_kernels;
     std::string build_opt[2];

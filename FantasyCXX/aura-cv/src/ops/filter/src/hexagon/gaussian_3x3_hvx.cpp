@@ -8,26 +8,26 @@ namespace aura
 /**
  * TODO 这个抵挡就是在device设备侧：DSP侧进行执行
  **/
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3VCore(HVX_Vector &vu8_src_p0, HVX_Vector &vu8_src_c, HVX_Vector &vu8_src_n0,
-                                            HVX_VectorPair &wu16_sum, const MI_U16 *kernel)
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3VCore(HVX_Vector &vu8_src_p0, HVX_Vector &vu8_src_c, HVX_Vector &vu8_src_n0,
+                                            HVX_VectorPair &wu16_sum, const DT_U16 *kernel)
 {
-    MI_U32 k0k0k0k0 = Q6_R_vsplatb_R(kernel[0]);
-    MI_U32 k1k1k1k1 = Q6_R_vsplatb_R(kernel[1]);
+    DT_U32 k0k0k0k0 = Q6_R_vsplatb_R(kernel[0]);
+    DT_U32 k1k1k1k1 = Q6_R_vsplatb_R(kernel[1]);
 
     wu16_sum = Q6_Wh_vmpa_WubRub(Q6_W_vcombine_VV(vu8_src_p0, vu8_src_n0), k0k0k0k0);
     wu16_sum = Q6_Wuh_vmpyacc_WuhVubRub(wu16_sum, vu8_src_c, k1k1k1k1);
 }
 
-// using Tp = MI_U8
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &wu16_sum_x0, HVX_VectorPair &wu16_sum_x1, HVX_VectorPair &wu16_sum_x2,
-                                            HVX_Vector &vu8_result, const MI_U16 *kernel)
+// using Tp = DT_U8
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3HCore(HVX_VectorPair &wu16_sum_x0, HVX_VectorPair &wu16_sum_x1, HVX_VectorPair &wu16_sum_x2,
+                                            HVX_Vector &vu8_result, const DT_U16 *kernel)
 {
-    MI_U32 k0k0k0k0   = Q6_R_vsplatb_R(kernel[0]);
-    MI_U32 k1k1       = (kernel[1] << 16) | kernel[1];
-    MI_S32 align_size = sizeof(MI_U16);
+    DT_U32 k0k0k0k0   = Q6_R_vsplatb_R(kernel[0]);
+    DT_U32 k1k1       = (kernel[1] << 16) | kernel[1];
+    DT_S32 align_size = sizeof(DT_U16);
 
     HVX_Vector wu16_sum_x1_lo = Q6_V_lo_W(wu16_sum_x1);
     HVX_Vector wu16_sum_x1_hi = Q6_V_hi_W(wu16_sum_x1);
@@ -49,27 +49,27 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &wu16_sum_x0, HVX_V
     vu8_result = Q6_Vub_vsat_VhVh(vu16_result_hi, vu16_result_lo);
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3VCore(HVX_Vector &vu16_src_p0, HVX_Vector &vu16_src_c, HVX_Vector &vu16_src_n0,
-                                            HVX_VectorPair &wu32_sum, const MI_U32 *kernel)
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3VCore(HVX_Vector &vu16_src_p0, HVX_Vector &vu16_src_c, HVX_Vector &vu16_src_n0,
+                                            HVX_VectorPair &wu32_sum, const DT_U32 *kernel)
 {
-    MI_U32 k0k0 = (kernel[0] << 16) | kernel[0];
-    MI_U32 k1k1 = (kernel[1] << 16) | kernel[1];
+    DT_U32 k0k0 = (kernel[0] << 16) | kernel[0];
+    DT_U32 k1k1 = (kernel[1] << 16) | kernel[1];
 
     wu32_sum = Q6_Wuw_vmpy_VuhRuh(vu16_src_p0, k0k0);
     wu32_sum = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum, vu16_src_c,  k1k1);
     wu32_sum = Q6_Wuw_vmpyacc_WuwVuhRuh(wu32_sum, vu16_src_n0, k0k0);
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &wu32_sum_x0, HVX_VectorPair &wu32_sum_x1, HVX_VectorPair &wu32_sum_x2,
-                                            HVX_Vector &vu16_result, const MI_U32 *kernel)
+// using Tp = DT_U16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3HCore(HVX_VectorPair &wu32_sum_x0, HVX_VectorPair &wu32_sum_x1, HVX_VectorPair &wu32_sum_x2,
+                                            HVX_Vector &vu16_result, const DT_U32 *kernel)
 {
     HVX_Vector vu32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vu32_k1 = Q6_V_vsplat_R(kernel[1]);
-    MI_S32 align_size  = sizeof(MI_U32);
+    DT_S32 align_size  = sizeof(DT_U32);
 
     HVX_Vector vu32_sum_x1_lo = Q6_V_lo_W(wu32_sum_x1);
     HVX_Vector vu32_sum_x1_hi = Q6_V_hi_W(wu32_sum_x1);
@@ -96,27 +96,27 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &wu32_sum_x0, HVX_V
     vu16_result = Q6_Vuh_vsat_VuwVuw(vu32_sum_hi, vu32_sum_lo);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3VCore(HVX_Vector &vs16_src_p0, HVX_Vector &vs16_src_c, HVX_Vector &vs16_src_n0,
-                                            HVX_VectorPair &ws32_sum, const MI_S32 *kernel)
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3VCore(HVX_Vector &vs16_src_p0, HVX_Vector &vs16_src_c, HVX_Vector &vs16_src_n0,
+                                            HVX_VectorPair &ws32_sum, const DT_S32 *kernel)
 {
-    MI_S32 k0k0 = (kernel[0] << 16) | kernel[0];
-    MI_S32 k1k1 = (kernel[1] << 16) | kernel[1];
+    DT_S32 k0k0 = (kernel[0] << 16) | kernel[0];
+    DT_S32 k1k1 = (kernel[1] << 16) | kernel[1];
 
     ws32_sum = Q6_Ww_vmpy_VhRh(vs16_src_p0, k0k0);
     ws32_sum = Q6_Ww_vmpyacc_WwVhRh(ws32_sum, vs16_src_c,  k1k1);
     ws32_sum = Q6_Ww_vmpyacc_WwVhRh(ws32_sum, vs16_src_n0, k0k0);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &ws32_sum_x0, HVX_VectorPair &ws32_sum_x1, HVX_VectorPair &ws32_sum_x2,
-                                            HVX_Vector &vs16_result, const MI_S32 *kernel)
+// using Tp = DT_S16
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3HCore(HVX_VectorPair &ws32_sum_x0, HVX_VectorPair &ws32_sum_x1, HVX_VectorPair &ws32_sum_x2,
+                                            HVX_Vector &vs16_result, const DT_S32 *kernel)
 {
     HVX_Vector vs32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vs32_k1 = Q6_V_vsplat_R(kernel[1]);
-    MI_S32 align_size  = sizeof(MI_S32);
+    DT_S32 align_size  = sizeof(DT_S32);
 
     HVX_Vector vs32_sum_x1_lo = Q6_V_lo_W(ws32_sum_x1);
     HVX_Vector vs32_sum_x1_hi = Q6_V_hi_W(ws32_sum_x1);
@@ -143,10 +143,10 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &ws32_sum_x0, HVX_V
     vs16_result = Q6_Vh_vsat_VwVw(vs32_sum_hi, vs32_sum_lo);
 }
 
-// using Tp = MI_U32
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_U32>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3VCore(HVX_Vector &vu32_src_p0, HVX_Vector &vu32_src_c, HVX_Vector &vu32_src_n0,
-                                            HVX_VectorPair &wu64_sum, const MI_U32 *kernel)
+// using Tp = DT_U32
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_U32>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3VCore(HVX_Vector &vu32_src_p0, HVX_Vector &vu32_src_c, HVX_Vector &vu32_src_n0,
+                                            HVX_VectorPair &wu64_sum, const DT_U32 *kernel)
 {
     HVX_Vector vu16_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vu16_k1 = Q6_V_vsplat_R(kernel[1]);
@@ -156,14 +156,14 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3VCore(HVX_Vector &vu32_src_p0, HVX_Vecto
     wu64_sum = Q6_Wud_vadd_WudWud(wu64_sum, Q6_Wud_vmul32xlo16_VuwVuw(vu32_src_n0, vu16_k0));
 }
 
-// using Tp = MI_U32 MI_S32
-template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) == 4>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &wd64_sum_x0, HVX_VectorPair &wd64_sum_x1, HVX_VectorPair &wd64_sum_x2,
+// using Tp = DT_U32 DT_S32
+template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) == 4>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3HCore(HVX_VectorPair &wd64_sum_x0, HVX_VectorPair &wd64_sum_x1, HVX_VectorPair &wd64_sum_x2,
                                             HVX_Vector &vd32_result, const Kt *kernel)
 {
     HVX_Vector vu16_k0   = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vu16_k1   = Q6_V_vsplat_R(kernel[1]);
-    MI_S32 align_size    = sizeof(MI_U32);
+    DT_S32 align_size    = sizeof(DT_U32);
     HVX_Vector vu32_half = Q6_V_vsplat_R(1 << 27);
 
     HVX_Vector vd64_sum_x1_lo = Q6_V_lo_W(wd64_sum_x1);
@@ -197,10 +197,10 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &wd64_sum_x0, HVX_V
     vd32_result = Q6_Vw_vadd_VwVw(vd32_sum_hi, vd32_sum_lo);
 }
 
-// using Tp = MI_S32
-template <typename Tp, typename std::enable_if<std::is_same<Tp, MI_S32>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3VCore(HVX_Vector &vs32_src_p0, HVX_Vector &vs32_src_c, HVX_Vector &vs32_src_n0,
-                                            HVX_VectorPair &ws64_sum, const MI_S32 *kernel)
+// using Tp = DT_S32
+template <typename Tp, typename std::enable_if<std::is_same<Tp, DT_S32>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3VCore(HVX_Vector &vs32_src_p0, HVX_Vector &vs32_src_c, HVX_Vector &vs32_src_n0,
+                                            HVX_VectorPair &ws64_sum, const DT_S32 *kernel)
 {
     HVX_Vector vs32_k0 = Q6_V_vsplat_R(kernel[0]);
     HVX_Vector vs32_k1 = Q6_V_vsplat_R(kernel[1]);
@@ -210,10 +210,10 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3VCore(HVX_Vector &vs32_src_p0, HVX_Vecto
     ws64_sum = Q6_Wd_vmulacc_WdVwVw(ws64_sum, vs32_src_n0, vs32_k0);
 }
 
-// Tp = MI_U8 MI_U16 MI_S16
-template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) != 4>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &w_sum_x0, HVX_VectorPair &w_sum_x1, HVX_VectorPair &w_sum_x2, HVX_VectorPair &w_sum_x3,
-                                            HVX_Vector &v_result_x0, HVX_Vector &v_result_x1, const Kt *kernel, MI_S32 rest)
+// Tp = DT_U8 DT_U16 DT_S16
+template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) != 4>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3HCore(HVX_VectorPair &w_sum_x0, HVX_VectorPair &w_sum_x1, HVX_VectorPair &w_sum_x2, HVX_VectorPair &w_sum_x3,
+                                            HVX_Vector &v_result_x0, HVX_Vector &v_result_x1, const Kt *kernel, DT_S32 rest)
 {
     HVX_Vector v_sum_x0_lo = Q6_V_lo_W(w_sum_x0);
     HVX_Vector v_sum_x0_hi = Q6_V_hi_W(w_sum_x0);
@@ -227,8 +227,8 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &w_sum_x0, HVX_Vect
     HVX_Vector v_sum_l0_lo, v_sum_l0_hi, v_sum_r0_lo, v_sum_r0_hi;
     if (rest & 1)
     {
-        MI_S32 align_size0 = (rest / 2) * sizeof(Kt);
-        MI_S32 align_size1 = align_size0 + sizeof(Kt);
+        DT_S32 align_size0 = (rest / 2) * sizeof(Kt);
+        DT_S32 align_size1 = align_size0 + sizeof(Kt);
         v_sum_r0_lo = Q6_V_vlalign_safe_VVR(v_sum_x3_hi, v_sum_x2_hi, align_size1);
         v_sum_r0_hi = Q6_V_vlalign_safe_VVR(v_sum_x3_lo, v_sum_x2_lo, align_size0);
         v_sum_l0_lo = Q6_V_valign_safe_VVR(v_sum_x1_hi, v_sum_x0_hi, align_size0);
@@ -236,7 +236,7 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &w_sum_x0, HVX_Vect
     }
     else
     {
-        MI_S32 align_size = (rest / 2) * sizeof(Kt);
+        DT_S32 align_size = (rest / 2) * sizeof(Kt);
         v_sum_r0_lo = Q6_V_vlalign_safe_VVR(v_sum_x3_lo, v_sum_x2_lo, align_size);
         v_sum_r0_hi = Q6_V_vlalign_safe_VVR(v_sum_x3_hi, v_sum_x2_hi, align_size);
         v_sum_l0_lo = Q6_V_valign_safe_VVR(v_sum_x1_lo, v_sum_x0_lo, align_size);
@@ -250,12 +250,12 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &w_sum_x0, HVX_Vect
     Gaussian3x3HCore<Tp>(w_sum_l0, w_sum_x2, w_sum_x3, v_result_x1, kernel);
 }
 
-// Tp = MI_U32 MI_S32
-template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) == 4>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &wd64_sum_x0, HVX_VectorPair &wd64_sum_x1, HVX_VectorPair &wd64_sum_x2, HVX_VectorPair &wd64_sum_x3,
-                                            HVX_Vector &vd32_result_x0, HVX_Vector &vd32_result_x1, const Kt *kernel, MI_S32 rest)
+// Tp = DT_U32 DT_S32
+template <typename Tp, typename Kt, typename std::enable_if<sizeof(Tp) == 4>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID Gaussian3x3HCore(HVX_VectorPair &wd64_sum_x0, HVX_VectorPair &wd64_sum_x1, HVX_VectorPair &wd64_sum_x2, HVX_VectorPair &wd64_sum_x3,
+                                            HVX_Vector &vd32_result_x0, HVX_Vector &vd32_result_x1, const Kt *kernel, DT_S32 rest)
 {
-    MI_S32 align_size = rest * sizeof(Kt);
+    DT_S32 align_size = rest * sizeof(Kt);
 
     HVX_Vector vd32_sum_x0_lo = Q6_V_lo_W(wd64_sum_x0);
     HVX_Vector vd32_sum_x0_hi = Q6_V_hi_W(wd64_sum_x0);
@@ -292,16 +292,16 @@ AURA_ALWAYS_INLINE AURA_VOID Gaussian3x3HCore(HVX_VectorPair &wd64_sum_x0, HVX_V
  * @param border_value
  * @param width
  */
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C, typename Kt>
-static AURA_VOID Gaussian3x3Row(const Tp *src_p0, const Tp *src_c, const Tp *src_n0, Tp *dst,
-                              const Kt *kernel, const std::vector<Tp> &border_value, MI_S32 width)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C, typename Kt>
+static DT_VOID Gaussian3x3Row(const Tp *src_p0, const Tp *src_c, const Tp *src_n0, Tp *dst,
+                              const Kt *kernel, const std::vector<Tp> &border_value, DT_S32 width)
 {
     ///
     using MVType = typename MVHvxVector<C>::Type;
     using MWType = typename MWHvxVector<C>::Type;
 
-    MI_S32 elem_counts = AURA_HVLEN / sizeof(Tp);
-    MI_S32 back_offset = width - elem_counts;
+    DT_S32 elem_counts = AURA_HVLEN / sizeof(Tp);
+    DT_S32 back_offset = width - elem_counts;
 
     MVType mv_src_p0, mv_src_c, mv_src_n0;
     MWType mw_sum_x0, mw_sum_x1, mw_sum_x2;
@@ -314,7 +314,7 @@ static AURA_VOID Gaussian3x3Row(const Tp *src_p0, const Tp *src_c, const Tp *src
         vload(src_n0, mv_src_n0);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p0 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_p0.val[ch], src_p0[ch], border_value[ch]);
             HVX_Vector v_border_c  = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_c.val[ch],  src_c[ch],  border_value[ch]);
@@ -327,14 +327,14 @@ static AURA_VOID Gaussian3x3Row(const Tp *src_p0, const Tp *src_c, const Tp *src
 
     // main(0 ~ n-2)
     {
-        for (MI_S32 x = elem_counts; x <= back_offset; x += elem_counts)
+        for (DT_S32 x = elem_counts; x <= back_offset; x += elem_counts)
         {
             vload(src_p0 + C * x, mv_src_p0);
             vload(src_c  + C * x, mv_src_c);
             vload(src_n0 + C * x, mv_src_n0);
 
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 Gaussian3x3VCore<Tp>(mv_src_p0.val[ch], mv_src_c.val[ch], mv_src_n0.val[ch], mw_sum_x2.val[ch], kernel);
                 Gaussian3x3HCore<Tp>(mw_sum_x0.val[ch], mw_sum_x1.val[ch], mw_sum_x2.val[ch], mv_result.val[ch], kernel);
@@ -349,8 +349,8 @@ static AURA_VOID Gaussian3x3Row(const Tp *src_p0, const Tp *src_c, const Tp *src
 
     // remain
     {
-        MI_S32 last = C * (width - 1);
-        MI_S32 rest = width % elem_counts;
+        DT_S32 last = C * (width - 1);
+        DT_S32 rest = width % elem_counts;
         MVType mv_last;
 
         vload(src_p0 + C * back_offset, mv_src_p0);
@@ -358,7 +358,7 @@ static AURA_VOID Gaussian3x3Row(const Tp *src_p0, const Tp *src_c, const Tp *src
         vload(src_n0 + C * back_offset, mv_src_n0);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p0 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_p0.val[ch], src_p0[last + ch], border_value[ch]);
             HVX_Vector v_border_c  = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_c.val[ch],  src_c[last + ch],  border_value[ch]);
@@ -389,18 +389,18 @@ static AURA_VOID Gaussian3x3Row(const Tp *src_p0, const Tp *src_c, const Tp *src
  * @param end_row
  * @return
  */
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C>
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C>
 static Status Gaussian3x3HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, const std::vector<Tp> &border_value,
-                                 const Tp *border_buffer, MI_S32 start_row, MI_S32 end_row)
+                                 const Tp *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     /// 如果数据是32位，则默认就是32位。如果不是32位。则提升
     using Kt = typename std::conditional<sizeof(Tp) == 4, Tp, typename Promote<Tp>::Type>::type;
 
     ///
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 height = src.GetSizes().m_height;
     /// 数据步长，默认就是数据的宽度
-    MI_S32 stride = src.GetStrides().m_width;
+    DT_S32 stride = src.GetStrides().m_width;
 
     /// kmat.Ptr<Kt> 将数据结构mat转换成为指针(模仿opencv的mat的写法)
     /// 将指针指向高斯核向量的第0个数据
@@ -414,12 +414,12 @@ static Status Gaussian3x3HvxImpl(const Mat &src, Mat &dst, const Mat &kmat, cons
     /// TODO 这个函数的设计？ 是什么？？
     /// 用于生成L2缓存预取参数（L2缓存是介于CPU和主存之间的）
     ///
-    MI_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 2 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 2)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 2)), L2fetch_param);
         }
 
         Tp *dst_row = dst.Ptr<Tp>(y);
@@ -452,14 +452,14 @@ static Status Gaussian3x3HvxHelper(Context *ctx, const Mat &src, Mat &dst, const
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     /// 判断输入数据的通融倒数
     switch (channel)
@@ -470,21 +470,21 @@ static Status Gaussian3x3HvxHelper(Context *ctx, const Mat &src, Mat &dst, const
             /// 这个是由框架进行划分同等的线程进行多线程计算的
             /// start 是0, height是数据的高低。也就是行数。 多线程会进行划分相同的行数来进行多线程处理
             /// 具体的函数的实现：Gaussian3x3HvxImpl
-            ret = wp->ParallelFor((MI_S32)0, height, Gaussian3x3HvxImpl<Tp, BORDER_TYPE, 1>,
+            ret = wp->ParallelFor((DT_S32)0, height, Gaussian3x3HvxImpl<Tp, BORDER_TYPE, 1>,
                                   std::cref(src), std::ref(dst), std::cref(kmat), std::cref(border_value), border_buffer);
             break;
         }
 
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Gaussian3x3HvxImpl<Tp, BORDER_TYPE, 2>,
+            ret = wp->ParallelFor((DT_S32)0, height, Gaussian3x3HvxImpl<Tp, BORDER_TYPE, 2>,
                                   std::cref(src), std::ref(dst), std::cref(kmat), std::cref(border_value), border_buffer);
             break;
         }
 
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, Gaussian3x3HvxImpl<Tp, BORDER_TYPE, 3>,
+            ret = wp->ParallelFor((DT_S32)0, height, Gaussian3x3HvxImpl<Tp, BORDER_TYPE, 3>,
                                   std::cref(src), std::ref(dst), std::cref(kmat), std::cref(border_value), border_buffer);
             break;
         }
@@ -500,7 +500,7 @@ static Status Gaussian3x3HvxHelper(Context *ctx, const Mat &src, Mat &dst, const
 }
 
 /**
- * 模板函数。传入的模板数据可能是：MI_U8、MI_U16、MI_S16、MI_U32、MI_S32
+ * 模板函数。传入的模板数据可能是：DT_U8、DT_U16、DT_S16、DT_U32、DT_S32
  * @tparam Tp
  * @param ctx
  * @param src
@@ -516,12 +516,12 @@ static Status Gaussian3x3HvxHelper(Context *ctx, const Mat &src, Mat &dst, const
 {
     Status ret = Status::ERROR;
 
-    Tp *border_buffer = MI_NULL;
+    Tp *border_buffer = DT_NULL;
     /// 将传递尽力的border数据，传入进来之后我们将其转化成为向量
     std::vector<Tp> vec_border_value = border_value.ToVector<Tp>();
 
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (border_type)
     {
@@ -530,7 +530,7 @@ static Status Gaussian3x3HvxHelper(Context *ctx, const Mat &src, Mat &dst, const
             // 创建边界的buffer 我们看一下的这个边界的buffer是怎么处理的。
             // 如果
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -575,31 +575,31 @@ Status Gaussian3x3Hvx(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat,
         // 看看原始数据
         case ElemType::U8:
         {
-            ret = Gaussian3x3HvxHelper<MI_U8>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian3x3HvxHelper<DT_U8>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = Gaussian3x3HvxHelper<MI_U16>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian3x3HvxHelper<DT_U16>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = Gaussian3x3HvxHelper<MI_S16>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian3x3HvxHelper<DT_S16>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 
         case ElemType::U32:
         {
-            ret = Gaussian3x3HvxHelper<MI_U32>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian3x3HvxHelper<DT_U32>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 
         case ElemType::S32:
         {
-            ret = Gaussian3x3HvxHelper<MI_S32>(ctx, src, dst, kmat, border_type, border_value);
+            ret = Gaussian3x3HvxHelper<DT_S32>(ctx, src, dst, kmat, border_type, border_value);
             break;
         }
 

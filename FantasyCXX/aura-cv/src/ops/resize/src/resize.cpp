@@ -85,12 +85,12 @@ Resize::Resize(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Resize::SetArgs(const Array *src, Array *dst, InterpType type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -144,14 +144,14 @@ Status Resize::SetArgs(const Array *src, Array *dst, InterpType type)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateResizeImpl(m_ctx, impl_target, type);
     }
 
     // run initialize
     ResizeImpl *resize_impl = dynamic_cast<ResizeImpl*>(m_impl.get());
-    if (MI_NULL == resize_impl)
+    if (DT_NULL == resize_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "resize_impl is null ptr");
         return Status::ERROR;
@@ -162,11 +162,11 @@ Status Resize::SetArgs(const Array *src, Array *dst, InterpType type)
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Resize::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 iwidth, MI_S32 iheight, MI_S32 owidth, MI_S32 oheight,
+Status Resize::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 iwidth, DT_S32 iheight, DT_S32 owidth, DT_S32 oheight,
                             InterpType interp_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -230,13 +230,13 @@ AURA_EXPORTS Status IResize(Context *ctx, const Mat &src, Mat &dst, InterpType t
 }
 
 ResizeImpl::ResizeImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Resize", target),
-                                                               m_src(MI_NULL), m_dst(MI_NULL),
+                                                               m_src(DT_NULL), m_dst(DT_NULL),
                                                                m_type(InterpType::LINEAR)
 {}
 
 Status ResizeImpl::SetArgs(const Array *src, Array *dst, InterpType type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -293,7 +293,7 @@ std::string ResizeImpl::ToString() const
     return str;
 }
 
-AURA_VOID ResizeImpl::Dump(const std::string &prefix) const
+DT_VOID ResizeImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

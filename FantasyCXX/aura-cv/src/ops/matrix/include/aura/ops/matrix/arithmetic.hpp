@@ -176,7 +176,7 @@ public:
      *
      * For more details, please refer to @ref scalar_divide_details
      */
-    Status SetArgs(MI_F32 scalar, const Array *src, Array *dst);
+    Status SetArgs(DT_F32 scalar, const Array *src, Array *dst);
 };
 
 /**
@@ -305,7 +305,7 @@ AURA_EXPORTS Status IDivide(Context *ctx, const Mat &src0, const Mat &src1, Mat 
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status IAdd(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IAdd(Context *ctx, const Mat &src, DT_F32 scalar, Mat &dst, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Performs element-wise subtraction of a scalar value from a matrix.
@@ -330,7 +330,7 @@ AURA_EXPORTS Status IAdd(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, 
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status ISubtract(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status ISubtract(Context *ctx, const Mat &src, DT_F32 scalar, Mat &dst, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Performs element-wise multiplication of a matrix by a scalar value.
@@ -355,7 +355,7 @@ AURA_EXPORTS Status ISubtract(Context *ctx, const Mat &src, MI_F32 scalar, Mat &
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status IMultiply(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IMultiply(Context *ctx, const Mat &src, DT_F32 scalar, Mat &dst, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Performs element-wise division of a matrix by a scalar value.
@@ -380,7 +380,7 @@ AURA_EXPORTS Status IMultiply(Context *ctx, const Mat &src, MI_F32 scalar, Mat &
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status IDivide(Context *ctx, const Mat &src, MI_F32 scalar, Mat &dst, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IDivide(Context *ctx, const Mat &src, DT_F32 scalar, Mat &dst, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Performs element-wise subtraction of a matrix from a scalar value.
@@ -405,7 +405,7 @@ AURA_EXPORTS Status IDivide(Context *ctx, const Mat &src, MI_F32 scalar, Mat &ds
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status ISubtract(Context *ctx, MI_F32 scalar, const Mat &src, Mat &dst, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status ISubtract(Context *ctx, DT_F32 scalar, const Mat &src, Mat &dst, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Performs element-wise division of a scalar value by a matrix.
@@ -430,7 +430,7 @@ AURA_EXPORTS Status ISubtract(Context *ctx, MI_F32 scalar, const Mat &src, Mat &
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status IDivide(Context *ctx, MI_F32 scalar, const Mat &src, Mat &dst, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IDivide(Context *ctx, DT_F32 scalar, const Mat &src, Mat &dst, const OpTarget &target = OpTarget::Default());
 
 /**
  * @}

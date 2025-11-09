@@ -30,17 +30,17 @@ namespace aura
  * 
  * @tparam Tp The input type.
  */
-/// 这段代码定义了一个名为 Promote 的模板类，并通过模板全特化为不同的基础数据类型（如 MI_U8、MI_S8 等）提供了类型提升规则。
+/// 这段代码定义了一个名为 Promote 的模板类，并通过模板全特化为不同的基础数据类型（如 DT_U8、DT_S8 等）提供了类型提升规则。
 /// 其核心目的是在编译期自动为数值类型选择更高精度的类型，以防止计算过程中的溢出或精度损失。
 template <typename Tp> struct Promote;
 // 声明一个泛型模板 Promote，但未提供实现。这表示该模板的特化版本必须覆盖所有需要用到的类型，否则编译会失败
-template <> struct Promote<MI_U8>  { using Type = MI_U16; };
-template <> struct Promote<MI_S8>  { using Type = MI_S16; };
-template <> struct Promote<MI_U16> { using Type = MI_U32; };
-template <> struct Promote<MI_S16> { using Type = MI_S32; };
-template <> struct Promote<MI_U32> { using Type = MI_U64; };
-template <> struct Promote<MI_S32> { using Type = MI_S64; };
-template <> struct Promote<MI_F32> { using Type = MI_F32; };
+template <> struct Promote<DT_U8>  { using Type = DT_U16; };
+template <> struct Promote<DT_S8>  { using Type = DT_S16; };
+template <> struct Promote<DT_U16> { using Type = DT_U32; };
+template <> struct Promote<DT_S16> { using Type = DT_S32; };
+template <> struct Promote<DT_U32> { using Type = DT_U64; };
+template <> struct Promote<DT_S32> { using Type = DT_S64; };
+template <> struct Promote<DT_F32> { using Type = DT_F32; };
 
 /**
  * @brief A helper struct that checks whether a type is a floating-point type.
@@ -142,7 +142,7 @@ template <typename Tp> struct _is_scalar : std::is_scalar<Tp> {};
 template <typename Tp> struct  is_scalar : _is_scalar<typename std::remove_cv<Tp>::type> {};
 
 #if defined(AURA_BUILD_HOST)
-template <> struct Promote<MI_F16> { using Type = MI_F32; };
+template <> struct Promote<MI_F16> { using Type = DT_F32; };
 template <> struct _is_floating_point<MI_F16> : std::true_type {};
 template <> struct _is_integral<MI_F16> : std::false_type {};
 template <> struct _is_arithmetic<MI_F16> : std::true_type {};

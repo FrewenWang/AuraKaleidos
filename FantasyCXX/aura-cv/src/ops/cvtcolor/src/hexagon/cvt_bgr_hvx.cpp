@@ -5,38 +5,38 @@
 namespace aura
 {
 
-template <MI_S32 IC, MI_S32 OC>
-static Status CvtBgr2BgraHvxImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_S32 start_row, MI_S32 end_row)
+template <DT_S32 IC, DT_S32 OC>
+static Status CvtBgr2BgraHvxImpl(const Mat &src, Mat &dst, DT_BOOL swapb, DT_S32 start_row, DT_S32 end_row)
 {
     using MVSt = typename MVHvxVector<IC>::Type;
     using MVDt = typename MVHvxVector<OC>::Type;
 
-    MI_S32 width   = src.GetSizes().m_width;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 width   = src.GetSizes().m_width;
+    DT_S32 istride = src.GetStrides().m_width;
 
-    MI_S32 width_align = width & (-AURA_HVLEN);
+    DT_S32 width_align = width & (-AURA_HVLEN);
 
     MVSt mvu8_src;
     MVDt mvu8_dst;
 
-    MI_S32 blue_idx = swapb ? 2 : 0;
-    MI_S32 red_idx  = swapb ? 0 : 2;
+    DT_S32 blue_idx = swapb ? 2 : 0;
+    DT_S32 red_idx  = swapb ? 0 : 2;
 
     HVX_Vector vu8_const_255 = Q6_Vb_vsplat_R(255);
 
-    MI_U64 L2fetch_param = L2PfParam(istride, width * IC * ElemTypeSize(src.GetElemType()), 1, 0);
+    DT_U64 L2fetch_param = L2PfParam(istride, width * IC * ElemTypeSize(src.GetElemType()), 1, 0);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y < (end_row - 1))
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(y + 1)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(y + 1)), L2fetch_param);
         }
 
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8       *dst_row = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8       *dst_row = dst.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += AURA_HVLEN)
         {
 LOOP_BODY:
@@ -63,7 +63,7 @@ LOOP_BODY:
     return Status::OK;
 }
 
-Status CvtBgr2BgraHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb)
+Status CvtBgr2BgraHvx(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb)
 {
     Status ret = Status::ERROR;
 
@@ -80,11 +80,11 @@ Status CvtBgr2BgraHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb)
         return ret;
     }
 
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetSizes().m_channel, dst.GetSizes().m_channel);
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 pattern = AURA_MAKE_PATTERN(src.GetSizes().m_channel, dst.GetSizes().m_channel);
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
@@ -94,25 +94,25 @@ Status CvtBgr2BgraHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb)
     {
         case AURA_MAKE_PATTERN(3, 3):
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtBgr2BgraHvxImpl<3, 3>, std::cref(src), std::ref(dst), swapb);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtBgr2BgraHvxImpl<3, 3>, std::cref(src), std::ref(dst), swapb);
             break;
         }
 
         case AURA_MAKE_PATTERN(4, 3):
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtBgr2BgraHvxImpl<4, 3>, std::cref(src), std::ref(dst), swapb);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtBgr2BgraHvxImpl<4, 3>, std::cref(src), std::ref(dst), swapb);
             break;
         }
 
         case AURA_MAKE_PATTERN(3, 4):
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtBgr2BgraHvxImpl<3, 4>, std::cref(src), std::ref(dst), swapb);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtBgr2BgraHvxImpl<3, 4>, std::cref(src), std::ref(dst), swapb);
             break;
         }
 
         case AURA_MAKE_PATTERN(4, 4):
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtBgr2BgraHvxImpl<4, 4>, std::cref(src), std::ref(dst), swapb);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtBgr2BgraHvxImpl<4, 4>, std::cref(src), std::ref(dst), swapb);
             break;
         }
 
@@ -136,22 +136,22 @@ Status CvtBgr2BgraHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb)
  * @param end_row
  * @return
  */
-template <MI_S32 IC>
-static Status CvtBgr2GrayHvxImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_S32 start_row, MI_S32 end_row)
+template <DT_S32 IC>
+static Status CvtBgr2GrayHvxImpl(const Mat &src, Mat &dst, DT_BOOL swapb, DT_S32 start_row, DT_S32 end_row)
 {
     /// 构建HVX的向量
     using MVType = typename MVHvxVector<IC>::Type;
 
-    MI_S32 width   = src.GetSizes().m_width;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 width   = src.GetSizes().m_width;
+    DT_S32 istride = src.GetStrides().m_width;
 
     /// 设置宽度对齐
-    MI_S32 width_align  = width & (-AURA_HVLEN);
+    DT_S32 width_align  = width & (-AURA_HVLEN);
 
     //// TODO 这个地为什么和NONE不一样
-    MI_S32 b_coeff = (Bgr2GrayParam::BC << 16) | (Bgr2GrayParam::BC); // 3735;
-    MI_S32 g_coeff = (Bgr2GrayParam::GC << 16) | (Bgr2GrayParam::GC); // 19235;
-    MI_S32 r_coeff = (Bgr2GrayParam::RC << 16) | (Bgr2GrayParam::RC); // 9798;
+    DT_S32 b_coeff = (Bgr2GrayParam::BC << 16) | (Bgr2GrayParam::BC); // 3735;
+    DT_S32 g_coeff = (Bgr2GrayParam::GC << 16) | (Bgr2GrayParam::GC); // 19235;
+    DT_S32 r_coeff = (Bgr2GrayParam::RC << 16) | (Bgr2GrayParam::RC); // 9798;
 
     if (swapb)
     {
@@ -167,18 +167,18 @@ static Status CvtBgr2GrayHvxImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_S32
 
     HVX_VectorPair ws32_const_half = Q6_W_vcombine_VV(Q6_V_vsplat_R(1 << 14), Q6_V_vsplat_R(1 << 14));
 
-    MI_U64 L2fetch_param = L2PfParam(istride, width * IC * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    DT_U64 L2fetch_param = L2PfParam(istride, width * IC * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         if (y < (end_row - 1))
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(y + 1)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(y + 1)), L2fetch_param);
         }
 
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8       *dst_row = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8       *dst_row = dst.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += AURA_HVLEN)
         {
 LOOP_BODY:
@@ -213,7 +213,7 @@ LOOP_BODY:
     return Status::OK;
 }
 
-Status CvtBgr2GrayHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb)
+Status CvtBgr2GrayHvx(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb)
 {
     Status ret = Status::ERROR;
 
@@ -229,11 +229,11 @@ Status CvtBgr2GrayHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb)
         return ret;
     }
 
-    MI_S32 height   = src.GetSizes().m_height;
-    MI_S32 ichannel = src.GetSizes().m_channel;
+    DT_S32 height   = src.GetSizes().m_height;
+    DT_S32 ichannel = src.GetSizes().m_channel;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
@@ -243,12 +243,12 @@ Status CvtBgr2GrayHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb)
     {
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtBgr2GrayHvxImpl<3>, std::cref(src), std::ref(dst), swapb);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtBgr2GrayHvxImpl<3>, std::cref(src), std::ref(dst), swapb);
             break;
         }
         case 4:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtBgr2GrayHvxImpl<4>, std::cref(src), std::ref(dst), swapb);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtBgr2GrayHvxImpl<4>, std::cref(src), std::ref(dst), swapb);
             break;
         }
 
@@ -262,18 +262,18 @@ Status CvtBgr2GrayHvx(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb)
     AURA_RETURN(ctx, ret);
 }
 
-template <MI_S32 OC>
-static Status CvtGray2BgrHvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template <DT_S32 OC>
+static Status CvtGray2BgrHvxImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     /// 定义一个三通道的1024bits的向量
     using MVType = typename MVHvxVector<OC>::Type;
 
-    MI_S32 width    = src.GetSizes().m_width;
-    MI_S32 istride  = src.GetStrides().m_width;
+    DT_S32 width    = src.GetSizes().m_width;
+    DT_S32 istride  = src.GetStrides().m_width;
 
     /// 4096 & ~(-128)
     // AURA_HVLEN = 128; TODO 所以咱们HVX必须要进行128位对齐
-    MI_S32 width_align  = width & (-AURA_HVLEN);
+    DT_S32 width_align  = width & (-AURA_HVLEN);
     /// 使用一个HVX的向量。1024位的数据，如果是U8数据。也就是一次性加载128个元素(128*8 = 1024)
     HVX_Vector vu8_src;
     MVType     mvu8_dst;
@@ -282,16 +282,16 @@ static Status CvtGray2BgrHvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_
     // istride	输入数据的行跨度（Stride）	相邻行数据的内存地址偏移（字节单位），反映数据在内存中的连续性
     // width * ElemTypeSize(src.GetElemType())	​单行数据的总字节宽度​	- src.GetElemType()：获取数据源元素类型（如 float16、int8）
     // -ElemTypeSize() ：计算该类型的字节大小（如 float16 为2字节）-width：数据行宽度（元素数量）乘积结果​：单行数据占用的总字节数
-    MI_U64 L2fetch_param = L2PfParam(istride, width * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; y++) {
+    DT_U64 L2fetch_param = L2PfParam(istride, width * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; y++) {
         if (y < (end_row - 1)) {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(y + 1)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(y + 1)), L2fetch_param);
         }
 
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8       *dst_row = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8       *dst_row = dst.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += AURA_HVLEN)
         {
 LOOP_BODY:
@@ -334,11 +334,11 @@ Status CvtGray2BgrHvx(Context *ctx, const Mat &src, Mat &dst)
         return ret;
     }
 
-    MI_S32 height   = src.GetSizes().m_height;
-    MI_S32 ochannel = dst.GetSizes().m_channel;
+    DT_S32 height   = src.GetSizes().m_height;
+    DT_S32 ochannel = dst.GetSizes().m_channel;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
@@ -348,13 +348,13 @@ Status CvtGray2BgrHvx(Context *ctx, const Mat &src, Mat &dst)
     {
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtGray2BgrHvxImpl<3>, std::cref(src), std::ref(dst));
+            ret = wp->ParallelFor((DT_S32)0, height, CvtGray2BgrHvxImpl<3>, std::cref(src), std::ref(dst));
             break;
         }
 
         case 4:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtGray2BgrHvxImpl<4>, std::cref(src), std::ref(dst));
+            ret = wp->ParallelFor((DT_S32)0, height, CvtGray2BgrHvxImpl<4>, std::cref(src), std::ref(dst));
             break;
         }
 

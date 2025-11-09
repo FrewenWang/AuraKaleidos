@@ -118,7 +118,7 @@ public:
      * @return The vector containing scalar elements.
      */
     template<typename Tp1 = Tp0>
-    std::vector<Tp1> ToVector(MI_U32 n = 4) const
+    std::vector<Tp1> ToVector(DT_U32 n = 4) const
     {
         if (n <= 4)
         {
@@ -168,7 +168,7 @@ public:
      *
      * @return A Scalar_ object with element-wise multiplication and scaling.
      */
-    Scalar_<Tp0> Mul(const Scalar_<Tp0> &a, MI_F64 scale = 1) const
+    Scalar_<Tp0> Mul(const Scalar_<Tp0> &a, DT_F64 scale = 1) const
     {
         return Scalar_<Tp0>(SaturateCast<Tp0>(m_val[0] * a.m_val[0] * scale),
                             SaturateCast<Tp0>(m_val[1] * a.m_val[1] * scale),
@@ -194,7 +194,7 @@ public:
      *
      * @return True if the Scalar_ is purely real, false otherwise.
      */
-    MI_BOOL IsReal() const
+    DT_BOOL IsReal() const
     {
         return m_val[1] == 0 && m_val[2] == 0 && m_val[3] == 0;
     }
@@ -206,7 +206,7 @@ public:
      *
      * @return True if all elements are equal, false otherwise.
      */
-    MI_BOOL operator==(const Scalar_ &sc) const
+    DT_BOOL operator==(const Scalar_ &sc) const
     {
         return m_val[0] == sc.m_val[0] && m_val[1] == sc.m_val[1] &&
                m_val[2] == sc.m_val[2] && m_val[3] == sc.m_val[3];
@@ -219,7 +219,7 @@ public:
      *
      * @return True if any element is not equal, false if all elements are equal.
      */
-    MI_BOOL operator!=(const Scalar_ &sc) const
+    DT_BOOL operator!=(const Scalar_ &sc) const
     {
         return m_val[0] != sc.m_val[0] || m_val[1] != sc.m_val[1] ||
                m_val[2] != sc.m_val[2] || m_val[3] != sc.m_val[3];
@@ -500,10 +500,10 @@ AURA_INLINE Scalar_<Tp0> operator==(const Scalar_<Tp0> &a, const Scalar_<Tp0> &b
  * @return A new Scalar_ object representing the division result.
  */
 template<typename Tp0>
-AURA_INLINE Scalar_<Tp0> operator/(const Scalar_<Tp0> &a, MI_F32 b)
+AURA_INLINE Scalar_<Tp0> operator/(const Scalar_<Tp0> &a, DT_F32 b)
 {
-    MI_F32 s = 1 / b;
-    return Scalar_<MI_F32>(a.m_val[0] * s, a.m_val[1] * s, a.m_val[2] * s, a.m_val[3] * s);
+    DT_F32 s = 1 / b;
+    return Scalar_<DT_F32>(a.m_val[0] * s, a.m_val[1] * s, a.m_val[2] * s, a.m_val[3] * s);
 }
 
 /**
@@ -517,10 +517,10 @@ AURA_INLINE Scalar_<Tp0> operator/(const Scalar_<Tp0> &a, MI_F32 b)
  * @return A new Scalar_ object representing the division result.
  */
 template<typename Tp0>
-AURA_INLINE Scalar_<Tp0> operator/(const Scalar_<Tp0> &a, MI_F64 b)
+AURA_INLINE Scalar_<Tp0> operator/(const Scalar_<Tp0> &a, DT_F64 b)
 {
-    MI_F64 s = 1 / b;
-    return Scalar_<MI_F64>(a.m_val[0] * s, a.m_val[1] * s, a.m_val[2] * s, a.m_val[3] * s);
+    DT_F64 s = 1 / b;
+    return Scalar_<DT_F64>(a.m_val[0] * s, a.m_val[1] * s, a.m_val[2] * s, a.m_val[3] * s);
 }
 
 /**
@@ -557,8 +557,8 @@ AURA_INLINE Scalar_<Tp0> operator/(const Scalar_<Tp0> &a, const Scalar_<Tp0> &b)
     return a * ((Tp0)1 / b);
 }
 
-typedef Scalar_<MI_F64> Scalar;
-typedef Scalar_<MI_S32> Scalari;
+typedef Scalar_<DT_F64> Scalar;
+typedef Scalar_<DT_S32> Scalari;
 
 /**
  * @}

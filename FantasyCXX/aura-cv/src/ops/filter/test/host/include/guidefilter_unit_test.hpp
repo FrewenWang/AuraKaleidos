@@ -15,27 +15,27 @@ using namespace aura;
 AURA_TEST_PARAM(GuideFilterParam,
                 ElemType,          elem_type,
                 MatSize,           mat_size,
-                MI_S32,            ksize,
-                MI_F32,            eps,
+                DT_S32,            ksize,
+                DT_F32,            eps,
                 GuideFilterType,   type,
                 BorderType,        border_type,
                 OpTarget,          target);
 
 template <typename Tp> struct GuideFilterOpenCVTraits;
 
-template <> struct GuideFilterOpenCVTraits<MI_U8>
+template <> struct GuideFilterOpenCVTraits<DT_U8>
 {
     static constexpr ElemType elem_type = ElemType::U16;
 };
-template <> struct GuideFilterOpenCVTraits<MI_S8>
+template <> struct GuideFilterOpenCVTraits<DT_S8>
 {
     static constexpr ElemType elem_type = ElemType::S16;
 };
-template <> struct GuideFilterOpenCVTraits<MI_U16>
+template <> struct GuideFilterOpenCVTraits<DT_U16>
 {
     static constexpr ElemType elem_type = ElemType::U32;
 };
-template <> struct GuideFilterOpenCVTraits<MI_S16>
+template <> struct GuideFilterOpenCVTraits<DT_S16>
 {
     static constexpr ElemType elem_type = ElemType::S32;
 };
@@ -43,18 +43,18 @@ template <> struct GuideFilterOpenCVTraits<MI_F16>
 {
     static constexpr ElemType elem_type = ElemType::F32;
 };
-template <> struct GuideFilterOpenCVTraits<MI_F32>
+template <> struct GuideFilterOpenCVTraits<DT_F32>
 {
     static constexpr ElemType elem_type = ElemType::F32;
 };
 
 template<typename Tp>
-static AURA_VOID GuideFilterOpenCVHelper(cv::Mat &i, cv::Mat &p, cv::Mat &q, MI_S32 r, MI_F32 &eps, GuideFilterType &type, cv::BorderTypes border_type)
+static DT_VOID GuideFilterOpenCVHelper(cv::Mat &i, cv::Mat &p, cv::Mat &q, DT_S32 r, DT_F32 &eps, GuideFilterType &type, cv::BorderTypes border_type)
 {
     if (GuideFilterType::FAST == type)
     {
-        MI_S32 r_sub = MAX(r / 2, 1);
-        MI_S32 wsize = 2 * r_sub + 1;
+        DT_S32 r_sub = MAX(r / 2, 1);
+        DT_S32 wsize = 2 * r_sub + 1;
         auto elem_type = GuideFilterOpenCVTraits<Tp>::elem_type;
 
         //isub=resize(i)
@@ -132,7 +132,7 @@ static AURA_VOID GuideFilterOpenCVHelper(cv::Mat &i, cv::Mat &p, cv::Mat &q, MI_
     }
     else // GuideFilterType::NORMAL
     {
-        MI_S32 wsize = 2 * r + 1;
+        DT_S32 wsize = 2 * r + 1;
         auto elem_type = GuideFilterOpenCVTraits<Tp>::elem_type;
 
         //meanI=fmean(I)
@@ -198,7 +198,7 @@ static AURA_VOID GuideFilterOpenCVHelper(cv::Mat &i, cv::Mat &p, cv::Mat &q, MI_
     return;
 }
 
-static Status CvGuideFilter(Context *ctx, Mat &src0, Mat &src1, Mat &dst, MI_S32 &ksize, MI_F32 &eps, GuideFilterType &type, BorderType &border_type)
+static Status CvGuideFilter(Context *ctx, Mat &src0, Mat &src1, Mat &dst, DT_S32 &ksize, DT_F32 &eps, GuideFilterType &type, BorderType &border_type)
 {
     AURA_UNUSED(ctx);
 
@@ -209,25 +209,25 @@ static Status CvGuideFilter(Context *ctx, Mat &src0, Mat &src1, Mat &dst, MI_S32
     {
         case ElemType::U8:
         {
-            GuideFilterOpenCVHelper<MI_U8>(cv_src0, cv_src1, cv_ref, ksize / 2, eps, type, (cv::BorderTypes)BorderTypeToOpencv(border_type));
+            GuideFilterOpenCVHelper<DT_U8>(cv_src0, cv_src1, cv_ref, ksize / 2, eps, type, (cv::BorderTypes)BorderTypeToOpencv(border_type));
             break;
         }
 
         case ElemType::U16:
         {
-            GuideFilterOpenCVHelper<MI_U16>(cv_src0, cv_src1, cv_ref, ksize / 2, eps, type, (cv::BorderTypes)BorderTypeToOpencv(border_type));
+            GuideFilterOpenCVHelper<DT_U16>(cv_src0, cv_src1, cv_ref, ksize / 2, eps, type, (cv::BorderTypes)BorderTypeToOpencv(border_type));
             break;
         }
 
         case ElemType::S16:
         {
-            GuideFilterOpenCVHelper<MI_S16>(cv_src0, cv_src1, cv_ref, ksize / 2, eps, type, (cv::BorderTypes)BorderTypeToOpencv(border_type));
+            GuideFilterOpenCVHelper<DT_S16>(cv_src0, cv_src1, cv_ref, ksize / 2, eps, type, (cv::BorderTypes)BorderTypeToOpencv(border_type));
             break;
         }
 
         case ElemType::F32:
         {
-            GuideFilterOpenCVHelper<MI_F32>(cv_src0, cv_src1, cv_ref, ksize / 2, eps, type, (cv::BorderTypes)BorderTypeToOpencv(border_type));
+            GuideFilterOpenCVHelper<DT_F32>(cv_src0, cv_src1, cv_ref, ksize / 2, eps, type, (cv::BorderTypes)BorderTypeToOpencv(border_type));
             break;
         }
 
@@ -263,7 +263,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         GuideFilterParam run_param(GetParam((index)));
 
@@ -286,13 +286,13 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         GuideFilterParam run_param(GetParam((index)));
         ElemType elem_type = run_param.elem_type;
         MatSize mat_size = run_param.mat_size;
-        MI_F32 eps = run_param.eps;
+        DT_F32 eps = run_param.eps;
         AURA_LOGD(m_ctx, AURA_TAG, "guidefilter param detail: %s\n", run_param.ToString().c_str());
 
         if ((run_param.ksize > 100) && ((run_param.mat_size.m_sizes.m_height >= 1024) ||
@@ -315,12 +315,12 @@ public:
         refs.push_back(ref0);
         refs.push_back(ref1);
 
-        MI_S32 loop_count = stress_count ? stress_count : 5;
+        DT_S32 loop_count = stress_count ? stress_count : 5;
         Scalar border_value = Scalar(0, 0, 0, 0);
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
-        MI_F32 tolerance = (ElemType::F32 == elem_type) ? 0.5f : 3.0f;
+        DT_F32 tolerance = (ElemType::F32 == elem_type) ? 0.5f : 3.0f;
         tolerance        = (TargetType::HVX == run_param.target.m_type) ? 7.f : tolerance;
 
         result.param  = GuideFilterTypeToString(run_param.type) + BorderTypeToString(run_param.border_type) + " | ksize: " + std::to_string(run_param.ksize);
@@ -431,8 +431,8 @@ public:
             else
             {
                 // since there is diff in resize, the error is amplified after square calculation
-                MI_S32 index = (ElemType::F32 == elem_type) ? 1 : tolerance;
-                result.accu_status =  (static_cast<MI_F32>(cmp_result.hist[index].second) / cmp_result.total) > 0.93 ? TestStatus::PASSED : TestStatus::FAILED;
+                DT_S32 index = (ElemType::F32 == elem_type) ? 1 : tolerance;
+                result.accu_status =  (static_cast<DT_F32>(cmp_result.hist[index].second) / cmp_result.total) > 0.93 ? TestStatus::PASSED : TestStatus::FAILED;
                 result.accu_result = cmp_result.ToString();
             }
         }

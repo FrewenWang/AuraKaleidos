@@ -52,7 +52,7 @@ Status GraphRpc(Context *ctx, HexagonRpcParam &rpc_param)
     }
 
     graph = Create<Graph>(ctx, graph_name, end_time, host_base_time, props);
-    if (MI_NULL == graph)
+    if (DT_NULL == graph)
     {
         AURA_ADD_ERROR_STRING(ctx, "null ptr");
         ret = Status::ERROR;
@@ -107,7 +107,7 @@ EXIT:
                 {
                     AURA_ADD_ERROR_STRING(ctx, "invalid buffer or size not satisfied");
                     rpc_param.ResetBuffer();
-                    rpc_param.Set((MI_S32)0);
+                    rpc_param.Set((DT_S32)0);
                     ret = Status::ERROR;
                 }
             }

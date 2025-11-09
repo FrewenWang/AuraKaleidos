@@ -80,12 +80,12 @@ namespace aura
  * @param name The name of param to be serialized.
  * @param param The param to be serialized.
  *
- * @return AURA_VOID.
+ * @return DT_VOID.
  */
-template <typename Tp, typename std::enable_if<std::is_same<Array*, Tp>::value || std::is_same<const Array*, Tp>::value>::type* = MI_NULL>
-AURA_INLINE AURA_VOID JsonTo(aura_json::json &json_params, std::string name, const Tp param)
+template <typename Tp, typename std::enable_if<std::is_same<Array*, Tp>::value || std::is_same<const Array*, Tp>::value>::type* = DT_NULL>
+AURA_INLINE DT_VOID JsonTo(aura_json::json &json_params, std::string name, const Tp param)
 {
-    if (MI_NULL == param)
+    if (DT_NULL == param)
     {
         return;
     }
@@ -113,22 +113,22 @@ AURA_INLINE AURA_VOID JsonTo(aura_json::json &json_params, std::string name, con
  * @param name The name of param to be serialized.
  * @param param The param to be serialized.
  *
- * @return AURA_VOID.
+ * @return DT_VOID.
  */
-template <typename Tp, typename std::enable_if<std::is_same<Array*, Tp>::value || std::is_same<const Array*, Tp>::value>::type* = MI_NULL>
-AURA_INLINE AURA_VOID JsonTo(aura_json::json &json_params, std::string name, const std::vector<Tp> &param)
+template <typename Tp, typename std::enable_if<std::is_same<Array*, Tp>::value || std::is_same<const Array*, Tp>::value>::type* = DT_NULL>
+AURA_INLINE DT_VOID JsonTo(aura_json::json &json_params, std::string name, const std::vector<Tp> &param)
 {
     if (param.size() == 0)
     {
         return;
     }
 
-    if ((param[0] != MI_NULL) && (param[0]->GetArrayType() == ArrayType::MAT))
+    if ((param[0] != DT_NULL) && (param[0]->GetArrayType() == ArrayType::MAT))
     {
         std::vector<const Mat*> mats;
         for (auto array : param)
         {
-            if (MI_NULL == array)
+            if (DT_NULL == array)
             {
                 break;
             }
@@ -138,13 +138,13 @@ AURA_INLINE AURA_VOID JsonTo(aura_json::json &json_params, std::string name, con
 
         json_params[name] = mats;
     }
-    else if ((param[0] != MI_NULL) && param[0]->GetArrayType() == ArrayType::CL_MEMORY)
+    else if ((param[0] != DT_NULL) && param[0]->GetArrayType() == ArrayType::CL_MEMORY)
     {
 #if defined(AURA_ENABLE_OPENCL)
         std::vector<const CLMem*> cl_mems;
         for (auto array : param)
         {
-            if (MI_NULL == array)
+            if (DT_NULL == array)
             {
                 break;
             }
@@ -166,10 +166,10 @@ AURA_INLINE AURA_VOID JsonTo(aura_json::json &json_params, std::string name, con
  * @param name The name of param to be serialized.
  * @param param The param to be serialized.
  *
- * @return AURA_VOID.
+ * @return DT_VOID.
  */
-template <typename Tp, typename std::enable_if<!(std::is_same<Array*, Tp>::value || std::is_same<const Array*, Tp>::value)>::type* = MI_NULL>
-AURA_INLINE AURA_VOID JsonTo(aura_json::json &json_params, std::string name, const Tp &param)
+template <typename Tp, typename std::enable_if<!(std::is_same<Array*, Tp>::value || std::is_same<const Array*, Tp>::value)>::type* = DT_NULL>
+AURA_INLINE DT_VOID JsonTo(aura_json::json &json_params, std::string name, const Tp &param)
 {
     json_params[name] = param;
 }
@@ -246,8 +246,8 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = MI_NULL>
-    Status SetArray(const std::string &name, const Tp *array, MI_BOOL check = MI_TRUE);
+    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = DT_NULL>
+    Status SetArray(const std::string &name, const Tp *array, DT_BOOL check = DT_TRUE);
 
     /**
      * @brief Set array_map with name and array pointer, support Array* or const Array* vector type.
@@ -259,7 +259,7 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = MI_NULL>
+    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = DT_NULL>
     Status SetArray(const std::vector<std::string> &name, const std::vector<Tp*> &arrays);
 
     /**
@@ -272,7 +272,7 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = MI_NULL>
+    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = DT_NULL>
     Status SetArray(const std::string &name, const std::vector<Tp*> &arrays);
 
     /**
@@ -287,8 +287,8 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = MI_NULL>
-    Status SetArray(const std::string &name, const Tp &array, MI_BOOL check = MI_TRUE);
+    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = DT_NULL>
+    Status SetArray(const std::string &name, const Tp &array, DT_BOOL check = DT_TRUE);
 
     /**
      * @brief Set array_map with name and array pointer, support Mat or CLMem vector type.
@@ -300,7 +300,7 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = MI_NULL>
+    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = DT_NULL>
     Status SetArray(const std::vector<std::string> &name, const std::vector<Tp> &arrays);
 
     /**
@@ -313,7 +313,7 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = MI_NULL>
+    template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type* = DT_NULL>
     Status SetArray(const std::string &name, const std::vector<Tp> &arrays);
 
     /**
@@ -351,20 +351,20 @@ private:
 };
 
 template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type*>
-Status JsonWrapper::SetArray(const std::string &name, const Tp *array, MI_BOOL check)
+Status JsonWrapper::SetArray(const std::string &name, const Tp *array, DT_BOOL check)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == array && MI_TRUE == check)
+    if (DT_NULL == array && DT_TRUE == check)
     {
         std::string str_info = "array:" + name + "is null";
         AURA_ADD_ERROR_STRING(m_ctx, str_info.c_str());
         return Status::ERROR;
     }
-    else if (array != MI_NULL)
+    else if (array != DT_NULL)
     {
         m_array_map[array] = m_prefix + "_" + name + ".bin";
         array->Dump(m_prefix + "_" + name + ".bin");
@@ -376,7 +376,7 @@ Status JsonWrapper::SetArray(const std::string &name, const Tp *array, MI_BOOL c
 template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type*>
 Status JsonWrapper::SetArray(const std::vector<std::string> &name, const std::vector<Tp*> &arrays)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -393,7 +393,7 @@ Status JsonWrapper::SetArray(const std::vector<std::string> &name, const std::ve
 
     for (; it_name != name.end(); ++it_name, ++it_arrays)
     {
-        if (MI_NULL == (*it_arrays))
+        if (DT_NULL == (*it_arrays))
         {
             std::string str_info = "array:" + (*it_name) + "is null";
             AURA_ADD_ERROR_STRING(m_ctx, str_info.c_str());
@@ -411,18 +411,18 @@ Status JsonWrapper::SetArray(const std::vector<std::string> &name, const std::ve
 template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type*>
 Status JsonWrapper::SetArray(const std::string &name, const std::vector<Tp*> &arrays)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
     Status ret = Status::OK;
     auto it    = arrays.begin();
-    MI_S32 idx = 0;
+    DT_S32 idx = 0;
 
     for (; it != arrays.end(); ++it, ++idx)
     {
-        if (MI_NULL == (*it))
+        if (DT_NULL == (*it))
         {
             std::string str_info = "array:" + name + "_" + std::to_string(idx) + "is null";
             AURA_ADD_ERROR_STRING(m_ctx, str_info.c_str());
@@ -438,14 +438,14 @@ Status JsonWrapper::SetArray(const std::string &name, const std::vector<Tp*> &ar
 }
 
 template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type*>
-Status JsonWrapper::SetArray(const std::string &name, const Tp &array, MI_BOOL check)
+Status JsonWrapper::SetArray(const std::string &name, const Tp &array, DT_BOOL check)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (!array.IsValid() && (MI_TRUE == check))
+    if (!array.IsValid() && (DT_TRUE == check))
     {
         std::string str_info = "array:" + name + "is invalid";
         AURA_ADD_ERROR_STRING(m_ctx, str_info.c_str());
@@ -463,7 +463,7 @@ Status JsonWrapper::SetArray(const std::string &name, const Tp &array, MI_BOOL c
 template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type*>
 Status JsonWrapper::SetArray(const std::vector<std::string> &name, const std::vector<Tp> &arrays)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -498,14 +498,14 @@ Status JsonWrapper::SetArray(const std::vector<std::string> &name, const std::ve
 template <typename Tp, typename std::enable_if<std::is_base_of<Array, Tp>::value>::type*>
 Status JsonWrapper::SetArray(const std::string &name, const std::vector<Tp> &arrays)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
     Status ret = Status::OK;
     auto it    = arrays.begin();
-    MI_S32 idx = 0;
+    DT_S32 idx = 0;
 
     for (; it != arrays.end(); ++it, ++idx)
     {
@@ -535,8 +535,8 @@ Status JsonWrapper::SetArray(const std::string &name, const std::vector<Tp> &arr
  *
  * @return nlohamnn::json The json value to find
  */
-template <typename Tp, typename std::enable_if<std::is_base_of<aura_json::json, Tp>::value>::type* = MI_NULL>
-const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_value, MI_S32 idx)
+template <typename Tp, typename std::enable_if<std::is_base_of<aura_json::json, Tp>::value>::type* = DT_NULL>
+const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_value, DT_S32 idx)
 {
     if (json.is_array() && (json.size() > static_cast<size_t>(idx)))
     {
@@ -557,8 +557,8 @@ const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_va
  *
  * @return nlohamnn::json The json value to find
  */
-template <typename Tp, typename std::enable_if<!std::is_base_of<aura_json::json, Tp>::value>::type* = MI_NULL>
-aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, MI_S32 idx)
+template <typename Tp, typename std::enable_if<!std::is_base_of<aura_json::json, Tp>::value>::type* = DT_NULL>
+aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, DT_S32 idx)
 {
     if (json.is_array() && (json.size() > static_cast<size_t>(idx)))
     {
@@ -579,7 +579,7 @@ aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, MI
  *
  * @return nlohamnn::json The json value to find.
  */
-template <typename Tp, typename std::enable_if<std::is_base_of<aura_json::json, Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_base_of<aura_json::json, Tp>::value>::type* = DT_NULL>
 const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_value, const std::string &key)
 {
     if (json.contains(key))
@@ -601,7 +601,7 @@ const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_va
  *
  * @return nlohamnn::json The json value to find.
  */
-template <typename Tp, typename std::enable_if<!std::is_base_of<aura_json::json, Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<!std::is_base_of<aura_json::json, Tp>::value>::type* = DT_NULL>
 aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, const std::string &key)
 {
     if (json.contains(key))
@@ -624,8 +624,8 @@ aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, co
  *
  * @return nlohamnn::json The json value to find
  */
-template <typename Tp, typename ...ArgsType, typename std::enable_if<std::is_base_of<aura_json::json, Tp>::value>::type* = MI_NULL>
-const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_value, MI_S32 idx, ArgsType &&...args)
+template <typename Tp, typename ...ArgsType, typename std::enable_if<std::is_base_of<aura_json::json, Tp>::value>::type* = DT_NULL>
+const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_value, DT_S32 idx, ArgsType &&...args)
 {
     if (json.is_array() && (json.size() > static_cast<size_t>(idx)))
     {
@@ -647,8 +647,8 @@ const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_va
  *
  * @return nlohamnn::json The json value to find
  */
-template <typename Tp, typename ...ArgsType, typename std::enable_if<!std::is_base_of<aura_json::json, Tp>::value>::type* = MI_NULL>
-aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, MI_S32 idx, ArgsType &&...args)
+template <typename Tp, typename ...ArgsType, typename std::enable_if<!std::is_base_of<aura_json::json, Tp>::value>::type* = DT_NULL>
+aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, DT_S32 idx, ArgsType &&...args)
 {
     if (json.is_array() && (json.size() > static_cast<size_t>(idx)))
     {
@@ -670,7 +670,7 @@ aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, MI
  *
  * @return nlohamnn::json The json value to find.
  */
-template <typename Tp, typename ...ArgsType, typename std::enable_if<std::is_base_of<aura_json::json, Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename ...ArgsType, typename std::enable_if<std::is_base_of<aura_json::json, Tp>::value>::type* = DT_NULL>
 const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_value, const std::string &key, ArgsType &&...args)
 {
     if (json.contains(key))
@@ -693,7 +693,7 @@ const aura_json::json& GetJson(const aura_json::json &json, const Tp &default_va
  *
  * @return nlohamnn::json The json value to find.
  */
-template <typename Tp, typename ...ArgsType, typename std::enable_if<!std::is_base_of<aura_json::json, Tp>::value>::type* = MI_NULL>
+template <typename Tp, typename ...ArgsType, typename std::enable_if<!std::is_base_of<aura_json::json, Tp>::value>::type* = DT_NULL>
 aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, const std::string &key, ArgsType &&...args)
 {
     if (json.contains(key))
@@ -710,9 +710,9 @@ aura_json::json GetJson(const aura_json::json &json, const Tp &default_value, co
  * @param json The aura_json::json object.
  * @param key  The key to be queried.
  *
- * @return MI_BOOL  Returns MI_TRUE if it exists, MI_FALSE if it does not exist.
+ * @return DT_BOOL  Returns DT_TRUE if it exists, DT_FALSE if it does not exist.
  */
-AURA_EXPORTS MI_BOOL JsonHasKeys(const aura_json::json &json, const std::string &key);
+AURA_EXPORTS DT_BOOL JsonHasKeys(const aura_json::json &json, const std::string &key);
 
 /**
  * @brief Returns whether the specified keys exists in the json.
@@ -723,9 +723,9 @@ AURA_EXPORTS MI_BOOL JsonHasKeys(const aura_json::json &json, const std::string 
  *             {"a": {"b": "c"}}, then to query whether "b" exists, you should to write as follows:
  *             JsonHasKeys(json, {"a", "b"}).
  *
- * @return MI_BOOL  Returns MI_TRUE if it exists, MI_FALSE if it does not exist.
+ * @return DT_BOOL  Returns DT_TRUE if it exists, DT_FALSE if it does not exist.
  */
-AURA_EXPORTS MI_BOOL JsonHasKeys(const aura_json::json &json, const std::initializer_list<std::string> &keys);
+AURA_EXPORTS DT_BOOL JsonHasKeys(const aura_json::json &json, const std::initializer_list<std::string> &keys);
 
 /**
  * @brief Returns whether the specified keys exist in the json.
@@ -734,14 +734,14 @@ AURA_EXPORTS MI_BOOL JsonHasKeys(const aura_json::json &json, const std::initial
  * @param key  The key to be queried.
  * @param args Variable parameter list, expect all keys to be string type.
  *
- * @return MI_BOOL  Returns MI_TRUE if it exists, MI_FALSE if it does not exist.
+ * @return DT_BOOL  Returns DT_TRUE if it exists, DT_FALSE if it does not exist.
  */
 template <typename ...ArgsType>
-MI_BOOL JsonHasKeys(const aura_json::json &json, const std::string &key, ArgsType &&...args)
+DT_BOOL JsonHasKeys(const aura_json::json &json, const std::string &key, ArgsType &&...args)
 {
     if (!json.contains(key))
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
 
     return JsonHasKeys(json, std::forward<ArgsType>(args)...);
@@ -754,14 +754,14 @@ MI_BOOL JsonHasKeys(const aura_json::json &json, const std::string &key, ArgsTyp
  * @param keys The key list to be queried.
  * @param args Variable parameter list, expect all keys to be std::initializer_list<std::string>.
  *
- * @return MI_BOOL  Returns MI_TRUE if it exists, MI_FALSE if it does not exist.
+ * @return DT_BOOL  Returns DT_TRUE if it exists, DT_FALSE if it does not exist.
  */
 template <typename ...ArgsType>
-MI_BOOL JsonHasKeys(const aura_json::json &json, std::initializer_list<std::string> &keys, ArgsType &&...args)
+DT_BOOL JsonHasKeys(const aura_json::json &json, std::initializer_list<std::string> &keys, ArgsType &&...args)
 {
     if (!JsonHasKeys(json, keys))
     {
-        return MI_FALSE;
+        return DT_FALSE;
     }
 
     return JsonHasKeys(json, std::forward<ArgsType>(args)...);

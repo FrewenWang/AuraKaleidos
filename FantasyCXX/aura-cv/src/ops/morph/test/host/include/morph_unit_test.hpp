@@ -22,7 +22,7 @@ struct MorphTestParam
     MorphTestParam()
     {}
 
-    MorphTestParam(MI_S32 ksize, MI_S32 iterations) : ksize(ksize), iterations(iterations)
+    MorphTestParam(DT_S32 ksize, DT_S32 iterations) : ksize(ksize), iterations(iterations)
     {}
 
     friend std::ostream& operator<<(std::ostream &os, const MorphTestParam &morph_test_param)
@@ -39,8 +39,8 @@ struct MorphTestParam
         return ss.str();
     }
 
-    MI_S32 ksize;
-    MI_S32 iterations;
+    DT_S32 ksize;
+    DT_S32 iterations;
 };
 
 AURA_TEST_PARAM(MorphParam,
@@ -51,7 +51,7 @@ AURA_TEST_PARAM(MorphParam,
                 MorphTestParam, morph_test_param,
                 OpTarget,       target);
 
-static Status CvMorphologyEx(Context *ctx, Mat &src, Mat &dst, MorphType type, MI_S32 ksize, MorphShape shape, MI_S32 iterations)
+static Status CvMorphologyEx(Context *ctx, Mat &src, Mat &dst, MorphType type, DT_S32 ksize, MorphShape shape, DT_S32 iterations)
 {
     AURA_UNUSED(ctx);
 
@@ -98,7 +98,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         MorphParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -121,7 +121,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         MorphParam run_param(GetParam((index)));
@@ -129,20 +129,20 @@ public:
         MatSize &mat_size  = run_param.mat_size;
         MorphType type     = run_param.type;
         MorphShape shape   = run_param.shape;
-        MI_S32 ksize       = run_param.morph_test_param.ksize;
-        MI_S32 iterations  = run_param.morph_test_param.iterations;
+        DT_S32 ksize       = run_param.morph_test_param.ksize;
+        DT_S32 iterations  = run_param.morph_test_param.iterations;
         AURA_LOGD(m_ctx, AURA_TAG, "morph param detail: elem_type(%s), mat_size(%d, %d, %d), type(%s), shape(%s), morph_test_param(%s)\n",
                   ElemTypesToString(elem_type).c_str(), mat_size.m_sizes.m_channel, mat_size.m_sizes.m_height, mat_size.m_sizes.m_width,
                   MorphTypeToString(type).c_str(), MorphShapeToString(shape).c_str(), run_param.morph_test_param.ToString().c_str());
 
         // create iauras
-        MI_BOOL promote = ElemType::F16 == elem_type && TargetType::NONE == run_param.target.m_type;
+        DT_BOOL promote = ElemType::F16 == elem_type && TargetType::NONE == run_param.target.m_type;
         ElemType cv_elem_type = promote ? ElemType::F32 : elem_type;
         Mat src = m_factory.GetDerivedMat(1.f, 0.f, elem_type, mat_size.m_sizes, AURA_MEM_DEFAULT, mat_size.m_strides);
         Mat dst = m_factory.GetEmptyMat(elem_type, mat_size.m_sizes, AURA_MEM_DEFAULT, mat_size.m_strides);
         Mat ref = m_factory.GetEmptyMat(cv_elem_type, mat_size.m_sizes, AURA_MEM_DEFAULT, mat_size.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;

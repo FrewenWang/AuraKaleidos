@@ -46,8 +46,8 @@ static std::shared_ptr<RotateImpl> CreateRotateImpl(Context *ctx, const OpTarget
 #if defined(AURA_ENABLE_NEON)
 AURA_INLINE Status CheckRotateNeonParam(const Array *src)
 {
-    MI_S32 width  = src->GetSizes().m_width;
-    MI_S32 height = src->GetSizes().m_height;
+    DT_S32 width  = src->GetSizes().m_width;
+    DT_S32 height = src->GetSizes().m_height;
     if ((width < 8) || (height < 8))
     {
         return Status::ERROR;
@@ -61,12 +61,12 @@ Rotate::Rotate(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Rotate::SetArgs(const Array *src, Array *dst, RotateType type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -105,14 +105,14 @@ Status Rotate::SetArgs(const Array *src, Array *dst, RotateType type)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateRotateImpl(m_ctx, impl_target);
     }
 
     // run initialize
     RotateImpl *rotate_impl = dynamic_cast<RotateImpl*>(m_impl.get());
-    if (MI_NULL == rotate_impl)
+    if (DT_NULL == rotate_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "rotate_impl is null ptr");
         return Status::ERROR;
@@ -123,10 +123,10 @@ Status Rotate::SetArgs(const Array *src, Array *dst, RotateType type)
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Rotate::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 ochannel, RotateType type)
+Status Rotate::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 ochannel, RotateType type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -156,18 +156,18 @@ AURA_EXPORTS Status IRotate(Context *ctx, const Mat &src, Mat &dst, RotateType t
 }
 
 RotateImpl::RotateImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Rotate", target),
-                                                               m_src(MI_NULL), m_dst(MI_NULL),
+                                                               m_src(DT_NULL), m_dst(DT_NULL),
                                                                m_type(RotateType::ROTATE_180)
 {}
 
 Status RotateImpl::SetArgs(const Array *src, Array *dst, RotateType type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -231,7 +231,7 @@ std::string RotateImpl::ToString() const
     return str;
 }
 
-AURA_VOID RotateImpl::Dump(const std::string &prefix) const
+DT_VOID RotateImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

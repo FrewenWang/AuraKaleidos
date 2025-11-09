@@ -41,19 +41,19 @@ NNEngine 是 NN 的大管家，负责创建不同的 NNExecutor。在 AURA 中�
 std::shared_ptr<aura::Context> CreateNNContext()
 {
     aura::Config config;
-    config.SetNNConf(MI_TRUE);                                      // 使能 NN 模块
+    config.SetNNConf(DT_TRUE);                                      // 使能 NN 模块
 
     std::shared_ptr<aura::Context> ctx = std::make_shared<aura::Context>(config);   // 创建上下文对象
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         fprintf(stderr, "failed to create context\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (ctx->Initialize() != aura::Status::OK)                      // 初始化上下文对象
     {
         fprintf(stderr, "failed to initialize context\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return ctx;
@@ -205,12 +205,12 @@ aura::Status Validate(const aura::Mat &mat)
         return aura::Status::ERROR;
     }
 
-    MI_S32 id    = 0;                                               // 预测结果
-    MI_F32 max_p = mat.Ptr<MI_F32>(0)[0];                           // 最大概率
+    DT_S32 id    = 0;                                               // 预测结果
+    DT_F32 max_p = mat.Ptr<DT_F32>(0)[0];                           // 最大概率
 
-    for (MI_S32 i = 1; i < mat.GetSizes().m_width; i++)
+    for (DT_S32 i = 1; i < mat.GetSizes().m_width; i++)
     {
-        MI_F32 p = mat.Ptr<MI_F32>(0)[i];
+        DT_F32 p = mat.Ptr<DT_F32>(0)[i];
         if (p > max_p)                                              // 找到概率最大的类别
         {
             max_p = p;

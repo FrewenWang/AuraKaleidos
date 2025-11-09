@@ -18,12 +18,12 @@ struct MinbTestInfo
 };
 
 static Status SnpeRun(Context *ctx, Mat &src, Mat &dst, std::string backend, std::string &minb_file, std::string &minn_name,
-                      MI_S32 forward_count, MI_S32 &cur_count, MI_S32 total_count)
+                      DT_S32 forward_count, DT_S32 &cur_count, DT_S32 total_count)
 {
     Status ret = Status::ERROR;
 
-    NNEngine *nn_engine = MI_NULL;
-    std::shared_ptr<NNExecutor> nn_executor = MI_NULL;
+    NNEngine *nn_engine = DT_NULL;
+    std::shared_ptr<NNExecutor> nn_executor = DT_NULL;
     MatMap input;
     MatMap output;
     Time start_time, create_exe_time, init_time, exe_time, delete_time;
@@ -33,7 +33,7 @@ static Status SnpeRun(Context *ctx, Mat &src, Mat &dst, std::string backend, std
     config["htp_async_call"] = "false";
 
     nn_engine = ctx->GetNNEngine();
-    if (MI_NULL== nn_engine)
+    if (DT_NULL== nn_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "GetNNEngine fail\n");
         goto EXIT;
@@ -41,7 +41,7 @@ static Status SnpeRun(Context *ctx, Mat &src, Mat &dst, std::string backend, std
 
     start_time = Time::Now();
     nn_executor = nn_engine->CreateNNExecutor(minb_file, minn_name, "abcdefg", config);
-    if (MI_NULL == nn_executor)
+    if (DT_NULL == nn_executor)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_executor is null\n");
         goto EXIT;
@@ -67,7 +67,7 @@ static Status SnpeRun(Context *ctx, Mat &src, Mat &dst, std::string backend, std
     input.insert(std::make_pair("input", &src));
     output.insert(std::make_pair("InceptionV3/Predictions/Reshape_1", &dst));
 
-    for (MI_S32 i = 0; i < forward_count; i++)
+    for (DT_S32 i = 0; i < forward_count; i++)
     {
         start_time = Time::Now();
         ret = nn_executor->Forward(input, output);
@@ -100,7 +100,7 @@ static TestResult SnpeTest(std::string &minb_file, std::string &minn_name, std::
     std::string minb_path  = data_path + "minb/";
     std::string input_file = data_path + "trash_1x299x299x3_u8.bin";
 
-    MI_U32 forward_count = 5;
+    DT_U32 forward_count = 5;
 
     Mat src, dst_ref;
     Mat dst(ctx, ElemType::U8, {1, 1001}, AURA_MEM_DMA_BUF_HEAP);
@@ -109,12 +109,12 @@ static TestResult SnpeTest(std::string &minb_file, std::string &minn_name, std::
     TestResult result;
     TestTime time_val;
     MatCmpResult cmp_result;
-    MI_F64 cmp_eps = ("GPU" == backend) ? 1 : 1e-5;
+    DT_F64 cmp_eps = ("GPU" == backend) ? 1 : 1e-5;
 
     dst_ref = factory.GetFileMat(snpe_path + ref_file, ElemType::U8, {1, 1001});
 
-    MI_S32 cur_count = 0;
-    MI_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
+    DT_S32 cur_count = 0;
+    DT_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
 
     Status status_exec = Executor(loop_count, 2, time_val, SnpeRun, ctx, src, dst, backend, minb_path + minb_file, minn_name,
                                   forward_count, cur_count, loop_count);
@@ -139,24 +139,24 @@ EXIT:
     return result;
 }
 
-static Status QnnRun(Context *ctx, Mat &src, Mat &dst, std::string &minn_file, std::string &minn_name, MI_S32 forward_count,
-                    MI_S32 &cur_count, MI_S32 total_count, MI_F32 &forward_time, MI_BOOL do_register = MI_FALSE)
+static Status QnnRun(Context *ctx, Mat &src, Mat &dst, std::string &minn_file, std::string &minn_name, DT_S32 forward_count,
+                    DT_S32 &cur_count, DT_S32 total_count, DT_F32 &forward_time, DT_BOOL do_register = DT_FALSE)
 {
     Status ret = Status::ERROR;
 
-    NNEngine *nn_engine = MI_NULL;
-    std::shared_ptr<NNExecutor> nn_executor = MI_NULL;
+    NNEngine *nn_engine = DT_NULL;
+    std::shared_ptr<NNExecutor> nn_executor = DT_NULL;
     MatMap input;
     MatMap output;
     NNConfig config;
-    MI_S32 step = forward_count / 3 + 1;
+    DT_S32 step = forward_count / 3 + 1;
     Time start_time, create_exe_time, init_time, exe_time, delete_time;
 
     std::vector<std::string> htp_perf_level = {"perf_low", "perf_normal", "perf_high"};
     std::vector<std::string> hmx_perf_level = {"perf_low", "perf_normal", "perf_high"};
 
     nn_engine = ctx->GetNNEngine();
-    if (MI_NULL == nn_engine)
+    if (DT_NULL == nn_engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_engine is null\n");
         return ret;
@@ -168,7 +168,7 @@ static Status QnnRun(Context *ctx, Mat &src, Mat &dst, std::string &minn_file, s
 
     nn_executor = nn_engine->CreateNNExecutor(minn_file, minn_name, "abcdefg", config);
 
-    if (MI_NULL == nn_executor)
+    if (DT_NULL == nn_executor)
     {
         AURA_LOGE(ctx, AURA_TAG, "nn_executor is null\n");
         goto EXIT;
@@ -194,7 +194,7 @@ static Status QnnRun(Context *ctx, Mat &src, Mat &dst, std::string &minn_file, s
     input.insert(std::make_pair("input", &src));
     output.insert(std::make_pair("InceptionV3/Predictions/Reshape_1", &dst));
 
-    if (MI_TRUE == do_register)
+    if (DT_TRUE == do_register)
     {
         AnyParams params;
         params["input_matmap"] = input;
@@ -207,7 +207,7 @@ static Status QnnRun(Context *ctx, Mat &src, Mat &dst, std::string &minn_file, s
         }
     }
 
-    for (MI_S32 iter = 0; iter < forward_count; iter++)
+    for (DT_S32 iter = 0; iter < forward_count; iter++)
     {
         AnyParams params;
         params["perf_level"]         = std::ref(htp_perf_level[(cur_count - 1) % 3]);
@@ -228,13 +228,13 @@ static Status QnnRun(Context *ctx, Mat &src, Mat &dst, std::string &minn_file, s
         }
         exe_time = Time::Now() - start_time;
 
-        forward_time += (MI_F32)exe_time.AsMilliSec();
+        forward_time += (DT_F32)exe_time.AsMilliSec();
         AURA_LOGD(ctx, AURA_TAG, "backend = %s, htp_perf_level = %s, hmx_perf_level = %s, forward time = %s\n", "NPU",
                   htp_perf_level[(cur_count - 1) % 3].c_str(), hmx_perf_level[iter / step].c_str(), exe_time.ToString().c_str());
 
     }
 
-    if (MI_TRUE == do_register)
+    if (DT_TRUE == do_register)
     {
         AnyParams params;
         params["input_matmap"] = input;
@@ -268,7 +268,7 @@ static TestResult QnnTest(std::string &minb_file, std::string &minn_name, std::s
     std::string minb_path  = data_path + "minb/";
     std::string input_file = data_path + "trash_1x299x299x3_u8.bin";
 
-    MI_S32 forward_count = 5;
+    DT_S32 forward_count = 5;
 
     Mat dst(ctx, ElemType::U8, Sizes3(1, 1, 1001), AURA_MEM_DMA_BUF_HEAP);
     Mat src     = factory.GetFileMat(input_file, ElemType::U8, {299, 299, 3});
@@ -276,17 +276,17 @@ static TestResult QnnTest(std::string &minb_file, std::string &minn_name, std::s
 
     TestTime time_val;
 
-    MI_F32 time_do_register = 0;
-    MI_F32 time_no_register = 0;
+    DT_F32 time_do_register = 0;
+    DT_F32 time_no_register = 0;
 
     TestResult result;
     MatCmpResult cmp_result;
 
-    MI_S32 cur_count = 0;
-    MI_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
+    DT_S32 cur_count = 0;
+    DT_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
 
     Status status_exec = Executor(loop_count, 2, time_val, QnnRun, ctx, src, dst, minb_path + minb_file, minn_name,
-                                  forward_count, cur_count, loop_count, time_no_register, MI_FALSE);
+                                  forward_count, cur_count, loop_count, time_no_register, DT_FALSE);
     if (Status::OK == status_exec)
     {
         result.perf_result["npu"] = time_val;
@@ -305,7 +305,7 @@ static TestResult QnnTest(std::string &minb_file, std::string &minn_name, std::s
     result.accu_result = cmp_result.ToString();
 
     status_exec = Executor(loop_count, 2, time_val, QnnRun, ctx, src, dst, minb_path + minb_file, minn_name,
-                                forward_count, cur_count, loop_count, time_do_register, MI_TRUE);
+                                forward_count, cur_count, loop_count, time_do_register, DT_TRUE);
     if (Status::OK == status_exec)
     {
         result.perf_result["npu"] = time_val;
@@ -344,8 +344,8 @@ NEW_TESTCASE(runtime_nn_minb_test)
         }
     };
 
-    MI_U32 test_num = minb_test_info.model_list.size();
-    for (MI_U32 idx = 0; idx < test_num; idx++)
+    DT_U32 test_num = minb_test_info.model_list.size();
+    for (DT_U32 idx = 0; idx < test_num; idx++)
     {
         TestResult result;
         if ("snpe" == minb_test_info.model_list[idx].sdk)

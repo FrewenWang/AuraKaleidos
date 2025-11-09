@@ -46,7 +46,7 @@ static Status CvWarpPerspective(Mat &src, Mat &dst, Mat &mat,
     cv::Mat cv_dst = MatToOpencv(dst);
     cv::Mat cv_mat = MatToOpencv(mat);
 
-    cv::warpPerspective(cv_src, cv_dst, cv_mat, cv::Size(cv_dst.cols, cv_dst.rows), static_cast<MI_S32>(interp_type), BorderTypeToOpencv(border_type));
+    cv::warpPerspective(cv_src, cv_dst, cv_mat, cv::Size(cv_dst.cols, cv_dst.rows), static_cast<DT_S32>(interp_type), BorderTypeToOpencv(border_type));
 #else
     AURA_UNUSED(src);
     AURA_UNUSED(dst);
@@ -58,28 +58,28 @@ static Status CvWarpPerspective(Mat &src, Mat &dst, Mat &mat,
     return Status::OK;
 }
 
-static AURA_VOID GetPerspectivePoints(std::vector<Point2> &src_points, std::vector<Point2> &dst_points, const aura::Sizes3 &sizes)
+static DT_VOID GetPerspectivePoints(std::vector<Point2> &src_points, std::vector<Point2> &dst_points, const aura::Sizes3 &sizes)
 {
-    MI_S32 width  = sizes.m_width;
-    MI_S32 height = sizes.m_height;
+    DT_S32 width  = sizes.m_width;
+    DT_S32 height = sizes.m_height;
 
     src_points[0].m_x = 0.f;
     src_points[0].m_y = 0.f;
-    src_points[1].m_x = (MI_F32)(width - 1);
+    src_points[1].m_x = (DT_F32)(width - 1);
     src_points[1].m_y = 0.f;
     src_points[2].m_x = 0.f;
-    src_points[2].m_y = (MI_F32)(height - 1);
-    src_points[3].m_x = (MI_F32)(width  - 1);
-    src_points[3].m_y = (MI_F32)(height - 1);
+    src_points[2].m_y = (DT_F32)(height - 1);
+    src_points[3].m_x = (DT_F32)(width  - 1);
+    src_points[3].m_y = (DT_F32)(height - 1);
 
     dst_points[0].m_x = 0.f;
     dst_points[0].m_y = 0.f;
-    dst_points[1].m_x = (MI_F32)(width - 1);
+    dst_points[1].m_x = (DT_F32)(width - 1);
     dst_points[1].m_y = 0.f;
     dst_points[2].m_x = 0.f;
-    dst_points[2].m_y = (MI_F32)(height - 1);
-    dst_points[3].m_x = (MI_F32)(width  - 1);
-    dst_points[3].m_y = (MI_F32)(height - 1);
+    dst_points[2].m_y = (DT_F32)(height - 1);
+    dst_points[3].m_x = (DT_F32)(width  - 1);
+    dst_points[3].m_y = (DT_F32)(height - 1);
 
     return;
 }
@@ -103,7 +103,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         WarpPerspectiveParam run_param(GetParam(index));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -126,7 +126,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         WarpPerspectiveParam run_param(GetParam(index));
@@ -147,7 +147,7 @@ public:
         GetPerspectivePoints(src_points, dst_points, mat_size.m_sizes);
         Mat mat = GetPerspectiveTransform(m_ctx, src_points, dst_points);
 
-        MI_S32       loop_count = stress_count ? stress_count : 10;
+        DT_S32       loop_count = stress_count ? stress_count : 10;
         TestTime     time_val;
         MatCmpResult cmp_result;
         TestResult   result;
@@ -211,7 +211,7 @@ public:
         // compare
         if (Status::OK == MatCompare(m_ctx, dst, ref, cmp_result, 1, 0.5))
         {
-            if (cmp_result.status || (cmp_result.total - cmp_result.hist[cmp_result.hist.size() - 1].second) / (MI_F64)cmp_result.total <= 0.00003)
+            if (cmp_result.status || (cmp_result.total - cmp_result.hist[cmp_result.hist.size() - 1].second) / (DT_F64)cmp_result.total <= 0.00003)
             {
                 result.accu_status = TestStatus::PASSED;
             }

@@ -18,7 +18,7 @@ const static std::map<std::string, SampleRuntimeFunc> g_func_map = {
     {"cl_mat", CLMemSampleTest},
 };
 
-static aura::Status InputParser(MI_S32 argc, MI_CHAR *argv[], SampleRuntimeFunc &func)
+static aura::Status InputParser(DT_S32 argc, DT_CHAR *argv[], SampleRuntimeFunc &func)
 {
     if (argc != 2)
     {
@@ -40,7 +40,7 @@ static aura::Status InputParser(MI_S32 argc, MI_CHAR *argv[], SampleRuntimeFunc 
     return aura::Status::OK;
 }
 
-MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
+DT_S32 main(DT_S32 argc, DT_CHAR *argv[])
 {
     SampleRuntimeFunc sample_func;
 

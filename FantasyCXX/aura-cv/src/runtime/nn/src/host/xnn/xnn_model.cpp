@@ -14,7 +14,7 @@ XnnModel::XnnModel(Context *ctx, const ModelInfo &model_info) : NNModel(ctx, mod
             break;
         }
 
-        m_is_valid = MI_FALSE;
+        m_is_valid = DT_FALSE;
 
         if (std::string::npos == m_framework_version.find("xnn"))
         {
@@ -28,7 +28,7 @@ XnnModel::XnnModel(Context *ctx, const ModelInfo &model_info) : NNModel(ctx, mod
             break;
         }
 
-        m_is_valid = MI_TRUE;
+        m_is_valid = DT_TRUE;
     } while (0);
 }
 

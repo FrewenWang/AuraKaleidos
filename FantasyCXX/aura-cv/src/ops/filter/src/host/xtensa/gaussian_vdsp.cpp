@@ -7,7 +7,7 @@ namespace aura
 GaussianVdsp::GaussianVdsp(Context *ctx, const OpTarget &target) : GaussianImpl(ctx, target)
 {}
 
-Status GaussianVdsp::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+Status GaussianVdsp::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                              BorderType border_type, const Scalar &border_value)
 {
     if (GaussianImpl::SetArgs(src, dst, ksize, sigma, border_type, border_value) != Status::OK)
@@ -28,7 +28,7 @@ Status GaussianVdsp::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only supports 1");
@@ -104,7 +104,7 @@ Status GaussianVdsp::Run()
     }
 
     XtensaEngine *engine = m_ctx->GetXtensaEngine();
-    if (MI_NULL == engine)
+    if (DT_NULL == engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "GetXtensaEngine failed");
         return ret;

@@ -33,12 +33,12 @@ FindContours::FindContours(Context *ctx, const OpTarget &target) : Op(ctx, targe
 Status FindContours::SetArgs(const Array *src, std::vector<std::vector<Point2i>> &contours, std::vector<Scalari> &hierarchy, 
                              ContoursMode mode, ContoursMethod method, Point2i offset)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -47,14 +47,14 @@ Status FindContours::SetArgs(const Array *src, std::vector<std::vector<Point2i>>
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateFindContoursImpl(m_ctx, impl_target);
     }
 
     // run initialize
     FindContoursImpl *find_contours_impl = dynamic_cast<FindContoursImpl *>(m_impl.get());
-    if (MI_NULL == find_contours_impl)
+    if (DT_NULL == find_contours_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "find_contours_impl is null ptr");
         return Status::ERROR;
@@ -76,13 +76,13 @@ AURA_EXPORTS Status IFindContours(Context *ctx, const Mat &src, std::vector<std:
 FindContoursImpl::FindContoursImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "FindContours", target),
                                                                            m_mode(ContoursMode::RETR_EXTERNAL),
                                                                            m_method(ContoursMethod::CHAIN_APPROX_SIMPLE),
-                                                                           m_src(MI_NULL)
+                                                                           m_src(DT_NULL)
 {}
 
 Status FindContoursImpl::SetArgs(const Array *src, std::vector<std::vector<Point2i>> &contours, std::vector<Scalari> &hierarchy,
                                  const ContoursMode mode, const ContoursMethod method, Point2i offset)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -122,7 +122,7 @@ std::string FindContoursImpl::ToString() const
     return str;
 }
 
-AURA_VOID FindContoursImpl::Dump(const std::string &prefix) const
+DT_VOID FindContoursImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

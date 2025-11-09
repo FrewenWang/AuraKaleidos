@@ -57,12 +57,12 @@ Filter2d::Filter2d(Context *ctx, const OpTarget &target) : Op(ctx, target)
 Status Filter2d::SetArgs(const Array *src, Array *dst, const Array *kmat,
                          BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst) || (MI_NULL == kmat))
+    if ((DT_NULL == src) || (DT_NULL == dst) || (DT_NULL == kmat))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst/kmat is null ptr");
         return Status::ERROR;
@@ -113,14 +113,14 @@ Status Filter2d::SetArgs(const Array *src, Array *dst, const Array *kmat,
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateFilter2DImpl(m_ctx, impl_target);
     }
 
     // run initialize
     Filter2dImpl *filter2d_impl = dynamic_cast<Filter2dImpl*>(m_impl.get());
-    if (MI_NULL == filter2d_impl)
+    if (DT_NULL == filter2d_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "filter2d_impl is null ptr");
         return Status::ERROR;
@@ -131,10 +131,10 @@ Status Filter2d::SetArgs(const Array *src, Array *dst, const Array *kmat,
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Filter2d::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type)
+Status Filter2d::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -166,13 +166,13 @@ AURA_EXPORTS Status IFilter2d(Context *ctx, const Mat &src, Mat &dst, const Mat 
 
 Filter2dImpl::Filter2dImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Filter2d", target),
                                                                    m_ksize(0), m_border_type(BorderType::REFLECT_101),
-                                                                   m_src(MI_NULL), m_dst(MI_NULL), m_kmat(MI_NULL)
+                                                                   m_src(DT_NULL), m_dst(DT_NULL), m_kmat(DT_NULL)
 {}
 
 Status Filter2dImpl::SetArgs(const Array *src, Array *dst, const Array *kmat,
                              BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -241,7 +241,7 @@ std::string Filter2dImpl::ToString() const
     return str;
 }
 
-AURA_VOID Filter2dImpl::Dump(const std::string &prefix) const
+DT_VOID Filter2dImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

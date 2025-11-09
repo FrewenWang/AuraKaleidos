@@ -9,26 +9,26 @@ namespace aura
 
 template <typename Tp> struct CvtVecTraits;
 
-template <> struct CvtVecTraits<MI_U8>  { using Type = uint8x8_t;     };
-template <> struct CvtVecTraits<MI_S8>  { using Type = int8x8_t;      };
-template <> struct CvtVecTraits<MI_U16> { using Type = uint16x8_t;    };
-template <> struct CvtVecTraits<MI_S16> { using Type = int16x8_t;     };
-template <> struct CvtVecTraits<MI_U32> { using Type = uint32x4x2_t;  };
-template <> struct CvtVecTraits<MI_S32> { using Type = int32x4x2_t;   };
+template <> struct CvtVecTraits<DT_U8>  { using Type = uint8x8_t;     };
+template <> struct CvtVecTraits<DT_S8>  { using Type = int8x8_t;      };
+template <> struct CvtVecTraits<DT_U16> { using Type = uint16x8_t;    };
+template <> struct CvtVecTraits<DT_S16> { using Type = int16x8_t;     };
+template <> struct CvtVecTraits<DT_U32> { using Type = uint32x4x2_t;  };
+template <> struct CvtVecTraits<DT_S32> { using Type = int32x4x2_t;   };
 template <> struct CvtVecTraits<MI_F16> { using Type = float16x8_t;   };
-template <> struct CvtVecTraits<MI_F32> { using Type = float32x4x2_t; };
+template <> struct CvtVecTraits<DT_F32> { using Type = float32x4x2_t; };
 
-template <typename Dt, typename St = Dt, typename std::enable_if<(std::is_same<Dt, St>::value)>::type* = MI_NULL>
+template <typename Dt, typename St = Dt, typename std::enable_if<(std::is_same<Dt, St>::value)>::type* = DT_NULL>
 AURA_ALWAYS_INLINE typename CvtVecTraits<Dt>::Type Cvt8(const typename CvtVecTraits<St>::Type &v)
 {
     return v;
 }
 
 #define DECL_CVT8_FUNC(type_src, type_dst) \
-    template <typename Dt, typename std::enable_if<(std::is_same<Dt, type_dst>::value)>::type* = MI_NULL> \
+    template <typename Dt, typename std::enable_if<(std::is_same<Dt, type_dst>::value)>::type* = DT_NULL> \
     AURA_ALWAYS_INLINE typename CvtVecTraits<Dt>::Type Cvt8(const typename CvtVecTraits<type_src>::Type &v)
 
-DECL_CVT8_FUNC(MI_S32, MI_U32)
+DECL_CVT8_FUNC(DT_S32, DT_U32)
 {
     int32x4_t vqs32_zero;
     neon::vdup(vqs32_zero, 0);
@@ -38,45 +38,45 @@ DECL_CVT8_FUNC(MI_S32, MI_U32)
     return v2q;
 }
 
-DECL_CVT8_FUNC(MI_U32, MI_S32)
+DECL_CVT8_FUNC(DT_U32, DT_S32)
 {
     uint32x4_t vqu32_max;
-    neon::vdup(vqu32_max, (MI_U32)2147483647);
+    neon::vdup(vqu32_max, (DT_U32)2147483647);
     typename CvtVecTraits<Dt>::Type v2q;
     v2q.val[0] = neon::vreinterpret(neon::vmin(v.val[0], vqu32_max));
     v2q.val[1] = neon::vreinterpret(neon::vmin(v.val[1], vqu32_max));
     return v2q;
 }
 
-DECL_CVT8_FUNC(MI_S16, MI_U16)
+DECL_CVT8_FUNC(DT_S16, DT_U16)
 {
     int16x8_t vqs16_zero;
     neon::vdup(vqs16_zero, 0);
     return neon::vreinterpret(neon::vmax(v, vqs16_zero));
 }
 
-DECL_CVT8_FUNC(MI_U16, MI_S16)
+DECL_CVT8_FUNC(DT_U16, DT_S16)
 {
     uint16x8_t vqu16_max;
-    neon::vdup(vqu16_max, (MI_U16)32767);
+    neon::vdup(vqu16_max, (DT_U16)32767);
     return neon::vreinterpret(neon::vmin(v, vqu16_max));
 }
 
-DECL_CVT8_FUNC(MI_S8, MI_U8)
+DECL_CVT8_FUNC(DT_S8, DT_U8)
 {
     int8x8_t vds8_zero;
     neon::vdup(vds8_zero, 0);
     return neon::vreinterpret(neon::vmax(v, vds8_zero));
 }
 
-DECL_CVT8_FUNC(MI_U8, MI_S8)
+DECL_CVT8_FUNC(DT_U8, DT_S8)
 {
     uint8x8_t vdu8_max;
-    neon::vdup(vdu8_max, (MI_U8)127);
+    neon::vdup(vdu8_max, (DT_U8)127);
     return neon::vreinterpret(neon::vmin(v, vdu8_max));
 }
 
-DECL_CVT8_FUNC(MI_S32, MI_F32)
+DECL_CVT8_FUNC(DT_S32, DT_F32)
 {
     typename CvtVecTraits<Dt>::Type v2q;
     v2q.val[0] = neon::vcvt<Dt>(v.val[0]);
@@ -84,7 +84,7 @@ DECL_CVT8_FUNC(MI_S32, MI_F32)
     return v2q;
 }
 
-DECL_CVT8_FUNC(MI_U32, MI_F32)
+DECL_CVT8_FUNC(DT_U32, DT_F32)
 {
     typename CvtVecTraits<Dt>::Type v2q;
     v2q.val[0] = neon::vcvt<Dt>(v.val[0]);
@@ -92,7 +92,7 @@ DECL_CVT8_FUNC(MI_U32, MI_F32)
     return v2q;
 }
 
-DECL_CVT8_FUNC(MI_F32, MI_S32)
+DECL_CVT8_FUNC(DT_F32, DT_S32)
 {
     typename CvtVecTraits<Dt>::Type v2q;
     v2q.val[0] = neon::vcvtn<Dt>(v.val[0]);
@@ -100,39 +100,31 @@ DECL_CVT8_FUNC(MI_F32, MI_S32)
     return v2q;
 }
 
-DECL_CVT8_FUNC(MI_F32, MI_U32)
+DECL_CVT8_FUNC(DT_F32, DT_U32)
 {
-    return Cvt8<Dt>(Cvt8<MI_S32>(v));
+    return Cvt8<Dt>(Cvt8<DT_S32>(v));
 }
 
-DECL_CVT8_FUNC(MI_S32, MI_U16)
+DECL_CVT8_FUNC(DT_S32, DT_U16)
 {
     return neon::vcombine(neon::vqmovun(v.val[0]), neon::vqmovun(v.val[1]));
 }
 
-DECL_CVT8_FUNC(MI_S32, MI_S16)
+DECL_CVT8_FUNC(DT_S32, DT_S16)
 {
     return neon::vcombine(neon::vqmovn(v.val[0]), neon::vqmovn(v.val[1]));
 }
-DECL_CVT8_FUNC(MI_U32, MI_U16)
+DECL_CVT8_FUNC(DT_U32, DT_U16)
 {
     return neon::vcombine(neon::vqmovn(v.val[0]), neon::vqmovn(v.val[1]));
 }
 
-DECL_CVT8_FUNC(MI_U32, MI_S16)
+DECL_CVT8_FUNC(DT_U32, DT_S16)
 {
-    return Cvt8<Dt>(Cvt8<MI_S32>(v));
+    return Cvt8<Dt>(Cvt8<DT_S32>(v));
 }
 
-DECL_CVT8_FUNC(MI_S16, MI_S32)
-{
-    typename CvtVecTraits<Dt>::Type v2q;
-    v2q.val[0] = neon::vmovl(neon::vgetlow(v));
-    v2q.val[1] = neon::vmovl(neon::vgethigh(v));
-    return v2q;
-}
-
-DECL_CVT8_FUNC(MI_U16, MI_S32)
+DECL_CVT8_FUNC(DT_S16, DT_S32)
 {
     typename CvtVecTraits<Dt>::Type v2q;
     v2q.val[0] = neon::vmovl(neon::vgetlow(v));
@@ -140,7 +132,7 @@ DECL_CVT8_FUNC(MI_U16, MI_S32)
     return v2q;
 }
 
-DECL_CVT8_FUNC(MI_U16, MI_U32)
+DECL_CVT8_FUNC(DT_U16, DT_S32)
 {
     typename CvtVecTraits<Dt>::Type v2q;
     v2q.val[0] = neon::vmovl(neon::vgetlow(v));
@@ -148,138 +140,146 @@ DECL_CVT8_FUNC(MI_U16, MI_U32)
     return v2q;
 }
 
-DECL_CVT8_FUNC(MI_S16, MI_U32)
+DECL_CVT8_FUNC(DT_U16, DT_U32)
 {
-    return Cvt8<Dt>(Cvt8<MI_U16>(v));
+    typename CvtVecTraits<Dt>::Type v2q;
+    v2q.val[0] = neon::vmovl(neon::vgetlow(v));
+    v2q.val[1] = neon::vmovl(neon::vgethigh(v));
+    return v2q;
 }
 
-DECL_CVT8_FUNC(MI_S16, MI_U8)
+DECL_CVT8_FUNC(DT_S16, DT_U32)
+{
+    return Cvt8<Dt>(Cvt8<DT_U16>(v));
+}
+
+DECL_CVT8_FUNC(DT_S16, DT_U8)
 {
     return neon::vqmovun(v);
 }
 
-DECL_CVT8_FUNC(MI_S16, MI_S8)
+DECL_CVT8_FUNC(DT_S16, DT_S8)
 {
     return neon::vqmovn(v);
 }
 
-DECL_CVT8_FUNC(MI_U16, MI_U8)
+DECL_CVT8_FUNC(DT_U16, DT_U8)
 {
     return neon::vqmovn(v);
 }
 
-DECL_CVT8_FUNC(MI_U16, MI_S8)
+DECL_CVT8_FUNC(DT_U16, DT_S8)
 {
-    return Cvt8<Dt>(Cvt8<MI_S16>(v));
+    return Cvt8<Dt>(Cvt8<DT_S16>(v));
 }
 
-DECL_CVT8_FUNC(MI_U8, MI_S16)
+DECL_CVT8_FUNC(DT_U8, DT_S16)
 {
     return neon::vmovl(v);
 }
 
-DECL_CVT8_FUNC(MI_U8, MI_U16)
+DECL_CVT8_FUNC(DT_U8, DT_U16)
 {
     return neon::vmovl(v);
 }
 
-DECL_CVT8_FUNC(MI_S8, MI_S16)
+DECL_CVT8_FUNC(DT_S8, DT_S16)
 {
     return neon::vmovl(v);
 }
 
-DECL_CVT8_FUNC(MI_S8, MI_U16)
+DECL_CVT8_FUNC(DT_S8, DT_U16)
 {
-    return Cvt8<Dt>(Cvt8<MI_U8>(v));
+    return Cvt8<Dt>(Cvt8<DT_U8>(v));
 }
 
-DECL_CVT8_FUNC(MI_U16, MI_F32)
+DECL_CVT8_FUNC(DT_U16, DT_F32)
 {
-    return Cvt8<Dt>(Cvt8<MI_U32>(v));
+    return Cvt8<Dt>(Cvt8<DT_U32>(v));
 }
 
-DECL_CVT8_FUNC(MI_S16, MI_F32)
+DECL_CVT8_FUNC(DT_S16, DT_F32)
 {
-    return Cvt8<Dt>(Cvt8<MI_S32>(v));
+    return Cvt8<Dt>(Cvt8<DT_S32>(v));
 }
 
-DECL_CVT8_FUNC(MI_F32, MI_U16)
+DECL_CVT8_FUNC(DT_F32, DT_U16)
 {
-    return Cvt8<Dt>(Cvt8<MI_S32>(v));
+    return Cvt8<Dt>(Cvt8<DT_S32>(v));
 }
 
-DECL_CVT8_FUNC(MI_F32, MI_S16)
+DECL_CVT8_FUNC(DT_F32, DT_S16)
 {
-    return Cvt8<Dt>(Cvt8<MI_S32>(v));
+    return Cvt8<Dt>(Cvt8<DT_S32>(v));
 }
 
-DECL_CVT8_FUNC(MI_U32, MI_U8)
+DECL_CVT8_FUNC(DT_U32, DT_U8)
 {
-    return Cvt8<Dt>(Cvt8<MI_U16>(v));
+    return Cvt8<Dt>(Cvt8<DT_U16>(v));
 }
 
-DECL_CVT8_FUNC(MI_S32, MI_U8)
+DECL_CVT8_FUNC(DT_S32, DT_U8)
 {
-    return Cvt8<Dt>(Cvt8<MI_U16>(v));
+    return Cvt8<Dt>(Cvt8<DT_U16>(v));
 }
 
-DECL_CVT8_FUNC(MI_U32, MI_S8)
+DECL_CVT8_FUNC(DT_U32, DT_S8)
 {
-    return Cvt8<Dt>(Cvt8<MI_S16>(v));
+    return Cvt8<Dt>(Cvt8<DT_S16>(v));
 }
 
-DECL_CVT8_FUNC(MI_S32, MI_S8)
+DECL_CVT8_FUNC(DT_S32, DT_S8)
 {
-    return Cvt8<Dt>(Cvt8<MI_S16>(v));
+    return Cvt8<Dt>(Cvt8<DT_S16>(v));
 }
 
-DECL_CVT8_FUNC(MI_U8, MI_U32)
+DECL_CVT8_FUNC(DT_U8, DT_U32)
 {
-    return Cvt8<Dt>(Cvt8<MI_U16>(v));
+    return Cvt8<Dt>(Cvt8<DT_U16>(v));
 }
 
-DECL_CVT8_FUNC(MI_S8, MI_U32)
+DECL_CVT8_FUNC(DT_S8, DT_U32)
 {
-    return Cvt8<Dt>(Cvt8<MI_U16>(v));
+    return Cvt8<Dt>(Cvt8<DT_U16>(v));
 }
 
-DECL_CVT8_FUNC(MI_U8, MI_S32)
+DECL_CVT8_FUNC(DT_U8, DT_S32)
 {
-    return Cvt8<Dt>(Cvt8<MI_U16>(v));
+    return Cvt8<Dt>(Cvt8<DT_U16>(v));
 }
 
-DECL_CVT8_FUNC(MI_S8, MI_S32)
+DECL_CVT8_FUNC(DT_S8, DT_S32)
 {
-    return Cvt8<Dt>(Cvt8<MI_S16>(v));
+    return Cvt8<Dt>(Cvt8<DT_S16>(v));
 }
 
-DECL_CVT8_FUNC(MI_U8, MI_F32)
+DECL_CVT8_FUNC(DT_U8, DT_F32)
 {
-    return Cvt8<Dt>(Cvt8<MI_U32>(Cvt8<MI_U16>(v)));
+    return Cvt8<Dt>(Cvt8<DT_U32>(Cvt8<DT_U16>(v)));
 }
 
-DECL_CVT8_FUNC(MI_S8, MI_F32)
+DECL_CVT8_FUNC(DT_S8, DT_F32)
 {
-    return Cvt8<Dt>(Cvt8<MI_S32>(Cvt8<MI_S16>(v)));
+    return Cvt8<Dt>(Cvt8<DT_S32>(Cvt8<DT_S16>(v)));
 }
 
-DECL_CVT8_FUNC(MI_F32, MI_U8)
+DECL_CVT8_FUNC(DT_F32, DT_U8)
 {
-    return Cvt8<Dt>(Cvt8<MI_S16>(Cvt8<MI_S32>(v)));
+    return Cvt8<Dt>(Cvt8<DT_S16>(Cvt8<DT_S32>(v)));
 }
 
-DECL_CVT8_FUNC(MI_F32, MI_S8)
+DECL_CVT8_FUNC(DT_F32, DT_S8)
 {
-    return Cvt8<Dt>(Cvt8<MI_S16>(Cvt8<MI_S32>(v)));
+    return Cvt8<Dt>(Cvt8<DT_S16>(Cvt8<DT_S32>(v)));
 }
 
 #if defined(AURA_ENABLE_NEON_FP16)
-DECL_CVT8_FUNC(MI_F32, MI_F16)
+DECL_CVT8_FUNC(DT_F32, MI_F16)
 {
     return neon::vcombine(neon::vcvt<Dt>(v.val[0]), neon::vcvt<Dt>(v.val[1]));
 }
 
-DECL_CVT8_FUNC(MI_F16, MI_F32)
+DECL_CVT8_FUNC(MI_F16, DT_F32)
 {
     typename CvtVecTraits<Dt>::Type v2q;
     v2q.val[0] = neon::vcvt<Dt>(neon::vgetlow(v));
@@ -287,80 +287,80 @@ DECL_CVT8_FUNC(MI_F16, MI_F32)
     return v2q;
 }
 
-DECL_CVT8_FUNC(MI_F16, MI_U8)
+DECL_CVT8_FUNC(MI_F16, DT_U8)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_F16, MI_S8)
+DECL_CVT8_FUNC(MI_F16, DT_S8)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_F16, MI_U16)
+DECL_CVT8_FUNC(MI_F16, DT_U16)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_F16, MI_S16)
+DECL_CVT8_FUNC(MI_F16, DT_S16)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_F16, MI_U32)
+DECL_CVT8_FUNC(MI_F16, DT_U32)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_F16, MI_S32)
+DECL_CVT8_FUNC(MI_F16, DT_S32)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_U8, MI_F16)
+DECL_CVT8_FUNC(DT_U8, MI_F16)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_S8, MI_F16)
+DECL_CVT8_FUNC(DT_S8, MI_F16)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_U16, MI_F16)
+DECL_CVT8_FUNC(DT_U16, MI_F16)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_S16, MI_F16)
+DECL_CVT8_FUNC(DT_S16, MI_F16)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_U32, MI_F16)
+DECL_CVT8_FUNC(DT_U32, MI_F16)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 
-DECL_CVT8_FUNC(MI_S32, MI_F16)
+DECL_CVT8_FUNC(DT_S32, MI_F16)
 {
-    return Cvt8<Dt>(Cvt8<MI_F32>(v));
+    return Cvt8<Dt>(Cvt8<DT_F32>(v));
 }
 #endif
 
-template <typename Dt, typename St, typename std::enable_if<((sizeof(St) == 1))>::type* = MI_NULL>
+template <typename Dt, typename St, typename std::enable_if<((sizeof(St) == 1))>::type* = DT_NULL>
 AURA_ALWAYS_INLINE typename CvtVecTraits<Dt>::Type LoadPairAs(const St *p)
 {
     return Cvt8<Dt>(neon::vload1(p));
 }
 
-template <typename Dt, typename St, typename std::enable_if<((sizeof(St) == 2))>::type* = MI_NULL>
+template <typename Dt, typename St, typename std::enable_if<((sizeof(St) == 2))>::type* = DT_NULL>
 AURA_ALWAYS_INLINE typename CvtVecTraits<Dt>::Type LoadPairAs(const St *p)
 {
     return Cvt8<Dt>(neon::vload1q(p));
 }
 
-template <typename Dt, typename St, typename std::enable_if<((sizeof(St) == 4))>::type* = MI_NULL>
+template <typename Dt, typename St, typename std::enable_if<((sizeof(St) == 4))>::type* = DT_NULL>
 AURA_ALWAYS_INLINE typename CvtVecTraits<Dt>::Type LoadPairAs(const St *p)
 {
     typename CvtVecTraits<St>::Type v2q;
@@ -369,15 +369,15 @@ AURA_ALWAYS_INLINE typename CvtVecTraits<Dt>::Type LoadPairAs(const St *p)
     return Cvt8<Dt>(v2q);
 }
 
-template <typename Dt, typename St, typename std::enable_if<((sizeof(Dt) < 4))>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID StorePairAs(Dt *p, const typename CvtVecTraits<St>::Type &v)
+template <typename Dt, typename St, typename std::enable_if<((sizeof(Dt) < 4))>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID StorePairAs(Dt *p, const typename CvtVecTraits<St>::Type &v)
 {
     typename CvtVecTraits<Dt>::Type vq = Cvt8<Dt>(v);
     neon::vstore(p, vq);
 }
 
-template <typename Dt, typename St, typename std::enable_if<((sizeof(Dt) == 4))>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID StorePairAs(Dt *p, const typename CvtVecTraits<St>::Type &v)
+template <typename Dt, typename St, typename std::enable_if<((sizeof(Dt) == 4))>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID StorePairAs(Dt *p, const typename CvtVecTraits<St>::Type &v)
 {
     typename CvtVecTraits<Dt>::Type v2q = Cvt8<Dt>(v);
     neon::vstore(p, v2q.val[0]);
@@ -393,8 +393,8 @@ enum class CvtMethod
 };
 
 template <CvtMethod METHOD, typename St, typename Dt,
-          typename std::enable_if<(CvtMethod::NO_SCALE == METHOD)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CvtCore(const St *src, Dt *dst, float32x4_t &va, float32x4_t &vb)
+          typename std::enable_if<(CvtMethod::NO_SCALE == METHOD)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CvtCore(const St *src, Dt *dst, float32x4_t &va, float32x4_t &vb)
 {
     AURA_UNUSED(va);
     AURA_UNUSED(vb);
@@ -402,55 +402,55 @@ AURA_ALWAYS_INLINE AURA_VOID CvtCore(const St *src, Dt *dst, float32x4_t &va, fl
 }
 
 template <CvtMethod METHOD, typename St, typename Dt,
-          typename std::enable_if<(CvtMethod::MUL_ADD == METHOD)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CvtCore(const St *src, Dt *dst, float32x4_t &va, float32x4_t &vb)
+          typename std::enable_if<(CvtMethod::MUL_ADD == METHOD)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CvtCore(const St *src, Dt *dst, float32x4_t &va, float32x4_t &vb)
 {
-    auto v2q = LoadPairAs<MI_F32, St>(src);
+    auto v2q = LoadPairAs<DT_F32, St>(src);
     v2q.val[0] = neon::vmla(vb, va, v2q.val[0]);
     v2q.val[1] = neon::vmla(vb, va, v2q.val[1]);
-    StorePairAs<Dt, MI_F32>(dst, v2q);
+    StorePairAs<Dt, DT_F32>(dst, v2q);
 }
 
 template <CvtMethod METHOD, typename St, typename Dt,
-          typename std::enable_if<(CvtMethod::MUL_ONLY == METHOD)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CvtCore(const St *src, Dt *dst, float32x4_t &va, float32x4_t &vb)
+          typename std::enable_if<(CvtMethod::MUL_ONLY == METHOD)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CvtCore(const St *src, Dt *dst, float32x4_t &va, float32x4_t &vb)
 {
     AURA_UNUSED(vb);
-    auto v2q = LoadPairAs<MI_F32, St>(src);
+    auto v2q = LoadPairAs<DT_F32, St>(src);
     v2q.val[0] = neon::vmul(v2q.val[0], va);
     v2q.val[1] = neon::vmul(v2q.val[1], va);
-    StorePairAs<Dt, MI_F32>(dst, v2q);
+    StorePairAs<Dt, DT_F32>(dst, v2q);
 }
 
 template <CvtMethod METHOD, typename St, typename Dt,
-          typename std::enable_if<(CvtMethod::ADD_ONLY == METHOD)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID CvtCore(const St *src, Dt *dst, float32x4_t &va, float32x4_t &vb)
+          typename std::enable_if<(CvtMethod::ADD_ONLY == METHOD)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID CvtCore(const St *src, Dt *dst, float32x4_t &va, float32x4_t &vb)
 {
     AURA_UNUSED(va);
-    auto v2q = LoadPairAs<MI_F32, St>(src);
+    auto v2q = LoadPairAs<DT_F32, St>(src);
     v2q.val[0] = neon::vadd(v2q.val[0], vb);
     v2q.val[1] = neon::vadd(v2q.val[1], vb);
-    StorePairAs<Dt, MI_F32>(dst, v2q);
+    StorePairAs<Dt, DT_F32>(dst, v2q);
 }
 
 template <CvtMethod METHOD, typename St, typename Dt>
-static Status ConvertToNeonImpl(const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta, MI_S32 start_row, MI_S32 end_row)
+static Status ConvertToNeonImpl(const Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta, DT_S32 start_row, DT_S32 end_row)
 {
     float32x4_t vqf32_a, vqf32_b;
     neon::vdup(vqf32_a, alpha);
     neon::vdup(vqf32_b, beta);
 
     Sizes3 sz = src.GetSizes();
-    MI_S32 align = AURA_LANES_F32 * 2;
-    MI_S32 width = (sz.m_width * sz.m_channel);
-    MI_S32 width_align = (width & (-align));
+    DT_S32 align = AURA_LANES_F32 * 2;
+    DT_S32 width = (sz.m_width * sz.m_channel);
+    DT_S32 width_align = (width & (-align));
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         const St *src_row = src.Ptr<St>(y);
         Dt       *dst_row = dst.Ptr<Dt>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (x = 0; x < width_align; x += align)
         {
             CvtCore<METHOD>(src_row + x, dst_row + x, vqf32_a, vqf32_b);
@@ -465,11 +465,11 @@ static Status ConvertToNeonImpl(const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 b
 }
 
 template <typename St, typename Dt>
-static Status ConvertToNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta, const OpTarget &target)
+static Status ConvertToNeonHelper(Context *ctx, const Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta, const OpTarget &target)
 {
     AURA_UNUSED(target);
-    MI_BOOL no_alpha = (Abs(alpha - 1.0) < DBL_EPSILON);
-    MI_BOOL no_beta  = (Abs(beta) < DBL_EPSILON);
+    DT_BOOL no_alpha = (Abs(alpha - 1.0) < DBL_EPSILON);
+    DT_BOOL no_beta  = (Abs(beta) < DBL_EPSILON);
     CvtMethod method = (no_alpha && no_beta) ? CvtMethod::NO_SCALE
                                              : ((no_alpha) ? CvtMethod::ADD_ONLY
                                                            : ((no_beta) ? CvtMethod::MUL_ONLY
@@ -482,7 +482,7 @@ static Status ConvertToNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_F32
 
     Status ret = Status::ERROR;
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -542,7 +542,7 @@ static Status ConvertToNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_F32
 }
 
 template <typename Tp>
-static Status ConvertToNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta, const OpTarget &target)
+static Status ConvertToNeonHelper(Context *ctx, const Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
@@ -550,55 +550,55 @@ static Status ConvertToNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_F32
     {
         case ElemType::U8:
         {
-            ret = ConvertToNeonHelper<Tp, MI_U8>(ctx, src, dst, alpha, beta, target);
+            ret = ConvertToNeonHelper<Tp, DT_U8>(ctx, src, dst, alpha, beta, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, DT_U8> failed.");
             }
             break;
         }
         case ElemType::S8:
         {
-            ret = ConvertToNeonHelper<Tp, MI_S8>(ctx, src, dst, alpha, beta, target);
+            ret = ConvertToNeonHelper<Tp, DT_S8>(ctx, src, dst, alpha, beta, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, MI_S8> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, DT_S8> failed.");
             }
             break;
         }
         case ElemType::U16:
         {
-            ret = ConvertToNeonHelper<Tp, MI_U16>(ctx, src, dst, alpha, beta, target);
+            ret = ConvertToNeonHelper<Tp, DT_U16>(ctx, src, dst, alpha, beta, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, DT_U16> failed.");
             }
             break;
         }
         case ElemType::S16:
         {
-            ret = ConvertToNeonHelper<Tp, MI_S16>(ctx, src, dst, alpha, beta, target);
+            ret = ConvertToNeonHelper<Tp, DT_S16>(ctx, src, dst, alpha, beta, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, MI_S16> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, DT_S16> failed.");
             }
             break;
         }
         case ElemType::U32:
         {
-            ret = ConvertToNeonHelper<Tp, MI_U32>(ctx, src, dst, alpha, beta, target);
+            ret = ConvertToNeonHelper<Tp, DT_U32>(ctx, src, dst, alpha, beta, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, MI_U32> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, DT_U32> failed.");
             }
             break;
         }
         case ElemType::S32:
         {
-            ret = ConvertToNeonHelper<Tp, MI_S32>(ctx, src, dst, alpha, beta, target);
+            ret = ConvertToNeonHelper<Tp, DT_S32>(ctx, src, dst, alpha, beta, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, MI_S32> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, DT_S32> failed.");
             }
             break;
         }
@@ -615,10 +615,10 @@ static Status ConvertToNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_F32
 #endif
         case ElemType::F32:
         {
-            ret = ConvertToNeonHelper<Tp, MI_F32>(ctx, src, dst, alpha, beta, target);
+            ret = ConvertToNeonHelper<Tp, DT_F32>(ctx, src, dst, alpha, beta, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, MI_F32> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ConvertToNeonHelper<Tp, DT_F32> failed.");
             }
             break;
         }
@@ -636,7 +636,7 @@ static Status ConvertToNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_F32
 ConvertToNeon::ConvertToNeon(Context *ctx, const OpTarget &target) : ConvertToImpl(ctx, target)
 {}
 
-Status ConvertToNeon::SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta)
+Status ConvertToNeon::SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta)
 {
     if (ConvertToImpl::SetArgs(src, dst, alpha, beta) != Status::OK)
     {
@@ -658,13 +658,13 @@ Status ConvertToNeon::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
@@ -676,55 +676,55 @@ Status ConvertToNeon::Run()
     {
         case ElemType::U8:
         {
-            ret = ConvertToNeonHelper<MI_U8>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
+            ret = ConvertToNeonHelper<DT_U8>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<DT_U8> failed.");
             }
             break;
         }
         case ElemType::S8:
         {
-            ret = ConvertToNeonHelper<MI_S8>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
+            ret = ConvertToNeonHelper<DT_S8>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<MI_S8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<DT_S8> failed.");
             }
             break;
         }
         case ElemType::U16:
         {
-            ret = ConvertToNeonHelper<MI_U16>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
+            ret = ConvertToNeonHelper<DT_U16>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<DT_U16> failed.");
             }
             break;
         }
         case ElemType::S16:
         {
-            ret = ConvertToNeonHelper<MI_S16>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
+            ret = ConvertToNeonHelper<DT_S16>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<MI_S16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<DT_S16> failed.");
             }
             break;
         }
         case ElemType::U32:
         {
-            ret = ConvertToNeonHelper<MI_U32>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
+            ret = ConvertToNeonHelper<DT_U32>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<MI_U32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<DT_U32> failed.");
             }
             break;
         }
         case ElemType::S32:
         {
-            ret = ConvertToNeonHelper<MI_S32>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
+            ret = ConvertToNeonHelper<DT_S32>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<MI_S32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<DT_S32> failed.");
             }
             break;
         }
@@ -741,10 +741,10 @@ Status ConvertToNeon::Run()
 #endif
         case ElemType::F32:
         {
-            ret = ConvertToNeonHelper<MI_F32>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
+            ret = ConvertToNeonHelper<DT_F32>(m_ctx, *src, *dst, m_alpha, m_beta, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<MI_F32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "ConvertToNeonHelper<DT_F32> failed.");
             }
             break;
         }

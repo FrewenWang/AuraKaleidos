@@ -8,35 +8,35 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/boxfilter_none.cpp b/Aur
  };
  
  template <>
- struct BoxFilterTraits<MI_U8>
+ struct BoxFilterTraits<DT_U8>
  {
 +    /// Inter类型
-     using InterType = MI_U32;
+     using InterType = DT_U32;
  };
  
 @@ -28,23 +30,28 @@
  template <typename Tp>
- static Status BoxFilterNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 ksize, MI_S32 start_row, MI_S32 end_row)
+ static Status BoxFilterNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 ksize, DT_S32 start_row, DT_S32 end_row)
  {
-+    /// 所以定义的这个变量的类型是MI_U32 其实就是将U8提升为U32
++    /// 所以定义的这个变量的类型是DT_U32 其实就是将U8提升为U32
      using InterType = typename BoxFilterTraits<Tp>::InterType;
 -
 +    //// 19 * 19 的滤波核
-     MI_S32 ksize_sq = ksize * ksize;
+     DT_S32 ksize_sq = ksize * ksize;
  
      const Sizes3 isizes  = src.GetSizes();
      const Sizes3 osizes  = dst.GetSizes();
 +    
-     const MI_S32 iwidth  = isizes.m_width;
-     const MI_S32 owidth  = osizes.m_width;
+     const DT_S32 iwidth  = isizes.m_width;
+     const DT_S32 owidth  = osizes.m_width;
 +    
-     const MI_S32 channel = isizes.m_channel;
-     MI_S32 ksh = ksize >> 1;
+     const DT_S32 channel = isizes.m_channel;
+     DT_S32 ksh = ksize >> 1;
 -
 +    //// 重要！！！！！，下面就是盒式滤波的具体实现
      std::vector<const Tp*> src_rows(ksize);
 +    //// 获取每一行图像数据的开始的指针。我们是19 * 19 的滤波，所以我们需要记录19行的滤波，计算下面19行的数据
-     for (MI_S32 k = 0; k < ksize; k++)
+     for (DT_S32 k = 0; k < ksize; k++)
      {
 +        /// 第K行的数据的头结点指针
          src_rows[k] = src.Ptr<Tp>(start_row + k);
@@ -45,7 +45,7 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/boxfilter_none.cpp b/Aur
 +    /// 获取对应线程里面的对应Buffer
      InterType *sum_row = thread_buffer.GetThreadData<InterType>();
  
-     if (MI_NULL == sum_row)
+     if (DT_NULL == sum_row)
 @@ -52,14 +59,17 @@
          AURA_ADD_ERROR_STRING(ctx, "Get Buffer failed");
          return Status::ERROR;
@@ -53,24 +53,24 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/boxfilter_none.cpp b/Aur
 -
 +    
 +    /// 一次遍历每一行
-     for (MI_S32 y = start_row; y < end_row; y++)
+     for (DT_S32 y = start_row; y < end_row; y++)
      {
          // calc vertical sum (iwidth = owidth + ksize/2 * 2)
-         for (MI_S32 x = 0; x < iwidth; x++)
+         for (DT_S32 x = 0; x < iwidth; x++)
          {
 +            //// 一次遍历每个通道
-             for (MI_S32 ch = 0; ch < channel; ch++)
+             for (DT_S32 ch = 0; ch < channel; ch++)
              {
 +                /// 计算sum
                  InterType sum = 0;
-                 MI_S32 index  = x * channel + ch;
+                 DT_S32 index  = x * channel + ch;
  
 @@ -137,8 +147,11 @@
      }
  
      // Get border mat sizes
 +    /// TODO 这个地方很重要。计算补边的大小
-     MI_S32 ksh          = m_ksize >> 1;
+     DT_S32 ksh          = m_ksize >> 1;
 +    //// 计算
      Sizes3 border_sizes = m_src->GetSizes() + Sizes3(ksh << 1, ksh << 1, 0);
 +    /// 创建对应的补边之后的Mat的数据的大小（这个时候是不是就分配创建的对应的内存数据）
@@ -96,7 +96,7 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/boxfilter_none.cpp b/Aur
  
      // Get border mat sizes
 +    // 计算边界补边的大小。比如滤波核的大小是19，则补边的大小就为9
-     MI_S32 ksh = m_ksize >> 1;
+     DT_S32 ksh = m_ksize >> 1;
 +    // 进行设置边。补边的上下左右都是9
      if (IMakeBorder(m_ctx, *src, m_src_border, ksh, ksh, ksh, ksh, m_border_type, m_border_value, OpTarget::None()) != Status::OK)
      {
@@ -107,11 +107,11 @@ diff a/AuraFantasyCXX/aura-aura/src/ops/filter/src/none/boxfilter_none.cpp b/Aur
      Status ret = Status::ERROR;
 -
 +    /// 获取输出数据的宽度
-     MI_S32 oheight  = dst->GetSizes().m_height;
+     DT_S32 oheight  = dst->GetSizes().m_height;
 +    
 +    /// 使用我们扩张补边之后的Mat数据作为输入数据
-     MI_S32 iwidth   = m_src_border.GetSizes().m_width;
-     MI_S32 ichannel = m_src_border.GetSizes().m_channel;
+     DT_S32 iwidth   = m_src_border.GetSizes().m_width;
+     DT_S32 ichannel = m_src_border.GetSizes().m_channel;
  
 +    
 +///// 这个就是定义Filter的NONE的宏定义的具体实现

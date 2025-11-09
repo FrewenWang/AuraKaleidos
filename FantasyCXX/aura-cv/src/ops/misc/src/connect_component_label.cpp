@@ -7,8 +7,8 @@ namespace aura
 #if defined(AURA_ENABLE_OPENCL)
 AURA_INLINE Status CheckCLSupport(Context *ctx, const Array &array)
 {
-    MI_S32 width  = array.GetSizes().m_width;
-    MI_S32 height = array.GetSizes().m_height;
+    DT_S32 width  = array.GetSizes().m_width;
+    DT_S32 height = array.GetSizes().m_height;
     if (width < 16 || height < 4)
     {
         AURA_ADD_ERROR_STRING(ctx, "size is too small for opencl");
@@ -54,13 +54,13 @@ ConnectComponentLabel::ConnectComponentLabel(Context *ctx, const OpTarget &targe
 Status ConnectComponentLabel::SetArgs(const Array *src, Array *dst, CCLAlgo algo_type, ConnectivityType connectivity_type,
                                       EquivalenceSolver solver_type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "Context is null");
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -78,7 +78,7 @@ Status ConnectComponentLabel::SetArgs(const Array *src, Array *dst, CCLAlgo algo
             if (CheckCLSupport(m_ctx, *src) != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "switch opencl impl to neon impl");
-                impl_target = OpTarget::None(MI_TRUE);
+                impl_target = OpTarget::None(DT_TRUE);
                 algo_type   = aura::CCLAlgo::SPAGHETTI;
             }
 #endif // AURA_ENABLE_OPENCL
@@ -92,14 +92,14 @@ Status ConnectComponentLabel::SetArgs(const Array *src, Array *dst, CCLAlgo algo
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateCCLImpl(m_ctx, impl_target);
     }
 
     // run initialize
     ConnectComponentLabelImpl *ccl_impl = dynamic_cast<ConnectComponentLabelImpl *>(m_impl.get());
-    if (MI_NULL == ccl_impl)
+    if (DT_NULL == ccl_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "ccl_impl is null ptr");
         return Status::ERROR;
@@ -113,7 +113,7 @@ Status ConnectComponentLabel::SetArgs(const Array *src, Array *dst, CCLAlgo algo
 Status ConnectComponentLabel::CLPrecompile(Context *ctx, ElemType dst_elem_type, CCLAlgo algo_type, ConnectivityType connectivity_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -143,7 +143,7 @@ AURA_EXPORTS Status IConnectComponentLabel(Context *ctx, const Mat &src, Mat &ds
 }
 
 ConnectComponentLabelImpl::ConnectComponentLabelImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "ConnectComponentLabel", target),
-                                                                                             m_src(MI_NULL), m_dst(MI_NULL),
+                                                                                             m_src(DT_NULL), m_dst(DT_NULL),
                                                                                              m_connectivity_type(ConnectivityType::CROSS),
                                                                                              m_algo_type(CCLAlgo::SPAGHETTI)
 {}
@@ -152,7 +152,7 @@ Status ConnectComponentLabelImpl::SetArgs(const Array *src, Array *dst, CCLAlgo 
                                           ConnectivityType connectivity_type, EquivalenceSolver solver_type)
 {
     AURA_UNUSED(solver_type);
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -211,7 +211,7 @@ std::string ConnectComponentLabelImpl::ToString() const
     return str;
 }
 
-AURA_VOID ConnectComponentLabelImpl::Dump(const std::string &prefix) const
+DT_VOID ConnectComponentLabelImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

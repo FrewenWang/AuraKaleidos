@@ -58,7 +58,7 @@ public:
     MatrixDctTest(Context *ctx, DctParam::TupleTable &table):TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         DctParam run_param(GetParam(index));
         AURA_LOGD(m_ctx, AURA_TAG, "Run param: %s\n", run_param.ToString().c_str());
@@ -78,7 +78,7 @@ public:
         res.output = run_param.mat_size.ToString() + " " + "F32";
 
         // run interface
-        MI_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
+        DT_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
 
         Status status_exec = Executor(loop_count, 2, time_val, IDct, m_ctx, src, dst, run_param.target);
 
@@ -161,7 +161,7 @@ public:
     MatrixIDctTest(Context *ctx, IDctParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         IDctParam run_param(GetParam(index));
@@ -174,14 +174,14 @@ public:
         TestTime time_val;
         MatCmpResult cmp_res;
         TestResult res;
-        MI_F32 tolerance = (ElemType::F32 == run_param.elem_type) ? 0.1f : (ElemType::F16 == run_param.elem_type) ? 2.f : 1.f;
+        DT_F32 tolerance = (ElemType::F32 == run_param.elem_type) ? 0.1f : (ElemType::F16 == run_param.elem_type) ? 2.f : 1.f;
 
         res.param  = "";
         res.input  = run_param.mat_size.ToString() + " " + ElemTypesToString(ElemType::F32);
         res.output = run_param.mat_size.ToString() + " " + ElemTypesToString(run_param.elem_type);
 
         // run interface
-        MI_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
+        DT_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
 
         Status status_exec = Executor(loop_count, 2, time_val, IInverseDct, m_ctx, src, dst, run_param.target);
         if (Status::OK == status_exec)

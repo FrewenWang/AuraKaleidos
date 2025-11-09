@@ -26,7 +26,7 @@ namespace aura
  * @tparam TupleTable Type of the tuple table.
  * @tparam N Index of the tuple element to calculate the size.
  */
-template<typename TupleTable, MI_S32 N>
+template<typename TupleTable, DT_S32 N>
 struct CalcSizeHelper
 {
     /**
@@ -35,7 +35,7 @@ struct CalcSizeHelper
      * @param t The TupleTable.
      * @return The calculated size.
      */
-    static MI_S32 CalcSize(const TupleTable &t)
+    static DT_S32 CalcSize(const TupleTable &t)
     {
         return std::get<N - 1>(t).size() * CalcSizeHelper<TupleTable, N - 1>::CalcSize(t);
     }
@@ -55,7 +55,7 @@ struct CalcSizeHelper<TupleTable, 1>
      * @param t The TupleTable.
      * @return The calculated size.
      */
-    static MI_S32 CalcSize(const TupleTable &t)
+    static DT_S32 CalcSize(const TupleTable &t)
     {
         return std::get<0>(t).size();
     }
@@ -68,7 +68,7 @@ struct CalcSizeHelper<TupleTable, 1>
  * @tparam Tuple Type of the tuple.
  * @tparam N Index of the tuple element to get the parameter.
  */
-template<typename TupleTable, typename Tuple, MI_S32 N>
+template<typename TupleTable, typename Tuple, DT_S32 N>
 struct GetParamHelper
 {
     /**
@@ -78,10 +78,10 @@ struct GetParamHelper
      * @param param_tuple The Tuple to be populated.
      * @param idx The index of the parameter to be extracted.
      */
-    static AURA_VOID GetParam(const TupleTable &param_table, Tuple &param_tuple, MI_S32 idx)
+    static DT_VOID GetParam(const TupleTable &param_table, Tuple &param_tuple, DT_S32 idx)
     {
-        MI_S32 size    = CalcSizeHelper<TupleTable, N - 1>::CalcSize(param_table);
-        MI_S32 vec_idx = idx / size;
+        DT_S32 size    = CalcSizeHelper<TupleTable, N - 1>::CalcSize(param_table);
+        DT_S32 vec_idx = idx / size;
         GetParamHelper<TupleTable, Tuple, N - 1>::GetParam(param_table, param_tuple, idx - vec_idx * size);
         std::get<N - 1>(param_tuple) = std::get<N - 1>(param_table)[vec_idx];
     }
@@ -103,7 +103,7 @@ struct GetParamHelper<TupleTable, Tuple, 1>
      * @param param_tuple The Tuple to be populated.
      * @param idx The index of the parameter to be extracted.
      */
-    static AURA_VOID GetParam(const TupleTable &param_table, Tuple &param_tuple, MI_S32 idx)
+    static DT_VOID GetParam(const TupleTable &param_table, Tuple &param_tuple, DT_S32 idx)
     {
         std::get<0>(param_tuple) = std::get<0>(param_table)[idx];
     }
@@ -146,12 +146,12 @@ public:
      *
      * @param table The tuple table containing test parameters.
      */
-    AURA_VOID Initialize(const TupleTable &table)
+    DT_VOID Initialize(const TupleTable &table)
     {
         // parse params and save to m_params
-        MI_S32 size = CalcSizeHelper<TupleTable, std::tuple_size<TupleTable>::value>::CalcSize(table);
+        DT_S32 size = CalcSizeHelper<TupleTable, std::tuple_size<TupleTable>::value>::CalcSize(table);
         this->m_params.resize(size);
-        for (MI_S32 i = 0; i < size; i++)
+        for (DT_S32 i = 0; i < size; i++)
         {
             GetParamHelper<TupleTable, Tuple, std::tuple_size<TupleTable>::value>::GetParam(table, m_params[i], i);
         }
@@ -164,7 +164,7 @@ public:
      * 
      * @return The tuple containing test parameters.
      */
-    Tuple& GetParam(MI_S32 index)
+    Tuple& GetParam(DT_S32 index)
     {
         return this->m_params[index];
     }
@@ -176,7 +176,7 @@ public:
      * 
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    virtual Status CheckParam(MI_S32 index)
+    virtual Status CheckParam(DT_S32 index)
     {
         AURA_UNUSED(index);
         return Status::OK;
@@ -188,7 +188,7 @@ public:
      * @param test_case The test case instance.
      * @param loop_count The number of times to loop through the tests (default is 0, no looping).
      */
-    AURA_VOID RunTest(TestCase *test_case, MI_S32 loop_count = 0)
+    DT_VOID RunTest(TestCase *test_case, DT_S32 loop_count = 0)
     {
         for (decltype(m_params.size()) i = 0; i < m_params.size(); i++)
         {
@@ -219,7 +219,7 @@ public:
      * 
      * @return The result of the test case execution.
      */
-    virtual MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 loop_count = 0) = 0;
+    virtual DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 loop_count = 0) = 0;
 
 private:
     std::vector<Tuple> m_params;    /*!< Vector to store test parameters. */

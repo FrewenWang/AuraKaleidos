@@ -10,7 +10,7 @@ static Status CheckHvxSupport(Context *ctx, const Array &array, CvtColorType typ
 {
     Status ret = Status::ERROR;
 
-    MI_S32 width = array.GetSizes().m_width;
+    DT_S32 width = array.GetSizes().m_width;
     switch (type)
     {
         case CvtColorType::BGR2BGRA:
@@ -84,11 +84,11 @@ static Status CheckArrayElemType(Context *ctx, const std::vector<const Array*> &
 {
     Status ret = Status::OK;
 
-    const MI_S32 src_len = src.size();
-    const MI_S32 dst_len = dst.size();
+    const DT_S32 src_len = src.size();
+    const DT_S32 dst_len = dst.size();
 
     /// 判断每个存放数据是否是非法的
-    for (MI_S32 i = 0; i < src_len; i++)
+    for (DT_S32 i = 0; i < src_len; i++)
     {
         if (!(src[i]->IsValid()))
         {
@@ -97,7 +97,7 @@ static Status CheckArrayElemType(Context *ctx, const std::vector<const Array*> &
         }
     }
     /// 判断每个输出数据是否是非法的
-    for (MI_S32 i = 0; i < dst_len; i++)
+    for (DT_S32 i = 0; i < dst_len; i++)
     {
         if (!(dst[i]->IsValid()))
         {
@@ -145,7 +145,7 @@ static Status CheckArrayElemType(Context *ctx, const std::vector<const Array*> &
         case CvtColorType::YUV2RGB_Y444_601:
         {
             /// 判断所有的数据是否是U8
-            for (MI_S32 i = 0; i < src_len; i++)
+            for (DT_S32 i = 0; i < src_len; i++)
             {
                 if (src[i]->GetElemType() != ElemType::U8)
                 {
@@ -153,7 +153,7 @@ static Status CheckArrayElemType(Context *ctx, const std::vector<const Array*> &
                     return Status::ERROR;
                 }
             }
-            for (MI_S32 i = 0; i < dst_len; i++)
+            for (DT_S32 i = 0; i < dst_len; i++)
             {
                 if (dst[i]->GetElemType() != ElemType::U8)
                 {
@@ -168,7 +168,7 @@ static Status CheckArrayElemType(Context *ctx, const std::vector<const Array*> &
         case CvtColorType::RGB2YUV_NV21_P010:
         {
             /// 判断所有的数据是否是U16
-            for (MI_S32 i = 0; i < src_len; i++)
+            for (DT_S32 i = 0; i < src_len; i++)
             {
                 if (src[i]->GetElemType() != ElemType::U16)
                 {
@@ -176,7 +176,7 @@ static Status CheckArrayElemType(Context *ctx, const std::vector<const Array*> &
                     return Status::ERROR;
                 }
             }
-            for (MI_S32 i = 0; i < dst_len; i++)
+            for (DT_S32 i = 0; i < dst_len; i++)
             {
                 if (dst[i]->GetElemType() != ElemType::U16)
                 {
@@ -192,7 +192,7 @@ static Status CheckArrayElemType(Context *ctx, const std::vector<const Array*> &
         case CvtColorType::BAYERRG2BGR:
         case CvtColorType::BAYERGR2BGR:
         {
-            for (MI_S32 i = 0; i < src_len; i++)
+            for (DT_S32 i = 0; i < src_len; i++)
             {
                 if (src[i]->GetElemType() != ElemType::U8 && src[i]->GetElemType() != ElemType::U16)
                 {
@@ -200,7 +200,7 @@ static Status CheckArrayElemType(Context *ctx, const std::vector<const Array*> &
                     ret = Status::ERROR;
                 }
             }
-            for (MI_S32 i = 0; i < dst_len; i++)
+            for (DT_S32 i = 0; i < dst_len; i++)
             {
                 if (dst[i]->GetElemType() != ElemType::U8 && dst[i]->GetElemType() != ElemType::U16)
                 {
@@ -225,8 +225,8 @@ static Status CheckArrayNum(Context *ctx, const std::vector<const Array*> &src, 
 {
     Status ret = Status::ERROR;
     // 但是输入数据的大小
-    const MI_S32 src_len = src.size();
-    const MI_S32 dst_len = dst.size();
+    const DT_S32 src_len = src.size();
+    const DT_S32 dst_len = dst.size();
 
     switch (type)
     {
@@ -373,7 +373,7 @@ CvtColor::CvtColor(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status CvtColor::SetArgs(const std::vector<const Array*> &src, const std::vector<Array*> &dst, CvtColorType type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -418,13 +418,13 @@ Status CvtColor::SetArgs(const std::vector<const Array*> &src, const std::vector
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateCvtColorImpl(m_ctx, impl_target);
     }
 
     CvtColorImpl *cvtcolor_impl = dynamic_cast<CvtColorImpl*>(m_impl.get());
-    if (MI_NULL == cvtcolor_impl)
+    if (DT_NULL == cvtcolor_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "cvtcolor_impl is null ptr");
         return Status::ERROR;
@@ -438,7 +438,7 @@ Status CvtColor::SetArgs(const std::vector<const Array*> &src, const std::vector
 Status CvtColor::CLPrecompile(Context *ctx, ElemType elem_type, CvtColorType cvtcolor_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -486,7 +486,7 @@ CvtColorImpl::CvtColorImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, A
 
 Status CvtColorImpl::SetArgs(const std::vector<const Array*> &src, const std::vector<Array*> &dst, CvtColorType type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -518,7 +518,7 @@ std::vector<const Array*> CvtColorImpl::GetInputArrays() const
 std::vector<const Array*> CvtColorImpl::GetOutputArrays() const
 {
     std::vector<const Array*> dst_out;
-    for (MI_U32 i = 0; i < m_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_dst.size(); i++)
     {
         dst_out.push_back(m_dst[i]);
     }
@@ -537,7 +537,7 @@ std::string CvtColorImpl::ToString() const
     return str;
 }
 
-AURA_VOID CvtColorImpl::Dump(const std::string &prefix) const
+DT_VOID CvtColorImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

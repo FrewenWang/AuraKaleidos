@@ -55,8 +55,8 @@ static std::shared_ptr<GemmImpl> CreateGemmImpl(Context *ctx, const OpTarget &ta
 #if defined(AURA_ENABLE_NEON)
 AURA_INLINE Status CheckGemmNeonParam(const Array *mat)
 {
-    MI_S32 width  = mat->GetSizes().m_width;
-    MI_S32 height = mat->GetSizes().m_height;
+    DT_S32 width  = mat->GetSizes().m_width;
+    DT_S32 height = mat->GetSizes().m_height;
     if ((width < 4) || (height < 4))
     {
         return Status::ERROR;
@@ -68,9 +68,9 @@ AURA_INLINE Status CheckGemmNeonParam(const Array *mat)
 #if defined(AURA_ENABLE_OPENCL)
 static Status CheckCLSupport(const Array *src0, const Array *src1)
 {
-    MI_S32 m = src0->GetSizes().m_height;
-    MI_S32 k = src0->GetSizes().m_width;
-    MI_S32 n = src1->GetSizes().m_width;
+    DT_S32 m = src0->GetSizes().m_height;
+    DT_S32 k = src0->GetSizes().m_width;
+    DT_S32 n = src1->GetSizes().m_width;
 
     if (m < 64 || n < 64 || k < 8)
     {
@@ -86,12 +86,12 @@ Gemm::Gemm(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Gemm::SetArgs(const Array *src0, const Array *src1, Array *dst)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -131,14 +131,14 @@ Status Gemm::SetArgs(const Array *src0, const Array *src1, Array *dst)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateGemmImpl(m_ctx, impl_target);
     }
 
     // run initialize
     GemmImpl *gemm_impl = dynamic_cast<GemmImpl*>(m_impl.get());
-    if (MI_NULL == gemm_impl)
+    if (DT_NULL == gemm_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "gemm_impl is null ptr");
         return Status::ERROR;
@@ -152,7 +152,7 @@ Status Gemm::SetArgs(const Array *src0, const Array *src1, Array *dst)
 Status Gemm::CLPrecompile(Context *ctx)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -163,11 +163,11 @@ Status Gemm::CLPrecompile(Context *ctx)
 
     if (GpuType::ADRENO == m_gpu_type)
     {
-        MI_S32 elem_counts = 8;
-        MI_S32 bm = 64;
-        MI_S32 bn = 64;
-        MI_S32 bk = 8;
-        MI_S32 load_size   = bm * bk / (2 * (bn / 8) * (bm / 8));
+        DT_S32 elem_counts = 8;
+        DT_S32 bm = 64;
+        DT_S32 bn = 64;
+        DT_S32 bk = 8;
+        DT_S32 load_size   = bm * bk / (2 * (bn / 8) * (bm / 8));
 
         cl_kernels = GemmAdrenoCL::GetCLKernels(ctx, elem_counts, load_size);
     }
@@ -196,18 +196,18 @@ AURA_EXPORTS Status IGemm(Context *ctx, const Mat &src0, const Mat &src1, Mat &d
 }
 
 GemmImpl::GemmImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Gemm", target),
-                                                           m_src0(MI_NULL), m_src1(MI_NULL),
-                                                           m_dst(MI_NULL)
+                                                           m_src0(DT_NULL), m_src1(DT_NULL),
+                                                           m_dst(DT_NULL)
 {}
 
 Status GemmImpl::SetArgs(const Array *src0, const Array *src1, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src0) || (MI_NULL == src1) || (MI_NULL == dst))
+    if ((DT_NULL == src0) || (DT_NULL == src1) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -263,7 +263,7 @@ std::string GemmImpl::ToString() const
     return str;
 }
 
-AURA_VOID GemmImpl::Dump(const std::string &prefix) const
+DT_VOID GemmImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

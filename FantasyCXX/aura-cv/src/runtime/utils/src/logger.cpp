@@ -38,7 +38,7 @@
     va_start(args, format);                                                    \
     va_list args_copy;                                                         \
     va_copy(args_copy, args);                                                  \
-    MI_S32 length = std::vsnprintf(MI_NULL, 0, format, args_copy);             \
+    DT_S32 length = std::vsnprintf(DT_NULL, 0, format, args_copy);             \
     va_end(args_copy);                                                         \
     std::string buffer(length, 0);                                             \
     std::vsnprintf(&buffer[0], length + 1, format, args);                      \
@@ -57,9 +57,9 @@ static std::string GetExtInfo()
 // #elif defined(AURA_BUILD_HOST)
 // #  if !defined(AURA_BUILD_WIN)
 // #    if defined(__GLIBC__)
-//         MI_S32 tid = syscall(SYS_gettid);
+//         DT_S32 tid = syscall(SYS_gettid);
 // #    else
-//         MI_S32 tid = gettid();
+//         DT_S32 tid = gettid();
 // #    endif // __GLIBC__
 //         ss << (tid) << " ";
 // #  else // AURA_BUILD_WIN
@@ -70,7 +70,7 @@ static std::string GetExtInfo()
     return ss.str();
 }
 
-static AURA_VOID StdoutPrintImpl(LogLevel level, const std::string &info)
+static DT_VOID StdoutPrintImpl(LogLevel level, const std::string &info)
 {
     switch (level)
     {
@@ -101,9 +101,9 @@ static AURA_VOID StdoutPrintImpl(LogLevel level, const std::string &info)
     return;
 }
 
-static AURA_VOID FilePrintImpl(FILE *fp, const std::string &info)
+static DT_VOID FilePrintImpl(FILE *fp, const std::string &info)
 {
-    if (MI_NULL == fp || info.empty())
+    if (DT_NULL == fp || info.empty())
     {
         return;
     }
@@ -112,7 +112,7 @@ static AURA_VOID FilePrintImpl(FILE *fp, const std::string &info)
 }
 
 #if (defined(AURA_BUILD_ANDROID) || defined(AURA_BUILD_HEXAGON))
-static std::vector<std::string> SplitString(const std::string &str, const MI_CHAR *delim)
+static std::vector<std::string> SplitString(const std::string &str, const DT_CHAR *delim)
 {
     std::vector<std::string> sub_strings;
     size_t last  = 0;
@@ -134,7 +134,7 @@ static std::vector<std::string> SplitString(const std::string &str, const MI_CHA
 }
 #endif // AURA_BUILD_ANDROID || AURA_BUILD_HEXAGON
 
-static AURA_VOID LogcatPrintImpl(const MI_CHAR *tag, LogLevel level, const std::string &info)
+static DT_VOID LogcatPrintImpl(const DT_CHAR *tag, LogLevel level, const std::string &info)
 {
     AURA_UNUSED(tag);
     AURA_UNUSED(level);
@@ -157,7 +157,7 @@ static AURA_VOID LogcatPrintImpl(const MI_CHAR *tag, LogLevel level, const std::
     return;
 }
 
-static AURA_VOID FarfPrintImpl(LogLevel level, const std::string &info)
+static DT_VOID FarfPrintImpl(LogLevel level, const std::string &info)
 {
     AURA_UNUSED(level);
     AURA_UNUSED(info);
@@ -190,7 +190,7 @@ static AURA_VOID FarfPrintImpl(LogLevel level, const std::string &info)
     return;
 }
 
-AURA_EXPORTS AURA_VOID StdoutPrint(const MI_CHAR *tag, LogLevel level, const MI_CHAR *format, ...)
+AURA_EXPORTS DT_VOID StdoutPrint(const DT_CHAR *tag, LogLevel level, const DT_CHAR *format, ...)
 {
     GET_FORMAT_STR(info, format);
     std::string output = std::string("[") + tag + "] " + GetExtInfo() + info;
@@ -198,7 +198,7 @@ AURA_EXPORTS AURA_VOID StdoutPrint(const MI_CHAR *tag, LogLevel level, const MI_
     StdoutPrintImpl(level, output);
 }
 
-AURA_EXPORTS AURA_VOID FilePrint(FILE *fp, const MI_CHAR *tag, const MI_CHAR *format, ...)
+AURA_EXPORTS DT_VOID FilePrint(FILE *fp, const DT_CHAR *tag, const DT_CHAR *format, ...)
 {
     GET_FORMAT_STR(info, format);
     std::string output = std::string("[") + tag + "] " + GetExtInfo() + info;
@@ -206,19 +206,19 @@ AURA_EXPORTS AURA_VOID FilePrint(FILE *fp, const MI_CHAR *tag, const MI_CHAR *fo
     FilePrintImpl(fp, output);
 }
 
-AURA_EXPORTS AURA_VOID LogcatPrint(const MI_CHAR *tag, LogLevel level, const MI_CHAR *format, ...)
+AURA_EXPORTS DT_VOID LogcatPrint(const DT_CHAR *tag, LogLevel level, const DT_CHAR *format, ...)
 {
     GET_FORMAT_STR(info, format);
     LogcatPrintImpl(tag, level, info);
 }
 
-AURA_EXPORTS AURA_VOID FarfPrint(LogLevel level, const MI_CHAR *format, ...)
+AURA_EXPORTS DT_VOID FarfPrint(LogLevel level, const DT_CHAR *format, ...)
 {
     GET_FORMAT_STR(info, format);
     FarfPrintImpl(level, info);
 }
 
-AURA_EXPORTS AURA_VOID Print(const MI_CHAR *tag, LogLevel level, const MI_CHAR *format, ...)
+AURA_EXPORTS DT_VOID Print(const DT_CHAR *tag, LogLevel level, const DT_CHAR *format, ...)
 {
     GET_FORMAT_STR(info, format);
 
@@ -233,9 +233,9 @@ AURA_EXPORTS AURA_VOID Print(const MI_CHAR *tag, LogLevel level, const MI_CHAR *
 #endif
 }
 
-Logger::Impl::Impl(LogOutput output, LogLevel level, const std::string &file, MI_S32 max_num_error_string)
+Logger::Impl::Impl(LogOutput output, LogLevel level, const std::string &file, DT_S32 max_num_error_string)
                   : m_output(output), m_level(level), m_file(file), m_mutex(), m_max_num_error_string(max_num_error_string),
-                    m_error_string_list(), m_fp(MI_NULL)
+                    m_error_string_list(), m_fp(DT_NULL)
 {
     if (LogOutput::FILE == m_output && !m_file.empty())
     {
@@ -245,16 +245,16 @@ Logger::Impl::Impl(LogOutput output, LogLevel level, const std::string &file, MI
 
 Logger::Impl::~Impl()
 {
-    if (m_fp != MI_NULL)
+    if (m_fp != DT_NULL)
     {
         fclose(m_fp);
-        m_fp = MI_NULL;
+        m_fp = DT_NULL;
     }
 }
 
-AURA_VOID Logger::Impl::Log(const MI_CHAR *tag, LogLevel level, const MI_CHAR *info)
+DT_VOID Logger::Impl::Log(const DT_CHAR *tag, LogLevel level, const DT_CHAR *info)
 {
-    if (static_cast<MI_S32>(m_level) < static_cast<MI_S32>(level))
+    if (static_cast<DT_S32>(m_level) < static_cast<DT_S32>(level))
     {
         return ;
     }
@@ -296,11 +296,11 @@ AURA_VOID Logger::Impl::Log(const MI_CHAR *tag, LogLevel level, const MI_CHAR *i
     return;
 }
 
-AURA_VOID Logger::Impl::AddErrorString(ErrorString &error_string)
+DT_VOID Logger::Impl::AddErrorString(ErrorString &error_string)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
 
-    while (static_cast<MI_S32>(m_error_string_list.size()) >= m_max_num_error_string)
+    while (static_cast<DT_S32>(m_error_string_list.size()) >= m_max_num_error_string)
     {
         m_error_string_list.pop_front();
     }
@@ -339,7 +339,7 @@ Logger::Logger(LogOutput output, LogLevel level, const std::string &file)
 Logger::~Logger()
 {}
 
-AURA_VOID Logger::Log(const MI_CHAR *tag, LogLevel level, const MI_CHAR *format, ...)
+DT_VOID Logger::Log(const DT_CHAR *tag, LogLevel level, const DT_CHAR *format, ...)
 {
     GET_FORMAT_STR(info, format);
 
@@ -349,7 +349,7 @@ AURA_VOID Logger::Log(const MI_CHAR *tag, LogLevel level, const MI_CHAR *format,
     }
 }
 
-AURA_VOID Logger::AddErrorString(const MI_CHAR *file, const MI_CHAR *func, MI_S32 line, const MI_CHAR *info)
+DT_VOID Logger::AddErrorString(const DT_CHAR *file, const DT_CHAR *func, DT_S32 line, const DT_CHAR *info)
 {
     ErrorString error_string(file, func, line, info);
     m_impl->AddErrorString(error_string);

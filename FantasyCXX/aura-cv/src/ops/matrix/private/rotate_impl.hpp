@@ -10,36 +10,36 @@
 
 namespace aura
 {
-    template <typename Tp, RotateType Rt, MI_S32 C> struct RotateNoneFunctor;
+    template <typename Tp, RotateType Rt, DT_S32 C> struct RotateNoneFunctor;
 
-template <typename Tp, MI_S32 C>
+template <typename Tp, DT_S32 C>
 struct RotateNoneFunctor<Tp, RotateType::ROTATE_90, C>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 4;
+    constexpr static DT_S32 BLOCK_SIZE = 4;
 
-    AURA_ALWAYS_INLINE Status operator()(const Mat &src, Mat &dst, MI_S32 start_blk, MI_S32 end_blk)
+    AURA_ALWAYS_INLINE Status operator()(const Mat &src, Mat &dst, DT_S32 start_blk, DT_S32 end_blk)
     {
         using BLOCK = struct { Tp val[C]; };
 
-        const MI_U8 *src_data = (MI_U8 *)src.GetData();
-        MI_U8 *dst_data       = (MI_U8 *)dst.GetData();
+        const DT_U8 *src_data = (DT_U8 *)src.GetData();
+        DT_U8 *dst_data       = (DT_U8 *)dst.GetData();
 
-        MI_U32 src_pitch = src.GetRowPitch();
-        MI_U32 dst_pitch = dst.GetRowPitch();
+        DT_U32 src_pitch = src.GetRowPitch();
+        DT_U32 dst_pitch = dst.GetRowPitch();
 
-        MI_S32 width  = dst.GetSizes().m_width;
-        MI_S32 height = dst.GetSizes().m_height;
+        DT_S32 width  = dst.GetSizes().m_width;
+        DT_S32 height = dst.GetSizes().m_height;
 
-        MI_S32 start_row = start_blk * BLOCK_SIZE;
-        MI_S32 end_row   = Min(end_blk * BLOCK_SIZE, height);
+        DT_S32 start_row = start_blk * BLOCK_SIZE;
+        DT_S32 end_row   = Min(end_blk * BLOCK_SIZE, height);
 
-        MI_S32 x = 0;
-        MI_S32 y = Max(static_cast<MI_S32>(0), start_row);
-        MI_S32 w = width;
-        MI_S32 h = Min(height, end_row);
+        DT_S32 x = 0;
+        DT_S32 y = Max(static_cast<DT_S32>(0), start_row);
+        DT_S32 w = width;
+        DT_S32 h = Min(height, end_row);
 
-        MI_S32 w_align4 = (w & (-4));
-        MI_S32 h_align4 = (h & (-4));
+        DT_S32 w_align4 = (w & (-4));
+        DT_S32 h_align4 = (h & (-4));
 
         for (; y < h_align4; y += 4)
         {
@@ -51,7 +51,7 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_90, C>
             x = 0;
             for (; x < w_align4; x += 4)
             {
-                MI_S32 sx = width - x - 1;
+                DT_S32 sx = width - x - 1;
                 const BLOCK *s0 = (const BLOCK *)(src_data + y * sizeof(BLOCK) + src_pitch * sx);
                 const BLOCK *s1 = (const BLOCK *)(src_data + y * sizeof(BLOCK) + src_pitch * (sx - 1));
                 const BLOCK *s2 = (const BLOCK *)(src_data + y * sizeof(BLOCK) + src_pitch * (sx - 2));
@@ -80,7 +80,7 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_90, C>
 
             for (; x < w; x++)
             {
-                MI_S32 sx = width - x - 1;
+                DT_S32 sx = width - x - 1;
                 const BLOCK *s0 = (const BLOCK *)(src_data + y * sizeof(BLOCK) + src_pitch * sx);
 
                 d0[x] = s0[0];
@@ -97,7 +97,7 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_90, C>
             x = 0;
             for (; x < w_align4; x += 4)
             {
-                MI_S32 sx = width - x - 1;
+                DT_S32 sx = width - x - 1;
                 const BLOCK *s0 = (const BLOCK *)(src_data + y * sizeof(BLOCK) + src_pitch * sx);
                 const BLOCK *s1 = (const BLOCK *)(src_data + y * sizeof(BLOCK) + src_pitch * (sx - 1));
                 const BLOCK *s2 = (const BLOCK *)(src_data + y * sizeof(BLOCK) + src_pitch * (sx - 2));
@@ -111,7 +111,7 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_90, C>
 
             for (; x < w; x++)
             {
-                MI_S32 sx = width - x - 1;
+                DT_S32 sx = width - x - 1;
                 const BLOCK *s0 = (const BLOCK *)(src_data + y * sizeof(BLOCK) + src_pitch * sx);
 
                 d0[x] = s0[0];
@@ -121,34 +121,34 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_90, C>
     }
 };
 
-template <typename Tp, MI_S32 C>
+template <typename Tp, DT_S32 C>
 struct RotateNoneFunctor<Tp, RotateType::ROTATE_180, C>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 4;
+    constexpr static DT_S32 BLOCK_SIZE = 4;
 
-    AURA_ALWAYS_INLINE Status operator()(const Mat &src, Mat &dst, MI_S32 start_blk, MI_S32 end_blk)
+    AURA_ALWAYS_INLINE Status operator()(const Mat &src, Mat &dst, DT_S32 start_blk, DT_S32 end_blk)
     {
         using BLOCK = struct { Tp val[C]; };
 
-        const MI_U8 *src_data = (MI_U8 *)src.GetData();
-        MI_U8 *dst_data       = (MI_U8 *)dst.GetData();
+        const DT_U8 *src_data = (DT_U8 *)src.GetData();
+        DT_U8 *dst_data       = (DT_U8 *)dst.GetData();
 
-        MI_U32 src_pitch = src.GetRowPitch();
-        MI_U32 dst_pitch = dst.GetRowPitch();
+        DT_U32 src_pitch = src.GetRowPitch();
+        DT_U32 dst_pitch = dst.GetRowPitch();
 
-        MI_S32 width  = dst.GetSizes().m_width;
-        MI_S32 height = dst.GetSizes().m_height;
+        DT_S32 width  = dst.GetSizes().m_width;
+        DT_S32 height = dst.GetSizes().m_height;
 
-        MI_S32 start_row = start_blk * BLOCK_SIZE;
-        MI_S32 end_row   = Min(end_blk * BLOCK_SIZE, height);
+        DT_S32 start_row = start_blk * BLOCK_SIZE;
+        DT_S32 end_row   = Min(end_blk * BLOCK_SIZE, height);
 
-        MI_S32 x = 0;
-        MI_S32 y = Max(static_cast<MI_S32>(0), start_row);
-        MI_S32 w = width;
-        MI_S32 h = Min(height, end_row);
+        DT_S32 x = 0;
+        DT_S32 y = Max(static_cast<DT_S32>(0), start_row);
+        DT_S32 w = width;
+        DT_S32 h = Min(height, end_row);
 
-        MI_S32 w_align4 = (w & (-4));
-        MI_S32 h_align4 = (h & (-4));
+        DT_S32 w_align4 = (w & (-4));
+        DT_S32 h_align4 = (h & (-4));
 
         for (; y < h_align4; y += 4)
         {
@@ -165,7 +165,7 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_180, C>
             x = 0;
             for (; x < w_align4; x += 4)
             {
-                MI_S32 sx = width - x - 1;
+                DT_S32 sx = width - x - 1;
                 d0[x]     = s0[sx];
                 d0[x + 1] = s0[sx - 1];
                 d0[x + 2] = s0[sx - 2];
@@ -186,7 +186,7 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_180, C>
 
             for (; x < w; x++)
             {
-                MI_S32 sx = width - x - 1;
+                DT_S32 sx = width - x - 1;
                 d0[x] = s0[sx];
                 d1[x] = s1[sx];
                 d2[x] = s2[sx];
@@ -202,7 +202,7 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_180, C>
             x = 0;
             for (; x < w_align4; x += 4)
             {
-                MI_S32 sx = width - x - 1;
+                DT_S32 sx = width - x - 1;
                 d0[x]     = s0[sx];
                 d0[x + 1] = s0[sx - 1];
                 d0[x + 2] = s0[sx - 2];
@@ -218,38 +218,38 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_180, C>
     }
 };
 
-template <typename Tp, MI_S32 C>
+template <typename Tp, DT_S32 C>
 struct RotateNoneFunctor<Tp, RotateType::ROTATE_270, C>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 4;
+    constexpr static DT_S32 BLOCK_SIZE = 4;
 
-    AURA_ALWAYS_INLINE Status operator()(const Mat &src, Mat &dst, MI_S32 start_blk, MI_S32 end_blk)
+    AURA_ALWAYS_INLINE Status operator()(const Mat &src, Mat &dst, DT_S32 start_blk, DT_S32 end_blk)
     {
         using BLOCK = struct { Tp val[C]; };
 
-        const MI_U8 *src_data = (MI_U8 *)src.GetData();
-        MI_U8 *dst_data       = (MI_U8 *)dst.GetData();
+        const DT_U8 *src_data = (DT_U8 *)src.GetData();
+        DT_U8 *dst_data       = (DT_U8 *)dst.GetData();
 
-        MI_U32 src_pitch = src.GetRowPitch();
-        MI_U32 dst_pitch = dst.GetRowPitch();
+        DT_U32 src_pitch = src.GetRowPitch();
+        DT_U32 dst_pitch = dst.GetRowPitch();
 
-        MI_S32 width  = dst.GetSizes().m_width;
-        MI_S32 height = dst.GetSizes().m_height;
+        DT_S32 width  = dst.GetSizes().m_width;
+        DT_S32 height = dst.GetSizes().m_height;
 
-        MI_S32 start_row = start_blk * BLOCK_SIZE;
-        MI_S32 end_row   = Min(end_blk * BLOCK_SIZE, height);
+        DT_S32 start_row = start_blk * BLOCK_SIZE;
+        DT_S32 end_row   = Min(end_blk * BLOCK_SIZE, height);
 
-        MI_S32 x = 0;
-        MI_S32 y = Max(static_cast<MI_S32>(0), start_row);
-        MI_S32 w = width;
-        MI_S32 h = Min(height, end_row);
+        DT_S32 x = 0;
+        DT_S32 y = Max(static_cast<DT_S32>(0), start_row);
+        DT_S32 w = width;
+        DT_S32 h = Min(height, end_row);
 
-        MI_S32 w_align4 = (w & (-4));
-        MI_S32 h_align4 = (h & (-4));
+        DT_S32 w_align4 = (w & (-4));
+        DT_S32 h_align4 = (h & (-4));
 
         for (; y < h_align4; y += 4)
         {
-            MI_S32 sy = height - y - 1;
+            DT_S32 sy = height - y - 1;
             BLOCK *d0 = (BLOCK *)(dst_data + dst_pitch * y);
             BLOCK *d1 = (BLOCK *)(dst_data + dst_pitch * (y + 1));
             BLOCK *d2 = (BLOCK *)(dst_data + dst_pitch * (y + 2));
@@ -297,7 +297,7 @@ struct RotateNoneFunctor<Tp, RotateType::ROTATE_270, C>
 
         for (; y < h; y++)
         {
-            MI_S32 sy = height - y - 1;
+            DT_S32 sy = height - y - 1;
             BLOCK *d0 = (BLOCK *)(dst_data + dst_pitch * y);
 
             x = 0;
@@ -338,7 +338,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
 
@@ -360,90 +360,90 @@ public:
 #if defined(AURA_ENABLE_NEON)
 
 // RotateTraits
-template <typename Tp, RotateType, MI_S32> struct RotateNeonFunctor;
+template <typename Tp, RotateType, DT_S32> struct RotateNeonFunctor;
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 1>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_90, 1>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 8;
-    using SType = MI_U8;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 8;
+    using SType = DT_U8;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 2>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_90, 2>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 8;
-    using SType = MI_U16;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 8;
+    using SType = DT_U16;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 3>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_90, 3>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 8;
-    using SType = MI_U8;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 8;
+    using SType = DT_U8;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 4>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_90, 4>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 4;
-    using SType = MI_U32;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 4;
+    using SType = DT_U32;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 1>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_180, 1>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 8;
-    using SType = MI_U8;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 8;
+    using SType = DT_U8;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 2>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_180, 2>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 8;
-    using SType = MI_U16;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 8;
+    using SType = DT_U16;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 3>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_180, 3>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 8;
-    using SType = MI_U8;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 8;
+    using SType = DT_U8;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 4>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_180, 4>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 4;
-    using SType = MI_U32;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 4;
+    using SType = DT_U32;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 1>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_270, 1>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 8;
-    using SType = MI_U8;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 8;
+    using SType = DT_U8;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 2>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_270, 2>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 8;
-    using SType = MI_U16;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 8;
+    using SType = DT_U16;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 3>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_270, 3>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 8;
-    using SType = MI_U8;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 8;
+    using SType = DT_U8;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
-template <> struct RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 4>
+template <> struct RotateNeonFunctor<DT_U8, RotateType::ROTATE_270, 4>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 4;
-    using SType = MI_U32;
-    AURA_VOID operator()(SType*, SType*, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32, MI_U32);
+    constexpr static DT_S32 BLOCK_SIZE = 4;
+    using SType = DT_U32;
+    DT_VOID operator()(SType*, SType*, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32, DT_U32);
 };
 
 class RotateNeon : public RotateImpl
@@ -473,13 +473,13 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 ochannel, RotateType type);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 ochannel, RotateType type);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
     CLMem    m_cl_src;
     CLMem    m_cl_dst;
-    MI_S32   m_elem_counts;
+    DT_S32   m_elem_counts;
 
     std::string m_profiling_string;
 };

@@ -6,18 +6,18 @@
 namespace aura
 {
 
-Buffer AllocatorVtcm::Allocate(MI_S64 size, MI_S32 align)
+Buffer AllocatorVtcm::Allocate(DT_S64 size, DT_S32 align)
 {
     size = AURA_ALIGN(size, 128);
 
-    AURA_VOID *addr = MI_NULL;
+    DT_VOID *addr = DT_NULL;
 #if __HEXAGON_ARCH__ >= 66
     compute_res_attr_t res_attr;
     HAP_compute_res_attr_init(&res_attr);
     HAP_compute_res_attr_set_serialize(&res_attr, 0);
     HAP_compute_res_attr_set_vtcm_param(&res_attr, size, (align != 0));
     auto ctx_id = HAP_compute_res_acquire(&res_attr, 1000); // Timeout 1ms
-    addr = (MI_U8 *)HAP_compute_res_attr_get_vtcm_ptr(&res_attr);
+    addr = (DT_U8 *)HAP_compute_res_attr_get_vtcm_ptr(&res_attr);
 
     if (!ctx_id)
     {
@@ -45,7 +45,7 @@ Buffer AllocatorVtcm::Allocate(MI_S64 size, MI_S32 align)
 #endif // __HEXAGON_ARCH__
 }
 
-AURA_VOID AllocatorVtcm::Free(Buffer &buffer)
+DT_VOID AllocatorVtcm::Free(Buffer &buffer)
 {
 #if __HEXAGON_ARCH__ >= 66
     if (AURA_MEM_VTCM == buffer.m_type && buffer.m_property != 0)

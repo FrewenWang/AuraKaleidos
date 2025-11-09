@@ -41,7 +41,7 @@ static Status GetCLBuildOptions(Context *ctx, BorderType border_type, ElemType e
     return Status::OK;
 }
 
-static Status GetCLName(MI_S32 channel, MI_S32 ksize, std::vector<std::string> &program_names, std::vector<std::string> &kernel_names)
+static Status GetCLName(DT_S32 channel, DT_S32 ksize, std::vector<std::string> &program_names, std::vector<std::string> &kernel_names)
 {
     std::string program_postfix = std::to_string(ksize) + "x" + std::to_string(ksize) + "_c" + std::to_string(channel);
     std::string kernel_postfix = std::to_string(ksize) + "x" + std::to_string(ksize) + "C" + std::to_string(channel);
@@ -55,13 +55,13 @@ static Status GetCLName(MI_S32 channel, MI_S32 ksize, std::vector<std::string> &
     return Status::OK;
 }
 
-static AURA_VOID GetCLGlobalSize(MI_S32 height, MI_S32 width, MI_S32 ksize, cl::NDRange cl_range[2], MI_S32 &main_width)
+static DT_VOID GetCLGlobalSize(DT_S32 height, DT_S32 width, DT_S32 ksize, cl::NDRange cl_range[2], DT_S32 &main_width)
 {
-    MI_S32 elem_counts = 6;
-    MI_S32 border      = (ksize >> 1) << 1;
+    DT_S32 elem_counts = 6;
+    DT_S32 border      = (ksize >> 1) << 1;
 
-    MI_S32 main_size = (width - border) / elem_counts;
-    MI_S32 main_rest = (width - border) % elem_counts;
+    DT_S32 main_size = (width - border) / elem_counts;
+    DT_S32 main_rest = (width - border) % elem_counts;
 
     // main global size
     cl_range[0] = cl::NDRange(main_size, height);
@@ -74,7 +74,7 @@ static AURA_VOID GetCLGlobalSize(MI_S32 height, MI_S32 width, MI_S32 ksize, cl::
 PyrUpCL::PyrUpCL(Context *ctx, const OpTarget &target) : PyrUpImpl(ctx, target)
 {}
 
-Status PyrUpCL::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+Status PyrUpCL::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                         BorderType border_type)
 {
     if (PyrUpImpl::SetArgs(src, dst, ksize, sigma, border_type) != Status::OK)
@@ -167,17 +167,17 @@ Status PyrUpCL::DeInitialize()
 Status PyrUpCL::Run()
 {
     Status ret = Status::OK;
-    const MI_S32 ksh = 3;
+    const DT_S32 ksh = 3;
 
-    MI_S32 istep = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 iheight = m_src->GetSizes().m_height;
-    MI_S32 iwidth  = m_src->GetSizes().m_width;
+    DT_S32 istep = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 iheight = m_src->GetSizes().m_height;
+    DT_S32 iwidth  = m_src->GetSizes().m_width;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
     // 1. get center_area and global_size
     cl::NDRange cl_global_size[2];
-    MI_S32 main_width = 0;
+    DT_S32 main_width = 0;
 
     GetCLGlobalSize(iheight, iwidth, ksh, cl_global_size, main_width);
 
@@ -186,11 +186,11 @@ Status PyrUpCL::Run()
     Status ret_sync = Status::ERROR;
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, cl::Buffer>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, cl::Buffer>(
                                 m_cl_src.GetCLMemRef<cl::Buffer>(), istep, iheight,
                                 m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
-                                (MI_S32)(cl_global_size[0].get()[1]),
-                                (MI_S32)(cl_global_size[0].get()[0]),
+                                (DT_S32)(cl_global_size[0].get()[1]),
+                                (DT_S32)(cl_global_size[0].get()[0]),
                                 m_cl_kmat.GetCLMemRef<cl::Buffer>(),
                                 cl_global_size[0],
                                 cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size[0]),
@@ -201,12 +201,12 @@ Status PyrUpCL::Run()
         goto EXIT;
     }
 
-    cl_ret |= m_cl_kernels[1].Run<cl::Buffer, MI_S32, MI_S32, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, cl::Buffer>(
+    cl_ret |= m_cl_kernels[1].Run<cl::Buffer, DT_S32, DT_S32, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, cl::Buffer>(
                                  m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  iheight, iwidth,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
-                                 (MI_S32)(cl_global_size[1].get()[1]),
-                                 (MI_S32)(cl_global_size[1].get()[0]),
+                                 (DT_S32)(cl_global_size[1].get()[1]),
+                                 (DT_S32)(cl_global_size[1].get()[0]),
                                  main_width,
                                  m_cl_kmat.GetCLMemRef<cl::Buffer>(),
                                  cl_global_size[1],
@@ -219,7 +219,7 @@ Status PyrUpCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event[1].wait();
         if (cl_ret != CL_SUCCESS)
@@ -228,7 +228,7 @@ Status PyrUpCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event[0]) +
                                  GetCLProfilingInfo(m_cl_kernels[1].GetKernelName(), cl_event[1]);
@@ -252,7 +252,7 @@ std::string PyrUpCL::ToString() const
     return PyrUpImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> PyrUpCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type)
+std::vector<CLKernel> PyrUpCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type)
 {
     std::vector<CLKernel> cl_kernels;
     std::vector<std::string> program_names, kernel_names;
@@ -270,7 +270,7 @@ std::vector<CLKernel> PyrUpCL::GetCLKernels(Context *ctx, ElemType elem_type, MI
         return cl_kernels;
     }
 
-    for (MI_S32 i = 0; i < static_cast<MI_S32>(program_names.size()); ++i)
+    for (DT_S32 i = 0; i < static_cast<DT_S32>(program_names.size()); ++i)
     {
         cl_kernels.emplace_back(ctx, program_names.at(i), kernel_names.at(i), "", build_opt);
     }

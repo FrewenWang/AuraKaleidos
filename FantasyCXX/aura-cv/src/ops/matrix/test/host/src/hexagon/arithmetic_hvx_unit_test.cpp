@@ -54,10 +54,10 @@ static ArithmeticParam::TupleTable g_arithmetic_table
 NEW_TESTCASE(matrix, Arithmetic, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     ArithmeticTest test(UnitTest::GetInstance()->GetContext(), g_arithmetic_table);
     test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

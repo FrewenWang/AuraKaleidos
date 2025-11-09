@@ -67,7 +67,7 @@ public:
      * @param border_type The border type for handling border pixels.
      * @param interp_type The interpolation method.
      */
-    static Status CLPrecompile(Context *ctx, ElemType map_elem_type, ElemType dst_elem_type, MI_S32 channel,
+    static Status CLPrecompile(Context *ctx, ElemType map_elem_type, ElemType dst_elem_type, DT_S32 channel,
                                BorderType border_type, InterpType interp_type);
 };
 

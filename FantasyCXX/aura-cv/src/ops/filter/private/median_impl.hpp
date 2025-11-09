@@ -18,7 +18,7 @@ class MedianImpl : public OpImpl
 public:
     MedianImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_S32 ksize);
+    virtual Status SetArgs(const Array *src, Array *dst, DT_S32 ksize);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -26,10 +26,10 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    MI_S32       m_ksize;
+    DT_S32       m_ksize;
     const Array *m_src;
     Array       *m_dst;
 };
@@ -39,7 +39,7 @@ class MedianNone : public MedianImpl
 public:
     MedianNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize) override;
 
     Status Initialize() override;
 
@@ -57,13 +57,13 @@ class MedianNeon : public MedianImpl
 public:
     MedianNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize) override;
 
     Status Run() override;
 };
 
 template<typename Tp>
-AURA_ALWAYS_INLINE AURA_VOID MinMaxOp(Tp &a, Tp &b)
+AURA_ALWAYS_INLINE DT_VOID MinMaxOp(Tp &a, Tp &b)
 {
     Tp t = a;
     a = neon::vmin(t, b);
@@ -80,7 +80,7 @@ class MedianCL : public MedianImpl
 {
 public:
     MedianCL(Context *ctx, const OpTarget &target);
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize) override;
 
     Status Initialize() override;
 
@@ -90,7 +90,7 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
@@ -107,7 +107,7 @@ class MedianHvx : public MedianImpl
 public:
     MedianHvx(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize) override;
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize) override;
 
     Status Run() override;
 
@@ -122,32 +122,32 @@ Status Median3x3Hvx(Context *ctx, const Mat &src, Mat &dst);
 Status Median5x5Hvx(Context *ctx, const Mat &src, Mat &dst);
 Status Median7x7Hvx(Context *ctx, const Mat &src, Mat &dst);
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID VectorMinMax(HVX_Vector &v_src0, HVX_Vector &v_src1)
+template <typename St, typename std::enable_if<std::is_same<St, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID VectorMinMax(HVX_Vector &v_src0, HVX_Vector &v_src1)
 {
     return Q6_vminmax_VubVub(v_src0, v_src1);
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_S8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID VectorMinMax(HVX_Vector &v_src0, HVX_Vector &v_src1)
+template <typename St, typename std::enable_if<std::is_same<St, DT_S8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID VectorMinMax(HVX_Vector &v_src0, HVX_Vector &v_src1)
 {
     return Q6_vminmax_VbVb(v_src0, v_src1);
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID VectorMinMax(HVX_Vector &v_src0, HVX_Vector &v_src1)
+template <typename St, typename std::enable_if<std::is_same<St, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID VectorMinMax(HVX_Vector &v_src0, HVX_Vector &v_src1)
 {
     return Q6_vminmax_VuhVuh(v_src0, v_src1);
 }
 
-template <typename St, typename std::enable_if<std::is_same<St, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID VectorMinMax(HVX_Vector &v_src0, HVX_Vector &v_src1)
+template <typename St, typename std::enable_if<std::is_same<St, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID VectorMinMax(HVX_Vector &v_src0, HVX_Vector &v_src1)
 {
     return Q6_vminmax_VhVh(v_src0, v_src1);
 }
 #  endif // AURA_BUILD_HEXAGON
 
-using MedianInParam = HexagonRpcParamType<Mat, Mat, MI_S32>;
+using MedianInParam = HexagonRpcParamType<Mat, Mat, DT_S32>;
 
 #  define AURA_OPS_FILTER_MEDIAN_OP_NAME          "Median"
 

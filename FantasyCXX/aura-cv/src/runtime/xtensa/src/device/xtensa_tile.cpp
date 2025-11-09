@@ -10,18 +10,18 @@ namespace aura
 namespace xtensa
 {
 
-static xi_tile* GetXiTile(AURA_VOID *src)
+static xi_tile* GetXiTile(DT_VOID *src)
 {
     if (NULL == src)
     {
         AURA_XTENSA_LOG("src is null\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (sizeof(xvTile) != sizeof(xi_tile))
     {
         AURA_XTENSA_LOG("sizeof(xvTile) != sizeof(xi_tile)\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return static_cast<xi_tile*>(src);
@@ -29,16 +29,16 @@ static xi_tile* GetXiTile(AURA_VOID *src)
 
 static xi_frame* GetXiFrame(xvFrame *src)
 {
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_XTENSA_LOG("src is null\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (sizeof(xvFrame) != sizeof(xi_frame))
     {
         AURA_XTENSA_LOG("sizeof(xvFrame) != sizeof(xi_frame)\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return reinterpret_cast<xi_frame*>(src);
@@ -46,33 +46,33 @@ static xi_frame* GetXiFrame(xvFrame *src)
 
 static xvFrame* GetxvFrame(FrameWrapper *src)
 {
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_XTENSA_LOG("src is null\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (!(src->IsValid()))
     {
         AURA_XTENSA_LOG("frame is invalid\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (sizeof(xvFrame) != sizeof(FrameWrapper))
     {
         AURA_XTENSA_LOG("sizeof(xvFrame) != sizeof(FrameWrapper)\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return reinterpret_cast<xvFrame*>(src);
 }
 
 //============================ TileWrapper ============================
-TileWrapper::TileWrapper() : m_flag(MI_FALSE), m_data(MI_NULL), m_elem_type(ElemType::INVALID), m_channel(0)
+TileWrapper::TileWrapper() : m_flag(DT_FALSE), m_data(DT_NULL), m_elem_type(ElemType::INVALID), m_channel(0)
 {}
 
-TileWrapper::TileWrapper(AURA_VOID *data, ElemType elem_type, MI_S32 channel)
-                         : m_flag(MI_FALSE), m_data(data), m_elem_type(elem_type), m_channel(channel)
+TileWrapper::TileWrapper(DT_VOID *data, ElemType elem_type, DT_S32 channel)
+                         : m_flag(DT_FALSE), m_data(data), m_elem_type(elem_type), m_channel(channel)
 {}
 
 TileWrapper::TileWrapper(const TileWrapper &tile)
@@ -84,12 +84,12 @@ TileWrapper::TileWrapper(const TileWrapper &tile)
     Memcpy(&m_desc, &tile.m_desc, sizeof(TileDesc));
 }
 
-MI_BOOL TileWrapper::IsValid() const
+DT_BOOL TileWrapper::IsValid() const
 {
-    return ((m_data != MI_NULL) && (m_elem_type != ElemType::INVALID) && (m_channel > 0));
+    return ((m_data != DT_NULL) && (m_elem_type != ElemType::INVALID) && (m_channel > 0));
 }
 
-Status TileWrapper::Update(MI_S32 x, MI_S32 y, MI_S32 width, MI_S32 height, aura::Sizes &edge_size)
+Status TileWrapper::Update(DT_S32 x, DT_S32 y, DT_S32 width, DT_S32 height, aura::Sizes &edge_size)
 {
     xvTile *xv_tile = static_cast<xvTile*>(m_data);
     if (NULL == xv_tile)
@@ -110,16 +110,16 @@ Status TileWrapper::Update(MI_S32 x, MI_S32 y, MI_S32 width, MI_S32 height, aura
     return Status::OK;
 }
 
-MI_S32 TileWrapper::GetXvTileType()
+DT_S32 TileWrapper::GetXvTileType()
 {
     struct Info
     {
-        MI_S32   ch;
+        DT_S32   ch;
         ElemType elem_type;
-        MI_S32   type;
+        DT_S32   type;
     };
 
-    MI_S32 type = -1;
+    DT_S32 type = -1;
     const Info type_map[] =
     {
         {1,  ElemType::U8,            XV_U8},
@@ -139,19 +139,19 @@ MI_S32 TileWrapper::GetXvTileType()
         {4, ElemType::U32, XV_TILE_RGBA_U32},
     };
 
-    MI_S32 size = sizeof(type_map) / sizeof(type_map[0]);
-    for (MI_S32 i = 0; i < size; i++)
+    DT_S32 size = sizeof(type_map) / sizeof(type_map[0]);
+    for (DT_S32 i = 0; i < size; i++)
     {
         if (type_map[i].ch == m_channel && type_map[i].elem_type == m_elem_type)
         {
-            type = (MI_S32)(type_map[i].type);
+            type = (DT_S32)(type_map[i].type);
         }
     }
 
     return type;
 }
 
-Status TileWrapper::Register(TileManager tm, AURA_VOID *buffer, FrameWrapper &frame, MI_U32 in_or_out, MI_S32 flag)
+Status TileWrapper::Register(TileManager tm, DT_VOID *buffer, FrameWrapper &frame, DT_U32 in_or_out, DT_S32 flag)
 {
     xvTile *xv_tile = static_cast<xvTile*>(m_data);
     if (NULL == xv_tile)
@@ -168,7 +168,7 @@ Status TileWrapper::Register(TileManager tm, AURA_VOID *buffer, FrameWrapper &fr
 
     if (0 == flag)
     {
-        MI_S32 tile_type = GetXvTileType();
+        DT_S32 tile_type = GetXvTileType();
         if (-1 == tile_type)
         {
             AURA_XTENSA_LOG("tile type is not exist\n");
@@ -176,7 +176,7 @@ Status TileWrapper::Register(TileManager tm, AURA_VOID *buffer, FrameWrapper &fr
         }
 
         xv_tile->type = tile_type;
-        MI_S32 ret = xvRegisterTile(static_cast<xvTileManager*>(tm), xv_tile, buffer, GetxvFrame(&frame), in_or_out);
+        DT_S32 ret = xvRegisterTile(static_cast<xvTileManager*>(tm), xv_tile, buffer, GetxvFrame(&frame), in_or_out);
         if (ret != AURA_XTENSA_OK)
         {
             AURA_XTENSA_LOG("xvRegisterTile failed\n");
@@ -201,12 +201,12 @@ TileWrapper& TileWrapper::operator=(const TileWrapper &tile)
     return *this;
 }
 
-AURA_VOID* TileWrapper::GetData()
+DT_VOID* TileWrapper::GetData()
 {
     return m_data;
 }
 
-const AURA_VOID* TileWrapper::GetData() const
+const DT_VOID* TileWrapper::GetData() const
 {
     return m_data;
 }
@@ -216,7 +216,7 @@ ElemType TileWrapper::GetElemType() const
     return m_elem_type;
 }
 
-MI_S32 TileWrapper::GetChannel() const
+DT_S32 TileWrapper::GetChannel() const
 {
     return m_channel;
 }
@@ -230,13 +230,13 @@ Status TileWrapper::Pad(BorderType border_type, Scalar &border_value) const
     }
 
     xi_tile *tile = GetXiTile(m_data);
-    if (MI_NULL == tile)
+    if (DT_NULL == tile)
     {
         AURA_XTENSA_LOG("GetXiTile failed\n");
         return Status::ERROR;
     }
 
-    MI_S32 ret = TilePadding(tile, static_cast<MI_S32>(border_type), border_value.m_val[0]);
+    DT_S32 ret = TilePadding(tile, static_cast<DT_S32>(border_type), border_value.m_val[0]);
     if (ret != XVF_SUCCESS)
     {
         AURA_XTENSA_LOG("TilePadding failed\n");
@@ -255,7 +255,7 @@ Status TileWrapper::Reset(aura::Sizes &extra_size, aura::Sizes &edge_size) const
     }
 
     xvTile *xv_tile = static_cast<xvTile*>(m_data);
-    if (MI_NULL == xv_tile)
+    if (DT_NULL == xv_tile)
     {
         AURA_XTENSA_LOG("xv_tile is null\n");
         return Status::ERROR;
@@ -271,14 +271,14 @@ Status TileWrapper::Reset(aura::Sizes &extra_size, aura::Sizes &edge_size) const
     xi_tile *tile       = GetXiTile(m_data);
     xi_frame *frame     = GetXiFrame(xv_tile->pFrame);
 
-    if ((MI_NULL == tile) || (MI_NULL == tile_info) || (MI_NULL == frame))
+    if ((DT_NULL == tile) || (DT_NULL == tile_info) || (DT_NULL == frame))
     {
         AURA_XTENSA_LOG("tile/tile_info/frame is null\n");
         return Status::ERROR;
     }
 
-    MI_S32 flags = GetEdgeFlags(tile, frame);
-    MI_S32 ret   = TileResetting(tile, tile_info, extra_size.m_width, extra_size.m_height,
+    DT_S32 flags = GetEdgeFlags(tile, frame);
+    DT_S32 ret   = TileResetting(tile, tile_info, extra_size.m_width, extra_size.m_height,
                                  edge_size.m_width, edge_size.m_height, flags);
     if (ret != XVF_SUCCESS)
     {
@@ -308,15 +308,15 @@ Status TileWrapper::Extract()
         TileInfo *tile_info = reinterpret_cast<TileInfo*>(const_cast<TileDesc*>(&m_desc));
         xi_tile *tile       = GetXiTile(m_data);
 
-        if ((MI_NULL == tile) || (MI_NULL == tile_info))
+        if ((DT_NULL == tile) || (DT_NULL == tile_info))
         {
             AURA_XTENSA_LOG("tile/tile_info is null\n");
             return Status::ERROR;
         }
 
-        ExtractTileInfo(tile_info, tile, static_cast<MI_S32>(m_elem_type));
+        ExtractTileInfo(tile_info, tile, static_cast<DT_S32>(m_elem_type));
 
-        m_flag = MI_TRUE;
+        m_flag = DT_TRUE;
     }
 
     return Status::OK;
@@ -339,7 +339,7 @@ Status TileWrapper::Restore()
     TileInfo *tile_info = reinterpret_cast<TileInfo*>(const_cast<TileDesc*>(&m_desc));
     xi_tile *tile       = GetXiTile(m_data);
 
-    if ((MI_NULL == tile) || (MI_NULL == tile_info))
+    if ((DT_NULL == tile) || (DT_NULL == tile_info))
     {
         AURA_XTENSA_LOG("tile/tile_info is null\n");
         return Status::ERROR;
@@ -347,7 +347,7 @@ Status TileWrapper::Restore()
 
     TileResetToOrigin(tile, tile_info);
 
-    m_flag = MI_FALSE;
+    m_flag = DT_FALSE;
 
     return Status::OK;
 }

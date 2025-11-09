@@ -69,9 +69,9 @@ public:
               std::shared_ptr<cl::Device> &cl_device,
               std::shared_ptr<cl::Context> &cl_context,
               const std::string &name,
-              std::vector<std::vector<MI_UCHAR> > binaries_vecs,
+              std::vector<std::vector<DT_UCHAR> > binaries_vecs,
               const std::string &build_options,
-              MI_U32 crc_val,
+              DT_U32 crc_val,
               CLProgramType cl_type);
 
     ~CLProgram();
@@ -85,7 +85,7 @@ public:
     std::string                  m_build_options;
     std::shared_ptr<cl::Program> m_cl_program;
     CLProgramType                m_cl_type;
-    MI_U32                       m_crc_val;
+    DT_U32                       m_crc_val;
     CLProgramBuildStatus         m_cl_build_status;
 
 private:

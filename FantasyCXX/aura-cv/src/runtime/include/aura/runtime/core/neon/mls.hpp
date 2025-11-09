@@ -37,16 +37,16 @@ DECLFUN(float32x4_t, float32x4_t, vmlsq, f32)
         return prefix##_##postfix(v, u, p);                            \
     }
 
-DECLFUN(uint16x4_t,  uint16x4_t,  MI_U16,  vmls_n,  u16)
-DECLFUN(uint16x8_t,  uint16x8_t,  MI_U16,  vmlsq_n, u16)
-DECLFUN(int16x4_t,   int16x4_t,   MI_S16,  vmls_n,  s16)
-DECLFUN(int16x8_t,   int16x8_t,   MI_S16,  vmlsq_n, s16)
-DECLFUN(uint32x2_t,  uint32x2_t,  MI_U32,  vmls_n,  u32)
-DECLFUN(uint32x4_t,  uint32x4_t,  MI_U32,  vmlsq_n, u32)
-DECLFUN(int32x2_t,   int32x2_t,   MI_S32,  vmls_n,  s32)
-DECLFUN(int32x4_t,   int32x4_t,   MI_S32,  vmlsq_n, s32)
-DECLFUN(float32x2_t, float32x2_t, MI_F32,  vmls_n,  f32)
-DECLFUN(float32x4_t, float32x4_t, MI_F32,  vmlsq_n, f32)
+DECLFUN(uint16x4_t,  uint16x4_t,  DT_U16,  vmls_n,  u16)
+DECLFUN(uint16x8_t,  uint16x8_t,  DT_U16,  vmlsq_n, u16)
+DECLFUN(int16x4_t,   int16x4_t,   DT_S16,  vmls_n,  s16)
+DECLFUN(int16x8_t,   int16x8_t,   DT_S16,  vmlsq_n, s16)
+DECLFUN(uint32x2_t,  uint32x2_t,  DT_U32,  vmls_n,  u32)
+DECLFUN(uint32x4_t,  uint32x4_t,  DT_U32,  vmlsq_n, u32)
+DECLFUN(int32x2_t,   int32x2_t,   DT_S32,  vmls_n,  s32)
+DECLFUN(int32x4_t,   int32x4_t,   DT_S32,  vmlsq_n, s32)
+DECLFUN(float32x2_t, float32x2_t, DT_F32,  vmls_n,  f32)
+DECLFUN(float32x4_t, float32x4_t, DT_F32,  vmlsq_n, f32)
 #undef DECLFUN
 
 #define DECLFUN(dtype, vtype, prefix, postfix)                         \
@@ -69,10 +69,10 @@ DECLFUN(int64x2_t,   int32x2_t,   vmlsl,  s32)
         return prefix##_##postfix(v, u, p);                            \
     }
 
-DECLFUN(uint32x4_t,  uint16x4_t, MI_U16,  vmlsl_n,  u16)
-DECLFUN(int32x4_t,   int16x4_t,  MI_S16,  vmlsl_n,  s16)
-DECLFUN(uint64x2_t,  uint32x2_t, MI_U32,  vmlsl_n,  u32)
-DECLFUN(int64x2_t,   int32x2_t,  MI_S32,  vmlsl_n,  s32)
+DECLFUN(uint32x4_t,  uint16x4_t, DT_U16,  vmlsl_n,  u16)
+DECLFUN(int32x4_t,   int16x4_t,  DT_S16,  vmlsl_n,  s16)
+DECLFUN(uint64x2_t,  uint32x2_t, DT_U32,  vmlsl_n,  u32)
+DECLFUN(int64x2_t,   int32x2_t,  DT_S32,  vmlsl_n,  s32)
 #undef DECLFUN
 
 } // namespace neon

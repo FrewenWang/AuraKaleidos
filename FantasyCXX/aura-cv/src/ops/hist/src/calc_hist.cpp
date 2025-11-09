@@ -38,15 +38,15 @@ static std::shared_ptr<CalcHistImpl> CreateCalcHistImpl(Context *ctx, const OpTa
 CalcHist::CalcHist(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status CalcHist::SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &hist, MI_S32 hist_size, 
-                         const Scalar &ranges, const Array *mask, MI_BOOL accumulate)
+Status CalcHist::SetArgs(const Array *src, DT_S32 channel, std::vector<DT_U32> &hist, DT_S32 hist_size, 
+                         const Scalar &ranges, const Array *mask, DT_BOOL accumulate)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src))
+    if ((DT_NULL == src))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -74,14 +74,14 @@ Status CalcHist::SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateCalcHistImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     CalcHistImpl *calc_hist_impl = dynamic_cast<CalcHistImpl *>(m_impl.get());
-    if (MI_NULL == calc_hist_impl)
+    if (DT_NULL == calc_hist_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "calc_hist_impl is null ptr");
         return Status::ERROR;
@@ -92,8 +92,8 @@ Status CalcHist::SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status ICalcHist(Context *ctx, const Mat &src, MI_S32 channel, std::vector<MI_U32> &hist, MI_S32 hist_size,
-                              const Scalar &ranges, const Mat &mask, MI_BOOL accumulate, const OpTarget &target)
+AURA_EXPORTS Status ICalcHist(Context *ctx, const Mat &src, DT_S32 channel, std::vector<DT_U32> &hist, DT_S32 hist_size,
+                              const Scalar &ranges, const Mat &mask, DT_BOOL accumulate, const OpTarget &target)
 {
     CalcHist calchist(ctx, target);
 
@@ -101,16 +101,16 @@ AURA_EXPORTS Status ICalcHist(Context *ctx, const Mat &src, MI_S32 channel, std:
 }
 
 CalcHistImpl::CalcHistImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "CalcHist", target),
-                                                                   m_channel(0), m_hist_size(0), m_accumulate(MI_FALSE),
-                                                                   m_src(MI_NULL), m_mask(MI_NULL), m_hist(MI_NULL)
+                                                                   m_channel(0), m_hist_size(0), m_accumulate(DT_FALSE),
+                                                                   m_src(DT_NULL), m_mask(DT_NULL), m_hist(DT_NULL)
 {}
 
-Status CalcHistImpl::SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &hist, MI_S32 hist_size, 
-                             const Scalar &ranges, const Array *mask, MI_BOOL accumulate)
+Status CalcHistImpl::SetArgs(const Array *src, DT_S32 channel, std::vector<DT_U32> &hist, DT_S32 hist_size, 
+                             const Scalar &ranges, const Array *mask, DT_BOOL accumulate)
 {
     Status ret = Status::ERROR;
 
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return ret;
     }
@@ -127,7 +127,7 @@ Status CalcHistImpl::SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U3
         return ret;
     }
 
-    if (hist.size() < (MI_U32)hist_size)
+    if (hist.size() < (DT_U32)hist_size)
     {
         hist.resize(hist_size);
     }
@@ -175,7 +175,7 @@ std::string CalcHistImpl::ToString() const
     return str;
 }
 
-AURA_VOID CalcHistImpl::Dump(const std::string &prefix) const
+DT_VOID CalcHistImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -185,7 +185,7 @@ AURA_VOID CalcHistImpl::Dump(const std::string &prefix) const
         return;
     }
 
-    if (json_wrapper.SetArray("mask", m_mask, MI_FALSE) != Status::OK)
+    if (json_wrapper.SetArray("mask", m_mask, DT_FALSE) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "SetArray src failed");
         return;

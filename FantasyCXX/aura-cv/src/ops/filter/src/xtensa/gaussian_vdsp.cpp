@@ -5,25 +5,25 @@ namespace aura
 namespace xtensa
 {
 
-AURA_INLINE Status GetGaussianKmat(xvTileManager *xv_tm, MI_S32 ksize, const vector<MI_F32> &in_kernel, AURA_VOID *&out_kernel)
+AURA_INLINE Status GetGaussianKmat(xvTileManager *xv_tm, DT_S32 ksize, const vector<DT_F32> &in_kernel, DT_VOID *&out_kernel)
 {
-    out_kernel = xvAllocateBuffer(xv_tm, ksize * sizeof(MI_F32), XV_MEM_BANK_COLOR_ANY, 128);
-    if (MI_NULL == out_kernel)
+    out_kernel = xvAllocateBuffer(xv_tm, ksize * sizeof(DT_F32), XV_MEM_BANK_COLOR_ANY, 128);
+    if (DT_NULL == out_kernel)
     {
         AURA_XTENSA_LOG("xvAllocateBuffer failed");
         return Status::ERROR;
     }
 
-    Memcpy(out_kernel, in_kernel.data(), ksize * sizeof(MI_F32));
+    Memcpy(out_kernel, in_kernel.data(), ksize * sizeof(DT_F32));
 
     return Status::OK;
 }
 
-template <typename Tp, MI_U32 Q>
-AURA_INLINE Status GetGaussianKmat(xvTileManager *xv_tm, MI_S32 ksize, const vector<MI_F32> &in_kernel, AURA_VOID *&out_kernel)
+template <typename Tp, DT_U32 Q>
+AURA_INLINE Status GetGaussianKmat(xvTileManager *xv_tm, DT_S32 ksize, const vector<DT_F32> &in_kernel, DT_VOID *&out_kernel)
 {
     out_kernel = xvAllocateBuffer(xv_tm, ksize * sizeof(Tp), XV_MEM_BANK_COLOR_ANY, 128);
-    if (MI_NULL == out_kernel)
+    if (DT_NULL == out_kernel)
     {
         AURA_XTENSA_LOG("xvAllocateBuffer failed");
         return Status::ERROR;
@@ -31,14 +31,14 @@ AURA_INLINE Status GetGaussianKmat(xvTileManager *xv_tm, MI_S32 ksize, const vec
 
     Tp *ker_row = static_cast<Tp*>(out_kernel);
 
-    MI_S32 sum = 0;
-    MI_F32 err = 0.f;
+    DT_S32 sum = 0;
+    DT_F32 err = 0.f;
 
-    for (MI_S32 i = 0; i < ksize / 2; i++)
+    for (DT_S32 i = 0; i < ksize / 2; i++)
     {
-        MI_F32 quan_kernel     = in_kernel[i] * (1 << Q) + err;
+        DT_F32 quan_kernel     = in_kernel[i] * (1 << Q) + err;
         Tp result              = static_cast<Tp>(quan_kernel + 0.5);
-        err                    = quan_kernel - (MI_F32)result;
+        err                    = quan_kernel - (DT_F32)result;
         ker_row[i]             = result;
         ker_row[ksize - 1 - i] = result;
         sum += result;
@@ -55,7 +55,7 @@ GaussianVdsp::GaussianVdsp(TileManager tm, ExecuteMode mode) : VdspOp(tm, mode)
     do
     {
         xvTileManager *xv_tm = static_cast<xvTileManager*>(m_tm);
-        if (MI_NULL == xv_tm)
+        if (DT_NULL == xv_tm)
         {
             AURA_XTENSA_LOG("xv_tm is null ptr");
             break;
@@ -63,15 +63,15 @@ GaussianVdsp::GaussianVdsp(TileManager tm, ExecuteMode mode) : VdspOp(tm, mode)
 
         if (ExecuteMode::TILE == m_mode)
         {
-            AURA_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(GaussianTile), XV_MEM_BANK_COLOR_ANY, 128);
-            if (MI_NULL == buffer)
+            DT_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(GaussianTile), XV_MEM_BANK_COLOR_ANY, 128);
+            if (DT_NULL == buffer)
             {
                 AURA_XTENSA_LOG("xvAllocateBuffer error");
                 break;
             }
 
             m_impl = new(buffer) GaussianTile(tm);
-            if (MI_NULL == m_impl)
+            if (DT_NULL == m_impl)
             {
                 AURA_XTENSA_LOG("m_impl is null ptr");
                 break;
@@ -79,15 +79,15 @@ GaussianVdsp::GaussianVdsp(TileManager tm, ExecuteMode mode) : VdspOp(tm, mode)
         }
         else if (ExecuteMode::FRAME == m_mode)
         {
-            AURA_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(GaussianFrame), XV_MEM_BANK_COLOR_ANY, 128);
-            if (MI_NULL == buffer)
+            DT_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(GaussianFrame), XV_MEM_BANK_COLOR_ANY, 128);
+            if (DT_NULL == buffer)
             {
                 AURA_XTENSA_LOG("xvAllocateBuffer error");
                 break;
             }
 
             m_impl = new(buffer) GaussianFrame(tm);
-            if (MI_NULL == m_impl)
+            if (DT_NULL == m_impl)
             {
                 AURA_XTENSA_LOG("m_impl is null ptr");
                 break;
@@ -101,9 +101,9 @@ GaussianVdsp::GaussianVdsp(TileManager tm, ExecuteMode mode) : VdspOp(tm, mode)
     } while(0);
 }
 
-Status GaussianVdsp::SetArgs(const Mat *src, Mat *dst, MI_S32 ksize, MI_F32 sigma, BorderType border_type, const Scalar &border_value)
+Status GaussianVdsp::SetArgs(const Mat *src, Mat *dst, DT_S32 ksize, DT_F32 sigma, BorderType border_type, const Scalar &border_value)
 {
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_XTENSA_LOG("src/dst is null ptr");
         return Status::ERROR;
@@ -112,7 +112,7 @@ Status GaussianVdsp::SetArgs(const Mat *src, Mat *dst, MI_S32 ksize, MI_F32 sigm
     if (ExecuteMode::FRAME == m_mode)
     {
         GaussianFrame *impl = static_cast<GaussianFrame*>(m_impl);
-        if (MI_NULL == impl)
+        if (DT_NULL == impl)
         {
             AURA_XTENSA_LOG("impl is null ptr");
             return Status::ERROR;
@@ -127,12 +127,12 @@ Status GaussianVdsp::SetArgs(const Mat *src, Mat *dst, MI_S32 ksize, MI_F32 sigm
     }
 }
 
-Status GaussianVdsp::SetArgs(const TileWrapper *src, TileWrapper *dst, MI_S32 ksize, MI_F32 sigma)
+Status GaussianVdsp::SetArgs(const TileWrapper *src, TileWrapper *dst, DT_S32 ksize, DT_F32 sigma)
 {
     if (ExecuteMode::TILE == m_mode)
     {
         GaussianTile *impl = static_cast<GaussianTile*>(m_impl);
-        if (MI_NULL == impl)
+        if (DT_NULL == impl)
         {
             AURA_XTENSA_LOG("impl is null ptr");
             return Status::ERROR;
@@ -151,12 +151,12 @@ AURA_VDSP_OP_CPP(Gaussian)
 
 //============================ GaussianTile ============================
 GaussianTile::GaussianTile(TileManager tm) : VdspOpTile(tm), m_ksize(0), m_sigma(0.f), m_elem_type(ElemType::INVALID), m_channel(0),
-                                             m_xv_src_tile(MI_NULL), m_xv_dst_tile(MI_NULL), m_kernel(MI_NULL)
+                                             m_xv_src_tile(DT_NULL), m_xv_dst_tile(DT_NULL), m_kernel(DT_NULL)
 {}
 
-Status GaussianTile::SetArgs(const TileWrapper *src, TileWrapper *dst, MI_S32 ksize, MI_F32 sigma)
+Status GaussianTile::SetArgs(const TileWrapper *src, TileWrapper *dst, DT_S32 ksize, DT_F32 sigma)
 {
-    if (MI_FALSE == m_flag)
+    if (DT_FALSE == m_flag)
     {
         if (src->GetElemType() != dst->GetElemType())
         {
@@ -197,7 +197,7 @@ Status GaussianTile::SetArgs(const TileWrapper *src, TileWrapper *dst, MI_S32 ks
         m_xv_src_tile = src;
         m_xv_dst_tile = dst;
 
-        m_flag = MI_TRUE;
+        m_flag = DT_TRUE;
     }
     else
     {
@@ -211,7 +211,7 @@ Status GaussianTile::SetArgs(const TileWrapper *src, TileWrapper *dst, MI_S32 ks
 Status GaussianTile::PrepareKmat()
 {
     xvTileManager *xv_tm = static_cast<xvTileManager*>(m_tm);
-    if (MI_NULL == xv_tm)
+    if (DT_NULL == xv_tm)
     {
         AURA_XTENSA_LOG("xv_tm is null ptr");
         return Status::ERROR;
@@ -219,11 +219,11 @@ Status GaussianTile::PrepareKmat()
 
     Status ret = Status::ERROR;
 
-    vector<MI_F32> kernel(m_ksize, 0);
+    vector<DT_F32> kernel(m_ksize, 0);
     kernel = GetGaussianKernel(m_ksize, m_sigma);
 
 #define GET_GAUSSIAN_KMAT(type)                                                             \
-    constexpr MI_U32 Q = GaussianTraits<type>::Q;                                           \
+    constexpr DT_U32 Q = GaussianTraits<type>::Q;                                           \
                                                                                             \
     ret = GetGaussianKmat<type, Q>(xv_tm, m_ksize, kernel, m_kernel);                       \
 
@@ -231,31 +231,31 @@ Status GaussianTile::PrepareKmat()
     {
         case ElemType::U8:
         {
-            GET_GAUSSIAN_KMAT(MI_U8)
+            GET_GAUSSIAN_KMAT(DT_U8)
             break;
         }
 
         case ElemType::U16:
         {
-            GET_GAUSSIAN_KMAT(MI_U16)
+            GET_GAUSSIAN_KMAT(DT_U16)
             break;
         }
 
         case ElemType::S16:
         {
-            GET_GAUSSIAN_KMAT(MI_S16)
+            GET_GAUSSIAN_KMAT(DT_S16)
             break;
         }
 
         case ElemType::U32:
         {
-            GET_GAUSSIAN_KMAT(MI_U32)
+            GET_GAUSSIAN_KMAT(DT_U32)
             break;
         }
 
         case ElemType::S32:
         {
-            GET_GAUSSIAN_KMAT(MI_S32)
+            GET_GAUSSIAN_KMAT(DT_S32)
             break;
         }
 
@@ -279,7 +279,7 @@ Status GaussianTile::PrepareKmat()
 
 Status GaussianTile::Initialize()
 {
-    if (MI_NULL == m_kernel)
+    if (DT_NULL == m_kernel)
     {
         // Prepare kmat
         if (PrepareKmat() != Status::OK)
@@ -298,26 +298,26 @@ Status GaussianTile::DeInitialize()
     m_sigma       = 0.f;
     m_elem_type   = ElemType::INVALID;
     m_channel     = 0;
-    m_xv_src_tile = MI_NULL;
-    m_xv_dst_tile = MI_NULL;
-    m_kernel      = MI_NULL;
+    m_xv_src_tile = DT_NULL;
+    m_xv_dst_tile = DT_NULL;
+    m_kernel      = DT_NULL;
 
     return Status::OK;
 }
 
 Status GaussianTile::Run()
 {
-    if (MI_NULL == m_xv_src_tile || MI_NULL == m_xv_dst_tile)
+    if (DT_NULL == m_xv_src_tile || DT_NULL == m_xv_dst_tile)
     {
         AURA_XTENSA_LOG("xv_src_tile/xv_dst_tile is null ptr");
         return Status::ERROR;
     }
 
-    MI_S32 ret = AURA_XTENSA_ERROR;
+    DT_S32 ret = AURA_XTENSA_ERROR;
 
     const xvTile *xv_src = static_cast<const xvTile*>(m_xv_src_tile->GetData());
     xvTile *xv_dst = static_cast<xvTile*>(m_xv_dst_tile->GetData());
-    if (xv_src == MI_NULL || xv_dst == MI_NULL)
+    if (xv_src == DT_NULL || xv_dst == DT_NULL)
     {
         AURA_XTENSA_LOG("xv_src_tile/xv_dst_tile data is null ptr");
         return Status::ERROR;
@@ -342,26 +342,26 @@ Status GaussianTile::Run()
 }
 
 //============================ GaussianFrame ============================
-GaussianFrame::GaussianFrame(TileManager tm) : VdspOpFrame(tm, 2), m_ksize(0), m_sigma(0.f), m_gaussian_tile(MI_NULL)
+GaussianFrame::GaussianFrame(TileManager tm) : VdspOpFrame(tm, 2), m_ksize(0), m_sigma(0.f), m_gaussian_tile(DT_NULL)
 {
     do
     {
         xvTileManager *xv_tm = static_cast<xvTileManager*>(m_tm);
-        if (MI_NULL == xv_tm)
+        if (DT_NULL == xv_tm)
         {
             AURA_XTENSA_LOG("xv_tm is null ptr");
             break;
         }
 
-        AURA_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(GaussianTile), XV_MEM_BANK_COLOR_ANY, 128);
-        if (MI_NULL == buffer)
+        DT_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(GaussianTile), XV_MEM_BANK_COLOR_ANY, 128);
+        if (DT_NULL == buffer)
         {
             AURA_XTENSA_LOG("xvAllocateBuffer failed");
             break;
         }
 
         m_gaussian_tile = new (buffer) GaussianTile(m_tm);
-        if (MI_NULL == m_gaussian_tile)
+        if (DT_NULL == m_gaussian_tile)
         {
             AURA_XTENSA_LOG("m_gaussian_tile is null ptr");
             break;
@@ -369,10 +369,10 @@ GaussianFrame::GaussianFrame(TileManager tm) : VdspOpFrame(tm, 2), m_ksize(0), m
     } while(0);
 }
 
-Status GaussianFrame::SetArgs(const Mat *src, Mat *dst, MI_S32 ksize, MI_F32 sigma, BorderType border_type, const Scalar &border_value)
+Status GaussianFrame::SetArgs(const Mat *src, Mat *dst, DT_S32 ksize, DT_F32 sigma, BorderType border_type, const Scalar &border_value)
 {
     xvTileManager *xv_tm = static_cast<xvTileManager*>(m_tm);
-    if (MI_NULL == xv_tm)
+    if (DT_NULL == xv_tm)
     {
         AURA_XTENSA_LOG("xv_tm is null ptr");
         return Status::ERROR;
@@ -402,7 +402,7 @@ Status GaussianFrame::SetArgs(const Mat *src, Mat *dst, MI_S32 ksize, MI_F32 sig
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1)
     {
         AURA_XTENSA_LOG("channel only support 1");
@@ -448,10 +448,10 @@ Status GaussianFrame::SetArgs(const Mat *src, Mat *dst, MI_S32 ksize, MI_F32 sig
 
 Status GaussianFrame::DeInitialize()
 {
-    if (m_gaussian_tile != MI_NULL)
+    if (m_gaussian_tile != DT_NULL)
     {
         m_gaussian_tile->DeInitialize();
-        m_gaussian_tile = MI_NULL;
+        m_gaussian_tile = DT_NULL;
     }
 
     m_ksize     = 0;
@@ -464,9 +464,9 @@ Status GaussianFrame::DeInitialize()
     return Status::OK;
 }
 
-AURA_VOID GaussianFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AURA_VOID *obj, AURA_VOID *tiles, MI_S32 flag)
+DT_VOID GaussianFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, DT_VOID *obj, DT_VOID *tiles, DT_S32 flag)
 {
-    if ((MI_NULL == xv_tm) || (MI_NULL == obj) || (MI_NULL == tiles))
+    if ((DT_NULL == xv_tm) || (DT_NULL == obj) || (DT_NULL == tiles))
     {
         AURA_XTENSA_LOG("xv_tm/obj/tiles is null ptr!");
         return;
@@ -480,13 +480,13 @@ AURA_VOID GaussianFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
 
     RefTileWrapper *ref_tile      = reinterpret_cast<RefTileWrapper*>(xv_ref_tile);
     GaussianFrame *gaussian_frame = static_cast<GaussianFrame*>(obj);
-    if ((MI_NULL == ref_tile) || (MI_NULL == gaussian_frame))
+    if ((DT_NULL == ref_tile) || (DT_NULL == gaussian_frame))
     {
         AURA_XTENSA_LOG("ref_tile/gaussian_frame is null ptr");
         return;
     }
 
-    MI_S32 tile_num = gaussian_frame->m_tile_num;
+    DT_S32 tile_num = gaussian_frame->m_tile_num;
     if ((gaussian_frame->m_frames.size() != tile_num) || (gaussian_frame->m_elem_types.size() != tile_num) || (gaussian_frame->m_channels.size() != tile_num))
     {
         AURA_XTENSA_LOG("frames/elem_types/channels size is not equal to m_tile_num\n");
@@ -494,13 +494,13 @@ AURA_VOID GaussianFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
     }
 
     Status ret       = Status::ERROR;
-    MI_S32 src_sizes = gaussian_frame->m_src_sizes;
-    MI_S32 dst_sizes = gaussian_frame->m_dst_sizes;
+    DT_S32 src_sizes = gaussian_frame->m_src_sizes;
+    DT_S32 dst_sizes = gaussian_frame->m_dst_sizes;
     xvTile *xv_tiles = static_cast<xvTile*>(tiles);
 
-    for (MI_S32 i = 0; i < src_sizes; i++)
+    for (DT_S32 i = 0; i < src_sizes; i++)
     {
-        TileWrapper tile_src(static_cast<AURA_VOID*>(xv_tiles + i), (gaussian_frame->m_elem_types)[i], (gaussian_frame->m_channels)[i]);
+        TileWrapper tile_src(static_cast<DT_VOID*>(xv_tiles + i), (gaussian_frame->m_elem_types)[i], (gaussian_frame->m_channels)[i]);
         Sizes sizes(gaussian_frame->m_ksize / 2, gaussian_frame->m_ksize / 2);
         ret = tile_src.Update(ref_tile->x, ref_tile->y, ref_tile->tile_width, ref_tile->tile_height, sizes);
         if (ret != Status::OK)
@@ -509,7 +509,7 @@ AURA_VOID GaussianFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
             return;
         }
 
-        ret = tile_src.Register(xv_tm, MI_NULL, gaussian_frame->m_frames[i], XV_INPUT_TILE, flag);
+        ret = tile_src.Register(xv_tm, DT_NULL, gaussian_frame->m_frames[i], XV_INPUT_TILE, flag);
         if (ret != Status::OK)
         {
             AURA_XTENSA_LOG("Register failed!\n");
@@ -517,9 +517,9 @@ AURA_VOID GaussianFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
         }
     }
 
-    for (MI_S32 i = src_sizes; i < src_sizes + dst_sizes; i++)
+    for (DT_S32 i = src_sizes; i < src_sizes + dst_sizes; i++)
     {
-        TileWrapper tile_dst(static_cast<AURA_VOID*>(xv_tiles + i), gaussian_frame->m_elem_types[i], gaussian_frame->m_channels[i]);
+        TileWrapper tile_dst(static_cast<DT_VOID*>(xv_tiles + i), gaussian_frame->m_elem_types[i], gaussian_frame->m_channels[i]);
         Sizes sizes(0, 0);
         ret = tile_dst.Update(ref_tile->x, ref_tile->y, ref_tile->tile_width, ref_tile->tile_height, sizes);
         if (ret != Status::OK)
@@ -528,7 +528,7 @@ AURA_VOID GaussianFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
             return;
         }
 
-        ret = tile_dst.Register(xv_tm, MI_NULL, gaussian_frame->m_frames[i], XV_OUTPUT_TILE, flag);
+        ret = tile_dst.Register(xv_tm, DT_NULL, gaussian_frame->m_frames[i], XV_OUTPUT_TILE, flag);
         if (ret != Status::OK)
         {
             AURA_XTENSA_LOG("Register failed!\n");
@@ -539,22 +539,22 @@ AURA_VOID GaussianFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
     return;
 }
 
-MI_S32 GaussianFrame::Execute(AURA_VOID *obj, AURA_VOID *tiles)
+DT_S32 GaussianFrame::Execute(DT_VOID *obj, DT_VOID *tiles)
 {
-    if ((MI_NULL == obj) || (MI_NULL == tiles))
+    if ((DT_NULL == obj) || (DT_NULL == tiles))
     {
         AURA_XTENSA_LOG("obj/tiles is null ptr");
         return AURA_XTENSA_ERROR;
     }
 
     GaussianFrame *gaussian_frame = static_cast<GaussianFrame*>(obj);
-    if (MI_NULL == gaussian_frame)
+    if (DT_NULL == gaussian_frame)
     {
         AURA_XTENSA_LOG("gaussian_frame is null ptr");
         return AURA_XTENSA_ERROR;
     }
 
-    if (MI_NULL == gaussian_frame->m_gaussian_tile)
+    if (DT_NULL == gaussian_frame->m_gaussian_tile)
     {
         AURA_XTENSA_LOG("m_gaussian_tile is null ptr");
         return AURA_XTENSA_ERROR;
@@ -592,11 +592,11 @@ MI_S32 GaussianFrame::Execute(AURA_VOID *obj, AURA_VOID *tiles)
 AURA_VDSP_OP_FRAME_CPP(Gaussian)
 
 //============================ GetGaussianKernel ============================
-vector<MI_F32> GetGaussianKernel(MI_S32 ksize, MI_F32 sigma)
+vector<DT_F32> GetGaussianKernel(DT_S32 ksize, DT_F32 sigma)
 {
-    vector<MI_F32> kernel(ksize, 0);
-    constexpr MI_S32 small_gaussian_size = 7;
-    constexpr MI_F32 small_gaussian_tab[][small_gaussian_size] =
+    vector<DT_F32> kernel(ksize, 0);
+    constexpr DT_S32 small_gaussian_size = 7;
+    constexpr DT_F32 small_gaussian_tab[][small_gaussian_size] =
     {
         {1.f},
         {0.25f, 0.5f, 0.25f},
@@ -606,8 +606,8 @@ vector<MI_F32> GetGaussianKernel(MI_S32 ksize, MI_F32 sigma)
 
     if ((ksize <= small_gaussian_size) && (sigma <= 0))
     {
-        const MI_F32 *t_ptr = small_gaussian_tab[ksize >> 1];
-        for (MI_S32 i = 0; i < ksize; i++)
+        const DT_F32 *t_ptr = small_gaussian_tab[ksize >> 1];
+        for (DT_S32 i = 0; i < ksize; i++)
         {
             kernel[i] = t_ptr[i];
         }
@@ -615,23 +615,23 @@ vector<MI_F32> GetGaussianKernel(MI_S32 ksize, MI_F32 sigma)
         return kernel;
     }
 
-    vector<MI_F32> vec_kernel(ksize, 0);
-    MI_F64 sigma_value = sigma > 0 ? static_cast<MI_F64>(sigma) : ((ksize - 1) * 0.5 - 1) * 0.3 + 0.8;
-    MI_F64 sigma2 = -0.5 / (sigma_value * sigma_value);
-    MI_F64 sum = 0;
+    vector<DT_F32> vec_kernel(ksize, 0);
+    DT_F64 sigma_value = sigma > 0 ? static_cast<DT_F64>(sigma) : ((ksize - 1) * 0.5 - 1) * 0.3 + 0.8;
+    DT_F64 sigma2 = -0.5 / (sigma_value * sigma_value);
+    DT_F64 sum = 0;
 
-    for (MI_S32 i = 0; i < ksize; i++)
+    for (DT_S32 i = 0; i < ksize; i++)
     {
-        MI_F64 x = i - (ksize - 1) * 0.5;
-        vec_kernel[i] = static_cast<MI_F32>(Exp(sigma2 * x * x));
+        DT_F64 x = i - (ksize - 1) * 0.5;
+        vec_kernel[i] = static_cast<DT_F32>(Exp(sigma2 * x * x));
         sum += vec_kernel[i];
     }
 
     sum = 1.0 / sum;
 
-    for (MI_S32 i = 0; i < ksize; i++)
+    for (DT_S32 i = 0; i < ksize; i++)
     {
-        kernel[i] = static_cast<MI_F32>(vec_kernel[i] * sum);
+        kernel[i] = static_cast<DT_F32>(vec_kernel[i] * sum);
     }
 
     return kernel;
@@ -640,7 +640,7 @@ vector<MI_F32> GetGaussianKernel(MI_S32 ksize, MI_F32 sigma)
 //============================ GaussianRpc ============================
 Status GaussianRpc(TileManager xv_tm, XtensaRpcParam &rpc_param)
 {
-    if (MI_NULL == xv_tm)
+    if (DT_NULL == xv_tm)
     {
         AURA_XTENSA_LOG("xv_tm is null ptr");
         return Status::ERROR;
@@ -648,8 +648,8 @@ Status GaussianRpc(TileManager xv_tm, XtensaRpcParam &rpc_param)
 
     Mat src;
     Mat dst;
-    MI_S32 ksize;
-    MI_F32 sigma;
+    DT_S32 ksize;
+    DT_F32 sigma;
     BorderType border_type;
     Scalar border_value;
     GaussianInParamVdsp in_param(rpc_param);

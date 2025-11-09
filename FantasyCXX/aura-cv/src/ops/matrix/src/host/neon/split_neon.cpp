@@ -5,31 +5,31 @@
 namespace aura
 {
 
-template <typename Tp, MI_S32 C>
-static Status SplitNeonImpl(const Mat &src, std::vector<Mat*> &dst, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, DT_S32 C>
+static Status SplitNeonImpl(const Mat &src, std::vector<Mat*> &dst, DT_S32 start_row, DT_S32 end_row)
 {
     using MVType = typename neon::MQVector<Tp, C>::MVType;
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(Tp);
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(Tp);
 
-    MI_S32 width       = src.GetSizes().m_width;
-    MI_S32 width_align = width & (-ELEM_COUNTS);
+    DT_S32 width       = src.GetSizes().m_width;
+    DT_S32 width_align = width & (-ELEM_COUNTS);
 
     MVType mv_src;
-    std::vector<Tp*> dst_rows(C, MI_NULL);
+    std::vector<Tp*> dst_rows(C, DT_NULL);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         const Tp *src_row = src.Ptr<Tp>(y);
-        for (MI_S32 c = 0; c < C; c++)
+        for (DT_S32 c = 0; c < C; c++)
         {
             dst_rows[c] = dst[c]->Ptr<Tp>(y);
         }
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += ELEM_COUNTS)
         {
             neon::vload(src_row + x * C, mv_src);
-            for (MI_S32 c = 0; c < C; c++)
+            for (DT_S32 c = 0; c < C; c++)
             {
                 neon::vstore(dst_rows[c] + x, mv_src.val[c]);
             }
@@ -37,7 +37,7 @@ static Status SplitNeonImpl(const Mat &src, std::vector<Mat*> &dst, MI_S32 start
 
         for (; x < width; x++)
         {
-            for (MI_S32 c = 0; c < C; c++)
+            for (DT_S32 c = 0; c < C; c++)
             {
                 dst_rows[c][x]  = src_row[x * C + c];
             }
@@ -57,11 +57,11 @@ static Status SplitNeonHelper(Context *ctx, const Mat &src, std::vector<Mat*> &d
 
     Status ret = Status::ERROR;
 
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return Status::ERROR;
@@ -71,22 +71,22 @@ static Status SplitNeonHelper(Context *ctx, const Mat &src, std::vector<Mat*> &d
     {
         case 1:
         {
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), height, SplitNeonImpl<Tp, 1>, src, dst);
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), height, SplitNeonImpl<Tp, 1>, src, dst);
             break;
         }
         case 2:
         {
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), height, SplitNeonImpl<Tp, 2>, src, dst);
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), height, SplitNeonImpl<Tp, 2>, src, dst);
             break;
         }
         case 3:
         {
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), height, SplitNeonImpl<Tp, 3>, src, dst);
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), height, SplitNeonImpl<Tp, 3>, src, dst);
             break;
         }
         case 4:
         {
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), height, SplitNeonImpl<Tp, 4>, src, dst);
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), height, SplitNeonImpl<Tp, 4>, src, dst);
             break;
         }
 
@@ -132,7 +132,7 @@ Status SplitNeon::SetArgs(const Array *src, const std::vector<Array*> &dst)
         }
     }
 
-    if (src->GetSizes().m_channel != static_cast<MI_S32>(dst.size()))
+    if (src->GetSizes().m_channel != static_cast<DT_S32>(dst.size()))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "the channel of src and dst do not match");
         return Status::ERROR;
@@ -144,7 +144,7 @@ Status SplitNeon::SetArgs(const Array *src, const std::vector<Array*> &dst)
 Status SplitNeon::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;
@@ -155,7 +155,7 @@ Status SplitNeon::Run()
     for (auto &mat : m_dst)
     {
         Mat *dst_mat = dynamic_cast<Mat*>(mat);
-        if (MI_NULL == dst_mat)
+        if (DT_NULL == dst_mat)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "dst is null");
             return Status::ERROR;
@@ -170,10 +170,10 @@ Status SplitNeon::Run()
         case ElemType::U8:
         case ElemType::S8:
         {
-            ret = SplitNeonHelper<MI_U8>(m_ctx, *src, dst);
+            ret = SplitNeonHelper<DT_U8>(m_ctx, *src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "SplitNeonHelper<MI_U8> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "SplitNeonHelper<DT_U8> failed");
             }
             break;
         }
@@ -184,10 +184,10 @@ Status SplitNeon::Run()
         case ElemType::F16:
 #endif
         {
-            ret = SplitNeonHelper<MI_U16>(m_ctx, *src, dst);
+            ret = SplitNeonHelper<DT_U16>(m_ctx, *src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "SplitNeonHelper<MI_U16> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "SplitNeonHelper<DT_U16> failed");
             }
             break;
         }
@@ -198,10 +198,10 @@ Status SplitNeon::Run()
         case ElemType::F32:
 #endif
         {
-            ret = SplitNeonHelper<MI_U32>(m_ctx, *src, dst);
+            ret = SplitNeonHelper<DT_U32>(m_ctx, *src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "SplitNeonHelper<MI_U32> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "SplitNeonHelper<DT_U32> failed");
             }
             break;
         }

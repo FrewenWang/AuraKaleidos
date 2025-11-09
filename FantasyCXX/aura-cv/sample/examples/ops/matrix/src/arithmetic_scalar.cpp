@@ -25,7 +25,7 @@ aura::Status ArithmScalarSampleTest(aura::Context *ctx, aura::TargetType type)
         return status;
     }
 
-    MI_F32 scalar = 128.2;
+    DT_F32 scalar = 128.2;
 
     // ---------------------
     //     run interface

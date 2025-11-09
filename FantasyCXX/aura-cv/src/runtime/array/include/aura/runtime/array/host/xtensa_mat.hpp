@@ -110,7 +110,7 @@ public:
     /**
      * @brief Release function for deallocating xtensa object data and resetting properties.
      */
-    AURA_VOID Release() override;
+    DT_VOID Release() override;
 
     /**
      * @brief Assignment operator for performing a shallow copy from another xtensa object.
@@ -142,16 +142,16 @@ public:
      *
      * Verifies whether the XtensaMat object is properly initialized and associated with valid XtensaMat memory.
      *
-     * @return MI_TRUE if the XtensaMat is valid, MI_FALSE otherwise.
+     * @return DT_TRUE if the XtensaMat is valid, DT_FALSE otherwise.
      */
-    MI_BOOL IsValid() const override;
+    DT_BOOL IsValid() const override;
 
     /**
      * @brief Display information about the XtensaMat object.
      *
      * Prints information such as XtensaMat memory type, dimensions, element type, and associated buffer (if any).
      */
-    AURA_VOID Show() const override;
+    DT_VOID Show() const override;
 
     /**
     * @brief Dumps the XtensaMat contents to a file in binary format.
@@ -160,7 +160,7 @@ public:
     *
     * @param fname The name of the file to write the XtensaMat dump.
     */
-    AURA_VOID Dump(const std::string &fname) const override;
+    DT_VOID Dump(const std::string &fname) const override;
 
     /**
      * @brief Synchronize the Xtensa with a specified synchronization type.
@@ -181,11 +181,11 @@ private:
     *
     * This method is used to reset properties of member vaiables.
     */
-    AURA_VOID Clear();
+    DT_VOID Clear();
 
 private:
     XtensaEngine *m_xtensa_engine;
-    MI_BOOL m_is_external_buffer;
+    DT_BOOL m_is_external_buffer;
 };
 
 /**

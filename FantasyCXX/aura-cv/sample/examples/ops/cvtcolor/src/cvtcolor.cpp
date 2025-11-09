@@ -86,7 +86,7 @@ aura::Status CvtColorSampleTest(aura::Context *ctx, aura::TargetType type)
 
 const static std::map<std::string, SampleOpsFunc> g_func_map = {{"cvtcolor", CvtColorSampleTest}};
 
-MI_S32 main(MI_S32 argc, MI_CHAR *argv[])
+DT_S32 main(DT_S32 argc, DT_CHAR *argv[])
 {
     SampleOpsFunc sample_func;
     aura::TargetType type;

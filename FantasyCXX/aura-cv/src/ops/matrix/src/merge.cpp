@@ -32,21 +32,21 @@ Merge::Merge(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Merge::SetArgs(const std::vector<const Array*> &src, Array *dst)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
     for (auto mat : src)
     {
-        if (MI_NULL == mat)
+        if (DT_NULL == mat)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
             return Status::ERROR;
         }
     }
 
-    if (MI_NULL == dst)
+    if (DT_NULL == dst)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dst is null ptr");
         return Status::ERROR;
@@ -55,14 +55,14 @@ Status Merge::SetArgs(const std::vector<const Array*> &src, Array *dst)
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateMergeImpl(m_ctx, impl_target);
     }
 
     // run initialize
     MergeImpl *merge_impl = dynamic_cast<MergeImpl*>(m_impl.get());
-    if (MI_NULL == merge_impl)
+    if (DT_NULL == merge_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "merge_impl is null ptr");
         return Status::ERROR;
@@ -89,26 +89,26 @@ AURA_EXPORTS Status IMerge(Context *ctx, const std::vector<Mat> &src, Mat &dst, 
 }
 
 MergeImpl::MergeImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Merge", target),
-                                                             m_dst(MI_NULL)
+                                                             m_dst(DT_NULL)
 {}
 
 Status MergeImpl::SetArgs(const std::vector<const Array*> &src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
     for (auto mat : src)
     {
-        if (MI_NULL == mat)
+        if (DT_NULL == mat)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
             return Status::ERROR;
         }
     }
 
-    if (MI_NULL == dst)
+    if (DT_NULL == dst)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dst is null ptr");
         return Status::ERROR;
@@ -125,7 +125,7 @@ Status MergeImpl::SetArgs(const std::vector<const Array*> &src, Array *dst)
 
     const ElemType dst_type = dst->GetElemType();
     const Sizes3 dst_sz     = dst->GetSizes();
-    MI_S32 src_total_ch     = 0;
+    DT_S32 src_total_ch     = 0;
 
     for (size_t i = 0; i < src_size; ++i)
     {
@@ -184,7 +184,7 @@ std::string MergeImpl::ToString() const
     return str;
 }
 
-AURA_VOID MergeImpl::Dump(const std::string &prefix) const
+DT_VOID MergeImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

@@ -10,8 +10,8 @@ static Status CheckNum(const vector<const Tp*> &src, const vector<Tp*> &dst, Cvt
 {
     Status ret = Status::ERROR;
 
-    const MI_S32 src_len = src.size();
-    const MI_S32 dst_len = dst.size();
+    const DT_S32 src_len = src.size();
+    const DT_S32 dst_len = dst.size();
 
     switch (type)
     {
@@ -101,10 +101,10 @@ static Status CheckElemType(const vector<const Tp*> &src, const vector<Tp*> &dst
 {
     Status ret = Status::OK;
 
-    const MI_S32 src_len = src.size();
-    const MI_S32 dst_len = dst.size();
+    const DT_S32 src_len = src.size();
+    const DT_S32 dst_len = dst.size();
 
-    for (MI_S32 i = 0; i < src_len; i++)
+    for (DT_S32 i = 0; i < src_len; i++)
     {
         if (!(src[i]->IsValid()))
         {
@@ -113,7 +113,7 @@ static Status CheckElemType(const vector<const Tp*> &src, const vector<Tp*> &dst
         }
     }
 
-    for (MI_S32 i = 0; i < dst_len; i++)
+    for (DT_S32 i = 0; i < dst_len; i++)
     {
         if (!(dst[i]->IsValid()))
         {
@@ -160,7 +160,7 @@ static Status CheckElemType(const vector<const Tp*> &src, const vector<Tp*> &dst
         case CvtColorType::YUV2RGB_YVYU_601:
         case CvtColorType::YUV2RGB_Y444_601:
         {
-            for (MI_S32 i = 0; i < src_len; i++)
+            for (DT_S32 i = 0; i < src_len; i++)
             {
                 if (src[i]->GetElemType() != ElemType::U8)
                 {
@@ -168,7 +168,7 @@ static Status CheckElemType(const vector<const Tp*> &src, const vector<Tp*> &dst
                     return Status::ERROR;
                 }
             }
-            for (MI_S32 i = 0; i < dst_len; i++)
+            for (DT_S32 i = 0; i < dst_len; i++)
             {
                 if (dst[i]->GetElemType() != ElemType::U8)
                 {
@@ -182,7 +182,7 @@ static Status CheckElemType(const vector<const Tp*> &src, const vector<Tp*> &dst
         case CvtColorType::RGB2YUV_NV12_P010:
         case CvtColorType::RGB2YUV_NV21_P010:
         {
-            for (MI_S32 i = 0; i < src_len; i++)
+            for (DT_S32 i = 0; i < src_len; i++)
             {
                 if (src[i]->GetElemType() != ElemType::U16)
                 {
@@ -190,7 +190,7 @@ static Status CheckElemType(const vector<const Tp*> &src, const vector<Tp*> &dst
                     return Status::ERROR;
                 }
             }
-            for (MI_S32 i = 0; i < dst_len; i++)
+            for (DT_S32 i = 0; i < dst_len; i++)
             {
                 if (dst[i]->GetElemType() != ElemType::U16)
                 {
@@ -206,7 +206,7 @@ static Status CheckElemType(const vector<const Tp*> &src, const vector<Tp*> &dst
         case CvtColorType::BAYERRG2BGR:
         case CvtColorType::BAYERGR2BGR:
         {
-            for (MI_S32 i = 0; i < src_len; i++)
+            for (DT_S32 i = 0; i < src_len; i++)
             {
                 if (src[i]->GetElemType() != ElemType::U8 && src[i]->GetElemType() != ElemType::U16)
                 {
@@ -214,7 +214,7 @@ static Status CheckElemType(const vector<const Tp*> &src, const vector<Tp*> &dst
                     ret = Status::ERROR;
                 }
             }
-            for (MI_S32 i = 0; i < dst_len; i++)
+            for (DT_S32 i = 0; i < dst_len; i++)
             {
                 if (dst[i]->GetElemType() != ElemType::U8 && dst[i]->GetElemType() != ElemType::U16)
                 {
@@ -249,15 +249,15 @@ CvtColorVdsp::CvtColorVdsp(TileManager tm, ExecuteMode mode) : VdspOp(tm, mode)
 
         if (ExecuteMode::TILE == m_mode)
         {
-            AURA_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(CvtColorTile), XV_MEM_BANK_COLOR_ANY, 128);
-            if (MI_NULL == buffer)
+            DT_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(CvtColorTile), XV_MEM_BANK_COLOR_ANY, 128);
+            if (DT_NULL == buffer)
             {
                 AURA_XTENSA_LOG("xvAllocateBuffer error");
                 break;
             }
 
             m_impl = new(buffer) CvtColorTile(tm);
-            if (MI_NULL == m_impl)
+            if (DT_NULL == m_impl)
             {
                 AURA_XTENSA_LOG("m_impl is null ptr");
                 break;
@@ -265,15 +265,15 @@ CvtColorVdsp::CvtColorVdsp(TileManager tm, ExecuteMode mode) : VdspOp(tm, mode)
         }
         else if (ExecuteMode::FRAME == m_mode)
         {
-            AURA_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(CvtColorFrame), XV_MEM_BANK_COLOR_ANY, 128);
-            if (MI_NULL == buffer)
+            DT_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(CvtColorFrame), XV_MEM_BANK_COLOR_ANY, 128);
+            if (DT_NULL == buffer)
             {
                 AURA_XTENSA_LOG("xvAllocateBuffer error");
                 break;
             }
 
             m_impl = new(buffer) CvtColorFrame(tm);
-            if (MI_NULL == m_impl)
+            if (DT_NULL == m_impl)
             {
                 AURA_XTENSA_LOG("m_impl is null ptr");
                 break;
@@ -289,7 +289,7 @@ CvtColorVdsp::CvtColorVdsp(TileManager tm, ExecuteMode mode) : VdspOp(tm, mode)
 
 Status CvtColorVdsp::SetArgs(const vector<const Mat*> &src, const vector<Mat*> &dst, CvtColorType type)
 {
-    if (MI_NULL == m_impl)
+    if (DT_NULL == m_impl)
     {
         AURA_XTENSA_LOG("m_impl is null ptr");
         return Status::ERROR;
@@ -304,7 +304,7 @@ Status CvtColorVdsp::SetArgs(const vector<const Mat*> &src, const vector<Mat*> &
     if (ExecuteMode::FRAME == m_mode)
     {
         CvtColorFrame *impl = static_cast<CvtColorFrame*>(m_impl);
-        if (MI_NULL == impl)
+        if (DT_NULL == impl)
         {
             AURA_XTENSA_LOG("impl is null ptr");
             return Status::ERROR;
@@ -321,7 +321,7 @@ Status CvtColorVdsp::SetArgs(const vector<const Mat*> &src, const vector<Mat*> &
 
 Status CvtColorVdsp::SetArgs(const vector<TileWrapper> &src, vector<TileWrapper> &dst, CvtColorType type)
 {
-    if (MI_NULL == m_impl)
+    if (DT_NULL == m_impl)
     {
         AURA_XTENSA_LOG("m_impl is null ptr");
         return Status::ERROR;
@@ -336,7 +336,7 @@ Status CvtColorVdsp::SetArgs(const vector<TileWrapper> &src, vector<TileWrapper>
     if (ExecuteMode::TILE == m_mode)
     {
         CvtColorTile *impl = static_cast<CvtColorTile*>(m_impl);
-        if (MI_NULL == impl)
+        if (DT_NULL == impl)
         {
             AURA_XTENSA_LOG("impl is null ptr");
             return Status::ERROR;
@@ -354,9 +354,9 @@ Status CvtColorVdsp::SetArgs(const vector<TileWrapper> &src, vector<TileWrapper>
 AURA_VDSP_OP_CPP(CvtColor)
 
 //============================ CvtColorTile ============================
-static MI_S32 CvtColorVdspTileImpl(const xvTile *src, xvTile *dst, CvtColorType type)
+static DT_S32 CvtColorVdspTileImpl(const xvTile *src, xvTile *dst, CvtColorType type)
 {
-    MI_S32 ret = AURA_XTENSA_ERROR;
+    DT_S32 ret = AURA_XTENSA_ERROR;
 
     switch (type)
     {
@@ -382,20 +382,20 @@ CvtColorTile::CvtColorTile(TileManager tm) : VdspOpTile(tm), m_type(CvtColorType
 
 Status CvtColorTile::SetArgs(const vector<TileWrapper> &src, vector<TileWrapper> &dst, CvtColorType type)
 {
-    if (MI_FALSE == m_flag)
+    if (DT_FALSE == m_flag)
     {
         m_type = type;
         m_src_sizes = src.size();
         m_dst_sizes = dst.size();
 
-        for (MI_S32 i = 0; i < m_src_sizes; i++)
+        for (DT_S32 i = 0; i < m_src_sizes; i++)
         {
             m_xv_src_tiles.push_back(&src[i]);
             m_src_elem_types.push_back(src[i].GetElemType());
             m_src_channels.push_back(src[i].GetChannel());
         }
 
-        for (MI_S32 i = 0; i < m_dst_sizes; i++)
+        for (DT_S32 i = 0; i < m_dst_sizes; i++)
         {
             m_xv_dst_tiles.push_back(&dst[i]);
             m_dst_elem_types.push_back(dst[i].GetElemType());
@@ -414,16 +414,16 @@ Status CvtColorTile::SetArgs(const vector<TileWrapper> &src, vector<TileWrapper>
             return Status::ERROR;
         }
 
-        m_flag = MI_TRUE;
+        m_flag = DT_TRUE;
     }
     else
     {
-        for (MI_S32 i = 0; i < m_xv_src_tiles.size(); i++)
+        for (DT_S32 i = 0; i < m_xv_src_tiles.size(); i++)
         {
             m_xv_src_tiles[i] = &src[i];
         }
 
-        for (MI_S32 i = 0; i < m_xv_dst_tiles.size(); i++)
+        for (DT_S32 i = 0; i < m_xv_dst_tiles.size(); i++)
         {
             m_xv_dst_tiles[i] = &dst[i];
         }
@@ -435,43 +435,43 @@ Status CvtColorTile::SetArgs(const vector<TileWrapper> &src, vector<TileWrapper>
 Status CvtColorTile::DeInitialize()
 {
     m_type = CvtColorType::INVALID;
-    m_flag = MI_FALSE;
+    m_flag = DT_FALSE;
     m_src_sizes = 0;
     m_dst_sizes = 0;
 
-    for (MI_S32 i = 0; i < m_src_elem_types.size(); i++)
+    for (DT_S32 i = 0; i < m_src_elem_types.size(); i++)
     {
         m_src_elem_types[i] = ElemType::INVALID;
     }
     m_src_elem_types.clear();
 
-    for (MI_S32 i = 0; i < m_dst_elem_types.size(); i++)
+    for (DT_S32 i = 0; i < m_dst_elem_types.size(); i++)
     {
         m_dst_elem_types[i] = ElemType::INVALID;
     }
     m_dst_elem_types.clear();
 
-    for (MI_S32 i = 0; i < m_src_channels.size(); i++)
+    for (DT_S32 i = 0; i < m_src_channels.size(); i++)
     {
         m_src_channels[i] = 0;
     }
     m_src_channels.clear();
 
-    for (MI_S32 i = 0; i < m_dst_channels.size(); i++)
+    for (DT_S32 i = 0; i < m_dst_channels.size(); i++)
     {
         m_dst_channels[i] = 0;
     }
     m_dst_channels.clear();
 
-    for (MI_S32 i = 0; i < m_xv_src_tiles.size(); i++)
+    for (DT_S32 i = 0; i < m_xv_src_tiles.size(); i++)
     {
-        m_xv_src_tiles[i] = MI_NULL;
+        m_xv_src_tiles[i] = DT_NULL;
     }
     m_xv_src_tiles.clear();
 
-    for (MI_S32 i = 0; i < m_xv_dst_tiles.size(); i++)
+    for (DT_S32 i = 0; i < m_xv_dst_tiles.size(); i++)
     {
-        m_xv_dst_tiles[i] = MI_NULL;
+        m_xv_dst_tiles[i] = DT_NULL;
     }
     m_xv_dst_tiles.clear();
 
@@ -487,14 +487,14 @@ Status CvtColorTile::Run()
     }
 
     vector<xvTile> src_tiles;
-    for (MI_S32 i = 0; i < m_xv_src_tiles.size(); i++)
+    for (DT_S32 i = 0; i < m_xv_src_tiles.size(); i++)
     {
-        xvTile *p_src = static_cast<xvTile*>(const_cast<AURA_VOID*>(m_xv_src_tiles[i]->GetData()));
+        xvTile *p_src = static_cast<xvTile*>(const_cast<DT_VOID*>(m_xv_src_tiles[i]->GetData()));
         src_tiles.push_back(*p_src);
     }
 
     vector<xvTile> dst_tiles;
-    for (MI_S32 i = 0; i < m_xv_dst_tiles.size(); i++)
+    for (DT_S32 i = 0; i < m_xv_dst_tiles.size(); i++)
     {
         xvTile *p_dst = static_cast<xvTile*>(m_xv_dst_tiles[i]->GetData());
         dst_tiles.push_back(*p_dst);
@@ -510,26 +510,26 @@ Status CvtColorTile::Run()
 }
 
 //============================ CvtColorFrame ============================
-CvtColorFrame::CvtColorFrame(TileManager tm) : VdspOpFrame(tm, 2), m_type(CvtColorType::INVALID), m_src_sizes(0), m_dst_sizes(0), m_cvtcolor_tile(MI_NULL)
+CvtColorFrame::CvtColorFrame(TileManager tm) : VdspOpFrame(tm, 2), m_type(CvtColorType::INVALID), m_src_sizes(0), m_dst_sizes(0), m_cvtcolor_tile(DT_NULL)
 {
     do
     {
         xvTileManager *xv_tm = static_cast<xvTileManager*>(m_tm);
-        if (MI_NULL == xv_tm)
+        if (DT_NULL == xv_tm)
         {
             AURA_XTENSA_LOG("xv_tm is null ptr");
             break;
         }
 
-        AURA_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(CvtColorTile), XV_MEM_BANK_COLOR_ANY, 128);
-        if (MI_NULL == buffer)
+        DT_VOID *buffer = xvAllocateBuffer(xv_tm, sizeof(CvtColorTile), XV_MEM_BANK_COLOR_ANY, 128);
+        if (DT_NULL == buffer)
         {
             AURA_XTENSA_LOG("xvAllocateBuffer failed");
             break;
         }
 
         m_cvtcolor_tile = new (buffer) CvtColorTile(m_tm);
-        if (MI_NULL == m_cvtcolor_tile)
+        if (DT_NULL == m_cvtcolor_tile)
         {
             AURA_XTENSA_LOG("m_cvtcolor_tile is null ptr");
             break;
@@ -540,7 +540,7 @@ CvtColorFrame::CvtColorFrame(TileManager tm) : VdspOpFrame(tm, 2), m_type(CvtCol
 Status CvtColorFrame::SetArgs(const vector<const Mat*> &src, const vector<Mat*> &dst, CvtColorType type)
 {
     xvTileManager *xv_tm = static_cast<xvTileManager*>(m_tm);
-    if (MI_NULL == xv_tm)
+    if (DT_NULL == xv_tm)
     {
         AURA_XTENSA_LOG("xv_tm is null ptr");
         return Status::ERROR;
@@ -571,7 +571,7 @@ Status CvtColorFrame::SetArgs(const vector<const Mat*> &src, const vector<Mat*> 
         return Status::ERROR;
     }
 
-    for (MI_S32 i = 0; i < src.size(); i++)
+    for (DT_S32 i = 0; i < src.size(); i++)
     {
         // set BorderType::CONSTANT for no padding tile
         FrameWrapper frame(xv_tm, src[i], BorderType::CONSTANT, 0);
@@ -586,7 +586,7 @@ Status CvtColorFrame::SetArgs(const vector<const Mat*> &src, const vector<Mat*> 
         m_channels.push_back(src[i]->GetSizes().m_channel);
     }
 
-    for (MI_S32 i = 0; i < dst.size(); i++)
+    for (DT_S32 i = 0; i < dst.size(); i++)
     {
         FrameWrapper frame(xv_tm, dst[i], BorderType::CONSTANT, 0);
         if (!frame.IsValid())
@@ -609,10 +609,10 @@ Status CvtColorFrame::DeInitialize()
     m_src_sizes = 0;
     m_dst_sizes = 0;
 
-    if (m_cvtcolor_tile != MI_NULL)
+    if (m_cvtcolor_tile != DT_NULL)
     {
         m_cvtcolor_tile->DeInitialize();
-        m_cvtcolor_tile = MI_NULL;
+        m_cvtcolor_tile = DT_NULL;
     }
 
     VdspOpFrame::DeInitialize();
@@ -620,9 +620,9 @@ Status CvtColorFrame::DeInitialize()
     return Status::OK;
 }
 
-AURA_VOID CvtColorFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AURA_VOID *obj, AURA_VOID *tiles, MI_S32 flag)
+DT_VOID CvtColorFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, DT_VOID *obj, DT_VOID *tiles, DT_S32 flag)
 {
-    if ((MI_NULL == xv_tm) || (MI_NULL == obj) || (MI_NULL == tiles) || (MI_NULL == xv_ref_tile))
+    if ((DT_NULL == xv_tm) || (DT_NULL == obj) || (DT_NULL == tiles) || (DT_NULL == xv_ref_tile))
     {
         AURA_XTENSA_LOG("params are null ptr!");
         return;
@@ -637,14 +637,14 @@ AURA_VOID CvtColorFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
     RefTileWrapper *ref_tile      = reinterpret_cast<RefTileWrapper*>(xv_ref_tile);
     CvtColorFrame *cvtcolor_frame = reinterpret_cast<CvtColorFrame*>(obj);
 
-    if ((MI_NULL == ref_tile) || (MI_NULL == cvtcolor_frame))
+    if ((DT_NULL == ref_tile) || (DT_NULL == cvtcolor_frame))
     {
         AURA_XTENSA_LOG("ref_tile/cvtcolor_frame is null ptr");
         return;
     }
 
-    MI_S32 tile_num  = cvtcolor_frame->m_tile_num;
-    MI_S32 src_sizes = cvtcolor_frame->m_src_sizes;
+    DT_S32 tile_num  = cvtcolor_frame->m_tile_num;
+    DT_S32 src_sizes = cvtcolor_frame->m_src_sizes;
 
     if ((cvtcolor_frame->m_frames.size() != tile_num) || (cvtcolor_frame->m_elem_types.size() != tile_num) || (cvtcolor_frame->m_channels.size() != tile_num))
     {
@@ -656,9 +656,9 @@ AURA_VOID CvtColorFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
     Status ret       = Status::ERROR;
     xvTile *xv_tiles = static_cast<xvTile*>(tiles);
 
-    for (MI_S32 i = 0; i < src_sizes; i++)
+    for (DT_S32 i = 0; i < src_sizes; i++)
     {
-        TileWrapper tile_src(static_cast<AURA_VOID*>(xv_tiles + i), (cvtcolor_frame->m_elem_types)[i], (cvtcolor_frame->m_channels)[i]);
+        TileWrapper tile_src(static_cast<DT_VOID*>(xv_tiles + i), (cvtcolor_frame->m_elem_types)[i], (cvtcolor_frame->m_channels)[i]);
         ret = tile_src.Update(ref_tile->x, ref_tile->y, ref_tile->tile_width, ref_tile->tile_height, sizes);
         if (ret != Status::OK)
         {
@@ -666,7 +666,7 @@ AURA_VOID CvtColorFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
             return;
         }
 
-        ret = tile_src.Register(xv_tm, MI_NULL, cvtcolor_frame->m_frames[i], XV_INPUT_TILE, flag);
+        ret = tile_src.Register(xv_tm, DT_NULL, cvtcolor_frame->m_frames[i], XV_INPUT_TILE, flag);
         if (ret != Status::OK)
         {
             AURA_XTENSA_LOG("Register failed!\n");
@@ -674,9 +674,9 @@ AURA_VOID CvtColorFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
         }
     }
 
-    for (MI_S32 i = src_sizes; i < static_cast<MI_S32>(tile_num); i++)
+    for (DT_S32 i = src_sizes; i < static_cast<DT_S32>(tile_num); i++)
     {
-        TileWrapper tile_dst(static_cast<AURA_VOID*>(xv_tiles + i), cvtcolor_frame->m_elem_types[i], cvtcolor_frame->m_channels[i]);
+        TileWrapper tile_dst(static_cast<DT_VOID*>(xv_tiles + i), cvtcolor_frame->m_elem_types[i], cvtcolor_frame->m_channels[i]);
         ret = tile_dst.Update(ref_tile->x, ref_tile->y, ref_tile->tile_width, ref_tile->tile_height, sizes);
         if (ret != Status::OK)
         {
@@ -684,7 +684,7 @@ AURA_VOID CvtColorFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
             return;
         }
 
-        ret = tile_dst.Register(xv_tm, MI_NULL, cvtcolor_frame->m_frames[i], XV_OUTPUT_TILE, flag);
+        ret = tile_dst.Register(xv_tm, DT_NULL, cvtcolor_frame->m_frames[i], XV_OUTPUT_TILE, flag);
         if (ret != Status::OK)
         {
             AURA_XTENSA_LOG("Register failed!\n");
@@ -695,23 +695,23 @@ AURA_VOID CvtColorFrame::Prepare(xvTileManager *xv_tm, RefTile *xv_ref_tile, AUR
     return;
 }
 
-MI_S32 CvtColorFrame::Execute(AURA_VOID *obj, AURA_VOID *tiles)
+DT_S32 CvtColorFrame::Execute(DT_VOID *obj, DT_VOID *tiles)
 {
-    if ((MI_NULL == obj) || (MI_NULL == tiles))
+    if ((DT_NULL == obj) || (DT_NULL == tiles))
     {
         AURA_XTENSA_LOG("obj/tiles is null ptr");
         return AURA_XTENSA_ERROR;
     }
 
     CvtColorFrame *cvtcolor_frame = static_cast<CvtColorFrame*>(obj);
-    if (MI_NULL == cvtcolor_frame)
+    if (DT_NULL == cvtcolor_frame)
     {
         AURA_XTENSA_LOG("cvtcolor_frame is null ptr");
         return AURA_XTENSA_ERROR;
     }
 
-    MI_S32 tile_num  = cvtcolor_frame->m_tile_num;
-    MI_S32 src_sizes = cvtcolor_frame->m_src_sizes;
+    DT_S32 tile_num  = cvtcolor_frame->m_tile_num;
+    DT_S32 src_sizes = cvtcolor_frame->m_src_sizes;
 
     if ((cvtcolor_frame->m_elem_types.size() != tile_num) || (cvtcolor_frame->m_channels.size() != tile_num))
     {
@@ -724,15 +724,15 @@ MI_S32 CvtColorFrame::Execute(AURA_VOID *obj, AURA_VOID *tiles)
     vector<TileWrapper> vec_dst;
     xvTile *xv_tile = static_cast<xvTile*>(tiles);
 
-    for (MI_S32 i = 0; i < src_sizes; i++)
+    for (DT_S32 i = 0; i < src_sizes; i++)
     {
-        TileWrapper tile_src(static_cast<AURA_VOID*>(xv_tile + i), cvtcolor_frame->m_elem_types[i], cvtcolor_frame->m_channels[i]);
+        TileWrapper tile_src(static_cast<DT_VOID*>(xv_tile + i), cvtcolor_frame->m_elem_types[i], cvtcolor_frame->m_channels[i]);
         vec_src.push_back(tile_src);
     }
 
-    for (MI_S32 i = src_sizes; i < tile_num; i++)
+    for (DT_S32 i = src_sizes; i < tile_num; i++)
     {
-        TileWrapper tile_dst(static_cast<AURA_VOID*>(xv_tile + i), cvtcolor_frame->m_elem_types[i], cvtcolor_frame->m_channels[i]);
+        TileWrapper tile_dst(static_cast<DT_VOID*>(xv_tile + i), cvtcolor_frame->m_elem_types[i], cvtcolor_frame->m_channels[i]);
         vec_dst.push_back(tile_dst);
     }
 
@@ -765,7 +765,7 @@ AURA_VDSP_OP_FRAME_CPP(CvtColor)
 //============================ CvtColorRpc ============================
 Status CvtColorRpc(TileManager xv_tm, XtensaRpcParam &rpc_param)
 {
-    if (MI_NULL == xv_tm)
+    if (DT_NULL == xv_tm)
     {
         AURA_XTENSA_LOG("xv_tm is null ptr");
         return Status::ERROR;
@@ -786,13 +786,13 @@ Status CvtColorRpc(TileManager xv_tm, XtensaRpcParam &rpc_param)
     vector<const Mat*> vec_src;
     vector<Mat*> vec_dst;
 
-    for (MI_S32 i = 0; i < src.size(); i++)
+    for (DT_S32 i = 0; i < src.size(); i++)
     {
         const Mat *p_src = &src[i];
         vec_src.push_back(p_src);
     }
 
-    for (MI_S32 i = 0; i < dst.size(); i++)
+    for (DT_S32 i = 0; i < dst.size(); i++)
     {
         Mat *p_dst = &dst[i];
         vec_dst.push_back(p_dst);

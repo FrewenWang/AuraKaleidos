@@ -88,7 +88,7 @@ private:
 #endif // AURA_ENABLE_XTENSA
 
     Config m_config;
-    MI_BOOL m_flag;
+    DT_BOOL m_flag;
 };
 
 } // namespace aura

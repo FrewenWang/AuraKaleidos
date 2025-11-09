@@ -54,7 +54,7 @@ public:
      *
      * For more details, please refer to @ref psnr_details
      */
-    Status SetArgs(const Array *src0, const Array *src1, MI_F64 coef_r, MI_F64 *result);
+    Status SetArgs(const Array *src0, const Array *src1, DT_F64 coef_r, DT_F64 *result);
 };
 
 /**
@@ -86,7 +86,7 @@ public:
  *
  * @note N is positive integer. Src0 and src1 must have same size and data type.
  */
-AURA_EXPORTS Status IPsnr(Context *ctx, const Mat &src0, const Mat &src1, MI_F64 coef_r, MI_F64 *result, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IPsnr(Context *ctx, const Mat &src0, const Mat &src1, DT_F64 coef_r, DT_F64 *result, const OpTarget &target = OpTarget::Default());
 
 /**
  * @}

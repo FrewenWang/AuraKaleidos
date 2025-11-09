@@ -13,7 +13,7 @@ Context::Impl::Impl(const Config &config)
                     m_cl_engine(),
 #endif // AURA_ENABLE_OPENCL
                     m_config(config),
-                    m_flag(MI_FALSE)
+                    m_flag(DT_FALSE)
 {}
 
 Context::Impl::~Impl()
@@ -21,17 +21,17 @@ Context::Impl::~Impl()
 
 Status Context::Impl::Initialize(Context *ctx)
 {
-    if (MI_FALSE == m_flag)
+    if (DT_FALSE == m_flag)
     {
         m_logger.reset(new Logger(m_config.m_log_output, m_config.m_log_level, m_config.m_log_file));
-        if (MI_NULL == m_logger.get())
+        if (DT_NULL == m_logger.get())
         {
             AURA_ADD_ERROR_STRING(ctx, "m_logger null ptr");
             return Status::ERROR;
         }
 
         m_mem_pool.reset(new MemPool(ctx));
-        if (MI_NULL == m_mem_pool.get())
+        if (DT_NULL == m_mem_pool.get())
         {
             AURA_ADD_ERROR_STRING(ctx, "m_mem_pool null ptr");
             return Status::ERROR;
@@ -40,7 +40,7 @@ Status Context::Impl::Initialize(Context *ctx)
 #if !defined(AURA_BUILD_XPLORER)
         m_wp.reset(new WorkerPool(ctx, m_config.m_thread_tag, m_config.m_compute_affinity, m_config.m_async_affinity,
                                   m_config.m_compute_threads, m_config.m_async_threads));
-        if (MI_NULL == m_wp.get())
+        if (DT_NULL == m_wp.get())
         {
             AURA_ADD_ERROR_STRING(ctx, "m_wp null ptr");
             return Status::ERROR;
@@ -49,7 +49,7 @@ Status Context::Impl::Initialize(Context *ctx)
 
 #if defined(AURA_BUILD_ANDROID)
         m_systrace.reset(new Systrace(m_config.m_enable_systrace));
-        if (MI_NULL == m_systrace.get())
+        if (DT_NULL == m_systrace.get())
         {
             AURA_ADD_ERROR_STRING(ctx, "m_systrace null ptr");
             return Status::ERROR;
@@ -61,7 +61,7 @@ Status Context::Impl::Initialize(Context *ctx)
                                        m_config.m_cl_precompiled_type, m_config.m_cl_precompiled_sources,
                                        m_config.m_cl_external_version, m_config.m_cl_perf_level,
                                        m_config.m_cl_priority_level));
-        if (MI_NULL == m_cl_engine.get())
+        if (DT_NULL == m_cl_engine.get())
         {
             AURA_ADD_ERROR_STRING(ctx, "m_cl_engine null ptr");
             return Status::ERROR;
@@ -71,7 +71,7 @@ Status Context::Impl::Initialize(Context *ctx)
 #if defined(AURA_ENABLE_HEXAGON)
         m_hexagon_engine.reset(new HexagonEngine(ctx, m_config.m_enable_hexagon, m_config.m_unsigned_pd, m_config.m_hexagon_lib_prefix, m_config.m_async_call, 
                                                  m_config.m_hexagon_log_output, m_config.m_hexagon_log_level, m_config.m_hexagon_log_file));
-        if (MI_NULL == m_hexagon_engine.get())
+        if (DT_NULL == m_hexagon_engine.get())
         {
             AURA_ADD_ERROR_STRING(ctx, "m_hexagon_engine null ptr");
             return Status::ERROR;
@@ -80,7 +80,7 @@ Status Context::Impl::Initialize(Context *ctx)
 
 #if defined(AURA_ENABLE_NN)
         m_nn_engine.reset(new NNEngine(ctx, m_config.m_enable_nn));
-        if (MI_NULL == m_nn_engine.get())
+        if (DT_NULL == m_nn_engine.get())
         {
             AURA_ADD_ERROR_STRING(ctx, "m_nn_engine null ptr");
             return Status::ERROR;
@@ -89,14 +89,14 @@ Status Context::Impl::Initialize(Context *ctx)
 
 #if defined(AURA_ENABLE_XTENSA)
         m_xtensa_engine.reset(new XtensaEngine(ctx, m_config.m_enable_xtensa, m_config.m_pil_name, m_config.m_xtensa_priority_level));
-        if (MI_NULL == m_xtensa_engine.get())
+        if (DT_NULL == m_xtensa_engine.get())
         {
             AURA_ADD_ERROR_STRING(ctx, "m_xtensa_engine null ptr");
             return Status::ERROR;
         }
 #endif // AURA_ENABLE_XTENSA
 
-        m_flag = MI_TRUE;
+        m_flag = DT_TRUE;
     }
 
     return Status::OK;
@@ -168,7 +168,7 @@ Context::Context(const Config &config)
 Context::~Context()
 {}
 
-MI_BOOL Context::IsPlatformSupported()
+DT_BOOL Context::IsPlatformSupported()
 {
     return CpuInfo::Get().IsAtomicsSupported();
 }
@@ -198,7 +198,7 @@ Logger* Context::GetLogger() const
     {
         return m_impl->GetLogger();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 MemPool* Context::GetMemPool() const
@@ -207,7 +207,7 @@ MemPool* Context::GetMemPool() const
     {
         return m_impl->GetMemPool();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 WorkerPool* Context::GetWorkerPool() const
@@ -216,7 +216,7 @@ WorkerPool* Context::GetWorkerPool() const
     {
         return m_impl->GetWorkerPool();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 #if defined(AURA_BUILD_ANDROID)
@@ -226,7 +226,7 @@ Systrace* Context::GetSystrace() const
     {
         return m_impl->GetSystrace();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // AURA_BUILD_ANDROID
 
@@ -237,7 +237,7 @@ CLEngine* Context::GetCLEngine() const
     {
         return m_impl->GetCLEngine();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // AURA_ENABLE_OPENCL
 
@@ -248,7 +248,7 @@ HexagonEngine* Context::GetHexagonEngine() const
     {
         return m_impl->GetHexagonEngine();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // AURA_ENABLE_HEXAGON
 
@@ -259,7 +259,7 @@ NNEngine* Context::GetNNEngine() const
     {
         return m_impl->GetNNEngine();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // AURA_ENABLE_NN
 
@@ -270,7 +270,7 @@ XtensaEngine* Context::GetXtensaEngine() const
     {
         return m_impl->GetXtensaEngine();
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // AURA_ENABLE_XTENSA
 

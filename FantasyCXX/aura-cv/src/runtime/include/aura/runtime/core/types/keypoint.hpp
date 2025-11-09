@@ -61,8 +61,8 @@ public:
      * @param octave Pyramid octave in which the keypoint has been detected.
      * @param class_id The class identifier for the keypoint.
      */
-    KeyPoint_(Point2_<Tp0> pt, MI_F32 size, MI_F32 angle = -1, MI_F32 response = 0,
-              MI_S32 octave = 0, MI_S32 class_id = -1) : m_pt(pt), m_size(size),
+    KeyPoint_(Point2_<Tp0> pt, DT_F32 size, DT_F32 angle = -1, DT_F32 response = 0,
+              DT_S32 octave = 0, DT_S32 class_id = -1) : m_pt(pt), m_size(size),
               m_angle(angle), m_response(response), m_octave(octave), m_class_id(class_id)
     {}
 
@@ -77,8 +77,8 @@ public:
      * @param octave Pyramid octave in which the keypoint has been detected.
      * @param class_id The class identifier for the keypoint.
      */
-    KeyPoint_(Tp0 x, Tp0 y, MI_F32 size, MI_F32 angle = -1, MI_F32 response = 0,
-              MI_S32 octave = 0, MI_S32 class_id = -1) : m_pt(x, y), m_size(size),
+    KeyPoint_(Tp0 x, Tp0 y, DT_F32 size, DT_F32 angle = -1, DT_F32 response = 0,
+              DT_S32 octave = 0, DT_S32 class_id = -1) : m_pt(x, y), m_size(size),
               m_angle(angle), m_response(response), m_octave(octave), m_class_id(class_id)
     {}
 
@@ -125,9 +125,9 @@ public:
      *                   convert only specified keypoints)
      */
     template<typename Tp1>
-    AURA_INLINE AURA_VOID Convert(const std::vector<KeyPoint_> &keypoints,
+    AURA_INLINE DT_VOID Convert(const std::vector<KeyPoint_> &keypoints,
                                 std::vector<Point2_<Tp1> > &points2d,
-                                const std::vector<MI_S32> &kp_indexes = std::vector<MI_S32>())
+                                const std::vector<DT_S32> &kp_indexes = std::vector<DT_S32>())
     {
         if (kp_indexes.empty())
         {
@@ -144,7 +144,7 @@ public:
             points2d.resize(kp_sizes);
             for (size_t i = 0; i < kp_sizes; ++i)
             {
-                MI_S32 idx = kp_indexes[i];
+                DT_S32 idx = kp_indexes[i];
                 if (idx >= 0)
                 {
                     points2d[i] = keypoints[idx].m_pt;
@@ -166,10 +166,10 @@ public:
      * @param class_id The class identifier for the keypoint.
      */
     template<typename Tp1>
-    AURA_INLINE AURA_VOID Convert(const std::vector<Point2_<Tp1> > &points2d,
+    AURA_INLINE DT_VOID Convert(const std::vector<Point2_<Tp1> > &points2d,
                                 std::vector<KeyPoint_> &keypoints,
-                                MI_F32 size = 1.f, MI_F32 response = 1.f,
-                                MI_S32 octave = 0, MI_S32 class_id = 1)
+                                DT_F32 size = 1.f, DT_F32 response = 1.f,
+                                DT_S32 octave = 0, DT_S32 class_id = 1)
     {
         size_t kp_sizes = points2d.size();
         keypoints.resize(kp_sizes);
@@ -181,17 +181,17 @@ public:
 #endif
 
     Point2_<Tp0> m_pt;  /*!< Coordinates of the keypoints */
-    MI_F32 m_size;      /*!< Diameter of the meaningful keypoint neighborhood */
-    MI_F32 m_angle;     /*!< Computed orientation of the keypoint (-1 if not applicable); it's in [0,360) degrees
+    DT_F32 m_size;      /*!< Diameter of the meaningful keypoint neighborhood */
+    DT_F32 m_angle;     /*!< Computed orientation of the keypoint (-1 if not applicable); it's in [0,360) degrees
                              and measured relative to iaura coordinate system, ie in clockwise*/
-    MI_F32 m_response;  /*!< The response by which the most strong keypoints have been selected. Can be used for
+    DT_F32 m_response;  /*!< The response by which the most strong keypoints have been selected. Can be used for
                              the further sorting or subsampling */
-    MI_S32 m_octave;    /*!< Octave (pyramid layer) from which the keypoint has been extracted */
-    MI_S32 m_class_id;  /*!< Object class (if the keypoints need to be clustered by an object they belong to) */
+    DT_S32 m_octave;    /*!< Octave (pyramid layer) from which the keypoint has been extracted */
+    DT_S32 m_class_id;  /*!< Object class (if the keypoints need to be clustered by an object they belong to) */
 };
 
-typedef KeyPoint_<MI_S32> KeyPointi;
-typedef KeyPoint_<MI_F32> KeyPoint;
+typedef KeyPoint_<DT_S32> KeyPointi;
+typedef KeyPoint_<DT_F32> KeyPoint;
 
 /**
  * @}

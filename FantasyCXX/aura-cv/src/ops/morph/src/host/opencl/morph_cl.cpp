@@ -3,8 +3,8 @@
 namespace aura
 {
 
-static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, MI_S32 ksize, MI_S32 elem_counts,
-                                     MI_S32 elem_height, MorphType type)
+static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, DT_S32 ksize, DT_S32 elem_counts,
+                                     DT_S32 elem_height, MorphType type)
 {
     CLBuildOptions cl_build_opt(ctx);
 
@@ -17,9 +17,9 @@ static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, MI_S32 ks
     return cl_build_opt.ToString(elem_type);
 }
 
-static Status GetCLName(Context *ctx, MI_S32 channel, MorphShape shape, std::string &program_name, std::string &kernel_name)
+static Status GetCLName(Context *ctx, DT_S32 channel, MorphShape shape, std::string &program_name, std::string &kernel_name)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -56,13 +56,13 @@ static Status GetCLName(Context *ctx, MI_S32 channel, MorphShape shape, std::str
     return Status::OK;
 }
 
-static AURA_VOID GetCLGlobalSize(MI_S32 height, MI_S32 width, MI_S32 elem_counts,
-                               MI_S32 elem_height, cl::NDRange &cl_global_size)
+static DT_VOID GetCLGlobalSize(DT_S32 height, DT_S32 width, DT_S32 elem_counts,
+                               DT_S32 elem_height, cl::NDRange &cl_global_size)
 {
     cl_global_size = cl::NDRange((width + elem_counts - 1) / elem_counts, (height + elem_height - 1) / elem_height);
 }
 
-static AURA_VOID GetCLKernelParam(MorphShape shape, MI_S32 &elem_counts, MI_S32 &elem_height)
+static DT_VOID GetCLKernelParam(MorphShape shape, DT_S32 &elem_counts, DT_S32 &elem_height)
 {
     elem_counts = 4;
     elem_height = (MorphShape::RECT == shape) ? 6 : ((MorphShape::CROSS == shape) ? 5 : 4);
@@ -70,14 +70,14 @@ static AURA_VOID GetCLKernelParam(MorphShape shape, MI_S32 &elem_counts, MI_S32 
 
 Status MorphCL::MorphCLImpl(CLMem &cl_src, CLMem &cl_dst)
 {
-    MI_S32 istep  = cl_src.GetRowPitch() / ElemTypeSize(cl_src.GetElemType());
-    MI_S32 ostep  = cl_dst.GetRowPitch() / ElemTypeSize(cl_dst.GetElemType());
-    MI_S32 height = cl_dst.GetSizes().m_height;
-    MI_S32 width  = cl_dst.GetSizes().m_width;
+    DT_S32 istep  = cl_src.GetRowPitch() / ElemTypeSize(cl_src.GetElemType());
+    DT_S32 ostep  = cl_dst.GetRowPitch() / ElemTypeSize(cl_dst.GetElemType());
+    DT_S32 height = cl_dst.GetSizes().m_height;
+    DT_S32 width  = cl_dst.GetSizes().m_width;
 
     // 1. get cl_global_size
     cl::NDRange cl_global_size;
-    MI_S32 elem_counts, elem_height;
+    DT_S32 elem_counts, elem_height;
 
     GetCLKernelParam(m_shape, elem_counts, elem_height);
     GetCLGlobalSize(height, width, elem_counts, elem_height, cl_global_size);
@@ -87,7 +87,7 @@ Status MorphCL::MorphCLImpl(CLMem &cl_src, CLMem &cl_dst)
     cl_int cl_ret = CL_SUCCESS;
     Status ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32>(
                                  cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                  height, width, cl_global_size,
@@ -99,7 +99,7 @@ Status MorphCL::MorphCLImpl(CLMem &cl_src, CLMem &cl_dst)
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -108,7 +108,7 @@ Status MorphCL::MorphCLImpl(CLMem &cl_src, CLMem &cl_dst)
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -128,7 +128,7 @@ EXIT:
 MorphCL::MorphCL(Context *ctx, MorphType type, const OpTarget &target) : MorphImpl(ctx, type, target)
 {}
 
-Status MorphCL::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape, MI_S32 iterations)
+Status MorphCL::SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape, DT_S32 iterations)
 {
     if (MorphImpl::SetArgs(src, dst, ksize, shape, iterations) != Status::OK)
     {
@@ -220,7 +220,7 @@ Status MorphCL::Run()
         return ret;
     }
 
-    for (MI_S32 i = 1; i < m_iterations; i++)
+    for (DT_S32 i = 1; i < m_iterations; i++)
     {
         temp_cl_src = (((i + m_iterations) & 1) == 0) ? &m_cl_dst : &m_cl_tmp;
         temp_cl_dst = (((i + m_iterations) & 1) == 0) ? &m_cl_tmp : &m_cl_dst;
@@ -266,10 +266,10 @@ std::string MorphCL::ToString() const
     return MorphImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> MorphCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, MorphShape shape, MorphType type)
+std::vector<CLKernel> MorphCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, MorphShape shape, MorphType type)
 {
     std::vector<CLKernel> cl_kernels;
-    MI_S32 elem_counts, elem_height;
+    DT_S32 elem_counts, elem_height;
 
     GetCLKernelParam(shape, elem_counts, elem_height);
     std::string build_opt = GetCLBuildOptions(ctx, elem_type, ksize, elem_counts, elem_height, type);

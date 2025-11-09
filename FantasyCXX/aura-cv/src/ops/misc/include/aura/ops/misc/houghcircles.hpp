@@ -103,8 +103,8 @@ public:
      *
      * For more details, please refer to @ref houghcircles_details
      */
-    Status SetArgs(const Array *src, std::vector<Scalar> &circles, HoughCirclesMethod method, MI_F64 dp,
-                   MI_F64 min_dist, MI_F64 canny_thresh, MI_F64 acc_thresh, MI_S32 min_radius, MI_S32 max_radius);
+    Status SetArgs(const Array *src, std::vector<Scalar> &circles, HoughCirclesMethod method, DT_F64 dp,
+                   DT_F64 min_dist, DT_F64 canny_thresh, DT_F64 acc_thresh, DT_S32 min_radius, DT_S32 max_radius);
 };
 
 /**
@@ -134,8 +134,8 @@ public:
  *
  * @note HoughCirclesMethod only supports HoughCirclesMethod(HOUGH_GRADIENT).
  */
-AURA_EXPORTS Status IHoughCircles(Context *ctx, const Mat &mat, std::vector<Scalar> &circles, HoughCirclesMethod method, MI_F64 dp,
-                                  MI_F64 min_dist, MI_F64 canny_thresh, MI_F64 acc_thresh, MI_S32 min_radius, MI_S32 max_radius,
+AURA_EXPORTS Status IHoughCircles(Context *ctx, const Mat &mat, std::vector<Scalar> &circles, HoughCirclesMethod method, DT_F64 dp,
+                                  DT_F64 min_dist, DT_F64 canny_thresh, DT_F64 acc_thresh, DT_S32 min_radius, DT_S32 max_radius,
                                   const OpTarget &target = OpTarget::Default());
 
 } // namespace aura

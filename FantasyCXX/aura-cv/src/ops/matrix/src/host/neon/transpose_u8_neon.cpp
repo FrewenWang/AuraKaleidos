@@ -5,10 +5,10 @@
 namespace aura
 {
 
-AURA_ALWAYS_INLINE AURA_VOID Transpose16x16U8Neon(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step, MI_U32 src_x, MI_U32 src_y)
+AURA_ALWAYS_INLINE DT_VOID Transpose16x16U8Neon(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step, DT_U32 src_x, DT_U32 src_y)
 {
-    MI_U32 src_addr = src_x * src_step + src_y;
-    MI_U32 dst_addr = src_y * dst_step + src_x;
+    DT_U32 src_addr = src_x * src_step + src_y;
+    DT_U32 dst_addr = src_y * dst_step + src_x;
 
     uint8x16_t vqu8_line0 = neon::vload1q(&src_data[src_addr]);
     uint8x16_t vqu8_line1 = neon::vload1q(&src_data[src_addr += src_step]);
@@ -89,10 +89,10 @@ AURA_ALWAYS_INLINE AURA_VOID Transpose16x16U8Neon(MI_U8 *src_data, MI_U8 *dst_da
     neon::vstore(&dst_data[dst_addr += dst_step], vqu8_outf);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Transpose16x8U8Neon(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step, MI_U32 src_x, MI_U32 src_y)
+AURA_ALWAYS_INLINE DT_VOID Transpose16x8U8Neon(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step, DT_U32 src_x, DT_U32 src_y)
 {
-    MI_U32 src_addr = src_x * src_step + src_y;
-    MI_U32 dst_addr = src_y * dst_step + src_x;
+    DT_U32 src_addr = src_x * src_step + src_y;
+    DT_U32 dst_addr = src_y * dst_step + src_x;
 
     uint8x8_t vdu8_line0 = neon::vload1(&src_data[src_addr]);
     uint8x8_t vdu8_line1 = neon::vload1(&src_data[src_addr += src_step]);
@@ -157,10 +157,10 @@ AURA_ALWAYS_INLINE AURA_VOID Transpose16x8U8Neon(MI_U8 *src_data, MI_U8 *dst_dat
     neon::vstore(&dst_data[dst_addr += dst_step], vqu8_out7);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Transpose8x16U8Neon(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step, MI_U32 src_x, MI_U32 src_y)
+AURA_ALWAYS_INLINE DT_VOID Transpose8x16U8Neon(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step, DT_U32 src_x, DT_U32 src_y)
 {
-    MI_U32 src_addr = src_x * src_step + src_y;
-    MI_U32 dst_addr = src_y * dst_step + src_x;
+    DT_U32 src_addr = src_x * src_step + src_y;
+    DT_U32 dst_addr = src_y * dst_step + src_x;
 
     uint8x16_t vqu8_line0 = neon::vload1q(&src_data[src_addr]);
     uint8x16_t vqu8_line1 = neon::vload1q(&src_data[src_addr += src_step]);
@@ -221,10 +221,10 @@ AURA_ALWAYS_INLINE AURA_VOID Transpose8x16U8Neon(MI_U8 *src_data, MI_U8 *dst_dat
     neon::vstore(&dst_data[dst_addr += dst_step], vdu8_outf);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID Transpose8x8U8Neon(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step, MI_U32 src_x, MI_U32 src_y)
+AURA_ALWAYS_INLINE DT_VOID Transpose8x8U8Neon(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step, DT_U32 src_x, DT_U32 src_y)
 {
-    MI_U32 src_addr = src_x * src_step + src_y;
-    MI_U32 dst_addr = src_y * dst_step + src_x;
+    DT_U32 src_addr = src_x * src_step + src_y;
+    DT_U32 dst_addr = src_y * dst_step + src_x;
 
     uint8x8_t vdu8_line0 = neon::vload1(&src_data[src_addr]);
     uint8x8_t vdu8_line1 = neon::vload1(&src_data[src_addr += src_step]);
@@ -269,30 +269,30 @@ AURA_ALWAYS_INLINE AURA_VOID Transpose8x8U8Neon(MI_U8 *src_data, MI_U8 *dst_data
     neon::vstore(&dst_data[dst_addr += dst_step], vdu8_out7);
 }
 
-template <MI_S32 C> struct TransposeU8NeonFunctor;
+template <DT_S32 C> struct TransposeU8NeonFunctor;
 
 template <> struct TransposeU8NeonFunctor<1>
 {
-    constexpr static MI_S32 BLOCK_SIZE = 16;
-    Status operator()(const Mat &src, Mat &dst, MI_S32 start_blk, MI_S32 end_blk)
+    constexpr static DT_S32 BLOCK_SIZE = 16;
+    Status operator()(const Mat &src, Mat &dst, DT_S32 start_blk, DT_S32 end_blk)
     {
-        MI_S32 start_row = start_blk * 16;
-        MI_S32 end_row   = Min(end_blk * 16, dst.GetSizes().m_height);
-        MI_U8 *src_data = (MI_U8 *)src.GetData();
-        MI_U8 *dst_data = (MI_U8 *)dst.GetData();
-        MI_S32 src_step = src.GetRowPitch() / sizeof(MI_U8);
-        MI_S32 dst_step = dst.GetRowPitch() / sizeof(MI_U8);
+        DT_S32 start_row = start_blk * 16;
+        DT_S32 end_row   = Min(end_blk * 16, dst.GetSizes().m_height);
+        DT_U8 *src_data = (DT_U8 *)src.GetData();
+        DT_U8 *dst_data = (DT_U8 *)dst.GetData();
+        DT_S32 src_step = src.GetRowPitch() / sizeof(DT_U8);
+        DT_S32 dst_step = dst.GetRowPitch() / sizeof(DT_U8);
 
-        MI_S32 w = dst.GetSizes().m_width;
-        MI_S32 h = Min(dst.GetSizes().m_height, end_row);
+        DT_S32 w = dst.GetSizes().m_width;
+        DT_S32 h = Min(dst.GetSizes().m_height, end_row);
 
-        MI_S32 w_align8  = (w & (-8));
-        MI_S32 w_align16 = (w & (-16));
-        MI_S32 h_align8  = (h & (-8));
-        MI_S32 h_align16 = (h & (-16));
+        DT_S32 w_align8  = (w & (-8));
+        DT_S32 w_align16 = (w & (-16));
+        DT_S32 h_align8  = (h & (-8));
+        DT_S32 h_align16 = (h & (-16));
 
-        MI_S32 x = 0;
-        MI_S32 y = Max(0, start_row);
+        DT_S32 x = 0;
+        DT_S32 y = Max(0, start_row);
 
         for (; y < h_align16; y += 16)
         {
@@ -337,7 +337,7 @@ template <> struct TransposeU8NeonFunctor<1>
         if (y < end_row)
         {
             y /= 16;
-            TransposeNoneFunctor<MI_U8, 1>()(src, dst, y, end_row);
+            TransposeNoneFunctor<DT_U8, 1>()(src, dst, y, end_row);
         }
 
         return Status::OK;
@@ -350,13 +350,13 @@ Status TransposeU8Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &t
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
@@ -372,7 +372,7 @@ Status TransposeU8Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &t
         }
         case 2:
         {
-            TransposeNoneFunctor<MI_U8, 2> op;
+            TransposeNoneFunctor<DT_U8, 2> op;
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, op, std::cref(src), std::ref(dst));
             if (ret != Status::OK)
             {
@@ -382,7 +382,7 @@ Status TransposeU8Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &t
         }
         case 3:
         {
-            TransposeNoneFunctor<MI_U8, 3> op;
+            TransposeNoneFunctor<DT_U8, 3> op;
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, op, std::cref(src), std::ref(dst));
             if (ret != Status::OK)
             {
@@ -392,7 +392,7 @@ Status TransposeU8Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &t
         }
         case 4:
         {
-            TransposeNoneFunctor<MI_U8, 4> op;
+            TransposeNoneFunctor<DT_U8, 4> op;
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, op, std::cref(src), std::ref(dst));
             if (ret != Status::OK)
             {

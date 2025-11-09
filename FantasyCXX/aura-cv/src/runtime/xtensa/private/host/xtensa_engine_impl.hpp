@@ -17,21 +17,21 @@ namespace aura
 class XtensaEngine::Impl
 {
 public:
-    Impl(Context *ctx, MI_BOOL enable_xtensa, const std::string &pil_name, XtensaPriorityLevel priority);
+    Impl(Context *ctx, DT_BOOL enable_xtensa, const std::string &pil_name, XtensaPriorityLevel priority);
     ~Impl();
 
     Status Run(const std::string &package, const std::string &module,
                XtensaRpcParam &rpc_param);
 
-    Status CacheStart(MI_S32 fd);
+    Status CacheStart(DT_S32 fd);
 
-    Status CacheEnd(MI_S32 fd);
+    Status CacheEnd(DT_S32 fd);
 
     Status MapBuffer(const Buffer &buffer);
 
     Status UnmapBuffer(const Buffer &buffer);
 
-    MI_U32 GetDeviceAddr(const Buffer &buffer);
+    DT_U32 GetDeviceAddr(const Buffer &buffer);
 
     Status SetPower(XtensaPowerLevel level);
 
@@ -52,16 +52,16 @@ private:
 #if !defined(AURA_BUILD_XPLORER)
     struct MemBlk
     {
-        MemBlk(const Buffer &buffer, MI_U32 device_addr) : m_host_buffer(buffer), m_device_addr(device_addr)
+        MemBlk(const Buffer &buffer, DT_U32 device_addr) : m_host_buffer(buffer), m_device_addr(device_addr)
         {}
 
         Buffer m_host_buffer;
-        MI_U32 m_device_addr;
+        DT_U32 m_device_addr;
     };
 #endif // AURA_BUILD_XTENSA
 
     Context *m_ctx;
-    MI_BOOL m_flag;
+    DT_BOOL m_flag;
     std::string m_pil_name;
     XtensaPriorityLevel m_priority;
 
@@ -70,12 +70,12 @@ private:
     application_symbol_tray m_symbol_tray;
     xvTileManager m_xv_tm;
 #else
-    MI_U32 m_op_id;
-    AURA_VOID *m_handle;
+    DT_U32 m_op_id;
+    DT_VOID *m_handle;
     std::future<Status> m_init_token;
     std::shared_ptr<WorkerPool> m_wp;
     std::mutex m_lock;
-    std::unordered_map<MI_UPTR_T, MemBlk> m_mblk_map;
+    std::unordered_map<DT_UPTR_T, MemBlk> m_mblk_map;
 #endif // AURA_BUILD_XPLORER
 };
 

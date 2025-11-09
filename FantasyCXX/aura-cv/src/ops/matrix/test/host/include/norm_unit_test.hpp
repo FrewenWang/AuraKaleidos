@@ -44,7 +44,7 @@ AURA_INLINE cv::NormTypes NormTypeConvert(NormType type)
 }
 #endif
 
-AURA_INLINE Status CvNorm(Mat &src, MI_F64 &result, NormType type)
+AURA_INLINE Status CvNorm(Mat &src, DT_F64 &result, NormType type)
 {
     if (ElemType::U32 == src.GetElemType() || ElemType::F16 == src.GetElemType())
     {
@@ -68,7 +68,7 @@ public:
     NormTest(Context *ctx, NormParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         NormParam run_param(GetParam((index)));
@@ -85,15 +85,15 @@ public:
         TestResult result;
         result.input  = mat_size.ToString() + " " + ElemTypesToString(elem_type);
         result.param  = NormTypeToString(run_param.norm_type);
-        result.output = "MI_F64";
+        result.output = "DT_F64";
 
         // Execute result variables
         Status ret = Status::OK;
-        MI_F64 res_norm = 0.0;
-        MI_F64 ref_norm = 0.0;
+        DT_F64 res_norm = 0.0;
+        DT_F64 ref_norm = 0.0;
 
         // Run interface
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         Status status_exec = Executor(loop_count, 2, time_val, INorm, m_ctx, src_mat, &res_norm, run_param.norm_type, run_param.target);
         if (Status::OK == status_exec)
@@ -138,7 +138,7 @@ public:
 
         // Compare
         {
-            MI_F64 relative_diff = Abs(res_norm - ref_norm) / Max(Abs(res_norm), Abs(ref_norm));
+            DT_F64 relative_diff = Abs(res_norm - ref_norm) / Max(Abs(res_norm), Abs(ref_norm));
             result.accu_result = std::string("dst norm: ") + std::to_string(res_norm) + std::string(" ref norm: ") + std::to_string(ref_norm);
             result.accu_status = (relative_diff < 1E-4) ? TestStatus::PASSED : TestStatus::FAILED;
             if (TestStatus::FAILED == result.accu_status)

@@ -6,15 +6,15 @@ namespace aura
 {
 
 template <typename Tp, BorderType BORDER_TYPE, typename Kt>
-static AURA_VOID PyrDown5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0,
-                             const Tp *src_n1, MI_S32 iwidth, Tp *dst, MI_S32 owidth, const Kt *kernel)
+static DT_VOID PyrDown5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0,
+                             const Tp *src_n1, DT_S32 iwidth, Tp *dst, DT_S32 owidth, const Kt *kernel)
 {
     using SumType = typename Promote<Kt>::Type;
 
-    MI_S32 sx = 0;
-    MI_S32 src_idx_l1 = 0, src_idx_l0 = 0, src_idx_c = 0, src_idx_n0 = 0, src_idx_n1 = 0;
+    DT_S32 sx = 0;
+    DT_S32 src_idx_l1 = 0, src_idx_l0 = 0, src_idx_c = 0, src_idx_n0 = 0, src_idx_n1 = 0;
     SumType sum[5] = {0}, result = 0;
-    for (MI_S32 dx = 0; dx < owidth; dx++)
+    for (DT_S32 dx = 0; dx < owidth; dx++)
     {
         sx = dx << 1;
         src_idx_l1 = GetBorderIdx<BORDER_TYPE>(sx - 2, iwidth);
@@ -43,24 +43,24 @@ static AURA_VOID PyrDown5x5Row(const Tp *src_p1, const Tp *src_p0, const Tp *src
 }
 
 template <typename Tp, BorderType BORDER_TYPE>
-static Status PyrDown5x5NoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat, MI_S32 start_row, MI_S32 end_row)
+static Status PyrDown5x5NoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat, DT_S32 start_row, DT_S32 end_row)
 {
     AURA_UNUSED(ctx);
 
     using Kt = typename PyrDownTraits<Tp>::KernelType;
     const Kt *kernel = kmat.Ptr<Kt>(0);
 
-    const MI_S32 iwidth = src.GetSizes().m_width;
-    const MI_S32 owidth = dst.GetSizes().m_width;
-    MI_S32 sy = 0;
+    const DT_S32 iwidth = src.GetSizes().m_width;
+    const DT_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 sy = 0;
 
-    const Tp *src_p1  = src.Ptr<Tp, BORDER_TYPE>(start_row - 2, MI_NULL);
-    const Tp *src_p0  = src.Ptr<Tp, BORDER_TYPE>(start_row - 1, MI_NULL);
+    const Tp *src_p1  = src.Ptr<Tp, BORDER_TYPE>(start_row - 2, DT_NULL);
+    const Tp *src_p0  = src.Ptr<Tp, BORDER_TYPE>(start_row - 1, DT_NULL);
     const Tp *src_c   = src.Ptr<Tp>(start_row);
-    const Tp *src_n0  = src.Ptr<Tp, BORDER_TYPE>(start_row + 1, MI_NULL);
-    const Tp *src_n1  = src.Ptr<Tp, BORDER_TYPE>(start_row + 2, MI_NULL);
+    const Tp *src_n0  = src.Ptr<Tp, BORDER_TYPE>(start_row + 1, DT_NULL);
+    const Tp *src_n1  = src.Ptr<Tp, BORDER_TYPE>(start_row + 2, DT_NULL);
 
-    for (MI_S32 dy = start_row; dy < end_row; dy++)
+    for (DT_S32 dy = start_row; dy < end_row; dy++)
     {
         sy          = dy << 1;
         Tp *dst_row = dst.Ptr<Tp>(dy);
@@ -70,8 +70,8 @@ static Status PyrDown5x5NoneImpl(Context *ctx, const Mat &src, Mat &dst, const M
         src_p1 = src_c;
         src_p0 = src_n0;
         src_c  = src_n1;
-        src_n0 = src.Ptr<Tp, BORDER_TYPE>(sy + 3, MI_NULL);
-        src_n1 = src.Ptr<Tp, BORDER_TYPE>(sy + 4, MI_NULL);
+        src_n0 = src.Ptr<Tp, BORDER_TYPE>(sy + 3, DT_NULL);
+        src_n1 = src.Ptr<Tp, BORDER_TYPE>(sy + 4, DT_NULL);
     }
 
     return Status::OK;
@@ -82,7 +82,7 @@ static Status PyrDown5x5NoneHelper(Context *ctx, const Mat &src, Mat &dst, const
                                    BorderType &border_type, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     switch (border_type)
     {
@@ -91,13 +91,13 @@ static Status PyrDown5x5NoneHelper(Context *ctx, const Mat &src, Mat &dst, const
             if (target.m_data.none.enable_mt)
             {
                 WorkerPool *wp = ctx->GetWorkerPool();
-                if (MI_NULL == wp)
+                if (DT_NULL == wp)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                     return Status::ERROR;
                 }
 
-                ret = wp->ParallelFor(static_cast<MI_S32>(0), oheight,
+                ret = wp->ParallelFor(static_cast<DT_S32>(0), oheight,
                                       PyrDown5x5NoneImpl<Tp, BorderType::REPLICATE>, ctx,
                                       std::cref(src), std::ref(dst), std::cref(kmat));
             }
@@ -113,13 +113,13 @@ static Status PyrDown5x5NoneHelper(Context *ctx, const Mat &src, Mat &dst, const
             if (target.m_data.none.enable_mt)
             {
                 WorkerPool *wp = ctx->GetWorkerPool();
-                if (MI_NULL == wp)
+                if (DT_NULL == wp)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                     return Status::ERROR;
                 }
 
-                ret = wp->ParallelFor(static_cast<MI_S32>(0), oheight,
+                ret = wp->ParallelFor(static_cast<DT_S32>(0), oheight,
                                       PyrDown5x5NoneImpl<Tp, BorderType::REFLECT_101>, ctx,
                                       std::cref(src), std::ref(dst), std::cref(kmat));
             }
@@ -148,19 +148,19 @@ Status PyrDown5x5None(Context *ctx, const Mat &src, Mat &dst, const Mat &kmat, B
     {
         case ElemType::U8:
         {
-            ret = PyrDown5x5NoneHelper<MI_U8>(ctx, src, dst, kmat, border_type, target);
+            ret = PyrDown5x5NoneHelper<DT_U8>(ctx, src, dst, kmat, border_type, target);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = PyrDown5x5NoneHelper<MI_U16>(ctx, src, dst, kmat, border_type, target);
+            ret = PyrDown5x5NoneHelper<DT_U16>(ctx, src, dst, kmat, border_type, target);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = PyrDown5x5NoneHelper<MI_S16>(ctx, src, dst, kmat, border_type, target);
+            ret = PyrDown5x5NoneHelper<DT_S16>(ctx, src, dst, kmat, border_type, target);
             break;
         }
 

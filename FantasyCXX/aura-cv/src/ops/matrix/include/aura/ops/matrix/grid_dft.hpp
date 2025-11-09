@@ -58,7 +58,7 @@ public:
      * should be aligned to a stride, which is obtained through the `GetCLLengthAlignSize` function and is
      * platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len);
+    Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len);
 
     /**
      * @brief Generate griddft opencl precompiled cache.
@@ -66,7 +66,7 @@ public:
      * @param elem_type The griddft src/dst array element type.
      * @param grid_len The length of the grid for the DFT operation.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 grid_len);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 grid_len);
 };
 
 /**
@@ -105,7 +105,7 @@ public:
      * should be aligned to a stride, which is obtained through the `GetCLLengthAlignSize` function and is
      * platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL with_scale);
+    Status SetArgs(const Array *src, Array *dst, DT_S32 grid_len, DT_BOOL with_scale);
 
     /**
      * @brief Generate grididft opencl precompiled cache.
@@ -115,7 +115,7 @@ public:
      * @param with_scale A boolean flag indicating whether to perform scaling in the IDFT (defaults to false).
      * @param save_real_only If dst channel is 1.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 grid_len, MI_S32 with_scale, MI_BOOL save_real_only);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 grid_len, DT_S32 with_scale, DT_BOOL save_real_only);
 };
 
 /**
@@ -140,7 +140,7 @@ public:
  * NEON         | U8C1/S8C1/U16C1/S16C1/F16C1/F32C1                       | F32C2        | 4/8/16/32
  * OpenCL       | U8C1/S8C1/U16C1/S16C1/F16C1/F32C1                       | F32C2        | 4/8/16/32
  */
-AURA_EXPORTS Status IGridDft(Context *ctx, const Mat &src, Mat &dst, MI_S32 grid_len, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IGridDft(Context *ctx, const Mat &src, Mat &dst, DT_S32 grid_len, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Performs an inverse grid-based Discrete Fourier Transform (IDFT) on the source matrix.
@@ -165,7 +165,7 @@ AURA_EXPORTS Status IGridDft(Context *ctx, const Mat &src, Mat &dst, MI_S32 grid
  * NEON         | F32C2         | U8C1/S8C1/U16C1/S16C1/F16C1/F32C1/F32C2                    | 4/8/16/32
  * OpenCL       | F32C2         | U8C1/S8C1/U16C1/S16C1/F16C1/F32C1/F32C2                    | 4/8/16/32
  */
-AURA_EXPORTS Status IGridIDft(Context *ctx, const Mat &src, Mat &dst, MI_S32 grid_len, MI_BOOL with_scale, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IGridIDft(Context *ctx, const Mat &src, Mat &dst, DT_S32 grid_len, DT_BOOL with_scale, const OpTarget &target = OpTarget::Default());
 
 /**
  * @}

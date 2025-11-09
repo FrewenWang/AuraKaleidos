@@ -5,7 +5,7 @@
 namespace aura
 {
 
-const static MI_S16 g_kernel_tabel[4][3] =
+const static DT_S16 g_kernel_tabel[4][3] =
 {
     { 1,  2, 1},
     {-1,  0, 1},
@@ -13,7 +13,7 @@ const static MI_S16 g_kernel_tabel[4][3] =
     { 3, 10, 3}
 };
 
-AURA_ALWAYS_INLINE int16x8_t Sobel3x3VCore(uint8x8_t &vdu8_src_p, uint8x8_t &vdu8_src_c, uint8x8_t &vdu8_src_n, const MI_S16 *kernel)
+AURA_ALWAYS_INLINE int16x8_t Sobel3x3VCore(uint8x8_t &vdu8_src_p, uint8x8_t &vdu8_src_c, uint8x8_t &vdu8_src_n, const DT_S16 *kernel)
 {
     int16x8_t vqs16_sum_p = neon::vmul(neon::vreinterpret(neon::vmovl(vdu8_src_p)), kernel[0]);
     int16x8_t vqs16_sum_c = neon::vmul(neon::vreinterpret(neon::vmovl(vdu8_src_c)), kernel[1]);
@@ -22,7 +22,7 @@ AURA_ALWAYS_INLINE int16x8_t Sobel3x3VCore(uint8x8_t &vdu8_src_p, uint8x8_t &vdu
     return neon::vadd(neon::vadd(vqs16_sum_p, vqs16_sum_n), vqs16_sum_c);
 }
 
-AURA_ALWAYS_INLINE int16x8_t Sobel3x3HCore(int16x8_t &vqs16_sum_x0, int16x8_t &vqs16_sum_x1, int16x8_t &vqs16_sum_x2, const MI_S16 *kernel)
+AURA_ALWAYS_INLINE int16x8_t Sobel3x3HCore(int16x8_t &vqs16_sum_x0, int16x8_t &vqs16_sum_x1, int16x8_t &vqs16_sum_x2, const DT_S16 *kernel)
 {
     int16x8_t vqs16_sum_l     = neon::vext<7>(vqs16_sum_x0, vqs16_sum_x1);
     int16x8_t vqs16_sum_r     = neon::vext<1>(vqs16_sum_x1, vqs16_sum_x2);
@@ -37,23 +37,23 @@ AURA_ALWAYS_INLINE int16x8_t Sobel3x3HCore(int16x8_t &vqs16_sum_x0, int16x8_t &v
     return neon::vadd(neon::vadd(vqs16_sum_mul_l, vqs16_sum_mul_r), vqs16_sum_mul_c);
 }
 
-AURA_ALWAYS_INLINE float32x4_t Sobel3x3VCore(float32x4_t &vqf32_src_p, float32x4_t &vqf32_src_c, float32x4_t &vqf32_src_n, const MI_S16 *kernel)
+AURA_ALWAYS_INLINE float32x4_t Sobel3x3VCore(float32x4_t &vqf32_src_p, float32x4_t &vqf32_src_c, float32x4_t &vqf32_src_n, const DT_S16 *kernel)
 {
-    float32x4_t vqf32_sum_p = neon::vmul(vqf32_src_p, static_cast<MI_F32>(kernel[0]));
-    float32x4_t vqf32_sum_c = neon::vmul(vqf32_src_c, static_cast<MI_F32>(kernel[1]));
-    float32x4_t vqf32_sum_n = neon::vmul(vqf32_src_n, static_cast<MI_F32>(kernel[2]));
+    float32x4_t vqf32_sum_p = neon::vmul(vqf32_src_p, static_cast<DT_F32>(kernel[0]));
+    float32x4_t vqf32_sum_c = neon::vmul(vqf32_src_c, static_cast<DT_F32>(kernel[1]));
+    float32x4_t vqf32_sum_n = neon::vmul(vqf32_src_n, static_cast<DT_F32>(kernel[2]));
 
     return neon::vadd(neon::vadd(vqf32_sum_p, vqf32_sum_n), vqf32_sum_c);
 }
 
-AURA_ALWAYS_INLINE float32x4_t Sobel3x3HCore(float32x4_t &vqf32_sum_x0, float32x4_t &vqf32_sum_x1, float32x4_t &vqf32_sum_x2, const MI_S16 *kernel)
+AURA_ALWAYS_INLINE float32x4_t Sobel3x3HCore(float32x4_t &vqf32_sum_x0, float32x4_t &vqf32_sum_x1, float32x4_t &vqf32_sum_x2, const DT_S16 *kernel)
 {
     float32x4_t vqf32_sum_l     = neon::vext<3>(vqf32_sum_x0, vqf32_sum_x1);
     float32x4_t vqf32_sum_r     = neon::vext<1>(vqf32_sum_x1, vqf32_sum_x2);
 
-    float32x4_t vqf32_sum_mul_l = neon::vmul(vqf32_sum_l,  static_cast<MI_F32>(kernel[0]));
-    float32x4_t vqf32_sum_mul_c = neon::vmul(vqf32_sum_x1, static_cast<MI_F32>(kernel[1]));
-    float32x4_t vqf32_sum_mul_r = neon::vmul(vqf32_sum_r,  static_cast<MI_F32>(kernel[2]));
+    float32x4_t vqf32_sum_mul_l = neon::vmul(vqf32_sum_l,  static_cast<DT_F32>(kernel[0]));
+    float32x4_t vqf32_sum_mul_c = neon::vmul(vqf32_sum_x1, static_cast<DT_F32>(kernel[1]));
+    float32x4_t vqf32_sum_mul_r = neon::vmul(vqf32_sum_r,  static_cast<DT_F32>(kernel[2]));
 
     vqf32_sum_x0 = vqf32_sum_x1;
     vqf32_sum_x1 = vqf32_sum_x2;
@@ -61,19 +61,19 @@ AURA_ALWAYS_INLINE float32x4_t Sobel3x3HCore(float32x4_t &vqf32_sum_x0, float32x
     return neon::vadd(neon::vadd(vqf32_sum_mul_l, vqf32_sum_mul_r), vqf32_sum_mul_c);
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C, MI_BOOL WITH_SCALE>
-static AURA_VOID Sobel3x3Row(const St *src_p, const St *src_c, const St *src_n, Dt *dst, const MI_S16 *kernel_x, const MI_S16 *kernel_y,
-                           MI_F32 scale, const std::vector<St> &border_value, MI_S32 width)
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C, DT_BOOL WITH_SCALE>
+static DT_VOID Sobel3x3Row(const St *src_p, const St *src_c, const St *src_n, Dt *dst, const DT_S16 *kernel_x, const DT_S16 *kernel_y,
+                           DT_F32 scale, const std::vector<St> &border_value, DT_S32 width)
 {
-    using MVSt      = typename std::conditional<std::is_same<St, MI_F32>::value, typename neon::MQVector<St, C>::MVType,
+    using MVSt      = typename std::conditional<std::is_same<St, DT_F32>::value, typename neon::MQVector<St, C>::MVType,
                                                 typename neon::MDVector<St, C>::MVType>::type;
-    using MVSumType = typename std::conditional<std::is_same<St, MI_F32>::value, typename neon::MQVector<St, C>::MVType,
-                                                typename neon::MQVector<MI_S16, C>::MVType>::type;
+    using MVSumType = typename std::conditional<std::is_same<St, DT_F32>::value, typename neon::MQVector<St, C>::MVType,
+                                                typename neon::MQVector<DT_S16, C>::MVType>::type;
 
-    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(sizeof(MVSt) / C / sizeof(St));
-    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
+    constexpr DT_S32 ELEM_COUNTS = static_cast<DT_S32>(sizeof(MVSt) / C / sizeof(St));
+    constexpr DT_S32 VOFFSET     = ELEM_COUNTS * C;
 
-    const MI_S32 width_align = (width & -ELEM_COUNTS) * C;
+    const DT_S32 width_align = (width & -ELEM_COUNTS) * C;
 
     MVSt mv_src_p[3], mv_src_c[3], mv_src_n[3];
     MVSumType mv_sum[3], mv_result;
@@ -87,7 +87,7 @@ static AURA_VOID Sobel3x3Row(const St *src_p, const St *src_c, const St *src_n, 
         neon::vload(src_n,           mv_src_n[1]);
         neon::vload(src_n + VOFFSET, mv_src_n[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p[1].val[ch], src_p[ch], border_value[ch]);
             mv_src_c[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_c[1].val[ch], src_c[ch], border_value[ch]);
@@ -102,13 +102,13 @@ static AURA_VOID Sobel3x3Row(const St *src_p, const St *src_c, const St *src_n, 
 
     // middle
     {
-        for (MI_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
+        for (DT_S32 x = VOFFSET; x < (width_align - VOFFSET); x += VOFFSET)
         {
             neon::vload(src_p + x + VOFFSET, mv_src_p[2]);
             neon::vload(src_c + x + VOFFSET, mv_src_c[2]);
             neon::vload(src_n + x + VOFFSET, mv_src_n[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mv_sum[2].val[ch] = Sobel3x3VCore(mv_src_p[2].val[ch], mv_src_c[2].val[ch], mv_src_n[2].val[ch], kernel_y);
                 mv_result.val[ch] = Sobel3x3HCore(mv_sum[0].val[ch], mv_sum[1].val[ch], mv_sum[2].val[ch], kernel_x);
@@ -121,7 +121,7 @@ static AURA_VOID Sobel3x3Row(const St *src_p, const St *src_c, const St *src_n, 
     {
         if (width_align != width * C)
         {
-            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+            DT_S32 x = (width - (ELEM_COUNTS << 1)) * C;
 
             neon::vload(src_p + x - VOFFSET, mv_src_p[0]);
             neon::vload(src_p + x,           mv_src_p[1]);
@@ -133,7 +133,7 @@ static AURA_VOID Sobel3x3Row(const St *src_p, const St *src_c, const St *src_n, 
             neon::vload(src_n + x,           mv_src_n[1]);
             neon::vload(src_n + x + VOFFSET, mv_src_n[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mv_sum[0].val[ch] = Sobel3x3VCore(mv_src_p[0].val[ch], mv_src_c[0].val[ch], mv_src_n[0].val[ch], kernel_y);
                 mv_sum[1].val[ch] = Sobel3x3VCore(mv_src_p[1].val[ch], mv_src_c[1].val[ch], mv_src_n[1].val[ch], kernel_y);
@@ -146,10 +146,10 @@ static AURA_VOID Sobel3x3Row(const St *src_p, const St *src_c, const St *src_n, 
 
     // right
     {
-        MI_S32 x    = (width - ELEM_COUNTS) * C;
-        MI_S32 last = (width - 1) * C;
+        DT_S32 x    = (width - ELEM_COUNTS) * C;
+        DT_S32 last = (width - 1) * C;
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p[2].val[ch], src_p[last], border_value[ch]);
             mv_src_c[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_c[2].val[ch], src_c[last], border_value[ch]);
@@ -164,16 +164,16 @@ static AURA_VOID Sobel3x3Row(const St *src_p, const St *src_c, const St *src_n, 
     }
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C, MI_BOOL WITH_SCALE>
-static Status Sobel3x3NeonImpl(const Mat &src, Mat &dst, const MI_S16 *kernel_x, const MI_S16 *kernel_y, MI_F32 scale,
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C, DT_BOOL WITH_SCALE>
+static Status Sobel3x3NeonImpl(const Mat &src, Mat &dst, const DT_S16 *kernel_x, const DT_S16 *kernel_y, DT_F32 scale,
                                const std::vector<St> &border_value, const St *border_buffer,
-                               MI_S32 start_row, MI_S32 end_row)
+                               DT_S32 start_row, DT_S32 end_row)
 {
-    const St *src_p = MI_NULL, *src_c = MI_NULL, *src_n = MI_NULL;
-    Dt *dst_c = MI_NULL;
+    const St *src_p = DT_NULL, *src_c = DT_NULL, *src_n = DT_NULL;
+    Dt *dst_c = DT_NULL;
 
-    MI_S32 width = dst.GetSizes().m_width;
-    MI_S32 y     = start_row;
+    DT_S32 width = dst.GetSizes().m_width;
+    DT_S32 y     = start_row;
 
     src_p = src.Ptr<St, BORDER_TYPE>(y - 1, border_buffer);
     src_c = src.Ptr<St>(y);
@@ -192,14 +192,14 @@ static Status Sobel3x3NeonImpl(const Mat &src, Mat &dst, const MI_S16 *kernel_x,
     return Status::OK;
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C>
-static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 dx, MI_S32 dy, MI_F32 scale,
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C>
+static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, DT_S32 dx, DT_S32 dy, DT_F32 scale,
                                  const std::vector<St> &border_value, const St *border_buffer, const OpTarget &target)
 {
     AURA_UNUSED(target);
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -207,26 +207,26 @@ static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 
 
     Status ret = Status::ERROR;
 
-    const MI_S16 *kernel_x = g_kernel_tabel[dx];
-    const MI_S16 *kernel_y = g_kernel_tabel[dy];
-    MI_S32 height    = dst.GetSizes().m_height;
+    const DT_S16 *kernel_x = g_kernel_tabel[dx];
+    const DT_S16 *kernel_y = g_kernel_tabel[dy];
+    DT_S32 height    = dst.GetSizes().m_height;
 
     if (NearlyEqual(scale, 1.f))
     {
-        ret = wp->ParallelFor(0, height, Sobel3x3NeonImpl<St, Dt, BORDER_TYPE, C, MI_FALSE>,
+        ret = wp->ParallelFor(0, height, Sobel3x3NeonImpl<St, Dt, BORDER_TYPE, C, DT_FALSE>,
                               std::cref(src), std::ref(dst), kernel_x, kernel_y, scale, std::cref(border_value), border_buffer);
         if (ret != Status::OK)
         {
-            AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonImpl<St, Dt, BORDER_TYPE, C, MI_FALSE> failed");
+            AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonImpl<St, Dt, BORDER_TYPE, C, DT_FALSE> failed");
         }
     }
     else
     {
-        ret = wp->ParallelFor(0, height, Sobel3x3NeonImpl<St, Dt, BORDER_TYPE, C, MI_TRUE>,
+        ret = wp->ParallelFor(0, height, Sobel3x3NeonImpl<St, Dt, BORDER_TYPE, C, DT_TRUE>,
                               std::cref(src), std::ref(dst), kernel_x, kernel_y, scale, std::cref(border_value), border_buffer);
         if (ret != Status::OK)
         {
-            AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonImpl<St, Dt, BORDER_TYPE, C, MI_TRUE> failed");
+            AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonImpl<St, Dt, BORDER_TYPE, C, DT_TRUE> failed");
         }
     }
 
@@ -234,7 +234,7 @@ static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 
 }
 
 template <typename St, typename Dt, BorderType BORDER_TYPE>
-static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 dx, MI_S32 dy, MI_F32 scale,
+static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, DT_S32 dx, DT_S32 dy, DT_F32 scale,
                                  const std::vector<St> &border_value, const St *border_buffer, const OpTarget &target)
 {
     Status ret = Status::ERROR;
@@ -282,23 +282,23 @@ static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 
 }
 
 template <typename St, typename Dt>
-static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 dx, MI_S32 dy, MI_F32 scale,
+static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, DT_S32 dx, DT_S32 dy, DT_F32 scale,
                                  BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
-    St *border_buffer = MI_NULL;
+    St *border_buffer = DT_NULL;
     std::vector<St> vec_border_value = border_value.ToVector<St>();
 
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (border_type)
     {
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -344,40 +344,40 @@ static Status Sobel3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 
     AURA_RETURN(ctx, ret);
 }
 
-Status Sobel3x3Neon(Context *ctx, const Mat &src, Mat &dst, MI_S32 dx, MI_S32 dy, MI_F32 scale,
+Status Sobel3x3Neon(Context *ctx, const Mat &src, Mat &dst, DT_S32 dx, DT_S32 dy, DT_F32 scale,
                     BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
 
     switch (pattern)
     {
         case AURA_MAKE_PATTERN(ElemType::U8, ElemType::S16):
         {
-            ret = Sobel3x3NeonHelper<MI_U8, MI_S16>(ctx, src, dst, dx, dy, scale, border_type, border_value, target);
+            ret = Sobel3x3NeonHelper<DT_U8, DT_S16>(ctx, src, dst, dx, dy, scale, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonHelper<MI_U8, MI_S16> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonHelper<DT_U8, DT_S16> failed");
             }
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::U8, ElemType::F32):
         {
-            ret = Sobel3x3NeonHelper<MI_U8, MI_F32>(ctx, src, dst, dx, dy, scale, border_type, border_value, target);
+            ret = Sobel3x3NeonHelper<DT_U8, DT_F32>(ctx, src, dst, dx, dy, scale, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonHelper<MI_U8, MI_F32> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonHelper<DT_U8, DT_F32> failed");
             }
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::F32, ElemType::F32):
         {
-            ret = Sobel3x3NeonHelper<MI_F32, MI_F32>(ctx, src, dst, dx, dy, scale, border_type, border_value, target);
+            ret = Sobel3x3NeonHelper<DT_F32, DT_F32>(ctx, src, dst, dx, dy, scale, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonHelper<MI_F32, MI_F32> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Sobel3x3NeonHelper<DT_F32, DT_F32> failed");
             }
             break;
         }

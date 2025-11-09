@@ -5,7 +5,7 @@
 namespace aura
 {
 
-Buffer AllocatorHeap::Allocate(MI_S64 size, MI_S32 align)
+Buffer AllocatorHeap::Allocate(DT_S64 size, DT_S32 align)
 {
     if (align <= 0)
     {
@@ -16,23 +16,23 @@ Buffer AllocatorHeap::Allocate(MI_S64 size, MI_S32 align)
 #endif
     }
 
-    AURA_VOID **align_addr = MI_NULL;
-    AURA_VOID *raw_addr = calloc(size + sizeof(AURA_VOID*) + align, 1);
-    if (raw_addr != MI_NULL)
+    DT_VOID **align_addr = DT_NULL;
+    DT_VOID *raw_addr = calloc(size + sizeof(DT_VOID*) + align, 1);
+    if (raw_addr != DT_NULL)
     {
-        align_addr = (AURA_VOID **)AURA_ALIGN((MI_UPTR_T)((AURA_VOID **)raw_addr + 1), align);
+        align_addr = (DT_VOID **)AURA_ALIGN((DT_UPTR_T)((DT_VOID **)raw_addr + 1), align);
         align_addr[-1] = raw_addr;
     }
 
     return Buffer(AURA_MEM_HEAP, size, size, align_addr, align_addr, 0);
 }
 
-AURA_VOID AllocatorHeap::Free(Buffer &buffer)
+DT_VOID AllocatorHeap::Free(Buffer &buffer)
 {
-    if (AURA_MEM_HEAP == buffer.m_type && buffer.m_origin != MI_NULL)
+    if (AURA_MEM_HEAP == buffer.m_type && buffer.m_origin != DT_NULL)
     {
-        AURA_VOID *raw_addr = ((AURA_VOID **)buffer.m_origin)[-1];
-        if (raw_addr != MI_NULL)
+        DT_VOID *raw_addr = ((DT_VOID **)buffer.m_origin)[-1];
+        if (raw_addr != DT_NULL)
         {
             free(raw_addr);
         }

@@ -20,7 +20,7 @@ static Status CvMakeBorder(Mat &src, Mat &dst, BorderType type,
                                  const BorderSize &bsize, const Scalar &scalar)
 {
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 cv_type = BorderTypeToOpencv(type);
+    DT_S32 cv_type = BorderTypeToOpencv(type);
     cv::Scalar cv_scalar = {scalar.m_val[0], scalar.m_val[1], scalar.m_val[2], scalar.m_val[3]};
 
     cv::Mat cv_src = MatToOpencv(src);
@@ -44,7 +44,7 @@ public:
     MakeBorderTest(Context *ctx, MakeBorderRunParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         /// get next param set
         MakeBorderRunParam run_param(GetParam((index)));
@@ -56,10 +56,10 @@ public:
         // get src mat sizes
         Sizes3 src_sizes   = src_mat_size.m_sizes;
         Sizes  src_strides = src_mat_size.m_strides;
-        MI_S32 top  = border_size.top;
-        MI_S32 bot  = border_size.bottom;
-        MI_S32 left = border_size.left;
-        MI_S32 righ = border_size.right;
+        DT_S32 top  = border_size.top;
+        DT_S32 bot  = border_size.bottom;
+        DT_S32 left = border_size.left;
+        DT_S32 righ = border_size.right;
 
         /// Get dst mat sizes
         Sizes3 dst_sizes   = src_sizes   + Sizes3(top + bot, left + righ, 0);
@@ -72,7 +72,7 @@ public:
         AURA_LOGI(m_ctx, AURA_TAG, "\n\n######################### MakeBorder param: %s\n", run_param.ToString().c_str());
 
         /// Create src mats
-        MI_S32 mem_type = AURA_MEM_DEFAULT;
+        DT_S32 mem_type = AURA_MEM_DEFAULT;
         Mat src_mat = m_factory.GetRandomMat(0, 1000, elem_type, src_sizes, mem_type, src_strides);
         Mat dst_mat = m_factory.GetEmptyMat(elem_type, dst_sizes, mem_type, dst_strides);
         Mat ref_mat = m_factory.GetEmptyMat(elem_type, dst_sizes, mem_type, dst_strides);
@@ -84,7 +84,7 @@ public:
 
         MatCmpResult cmp_result;
         TestTime time_val;
-        MI_S32 loop_count  = stress_count ? stress_count : 5;
+        DT_S32 loop_count  = stress_count ? stress_count : 5;
         Status status_exec = Executor(loop_count, 2, time_val, IMakeBorder, m_ctx, src_mat, dst_mat, run_param.border_size.top, run_param.border_size.bottom,
                               run_param.border_size.left, run_param.border_size.right, run_param.border_type, border_value, run_param.target);
         if (Status::OK == status_exec)

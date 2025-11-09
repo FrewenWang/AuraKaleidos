@@ -20,9 +20,9 @@
  *
  * @return The converted aura ElemType, or aura::ElemType::INVALID if conversion fails.
  */
-AURA_INLINE aura::ElemType MialgoElemType2Aura(MI_S32 elem_type)
+AURA_INLINE aura::ElemType MialgoElemType2Aura(DT_S32 elem_type)
 {
-    static const std::map<MI_S32, aura::ElemType> type_map
+    static const std::map<DT_S32, aura::ElemType> type_map
     {
         {MIALGO_MAT_U8,  aura::ElemType::U8},
         {MIALGO_MAT_S8,  aura::ElemType::S8},
@@ -46,9 +46,9 @@ AURA_INLINE aura::ElemType MialgoElemType2Aura(MI_S32 elem_type)
  *
  * @return The converted Mialgo ElemType, or -1 if conversion fails.
  */
-AURA_INLINE MI_S32 AuraElemType2Mialgo(aura::ElemType elem_type)
+AURA_INLINE DT_S32 AuraElemType2Mialgo(aura::ElemType elem_type)
 {
-    static const std::map<aura::ElemType, MI_S32> type_map
+    static const std::map<aura::ElemType, DT_S32> type_map
     {
         {aura::ElemType::U8,  MIALGO_MAT_U8},
         {aura::ElemType::S8,  MIALGO_MAT_S8},
@@ -70,9 +70,9 @@ AURA_INLINE MI_S32 AuraElemType2Mialgo(aura::ElemType elem_type)
  *
  * @return The converted aura MemType, or AURA_MEM_INVALID if conversion fails.
  */
-AURA_INLINE MI_S32 MialgoMemType2Aura(MialgoMemType mem_type)
+AURA_INLINE DT_S32 MialgoMemType2Aura(MialgoMemType mem_type)
 {
-    static const std::map<MialgoMemType, MI_S32> type_map
+    static const std::map<MialgoMemType, DT_S32> type_map
     {
         {MialgoMemType::MIALGO_MEM_HEAP, AURA_MEM_HEAP},
         {MialgoMemType::MIALGO_MEM_ION,  AURA_MEM_DMA_BUF_HEAP},
@@ -86,13 +86,13 @@ AURA_INLINE MI_S32 MialgoMemType2Aura(MialgoMemType mem_type)
  * @brief Converts aura MemType to MialgoMemType.
  *
  * @param ctx The aura::Context pointer.
- * @param MI_S32 The input aura MemType.
+ * @param DT_S32 The input aura MemType.
  *
  * @return The converted MialgoMemType, or MialgoMemType::MIALGO_MEM_NONE if conversion fails.
  */
-AURA_INLINE MialgoMemType AuraMemType2Mialgo(MI_S32 mem_type)
+AURA_INLINE MialgoMemType AuraMemType2Mialgo(DT_S32 mem_type)
 {
-    static const std::map<MI_S32, MialgoMemType> type_map
+    static const std::map<DT_S32, MialgoMemType> type_map
     {
         {AURA_MEM_HEAP,         MialgoMemType::MIALGO_MEM_HEAP},
         {AURA_MEM_DMA_BUF_HEAP, MialgoMemType::MIALGO_MEM_ION},
@@ -111,7 +111,7 @@ AURA_INLINE MialgoMemType AuraMemType2Mialgo(MI_S32 mem_type)
  *
  * @return The converted aura::Mat, or an empty aura::Mat if conversion fails.
  */
-AURA_INLINE aura::Mat MialgoMat2AuraMat(aura::Context *ctx, MialgoMat *src, MI_BOOL deep_clone = MI_FALSE)
+AURA_INLINE aura::Mat MialgoMat2AuraMat(aura::Context *ctx, MialgoMat *src, DT_BOOL deep_clone = DT_FALSE)
 {
     if (NULL == ctx || NULL == src)
     {
@@ -126,7 +126,7 @@ AURA_INLINE aura::Mat MialgoMat2AuraMat(aura::Context *ctx, MialgoMat *src, MI_B
         return aura::Mat();
     }
 
-    MI_S32 aura_mem_type = MialgoMemType2Aura(src->mem_info.type);
+    DT_S32 aura_mem_type = MialgoMemType2Aura(src->mem_info.type);
     if (AURA_MEM_INVALID == aura_mem_type)
     {
         AURA_ADD_ERROR_STRING(ctx, "MialgoMemType2Aura failed!");
@@ -166,10 +166,10 @@ AURA_INLINE aura::Mat MialgoMat2AuraMat(aura::Context *ctx, MialgoMat *src, MI_B
     if (deep_clone)
     {
         aura::Rect roi_deep(0, 0, dst_shallow.GetSizes().m_width, dst_shallow.GetSizes().m_height);
-        MI_S32 pitch_deep = dst_shallow.GetSizes().m_width * dst_shallow.GetSizes().m_channel * ElemTypeSize(dst_shallow.GetElemType());
+        DT_S32 pitch_deep = dst_shallow.GetSizes().m_width * dst_shallow.GetSizes().m_channel * ElemTypeSize(dst_shallow.GetElemType());
 
         // check whether data pointer or pitch need to be aligned to 128
-        if (!(src->shape.img.pitch & 127) && !(reinterpret_cast<MI_U64>(src->data) & 127))
+        if (!(src->shape.img.pitch & 127) && !(reinterpret_cast<DT_U64>(src->data) & 127))
         {
             pitch_deep = AURA_ALIGN(pitch_deep, 128);
         }
@@ -198,9 +198,9 @@ AURA_INLINE aura::Mat MialgoMat2AuraMat(aura::Context *ctx, MialgoMat *src, MI_B
  *
  * @return A pointer to the converted MialgoMat, or nullptr if conversion fails.
  */
-AURA_INLINE MialgoMat* AuraMat2MialgoMat(aura::Context *ctx, const aura::Mat &src, MI_BOOL deep_clone = MI_FALSE)
+AURA_INLINE MialgoMat* AuraMat2MialgoMat(aura::Context *ctx, const aura::Mat &src, DT_BOOL deep_clone = DT_FALSE)
 {
-    if (!src.IsValid() || MI_NULL == ctx)
+    if (!src.IsValid() || DT_NULL == ctx)
     {
         AURA_ADD_ERROR_STRING(ctx, "src is invalid or ctx is nullptr.");
         return NULL;
@@ -220,16 +220,16 @@ AURA_INLINE MialgoMat* AuraMat2MialgoMat(aura::Context *ctx, const aura::Mat &sr
         return NULL;
     }
 
-    const MI_S32 elem_type = AuraElemType2Mialgo(src.GetElemType());
+    const DT_S32 elem_type = AuraElemType2Mialgo(src.GetElemType());
     if (-1 == elem_type)
     {
         AURA_ADD_ERROR_STRING(ctx, "AuraElemType2Mialgo failed.");
         return NULL;
     }
 
-    MI_S32 size_dst[] = {src.GetSizes().m_channel, src.GetSizes().m_height, src.GetSizes().m_width};
+    DT_S32 size_dst[] = {src.GetSizes().m_channel, src.GetSizes().m_height, src.GetSizes().m_width};
 
-    MI_S32 flag_dst = MIALGO_MAT_FLAG_IMG_MAT | MIALGO_MAT_FLAG_CH_LAST;
+    DT_S32 flag_dst = MIALGO_MAT_FLAG_IMG_MAT | MIALGO_MAT_FLAG_CH_LAST;
     flag_dst |= (mem_type == MialgoMemType::MIALGO_MEM_HEAP) ? MIALGO_MAT_FLAG_HEAP_MEM : 0;
 
     MialgoMat *dst_shallow = (MialgoMat *)MialgoAllocateHeap(sizeof(MialgoMat));
@@ -240,8 +240,8 @@ AURA_INLINE MialgoMat* AuraMat2MialgoMat(aura::Context *ctx, const aura::Mat &sr
     }
     memset(dst_shallow, 0, sizeof(MialgoMat));
 
-    MI_S32 stride_dst_shallow[] = {0, 0, src.GetRowPitch()};
-    if (MialgoInitMat(dst_shallow, 3, size_dst, elem_type, stride_dst_shallow, flag_dst, const_cast<AURA_VOID *>(src.GetData())) != MIALGO_OK)
+    DT_S32 stride_dst_shallow[] = {0, 0, src.GetRowPitch()};
+    if (MialgoInitMat(dst_shallow, 3, size_dst, elem_type, stride_dst_shallow, flag_dst, const_cast<DT_VOID *>(src.GetData())) != MIALGO_OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "no mem");
         MialgoDeallocate(dst_shallow);
@@ -251,20 +251,20 @@ AURA_INLINE MialgoMat* AuraMat2MialgoMat(aura::Context *ctx, const aura::Mat &sr
     // mem info
     dst_shallow->mem_info.type = mem_type;
     dst_shallow->mem_info.size = src.GetBuffer().m_size;
-    dst_shallow->mem_info.phy_addr = reinterpret_cast<MI_U64>(src.GetBuffer().m_origin);
+    dst_shallow->mem_info.phy_addr = reinterpret_cast<DT_U64>(src.GetBuffer().m_origin);
     dst_shallow->mem_info.fd = src.GetBuffer().m_property;
 
     if (deep_clone)
     {
-        MI_S32 pitch_deep = size_dst[0] * size_dst[2] * ElemTypeSize(src.GetElemType());
+        DT_S32 pitch_deep = size_dst[0] * size_dst[2] * ElemTypeSize(src.GetElemType());
 
         // check whether data pointer or pitch need to be aligned to 128
-        if (!(src.GetRowPitch() & 127) && !(reinterpret_cast<MI_U64>(src.GetData()) & 127))
+        if (!(src.GetRowPitch() & 127) && !(reinterpret_cast<DT_U64>(src.GetData()) & 127))
         {
             pitch_deep = MIALGO_ALIGN(pitch_deep, 128);
         }
 
-        MI_S32 stride_dst_deep[] = {0, 0, pitch_deep};
+        DT_S32 stride_dst_deep[] = {0, 0, pitch_deep};
 
         MialgoMat *dst_deep = MialgoCreateMat(3, size_dst, elem_type, stride_dst_deep, flag_dst);
         if (NULL == dst_deep)
@@ -299,7 +299,7 @@ AURA_INLINE MialgoMat* AuraMat2MialgoMat(aura::Context *ctx, const aura::Mat &sr
  *
  * @return The converted aura::Mat, or an empty aura::Mat if conversion fails.
  */
-AURA_INLINE aura::Mat MialgoImg2AuraMat(aura::Context *ctx, MialgoImg *src, MI_BOOL deep_clone = MI_FALSE)
+AURA_INLINE aura::Mat MialgoImg2AuraMat(aura::Context *ctx, MialgoImg *src, DT_BOOL deep_clone = DT_FALSE)
 {
     if (NULL == ctx || NULL == src)
     {
@@ -340,9 +340,9 @@ AURA_INLINE aura::Mat MialgoImg2AuraMat(aura::Context *ctx, MialgoImg *src, MI_B
  *
  * @return A pointer to the converted MialgoImg, or nullptr if conversion fails.
  */
-AURA_INLINE MialgoImg* AuraMat2MialgoImg(aura::Context *ctx, const aura::Mat& src, MialgoImgFormat info, MI_BOOL deep_clone = MI_FALSE)
+AURA_INLINE MialgoImg* AuraMat2MialgoImg(aura::Context *ctx, const aura::Mat& src, MialgoImgFormat info, DT_BOOL deep_clone = DT_FALSE)
 {
-    if (!src.IsValid() || MI_NULL == ctx)
+    if (!src.IsValid() || DT_NULL == ctx)
     {
         AURA_ADD_ERROR_STRING(ctx, "src is invalid or ctx is nullptr");
         return NULL;

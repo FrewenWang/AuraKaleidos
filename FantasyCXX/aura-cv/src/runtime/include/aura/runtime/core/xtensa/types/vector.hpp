@@ -34,7 +34,7 @@ namespace xtensa
  * @tparam Tp The type of elements in the vector.
  * @tparam MAX_SIZE The maximum size of the vector.
  */
-template <typename Tp, MI_S32 MAX_SIZE = AURA_VECTOR_DEFAULT_MAX_SIZE>
+template <typename Tp, DT_S32 MAX_SIZE = AURA_VECTOR_DEFAULT_MAX_SIZE>
 class vector
 {
 public:
@@ -57,7 +57,7 @@ public:
         }
 
         m_size = init_list.size() > MAX_SIZE ? MAX_SIZE : init_list.size();
-        MI_S32 i = 0;
+        DT_S32 i = 0;
         for (const auto& value : init_list)
         {
             if (i >= m_size)
@@ -76,7 +76,7 @@ public:
      * @param size The size of the vector.
      * @param default_value The default value.
      */
-    explicit vector(MI_S32 size, Tp default_value = Tp())
+    explicit vector(DT_S32 size, Tp default_value = Tp())
     {
         if (size > MAX_SIZE)
         {
@@ -84,7 +84,7 @@ public:
         }
 
         m_size = size > MAX_SIZE ? MAX_SIZE : size;
-        for (MI_S32 i = 0; i < m_size; ++i)
+        for (DT_S32 i = 0; i < m_size; ++i)
         {
             m_data[i] = default_value;
         }
@@ -155,7 +155,7 @@ public:
             AURA_XTENSA_LOG("the input vector size > MAX_SIZE!\n");
         }
 
-        for (MI_S32 i = 0; i < m_size; ++i)
+        for (DT_S32 i = 0; i < m_size; ++i)
         {
             m_data[i] = other.m_data[i];
         }
@@ -173,7 +173,7 @@ public:
         if (this != &other)
         {
             m_size = other.m_size;
-            for (MI_S32 i = 0; i < m_size; ++i)
+            for (DT_S32 i = 0; i < m_size; ++i)
             {
                 m_data[i] = std::move(other.m_data[i]);
             }
@@ -268,7 +268,7 @@ public:
      *
      * @return True if the vector is empty, otherwise False.
      */
-    MI_BOOL empty() const
+    DT_BOOL empty() const
     {
         return 0 == m_size;
     }
@@ -278,7 +278,7 @@ public:
      *
      * @return The number of elements in the vector.
      */
-    MI_S32 size() const
+    DT_S32 size() const
     {
         return m_size;
     }
@@ -289,7 +289,7 @@ public:
      * @param size The new size of the vector.
      * @param default_value The value to initialize new elements with (if resizing larger).
      */
-    AURA_VOID resize(MI_S32 size, Tp default_value = Tp())
+    DT_VOID resize(DT_S32 size, Tp default_value = Tp())
     {
         if (size <= m_size)
         {
@@ -297,7 +297,7 @@ public:
         }
         else
         {
-            MI_S32 i = m_size;
+            DT_S32 i = m_size;
             for (; i < size && i < MAX_SIZE; ++i)
             {
                 m_data[i] = default_value;
@@ -331,7 +331,7 @@ public:
      *
      * @return The maximum number of elements the vector can hold.
      */
-    MI_S32 capacity() const
+    DT_S32 capacity() const
     {
         return MAX_SIZE;
     }
@@ -343,16 +343,16 @@ public:
      *
      * @return True if the push was successful, otherwise False (if the vector is full).
      */
-    MI_BOOL push_back(const Tp &value)
+    DT_BOOL push_back(const Tp &value)
     {
         if (m_size >= MAX_SIZE)
         {
             AURA_XTENSA_LOG("The vector size reach the max size!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
         m_data[m_size++] = value;
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -360,15 +360,15 @@ public:
      *
      * @return True if the pop was successful (vector is not empty), otherwise False.
      */
-    MI_BOOL pop_back()
+    DT_BOOL pop_back()
     {
         if (0 == m_size)
         {
-            return MI_FALSE;
+            return DT_FALSE;
         }
         --m_size;
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -378,7 +378,7 @@ public:
      *
      * @return Reference to the element at the specified index.
      */
-    Tp& at(MI_S32 index)
+    Tp& at(DT_S32 index)
     {
         if (index >= m_size)
         {
@@ -396,7 +396,7 @@ public:
      *
      * @return Const reference to the const element at the specified index.
      */
-    const Tp& at(MI_S32 index) const
+    const Tp& at(DT_S32 index) const
     {
         if (index >= m_size)
         {
@@ -416,7 +416,7 @@ public:
      *
      * @return Reference to the element at the specified index.
      */
-    Tp& operator[](MI_S32 index)
+    Tp& operator[](DT_S32 index)
     {
         return at(index);
     }
@@ -430,7 +430,7 @@ public:
      *
      * @return Const reference to the const element at the specified index.
      */
-    const Tp& operator[](MI_S32 index) const
+    const Tp& operator[](DT_S32 index) const
     {
         return at(index);
     }
@@ -491,18 +491,18 @@ public:
      *
      * @return True if the insertion was successful, otherwise False (if the vector is full or position is invalid).
      */
-    MI_BOOL insert(MI_S32 position, const Tp &value)
+    DT_BOOL insert(DT_S32 position, const Tp &value)
     {
         if (m_size >= MAX_SIZE)
         {
             AURA_XTENSA_LOG("The vector size reach the max size!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         if ((position < 0) || (position > m_size))
         {
             AURA_XTENSA_LOG("Invalid position!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         for (int i = m_size; i > position; --i)
@@ -513,7 +513,7 @@ public:
         m_data[position] = value;
         ++m_size;
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -523,26 +523,26 @@ public:
      *
      * @return True if the erase was successful (index is valid), otherwise False.
      */
-    MI_BOOL erase(MI_S32 index)
+    DT_BOOL erase(DT_S32 index)
     {
         if ((index < 0) || (index >= m_size))
         {
             AURA_XTENSA_LOG("Invalid index!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
-        for (MI_S32 i = index; i < m_size - 1; ++i)
+        for (DT_S32 i = index; i < m_size - 1; ++i)
         {
             m_data[i] = m_data[i + 1];
         }
         --m_size;
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
 public:
     Tp      m_data[MAX_SIZE];
-    MI_S32  m_size;
+    DT_S32  m_size;
 };
 
 /**

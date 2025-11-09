@@ -59,14 +59,14 @@ static std::shared_ptr<GridDftImpl> CreateGridDftImpl(Context *ctx, const OpTarg
 GridDft::GridDft(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status GridDft::SetArgs(const Array *src, Array *dst, MI_S32 grid_len)
+Status GridDft::SetArgs(const Array *src, Array *dst, DT_S32 grid_len)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -106,14 +106,14 @@ Status GridDft::SetArgs(const Array *src, Array *dst, MI_S32 grid_len)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateGridDftImpl(m_ctx, impl_target);
     }
 
     // run initialize
     GridDftImpl *grid_dft_impl = dynamic_cast<GridDftImpl*>(m_impl.get());
-    if (MI_NULL == grid_dft_impl)
+    if (DT_NULL == grid_dft_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "grid_dft_impl is null ptr");
         return Status::ERROR;
@@ -124,10 +124,10 @@ Status GridDft::SetArgs(const Array *src, Array *dst, MI_S32 grid_len)
     AURA_RETURN(m_ctx, ret);
 }
 
-Status GridDft::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 grid_len)
+Status GridDft::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 grid_len)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -148,7 +148,7 @@ Status GridDft::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 grid_len)
     return Status::OK;
 }
 
-AURA_EXPORTS Status IGridDft(Context *ctx, const Mat &src, Mat &dst, MI_S32 grid_len, const OpTarget &target)
+AURA_EXPORTS Status IGridDft(Context *ctx, const Mat &src, Mat &dst, DT_S32 grid_len, const OpTarget &target)
 {
     GridDft grid_dft(ctx, target);
 
@@ -156,18 +156,18 @@ AURA_EXPORTS Status IGridDft(Context *ctx, const Mat &src, Mat &dst, MI_S32 grid
 }
 
 GridDftImpl::GridDftImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "GridDft", target),
-                                                                 m_src(MI_NULL), m_dst(MI_NULL),
+                                                                 m_src(DT_NULL), m_dst(DT_NULL),
                                                                  m_grid_len(0)
 {}
 
-Status GridDftImpl::SetArgs(const Array *src, Array *dst, MI_S32 grid_len)
+Status GridDftImpl::SetArgs(const Array *src, Array *dst, DT_S32 grid_len)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src || MI_NULL == dst)
+    if (DT_NULL == src || DT_NULL == dst)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -202,7 +202,7 @@ Status GridDftImpl::SetArgs(const Array *src, Array *dst, MI_S32 grid_len)
 
     if (ElemType::F32 != dst->GetElemType())
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "currently dst does only support MI_F32 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "currently dst does only support DT_F32 type.");
         return Status::ERROR;
     }
 
@@ -239,7 +239,7 @@ std::string GridDftImpl::ToString() const
     return str;
 }
 
-AURA_VOID GridDftImpl::Dump(const std::string &prefix) const
+DT_VOID GridDftImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -295,14 +295,14 @@ static std::shared_ptr<GridIDftImpl> CreateGridIDftImpl(Context *ctx, const OpTa
 GridIDft::GridIDft(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status GridIDft::SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL with_scale)
+Status GridIDft::SetArgs(const Array *src, Array *dst, DT_S32 grid_len, DT_BOOL with_scale)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -342,14 +342,14 @@ Status GridIDft::SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL 
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateGridIDftImpl(m_ctx, impl_target);
     }
 
     // run initialize
     GridIDftImpl *grididft_impl = dynamic_cast<GridIDftImpl*>(m_impl.get());
-    if (MI_NULL == grididft_impl)
+    if (DT_NULL == grididft_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "grididft_impl is null ptr");
         return Status::ERROR;
@@ -360,10 +360,10 @@ Status GridIDft::SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL 
     AURA_RETURN(m_ctx, ret);
 }
 
-Status GridIDft::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 grid_len, MI_S32 with_scale, MI_BOOL save_real_only)
+Status GridIDft::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 grid_len, DT_S32 with_scale, DT_BOOL save_real_only)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -385,7 +385,7 @@ Status GridIDft::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 grid_len,
 
     return Status::OK;
 }
-AURA_EXPORTS Status IGridIDft(Context *ctx, const Mat &src, Mat &dst, MI_S32 grid_len, MI_BOOL with_scale, const OpTarget &target)
+AURA_EXPORTS Status IGridIDft(Context *ctx, const Mat &src, Mat &dst, DT_S32 grid_len, DT_BOOL with_scale, const OpTarget &target)
 {
     GridIDft grid_idft(ctx, target);
 
@@ -393,18 +393,18 @@ AURA_EXPORTS Status IGridIDft(Context *ctx, const Mat &src, Mat &dst, MI_S32 gri
 }
 
 GridIDftImpl::GridIDftImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "GridIDft", target),
-                                                                   m_src(MI_NULL), m_dst(MI_NULL),
-                                                                   m_grid_len(0), m_with_scale(MI_FALSE)
+                                                                   m_src(DT_NULL), m_dst(DT_NULL),
+                                                                   m_grid_len(0), m_with_scale(DT_FALSE)
 {}
 
-Status GridIDftImpl::SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL with_scale)
+Status GridIDftImpl::SetArgs(const Array *src, Array *dst, DT_S32 grid_len, DT_BOOL with_scale)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src || MI_NULL == dst)
+    if (DT_NULL == src || DT_NULL == dst)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -439,7 +439,7 @@ Status GridIDftImpl::SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_B
 
     if (src->GetElemType() != ElemType::F32)
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "currently src only supports MI_F32 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "currently src only supports DT_F32 type.");
         return Status::ERROR;
     }
 
@@ -483,7 +483,7 @@ std::string GridIDftImpl::ToString() const
     return str;
 }
 
-AURA_VOID GridIDftImpl::Dump(const std::string &prefix) const
+DT_VOID GridIDftImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

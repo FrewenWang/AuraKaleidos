@@ -9,18 +9,18 @@
 
 namespace aura
 {
-template <typename Tp, MI_S32 C>
+template <typename Tp, DT_S32 C>
 struct TransposeNoneFunctor
 {
-    constexpr static MI_S32 BLOCK_SIZE = 4;
+    constexpr static DT_S32 BLOCK_SIZE = 4;
 
-    AURA_VOID operator()(const MI_U8 *src_data, MI_U8 *dst_data, MI_S32 x, MI_S32 y, MI_S32 w, MI_S32 h,
-                       MI_S32 src_pitch, MI_S32 dst_pitch)
+    DT_VOID operator()(const DT_U8 *src_data, DT_U8 *dst_data, DT_S32 x, DT_S32 y, DT_S32 w, DT_S32 h,
+                       DT_S32 src_pitch, DT_S32 dst_pitch)
     {
         using BLOCK = struct { Tp val[C]; };
 
-        MI_S32 w_align4 = (w & (-4));
-        MI_S32 h_align4 = (h & (-4));
+        DT_S32 w_align4 = (w & (-4));
+        DT_S32 h_align4 = (h & (-4));
 
         for (; y < h_align4; y += 4)
         {
@@ -95,23 +95,23 @@ struct TransposeNoneFunctor
         }
     }
 
-    Status operator()(const Mat &src, Mat &dst, MI_S32 start_blk, MI_S32 end_blk)
+    Status operator()(const Mat &src, Mat &dst, DT_S32 start_blk, DT_S32 end_blk)
     {
-        MI_S32 start_row = start_blk * 16;
-        MI_S32 end_row   = Min(end_blk * 16, dst.GetSizes().m_height);
-        const MI_U8 *src_data = (MI_U8 *)src.GetData();
-        MI_U8 *dst_data       = (MI_U8 *)dst.GetData();
+        DT_S32 start_row = start_blk * 16;
+        DT_S32 end_row   = Min(end_blk * 16, dst.GetSizes().m_height);
+        const DT_U8 *src_data = (DT_U8 *)src.GetData();
+        DT_U8 *dst_data       = (DT_U8 *)dst.GetData();
 
-        MI_U32 src_pitch = src.GetRowPitch();
-        MI_U32 dst_pitch = dst.GetRowPitch();
+        DT_U32 src_pitch = src.GetRowPitch();
+        DT_U32 dst_pitch = dst.GetRowPitch();
 
-        MI_S32 width  = dst.GetSizes().m_width;
-        MI_S32 height = dst.GetSizes().m_height;
+        DT_S32 width  = dst.GetSizes().m_width;
+        DT_S32 height = dst.GetSizes().m_height;
 
-        MI_S32 x = 0;
-        MI_S32 y = Max(static_cast<MI_S32>(0), start_row);
-        MI_S32 w = width;
-        MI_S32 h = Min(height, end_row);
+        DT_S32 x = 0;
+        DT_S32 y = Max(static_cast<DT_S32>(0), start_row);
+        DT_S32 w = width;
+        DT_S32 h = Min(height, end_row);
 
         operator()(src_data, dst_data, x, y, w, h, src_pitch, dst_pitch);
 
@@ -132,7 +132,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
 
@@ -182,13 +182,13 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 ochannel);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 ochannel);
 
 private:
     std::vector<CLKernel> m_cl_kernels;
     CLMem m_cl_src;
     CLMem m_cl_dst;
-    MI_S32 m_elem_counts;
+    DT_S32 m_elem_counts;
 
     std::string m_profiling_string;
 };

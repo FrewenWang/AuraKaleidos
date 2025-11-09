@@ -59,10 +59,10 @@ static SobelParam::TupleTable g_sobel_table_hvx {
 NEW_TESTCASE(filter, Sobel, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     SobelTest test(UnitTest::GetInstance()->GetContext(), g_sobel_table_hvx);
     test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

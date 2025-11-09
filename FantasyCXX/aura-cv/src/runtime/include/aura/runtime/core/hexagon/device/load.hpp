@@ -10,55 +10,55 @@ typedef long HEXAGON_Vect_UN __attribute__((__vector_size__(AURA_HVLEN)))__attri
 namespace aura
 {
 
-extern const MI_U8 vdelta_load_d8[]    __attribute__((aligned(128)));
-extern const MI_U8 vrdelta_store_d8[]  __attribute__((aligned(128)));
-extern const MI_U8 vdelta_load_d16[]   __attribute__((aligned(128)));
-extern const MI_U8 vrdelta_store_d16[] __attribute__((aligned(128)));
-extern const MI_U8 vdelta_load_d32[]   __attribute__((aligned(128)));
-extern const MI_U8 vrdelta_store_d32[] __attribute__((aligned(128)));
+extern const DT_U8 vdelta_load_d8[]    __attribute__((aligned(128)));
+extern const DT_U8 vrdelta_store_d8[]  __attribute__((aligned(128)));
+extern const DT_U8 vdelta_load_d16[]   __attribute__((aligned(128)));
+extern const DT_U8 vrdelta_store_d16[] __attribute__((aligned(128)));
+extern const DT_U8 vdelta_load_d32[]   __attribute__((aligned(128)));
+extern const DT_U8 vrdelta_store_d32[] __attribute__((aligned(128)));
 
 // =============================================== HVX_Vector ===============================================
-AURA_INLINE AURA_VOID vload(const AURA_VOID *addr, HVX_Vector &v_out)
+AURA_INLINE DT_VOID vload(const DT_VOID *addr, HVX_Vector &v_out)
 {
     v_out = vmemu(addr);
 }
 
-AURA_INLINE AURA_VOID vstore(AURA_VOID *addr, const HVX_Vector &v_in)
+AURA_INLINE DT_VOID vstore(DT_VOID *addr, const HVX_Vector &v_in)
 {
     vmemu(addr) = v_in;
 }
 
 // =============================================== HVX_VectorPair ===============================================
-AURA_INLINE AURA_VOID vload(const AURA_VOID *addr, HVX_VectorPair &mv_out)
+AURA_INLINE DT_VOID vload(const DT_VOID *addr, HVX_VectorPair &mv_out)
 {
     HVX_Vector v_x0 = vmemu(addr);
-    HVX_Vector v_x1 = vmemu((MI_U8*)addr + AURA_HVLEN);
+    HVX_Vector v_x1 = vmemu((DT_U8*)addr + AURA_HVLEN);
 
     mv_out = Q6_W_vcombine_VV(v_x1, v_x0);
 }
 
-AURA_INLINE AURA_VOID vstore(AURA_VOID *addr, const HVX_VectorPair &mv_in)
+AURA_INLINE DT_VOID vstore(DT_VOID *addr, const HVX_VectorPair &mv_in)
 {
     vmemu(addr)                      = Q6_V_lo_W(mv_in);
-    vmemu((MI_U8*)addr + AURA_HVLEN) = Q6_V_hi_W(mv_in);
+    vmemu((DT_U8*)addr + AURA_HVLEN) = Q6_V_hi_W(mv_in);
 }
 
 // =============================================== HVX_VectorX1 ===============================================
-AURA_INLINE AURA_VOID vload(const AURA_VOID *addr, HVX_VectorX1 &v_out)
+AURA_INLINE DT_VOID vload(const DT_VOID *addr, HVX_VectorX1 &v_out)
 {
     vload(addr, v_out.val[0]);
 }
 
-AURA_INLINE AURA_VOID vstore(AURA_VOID *addr, const HVX_VectorX1 &v_in)
+AURA_INLINE DT_VOID vstore(DT_VOID *addr, const HVX_VectorX1 &v_in)
 {
     vstore(addr, v_in.val[0]);
 }
 
 // =============================================== HVX_VectorX2 ===============================================
 template <typename Tp>
-AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX2 &v_out)
+AURA_INLINE DT_VOID vload(const Tp *addr, HVX_VectorX2 &v_out)
 {
-    constexpr MI_S32 BYTES = static_cast<MI_S32>(sizeof(Tp));
+    constexpr DT_S32 BYTES = static_cast<DT_S32>(sizeof(Tp));
 
     HVX_Vector v_x0 = vmemu(addr);
     HVX_Vector v_x1 = vmemu(addr + AURA_HVLEN / BYTES);
@@ -69,9 +69,9 @@ AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX2 &v_out)
 }
 
 template <typename Tp>
-AURA_INLINE AURA_VOID vstore(Tp *addr, const HVX_VectorX2 &mv_in)
+AURA_INLINE DT_VOID vstore(Tp *addr, const HVX_VectorX2 &mv_in)
 {
-    constexpr MI_S32 BYTES = static_cast<MI_S32>(sizeof(Tp));
+    constexpr DT_S32 BYTES = static_cast<DT_S32>(sizeof(Tp));
     HVX_VectorPair w_uv = Q6_W_vshuff_VVR(mv_in.val[1], mv_in.val[0], -BYTES);
 
     vmemu(addr)                      = Q6_V_lo_W(w_uv);
@@ -80,10 +80,10 @@ AURA_INLINE AURA_VOID vstore(Tp *addr, const HVX_VectorX2 &mv_in)
 
 // =============================================== HVX_VectorX4 ===============================================
 template <typename Tp>
-AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX4 &mv_out)
+AURA_INLINE DT_VOID vload(const Tp *addr, HVX_VectorX4 &mv_out)
 {
-    constexpr MI_S32 BYTES   = static_cast<MI_S32>(sizeof(Tp));
-    constexpr MI_S32 BYTESX2 = BYTES * 2;
+    constexpr DT_S32 BYTES   = static_cast<DT_S32>(sizeof(Tp));
+    constexpr DT_S32 BYTESX2 = BYTES * 2;
 
     HVX_Vector v_x0 = vmemu(addr);
     HVX_Vector v_x1 = vmemu(addr + AURA_HVLEN / BYTES);
@@ -102,10 +102,10 @@ AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX4 &mv_out)
 }
 
 template <typename Tp>
-AURA_INLINE AURA_VOID vstore(Tp *addr, const HVX_VectorX4 &v_in)
+AURA_INLINE DT_VOID vstore(Tp *addr, const HVX_VectorX4 &v_in)
 {
-    constexpr MI_S32 BYTES   = static_cast<MI_S32>(sizeof(Tp));
-    constexpr MI_S32 BYTESX2 = BYTES * 2;
+    constexpr DT_S32 BYTES   = static_cast<DT_S32>(sizeof(Tp));
+    constexpr DT_S32 BYTESX2 = BYTES * 2;
     HVX_VectorPair w_uv0 = Q6_W_vshuff_VVR(v_in.val[1], v_in.val[0], -BYTES);
     HVX_VectorPair w_uv1 = Q6_W_vshuff_VVR(v_in.val[3], v_in.val[2], -BYTES);
     HVX_VectorPair w_uv2 = Q6_W_vshuff_VVR(Q6_V_lo_W(w_uv1), Q6_V_lo_W(w_uv0), -BYTESX2);
@@ -119,8 +119,8 @@ AURA_INLINE AURA_VOID vstore(Tp *addr, const HVX_VectorX4 &v_in)
 
 // =============================================== HVX_VectorX3 ===============================================
 // sizeof(Tp) == 1
-template <typename Tp, typename std::enable_if<sizeof(Tp) == 1>::type* = MI_NULL>
-AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX3 &mvd8_out)
+template <typename Tp, typename std::enable_if<sizeof(Tp) == 1>::type* = DT_NULL>
+AURA_INLINE DT_VOID vload(const Tp *addr, HVX_VectorX3 &mvd8_out)
 {
     HVX_Vector vd8_x0 = vmemu(addr);
     HVX_Vector vd8_x1 = vmemu(addr + AURA_HVLEN);
@@ -142,8 +142,8 @@ AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX3 &mvd8_out)
     mvd8_out.val[2] = Q6_V_lo_W(wd8_b_x);
 }
 
-template <typename Tp, typename std::enable_if<sizeof(Tp) == 1>::type* = MI_NULL>
-AURA_INLINE AURA_VOID vstore(Tp *addr, const HVX_VectorX3 &mvd8_in)
+template <typename Tp, typename std::enable_if<sizeof(Tp) == 1>::type* = DT_NULL>
+AURA_INLINE DT_VOID vstore(Tp *addr, const HVX_VectorX3 &mvd8_in)
 {
     HVX_VectorPair wd8_rg_rg   = Q6_W_vshuff_VVR(mvd8_in.val[1], mvd8_in.val[0], -1);
     HVX_VectorPair wd8_b0_b0   = Q6_W_vshuff_VVR(Q6_V_vzero(), mvd8_in.val[2], -1);
@@ -166,8 +166,8 @@ AURA_INLINE AURA_VOID vstore(Tp *addr, const HVX_VectorX3 &mvd8_in)
 }
 
 // sizeof(Tp) == 2
-template <typename Tp, typename std::enable_if<sizeof(Tp) == 2>::type* = MI_NULL>
-AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX3 &mvd16_out)
+template <typename Tp, typename std::enable_if<sizeof(Tp) == 2>::type* = DT_NULL>
+AURA_INLINE DT_VOID vload(const Tp *addr, HVX_VectorX3 &mvd16_out)
 {
     HVX_Vector vd16_x0 = vmemu(addr);
     HVX_Vector vd16_x1 = vmemu(addr + AURA_HVLEN / 2);
@@ -189,8 +189,8 @@ AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX3 &mvd16_out)
     mvd16_out.val[2] = Q6_V_lo_W(wd16_b_x);
 }
 
-template <typename Tp, typename std::enable_if<sizeof(Tp) == 2>::type* = MI_NULL>
-AURA_INLINE AURA_VOID vstore(Tp *addr, const HVX_VectorX3 &mvd16_in)
+template <typename Tp, typename std::enable_if<sizeof(Tp) == 2>::type* = DT_NULL>
+AURA_INLINE DT_VOID vstore(Tp *addr, const HVX_VectorX3 &mvd16_in)
 {
     HVX_VectorPair wd16_rg_rg   = Q6_W_vshuff_VVR(mvd16_in.val[1], mvd16_in.val[0], -2);
     HVX_VectorPair wd16_b0_b0   = Q6_W_vshuff_VVR(Q6_V_vzero(), mvd16_in.val[2], -2);
@@ -213,8 +213,8 @@ AURA_INLINE AURA_VOID vstore(Tp *addr, const HVX_VectorX3 &mvd16_in)
 }
 
 // sizeof(Tp) == 4
-template <typename Tp, typename std::enable_if<sizeof(Tp) == 4>::type* = MI_NULL>
-AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX3 &mvd32_out)
+template <typename Tp, typename std::enable_if<sizeof(Tp) == 4>::type* = DT_NULL>
+AURA_INLINE DT_VOID vload(const Tp *addr, HVX_VectorX3 &mvd32_out)
 {
     HVX_Vector vd32_x0 = vmemu(addr);
     HVX_Vector vd32_x1 = vmemu(addr + AURA_HALF_HVLEN / 2);
@@ -236,8 +236,8 @@ AURA_INLINE AURA_VOID vload(const Tp *addr, HVX_VectorX3 &mvd32_out)
     mvd32_out.val[2] = Q6_V_lo_W(wd32_b_x);
 }
 
-template <typename Tp, typename std::enable_if<sizeof(Tp) == 4>::type* = MI_NULL>
-AURA_INLINE AURA_VOID vstore(Tp *addr, const HVX_VectorX3 &mvd32_in)
+template <typename Tp, typename std::enable_if<sizeof(Tp) == 4>::type* = DT_NULL>
+AURA_INLINE DT_VOID vstore(Tp *addr, const HVX_VectorX3 &mvd32_in)
 {
     HVX_VectorPair wd32_rg_rg = Q6_W_vshuff_VVR(mvd32_in.val[1], mvd32_in.val[0], -4);
     HVX_VectorPair wd32_b0_b0 = Q6_W_vshuff_VVR(Q6_V_vzero(), mvd32_in.val[2], -4);

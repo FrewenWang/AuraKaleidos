@@ -11,19 +11,19 @@ Status TransposeU32Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
         case 1:
         {
-            TransposeNoneFunctor<MI_U32, 1> op;
+            TransposeNoneFunctor<DT_U32, 1> op;
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, op, std::cref(src), std::ref(dst));
             if (ret != Status::OK)
             {
@@ -33,7 +33,7 @@ Status TransposeU32Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &
         }
         case 2:
         {
-            TransposeNoneFunctor<MI_U32, 2> op;
+            TransposeNoneFunctor<DT_U32, 2> op;
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, op, std::cref(src), std::ref(dst));
             if (ret != Status::OK)
             {
@@ -43,7 +43,7 @@ Status TransposeU32Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &
         }
         case 3:
         {
-            TransposeNoneFunctor<MI_U32, 3> op;
+            TransposeNoneFunctor<DT_U32, 3> op;
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, op, std::cref(src), std::ref(dst));
             if (ret != Status::OK)
             {
@@ -53,7 +53,7 @@ Status TransposeU32Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &
         }
         case 4:
         {
-            TransposeNoneFunctor<MI_U32, 4> op;
+            TransposeNoneFunctor<DT_U32, 4> op;
             ret = wp->ParallelFor(0, dst.GetSizes().m_height, op, std::cref(src), std::ref(dst));
             if (ret != Status::OK)
             {

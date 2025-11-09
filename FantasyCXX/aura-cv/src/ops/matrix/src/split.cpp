@@ -40,12 +40,12 @@ Split::Split(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Split::SetArgs(const Array *src, const std::vector<Array*> &dst)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -53,7 +53,7 @@ Status Split::SetArgs(const Array *src, const std::vector<Array*> &dst)
 
     for (auto mat : dst)
     {
-        if (MI_NULL == mat)
+        if (DT_NULL == mat)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "dst is null ptr");
             return Status::ERROR;
@@ -63,14 +63,14 @@ Status Split::SetArgs(const Array *src, const std::vector<Array*> &dst)
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateSplitImpl(m_ctx, impl_target);
     }
 
     // run initialize
     SplitImpl *split_impl = dynamic_cast<SplitImpl*>(m_impl.get());
-    if (MI_NULL == split_impl)
+    if (DT_NULL == split_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "split_impl is null ptr");
         return Status::ERROR;
@@ -96,17 +96,17 @@ AURA_EXPORTS Status ISplit(Context *ctx, const Mat &src, std::vector<Mat> &dst, 
     return OpCall(ctx, split, &src, dst_arrays);
 }
 
-SplitImpl::SplitImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Split", target), m_src(MI_NULL)
+SplitImpl::SplitImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Split", target), m_src(DT_NULL)
 {}
 
 Status SplitImpl::SetArgs(const Array *src, const std::vector<Array*> &dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -114,7 +114,7 @@ Status SplitImpl::SetArgs(const Array *src, const std::vector<Array*> &dst)
 
     for (auto mat : dst)
     {
-        if (MI_NULL == mat)
+        if (DT_NULL == mat)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "dst is null ptr");
             return Status::ERROR;
@@ -132,7 +132,7 @@ Status SplitImpl::SetArgs(const Array *src, const std::vector<Array*> &dst)
 
     const ElemType src_type = src->GetElemType();
     const Sizes3 src_sz     = src->GetSizes();
-    MI_S32 dst_total_ch     = 0;
+    DT_S32 dst_total_ch     = 0;
 
     for (size_t i = 0; i < dst_size; ++i)
     {
@@ -179,7 +179,7 @@ std::vector<const Array*> SplitImpl::GetOutputArrays() const
 {
     std::vector<const Array*> dst_out;
 
-    for (MI_U32 i = 0; i < m_dst.size(); i++)
+    for (DT_U32 i = 0; i < m_dst.size(); i++)
     {
         dst_out.push_back(m_dst[i]);
     }
@@ -197,7 +197,7 @@ std::string SplitImpl::ToString() const
     return str;
 }
 
-AURA_VOID SplitImpl::Dump(const std::string &prefix) const
+DT_VOID SplitImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

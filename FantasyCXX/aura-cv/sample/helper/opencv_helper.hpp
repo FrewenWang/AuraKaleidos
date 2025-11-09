@@ -19,9 +19,9 @@
  *
  * @return The converted OpenCV element type, or -1 if conversion fails.
  */
-AURA_INLINE MI_S32 AuraElemType2OpenCV(aura::ElemType elem_type, MI_S32 channel)
+AURA_INLINE DT_S32 AuraElemType2OpenCV(aura::ElemType elem_type, DT_S32 channel)
 {
-    static const std::map<aura::ElemType, MI_S32> type_map =
+    static const std::map<aura::ElemType, DT_S32> type_map =
     {
         {aura::ElemType::U8,  CV_8U},
         {aura::ElemType::S8,  CV_8S},
@@ -44,7 +44,7 @@ AURA_INLINE MI_S32 AuraElemType2OpenCV(aura::ElemType elem_type, MI_S32 channel)
  *
  * @return The converted aura::ElemType, or aura::ElemType::INVALID if conversion fails.
  */
-AURA_INLINE aura::ElemType OpenCVElemType2Aura(MI_S32 elem_type)
+AURA_INLINE aura::ElemType OpenCVElemType2Aura(DT_S32 elem_type)
 {
     static const std::map<int, aura::ElemType> type_map =
     {
@@ -75,7 +75,7 @@ AURA_INLINE aura::ElemType OpenCVElemType2Aura(MI_S32 elem_type)
  *
  * @return The converted cv::Mat, or an empty cv::Mat if conversion fails.
  */
-AURA_INLINE cv::Mat AuraMat2OpenCVMat(aura::Context *ctx, aura::Mat &src, MI_BOOL deep_clone = MI_FALSE)
+AURA_INLINE cv::Mat AuraMat2OpenCVMat(aura::Context *ctx, aura::Mat &src, DT_BOOL deep_clone = DT_FALSE)
 {
     if (!src.IsValid())
     {
@@ -83,11 +83,11 @@ AURA_INLINE cv::Mat AuraMat2OpenCVMat(aura::Context *ctx, aura::Mat &src, MI_BOO
         return cv::Mat();
     }
 
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 height = src.GetSizes().m_height;
-    MI_S32 stride = src.GetStrides().m_width;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 height = src.GetSizes().m_height;
+    DT_S32 stride = src.GetStrides().m_width;
 
-    MI_S32 cv_type = AuraElemType2OpenCV(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 cv_type = AuraElemType2OpenCV(src.GetElemType(), src.GetSizes().m_channel);
     if (-1 == cv_type)
     {
         AURA_ADD_ERROR_STRING(ctx, "unsupported elem type");
@@ -125,7 +125,7 @@ AURA_INLINE cv::Mat AuraMat2OpenCVMat(aura::Context *ctx, aura::Mat &src, MI_BOO
  *
  * @return The converted aura::Mat, or an empty aura::Mat if conversion fails.
  */
-AURA_INLINE aura::Mat OpenCVMat2AuraMat(aura::Context *ctx, cv::Mat &src, MI_BOOL deep_clone = MI_FALSE)
+AURA_INLINE aura::Mat OpenCVMat2AuraMat(aura::Context *ctx, cv::Mat &src, DT_BOOL deep_clone = DT_FALSE)
 {
     if (src.empty())
     {
@@ -133,8 +133,8 @@ AURA_INLINE aura::Mat OpenCVMat2AuraMat(aura::Context *ctx, cv::Mat &src, MI_BOO
         return aura::Mat();
     }
 
-    MI_S64 total_bytes = src.step[0] * src.rows;
-    MI_S32 cv_data_type = src.type() & CV_MAT_DEPTH_MASK;
+    DT_S64 total_bytes = src.step[0] * src.rows;
+    DT_S32 cv_data_type = src.type() & CV_MAT_DEPTH_MASK;
 
     aura::Buffer buffer = aura::Buffer(AURA_MEM_HEAP, total_bytes, total_bytes, src.data, src.data, 0);
     if (!buffer.IsValid())
@@ -151,7 +151,7 @@ AURA_INLINE aura::Mat OpenCVMat2AuraMat(aura::Context *ctx, cv::Mat &src, MI_BOO
     }
 
     aura::Mat dst_shallow(ctx, aura_elem_type, aura::Sizes3(src.rows, src.cols,
-                          src.channels()), buffer, aura::Sizes(0, static_cast<MI_S32>(src.step[0])));
+                          src.channels()), buffer, aura::Sizes(0, static_cast<DT_S32>(src.step[0])));
     if (!dst_shallow.IsValid())
     {
         AURA_ADD_ERROR_STRING(ctx, "dst_shallow init failed");

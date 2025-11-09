@@ -13,40 +13,40 @@ Status ResizeBnNone(Context *ctx, const Mat &src, Mat &dst, const OpTarget &targ
     {
         case ElemType::U8:
         {
-            ret = ResizeBnNoneImpl<MI_U8>(ctx, src, dst);
+            ret = ResizeBnNoneImpl<DT_U8>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: MI_U8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: DT_U8");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            ret = ResizeBnNoneImpl<MI_S8>(ctx, src, dst);
+            ret = ResizeBnNoneImpl<DT_S8>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: MI_S8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: DT_S8");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = ResizeBnNoneImpl<MI_U16>(ctx, src, dst);
+            ret = ResizeBnNoneImpl<DT_U16>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: MI_U16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: DT_U16");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = ResizeBnNoneImpl<MI_S16>(ctx, src, dst);
+            ret = ResizeBnNoneImpl<DT_S16>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: MI_S16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: DT_S16");
             }
             break;
         }
@@ -64,10 +64,10 @@ Status ResizeBnNone(Context *ctx, const Mat &src, Mat &dst, const OpTarget &targ
 
         case ElemType::F32:
         {
-            ret = ResizeBnNoneImpl<MI_F32>(ctx, src, dst);
+            ret = ResizeBnNoneImpl<DT_F32>(ctx, src, dst);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: MI_F32");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeBnNoneImpl failed, type: DT_F32");
             }
             break;
         }

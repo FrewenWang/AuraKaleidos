@@ -6,7 +6,7 @@
 namespace aura
 {
 
-CLEngine::CLEngine(Context *ctx, MI_BOOL enable_cl, 
+CLEngine::CLEngine(Context *ctx, DT_BOOL enable_cl, 
                    const std::string &cache_path,
                    const std::string &cache_prefix,
                    CLPrecompiledType cl_precompiled_type,
@@ -21,12 +21,12 @@ CLEngine::CLEngine(Context *ctx, MI_BOOL enable_cl,
     do
     {
         // check ctx
-        if (MI_NULL == ctx)
+        if (DT_NULL == ctx)
         {
             break;
         }
 
-        if (MI_FALSE == enable_cl)
+        if (DT_FALSE == enable_cl)
         {
             break;
         }

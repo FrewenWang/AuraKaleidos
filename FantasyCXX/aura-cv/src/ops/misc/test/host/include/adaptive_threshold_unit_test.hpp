@@ -22,7 +22,7 @@ struct AdaptiveThresholdTestParam
     AdaptiveThresholdTestParam()
     {}
 
-    AdaptiveThresholdTestParam(MI_F32 max_val, AdaptiveThresholdMethod method, MI_S32 type, MI_S32 block_size, MI_F32 delta)
+    AdaptiveThresholdTestParam(DT_F32 max_val, AdaptiveThresholdMethod method, DT_S32 type, DT_S32 block_size, DT_F32 delta)
      : max_val(max_val), method(method), type(type), block_size(block_size), delta(delta)
     {}
 
@@ -39,11 +39,11 @@ struct AdaptiveThresholdTestParam
         return sstream.str();
     }
 
-    MI_F32 max_val;
+    DT_F32 max_val;
     AdaptiveThresholdMethod method;
-    MI_S32 type;
-    MI_S32 block_size;
-    MI_F32 delta;
+    DT_S32 type;
+    DT_S32 block_size;
+    DT_F32 delta;
 };
 
 AURA_TEST_PARAM(MiscAdaptiveThresholdParam,
@@ -52,9 +52,9 @@ AURA_TEST_PARAM(MiscAdaptiveThresholdParam,
                 OpTarget,                   target);
 
 #if !defined(AURA_BUILD_XPLORER)
-static MI_S32 AdaptiveThresholdMethodToOpencv(AdaptiveThresholdMethod method)
+static DT_S32 AdaptiveThresholdMethodToOpencv(AdaptiveThresholdMethod method)
 {
-    MI_S32 cv_type = -1;
+    DT_S32 cv_type = -1;
 
     switch (method)
     {
@@ -79,9 +79,9 @@ static MI_S32 AdaptiveThresholdMethodToOpencv(AdaptiveThresholdMethod method)
     return cv_type;
 }
 
-static MI_S32 AdaptiveThresholdTypeToOpencv(MI_S32 type)
+static DT_S32 AdaptiveThresholdTypeToOpencv(DT_S32 type)
 {
-    MI_S32 cv_type = -1;
+    DT_S32 cv_type = -1;
 
     switch (type)
     {
@@ -107,8 +107,8 @@ static MI_S32 AdaptiveThresholdTypeToOpencv(MI_S32 type)
 }
 #endif
 
-static Status CvAdaptiveThreshold(Context *ctx, Mat &src, Mat &dst, MI_F32 max_val, AdaptiveThresholdMethod method,
-                                        MI_S32 type, MI_S32 block_size, MI_F32 delta)
+static Status CvAdaptiveThreshold(Context *ctx, Mat &src, Mat &dst, DT_F32 max_val, AdaptiveThresholdMethod method,
+                                        DT_S32 type, DT_S32 block_size, DT_F32 delta)
 {
 #if defined(ANDROID)
 #  if !defined(__aarch64__)
@@ -121,11 +121,11 @@ static Status CvAdaptiveThreshold(Context *ctx, Mat &src, Mat &dst, MI_F32 max_v
     Status ret = Status::OK;
 
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 cv_method = AdaptiveThresholdMethodToOpencv(method);
-    MI_S32 cv_th_type = AdaptiveThresholdTypeToOpencv(type);
+    DT_S32 cv_method = AdaptiveThresholdMethodToOpencv(method);
+    DT_S32 cv_th_type = AdaptiveThresholdTypeToOpencv(type);
 
-    MI_S32 cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
-    MI_S32 cn = src.GetSizes().m_channel;
+    DT_S32 cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 cn = src.GetSizes().m_channel;
 
     if (cv_type != CV_8UC(cn))
     {
@@ -177,7 +177,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         MiscAdaptiveThresholdParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -199,12 +199,12 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         MiscAdaptiveThresholdParam run_param(GetParam((index)));
-        MI_F32 max_val = run_param.param.max_val;
-        MI_F32 delta   = run_param.param.delta;
+        DT_F32 max_val = run_param.param.max_val;
+        DT_F32 delta   = run_param.param.delta;
 
         // creat iauras
         Mat src = m_factory.GetDerivedMat(1.0f, 0.0f, ElemType::U8, run_param.mat_sizes.m_sizes, AURA_MEM_DEFAULT, run_param.mat_sizes.m_strides);
@@ -213,7 +213,7 @@ public:
         Mat dst    = m_factory.GetEmptyMat(ElemType::U8, sz.m_sizes, AURA_MEM_DEFAULT, sz.m_strides);
         Mat ref    = m_factory.GetEmptyMat(ElemType::U8, sz.m_sizes, AURA_MEM_DEFAULT, sz.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;

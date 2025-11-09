@@ -14,7 +14,7 @@ HexagonLibrary& HexagonLibrary::Get()
     return library;
 }
 
-HexagonLibrary::HexagonLibrary() : m_handle(MI_NULL)
+HexagonLibrary::HexagonLibrary() : m_handle(DT_NULL)
 {
     const std::vector<std::string> default_hexagon_library_paths =
     {
@@ -24,7 +24,7 @@ HexagonLibrary::HexagonLibrary() : m_handle(MI_NULL)
 
     for (auto &path : default_hexagon_library_paths)
     {
-        AURA_VOID *handle = LoadSymbols(path);
+        DT_VOID *handle = LoadSymbols(path);
         if (handle)
         {
             m_handle = handle;
@@ -38,18 +38,18 @@ HexagonLibrary::~HexagonLibrary()
     if (m_handle)
     {
         dlclose(m_handle);
-        m_handle = MI_NULL;
+        m_handle = DT_NULL;
     }
 }
 
-AURA_VOID* HexagonLibrary::LoadSymbols(const std::string &path)
+DT_VOID* HexagonLibrary::LoadSymbols(const std::string &path)
 {
     Status ret = Status::ERROR;
 
     dlerror();
 
-    AURA_VOID *handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_LOCAL);
-    if (MI_NULL == handle)
+    DT_VOID *handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_LOCAL);
+    if (DT_NULL == handle)
     {
         std::string info = "dlopen " + path + " failed, err : " + std::string(dlerror());
         AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
@@ -71,7 +71,7 @@ AURA_VOID* HexagonLibrary::LoadSymbols(const std::string &path)
     if (ret != Status::OK)
     {
         dlclose(handle);
-        handle = MI_NULL;
+        handle = DT_NULL;
     }
 
     return handle;

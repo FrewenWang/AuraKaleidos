@@ -105,7 +105,7 @@ public:
      * should be aligned to a stride, which is obtained through the `GetCLLengthAlignSize` function and is
      * platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_BOOL with_scale);
+    Status SetArgs(const Array *src, Array *dst, DT_BOOL with_scale);
 
     /**
      * @brief Generate arithmetic opencl precompiled cache.
@@ -115,7 +115,7 @@ public:
      * @param with_scale Flag indicating whether scaling is applied in the IDFT computation.
      * @param is_dst_c1 Is the dft dst array 1 channel.
      */
-    static Status CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, MI_BOOL with_scale, MI_BOOL is_dst_c1);
+    static Status CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, DT_BOOL with_scale, DT_BOOL is_dst_c1);
 };
 
 /**
@@ -187,7 +187,7 @@ AURA_EXPORTS Status IDft(Context *ctx, const Mat &src, Mat &dst, const OpTarget 
  *
  * @note For the OpenCL platform, the width and height of the src must both be greater than 16 and must be power of 2.
  */
-AURA_EXPORTS Status IInverseDft(Context *ctx, const Mat &src, Mat &dst, MI_BOOL with_scale, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IInverseDft(Context *ctx, const Mat &src, Mat &dst, DT_BOOL with_scale, const OpTarget &target = OpTarget::Default());
 
 /**
  * @}

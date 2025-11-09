@@ -37,10 +37,10 @@ struct AURA_EXPORTS TensorDesc
     {}
 
     ElemType elem_type;        /*!< Element type of tensor. 张量的元素类型 */
-    std::vector<MI_S32> sizes; /*!< Sizes of tensor. 张量的大小*/
-    MI_F32 scale;              /*!< quantization parameters scale value. */
-    MI_S32 zero_point;         /*!< quantization parameters zero value. */
-    MI_S32 graph_id;           /*!< graph id. */
+    std::vector<DT_S32> sizes; /*!< Sizes of tensor. 张量的大小*/
+    DT_F32 scale;              /*!< quantization parameters scale value. */
+    DT_S32 zero_point;         /*!< quantization parameters zero value. */
+    DT_S32 graph_id;           /*!< graph id. */
 };
 
 /**
@@ -155,7 +155,7 @@ public:
      */
     virtual ~NNExecutor()
     {
-        m_ctx = MI_NULL;
+        m_ctx = DT_NULL;
     }
 
     /**
@@ -186,15 +186,15 @@ public:
      *    |---------------------|----------------------------------------------------|--------------------------------------------------------------------------|
      *    | register_mem        | params["input_matmap" ]      : const MatMap&       | common config, register input & output buffer, use before Forward()      |
      *    |                     | params["output_matmap"]      : const MatMap&       | supported platform: qcom(qnn), xiaomi(xnn)                               |
-     *    |                     | params["graph_id"]           : MI_S32 (default 0)  |                                                                          |
+     *    |                     | params["graph_id"]           : DT_S32 (default 0)  |                                                                          |
      *    |---------------------|----------------------------------------------------|--------------------------------------------------------------------------|
      *    | deregister_mem      | params["input_matmap" ]      : const MatMap&       | common config, deregister input & output buffer, use after Forward()     |
      *    |                     | params["output_matmap"]      : const MatMap&       | supported platform: qcom(qnn), xiaomi(xnn)                               |
-     *    |                     | params["graph_id"]           : MI_S32 (default 0)  |                                                                          |
+     *    |                     | params["graph_id"]           : DT_S32 (default 0)  |                                                                          |
      *    |---------------------|----------------------------------------------------|--------------------------------------------------------------------------|
      *    | qnn_update_lora     | params["qnn_section_path"]   : const std::string&  | specialized config, update lora binary sections, use before Forward()    |
      *    |                     | params["qnn_decrypt_key"]    : const std::string&  | supported platform: qnn                                                  |
-     *    |                     | params["qnn_graph_id"]       : MI_S32              |                                                                          |
+     *    |                     | params["qnn_graph_id"]       : DT_S32              |                                                                          |
      *     -----------------------------------------------------------------------------------------------------------------------------------------------------|
      *
      *  Usage:
@@ -217,7 +217,7 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    virtual Status Forward(const MatMap &input, MatMap &output, MI_S32 graph_id = 0) = 0;
+    virtual Status Forward(const MatMap &input, MatMap &output, DT_S32 graph_id = 0) = 0;
 
     /**
      * @brief Get TensorDesc of input tensors for all graphs.

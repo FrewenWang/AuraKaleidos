@@ -55,7 +55,7 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize);
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize);
 
     /**
      * @brief Generate median opencl precompiled cache.
@@ -64,7 +64,7 @@ public:
      * @param channel The channel of the src/dst array.
      * @param ksize The size of the median kernel.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize);
 };
 
 /**
@@ -93,7 +93,7 @@ public:
  * @note 1.N is positive integer(ksize is odd positive integer). <br>
  *       2.The above implementations only supported BorderType(REPLICATE).
  */
-AURA_EXPORTS Status IMedian(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize,
+AURA_EXPORTS Status IMedian(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize,
                             const OpTarget &target = OpTarget::Default());
 
 } // namespace aura

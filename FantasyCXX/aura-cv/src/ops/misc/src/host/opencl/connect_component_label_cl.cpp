@@ -3,7 +3,7 @@
 namespace aura
 {
 
-static Status CheckCLExtensions(Context *ctx, MI_BOOL &ballot_flag, MI_BOOL &shuffle_flag)
+static Status CheckCLExtensions(Context *ctx, DT_BOOL &ballot_flag, DT_BOOL &shuffle_flag)
 {
     std::shared_ptr<CLRuntime> cl_rt = ctx->GetCLEngine()->GetCLRuntime();
 
@@ -47,7 +47,7 @@ static Status GetCLBuildOptions(Context *ctx, ConnectivityType connectivity_type
 
     std::shared_ptr<CLRuntime> cl_rt = ctx->GetCLEngine()->GetCLRuntime();
 
-    MI_BOOL ballot_flag = MI_FALSE, shuffle_flag = MI_FALSE;
+    DT_BOOL ballot_flag = DT_FALSE, shuffle_flag = DT_FALSE;
     if (CheckCLExtensions(ctx, ballot_flag, shuffle_flag) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "OpenCL CheckCLExtensions fail");
@@ -85,7 +85,7 @@ static Status GetCLBuildOptions(Context *ctx, ConnectivityType connectivity_type
 static Status GetCLName(Context *ctx, CCLAlgo algo_type, std::vector<std::string> &program_names,
                         std::vector<std::string> &kernel_names)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -101,13 +101,13 @@ static Status GetCLName(Context *ctx, CCLAlgo algo_type, std::vector<std::string
     return Status::OK;
 }
 
-static AURA_VOID GetCLSize(Context *ctx, MI_S32 height, MI_S32 width, MI_S32 max_group_size,
+static DT_VOID GetCLSize(Context *ctx, DT_S32 height, DT_S32 width, DT_S32 max_group_size,
                          ConnectivityType connectivity_type, cl::NDRange cl_local_size[3], cl::NDRange cl_global_size[3])
 {
     std::shared_ptr<CLRuntime> cl_rt = ctx->GetCLEngine()->GetCLRuntime();
 
-    const MI_S32 group_h = 4;
-    MI_S32 subgroup_size = 128;
+    const DT_S32 group_h = 4;
+    DT_S32 subgroup_size = 128;
 
     if (GpuType::ADRENO == cl_rt->GetGpuInfo().m_type)
     {
@@ -120,7 +120,7 @@ static AURA_VOID GetCLSize(Context *ctx, MI_S32 height, MI_S32 width, MI_S32 max
 
     if (ConnectivityType::CROSS == connectivity_type)
     {
-        MI_S32 strip_merge_global_h = ((height + group_h - 1) / group_h + group_h - 1) / group_h;
+        DT_S32 strip_merge_global_h = ((height + group_h - 1) / group_h + group_h - 1) / group_h;
 
         cl_local_size[0] = cl::NDRange(subgroup_size,  group_h);
         cl_local_size[1] = cl::NDRange(subgroup_size,  group_h);
@@ -132,8 +132,8 @@ static AURA_VOID GetCLSize(Context *ctx, MI_S32 height, MI_S32 width, MI_S32 max
     }
     else
     {
-        MI_S32 warp_nums_merge      = std::min((width + subgroup_size - 1) / subgroup_size, max_group_size / subgroup_size);
-        MI_S32 strip_merge_global_w = std::max((width + subgroup_size * (subgroup_size - 2) - 1) / (subgroup_size * (subgroup_size - 1)), 1);
+        DT_S32 warp_nums_merge      = std::min((width + subgroup_size - 1) / subgroup_size, max_group_size / subgroup_size);
+        DT_S32 strip_merge_global_w = std::max((width + subgroup_size * (subgroup_size - 2) - 1) / (subgroup_size * (subgroup_size - 1)), 1);
 
         cl_local_size[0] = cl::NDRange(subgroup_size,  group_h);
         cl_local_size[1] = cl::NDRange(subgroup_size,  1,       warp_nums_merge);
@@ -169,8 +169,8 @@ Status ConnectComponentLabelCL::SetArgs(const Array *src, Array *dst, CCLAlgo al
         return Status::ERROR;
     }
 
-    MI_S32 width  = src->GetSizes().m_width;
-    MI_S32 height = src->GetSizes().m_height;
+    DT_S32 width  = src->GetSizes().m_width;
+    DT_S32 height = src->GetSizes().m_height;
     if (width < 16 || height < 4)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "size is too small for opencl");
@@ -245,10 +245,10 @@ Status ConnectComponentLabelCL::DeInitialize()
 
 Status ConnectComponentLabelCL::Run()
 {
-    MI_S32 istep  = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep  = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 height = m_dst->GetSizes().m_height;
-    MI_S32 width  = m_dst->GetSizes().m_width;
+    DT_S32 istep  = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep  = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 height = m_dst->GetSizes().m_height;
+    DT_S32 width  = m_dst->GetSizes().m_width;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -256,7 +256,7 @@ Status ConnectComponentLabelCL::Run()
     cl::NDRange cl_local_size[3];
     cl::NDRange cl_global_size[3];
 
-    MI_S32 max_group_size = m_cl_kernels[1].GetMaxGroupSize();
+    DT_S32 max_group_size = m_cl_kernels[1].GetMaxGroupSize();
     GetCLSize(m_ctx, height, width, max_group_size, m_connectivity_type, cl_local_size, cl_global_size);
 
     cl::Event cl_event[3];
@@ -267,7 +267,7 @@ Status ConnectComponentLabelCL::Run()
     // 2. opencl run
     // 1st kernel
     {
-        cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32>(
+        cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32>(
                                     m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                     m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                     height, width,
@@ -281,9 +281,9 @@ Status ConnectComponentLabelCL::Run()
     }
 
     // 2nd kernel and 3rd kernel
-    for (MI_S32 i = 1; i < 3; ++i)
+    for (DT_S32 i = 1; i < 3; ++i)
     {
-        cl_ret = m_cl_kernels[i].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32>(
+        cl_ret = m_cl_kernels[i].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32>(
                                     m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                     m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                     height, width,
@@ -297,7 +297,7 @@ Status ConnectComponentLabelCL::Run()
     }
 
     // 3. opencl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event[2].wait();
         if (cl_ret != CL_SUCCESS)
@@ -345,7 +345,7 @@ std::vector<CLKernel> ConnectComponentLabelCL::GetCLKernels(Context *ctx, ElemTy
         return cl_kernels;
     }
 
-    for (MI_S32 i = 0; i < static_cast<MI_S32>(program_names.size()); ++i)
+    for (DT_S32 i = 0; i < static_cast<DT_S32>(program_names.size()); ++i)
     {
         cl_kernels.emplace_back(ctx, program_names.at(i), kernel_names.at(i), "", build_opt);
     }

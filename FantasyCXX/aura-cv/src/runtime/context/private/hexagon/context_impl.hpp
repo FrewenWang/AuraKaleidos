@@ -48,7 +48,7 @@ private:
 #endif // AURA_ENABLE_NN
     std::unordered_map<std::string, Buffer> m_share_buffer_map;
 
-    MI_BOOL m_flag;
+    DT_BOOL m_flag;
 };
 
 } // namespace aura

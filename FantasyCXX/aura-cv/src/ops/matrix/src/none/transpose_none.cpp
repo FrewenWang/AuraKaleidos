@@ -2,23 +2,23 @@
 #include "aura/runtime/logger.h"
 #include "aura/runtime/worker_pool.h"
 
-#define TRN_ROW_PTR(T, data, row, stride)  reinterpret_cast<T*>(reinterpret_cast<MI_SPTR_T>(data) + (row) * (stride))
+#define TRN_ROW_PTR(T, data, row, stride)  reinterpret_cast<T*>(reinterpret_cast<DT_SPTR_T>(data) + (row) * (stride))
 
 namespace aura
 {
 
 template <typename Tp>
-static AURA_VOID TransposeBlock(const Tp *src, Tp *dst, MI_S32 block_size_x, MI_S32 block_size_y, MI_S32 channel, MI_S32 ipitch, MI_S32 opitch)
+static DT_VOID TransposeBlock(const Tp *src, Tp *dst, DT_S32 block_size_x, DT_S32 block_size_y, DT_S32 channel, DT_S32 ipitch, DT_S32 opitch)
 {
-    for (MI_S32 y = 0; y < block_size_y; ++y)
+    for (DT_S32 y = 0; y < block_size_y; ++y)
     {
         Tp *dst_row = TRN_ROW_PTR(Tp, dst, y, opitch);
 
-        for (MI_S32 x = 0; x < block_size_x; ++x)
+        for (DT_S32 x = 0; x < block_size_x; ++x)
         {
             const Tp *src_row = TRN_ROW_PTR(Tp, src, x, ipitch);
 
-            for (MI_S32 ch = 0; ch < channel; ++ch)
+            for (DT_S32 ch = 0; ch < channel; ++ch)
             {
                 dst_row[x * channel + ch] = src_row[y * channel + ch];
             }
@@ -27,24 +27,24 @@ static AURA_VOID TransposeBlock(const Tp *src, Tp *dst, MI_S32 block_size_x, MI_
 }
 
 template <typename Tp>
-static AURA_VOID TransposeCommNoneImpl(const Mat &src, Mat &dst)
+static DT_VOID TransposeCommNoneImpl(const Mat &src, Mat &dst)
 {
     Sizes3 src_sz = src.GetSizes();
     Sizes3 dst_sz = dst.GetSizes();
 
-    const MI_S32 block_size = 8;
-    const MI_S32 channel = src_sz.m_channel;
+    const DT_S32 block_size = 8;
+    const DT_S32 channel = src_sz.m_channel;
 
-    const MI_S32 blk_count_x = (dst_sz.m_width  + block_size - 1) / block_size;
-    const MI_S32 blk_count_y = (dst_sz.m_height + block_size - 1) / block_size;
+    const DT_S32 blk_count_x = (dst_sz.m_width  + block_size - 1) / block_size;
+    const DT_S32 blk_count_y = (dst_sz.m_height + block_size - 1) / block_size;
 
-    const MI_S32 src_pitch = src.GetRowPitch();
-    const MI_S32 dst_pitch = dst.GetRowPitch();
+    const DT_S32 src_pitch = src.GetRowPitch();
+    const DT_S32 dst_pitch = dst.GetRowPitch();
 
-    for (MI_S32 by = 0; by < blk_count_y; ++by)
+    for (DT_S32 by = 0; by < blk_count_y; ++by)
     {
-        MI_S32 block_size_y = (blk_count_y - 1 == by) ? (dst_sz.m_height - block_size * (blk_count_y - 1)) : block_size;
-        MI_S32 bx = 0;
+        DT_S32 block_size_y = (blk_count_y - 1 == by) ? (dst_sz.m_height - block_size * (blk_count_y - 1)) : block_size;
+        DT_S32 bx = 0;
         for (; bx < blk_count_x - 1; ++bx)
         {
             const Tp *src_c = &src.At<Tp>(bx * block_size, by * block_size, 0);
@@ -54,7 +54,7 @@ static AURA_VOID TransposeCommNoneImpl(const Mat &src, Mat &dst)
 
         const Tp *src_c   = &src.At<Tp>(bx * block_size, by * block_size, 0);
         Tp *dst_c         = &dst.At<Tp>(by * block_size, bx * block_size, 0);
-        MI_S32 block_size_x = dst_sz.m_width - bx * block_size;
+        DT_S32 block_size_x = dst_sz.m_width - bx * block_size;
         TransposeBlock(src_c, dst_c, block_size_x, block_size_y, channel, src_pitch, dst_pitch);
     }
 }
@@ -63,19 +63,19 @@ template <typename Tp>
 static Status TransposeNoneHelper(Context *ctx, const Mat &src, Mat &dst, OpTarget &target)
 {
     Status ret = Status::OK;
-    MI_S32 height = dst.GetSizes().m_height;
+    DT_S32 height = dst.GetSizes().m_height;
 
 #define TRANSPOSE_NONE_FUNCTOR(channel)                                                                                 \
     TransposeNoneFunctor<Tp, channel> op;                                                                               \
     if (target.m_data.none.enable_mt)                                                                                   \
     {                                                                                                                   \
         WorkerPool *wp = ctx->GetWorkerPool();                                                                          \
-        if (MI_NULL == wp)                                                                                              \
+        if (DT_NULL == wp)                                                                                              \
         {                                                                                                               \
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");                                                         \
             return Status::ERROR;                                                                                       \
         }                                                                                                               \
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), AURA_ALIGN(height, 16) / 16, op, std::cref(src), std::ref(dst));  \
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), AURA_ALIGN(height, 16) / 16, op, std::cref(src), std::ref(dst));  \
     }                                                                                                                   \
     else                                                                                                                \
     {                                                                                                                   \
@@ -84,7 +84,7 @@ static Status TransposeNoneHelper(Context *ctx, const Mat &src, Mat &dst, OpTarg
                                                                                                                         \
     if (ret != Status::OK)                                                                                              \
     {                                                                                                                   \
-        MI_CHAR error_msg[128];                                                                                         \
+        DT_CHAR error_msg[128];                                                                                         \
         std::snprintf(error_msg, sizeof(error_msg), "TransposeNoneFunctor channel:%s failed", #channel);                \
         AURA_ADD_ERROR_STRING(ctx, error_msg);                                                                          \
     }
@@ -146,7 +146,7 @@ Status TransposeNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -159,7 +159,7 @@ Status TransposeNone::Run()
         case ElemType::U8:
         case ElemType::S8:
         {
-            ret = TransposeNoneHelper<MI_U8>(m_ctx, *src, *dst, m_target);
+            ret = TransposeNoneHelper<DT_U8>(m_ctx, *src, *dst, m_target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "TransposeNone Elem8 failed.");
@@ -172,7 +172,7 @@ Status TransposeNone::Run()
         case ElemType::F16:
 #endif
         {
-            ret = TransposeNoneHelper<MI_U16>(m_ctx, *src, *dst, m_target);
+            ret = TransposeNoneHelper<DT_U16>(m_ctx, *src, *dst, m_target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "TransposeNone Elem16 failed.");
@@ -185,7 +185,7 @@ Status TransposeNone::Run()
         case ElemType::F32:
 #endif
         {
-            ret = TransposeNoneHelper<MI_U32>(m_ctx, *src, *dst, m_target);
+            ret = TransposeNoneHelper<DT_U32>(m_ctx, *src, *dst, m_target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "TransposeNone Elem32 failed.");

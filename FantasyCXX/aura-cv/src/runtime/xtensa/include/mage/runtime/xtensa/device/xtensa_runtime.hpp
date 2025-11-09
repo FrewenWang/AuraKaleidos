@@ -27,15 +27,15 @@ namespace xtensa
  * @{
  */
 
-using XtensaRpcFunc = Status (*)(AURA_VOID*, XtensaRpcParam&);
-using PilRpcFunc    = MI_S32 (*)(const MI_CHAR*, MI_U8*, MI_S32);
+using XtensaRpcFunc = Status (*)(DT_VOID*, XtensaRpcParam&);
+using PilRpcFunc    = DT_S32 (*)(const DT_CHAR*, DT_U8*, DT_S32);
 
 /**
  * @brief the map between op name and rpc function.
  */
 struct XtensaRpcFuncRegister
 {
-    MI_CHAR       name[AURA_XTENSA_LEN_128];  /*!< the op name */
+    DT_CHAR       name[AURA_XTENSA_LEN_128];  /*!< the op name */
     XtensaRpcFunc func;                       /*!< the pointer of rpc function */
 };
 
@@ -50,7 +50,7 @@ struct XtensaRpcFuncRegister
  * @return AURA_XTENSA_ERROR if it encounters an error, else returns AURA_XTENSA_OK
  *
  */
-MI_S32 VdspRpcCall(const MI_CHAR *name, MI_U8 *param, MI_S32 param_len);
+DT_S32 VdspRpcCall(const DT_CHAR *name, DT_U8 *param, DT_S32 param_len);
 
 /**
  * @}

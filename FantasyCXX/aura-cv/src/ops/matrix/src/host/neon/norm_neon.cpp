@@ -13,41 +13,41 @@ struct NormInfTraits
 };
 
 template <>
-struct NormInfTraits<MI_S8>
+struct NormInfTraits<DT_S8>
 {
     using VType = uint8x16_t;
-    using SType = MI_U8;
+    using SType = DT_U8;
 };
 
 template <>
-struct NormInfTraits<MI_S16>
+struct NormInfTraits<DT_S16>
 {
     using VType = uint16x8_t;
-    using SType = MI_U16;
+    using SType = DT_U16;
 };
 
 template <typename Tp>
-static Status NormInfNeonImpl(const Mat &mat, std::vector<MI_F64> &task_result, MI_S32 start_row, MI_S32 end_row)
+static Status NormInfNeonImpl(const Mat &mat, std::vector<DT_F64> &task_result, DT_S32 start_row, DT_S32 end_row)
 {
-    constexpr MI_S32 VEC_SIZE = 16 / sizeof(Tp);
+    constexpr DT_S32 VEC_SIZE = 16 / sizeof(Tp);
     using VType = typename NormInfTraits<Tp>::VType;
     using SType = typename NormInfTraits<Tp>::SType;
 
     Sizes3 sz      = mat.GetSizes();
-    MI_S32 width   = sz.m_width;
-    MI_S32 channel = sz.m_channel;
+    DT_S32 width   = sz.m_width;
+    DT_S32 channel = sz.m_channel;
 
-    MI_S32 row_elem_count   = width * channel;
-    MI_S32 elem_count_align = row_elem_count & (-VEC_SIZE);
+    DT_S32 row_elem_count   = width * channel;
+    DT_S32 elem_count_align = row_elem_count & (-VEC_SIZE);
 
     VType res_vec;
     neon::vdup(res_vec, 0);
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         auto mat_row = mat.Ptr<Tp>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < elem_count_align; x += VEC_SIZE)
         {
             typename neon::QVector<Tp>::VType src_data;
@@ -69,19 +69,19 @@ static Status NormInfNeonImpl(const Mat &mat, std::vector<MI_F64> &task_result, 
     SType scalar_result[VEC_SIZE] = {0};
     neon::vstore(scalar_result, res_vec);
 
-    MI_F64 max_value = 0;
-    for (MI_S32 i = 0; i < VEC_SIZE; i++)
+    DT_F64 max_value = 0;
+    for (DT_S32 i = 0; i < VEC_SIZE; i++)
     {
-        max_value = Max(max_value, Abs(static_cast<MI_F64>(scalar_result[i])));
+        max_value = Max(max_value, Abs(static_cast<DT_F64>(scalar_result[i])));
     }
 
-    MI_S32 idx = start_row;
+    DT_S32 idx = start_row;
     task_result[idx] = max_value;
 
     return Status::OK;
 }
 
-static Status NormInfNeon(Context *ctx, const Mat &mat, MI_F64 *result, const OpTarget &target)
+static Status NormInfNeon(Context *ctx, const Mat &mat, DT_F64 *result, const OpTarget &target)
 {
     AURA_UNUSED(target);
     Status ret = Status::OK;
@@ -89,13 +89,13 @@ static Status NormInfNeon(Context *ctx, const Mat &mat, MI_F64 *result, const Op
 
     ElemType type  = mat.GetElemType();
     Sizes3 sz      = mat.GetSizes();
-    MI_S32 height  = sz.m_height;
+    DT_S32 height  = sz.m_height;
 
-    std::vector<MI_F64> task_result(height, 0.0);
+    std::vector<DT_F64> task_result(height, 0.0);
 
     WorkerPool *wp = ctx->GetWorkerPool();
 
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         return Status::ERROR;
     }
@@ -104,37 +104,37 @@ static Status NormInfNeon(Context *ctx, const Mat &mat, MI_F64 *result, const Op
     {
         case ElemType::U8:
         {
-            ret = wp->ParallelFor(0, height, NormInfNeonImpl<MI_U8>, std::ref(mat), std::ref(task_result));
+            ret = wp->ParallelFor(0, height, NormInfNeonImpl<DT_U8>, std::ref(mat), std::ref(task_result));
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<DT_U8> failed.");
             }
             break;
         }
         case ElemType::S8:
         {
-            ret = wp->ParallelFor(0, height, NormInfNeonImpl<MI_S8>, std::ref(mat), std::ref(task_result));
+            ret = wp->ParallelFor(0, height, NormInfNeonImpl<DT_S8>, std::ref(mat), std::ref(task_result));
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<MI_S8> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<DT_S8> failed.");
             }
             break;
         }
         case ElemType::U16:
         {
-            ret = wp->ParallelFor(0, height, NormInfNeonImpl<MI_U16>, std::ref(mat), std::ref(task_result));
+            ret = wp->ParallelFor(0, height, NormInfNeonImpl<DT_U16>, std::ref(mat), std::ref(task_result));
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<DT_U16> failed.");
             }
             break;
         }
         case ElemType::S16:
         {
-            ret = wp->ParallelFor(0, height, NormInfNeonImpl<MI_S16>, std::ref(mat), std::ref(task_result));
+            ret = wp->ParallelFor(0, height, NormInfNeonImpl<DT_S16>, std::ref(mat), std::ref(task_result));
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<MI_S16> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<DT_S16> failed.");
             }
             break;
         }
@@ -151,10 +151,10 @@ static Status NormInfNeon(Context *ctx, const Mat &mat, MI_F64 *result, const Op
 #endif
         case ElemType::F32:
         {
-            ret = wp->ParallelFor(0, height, NormInfNeonImpl<MI_F32>, std::cref(mat), std::ref(task_result));
+            ret = wp->ParallelFor(0, height, NormInfNeonImpl<DT_F32>, std::cref(mat), std::ref(task_result));
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<MI_F32> failed.");
+                AURA_ADD_ERROR_STRING(ctx, "ParallelFor NormInfNeonImpl<DT_F32> failed.");
             }
             break;
         }
@@ -177,7 +177,7 @@ static Status NormInfNeon(Context *ctx, const Mat &mat, MI_F64 *result, const Op
 NormNeon::NormNeon(Context *ctx, const OpTarget &target) : NormImpl(ctx, target)
 {}
 
-Status NormNeon::SetArgs(const Array *src, MI_F64 *result, NormType type)
+Status NormNeon::SetArgs(const Array *src, DT_F64 *result, NormType type)
 {
     if (NormImpl::SetArgs(src, result, type) != Status::OK)
     {
@@ -198,7 +198,7 @@ Status NormNeon::Run()
 {
     const Mat *src = dynamic_cast<const Mat*>(m_src);
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;

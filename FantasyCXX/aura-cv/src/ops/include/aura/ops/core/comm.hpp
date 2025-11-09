@@ -30,7 +30,7 @@
  *
  * @return Calculated numerical pattern value.
  */
-#define AURA_MAKE_PATTERN1(tp)                                  (static_cast<MI_S32>(tp))
+#define AURA_MAKE_PATTERN1(tp)                                  (static_cast<DT_S32>(tp))
 
 /**
  * @brief Generates a numerical pattern with two parameters.
@@ -40,7 +40,7 @@
  *
  * @return Calculated numerical pattern value.
  */
-#define AURA_MAKE_PATTERN2(tp0, tp1)                            (static_cast<MI_S32>(tp0) * 16  + static_cast<MI_S32>(tp1))
+#define AURA_MAKE_PATTERN2(tp0, tp1)                            (static_cast<DT_S32>(tp0) * 16  + static_cast<DT_S32>(tp1))
 
 /**
  * @brief Generates a pattern numerical with three parameters.
@@ -51,8 +51,8 @@
  *
  * @return Calculated numerical pattern value.
  */
-#define AURA_MAKE_PATTERN3(tp0, tp1, tp2)                       (static_cast<MI_S32>(tp0) * 256 + static_cast<MI_S32>(tp1) * 16  +         \
-                                                                 static_cast<MI_S32>(tp2))
+#define AURA_MAKE_PATTERN3(tp0, tp1, tp2)                       (static_cast<DT_S32>(tp0) * 256 + static_cast<DT_S32>(tp1) * 16  +         \
+                                                                 static_cast<DT_S32>(tp2))
 /**
  * @brief Generates a numerical pattern with four parameters.
  *
@@ -63,8 +63,8 @@
  *
  * @return Calculated numerical pattern value.
  */
-#define AURA_MAKE_PATTERN4(tp0, tp1, tp2, tp3)                  (static_cast<MI_S32>(tp0) * 4096 + static_cast<MI_S32>(tp1) * 256 +        \
-                                                                 static_cast<MI_S32>(tp2) * 16   + static_cast<MI_S32>(tp3))
+#define AURA_MAKE_PATTERN4(tp0, tp1, tp2, tp3)                  (static_cast<DT_S32>(tp0) * 4096 + static_cast<DT_S32>(tp1) * 256 +        \
+                                                                 static_cast<DT_S32>(tp2) * 16   + static_cast<DT_S32>(tp3))
 
 /**
  * @brief Helper macro used to select the appropriate pattern macro based on the number of arguments passed.
@@ -371,17 +371,17 @@ public:
             }
             case TargetType::OPENCL:
             {
-                m_data.opencl = Data::OpenCL(MI_FALSE);
+                m_data.opencl = Data::OpenCL(DT_FALSE);
                 break;
             }
             case TargetType::HVX:
             {
-                m_data.hvx = Data::Hvx(MI_FALSE);
+                m_data.hvx = Data::Hvx(DT_FALSE);
                 break;
             }
             case TargetType::VDSP:
             {
-                m_data.vdsp = Data::Vdsp(MI_FALSE);
+                m_data.vdsp = Data::Vdsp(DT_FALSE);
                 break;
             }
             default:
@@ -413,13 +413,13 @@ public:
      * @return The OpTarget with target type NONE.
      */
 #if defined(AURA_BUILD_HEXAGON)
-    static OpTarget None(MI_BOOL enable_mt = MI_TRUE)
+    static OpTarget None(DT_BOOL enable_mt = DT_TRUE)
 #else
-    static OpTarget None(MI_BOOL enable_mt = MI_FALSE)
+    static OpTarget None(DT_BOOL enable_mt = DT_FALSE)
 #endif
     {
 #if defined(AURA_BUILD_XPLORER)
-        enable_mt = MI_FALSE;
+        enable_mt = DT_FALSE;
 #endif
         OpTarget target(TargetType::NONE);
         target.m_data.none = Data::None(enable_mt);
@@ -444,7 +444,7 @@ public:
      *
      * @return The OpTarget with target type OPENCL.
      */
-    static OpTarget Opencl(MI_BOOL profiling = MI_FALSE)
+    static OpTarget Opencl(DT_BOOL profiling = DT_FALSE)
     {
         OpTarget target(TargetType::OPENCL);
         target.m_data.opencl = Data::OpenCL(profiling);
@@ -458,7 +458,7 @@ public:
      *
      * @return The OpTarget with target type HVX.
      */
-    static OpTarget Hvx(MI_BOOL profiling = MI_FALSE)
+    static OpTarget Hvx(DT_BOOL profiling = DT_FALSE)
     {
         OpTarget target(TargetType::HVX);
         target.m_data.hvx = Data::Hvx(profiling);
@@ -472,7 +472,7 @@ public:
      *
      * @return The OpTarget with target type VDSP.
      */
-    static OpTarget Vdsp(MI_BOOL profiling = MI_FALSE)
+    static OpTarget Vdsp(DT_BOOL profiling = DT_FALSE)
     {
         OpTarget target(TargetType::VDSP);
         target.m_data.vdsp = Data::Vdsp(profiling);
@@ -566,11 +566,11 @@ public:
      *
      * @return True if OpTargets are equal, false otherwise.
      */
-    MI_BOOL operator==(const OpTarget &target)
+    DT_BOOL operator==(const OpTarget &target)
     {
         if (m_type != target.m_type)
         {
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         switch (m_type)
@@ -579,7 +579,7 @@ public:
             {
                 if (m_data.none.enable_mt != target.m_data.none.enable_mt)
                 {
-                    return MI_FALSE;
+                    return DT_FALSE;
                 }
                 break;
             }
@@ -588,7 +588,7 @@ public:
             {
                 if (m_data.opencl.profiling != target.m_data.opencl.profiling)
                 {
-                    return MI_FALSE;
+                    return DT_FALSE;
                 }
                 break;
             }
@@ -597,7 +597,7 @@ public:
             {
                 if (m_data.hvx.profiling != target.m_data.hvx.profiling)
                 {
-                    return MI_FALSE;
+                    return DT_FALSE;
                 }
                 break;
             }
@@ -606,7 +606,7 @@ public:
             {
                 if (m_data.vdsp.profiling != target.m_data.vdsp.profiling)
                 {
-                    return MI_FALSE;
+                    return DT_FALSE;
                 }
                 break;
             }
@@ -617,7 +617,7 @@ public:
             }
         }
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -627,7 +627,7 @@ public:
      *
      * @return True if OpTargets are not equal, false otherwise.
      */
-    MI_BOOL operator!=(const OpTarget &target)
+    DT_BOOL operator!=(const OpTarget &target)
     {
         return !(*this == target);
     }
@@ -718,13 +718,13 @@ public:
          */
         struct None
         {
-            MI_BOOL enable_mt;
+            DT_BOOL enable_mt;
 
 #if defined(AURA_BUILD_HEXAGON)
-            None(MI_BOOL enable_mt = MI_TRUE) : enable_mt(enable_mt)
+            None(DT_BOOL enable_mt = DT_TRUE) : enable_mt(enable_mt)
             {}
 #else
-            None(MI_BOOL enable_mt = MI_FALSE) : enable_mt(enable_mt)
+            None(DT_BOOL enable_mt = DT_FALSE) : enable_mt(enable_mt)
             {}
 #endif // AURA_BUILD_HEXAGON
         } none;
@@ -734,8 +734,8 @@ public:
          */
         struct OpenCL
         {
-            MI_BOOL profiling;      /*!< Flag indicating whether profiling is enabled for OpenCL. */
-            OpenCL(MI_S32 profiling) : profiling(profiling)
+            DT_BOOL profiling;      /*!< Flag indicating whether profiling is enabled for OpenCL. */
+            OpenCL(DT_S32 profiling) : profiling(profiling)
             {}
         } opencl;
 
@@ -744,8 +744,8 @@ public:
          */
         struct Hvx
         {
-            MI_BOOL profiling;      /*!< Flag indicating whether profiling is enabled for HVX. */
-            Hvx(MI_S32 profiling) : profiling(profiling)
+            DT_BOOL profiling;      /*!< Flag indicating whether profiling is enabled for HVX. */
+            Hvx(DT_S32 profiling) : profiling(profiling)
             {}
         } hvx;
 
@@ -754,8 +754,8 @@ public:
          */
         struct Vdsp
         {
-            MI_BOOL profiling;      /*!< Flag indicating whether profiling is enabled for VDSP. */
-            Vdsp(MI_S32 profiling) : profiling(profiling)
+            DT_BOOL profiling;      /*!< Flag indicating whether profiling is enabled for VDSP. */
+            Vdsp(DT_S32 profiling) : profiling(profiling)
             {}
         } vdsp;
 
@@ -780,21 +780,21 @@ public:
  * @return A pointer to the created buffer. It is the responsibility of the caller to free the allocated memory.
  */
 template <typename Tp>
-AURA_INLINE Tp* CreateBorderBuffer(Context *ctx, MI_S32 width, MI_S32 channel, const std::vector<Tp> &border_value)
+AURA_INLINE Tp* CreateBorderBuffer(Context *ctx, DT_S32 width, DT_S32 channel, const std::vector<Tp> &border_value)
 {
     /// 创建buffer. 创建宽度长度的乘以通道数的buffer数据
     Tp *buffer = (Tp *)AURA_ALLOC(ctx, width * channel * sizeof(Tp));
-    if (MI_NULL == buffer)
+    if (DT_NULL == buffer)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC failed");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     /// 将这个数据填充满border_value的数据
     Tp *buffer_row = buffer;
-    for (MI_S32 x = 0; x < width; x++)
+    for (DT_S32 x = 0; x < width; x++)
     {
-        for (MI_S32 c = 0; c < channel; c++)
+        for (DT_S32 c = 0; c < channel; c++)
         {
             *buffer_row++ = border_value[c];
         }
@@ -815,23 +815,23 @@ AURA_INLINE Tp* CreateBorderBuffer(Context *ctx, MI_S32 width, MI_S32 channel, c
  *
  * @return The real index of the array under a specific border type.
  */
-template <BorderType BORDER_TYPE, typename std::enable_if<(BorderType::REPLICATE == BORDER_TYPE)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE MI_S32 GetBorderIdx(MI_S32 index, MI_S32 len)
+template <BorderType BORDER_TYPE, typename std::enable_if<(BorderType::REPLICATE == BORDER_TYPE)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_S32 GetBorderIdx(DT_S32 index, DT_S32 len)
 {
-    return Max(static_cast<MI_S32>(0), Min(index, len - 1));
+    return Max(static_cast<DT_S32>(0), Min(index, len - 1));
 }
 
-template <BorderType BORDER_TYPE, typename std::enable_if<(BorderType::REFLECT_101 == BORDER_TYPE)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE MI_S32 GetBorderIdx(MI_S32 index, MI_S32 len)
+template <BorderType BORDER_TYPE, typename std::enable_if<(BorderType::REFLECT_101 == BORDER_TYPE)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_S32 GetBorderIdx(DT_S32 index, DT_S32 len)
 {
     index           = Abs(index);
-    MI_S32 n        = index / (len - 1);
-    MI_S32 leftover = index - n * (len - 1);
+    DT_S32 n        = index / (len - 1);
+    DT_S32 leftover = index - n * (len - 1);
     return (n & 1) ? (len - 1 - leftover) : leftover;
 }
 
-template <BorderType BORDER_TYPE, typename std::enable_if<(BorderType::CONSTANT == BORDER_TYPE)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE MI_S32 GetBorderIdx(MI_S32 index, MI_S32 len)
+template <BorderType BORDER_TYPE, typename std::enable_if<(BorderType::CONSTANT == BORDER_TYPE)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_S32 GetBorderIdx(DT_S32 index, DT_S32 len)
 {
     return index >= 0 ? (index < len ? index : -1) : -1;
 }
@@ -849,9 +849,9 @@ AURA_ALWAYS_INLINE MI_S32 GetBorderIdx(MI_S32 index, MI_S32 len)
 AURA_INLINE Status CheckHvxWidth(const Array &array)
 {
     // 判断数据的宽度
-    MI_S32 width = array.GetSizes().m_width;
+    DT_S32 width = array.GetSizes().m_width;
     // 判断元素的个数
-    MI_S32 elem_counts = AURA_HVLEN / ElemTypeSize(array.GetElemType());
+    DT_S32 elem_counts = AURA_HVLEN / ElemTypeSize(array.GetElemType());
     // 数据的宽度小于元素的个数，也是不允许使用HVX的 TODO 为什么啊？
     if (width < elem_counts)
     {
@@ -875,19 +875,19 @@ AURA_INLINE Status CheckHvxWidth(const Array &array)
  *
  * @return The result of saturation conversion
  */
-template <typename St, typename Dt, MI_U32 Q, typename std::enable_if<std::is_same<St, MI_F32>::value && std::is_same<Dt, St>::value>::type* = MI_NULL>
+template <typename St, typename Dt, DT_U32 Q, typename std::enable_if<std::is_same<St, DT_F32>::value && std::is_same<Dt, St>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE Dt ShiftSatCast(const St val)
 {
     return val;
 }
 
-template <typename St, typename Dt, MI_U32 Q, typename std::enable_if<std::is_same<St, MI_F32>::value && !std::is_same<Dt, St>::value>::type* = MI_NULL>
+template <typename St, typename Dt, DT_U32 Q, typename std::enable_if<std::is_same<St, DT_F32>::value && !std::is_same<Dt, St>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE Dt ShiftSatCast(const St val)
 {
     return SaturateCast<Dt>(val);
 }
 
-template <typename St, typename Dt, MI_U32 Q, typename std::enable_if<!std::is_same<St, MI_F32>::value>::type* = MI_NULL>
+template <typename St, typename Dt, DT_U32 Q, typename std::enable_if<!std::is_same<St, DT_F32>::value>::type* = DT_NULL>
 AURA_ALWAYS_INLINE Dt ShiftSatCast(const St val)
 {
     return SaturateCast<Dt>((val + ((1 << Q) >> 1)) >> Q);
@@ -916,7 +916,7 @@ public:
     */
     virtual ~OpImpl()
     {
-        m_ctx = MI_NULL;
+        m_ctx = DT_NULL;
     }
 
     /**
@@ -961,7 +961,7 @@ public:
      *
      * @param prefix The prefix in the dump.
      */
-    virtual AURA_VOID Dump(const std::string &prefix) const
+    virtual DT_VOID Dump(const std::string &prefix) const
     {
         AURA_UNUSED(prefix);
     }
@@ -1026,12 +1026,12 @@ public:
      * @param ctx The pointer to the Context object.
      * @param target The target platform for the operator.
      */
-    Op(Context *ctx, const OpTarget &target = OpTarget::Default()) : m_ctx(ctx), m_target(target), m_ready(MI_FALSE)
+    Op(Context *ctx, const OpTarget &target = OpTarget::Default()) : m_ctx(ctx), m_target(target), m_ready(DT_FALSE)
     {}
 
     virtual ~Op()
     {
-        m_ctx = MI_NULL;
+        m_ctx = DT_NULL;
     }
 
     /**
@@ -1048,7 +1048,7 @@ public:
             ret = m_impl->Initialize();
             if (Status::OK == ret)
             {
-                m_ready = MI_TRUE;
+                m_ready = DT_TRUE;
             }
         }
         return ret;
@@ -1065,7 +1065,7 @@ public:
 
         if (m_ctx && m_impl)
         {
-            if (MI_TRUE == m_ready)
+            if (DT_TRUE == m_ready)
             {
                 ret = m_impl->Run();
             }
@@ -1087,7 +1087,7 @@ public:
             ret = m_impl->DeInitialize();
             if (Status::OK == ret)
             {
-                m_ready = MI_FALSE;
+                m_ready = DT_FALSE;
             }
         }
         return ret;
@@ -1115,7 +1115,7 @@ public:
      *
      * @param prefix The prefix in the dump.
      */
-    AURA_VOID Dump(const std::string &prefix) const
+    DT_VOID Dump(const std::string &prefix) const
     {
         if (m_ctx && m_impl)
         {
@@ -1195,7 +1195,7 @@ protected:
     Context *m_ctx;                     /*!< Pointer to the Context object */
     std::shared_ptr<OpImpl> m_impl;     /*!< Shared pointer to the implementation class. */
     OpTarget m_target;                  /*!< Target platform for the operator. */
-    MI_BOOL m_ready;                    /*!< Flag indicating whether the operator is ready for execution. */
+    DT_BOOL m_ready;                    /*!< Flag indicating whether the operator is ready for execution. */
 };
 
 /**
@@ -1215,7 +1215,7 @@ protected:
 template <typename Tp, typename ...ArgsType>
 Status OpCall(Context *ctx, Tp &op, ArgsType &&...args)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }

@@ -32,7 +32,7 @@ namespace aura
 AURA_INLINE Status CheckNeonWidth(const Array &array)
 {
     // 如果数据的宽度小于48，则不允许使用NEON。 TODO 为什么？
-    MI_S32 width = array.GetSizes().m_width;
+    DT_S32 width = array.GetSizes().m_width;
     if (width < 48)
     {
         return Status::ERROR;
@@ -58,7 +58,7 @@ AURA_INLINE Status CheckNeonWidth(const Array &array)
  * @return The resulting border vector.
  */
 template <BorderType BORDER_TYPE, BorderArea BORDER_AREA, typename VType, typename SType = typename neon::Scalar<VType>::SType,
-          typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE, SType>::type* = MI_NULL>
+          typename std::enable_if<BorderType::CONSTANT == BORDER_TYPE, SType>::type* = DT_NULL>
 AURA_INLINE VType GetBorderVector(VType reflect_101, SType replicate, SType constant)
 {
     AURA_UNUSED(reflect_101);
@@ -70,7 +70,7 @@ AURA_INLINE VType GetBorderVector(VType reflect_101, SType replicate, SType cons
 }
 
 template <BorderType BORDER_TYPE, BorderArea BORDER_AREA, typename VType, typename SType = typename neon::Scalar<VType>::SType,
-          typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE, SType>::type* = MI_NULL>
+          typename std::enable_if<BorderType::REPLICATE == BORDER_TYPE, SType>::type* = DT_NULL>
 AURA_INLINE VType GetBorderVector(VType reflect_101, SType replicate, SType constant)
 {
     AURA_UNUSED(reflect_101);
@@ -82,16 +82,16 @@ AURA_INLINE VType GetBorderVector(VType reflect_101, SType replicate, SType cons
 }
 
 template <BorderType BORDER_TYPE, BorderArea BORDER_AREA, typename VType, typename SType = typename neon::Scalar<VType>::SType,
-          typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE, SType>::type* = MI_NULL>
+          typename std::enable_if<BorderType::REFLECT_101 == BORDER_TYPE, SType>::type* = DT_NULL>
 AURA_INLINE VType GetBorderVector(VType reflect_101, SType replicate, SType constant)
 {
     AURA_UNUSED(replicate);
     AURA_UNUSED(constant);
 
-    constexpr MI_S32 elem_counts = static_cast<MI_S32>(sizeof(VType) / sizeof(SType));
-    constexpr MI_S32 number      = static_cast<MI_S32>(2 - sizeof(SType) / 2);
-    constexpr MI_S32 left        = 1 + number * (number + 1);
-    constexpr MI_S32 shift       = BorderArea::LEFT == BORDER_AREA ? left : elem_counts - left;
+    constexpr DT_S32 elem_counts = static_cast<DT_S32>(sizeof(VType) / sizeof(SType));
+    constexpr DT_S32 number      = static_cast<DT_S32>(2 - sizeof(SType) / 2);
+    constexpr DT_S32 left        = 1 + number * (number + 1);
+    constexpr DT_S32 shift       = BorderArea::LEFT == BORDER_AREA ? left : elem_counts - left;
 
     VType v_rev = neon::vrev64(reflect_101);
     return neon::vext<shift>(v_rev, v_rev);

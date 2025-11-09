@@ -12,9 +12,9 @@ namespace aura
 {
 
 template <typename Tp>
-AURA_INLINE Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &offset, Tp &val)
+AURA_INLINE Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, DT_S64 &offset, Tp &val)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -25,7 +25,7 @@ AURA_INLINE Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64
         return Status::ERROR;
     }
 
-    if (offset + static_cast<MI_S32>(sizeof(Tp)) > minn_buffer.m_size)
+    if (offset + static_cast<DT_S32>(sizeof(Tp)) > minn_buffer.m_size)
     {
         std::string info = "minn_buffer overflow, curr minn buffer data pos is " + std::to_string(offset) + ", again read " + \
                             std::to_string(sizeof(Tp)) + "bytes, will excess minn_buffer size " + std::to_string(minn_buffer.m_size);
@@ -34,18 +34,18 @@ AURA_INLINE Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64
     }
 
 #if defined(AURA_BUILD_HEXAGON)
-    AuraMemCopy(&val, (static_cast<MI_U8*>(minn_buffer.m_data) + offset), sizeof(Tp));
+    AuraMemCopy(&val, (static_cast<DT_U8*>(minn_buffer.m_data) + offset), sizeof(Tp));
 #else
-    memcpy(&val, (static_cast<MI_U8*>(minn_buffer.m_data) + offset), sizeof(Tp));
+    memcpy(&val, (static_cast<DT_U8*>(minn_buffer.m_data) + offset), sizeof(Tp));
 #endif // AURA_BUILD_HEXAGON
     offset += sizeof(Tp);
 
     return Status::OK;
 }
 
-AURA_INLINE Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &offset, std::string &str)
+AURA_INLINE Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, DT_S64 &offset, std::string &str)
 {
-    MI_U32 size = 0;
+    DT_U32 size = 0;
 
     if (NNDeserialize(ctx, minn_buffer, offset, size) != Status::OK)
     {
@@ -68,13 +68,13 @@ AURA_INLINE Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64
     }
 
     str.resize(size);
-    memcpy(&str[0], static_cast<MI_U8*>(minn_buffer.m_data) + offset, size);
+    memcpy(&str[0], static_cast<DT_U8*>(minn_buffer.m_data) + offset, size);
     offset += size;
 
     return Status::OK;
 }
 
-AURA_INLINE Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, MI_S64 &offset, MI_CHAR key, std::vector<std::string> &vec)
+AURA_INLINE Status NNDeserialize(Context *ctx, const Buffer &minn_buffer, DT_S64 &offset, DT_CHAR key, std::vector<std::string> &vec)
 {
     std::string str;
 

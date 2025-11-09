@@ -40,7 +40,7 @@ AURA_TEST_PARAM(GemmParam,
                 GemmTestParam, size_param,
                 OpTarget,      target);
 
-AURA_INLINE Status CvGemm(Mat &src1, Mat &src2, double alpha, Mat &src3, double beta, Mat &dst, MI_S32 flags = 0)
+AURA_INLINE Status CvGemm(Mat &src1, Mat &src2, double alpha, Mat &src3, double beta, Mat &dst, DT_S32 flags = 0)
 {
 #if !defined(AURA_BUILD_XPLORER)
     cv::Mat cv_src1 = MatToOpencv(src1);
@@ -68,7 +68,7 @@ public:
     MatrixGemmTest(Context *ctx, GemmParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         GemmParam run_param(GetParam((index)));
@@ -86,7 +86,7 @@ public:
         Mat dst = m_factory.GetEmptyMat(run_param.src_type, size_dst.m_sizes, AURA_MEM_DEFAULT, size_dst.m_strides);
         Mat ref = m_factory.GetEmptyMat(run_param.src_type, size_dst.m_sizes, AURA_MEM_DEFAULT, size_dst.m_strides);
 
-        MI_S32 loop_count = (stress_count > 0) ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
+        DT_S32 loop_count = (stress_count > 0) ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;

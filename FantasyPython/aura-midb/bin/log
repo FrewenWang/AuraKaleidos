@@ -1,0 +1,19 @@
+#!/bin/bash
+DATE=`adb shell date`
+if test -z $DATE
+then
+    DATE=`date`
+fi
+
+echo "时间点: $DATE"
+echo "事件:"
+
+if [ -z $1 ]
+then
+    logstr=$(zenity --entry --title 打点 --text $(date "+%y/%m/%d_%H:%M:%S"))
+else
+    logstr=$1
+fi
+
+adb shell "echo $DATE: $logstr >> /data/log_`date \"+%y%m%d\"`.txt"
+echo $DATE: $logstr >> $HOME/log_`date "+%y%m%d"`.txt

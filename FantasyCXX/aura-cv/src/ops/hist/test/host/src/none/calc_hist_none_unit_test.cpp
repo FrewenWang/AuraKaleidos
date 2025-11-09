@@ -11,10 +11,10 @@ static CalcHistParam::TupleTable g_hist_table_none
 
     // param : elem type | channel | hist size | range | accumulate | use mask
     {
-        {ElemType::U8 , 0, 256, {0, 256}, MI_FALSE, MI_FALSE},
-        {ElemType::U8 , 1, 242, {2, 244}, MI_FALSE, MI_TRUE},
-        {ElemType::U16, 0, 65536, {0, 65536}, MI_FALSE, MI_FALSE},
-        {ElemType::U16, 2, 65520, {10, 65530}, MI_FALSE, MI_TRUE}
+        {ElemType::U8 , 0, 256, {0, 256}, DT_FALSE, DT_FALSE},
+        {ElemType::U8 , 1, 242, {2, 244}, DT_FALSE, DT_TRUE},
+        {ElemType::U16, 0, 65536, {0, 65536}, DT_FALSE, DT_FALSE},
+        {ElemType::U16, 2, 65520, {10, 65530}, DT_FALSE, DT_TRUE}
     },
 
     // target

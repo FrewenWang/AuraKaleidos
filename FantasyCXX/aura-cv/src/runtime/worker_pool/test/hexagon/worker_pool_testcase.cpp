@@ -6,7 +6,7 @@
 
 using namespace aura;
 
-static AURA_VOID TestFunc(Context *ctx, Status &ret, WorkerPool *wp)
+static DT_VOID TestFunc(Context *ctx, Status &ret, WorkerPool *wp)
 {
     Mat mat(ctx, ElemType::F32, Sizes3(1024, 1024, 1));
     Sizes3 size = mat.GetSizes();
@@ -14,23 +14,23 @@ static AURA_VOID TestFunc(Context *ctx, Status &ret, WorkerPool *wp)
 
     auto func_benchmark = [&]() -> Status
     {
-        for (MI_S32 y = 0; y < size.m_height; ++y)
+        for (DT_S32 y = 0; y < size.m_height; ++y)
         {
-            for (MI_S32 x = 0; x < size.m_width; ++x)
+            for (DT_S32 x = 0; x < size.m_width; ++x)
             {
-                mat.At<MI_F32>(y, x, 0) += static_cast<MI_F32>(std::sqrt(y * size.m_width + x));
+                mat.At<DT_F32>(y, x, 0) += static_cast<DT_F32>(std::sqrt(y * size.m_width + x));
             }
         }
         return Status::OK;
     };
 
-    auto func = [&](MI_S32 start, MI_S32 end) -> Status
+    auto func = [&](DT_S32 start, DT_S32 end) -> Status
     {
-        for (MI_S32 y = start; y < end; ++y)
+        for (DT_S32 y = start; y < end; ++y)
         {
-            for (MI_S32 x = 0; x < size.m_width; ++x)
+            for (DT_S32 x = 0; x < size.m_width; ++x)
             {
-                mat.At<MI_F32>(y, x, 0) -= static_cast<MI_F32>(std::sqrt(y * size.m_width + x));
+                mat.At<DT_F32>(y, x, 0) -= static_cast<DT_F32>(std::sqrt(y * size.m_width + x));
             }
         }
         return Status::OK;
@@ -38,7 +38,7 @@ static AURA_VOID TestFunc(Context *ctx, Status &ret, WorkerPool *wp)
 
     auto perf_func = [&]() -> Status
     {
-        return wp->ParallelFor((MI_S32)0, size.m_height, func);
+        return wp->ParallelFor((DT_S32)0, size.m_height, func);
     };
 
     TestTime time;
@@ -49,11 +49,11 @@ static AURA_VOID TestFunc(Context *ctx, Status &ret, WorkerPool *wp)
     Executor(10, 5, time, perf_func);
     AURA_LOGI(ctx, AURA_TAG, "ParallelFor cost time: (%s)\n", time.ToString().c_str());
 
-    for (MI_S32 y = 0; y < size.m_height; ++y)
+    for (DT_S32 y = 0; y < size.m_height; ++y)
     {
-        for (MI_S32 x = 0; x < size.m_width; ++x)
+        for (DT_S32 x = 0; x < size.m_width; ++x)
         {
-            ret |= AURA_CHECK_EQ(ctx, static_cast<MI_S32>(mat.At<MI_F32>(y, x, 0)), (MI_S32)0, "check mat memory failed\n");
+            ret |= AURA_CHECK_EQ(ctx, static_cast<DT_S32>(mat.At<DT_F32>(y, x, 0)), (DT_S32)0, "check mat memory failed\n");
         }
     }
 }
@@ -68,13 +68,13 @@ NEW_TESTCASE(runtime_worker_pool_add_task_test)
     Mat mat(ctx, ElemType::S32, Sizes3(1024, 1024, 1));
     Sizes3 size = mat.GetSizes();
 
-    auto func = [&](MI_S32 start, MI_S32 end) -> Status
+    auto func = [&](DT_S32 start, DT_S32 end) -> Status
     {
-        for (MI_S32 y = start; y < end; ++y)
+        for (DT_S32 y = start; y < end; ++y)
         {
-            for (MI_S32 x = 0; x < size.m_width; ++x)
+            for (DT_S32 x = 0; x < size.m_width; ++x)
             {
-                mat.At<MI_S32>(y, x, 0) = y * size.m_width + x;
+                mat.At<DT_S32>(y, x, 0) = y * size.m_width + x;
             }
         }
         return Status::OK;
@@ -87,11 +87,11 @@ NEW_TESTCASE(runtime_worker_pool_add_task_test)
 
     WaitTokens(token0, token1, token2, token3);
 
-    for (MI_S32 y = 0; y < size.m_height; ++y)
+    for (DT_S32 y = 0; y < size.m_height; ++y)
     {
-        for (MI_S32 x = 0; x < size.m_width; ++x)
+        for (DT_S32 x = 0; x < size.m_width; ++x)
         {
-            ret |= AURA_CHECK_EQ(ctx, mat.At<MI_S32>(y, x, 0), y * size.m_width + x, "check mat memory failed\n");
+            ret |= AURA_CHECK_EQ(ctx, mat.At<DT_S32>(y, x, 0), y * size.m_width + x, "check mat memory failed\n");
         }
     }
 
@@ -131,16 +131,16 @@ public:
         return *this;
     }
 
-    AURA_VOID Print()
+    DT_VOID Print()
     {
         AURA_LOGI(m_ctx, AURA_TAG, "ExampleClass's Print functions is called, value is: %d\n", this->value);
     }
 
-    MI_S32 value;
+    DT_S32 value;
     Context *m_ctx;
 };
 
-static Status InputParallelForFunc(Context *ctx, ExampleClass &obj, MI_S32 start, MI_S32 end)
+static Status InputParallelForFunc(Context *ctx, ExampleClass &obj, DT_S32 start, DT_S32 end)
 {
     AURA_LOGI(ctx, AURA_TAG, "InputParallelForFunc with args: %d %d\n", start, end);
     obj.value = 777;
@@ -171,35 +171,35 @@ NEW_TESTCASE(runtime_worker_pool_stack_size)
     Context *ctx = UnitTest::GetInstance()->GetContext();
 
     {
-        const MI_S32 stack_size = 16;
+        const DT_S32 stack_size = 16;
         Time start = Time::Now();
         WorkerPool worker_pool(ctx, stack_size * 1024, "CustomTag");
         AURA_LOGI(ctx, AURA_TAG, "Create thread with stack size: %ldKB cost time: %s\n", stack_size, (Time::Now() - start).ToString().c_str());
     }
 
     {
-        const MI_S32 stack_size = 32;
+        const DT_S32 stack_size = 32;
         Time start = Time::Now();
         WorkerPool worker_pool(ctx, stack_size * 1024, "CustomTag");
         AURA_LOGI(ctx, AURA_TAG, "Create thread with stack size: %ldKB cost time: %s\n", stack_size, (Time::Now() - start).ToString().c_str());
     }
 
     {
-        const MI_S32 stack_size = 64;
+        const DT_S32 stack_size = 64;
         Time start = Time::Now();
         WorkerPool worker_pool(ctx, stack_size * 1024, "CustomTag");
         AURA_LOGI(ctx, AURA_TAG, "Create thread with stack size: %ldKB cost time: %s\n", stack_size, (Time::Now() - start).ToString().c_str());
     }
 
     {
-        const MI_S32 stack_size = 128;
+        const DT_S32 stack_size = 128;
         Time start = Time::Now();
         WorkerPool worker_pool(ctx, stack_size * 1024, "CustomTag");
         AURA_LOGI(ctx, AURA_TAG, "Create thread with stack size: %ldKB cost time: %s\n", stack_size, (Time::Now() - start).ToString().c_str());
     }
 
     {
-        const MI_S32 stack_size = 512;
+        const DT_S32 stack_size = 512;
         Time start = Time::Now();
         WorkerPool worker_pool(ctx, stack_size * 1024, "CustomTag");
         AURA_LOGI(ctx, AURA_TAG, "Create thread with stack size: %ldKB cost time: %s\n", stack_size, (Time::Now() - start).ToString().c_str());
@@ -212,12 +212,12 @@ NEW_TESTCASE(runtime_worker_pool_get_tid_test)
 {
     Status ret = Status::OK;
     Context *ctx = UnitTest::GetInstance()->GetContext();
-    const MI_S32 thread_num = ctx->GetWorkerPool()->GetComputeThreadNum();
+    const DT_S32 thread_num = ctx->GetWorkerPool()->GetComputeThreadNum();
 
     AURA_LOGI(ctx, AURA_TAG, "ThreadTest (thread number: %d)\n", thread_num);
-    auto FuncGetThreadId = [ctx](MI_S32 start, MI_S32 end) -> Status
+    auto FuncGetThreadId = [ctx](DT_S32 start, DT_S32 end) -> Status
     {
-        MI_S32 thread_id = ctx->GetWorkerPool()->GetComputeThreadIdx();
+        DT_S32 thread_id = ctx->GetWorkerPool()->GetComputeThreadIdx();
         AURA_LOGI(ctx, AURA_TAG, "running %2d - %2d: thread_id = %d, qurt_thread_get_id() = %d\n",
                   start, end, thread_id, qurt_thread_get_id());
 
@@ -230,13 +230,13 @@ NEW_TESTCASE(runtime_worker_pool_get_tid_test)
         return Status::OK;
     };
 
-    for (MI_S32 loop = 0; loop < 1000; loop++)
+    for (DT_S32 loop = 0; loop < 1000; loop++)
     {
         AURA_LOGI(ctx, AURA_TAG, "ThreadTest one:\n");
-        ret |= ctx->GetWorkerPool()->ParallelFor((MI_S32)0, thread_num, FuncGetThreadId);
+        ret |= ctx->GetWorkerPool()->ParallelFor((DT_S32)0, thread_num, FuncGetThreadId);
 
         AURA_LOGI(ctx, AURA_TAG, "ThreadTest two:\n");
-        ret |= ctx->GetWorkerPool()->ParallelFor((MI_S32)0, thread_num * 8, FuncGetThreadId);
+        ret |= ctx->GetWorkerPool()->ParallelFor((DT_S32)0, thread_num * 8, FuncGetThreadId);
     }
 
     AddTestResult(AURA_GET_TEST_STATUS(ret));
@@ -252,27 +252,27 @@ NEW_TESTCASE(runtime_worker_pool_wave_front_test)
 
     Sizes3 size = mat.GetSizes();
 
-    for (MI_S32 row = 0; row < size.m_height; row++)
+    for (DT_S32 row = 0; row < size.m_height; row++)
     {
-        for (MI_S32 col = 0; col < size.m_width; col++)
+        for (DT_S32 col = 0; col < size.m_width; col++)
         {
-            mat.At<MI_U16>(row, col, 0) = (MI_U16)(rand() % 256);
-            ref.At<MI_U16>(row, col, 0) = mat.At<MI_U16>(row, col, 0);
+            mat.At<DT_U16>(row, col, 0) = (DT_U16)(rand() % 256);
+            ref.At<DT_U16>(row, col, 0) = mat.At<DT_U16>(row, col, 0);
         }
     }
 
-    auto func_wpf = [&](MI_S32 row_step, MI_S32 col_step, MI_S32 row, MI_S32 col) -> Status
+    auto func_wpf = [&](DT_S32 row_step, DT_S32 col_step, DT_S32 row, DT_S32 col) -> Status
     {
-        MI_S32 row_start = row * row_step + 1;
-        MI_S32 row_end   = Min(row_start + row_step, mat.GetSizes().m_height);
-        MI_S32 col_start = col * col_step + 1;
-        MI_S32 col_end   = Min(col_start + col_step, mat.GetSizes().m_width);
+        DT_S32 row_start = row * row_step + 1;
+        DT_S32 row_end   = Min(row_start + row_step, mat.GetSizes().m_height);
+        DT_S32 col_start = col * col_step + 1;
+        DT_S32 col_end   = Min(col_start + col_step, mat.GetSizes().m_width);
 
-        for (MI_S32 y = row_start; y < row_end; ++y)
+        for (DT_S32 y = row_start; y < row_end; ++y)
         {
-            for (MI_S32 x = col_start; x < col_end; ++x)
+            for (DT_S32 x = col_start; x < col_end; ++x)
             {
-                mat.At<MI_U16>(y, x, 0) = (MI_U16)(mat.At<MI_U16>(y, x - 1, 0) + mat.At<MI_U16>(y - 1, x, 0));
+                mat.At<DT_U16>(y, x, 0) = (DT_U16)(mat.At<DT_U16>(y, x - 1, 0) + mat.At<DT_U16>(y - 1, x, 0));
             }
         }
         return Status::OK;
@@ -280,18 +280,18 @@ NEW_TESTCASE(runtime_worker_pool_wave_front_test)
 
     auto func_ref = [&]() -> Status
     {
-        for (MI_S32 y = 1; y < ref.GetSizes().m_height; ++y)
+        for (DT_S32 y = 1; y < ref.GetSizes().m_height; ++y)
         {
-            for (MI_S32 x = 1; x < ref.GetSizes().m_width; ++x)
+            for (DT_S32 x = 1; x < ref.GetSizes().m_width; ++x)
             {
-                ref.At<MI_U16>(y, x, 0) = (MI_U16)(ref.At<MI_U16>(y, x - 1, 0) + ref.At<MI_U16>(y - 1, x, 0));
+                ref.At<DT_U16>(y, x, 0) = (DT_U16)(ref.At<DT_U16>(y, x - 1, 0) + ref.At<DT_U16>(y - 1, x, 0));
             }
         }
         return Status::OK;
     };
 
-    MI_S32 block_height = 256;
-    MI_S32 block_width  = 256;
+    DT_S32 block_height = 256;
+    DT_S32 block_width  = 256;
 
     // test GetComputeThreadIdx
     AURA_LOGI(ctx, AURA_TAG, "WaveFront test begins\n");

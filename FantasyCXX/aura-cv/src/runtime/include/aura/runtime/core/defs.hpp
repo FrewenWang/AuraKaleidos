@@ -180,7 +180,7 @@ namespace aura_internal
  * @param func The name of the function pointer variable.
  */
 #if !defined(AURA_API_PTR)
-#  define AURA_API_PTR(func)    func##API func = MI_NULL
+#  define AURA_API_PTR(func)    func##API func = DT_NULL
 #endif // AURA_API_PTR
 
 /**
@@ -197,7 +197,7 @@ namespace aura_internal
 #if !defined(AURA_DLSYM_API)
 #  define AURA_DLSYM_API(handle, func)                                                  \
     {                                                                                   \
-        AURA_VOID *ptr = dlsym(handle, #func);                                            \
+        DT_VOID *ptr = dlsym(handle, #func);                                            \
         if (ptr)                                                                        \
         {                                                                               \
             func = reinterpret_cast<func##API>(ptr);                                    \
@@ -226,7 +226,7 @@ namespace aura_internal
 #if !defined(AURA_DLSYM_API_ADRENO)
 #  define AURA_DLSYM_API_ADRENO(handle, func)                                           \
     {                                                                                   \
-        AURA_VOID *ptr = dlsym(handle, #func);                                            \
+        DT_VOID *ptr = dlsym(handle, #func);                                            \
         if (ptr)                                                                        \
         {                                                                               \
             func = reinterpret_cast<func##API>(ptr);                                    \
@@ -256,7 +256,7 @@ namespace aura_internal
 #if !defined(AURA_DLSYM_API_MALI)
 #  define AURA_DLSYM_API_MALI(handle, func)                                             \
     {                                                                                   \
-        AURA_VOID *ptr = dlsym(handle, #func);                                            \
+        DT_VOID *ptr = dlsym(handle, #func);                                            \
         if (ptr)                                                                        \
         {                                                                               \
             func = reinterpret_cast<func##API>(ptr);                                    \

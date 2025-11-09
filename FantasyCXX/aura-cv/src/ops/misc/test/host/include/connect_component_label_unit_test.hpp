@@ -23,7 +23,7 @@
 
 using namespace aura;
 
-static Status GenerateCustomedMask(aura::Mat &mask, MI_F32 density)
+static Status GenerateCustomedMask(aura::Mat &mask, DT_F32 density)
 {
     if (density <= 0.f)
     {
@@ -37,23 +37,23 @@ static Status GenerateCustomedMask(aura::Mat &mask, MI_F32 density)
     }
     memset(mask.GetData(), 0, mask.GetTotalBytes());
 
-    const MI_S32 height = mask.GetSizes().m_height;
-    const MI_S32 width  = mask.GetSizes().m_width;
-    const MI_S32 seed   = 2023;
+    const DT_S32 height = mask.GetSizes().m_height;
+    const DT_S32 width  = mask.GetSizes().m_width;
+    const DT_S32 seed   = 2023;
     std::mt19937 gen(seed);
-    std::uniform_real_distribution<MI_F32> dis(0.0f, 1.0f);
+    std::uniform_real_distribution<DT_F32> dis(0.0f, 1.0f);
 
-    for (MI_S32 y = 0; y < height; y++)
+    for (DT_S32 y = 0; y < height; y++)
     {
-        for (MI_S32 x = 0; x < width; x++)
+        for (DT_S32 x = 0; x < width; x++)
         {
             if (dis(gen) < density)
             {
-                mask.At<MI_U8>(y, x) = 255;
+                mask.At<DT_U8>(y, x) = 255;
             }
             else
             {
-                mask.At<MI_U8>(y, x) = 0;
+                mask.At<DT_U8>(y, x) = 0;
             }
         }
     }
@@ -63,18 +63,18 @@ static Status GenerateCustomedMask(aura::Mat &mask, MI_F32 density)
 
 template <typename LabelType>
 static Status LabelCheck(Context *ctx, const Mat &img, const Mat &label, aura::ConnectivityType connectivity_type,
-                         MatCmpResult &result, MI_S32 tolerate = 0)
+                         MatCmpResult &result, DT_S32 tolerate = 0)
 {
     result.Clear();
     result.cmp_method = "connectivity BFS";
     
     tolerate = Abs(tolerate);
-    MI_S32 max_diff = 0, diff_count = 0;
-    MI_S32 dx[8] = {0, 0, 1, -1, 1, -1,  1, -1};
-    MI_S32 dy[8] = {1,-1, 0,  0, 1, -1, -1,  1};
-    MI_S32 search_areas = aura::ConnectivityType::CROSS == connectivity_type ? 4 : 8;
+    DT_S32 max_diff = 0, diff_count = 0;
+    DT_S32 dx[8] = {0, 0, 1, -1, 1, -1,  1, -1};
+    DT_S32 dy[8] = {1,-1, 0,  0, 1, -1, -1,  1};
+    DT_S32 search_areas = aura::ConnectivityType::CROSS == connectivity_type ? 4 : 8;
 
-    MI_S32 tot_pixel = 0;
+    DT_S32 tot_pixel = 0;
     auto size = label.GetSizes();
     tot_pixel += size.Total();
 
@@ -89,7 +89,7 @@ static Status LabelCheck(Context *ctx, const Mat &img, const Mat &label, aura::C
         for (auto x = 0; x < size.m_width; ++x)
         {
             // diff pixel
-            if ((label.Ptr<LabelType>(y)[x] ^ img.Ptr<MI_U8>(y)[x]) < 0)
+            if ((label.Ptr<LabelType>(y)[x] ^ img.Ptr<DT_U8>(y)[x]) < 0)
             {
                 diff_count++;
                 max_diff = label.Ptr<LabelType>(y)[x];
@@ -106,35 +106,35 @@ static Status LabelCheck(Context *ctx, const Mat &img, const Mat &label, aura::C
     {
         for (auto x = 0; x < size.m_width; ++x)
         {
-            if (0 == visited.Ptr<MI_U8>(y)[x] && label.Ptr<LabelType>(y)[x])
+            if (0 == visited.Ptr<DT_U8>(y)[x] && label.Ptr<LabelType>(y)[x])
             {
-                std::queue<std::pair<MI_S32, MI_S32>> neighbor_pixels;
+                std::queue<std::pair<DT_S32, DT_S32>> neighbor_pixels;
                 std::vector<LabelType> connected_component;
-                std::vector<std::pair<MI_S32, MI_S32>> connected_component_pos;
-                neighbor_pixels.push(std::pair<MI_S32, MI_S32>(y, x));
-                visited.Ptr<MI_U8>(y)[x] = 255;
+                std::vector<std::pair<DT_S32, DT_S32>> connected_component_pos;
+                neighbor_pixels.push(std::pair<DT_S32, DT_S32>(y, x));
+                visited.Ptr<DT_U8>(y)[x] = 255;
                 while (!neighbor_pixels.empty())
                 {
-                    std::pair<MI_S32, MI_S32> cur_pixel = neighbor_pixels.front();
-                    MI_S32 cur_y = cur_pixel.first;
-                    MI_S32 cur_x = cur_pixel.second;
+                    std::pair<DT_S32, DT_S32> cur_pixel = neighbor_pixels.front();
+                    DT_S32 cur_y = cur_pixel.first;
+                    DT_S32 cur_x = cur_pixel.second;
                     connected_component.emplace_back(label.Ptr<LabelType>(cur_y)[cur_x]);
-                    connected_component_pos.emplace_back(std::pair<MI_S32, MI_S32>(cur_y, cur_x));
+                    connected_component_pos.emplace_back(std::pair<DT_S32, DT_S32>(cur_y, cur_x));
                     neighbor_pixels.pop();
-                    for (MI_S32 direction = 0; direction < search_areas; direction++) 
+                    for (DT_S32 direction = 0; direction < search_areas; direction++) 
                     {
-                        MI_S32 new_x = cur_x + dx[direction];
-                        MI_S32 new_y = cur_y + dy[direction];
+                        DT_S32 new_x = cur_x + dx[direction];
+                        DT_S32 new_y = cur_y + dy[direction];
                         if ((new_x == cur_x && new_y == cur_y) ||
                             (!(new_x >= 0 && new_x < size.m_width && new_y >= 0 && new_y < size.m_height)))
                         {
                             continue;
                         }
                         if (label.Ptr<LabelType>(new_y)[new_x] > 0 &&
-                            0 == visited.Ptr<MI_U8>(new_y)[new_x])
+                            0 == visited.Ptr<DT_U8>(new_y)[new_x])
                         {
-                            visited.Ptr<MI_U8>(new_y)[new_x] = 255;
-                            neighbor_pixels.push(std::pair<MI_S32, MI_S32>(new_y, new_x));
+                            visited.Ptr<DT_U8>(new_y)[new_x] = 255;
+                            neighbor_pixels.push(std::pair<DT_S32, DT_S32>(new_y, new_x));
                         }
                     }
                 }
@@ -165,16 +165,16 @@ EXIT:
     if (max_diff > tolerate || max_diff != 0)
     {
         AURA_LOGI(ctx, AURA_TAG, "Max diff(%d) Pos(%d %d %d) \n", max_diff, max_pos.m_height, max_pos.m_width, max_pos.m_channel);
-        result.status = MI_FALSE;
+        result.status = DT_FALSE;
     }
     else
     {
-        result.status = MI_TRUE;
+        result.status = DT_TRUE;
     }
 
-    MI_S32 cur_tol = tolerate;
-    MI_S32 cur_sum = tot_pixel - diff_count;
-    MI_F64 cur_pct = 1. * cur_sum / tot_pixel;
+    DT_S32 cur_tol = tolerate;
+    DT_S32 cur_sum = tot_pixel - diff_count;
+    DT_F64 cur_pct = 1. * cur_sum / tot_pixel;
     result.hist.emplace_back(std::make_pair(cur_tol, cur_sum));
     AURA_LOGI(ctx, AURA_TAG, "diff <= %d : %.4f%% %d\n", cur_tol, 100. * cur_pct, cur_sum);
 
@@ -213,13 +213,13 @@ struct ConnectComponentLabelTestParam
 AURA_TEST_PARAM(MiscConnectComponentLabelParam,
                 aura::MatSize,                  mat_sizes,
                 aura::ElemType,                 label_elem_type,
-                MI_F32,                         mask_density,
+                DT_F32,                         mask_density,
                 ConnectComponentLabelTestParam, param,
                 aura::OpTarget,                 target);
 
 #if !defined(AURA_BUILD_XPLORER)
-static AURA_VOID CvConvertAlgoType(aura::Context *ctx, aura::CCLAlgo algo_type, aura::ConnectivityType connectivity_type,
-                                 MI_S32 &connectivity, cv::ConnectedComponentsAlgorithmsTypes &cv_algo_type)
+static DT_VOID CvConvertAlgoType(aura::Context *ctx, aura::CCLAlgo algo_type, aura::ConnectivityType connectivity_type,
+                                 DT_S32 &connectivity, cv::ConnectedComponentsAlgorithmsTypes &cv_algo_type)
 {
     if (aura::ConnectivityType::CROSS == connectivity_type)
     {
@@ -281,7 +281,7 @@ static aura::Status CvConnectComponentLabel(aura::Context *ctx, aura::Mat &img, 
     if (label.GetElemType() == aura::ElemType::S32)
     {
 #if !defined(AURA_BUILD_XPLORER)
-        MI_S32 cv_connectivity = 0;
+        DT_S32 cv_connectivity = 0;
         cv::ConnectedComponentsAlgorithmsTypes cv_algo_type = cv::ConnectedComponentsAlgorithmsTypes::CCL_DEFAULT;
 
         CvConvertAlgoType(ctx, algo_type, connectivity_type, cv_connectivity, cv_algo_type);
@@ -311,7 +311,7 @@ public:
     {}
 
 #if defined(AURA_ENABLE_OPENCL)
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         MiscConnectComponentLabelParam run_param(GetParam((index)));
 
@@ -325,7 +325,7 @@ public:
             
             std::shared_ptr<cl::Device> cl_device = m_ctx->GetCLEngine()->GetCLRuntime()->GetDevice();
             std::string device_version = cl_device->getInfo<CL_DEVICE_VERSION>();
-            MI_S32 adreno_num = std::stoi(device_version.substr(device_version.find_last_of(" ")));
+            DT_S32 adreno_num = std::stoi(device_version.substr(device_version.find_last_of(" ")));
 
             // adreno650 can not support atomic operate, bypass
             if (adreno_num <= 650)
@@ -338,7 +338,7 @@ public:
     }
 #endif // AURA_ENABLE_OPENCL
 
-    MI_S32 RunOne(MI_S32 index, aura::TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, aura::TestCase *test_case, DT_S32 stress_count) override
     {
         aura::Status ret = aura::Status::OK;
 
@@ -352,7 +352,7 @@ public:
         memset(src_img.GetData(), 0, src_img.GetTotalBytes());
         memset(dst_label.GetData(), 0, dst_label.GetTotalBytes());
         memset(ref_label.GetData(), 0, ref_label.GetTotalBytes());
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         aura::TestTime time_val;
         aura::MatCmpResult cmp_result;
@@ -423,13 +423,13 @@ public:
             {
                 case ElemType::U32:
                 {
-                    LabelCheck<MI_U32>(m_ctx, src_img, dst_label, run_param.param.connectivity_type, cmp_result, 0);
+                    LabelCheck<DT_U32>(m_ctx, src_img, dst_label, run_param.param.connectivity_type, cmp_result, 0);
                     break;
                 }
 
                 case ElemType::S32:
                 {
-                    LabelCheck<MI_S32>(m_ctx, src_img, dst_label, run_param.param.connectivity_type, cmp_result, 0);
+                    LabelCheck<DT_S32>(m_ctx, src_img, dst_label, run_param.param.connectivity_type, cmp_result, 0);
                     break;
                 }
 

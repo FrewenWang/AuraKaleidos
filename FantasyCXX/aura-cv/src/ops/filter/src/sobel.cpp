@@ -54,15 +54,15 @@ static std::shared_ptr<SobelImpl> CreateSobelImpl(Context *ctx, const OpTarget &
 Sobel::Sobel(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Sobel::SetArgs(const Array *src, Array *dst, MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_F32 scale,
+Status Sobel::SetArgs(const Array *src, Array *dst, DT_S32 dx, DT_S32 dy, DT_S32 ksize, DT_F32 scale,
                       BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -101,14 +101,14 @@ Status Sobel::SetArgs(const Array *src, Array *dst, MI_S32 dx, MI_S32 dy, MI_S32
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateSobelImpl(m_ctx, impl_target);
     }
 
     // run initialize
     SobelImpl *sobel_impl = dynamic_cast<SobelImpl*>(m_impl.get());
-    if (MI_NULL == sobel_impl)
+    if (DT_NULL == sobel_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "SobelImpl is null ptr");
         return Status::ERROR;
@@ -119,11 +119,11 @@ Status Sobel::SetArgs(const Array *src, Array *dst, MI_S32 dx, MI_S32 dy, MI_S32
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Sobel::CLPrecompile(Context *ctx, MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_F32 scale, BorderType border_type,
-                           MI_S32 channel, ElemType src_elem_type, ElemType dst_elem_type)
+Status Sobel::CLPrecompile(Context *ctx, DT_S32 dx, DT_S32 dy, DT_S32 ksize, DT_F32 scale, BorderType border_type,
+                           DT_S32 channel, ElemType src_elem_type, ElemType dst_elem_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -150,7 +150,7 @@ Status Sobel::CLPrecompile(Context *ctx, MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_
     return Status::OK;
 }
 
-AURA_EXPORTS Status ISobel(Context *ctx, const Mat &src, Mat &dst, MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_F32 scale,
+AURA_EXPORTS Status ISobel(Context *ctx, const Mat &src, Mat &dst, DT_S32 dx, DT_S32 dy, DT_S32 ksize, DT_F32 scale,
                            BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Sobel sobel(ctx, target);
@@ -161,13 +161,13 @@ AURA_EXPORTS Status ISobel(Context *ctx, const Mat &src, Mat &dst, MI_S32 dx, MI
 SobelImpl::SobelImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Sobel", target),
                                                              m_dx(0), m_dy(0), m_ksize(0), m_scale(0.f),
                                                              m_border_type(BorderType::REFLECT_101),
-                                                             m_src(MI_NULL), m_dst(MI_NULL)
+                                                             m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status SobelImpl::SetArgs(const Array *src, Array *dst, MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_F32 scale,
+Status SobelImpl::SetArgs(const Array *src, Array *dst, DT_S32 dx, DT_S32 dy, DT_S32 ksize, DT_F32 scale,
                           BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -204,8 +204,8 @@ Status SobelImpl::SetArgs(const Array *src, Array *dst, MI_S32 dx, MI_S32 dy, MI
             return Status::ERROR;
         }
 
-        MI_S32 ksx = (1 == ksize && dx > 0) ? 3 : ksize;
-        MI_S32 ksy = (1 == ksize && dy > 0) ? 3 : ksize;
+        DT_S32 ksx = (1 == ksize && dx > 0) ? 3 : ksize;
+        DT_S32 ksy = (1 == ksize && dy > 0) ? 3 : ksize;
         if (dx >= ksx || dy >= ksy)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "dx/dy cannot be greater than ksx/ksy");
@@ -257,7 +257,7 @@ std::string SobelImpl::ToString() const
     return str;
 }
 
-AURA_VOID SobelImpl::Dump(const std::string &prefix) const
+DT_VOID SobelImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

@@ -15,7 +15,7 @@ CLLibrary& aura::CLLibrary::Get()
     return library;
 }
 
-CLLibrary::CLLibrary() : m_handle(MI_NULL)
+CLLibrary::CLLibrary() : m_handle(DT_NULL)
 {
     Load();
 }
@@ -25,14 +25,14 @@ CLLibrary::~CLLibrary()
     UnLoad();
 }
 
-AURA_VOID* CLLibrary::LoadSymbols(const std::string &path)
+DT_VOID* CLLibrary::LoadSymbols(const std::string &path)
 {
     Status ret = Status::ERROR;
 
     dlerror();
 
-    AURA_VOID *handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_LOCAL);
-    if (MI_NULL == handle)
+    DT_VOID *handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_LOCAL);
+    if (DT_NULL == handle)
     {
         std::string info = "dlopen " + path + " failed, err : " + std::string(dlerror());
         AURA_PRINTE(AURA_TAG, "%s\n", info.c_str());
@@ -310,7 +310,7 @@ AURA_VOID* CLLibrary::LoadSymbols(const std::string &path)
     if (ret != Status::OK)
     {
         dlclose(handle);
-        handle = MI_NULL;
+        handle = DT_NULL;
     }
 
     return handle;
@@ -345,11 +345,11 @@ Status CLLibrary::Load()
     #endif // AURA_BUILD_ANDROID
     };
 
-    if (MI_NULL == m_handle)
+    if (DT_NULL == m_handle)
     {
         for (auto path : default_cl_library_paths)
         {
-            AURA_VOID *handle = LoadSymbols(path);
+            DT_VOID *handle = LoadSymbols(path);
             if (handle)
             {
                 m_handle = handle;
@@ -372,7 +372,7 @@ Status CLLibrary::UnLoad()
     if (m_handle)
     {
         dlclose(m_handle);
-        m_handle = MI_NULL;
+        m_handle = DT_NULL;
         ret = Status::OK;
     }
 
@@ -545,7 +545,7 @@ clCreateContext(const cl_context_properties *properties,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_context
@@ -567,7 +567,7 @@ clCreateContextFromType(const cl_context_properties *properties,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_int
@@ -641,7 +641,7 @@ clCreateCommandQueueWithProperties(cl_context                context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_2_0
 
@@ -699,7 +699,7 @@ clCreateBuffer(cl_context   context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 #if defined(CL_VERSION_1_1)
@@ -719,7 +719,7 @@ clCreateSubBuffer(cl_mem                buffer,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_1_1
 
@@ -741,7 +741,7 @@ clCreateIaura(cl_context            context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_1_2
 
@@ -763,7 +763,7 @@ clCreatePipe(cl_context               context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_2_0
 
@@ -785,7 +785,7 @@ clCreateBufferWithProperties(cl_context              context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_mem
@@ -806,7 +806,7 @@ clCreateIauraWithProperties(cl_context              context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_3_0
 
@@ -924,7 +924,7 @@ clSVMAlloc(cl_context       context,
     {
         return func(context, flags, size, alignment);
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY void
@@ -955,7 +955,7 @@ clCreateSamplerWithProperties(cl_context                  context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_2_0
 
@@ -1013,7 +1013,7 @@ clCreateProgramWithSource(cl_context   context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_program
@@ -1034,7 +1034,7 @@ clCreateProgramWithBinary(cl_context          context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 #if defined(CL_VERSION_1_2)
@@ -1054,7 +1054,7 @@ clCreateProgramWithBuiltInKernels(cl_context         context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_1_2
 
@@ -1074,7 +1074,7 @@ clCreateProgramWithIL(cl_context context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_2_1
 
@@ -1161,7 +1161,7 @@ clLinkProgram(cl_context         context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_1_2
 
@@ -1254,7 +1254,7 @@ clCreateKernel(cl_program program,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_int
@@ -1285,7 +1285,7 @@ clCloneKernel(cl_kernel source_kernel,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_2_1
 
@@ -1466,7 +1466,7 @@ clCreateUserEvent(cl_context context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_1_1
 
@@ -1875,7 +1875,7 @@ clEnqueueMapBuffer(cl_command_queue command_queue,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY void*
@@ -1902,7 +1902,7 @@ clEnqueueMapIaura(cl_command_queue command_queue,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_int
@@ -2140,7 +2140,7 @@ clGetExtensionFunctionAddressForPlatform(cl_platform_id platform,
     {
         return func(platform, func_name);
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 #endif // CL_VERSION_1_2
 
@@ -2181,7 +2181,7 @@ clCreateIaura2D(cl_context            context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_mem
@@ -2206,7 +2206,7 @@ clCreateIaura3D(cl_context             context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_int
@@ -2264,7 +2264,7 @@ clGetExtensionFunctionAddress(const char *func_name)
     {
         return func(func_name);
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 /* Deprecated OpenCL 2.0 APIs */
@@ -2283,7 +2283,7 @@ clCreateCommandQueue(cl_context                  context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_sampler
@@ -2302,7 +2302,7 @@ clCreateSampler(cl_context         context,
     {
         *errcode_ret = CL_INVALID_PLATFORM;
     }
-    return MI_NULL;
+    return DT_NULL;
 }
 
 CL_API_ENTRY cl_int

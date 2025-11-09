@@ -7,7 +7,7 @@ namespace aura
 
 // d16x4_t = uint16x4_t, int16x4_t
 template <typename d16x4_t, typename d32x4_t = typename neon::WVectorBits<d16x4_t>::VType,
-          typename std::enable_if<std::is_same<d16x4_t, uint16x4_t>::value || std::is_same<d16x4_t, int16x4_t>::value>::type * = MI_NULL>
+          typename std::enable_if<std::is_same<d16x4_t, uint16x4_t>::value || std::is_same<d16x4_t, int16x4_t>::value>::type * = DT_NULL>
 AURA_ALWAYS_INLINE d32x4_t Laplacian3x3VCore(d16x4_t &vd16_src_p, d16x4_t &vd16_src_n)
 {
     return neon::vaddl(vd16_src_p, vd16_src_n);
@@ -15,7 +15,7 @@ AURA_ALWAYS_INLINE d32x4_t Laplacian3x3VCore(d16x4_t &vd16_src_p, d16x4_t &vd16_
 
 // d16x4_t = uint16x4_t, int16x4_t
 template <typename d16x4_t, typename d32x4_t = typename neon::WVectorBits<d16x4_t>::VType,
-          typename std::enable_if<std::is_same<d16x4_t, uint16x4_t>::value || std::is_same<d16x4_t, int16x4_t>::value>::type * = MI_NULL>
+          typename std::enable_if<std::is_same<d16x4_t, uint16x4_t>::value || std::is_same<d16x4_t, int16x4_t>::value>::type * = DT_NULL>
 AURA_ALWAYS_INLINE d16x4_t Laplacian3x3HCore(d16x4_t &vd16_sum_x1, d32x4_t &vq32_sum_x0,
                                              d32x4_t &vq32_sum_x1, d32x4_t &vq32_sum_x2)
 {
@@ -56,7 +56,7 @@ AURA_ALWAYS_INLINE int16x8_t Laplacian3x3HCore(uint8x8_t &vdu8_sum_x1, int16x8_t
 #if defined(AURA_ENABLE_NEON_FP16)
 AURA_ALWAYS_INLINE float32x4_t Laplacian3x3VCore(float16x4_t &vdf16_src_p, float16x4_t &vdf16_src_n)
 {
-    return neon::vadd(neon::vcvt<MI_F32>(vdf16_src_p), neon::vcvt<MI_F32>(vdf16_src_n));
+    return neon::vadd(neon::vcvt<DT_F32>(vdf16_src_p), neon::vcvt<DT_F32>(vdf16_src_n));
 }
 
 AURA_ALWAYS_INLINE float16x4_t Laplacian3x3HCore(float16x4_t &vdf16_src_x1, float32x4_t &vqf32_sum_x0,
@@ -64,7 +64,7 @@ AURA_ALWAYS_INLINE float16x4_t Laplacian3x3HCore(float16x4_t &vdf16_src_x1, floa
 {
     float32x4_t vqf32_sum_l  = neon::vext<3>(vqf32_sum_x0, vqf32_sum_x1);
     float32x4_t vqf32_sum_r  = neon::vext<1>(vqf32_sum_x1, vqf32_sum_x2);
-    float32x4_t vqf32_sum_c  = neon::vmul(neon::vcvt<MI_F32>(vdf16_src_x1), 4.f);
+    float32x4_t vqf32_sum_c  = neon::vmul(neon::vcvt<DT_F32>(vdf16_src_x1), 4.f);
 
     float32x4_t vqf32_result = neon::vadd(vqf32_sum_l, vqf32_sum_r);
     vqf32_result             = neon::vsub(vqf32_result, vqf32_sum_c);
@@ -97,18 +97,18 @@ AURA_ALWAYS_INLINE float32x4_t Laplacian3x3HCore(float32x4_t &vqf32_src_x1, floa
     return neon::vadd(vqf32_result, vqf32_result);
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C>
-static AURA_VOID Laplacian3x3Row(const St *src_p, const St *src_c, const St *src_n, Dt *dst,
-                               const std::vector<St> &border_value, MI_S32 width)
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C>
+static DT_VOID Laplacian3x3Row(const St *src_p, const St *src_c, const St *src_n, Dt *dst,
+                               const std::vector<St> &border_value, DT_S32 width)
 {
-    using MVSt      = typename std::conditional<std::is_same<St, MI_F32>::value, typename neon::MQVector<St, C>::MVType,
+    using MVSt      = typename std::conditional<std::is_same<St, DT_F32>::value, typename neon::MQVector<St, C>::MVType,
                                                                                  typename neon::MDVector<St, C>::MVType>::type;
-    using MVDt      = typename std::conditional<std::is_same<St, MI_U8>::value,  typename neon::MQVector<Dt, C>::MVType, MVSt>::type;
+    using MVDt      = typename std::conditional<std::is_same<St, DT_U8>::value,  typename neon::MQVector<Dt, C>::MVType, MVSt>::type;
     using MVSumType = typename std::conditional<sizeof(St) == 2, typename neon::MQVector<typename Promote<St>::Type, C>::MVType, MVDt>::type;
 
-    constexpr MI_S32 ELEM_COUNTS = static_cast<MI_S32>(sizeof(MVDt) / C / sizeof(Dt));
-    constexpr MI_S32 VOFFSET     = ELEM_COUNTS * C;
-    const MI_S32 width_align     = (width & -ELEM_COUNTS) * C;
+    constexpr DT_S32 ELEM_COUNTS = static_cast<DT_S32>(sizeof(MVDt) / C / sizeof(Dt));
+    constexpr DT_S32 VOFFSET     = ELEM_COUNTS * C;
+    const DT_S32 width_align     = (width & -ELEM_COUNTS) * C;
 
     MVSt mv_src_p[3], mv_src_c, mv_src_n[3];
     MVDt mv_result;
@@ -122,7 +122,7 @@ static AURA_VOID Laplacian3x3Row(const St *src_p, const St *src_c, const St *src
         neon::vload(src_n,           mv_src_n[1]);
         neon::vload(src_n + VOFFSET, mv_src_n[2]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_p[1].val[ch], src_p[ch], border_value[ch]);
             mv_src_n[0].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::LEFT>(mv_src_n[1].val[ch], src_n[ch], border_value[ch]);
@@ -136,13 +136,13 @@ static AURA_VOID Laplacian3x3Row(const St *src_p, const St *src_c, const St *src
 
     // middle
     {
-        for (MI_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
+        for (DT_S32 x = VOFFSET; x < width_align - VOFFSET; x += VOFFSET)
         {
             neon::vload(src_p + x + VOFFSET, mv_src_p[2]);
             neon::vload(src_c + x,           mv_src_c);
             neon::vload(src_n + x + VOFFSET, mv_src_n[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mv_sum[2].val[ch] = Laplacian3x3VCore(mv_src_p[2].val[ch], mv_src_n[2].val[ch]);
                 mv_result.val[ch] = Laplacian3x3HCore(mv_src_c.val[ch], mv_sum[0].val[ch], mv_sum[1].val[ch], mv_sum[2].val[ch]);
@@ -155,7 +155,7 @@ static AURA_VOID Laplacian3x3Row(const St *src_p, const St *src_c, const St *src
     {
         if (width_align != width * C)
         {
-            MI_S32 x = (width - (ELEM_COUNTS << 1)) * C;
+            DT_S32 x = (width - (ELEM_COUNTS << 1)) * C;
 
             neon::vload(src_p + x - VOFFSET, mv_src_p[0]);
             neon::vload(src_p + x,           mv_src_p[1]);
@@ -165,7 +165,7 @@ static AURA_VOID Laplacian3x3Row(const St *src_p, const St *src_c, const St *src
             neon::vload(src_n + x,           mv_src_n[1]);
             neon::vload(src_n + x + VOFFSET, mv_src_n[2]);
 
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 mv_sum[0].val[ch] = Laplacian3x3VCore(mv_src_p[0].val[ch], mv_src_n[0].val[ch]);
                 mv_sum[1].val[ch] = Laplacian3x3VCore(mv_src_p[1].val[ch], mv_src_n[1].val[ch]);
@@ -178,14 +178,14 @@ static AURA_VOID Laplacian3x3Row(const St *src_p, const St *src_c, const St *src
 
     // right
     {
-        MI_S32 x    = (width - ELEM_COUNTS) * C;
-        MI_S32 last = (width - 1) * C;
+        DT_S32 x    = (width - ELEM_COUNTS) * C;
+        DT_S32 last = (width - 1) * C;
 
         neon::vload(src_p + x, mv_src_p[1]);
         neon::vload(src_c + x, mv_src_c);
         neon::vload(src_n + x, mv_src_n[1]);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             mv_src_p[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_p[1].val[ch], src_p[last], border_value[ch]);
             mv_src_n[2].val[ch] = GetBorderVector<BORDER_TYPE, BorderArea::RIGHT>(mv_src_n[1].val[ch], src_n[last], border_value[ch]);
@@ -197,15 +197,15 @@ static AURA_VOID Laplacian3x3Row(const St *src_p, const St *src_c, const St *src
     }
 }
 
-template <typename St, typename Dt, BorderType BORDER_TYPE, MI_S32 C>
+template <typename St, typename Dt, BorderType BORDER_TYPE, DT_S32 C>
 static Status Laplacian3x3NeonImpl(const Mat &src, Mat &dst, const std::vector<St> &border_value,
-                                   const St *border_buffer, MI_S32 start_row, MI_S32 end_row)
+                                   const St *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
-    const St *src_p = MI_NULL, *src_c = MI_NULL, *src_n = MI_NULL;
-    Dt *dst_c = MI_NULL;
+    const St *src_p = DT_NULL, *src_c = DT_NULL, *src_n = DT_NULL;
+    Dt *dst_c = DT_NULL;
 
-    MI_S32 width = dst.GetSizes().m_width;
-    MI_S32 y = start_row;
+    DT_S32 width = dst.GetSizes().m_width;
+    DT_S32 y = start_row;
 
     src_p = src.Ptr<St, BORDER_TYPE>(y - 1, border_buffer);
     src_c = src.Ptr<St>(y);
@@ -233,14 +233,14 @@ static Status Laplacian3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, con
     AURA_UNUSED(target);
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 height  = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 height  = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (channel)
     {
@@ -293,18 +293,18 @@ static Status Laplacian3x3NeonHelper(Context *ctx, const Mat &src, Mat &dst, Bor
 {
     Status ret = Status::ERROR;
 
-    St *border_buffer = MI_NULL;
+    St *border_buffer = DT_NULL;
     std::vector<St> vec_border_value = border_value.ToVector<St>();
 
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     switch (border_type)
     {
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -354,36 +354,36 @@ Status Laplacian3x3Neon(Context *ctx, const Mat &src, Mat &dst, BorderType borde
                         const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
-    MI_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(src.GetElemType(), dst.GetElemType());
 
     switch (pattern)
     {
         case AURA_MAKE_PATTERN(ElemType::U8, ElemType::S16):
         {
-            ret = Laplacian3x3NeonHelper<MI_U8, MI_S16>(ctx, src, dst, border_type, border_value, target);
+            ret = Laplacian3x3NeonHelper<DT_U8, DT_S16>(ctx, src, dst, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Laplacian3x3NeonHelper<MI_U8> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian3x3NeonHelper<DT_U8> failed");
             }
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::U16, ElemType::U16):
         {
-            ret = Laplacian3x3NeonHelper<MI_U16, MI_U16>(ctx, src, dst, border_type, border_value, target);
+            ret = Laplacian3x3NeonHelper<DT_U16, DT_U16>(ctx, src, dst, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Laplacian3x3NeonHelper<MI_U16> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian3x3NeonHelper<DT_U16> failed");
             }
             break;
         }
 
         case AURA_MAKE_PATTERN(ElemType::S16, ElemType::S16):
         {
-            ret = Laplacian3x3NeonHelper<MI_S16, MI_S16>(ctx, src, dst, border_type, border_value, target);
+            ret = Laplacian3x3NeonHelper<DT_S16, DT_S16>(ctx, src, dst, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Laplacian3x3NeonHelper<MI_S16> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian3x3NeonHelper<DT_S16> failed");
             }
             break;
         }
@@ -402,10 +402,10 @@ Status Laplacian3x3Neon(Context *ctx, const Mat &src, Mat &dst, BorderType borde
 
         case AURA_MAKE_PATTERN(ElemType::F32, ElemType::F32):
         {
-            ret = Laplacian3x3NeonHelper<MI_F32, MI_F32>(ctx, src, dst, border_type, border_value, target);
+            ret = Laplacian3x3NeonHelper<DT_F32, DT_F32>(ctx, src, dst, border_type, border_value, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "Laplacian3x3NeonHelper<MI_F32> failed");
+                AURA_ADD_ERROR_STRING(ctx, "Laplacian3x3NeonHelper<DT_F32> failed");
             }
             break;
         }

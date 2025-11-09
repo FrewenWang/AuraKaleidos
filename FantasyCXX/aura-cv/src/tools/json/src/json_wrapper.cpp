@@ -81,12 +81,12 @@ Status JsonWrapper::Read(aura_json::json &json_obj)
     return Status::OK;
 }
 
-MI_BOOL JsonHasKeys(const aura_json::json &json, const std::string &key)
+DT_BOOL JsonHasKeys(const aura_json::json &json, const std::string &key)
 {
     return json.contains(key);
 }
 
-MI_BOOL JsonHasKeys(const aura_json::json &json, const std::initializer_list<std::string> &keys)
+DT_BOOL JsonHasKeys(const aura_json::json &json, const std::initializer_list<std::string> &keys)
 {
     const aura_json::json *json_ptr = &json;
 
@@ -94,13 +94,13 @@ MI_BOOL JsonHasKeys(const aura_json::json &json, const std::initializer_list<std
     {
         if (!json_ptr->contains(name))
         {
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
         json_ptr = &(*json_ptr)[name];
     }
 
-    return MI_TRUE;
+    return DT_TRUE;
 }
 
 } // namespace aura

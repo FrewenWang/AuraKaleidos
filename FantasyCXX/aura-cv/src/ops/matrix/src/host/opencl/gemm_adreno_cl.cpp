@@ -5,7 +5,7 @@
 namespace aura
 {
 
-static std::string GetCLBuildOptions(Context *ctx, MI_S32 elem_counts, MI_S32 load_size)
+static std::string GetCLBuildOptions(Context *ctx, DT_S32 elem_counts, DT_S32 load_size)
 {
     CLBuildOptions cl_build_opt(ctx);
     cl_build_opt.AddOption("ELEM_COUNTS",      std::to_string(elem_counts));
@@ -15,15 +15,15 @@ static std::string GetCLBuildOptions(Context *ctx, MI_S32 elem_counts, MI_S32 lo
     return cl_build_opt.ToString();
 }
 
-static AURA_VOID GetCLSize(MI_S32 m, MI_S32 n, MI_S32 bm, MI_S32 bn,
-                         MI_S32 elem_counts, cl::NDRange &cl_global_size, cl::NDRange &cl_local_size)
+static DT_VOID GetCLSize(DT_S32 m, DT_S32 n, DT_S32 bm, DT_S32 bn,
+                         DT_S32 elem_counts, cl::NDRange &cl_global_size, cl::NDRange &cl_local_size)
 {
-    const MI_S32 local_size_x  = bn / elem_counts;
-    const MI_S32 local_size_y  = bm / elem_counts;
-    const MI_S32 group_size_x  = (n + bn - 1) / bn;
-    const MI_S32 group_size_y  = (m + bm - 1) / bm;
-    const MI_S32 global_size_x = group_size_x * local_size_x;
-    const MI_S32 global_size_y = group_size_y * local_size_y;
+    const DT_S32 local_size_x  = bn / elem_counts;
+    const DT_S32 local_size_y  = bm / elem_counts;
+    const DT_S32 group_size_x  = (n + bn - 1) / bn;
+    const DT_S32 group_size_y  = (m + bm - 1) / bm;
+    const DT_S32 global_size_x = group_size_x * local_size_x;
+    const DT_S32 global_size_y = group_size_y * local_size_y;
 
     cl_global_size = cl::NDRange(global_size_x, global_size_y);
     cl_local_size  = cl::NDRange(local_size_x,  local_size_y);
@@ -68,7 +68,7 @@ Status GemmAdrenoCL::Initialize()
     m_elem_counts    = 8;
     m_local_size_x   = m_bn / m_elem_counts;
     m_local_size_y   = m_bm / m_elem_counts;
-    MI_S32 load_size = m_bm * m_bk / (2 * m_local_size_x * m_local_size_y);
+    DT_S32 load_size = m_bm * m_bk / (2 * m_local_size_x * m_local_size_y);
 
     m_cl_kernels = GemmAdrenoCL::GetCLKernels(m_ctx, m_elem_counts, load_size);
     if (CheckCLKernels(m_ctx, m_cl_kernels) != Status::OK)
@@ -112,13 +112,13 @@ Status GemmAdrenoCL::DeInitialize()
 
 Status GemmAdrenoCL::Run()
 {
-    MI_S32 m = m_src0->GetSizes().m_height;
-    MI_S32 k = m_src0->GetSizes().m_width;
-    MI_S32 n = m_src1->GetSizes().m_width;
+    DT_S32 m = m_src0->GetSizes().m_height;
+    DT_S32 k = m_src0->GetSizes().m_width;
+    DT_S32 n = m_src1->GetSizes().m_width;
 
-    const MI_S32 istep0 = m_src0->GetRowPitch() / ElemTypeSize(m_src0->GetElemType());
-    const MI_S32 istep1 = m_src1->GetRowPitch() / ElemTypeSize(m_src1->GetElemType());
-    const MI_S32 ostep  =  m_dst->GetRowPitch() / ElemTypeSize( m_dst->GetElemType());
+    const DT_S32 istep0 = m_src0->GetRowPitch() / ElemTypeSize(m_src0->GetElemType());
+    const DT_S32 istep1 = m_src1->GetRowPitch() / ElemTypeSize(m_src1->GetElemType());
+    const DT_S32 ostep  =  m_dst->GetRowPitch() / ElemTypeSize( m_dst->GetElemType());
 
     cl::Event cl_event;
     cl_int cl_ret = CL_SUCCESS;
@@ -131,8 +131,8 @@ Status GemmAdrenoCL::Run()
     GetCLSize(m, n, m_bm, m_bn, m_elem_counts, cl_global_size, cl_local_size);
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::Buffer, MI_S32, cl::LocalSpaceArg,
-                                 cl::LocalSpaceArg, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::Buffer, DT_S32, cl::LocalSpaceArg,
+                                 cl::LocalSpaceArg, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src0.GetCLMemRef<cl::Buffer>(), istep0,
                                  m_cl_src1.GetCLMemRef<cl::Buffer>(), istep1,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(),  ostep,
@@ -149,7 +149,7 @@ Status GemmAdrenoCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event.wait();
         if (cl_ret != CL_SUCCESS)
@@ -158,7 +158,7 @@ Status GemmAdrenoCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event);
         }
@@ -179,7 +179,7 @@ std::string GemmAdrenoCL::ToString() const
     return GemmImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> GemmAdrenoCL::GetCLKernels(Context *ctx, MI_S32 elem_counts, MI_S32 load_size)
+std::vector<CLKernel> GemmAdrenoCL::GetCLKernels(Context *ctx, DT_S32 elem_counts, DT_S32 load_size)
 {
     std::vector<CLKernel> cl_kernels;
     std::string build_opt = GetCLBuildOptions(ctx, elem_counts, load_size);

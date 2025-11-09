@@ -8,16 +8,16 @@
 namespace aura
 {
 
-static Status AdaptiveThresholdNoneImpl(const Mat &src, Mat &dst, MI_U8 *tab, MI_S32 start_row, MI_S32 end_row)
+static Status AdaptiveThresholdNoneImpl(const Mat &src, Mat &dst, DT_U8 *tab, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width  = dst.GetSizes().m_width;
+    DT_S32 width  = dst.GetSizes().m_width;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8       *dst_row = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8       *dst_row = dst.Ptr<DT_U8>(y);
 
-        for (MI_S32 x = 0; x < width; x++)
+        for (DT_S32 x = 0; x < width; x++)
         {
             dst_row[x] = tab[src_row[x] - dst_row[x] + 255];
         }
@@ -29,8 +29,8 @@ static Status AdaptiveThresholdNoneImpl(const Mat &src, Mat &dst, MI_U8 *tab, MI
 AdaptiveThresholdNone::AdaptiveThresholdNone(Context *ctx, const OpTarget &target) : AdaptiveThresholdImpl(ctx, target)
 {}
 
-Status AdaptiveThresholdNone::SetArgs(const Array *src, Array *dst, MI_F32 max_val, AdaptiveThresholdMethod method,
-                                      MI_S32 type, MI_S32 block_size, MI_F32 delta)
+Status AdaptiveThresholdNone::SetArgs(const Array *src, Array *dst, DT_F32 max_val, AdaptiveThresholdMethod method,
+                                      DT_S32 type, DT_S32 block_size, DT_F32 delta)
 {
     if (AdaptiveThresholdImpl::SetArgs(src, dst, max_val, method, type, block_size, delta) != Status::OK)
     {
@@ -52,7 +52,7 @@ Status AdaptiveThresholdNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat       *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
@@ -60,7 +60,7 @@ Status AdaptiveThresholdNone::Run()
 
     Status ret = Status::ERROR;
 
-    MI_S32 height = dst->GetSizes().m_height;
+    DT_S32 height = dst->GetSizes().m_height;
 
     switch(m_method)
     {
@@ -116,23 +116,23 @@ Status AdaptiveThresholdNone::Run()
         }
     }
 
-    MI_S32 imax_val = SaturateCast<MI_U8>(m_max_val);
-    MI_S32 idelta = (AURA_THRESH_BINARY == m_type) ? Ceil(m_delta) : Floor(m_delta);
+    DT_S32 imax_val = SaturateCast<DT_U8>(m_max_val);
+    DT_S32 idelta = (AURA_THRESH_BINARY == m_type) ? Ceil(m_delta) : Floor(m_delta);
 
-    MI_U8 tab[768];
+    DT_U8 tab[768];
 
     if (AURA_THRESH_BINARY == m_type)
     {
-        for (MI_S32 i = 0; i < 768; i++)
+        for (DT_S32 i = 0; i < 768; i++)
         {
-            tab[i] = static_cast<MI_U8>(i - 255 > -idelta ? imax_val : 0);
+            tab[i] = static_cast<DT_U8>(i - 255 > -idelta ? imax_val : 0);
         }
     }
     else if (AURA_THRESH_BINARY_INV == m_type)
     {
-        for (MI_S32 i = 0; i < 768; i++)
+        for (DT_S32 i = 0; i < 768; i++)
         {
-            tab[i] = static_cast<MI_U8>(i - 255 <= -idelta ? imax_val : 0);
+            tab[i] = static_cast<DT_U8>(i - 255 <= -idelta ? imax_val : 0);
         }
     }
     else
@@ -144,13 +144,13 @@ Status AdaptiveThresholdNone::Run()
     if (m_target.m_data.none.enable_mt)
     {
         WorkerPool *wp = m_ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetWorkerpool failed");
             return Status::ERROR;
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), height, AdaptiveThresholdNoneImpl, *src, *dst, tab);
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), height, AdaptiveThresholdNoneImpl, *src, *dst, tab);
     }
     else
     {

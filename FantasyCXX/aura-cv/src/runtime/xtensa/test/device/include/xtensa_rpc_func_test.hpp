@@ -5,8 +5,8 @@ namespace aura
 namespace xtensa
 {
 
-using RpcParamInParam    = XtensaRpcParamType<string, map<MI_S32>>;
-using RpcParamOutParam   = XtensaRpcParamType<MI_S32, vector<MI_S32>, map<MI_S32>>;
+using RpcParamInParam    = XtensaRpcParamType<string, map<DT_S32>>;
+using RpcParamOutParam   = XtensaRpcParamType<DT_S32, vector<DT_S32>, map<DT_S32>>;
 
 Status RpcParamTestRpc(TileManager xv_tm, XtensaRpcParam &rpc_param);
 

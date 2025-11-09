@@ -27,13 +27,13 @@ aura::Status TomasiSampleTest(aura::Context *ctx, aura::TargetType type)
     std::vector<aura::KeyPoint> corners;
 
     // set interface parameters
-    MI_S32 max_corners   = 10000;
-    MI_F32 quality_level = 0.05;
-    MI_F32 min_distance  = 3.0;
-    MI_S32 block_size    = 3;
-    MI_S32 gradient_size = 3;
-    MI_BOOL use_harris   = MI_FALSE;
-    MI_F32 harris_k      = 0.04;
+    DT_S32 max_corners   = 10000;
+    DT_F32 quality_level = 0.05;
+    DT_F32 min_distance  = 3.0;
+    DT_S32 block_size    = 3;
+    DT_S32 gradient_size = 3;
+    DT_BOOL use_harris   = DT_FALSE;
+    DT_F32 harris_k      = 0.04;
 
     // ---------------------
     //     run interface

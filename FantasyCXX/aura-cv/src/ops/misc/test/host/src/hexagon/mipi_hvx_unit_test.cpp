@@ -25,12 +25,12 @@ static MiscMipiParam::TupleTable g_mipi_unpack_table_hvx
 NEW_TESTCASE(misc, MipiUnpack, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     MipiUnpackTest test(aura::UnitTest::GetInstance()->GetContext(), g_mipi_unpack_table_hvx);
     test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }
 
 static MiscMipiParam::TupleTable g_mipi_pack_table_hvx
@@ -56,10 +56,10 @@ static MiscMipiParam::TupleTable g_mipi_pack_table_hvx
 NEW_TESTCASE(misc, MipiPack, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     MipiPackTest test(aura::UnitTest::GetInstance()->GetContext(), g_mipi_pack_table_hvx);
     test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

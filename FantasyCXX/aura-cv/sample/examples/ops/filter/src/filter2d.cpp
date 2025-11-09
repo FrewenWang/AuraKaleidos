@@ -27,9 +27,9 @@ aura::Status Filter2dSampleTest(aura::Context *ctx, aura::TargetType type)
     }
 
     // set kernel mat value
-    MI_F32 *data = reinterpret_cast<MI_F32*>(kernel.GetData());
-    MI_S32 n = kernel.GetTotalBytes() / sizeof(MI_F32);
-    for (MI_S32 i = 0; i < n; i++)
+    DT_F32 *data = reinterpret_cast<DT_F32*>(kernel.GetData());
+    DT_S32 n = kernel.GetTotalBytes() / sizeof(DT_F32);
+    for (DT_S32 i = 0; i < n; i++)
     {
         data[i] = 0.3f;
     }

@@ -7,28 +7,28 @@ namespace aura
 {
 
 template <typename Tp0, typename Tp1>
-static Status ThresholdBinaryNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 max_val, MI_S32 start_row, MI_S32 end_row)
+static Status ThresholdBinaryNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 max_val, DT_S32 start_row, DT_S32 end_row)
 {
     using VType = typename neon::QVector<Tp0>::VType;
 
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(Tp0);
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(Tp0);
 
     VType vq_zeros, vq_thresh, vq_max_val;
     neon::vdup(vq_zeros, static_cast<Tp0>(0));
     neon::vdup(vq_thresh, SaturateCast<Tp0>(thresh));
     neon::vdup(vq_max_val, max_val);
 
-    MI_S32 channel     = dst.GetSizes().m_channel;
-    MI_S32 width_x_c   = dst.GetSizes().m_width * channel;
-    MI_S32 width_align = width_x_c & (-ELEM_COUNTS);
+    DT_S32 channel     = dst.GetSizes().m_channel;
+    DT_S32 width_x_c   = dst.GetSizes().m_width * channel;
+    DT_S32 width_align = width_x_c & (-ELEM_COUNTS);
 
     if (SaturateCast<Tp0>(thresh) > thresh) //special case, thresh is smaller than all src data
     {
-        for (MI_S32 y = start_row; y < end_row; y++)
+        for (DT_S32 y = start_row; y < end_row; y++)
         {
             Tp0 *dst_row = dst.Ptr<Tp0>(y);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < width_align; x += ELEM_COUNTS)
             {
                 neon::vstore(dst_row + x, vq_max_val);
@@ -42,11 +42,11 @@ static Status ThresholdBinaryNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 max_
     }
     else if (SaturateCast<Tp0>(thresh) < thresh) //special case, thresh is larger than all src data
     {
-        for (MI_S32 y = start_row; y < end_row; y++)
+        for (DT_S32 y = start_row; y < end_row; y++)
         {
             Tp0 *dst_row = dst.Ptr<Tp0>(y);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < width_align; x += ELEM_COUNTS)
             {
                 neon::vstore(dst_row + x, vq_zeros);
@@ -60,12 +60,12 @@ static Status ThresholdBinaryNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 max_
     }
     else
     {
-        for (MI_S32 y = start_row; y < end_row; y++)
+        for (DT_S32 y = start_row; y < end_row; y++)
         {
             const Tp0 *src_row = src.Ptr<Tp0>(y);
             Tp0       *dst_row = dst.Ptr<Tp0>(y);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < width_align; x += ELEM_COUNTS)
             {
                 auto vq_src  = neon::vload1q(src_row + x);
@@ -85,28 +85,28 @@ static Status ThresholdBinaryNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 max_
 }
 
 template <typename Tp0, typename Tp1>
-static Status ThresholdBinaryInvNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 max_val, MI_S32 start_row, MI_S32 end_row)
+static Status ThresholdBinaryInvNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 max_val, DT_S32 start_row, DT_S32 end_row)
 {
     using VType = typename neon::QVector<Tp0>::VType;
 
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(Tp0);
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(Tp0);
 
     VType vq_zeros, vq_thresh, vq_max_val;
     neon::vdup(vq_zeros, static_cast<Tp0>(0));
     neon::vdup(vq_thresh, SaturateCast<Tp0>(thresh));
     neon::vdup(vq_max_val, max_val);
 
-    MI_S32 channel     = dst.GetSizes().m_channel;
-    MI_S32 width_x_c   = dst.GetSizes().m_width * channel;
-    MI_S32 width_align = width_x_c & (-ELEM_COUNTS);
+    DT_S32 channel     = dst.GetSizes().m_channel;
+    DT_S32 width_x_c   = dst.GetSizes().m_width * channel;
+    DT_S32 width_align = width_x_c & (-ELEM_COUNTS);
 
     if (SaturateCast<Tp0>(thresh) > thresh) //special case, thresh is smaller than all src data
     {
-        for (MI_S32 y = start_row; y < end_row; y++)
+        for (DT_S32 y = start_row; y < end_row; y++)
         {
             Tp0 *dst_row = dst.Ptr<Tp0>(y);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < width_align; x += ELEM_COUNTS)
             {
                 neon::vstore(dst_row + x, vq_zeros);
@@ -120,11 +120,11 @@ static Status ThresholdBinaryInvNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 m
     }
     else if (SaturateCast<Tp0>(thresh) < thresh) //special case, thresh is larger than all src data
     {
-        for (MI_S32 y = start_row; y < end_row; y++)
+        for (DT_S32 y = start_row; y < end_row; y++)
         {
             Tp0 *dst_row = dst.Ptr<Tp0>(y);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < width_align; x += ELEM_COUNTS)
             {
                 neon::vstore(dst_row + x, vq_max_val);
@@ -138,12 +138,12 @@ static Status ThresholdBinaryInvNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 m
     }
     else
     {
-        for (MI_S32 y = start_row; y < end_row; y++)
+        for (DT_S32 y = start_row; y < end_row; y++)
         {
             const Tp0 *src_row = src.Ptr<Tp0>(y);
             Tp0       *dst_row = dst.Ptr<Tp0>(y);
 
-            MI_S32 x = 0;
+            DT_S32 x = 0;
             for (; x < width_align; x += ELEM_COUNTS)
             {
                 auto vq_src  = neon::vload1q(src_row + x);
@@ -163,25 +163,25 @@ static Status ThresholdBinaryInvNeon(const Mat &src, Mat &dst, Tp1 thresh, Tp0 m
 }
 
 template <typename Tp>
-static Status ThresholdTruncNeon(const Mat &src, Mat &dst, Tp thresh, MI_S32 start_row, MI_S32 end_row)
+static Status ThresholdTruncNeon(const Mat &src, Mat &dst, Tp thresh, DT_S32 start_row, DT_S32 end_row)
 {
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(Tp);
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(Tp);
 
     using VType = typename neon::QVector<Tp>::VType;
 
     VType vq_thresh;
     neon::vdup(vq_thresh, thresh);
 
-    MI_S32 channel     = dst.GetSizes().m_channel;
-    MI_S32 width_x_c   = dst.GetSizes().m_width * channel;
-    MI_S32 width_align = width_x_c & (-ELEM_COUNTS);
+    DT_S32 channel     = dst.GetSizes().m_channel;
+    DT_S32 width_x_c   = dst.GetSizes().m_width * channel;
+    DT_S32 width_align = width_x_c & (-ELEM_COUNTS);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         const Tp *src_row = src.Ptr<Tp>(y);
         Tp       *dst_row = dst.Ptr<Tp>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += ELEM_COUNTS)
         {
             auto vq_src = neon::vload1q(src_row + x);
@@ -199,26 +199,26 @@ static Status ThresholdTruncNeon(const Mat &src, Mat &dst, Tp thresh, MI_S32 sta
 }
 
 template <typename Tp0, typename Tp1>
-static Status ThresholdToZeroNeon(const Mat &src, Mat &dst, Tp1 thresh, MI_S32 start_row, MI_S32 end_row)
+static Status ThresholdToZeroNeon(const Mat &src, Mat &dst, Tp1 thresh, DT_S32 start_row, DT_S32 end_row)
 {
     using VType = typename neon::QVector<Tp0>::VType;
 
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(Tp0);
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(Tp0);
 
     VType vq_thresh, vq_zeros;
     neon::vdup(vq_zeros,  static_cast<Tp0>(0));
     neon::vdup(vq_thresh, SaturateCast<Tp0>(thresh));
 
-    MI_S32 channel     = dst.GetSizes().m_channel;
-    MI_S32 width_x_c   = dst.GetSizes().m_width * channel;
-    MI_S32 width_align = width_x_c & (-ELEM_COUNTS);
+    DT_S32 channel     = dst.GetSizes().m_channel;
+    DT_S32 width_x_c   = dst.GetSizes().m_width * channel;
+    DT_S32 width_align = width_x_c & (-ELEM_COUNTS);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         const Tp0 *src_row = src.Ptr<Tp0>(y);
         Tp0       *dst_row = dst.Ptr<Tp0>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += ELEM_COUNTS)
         {
             auto vq_src  = neon::vload1q(src_row + x);
@@ -237,26 +237,26 @@ static Status ThresholdToZeroNeon(const Mat &src, Mat &dst, Tp1 thresh, MI_S32 s
 }
 
 template <typename Tp0, typename Tp1>
-static Status ThresholdToZeroInvNeon(const Mat &src, Mat &dst, Tp1 thresh, MI_S32 start_row, MI_S32 end_row)
+static Status ThresholdToZeroInvNeon(const Mat &src, Mat &dst, Tp1 thresh, DT_S32 start_row, DT_S32 end_row)
 {
     using VType = typename neon::QVector<Tp0>::VType;
 
-    constexpr MI_S32 ELEM_COUNTS = 16 / sizeof(Tp0);
+    constexpr DT_S32 ELEM_COUNTS = 16 / sizeof(Tp0);
 
     VType vq_thresh, vq_zeros;
     neon::vdup(vq_zeros, static_cast<Tp0>(0));
     neon::vdup(vq_thresh, SaturateCast<Tp0>(thresh));
 
-    MI_S32 channel     = dst.GetSizes().m_channel;
-    MI_S32 width_x_c   = dst.GetSizes().m_width * channel;
-    MI_S32 width_align = width_x_c & (-ELEM_COUNTS);
+    DT_S32 channel     = dst.GetSizes().m_channel;
+    DT_S32 width_x_c   = dst.GetSizes().m_width * channel;
+    DT_S32 width_align = width_x_c & (-ELEM_COUNTS);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         const Tp0 *src_row = src.Ptr<Tp0>(y);
         Tp0       *dst_row = dst.Ptr<Tp0>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += ELEM_COUNTS)
         {
             auto vq_src  = neon::vload1q(src_row + x);
@@ -275,20 +275,20 @@ static Status ThresholdToZeroInvNeon(const Mat &src, Mat &dst, Tp1 thresh, MI_S3
 }
 
 template <typename Tp0, typename Tp1>
-static Status ThresholdNeonHelper(Context *ctx, const Mat &src, Mat &dst, Tp1 thresh, Tp0 max_val, MI_S32 type,
+static Status ThresholdNeonHelper(Context *ctx, const Mat &src, Mat &dst, Tp1 thresh, Tp0 max_val, DT_S32 type,
                                   const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
     AURA_UNUSED(target);
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     switch(type & AURA_THRESH_MASK_LOW)
     {
@@ -355,7 +355,7 @@ static Status ThresholdNeonHelper(Context *ctx, const Mat &src, Mat &dst, Tp1 th
 ThresholdNeon::ThresholdNeon(Context *ctx, const OpTarget &target) : ThresholdImpl(ctx, target)
 {}
 
-Status ThresholdNeon::SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type)
+Status ThresholdNeon::SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type)
 {
     Status ret = Status::ERROR;
 
@@ -381,13 +381,13 @@ Status ThresholdNeon::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat       *dst = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return ret;
     }
 
-    MI_S32 ithresh = Floor(m_thresh);
+    DT_S32 ithresh = Floor(m_thresh);
 
     switch (src->GetElemType())
     {
@@ -403,44 +403,44 @@ Status ThresholdNeon::Run()
                 }
             }
 
-            MI_U8 imax_val = SaturateCast<MI_U8>(m_max_val);
-            ret = ThresholdNeonHelper<MI_U8, MI_S32>(m_ctx, *src, *dst, ithresh, imax_val, m_type, m_target);
+            DT_U8 imax_val = SaturateCast<DT_U8>(m_max_val);
+            ret = ThresholdNeonHelper<DT_U8, DT_S32>(m_ctx, *src, *dst, ithresh, imax_val, m_type, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<MI_U8, MI_S32> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<DT_U8, DT_S32> failed");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            MI_S8 imax_val = SaturateCast<MI_S8>(m_max_val);
-            ret = ThresholdNeonHelper<MI_S8, MI_S32>(m_ctx, *src, *dst, ithresh, imax_val, m_type, m_target);
+            DT_S8 imax_val = SaturateCast<DT_S8>(m_max_val);
+            ret = ThresholdNeonHelper<DT_S8, DT_S32>(m_ctx, *src, *dst, ithresh, imax_val, m_type, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<MI_S8, MI_S32> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<DT_S8, DT_S32> failed");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            MI_U16 imax_val = SaturateCast<MI_U16>(m_max_val);
-            ret = ThresholdNeonHelper<MI_U16, MI_S32>(m_ctx, *src, *dst, ithresh, imax_val, m_type, m_target);
+            DT_U16 imax_val = SaturateCast<DT_U16>(m_max_val);
+            ret = ThresholdNeonHelper<DT_U16, DT_S32>(m_ctx, *src, *dst, ithresh, imax_val, m_type, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<MI_U16, MI_S32> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<DT_U16, DT_S32> failed");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            MI_S16 imax_val = SaturateCast<MI_S16>(m_max_val);
-            ret = ThresholdNeonHelper<MI_S16, MI_S32>(m_ctx, *src, *dst, ithresh, imax_val, m_type, m_target);
+            DT_S16 imax_val = SaturateCast<DT_S16>(m_max_val);
+            ret = ThresholdNeonHelper<DT_S16, DT_S32>(m_ctx, *src, *dst, ithresh, imax_val, m_type, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<MI_S16, MI_S32> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<DT_S16, DT_S32> failed");
             }
             break;
         }
@@ -459,10 +459,10 @@ Status ThresholdNeon::Run()
 
         case ElemType::F32:
         {
-            ret = ThresholdNeonHelper<MI_F32, MI_F32>(m_ctx, *src, *dst, m_thresh, m_max_val, m_type, m_target);
+            ret = ThresholdNeonHelper<DT_F32, DT_F32>(m_ctx, *src, *dst, m_thresh, m_max_val, m_type, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<MI_F32, MI_F32> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdNeonHelper<DT_F32, DT_F32> failed");
             }
             break;
         }

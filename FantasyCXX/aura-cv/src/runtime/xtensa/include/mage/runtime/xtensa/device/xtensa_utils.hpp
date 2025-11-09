@@ -22,7 +22,7 @@ namespace xtensa
  * @{
  */
 
-AURA_VOID* AllocateBuffer(TileManager tm, MI_S32 size, MI_S32 align);
+DT_VOID* AllocateBuffer(TileManager tm, DT_S32 size, DT_S32 align);
 
 /**
  *
@@ -33,7 +33,7 @@ AURA_VOID* AllocateBuffer(TileManager tm, MI_S32 size, MI_S32 align);
  * @return AURA_XTENSA_ERROR if it encounters an error, else returns AURA_XTENSA_OK
  *
  */
-MI_S32 BufferCheckPointSave(TileManager tm);
+DT_S32 BufferCheckPointSave(TileManager tm);
 
 /**
  *
@@ -45,7 +45,7 @@ MI_S32 BufferCheckPointSave(TileManager tm);
  * @return Status::ERROR if it encounters an error, else returns Status::OK
  *
  */
-Status BufferCheckPointRestore(TileManager tm, MI_S32 idx);
+Status BufferCheckPointRestore(TileManager tm, DT_S32 idx);
 
 /**
  * @}

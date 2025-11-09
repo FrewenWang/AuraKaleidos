@@ -20,7 +20,7 @@ static ElemType GetDstType(ElemType src_type)
     return dst_type;
 }
 
-static std::string GetCLMainBuildOptions(Context *ctx, const MI_S32 elem_counts, ElemType src_type, ElemType sum_type)
+static std::string GetCLMainBuildOptions(Context *ctx, const DT_S32 elem_counts, ElemType src_type, ElemType sum_type)
 {
     CLBuildOptions cl_build_opt(ctx);
     cl_build_opt.AddOption("St",          CLTypeString(src_type));
@@ -68,14 +68,14 @@ Status SumCL::Initialize()
     }
 
     ElemType src_type             = m_src->GetElemType();
-    const MI_S32 elem_counts_main = 16 / ElemTypeSize(src_type);
-    MI_S32 height                 = m_src->GetSizes().m_height;
-    MI_S32 width                  = m_src->GetSizes().m_width * m_src->GetSizes().m_channel;
+    const DT_S32 elem_counts_main = 16 / ElemTypeSize(src_type);
+    DT_S32 height                 = m_src->GetSizes().m_height;
+    DT_S32 width                  = m_src->GetSizes().m_width * m_src->GetSizes().m_channel;
 
     ElemType dst_type      = GetDstType(src_type);
     m_group_size_x_main    = (width + m_blk_w * elem_counts_main - 1) / (m_blk_w * elem_counts_main);
     m_group_size_y_main    = (height + m_blk_h - 1) / m_blk_h;
-    MI_S32 group_size_main = m_group_size_x_main * m_group_size_y_main;
+    DT_S32 group_size_main = m_group_size_x_main * m_group_size_y_main;
 
     // 1. init cl_mem
     m_cl_src = CLMem::FromArray(m_ctx, *m_src, CLMemParam(CL_MEM_READ_ONLY));
@@ -92,7 +92,7 @@ Status SumCL::Initialize()
         return Status::ERROR;
     }
 
-    dst_mat = Mat(m_ctx, ElemType::U8, {1, static_cast<MI_S32>(ElemTypeSize(dst_type))});
+    dst_mat = Mat(m_ctx, ElemType::U8, {1, static_cast<DT_S32>(ElemTypeSize(dst_type))});
 
     m_cl_dst = CLMem::FromArray(m_ctx, dst_mat, CLMemParam(CL_MEM_WRITE_ONLY));
     if (!m_cl_dst.IsValid())
@@ -141,34 +141,34 @@ Status SumCL::Run()
 {
     std::shared_ptr<CLRuntime> cl_rt      = m_ctx->GetCLEngine()->GetCLRuntime();
     std::shared_ptr<cl::Device> cl_device = cl_rt->GetDevice();
-    MI_S32 istep                          = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 height                         = m_src->GetSizes().m_height;
-    MI_S32 width                          = m_src->GetSizes().m_width * m_src->GetSizes().m_channel;
+    DT_S32 istep                          = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 height                         = m_src->GetSizes().m_height;
+    DT_S32 width                          = m_src->GetSizes().m_width * m_src->GetSizes().m_channel;
     ElemType src_type                     = m_src->GetElemType();
     ElemType dst_type                     = GetDstType(src_type);
 
     // 1. get center_area and cl_global_size
     size_t preferred_group_size;
     m_cl_kernels[0].GetClKernel()->getWorkGroupInfo(*cl_device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &preferred_group_size);
-    MI_S32 max_group_size     = m_cl_kernels[0].GetMaxGroupSize();
-    MI_S32 max_local_mem_size = cl_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+    DT_S32 max_group_size     = m_cl_kernels[0].GetMaxGroupSize();
+    DT_S32 max_local_mem_size = cl_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
 
-    MI_S32 local_size_x_main  = Min(max_local_mem_size, Min(max_group_size, 2 * (MI_S32)preferred_group_size));
-    MI_S32 local_size_y_main  = 1;
-    MI_S32 group_size_main    = m_group_size_x_main * m_group_size_y_main;
-    MI_S32 global_size_x_main = local_size_x_main * m_group_size_x_main;
-    MI_S32 global_size_y_main = local_size_y_main * m_group_size_y_main;
-    MI_S32 global_size_remain = Min(max_local_mem_size, Min(group_size_main, (MI_S32)m_cl_kernels[1].GetMaxGroupSize()));
-    MI_S32 elem_counts_remain = (group_size_main + global_size_remain - 1) / global_size_remain;
+    DT_S32 local_size_x_main  = Min(max_local_mem_size, Min(max_group_size, 2 * (DT_S32)preferred_group_size));
+    DT_S32 local_size_y_main  = 1;
+    DT_S32 group_size_main    = m_group_size_x_main * m_group_size_y_main;
+    DT_S32 global_size_x_main = local_size_x_main * m_group_size_x_main;
+    DT_S32 global_size_y_main = local_size_y_main * m_group_size_y_main;
+    DT_S32 global_size_remain = Min(max_local_mem_size, Min(group_size_main, (DT_S32)m_cl_kernels[1].GetMaxGroupSize()));
+    DT_S32 elem_counts_remain = (group_size_main + global_size_remain - 1) / global_size_remain;
 
     cl::Event cl_event[2];
     cl_int cl_ret = CL_SUCCESS;
     Status ret    = Status::ERROR;
 
     // 2. opencl run
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32,
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32,
                                  cl::Buffer, cl::LocalSpaceArg,
-                                 MI_S32, MI_S32, MI_S32, MI_S32>(
+                                 DT_S32, DT_S32, DT_S32, DT_S32>(
                                  m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_partial.GetCLMemRef<cl::Buffer>(),
                                  cl::Local(local_size_x_main * local_size_y_main * ElemTypeSize(dst_type)),
@@ -184,7 +184,7 @@ Status SumCL::Run()
 
     cl_ret = m_cl_kernels[1].Run<cl::Buffer, cl::Buffer,
                                  cl::LocalSpaceArg,
-                                 MI_S32, MI_S32>(
+                                 DT_S32, DT_S32>(
                                  m_cl_partial.GetCLMemRef<cl::Buffer>(),
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(),
                                  cl::Local(global_size_remain * ElemTypeSize(dst_type)),
@@ -199,7 +199,7 @@ Status SumCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (dst_mat.GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (dst_mat.GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event[1].wait();
         if (cl_ret != CL_SUCCESS)
@@ -208,7 +208,7 @@ Status SumCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event[0]) +
                                  GetCLProfilingInfo(m_cl_kernels[1].GetKernelName(), cl_event[1]);
@@ -225,20 +225,20 @@ Status SumCL::Run()
     {
         case ElemType::U32:
         {
-            MI_U32 *dst_ptr = dst_mat.Ptr<MI_U32>(0);
-            m_result->m_val[0] = static_cast<MI_F64>(dst_ptr[0]);
+            DT_U32 *dst_ptr = dst_mat.Ptr<DT_U32>(0);
+            m_result->m_val[0] = static_cast<DT_F64>(dst_ptr[0]);
             break;
         }
         case ElemType::S32:
         {
-            MI_S32 *dst_ptr = dst_mat.Ptr<MI_S32>(0);
-            m_result->m_val[0] = static_cast<MI_F64>(dst_ptr[0]);
+            DT_S32 *dst_ptr = dst_mat.Ptr<DT_S32>(0);
+            m_result->m_val[0] = static_cast<DT_F64>(dst_ptr[0]);
             break;
         }
         default:
         {
-            MI_F32 *dst_ptr = dst_mat.Ptr<MI_F32>(0);
-            m_result->m_val[0] = static_cast<MI_F64>(dst_ptr[0]);
+            DT_F32 *dst_ptr = dst_mat.Ptr<DT_F32>(0);
+            m_result->m_val[0] = static_cast<DT_F64>(dst_ptr[0]);
             break;
         }
     }
@@ -257,7 +257,7 @@ std::vector<CLKernel> SumCL::GetCLKernels(Context *ctx, ElemType src_elem_type, 
     std::vector<CLKernel> cl_kernels;
     std::string build_opt[2];
 
-    MI_S32 elem_counts_main = 16 / ElemTypeSize(src_elem_type);
+    DT_S32 elem_counts_main = 16 / ElemTypeSize(src_elem_type);
 
     build_opt[0] = GetCLMainBuildOptions(ctx, elem_counts_main, src_elem_type, dst_elem_type);
     build_opt[1] = GetCLRemainBuildOptions(ctx, dst_elem_type, dst_elem_type);
@@ -286,9 +286,9 @@ Status MeanCL::Run()
         return Status::ERROR;
     }
 
-    const MI_S32 height = m_src->GetSizes().m_height;
-    const MI_S32 width  = m_src->GetSizes().m_width;
-    *m_result           = (*m_result) / static_cast<MI_F64>(height * width);
+    const DT_S32 height = m_src->GetSizes().m_height;
+    const DT_S32 width  = m_src->GetSizes().m_width;
+    *m_result           = (*m_result) / static_cast<DT_F64>(height * width);
 
     return Status::OK;
 }

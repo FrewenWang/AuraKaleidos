@@ -8,30 +8,30 @@
 namespace aura
 {
 
-static Status AbsSumS8NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64> &task_result, MI_S32 start_blk, MI_S32 end_blk)
+static Status AbsSumS8NeonImpl(Context *ctx, const Mat &mat, std::vector<DT_F64> &task_result, DT_S32 start_blk, DT_S32 end_blk)
 {
     AURA_UNUSED(ctx);
-    constexpr MI_S32 block_size = (1 << 8);
-    constexpr MI_S32 block_step = block_size * 16;
+    constexpr DT_S32 block_size = (1 << 8);
+    constexpr DT_S32 block_step = block_size * 16;
 
     Sizes3 sz             = mat.GetSizes();
-    MI_S32 width          = sz.m_width;
-    MI_S32 channel        = sz.m_channel;
-    MI_S32 row_elem_count = width * channel;
-    MI_S32 start_row      = start_blk * SUM_BLK;
-    MI_S32 end_row        = Min(end_blk * SUM_BLK, sz.m_height);
+    DT_S32 width          = sz.m_width;
+    DT_S32 channel        = sz.m_channel;
+    DT_S32 row_elem_count = width * channel;
+    DT_S32 start_row      = start_blk * SUM_BLK;
+    DT_S32 end_row        = Min(end_blk * SUM_BLK, sz.m_height);
 
-    MI_F64 result = 0.0;
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    DT_F64 result = 0.0;
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        const MI_S8 *src_row = mat.Ptr<MI_S8>(y);
+        const DT_S8 *src_row = mat.Ptr<DT_S8>(y);
         uint32x4_t vqu32_row_sum;
         neon::vdup(vqu32_row_sum, 0);
-        MI_S32 bx = 0;
-        for (MI_S32 x = 0; x < row_elem_count; x += block_step)
+        DT_S32 bx = 0;
+        for (DT_S32 x = 0; x < row_elem_count; x += block_step)
         {
-            MI_S32 blk_len = Min(row_elem_count - x, block_step);
-            MI_S32 blk_len_align16 = blk_len & (-16);
+            DT_S32 blk_len = Min(row_elem_count - x, block_step);
+            DT_S32 blk_len_align16 = blk_len & (-16);
             uint16x8_t vqu16_block_sum;
             neon::vdup(vqu16_block_sum, 0);
             for (bx = x; bx < x + blk_len_align16; bx += 16)
@@ -46,7 +46,7 @@ static Status AbsSumS8NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64>
 
         for (; bx < row_elem_count; bx++)
         {
-            result += Abs(static_cast<MI_F64>(src_row[bx]));
+            result += Abs(static_cast<DT_F64>(src_row[bx]));
         }
         result += neon::vgetlane<0>(vqu32_row_sum);
         result += neon::vgetlane<1>(vqu32_row_sum);
@@ -59,30 +59,30 @@ static Status AbsSumS8NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64>
     return Status::OK;
 }
 
-static Status AbsSumS16NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64> &task_result, MI_S32 start_blk, MI_S32 end_blk)
+static Status AbsSumS16NeonImpl(Context *ctx, const Mat &mat, std::vector<DT_F64> &task_result, DT_S32 start_blk, DT_S32 end_blk)
 {
     AURA_UNUSED(ctx);
-    constexpr MI_S32 block_size = (1 << 16);
-    constexpr MI_S32 block_step = block_size * 8;
+    constexpr DT_S32 block_size = (1 << 16);
+    constexpr DT_S32 block_step = block_size * 8;
 
     Sizes3 sz             = mat.GetSizes();
-    MI_S32 width          = sz.m_width;
-    MI_S32 channel        = sz.m_channel;
-    MI_S32 row_elem_count = width * channel;
-    MI_S32 start_row      = start_blk * SUM_BLK;
-    MI_S32 end_row        = Min(end_blk * SUM_BLK, sz.m_height);
+    DT_S32 width          = sz.m_width;
+    DT_S32 channel        = sz.m_channel;
+    DT_S32 row_elem_count = width * channel;
+    DT_S32 start_row      = start_blk * SUM_BLK;
+    DT_S32 end_row        = Min(end_blk * SUM_BLK, sz.m_height);
 
-    MI_F64 result = 0.0;
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    DT_F64 result = 0.0;
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        const MI_S16 *src_row = mat.Ptr<MI_S16>(y);
+        const DT_S16 *src_row = mat.Ptr<DT_S16>(y);
         uint64x2_t vqu64_row_sum;
         neon::vdup(vqu64_row_sum, 0);
-        MI_S32 bx = 0;
-        for (MI_S32 x = 0; x < row_elem_count; x += block_step)
+        DT_S32 bx = 0;
+        for (DT_S32 x = 0; x < row_elem_count; x += block_step)
         {
-            MI_S32 blk_len = Min(row_elem_count - x, block_step);
-            MI_S32 blk_len_align8 = blk_len & (-8);
+            DT_S32 blk_len = Min(row_elem_count - x, block_step);
+            DT_S32 blk_len_align8 = blk_len & (-8);
             uint32x4_t vqu32_block_sum;
             neon::vdup(vqu32_block_sum, 0);
             for (bx = x; bx < x + blk_len_align8; bx += 8)
@@ -95,10 +95,10 @@ static Status AbsSumS16NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64
             vqu64_row_sum = neon::vpadal(vqu64_row_sum, vqu32_block_sum);
             for (; bx < row_elem_count; bx++)
             {
-                result += Abs(static_cast<MI_F64>(src_row[bx]));
+                result += Abs(static_cast<DT_F64>(src_row[bx]));
             }
-            result += static_cast<MI_F64>(neon::vgetlane<0>(vqu64_row_sum));
-            result += static_cast<MI_F64>(neon::vgetlane<1>(vqu64_row_sum));
+            result += static_cast<DT_F64>(neon::vgetlane<0>(vqu64_row_sum));
+            result += static_cast<DT_F64>(neon::vgetlane<1>(vqu64_row_sum));
         }
     }
 
@@ -108,30 +108,30 @@ static Status AbsSumS16NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64
 }
 
 #if defined(AURA_ENABLE_NEON_FP16)
-static Status AbsSumF16NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64> &task_result, MI_S32 start_blk, MI_S32 end_blk)
+static Status AbsSumF16NeonImpl(Context *ctx, const Mat &mat, std::vector<DT_F64> &task_result, DT_S32 start_blk, DT_S32 end_blk)
 {
     AURA_UNUSED(ctx);
     Sizes3 sz                = mat.GetSizes();
-    MI_S32 width             = sz.m_width;
-    MI_S32 channel           = sz.m_channel;
-    MI_S32 row_elem_count    = width * channel;
-    MI_S32 elem_count_align8 = row_elem_count & (-8);
-    MI_S32 start_row         = start_blk * SUM_BLK;
-    MI_S32 end_row           = Min(end_blk * SUM_BLK, sz.m_height);
+    DT_S32 width             = sz.m_width;
+    DT_S32 channel           = sz.m_channel;
+    DT_S32 row_elem_count    = width * channel;
+    DT_S32 elem_count_align8 = row_elem_count & (-8);
+    DT_S32 start_row         = start_blk * SUM_BLK;
+    DT_S32 end_row           = Min(end_blk * SUM_BLK, sz.m_height);
 
-    MI_F64 result = 0.0;
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    DT_F64 result = 0.0;
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         const MI_F16 *src_row = mat.Ptr<MI_F16>(y);
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         float32x4_t vqf32_row_sum;
         neon::vdup(vqf32_row_sum, 0);
         for (; x < elem_count_align8; x += 8)
         {
             float16x8_t vqf16_src_data;
             neon::vload(src_row + x, vqf16_src_data);
-            float32x4_t vqf32_hi_abs = neon::vabs(neon::vcvt<MI_F32>(neon::vgethigh(vqf16_src_data)));
-            float32x4_t vqf32_lo_abs = neon::vabs(neon::vcvt<MI_F32>(neon::vgetlow(vqf16_src_data)));
+            float32x4_t vqf32_hi_abs = neon::vabs(neon::vcvt<DT_F32>(neon::vgethigh(vqf16_src_data)));
+            float32x4_t vqf32_lo_abs = neon::vabs(neon::vcvt<DT_F32>(neon::vgetlow(vqf16_src_data)));
             vqf32_row_sum = neon::vadd(vqf32_row_sum, vqf32_hi_abs);
             vqf32_row_sum = neon::vadd(vqf32_row_sum, vqf32_lo_abs);
         }
@@ -142,7 +142,7 @@ static Status AbsSumF16NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64
 
         for (; x < row_elem_count; ++x)
         {
-            result += Abs(static_cast<MI_F64>(src_row[x]));
+            result += Abs(static_cast<DT_F64>(src_row[x]));
         }
     }
 
@@ -152,22 +152,22 @@ static Status AbsSumF16NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64
 }
 #endif
 
-static Status AbsSumF32NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64> &task_result, MI_S32 start_blk, MI_S32 end_blk)
+static Status AbsSumF32NeonImpl(Context *ctx, const Mat &mat, std::vector<DT_F64> &task_result, DT_S32 start_blk, DT_S32 end_blk)
 {
     AURA_UNUSED(ctx);
     Sizes3 sz                = mat.GetSizes();
-    MI_S32 width             = sz.m_width;
-    MI_S32 channel           = sz.m_channel;
-    MI_S32 row_elem_count    = width * channel;
-    MI_S32 elem_count_align4 = row_elem_count & (-4);
-    MI_S32 start_row         = start_blk * SUM_BLK;
-    MI_S32 end_row           = Min(end_blk * SUM_BLK, sz.m_height);
+    DT_S32 width             = sz.m_width;
+    DT_S32 channel           = sz.m_channel;
+    DT_S32 row_elem_count    = width * channel;
+    DT_S32 elem_count_align4 = row_elem_count & (-4);
+    DT_S32 start_row         = start_blk * SUM_BLK;
+    DT_S32 end_row           = Min(end_blk * SUM_BLK, sz.m_height);
 
-    MI_F64 result = 0.0;
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    DT_F64 result = 0.0;
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        const MI_F32 *src_row = mat.Ptr<MI_F32>(y);
-        MI_S32 x = 0;
+        const DT_F32 *src_row = mat.Ptr<DT_F32>(y);
+        DT_S32 x = 0;
         float32x4_t vqf32_row_sum;
         neon::vdup(vqf32_row_sum, 0);
         for (; x < elem_count_align4; x += 4)
@@ -192,23 +192,23 @@ static Status AbsSumF32NeonImpl(Context *ctx, const Mat &mat, std::vector<MI_F64
     return Status::OK;
 }
 
-static Status AbsSumNeonHelper(Context *ctx, const Mat &mat, MI_F64 &result, const OpTarget &target)
+static Status AbsSumNeonHelper(Context *ctx, const Mat &mat, DT_F64 &result, const OpTarget &target)
 {
     AURA_UNUSED(target);
     Status ret = Status::ERROR;
 
     Sizes3 sz        = mat.GetSizes();
-    MI_S32 height    = sz.m_height;
+    DT_S32 height    = sz.m_height;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "Get worker_pool failed.");
         return Status::ERROR;
     }
 
-    MI_S32 task_nums = (height + SUM_BLK - 1) / SUM_BLK;
-    std::vector<MI_F64> task_result(task_nums, 0.0);
+    DT_S32 task_nums = (height + SUM_BLK - 1) / SUM_BLK;
+    std::vector<DT_F64> task_result(task_nums, 0.0);
 
     switch (mat.GetElemType())
     {
@@ -266,7 +266,7 @@ static Status AbsSumNeonHelper(Context *ctx, const Mat &mat, MI_F64 &result, con
     AURA_RETURN(ctx, ret);
 }
 
-Status AbsSumNeon(Context *ctx, const Mat &mat, MI_F64 &result, const OpTarget &target)
+Status AbsSumNeon(Context *ctx, const Mat &mat, DT_F64 &result, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 

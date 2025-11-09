@@ -73,17 +73,17 @@ NEW_TESTCASE(runtime_opencl_engine_test)
 
     Buffer buffer = ctx->GetMemPool()->GetBuffer(AURA_ALLOC_PARAM(ctx, AURA_MEM_SVM, 1024, 0));
     AURA_LOGI(ctx, AURA_TAG, "%s\n", buffer.ToString().c_str());
-    ret |= AURA_CHECK_EQ(ctx, buffer.m_type, static_cast<MI_S32>(AURA_MEM_SVM), "check Buffer::m_type failed\n");
+    ret |= AURA_CHECK_EQ(ctx, buffer.m_type, static_cast<DT_S32>(AURA_MEM_SVM), "check Buffer::m_type failed\n");
     
-    MI_U8 *ptr = (MI_U8*)buffer.m_data;
-    for (MI_S32 i = 0; i < 1024; ++i)
+    DT_U8 *ptr = (DT_U8*)buffer.m_data;
+    for (DT_S32 i = 0; i < 1024; ++i)
     {
         ptr[i] = i & 0xFF;
     }
 
-    for (MI_S32 i = 0; i < 1024; ++i)
+    for (DT_S32 i = 0; i < 1024; ++i)
     {
-        ret |= AURA_CHECK_EQ(ctx, static_cast<MI_S32>(ptr[i]), i & 0xFF, "check Buffer::m_data failed\n");
+        ret |= AURA_CHECK_EQ(ctx, static_cast<DT_S32>(ptr[i]), i & 0xFF, "check Buffer::m_data failed\n");
     }
 
     AURA_FREE(ctx, buffer.m_data);

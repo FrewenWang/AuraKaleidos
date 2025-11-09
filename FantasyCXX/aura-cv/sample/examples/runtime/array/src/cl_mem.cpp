@@ -47,10 +47,10 @@ aura::Status CLMemSampleTest(aura::Context *ctx)
             AURA_LOGE(ctx, SAMPLE_TAG, "Construct a cl mat failed\n");
             return aura::Status::ERROR;
         }
-        MI_U32 *data = cl_mat.GetCLMemPtr<MI_U32>();
+        DT_U32 *data = cl_mat.GetCLMemPtr<DT_U32>();
         AURA_LOGD(ctx, SAMPLE_TAG, "Use cl mat GetCLMemPtr() function, cl mat data ptr is %p\n", data);
 
-        MI_S32 channel = cl_mat.GetCLIauraChannelNum(CL_R);
+        DT_S32 channel = cl_mat.GetCLIauraChannelNum(CL_R);
         AURA_LOGD(ctx, SAMPLE_TAG, "Use cl mat GetCLIauraChannelNum() function, channel is %d\n", channel);
     }
 

@@ -6,7 +6,7 @@
 namespace aura
 {
 
-CLKernel::CLKernel() : m_ctx(MI_NULL), m_max_group_size(0), m_kernel_name()
+CLKernel::CLKernel() : m_ctx(DT_NULL), m_max_group_size(0), m_kernel_name()
 {}
 
 CLKernel::CLKernel(Context *ctx,
@@ -60,7 +60,7 @@ CLKernel::CLKernel(Context *ctx,
                     {
                         size_t max_group_size = 0;
                         m_cl_kernel->getWorkGroupInfo(*cl_device, CL_KERNEL_WORK_GROUP_SIZE, &max_group_size);
-                        m_max_group_size = static_cast<MI_S32>(max_group_size);
+                        m_max_group_size = static_cast<DT_S32>(max_group_size);
                     }
                     m_cl_queue = cl_rt->GetCommandQueue();
                 }
@@ -74,14 +74,14 @@ std::shared_ptr<cl::Kernel> CLKernel::GetClKernel() const
     return m_cl_kernel;
 }
 
-MI_U32 CLKernel::GetMaxGroupSize() const
+DT_U32 CLKernel::GetMaxGroupSize() const
 {
     return m_max_group_size;
 }
 
-AURA_VOID CLKernel::DeInitialize()
+DT_VOID CLKernel::DeInitialize()
 {
-    m_ctx = MI_NULL;
+    m_ctx = DT_NULL;
     m_max_group_size = 0;
     m_cl_kernel.reset();
     m_cl_queue.reset();
@@ -105,7 +105,7 @@ Status CLKernel::CheckKenrelWorkSize(cl::NDRange &cl_global, cl::NDRange &cl_loc
         if (m_cl_kernel && cl_device && m_ctx)
         {
             size_t *lws = cl_local.get();
-            MI_S32 cur_local_size = 0;
+            DT_S32 cur_local_size = 0;
 
             if (1 == cl_global.dimensions())
             {
@@ -139,10 +139,10 @@ Status CLKernel::CheckKenrelWorkSize(cl::NDRange &cl_global, cl::NDRange &cl_loc
                 std::shared_ptr<CLRuntime> cl_rt = cl_engine->GetCLRuntime();
                 if (cl_rt && (cl_global.dimensions() == cl_local.dimensions()) && (cl_global.dimensions() > 0))
                 {
-                    if (MI_FALSE == cl_rt->IsNonUniformWorkgroupsSupported())
+                    if (DT_FALSE == cl_rt->IsNonUniformWorkgroupsSupported())
                     {
                         size_t *cl_gws = cl_global.get();
-                        for (MI_S32 i = 0; i < static_cast<MI_S32>(cl_global.dimensions()); i++)
+                        for (DT_S32 i = 0; i < static_cast<DT_S32>(cl_global.dimensions()); i++)
                         {
                             cl_gws[i] = (cl_gws[i] + lws[i] - 1) / lws[i] * lws[i];
                         }
@@ -155,9 +155,9 @@ Status CLKernel::CheckKenrelWorkSize(cl::NDRange &cl_global, cl::NDRange &cl_loc
     return ret;
 }
 
-MI_BOOL CLKernel::IsValid() const 
+DT_BOOL CLKernel::IsValid() const 
 {
-    return m_cl_kernel != MI_NULL;
+    return m_cl_kernel != DT_NULL;
 }
 
 std::string CLKernel::GetKernelName() const

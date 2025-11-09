@@ -40,7 +40,7 @@ public:
     MergeMultiMatTest(Context *ctx, MergeParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         MergeParam run_param(GetParam((index)));
@@ -61,7 +61,7 @@ public:
         dst_sz.m_width  = src_sz.m_width;
         dst_sz.m_height = src_sz.m_height;
 
-        MI_S32 total_ch_count = 0;
+        DT_S32 total_ch_count = 0;
         for (size_t n = 0; n < mat_sizes.size(); ++n)
         {
             total_ch_count += mat_sizes[n].m_sizes.m_channel;
@@ -80,7 +80,7 @@ public:
         Mat ref = m_factory.GetEmptyMat(run_param.elem_type, dst_sz);
 
         // run interface
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
         Status status_exec = Executor(loop_count, 2, time_val, IMerge, m_ctx, srcs, dst, run_param.target);
 
         if (Status::OK == status_exec)

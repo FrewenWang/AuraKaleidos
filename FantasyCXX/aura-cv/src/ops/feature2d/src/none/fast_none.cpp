@@ -4,31 +4,31 @@
 namespace aura
 {
 
-static AURA_VOID MakeOffsetsNone(MI_S32 pixel[25], MI_S32 stride, MI_S32 pattern_size)
+static DT_VOID MakeOffsetsNone(DT_S32 pixel[25], DT_S32 stride, DT_S32 pattern_size)
 {
-    const MI_S32 offsets16[][2] =
+    const DT_S32 offsets16[][2] =
     {
         {0,  3}, { 1,  3}, { 2,  2}, { 3,  1}, { 3, 0}, { 3, -1}, { 2, -2}, { 1, -3},
         {0, -3}, {-1, -3}, {-2, -2}, {-3, -1}, {-3, 0}, {-3,  1}, {-2,  2}, {-1,  3}
     };
 
-    const MI_S32 offsets12[][2] =
+    const DT_S32 offsets12[][2] =
     {
         {0,  2}, { 1,  2}, { 2,  1}, { 2, 0}, { 2, -1}, { 1, -2},
         {0, -2}, {-1, -2}, {-2, -1}, {-2, 0}, {-2,  1}, {-1,  2}
     };
 
-    const MI_S32 offsets8[][2] =
+    const DT_S32 offsets8[][2] =
     {
         {0,  1}, { 1,  1}, { 1, 0}, { 1, -1},
         {0, -1}, {-1, -1}, {-1, 0}, {-1,  1}
     };
 
-    const MI_S32 (*offsets)[2] = pattern_size == 16 ? offsets16 :
+    const DT_S32 (*offsets)[2] = pattern_size == 16 ? offsets16 :
                                  pattern_size == 12 ? offsets12 :
                                  pattern_size == 8  ? offsets8  : 0;
 
-    MI_S32 k = 0;
+    DT_S32 k = 0;
     for (; k < pattern_size; k++)
     {
         pixel[k] = offsets[k][0] + offsets[k][1] * stride;
@@ -40,57 +40,57 @@ static AURA_VOID MakeOffsetsNone(MI_S32 pixel[25], MI_S32 stride, MI_S32 pattern
     }
 }
 
-template<MI_S32 PATTERN_SIZE>
-static MI_S32 CornerScoreNone(const MI_U8 *src_c, const MI_S32 pixel[], MI_S32 threshold);
+template<DT_S32 PATTERN_SIZE>
+static DT_S32 CornerScoreNone(const DT_U8 *src_c, const DT_S32 pixel[], DT_S32 threshold);
 
 template<>
-MI_S32 CornerScoreNone<16>(const MI_U8 *src_c, const MI_S32 pixel[], MI_S32 threshold)
+DT_S32 CornerScoreNone<16>(const DT_U8 *src_c, const DT_S32 pixel[], DT_S32 threshold)
 {
-    constexpr MI_S32 ksize = 8;
-    constexpr MI_S32 nsize = ksize * 3 + 1;
+    constexpr DT_S32 ksize = 8;
+    constexpr DT_S32 nsize = ksize * 3 + 1;
 
-    MI_S32 k, center = src_c[0];
-    MI_S16 diff[nsize];
+    DT_S32 k, center = src_c[0];
+    DT_S16 diff[nsize];
 
     for (k = 0; k < nsize; k++)
     {
-        diff[k] = static_cast<MI_S16>(center - src_c[pixel[k]]);
+        diff[k] = static_cast<DT_S16>(center - src_c[pixel[k]]);
     }
 
-    MI_S32 a0 = threshold;
+    DT_S32 a0 = threshold;
     for (k = 0; k < 16; k += 2)
     {
-        MI_S32 a = Min(static_cast<MI_S32>(diff[k + 1]), static_cast<MI_S32>(diff[k + 2]));
-        a = Min(a, static_cast<MI_S32>(diff[k + 3]));
+        DT_S32 a = Min(static_cast<DT_S32>(diff[k + 1]), static_cast<DT_S32>(diff[k + 2]));
+        a = Min(a, static_cast<DT_S32>(diff[k + 3]));
         if (a <= a0)
         {
             continue;
         }
-        a  = Min(a, static_cast<MI_S32>(diff[k + 4]));
-        a  = Min(a, static_cast<MI_S32>(diff[k + 5]));
-        a  = Min(a, static_cast<MI_S32>(diff[k + 6]));
-        a  = Min(a, static_cast<MI_S32>(diff[k + 7]));
-        a  = Min(a, static_cast<MI_S32>(diff[k + 8]));
-        a0 = Max(a0, Min(a, static_cast<MI_S32>(diff[k])));
-        a0 = Max(a0, Min(a, static_cast<MI_S32>(diff[k + 9])));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 4]));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 5]));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 6]));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 7]));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 8]));
+        a0 = Max(a0, Min(a, static_cast<DT_S32>(diff[k])));
+        a0 = Max(a0, Min(a, static_cast<DT_S32>(diff[k + 9])));
     }
 
-    MI_S32 b0 = -a0;
+    DT_S32 b0 = -a0;
     for (k = 0; k < 16; k += 2)
     {
-        MI_S32 b = Max(static_cast<MI_S32>(diff[k + 1]), static_cast<MI_S32>(diff[k + 2]));
-        b = Max(b, static_cast<MI_S32>(diff[k + 3]));
-        b = Max(b, static_cast<MI_S32>(diff[k + 4]));
-        b = Max(b, static_cast<MI_S32>(diff[k + 5]));
+        DT_S32 b = Max(static_cast<DT_S32>(diff[k + 1]), static_cast<DT_S32>(diff[k + 2]));
+        b = Max(b, static_cast<DT_S32>(diff[k + 3]));
+        b = Max(b, static_cast<DT_S32>(diff[k + 4]));
+        b = Max(b, static_cast<DT_S32>(diff[k + 5]));
         if (b >= b0)
         {
             continue;
         }
-        b  = Max(b, static_cast<MI_S32>(diff[k + 6]));
-        b  = Max(b, static_cast<MI_S32>(diff[k + 7]));
-        b  = Max(b, static_cast<MI_S32>(diff[k + 8]));
-        b0 = Min(b0, Max(b, static_cast<MI_S32>(diff[k])));
-        b0 = Min(b0, Max(b, static_cast<MI_S32>(diff[k + 9])));
+        b  = Max(b, static_cast<DT_S32>(diff[k + 6]));
+        b  = Max(b, static_cast<DT_S32>(diff[k + 7]));
+        b  = Max(b, static_cast<DT_S32>(diff[k + 8]));
+        b0 = Min(b0, Max(b, static_cast<DT_S32>(diff[k])));
+        b0 = Min(b0, Max(b, static_cast<DT_S32>(diff[k + 9])));
     }
 
     threshold = -b0 - 1;
@@ -99,49 +99,49 @@ MI_S32 CornerScoreNone<16>(const MI_U8 *src_c, const MI_S32 pixel[], MI_S32 thre
 }
 
 template<>
-MI_S32 CornerScoreNone<12>(const MI_U8 *src_c, const MI_S32 pixel[], MI_S32 threshold)
+DT_S32 CornerScoreNone<12>(const DT_U8 *src_c, const DT_S32 pixel[], DT_S32 threshold)
 {
-    constexpr MI_S32 ksize = 6;
-    constexpr MI_S32 nsize = ksize * 3 + 1;
+    constexpr DT_S32 ksize = 6;
+    constexpr DT_S32 nsize = ksize * 3 + 1;
 
-    MI_S32 k, center = src_c[0];
-    MI_S16 diff[nsize + 4];
+    DT_S32 k, center = src_c[0];
+    DT_S16 diff[nsize + 4];
 
     for (k = 0; k < nsize; k++)
     {
-        diff[k] = static_cast<MI_S16>(center - src_c[pixel[k]]);
+        diff[k] = static_cast<DT_S16>(center - src_c[pixel[k]]);
     }
 
-    MI_S32 a0 = threshold;
+    DT_S32 a0 = threshold;
     for (k = 0; k < 12; k += 2)
     {
-        MI_S32 a = Min(static_cast<MI_S32>(diff[k + 1]), static_cast<MI_S32>(diff[k + 2]));
+        DT_S32 a = Min(static_cast<DT_S32>(diff[k + 1]), static_cast<DT_S32>(diff[k + 2]));
         if (a <= a0)
         {
             continue;
         }
-        a  = Min(a, static_cast<MI_S32>(diff[k + 3]));
-        a  = Min(a, static_cast<MI_S32>(diff[k + 4]));
-        a  = Min(a, static_cast<MI_S32>(diff[k + 5]));
-        a  = Min(a, static_cast<MI_S32>(diff[k + 6]));
-        a0 = Max(a0, Min(a, static_cast<MI_S32>(diff[k])));
-        a0 = Max(a0, Min(a, static_cast<MI_S32>(diff[k + 7])));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 3]));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 4]));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 5]));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 6]));
+        a0 = Max(a0, Min(a, static_cast<DT_S32>(diff[k])));
+        a0 = Max(a0, Min(a, static_cast<DT_S32>(diff[k + 7])));
     }
 
-    MI_S32 b0 = -a0;
+    DT_S32 b0 = -a0;
     for (k = 0; k < 12; k += 2)
     {
-        MI_S32 b = Max(static_cast<MI_S32>(diff[k + 1]), static_cast<MI_S32>(diff[k + 2]));
-        b = Max(b, static_cast<MI_S32>(diff[k + 3]));
-        b = Max(b, static_cast<MI_S32>(diff[k + 4]));
+        DT_S32 b = Max(static_cast<DT_S32>(diff[k + 1]), static_cast<DT_S32>(diff[k + 2]));
+        b = Max(b, static_cast<DT_S32>(diff[k + 3]));
+        b = Max(b, static_cast<DT_S32>(diff[k + 4]));
         if (b >= b0)
         {
             continue;
         }
-        b  = Max(b, static_cast<MI_S32>(diff[k + 5]));
-        b  = Max(b, static_cast<MI_S32>(diff[k + 6]));
-        b0 = Min(b0, Max(b, static_cast<MI_S32>(diff[k])));
-        b0 = Min(b0, Max(b, static_cast<MI_S32>(diff[k + 7])));
+        b  = Max(b, static_cast<DT_S32>(diff[k + 5]));
+        b  = Max(b, static_cast<DT_S32>(diff[k + 6]));
+        b0 = Min(b0, Max(b, static_cast<DT_S32>(diff[k])));
+        b0 = Min(b0, Max(b, static_cast<DT_S32>(diff[k + 7])));
     }
 
     threshold = -b0 - 1;
@@ -150,45 +150,45 @@ MI_S32 CornerScoreNone<12>(const MI_U8 *src_c, const MI_S32 pixel[], MI_S32 thre
 }
 
 template<>
-MI_S32 CornerScoreNone<8>(const MI_U8 *src_c, const MI_S32 pixel[], MI_S32 threshold)
+DT_S32 CornerScoreNone<8>(const DT_U8 *src_c, const DT_S32 pixel[], DT_S32 threshold)
 {
-    constexpr MI_S32 ksize = 4;
-    constexpr MI_S32 nsize = ksize * 3 + 1;
+    constexpr DT_S32 ksize = 4;
+    constexpr DT_S32 nsize = ksize * 3 + 1;
 
-    MI_S32 k, center = src_c[0];
-    MI_S16 diff[nsize];
+    DT_S32 k, center = src_c[0];
+    DT_S16 diff[nsize];
 
     for (k = 0; k < nsize; k++)
     {
-        diff[k] = static_cast<MI_S16>(center - src_c[pixel[k]]);
+        diff[k] = static_cast<DT_S16>(center - src_c[pixel[k]]);
     }
 
-    MI_S32 a0 = threshold;
+    DT_S32 a0 = threshold;
     for (k = 0; k < 8; k += 2)
     {
-        MI_S32 a = Min(static_cast<MI_S32>(diff[k + 1]), static_cast<MI_S32>(diff[k + 2]));
+        DT_S32 a = Min(static_cast<DT_S32>(diff[k + 1]), static_cast<DT_S32>(diff[k + 2]));
         if (a <= a0)
         {
             continue;
         }
-        a  = Min(a, static_cast<MI_S32>(diff[k + 3]));
-        a  = Min(a, static_cast<MI_S32>(diff[k + 4]));
-        a0 = Max(a0, Min(a, static_cast<MI_S32>(diff[k])));
-        a0 = Max(a0, Min(a, static_cast<MI_S32>(diff[k + 5])));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 3]));
+        a  = Min(a, static_cast<DT_S32>(diff[k + 4]));
+        a0 = Max(a0, Min(a, static_cast<DT_S32>(diff[k])));
+        a0 = Max(a0, Min(a, static_cast<DT_S32>(diff[k + 5])));
     }
 
-    MI_S32 b0 = -a0;
+    DT_S32 b0 = -a0;
     for (k = 0; k < 8; k += 2)
     {
-        MI_S32 b = Max(static_cast<MI_S32>(diff[k + 1]), static_cast<MI_S32>(diff[k + 2]));
-        b = Max(b, static_cast<MI_S32>(diff[k + 3]));
+        DT_S32 b = Max(static_cast<DT_S32>(diff[k + 1]), static_cast<DT_S32>(diff[k + 2]));
+        b = Max(b, static_cast<DT_S32>(diff[k + 3]));
         if (b >= b0)
         {
             continue;
         }
-        b  = Max(b, static_cast<MI_S32>(diff[k + 4]));
-        b0 = Min(b0, Max(b, static_cast<MI_S32>(diff[k])));
-        b0 = Min(b0, Max(b, static_cast<MI_S32>(diff[k + 5])));
+        b  = Max(b, static_cast<DT_S32>(diff[k + 4]));
+        b0 = Min(b0, Max(b, static_cast<DT_S32>(diff[k])));
+        b0 = Min(b0, Max(b, static_cast<DT_S32>(diff[k + 5])));
     }
 
     threshold = -b0 - 1;
@@ -196,44 +196,44 @@ MI_S32 CornerScoreNone<8>(const MI_U8 *src_c, const MI_S32 pixel[], MI_S32 thres
     return threshold;
 }
 
-template <MI_S32 PATTERN_SIZE>
-static Status FastNoneImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &key_points, MI_S32 threshold, MI_BOOL nonmax_suppression)
+template <DT_S32 PATTERN_SIZE>
+static Status FastNoneImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &key_points, DT_S32 threshold, DT_BOOL nonmax_suppression)
 {
-    MI_S32 iwidth  = mat.GetSizes().m_width;
-    MI_S32 iheight = mat.GetSizes().m_height;
-    MI_S32 istride = mat.GetRowPitch();
+    DT_S32 iwidth  = mat.GetSizes().m_width;
+    DT_S32 iheight = mat.GetSizes().m_height;
+    DT_S32 istride = mat.GetRowPitch();
 
-    constexpr MI_S32 ksize = PATTERN_SIZE / 2;
-    constexpr MI_S32 nsize = PATTERN_SIZE + ksize + 1;
+    constexpr DT_S32 ksize = PATTERN_SIZE / 2;
+    constexpr DT_S32 nsize = PATTERN_SIZE + ksize + 1;
 
-    MI_S32 x, y, k, pixel[25];
+    DT_S32 x, y, k, pixel[25];
     MakeOffsetsNone(pixel, istride, PATTERN_SIZE);
 
     key_points.clear();
 
-    threshold = Clamp<MI_U8>(threshold, 0, 255);
+    threshold = Clamp<DT_U8>(threshold, 0, 255);
 
-    MI_U8 threshold_tab[512];
+    DT_U8 threshold_tab[512];
     for (x = -255; x <= 255; x++)
     {
-        threshold_tab[x + 255] = static_cast<MI_U8>(x < -threshold ? 1 : x > threshold ? 2 : 0);
+        threshold_tab[x + 255] = static_cast<DT_U8>(x < -threshold ? 1 : x > threshold ? 2 : 0);
     }
 
-    MI_S32 buffer_size = (iwidth + 16) * 3 * (sizeof(MI_S32) + sizeof(MI_U8)) + 128;
-    MI_U8 *buffer      = static_cast<MI_U8*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, buffer_size, 0));
-    if (MI_NULL == buffer)
+    DT_S32 buffer_size = (iwidth + 16) * 3 * (sizeof(DT_S32) + sizeof(DT_U8)) + 128;
+    DT_U8 *buffer      = static_cast<DT_U8*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, buffer_size, 0));
+    if (DT_NULL == buffer)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM fail");
         return Status::ERROR;
     }
 
-    MI_U8 *row_ptr[3];
+    DT_U8 *row_ptr[3];
     row_ptr[0] = buffer;
     row_ptr[1] = row_ptr[0] + iwidth;
     row_ptr[2] = row_ptr[1] + iwidth;
 
-    MI_S32 *cprow[3];
-    cprow[0] = reinterpret_cast<MI_S32*>(((MI_UPTR_T)(row_ptr[2] + iwidth) + sizeof(MI_S32) - 1) & -(sizeof(MI_S32))) + 1;
+    DT_S32 *cprow[3];
+    cprow[0] = reinterpret_cast<DT_S32*>(((DT_UPTR_T)(row_ptr[2] + iwidth) + sizeof(DT_S32) - 1) & -(sizeof(DT_S32))) + 1;
     cprow[1] = cprow[0] + iwidth + 1;
     cprow[2] = cprow[1] + iwidth + 1;
 
@@ -242,21 +242,21 @@ static Status FastNoneImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &
     y = 3;
     for (; y < (iheight - 2); y++)
     {
-        const MI_U8 *src_row = mat.Ptr<MI_U8>(y) + 3;
-        MI_U8 *curr          = row_ptr[(y - 3) % 3];
-        MI_S32 *cornerpos    = cprow[(y - 3) % 3];
+        const DT_U8 *src_row = mat.Ptr<DT_U8>(y) + 3;
+        DT_U8 *curr          = row_ptr[(y - 3) % 3];
+        DT_S32 *cornerpos    = cprow[(y - 3) % 3];
 
         memset(curr, 0, iwidth);
-        MI_S32 ncorners = 0;
+        DT_S32 ncorners = 0;
 
         if (y < (iheight - 3))
         {
             x = 3;
             for (; x < (iwidth - 3); x++, src_row++)
             {
-                MI_S32 center    = src_row[0];
-                const MI_U8 *tab = &threshold_tab[0] - center + 255;
-                MI_S32 cmp_val   = tab[src_row[pixel[0]]] | tab[src_row[pixel[8]]];
+                DT_S32 center    = src_row[0];
+                const DT_U8 *tab = &threshold_tab[0] - center + 255;
+                DT_S32 cmp_val   = tab[src_row[pixel[0]]] | tab[src_row[pixel[8]]];
 
                 if (0 == cmp_val)
                 {
@@ -279,16 +279,16 @@ static Status FastNoneImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &
 
                 if (cmp_val & 1)
                 {
-                    MI_S32 bound = center - threshold, count = 0;
+                    DT_S32 bound = center - threshold, count = 0;
                     for (k = 0; k < nsize; k++)
                     {
-                        MI_S32 neighbor = src_row[pixel[k]];
+                        DT_S32 neighbor = src_row[pixel[k]];
                         if (neighbor < bound)
                         {
                             if (++count > ksize)
                             {
                                 cornerpos[ncorners++] = x;
-                                curr[x] = nonmax_suppression ? (static_cast<MI_U8>(CornerScoreNone<PATTERN_SIZE>(src_row, pixel, threshold))) : 0;
+                                curr[x] = nonmax_suppression ? (static_cast<DT_U8>(CornerScoreNone<PATTERN_SIZE>(src_row, pixel, threshold))) : 0;
                                 break;
                             }
                         }
@@ -301,16 +301,16 @@ static Status FastNoneImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &
 
                 if (cmp_val & 2)
                 {
-                    MI_S32 bound = center + threshold, count = 0;
+                    DT_S32 bound = center + threshold, count = 0;
                     for (k = 0; k < nsize; k++)
                     {
-                        MI_S32 neighbor = src_row[pixel[k]];
+                        DT_S32 neighbor = src_row[pixel[k]];
                         if (neighbor > bound)
                         {
                             if (++count > ksize)
                             {
                                 cornerpos[ncorners++] = x;
-                                curr[x] = nonmax_suppression ? (static_cast<MI_U8>(CornerScoreNone<PATTERN_SIZE>(src_row, pixel, threshold))) : 0;
+                                curr[x] = nonmax_suppression ? (static_cast<DT_U8>(CornerScoreNone<PATTERN_SIZE>(src_row, pixel, threshold))) : 0;
                                 break;
                             }
                         }
@@ -330,8 +330,8 @@ static Status FastNoneImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &
             continue;
         }
 
-        const MI_U8 *prev  = row_ptr[(y - 4 + 3) % 3];
-        const MI_U8 *pprev = row_ptr[(y - 5 + 3) % 3];
+        const DT_U8 *prev  = row_ptr[(y - 4 + 3) % 3];
+        const DT_U8 *pprev = row_ptr[(y - 5 + 3) % 3];
 
         cornerpos = cprow[(y - 4 + 3) % 3];
         ncorners  = cornerpos[-1];
@@ -339,12 +339,12 @@ static Status FastNoneImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &
         for (k = 0; k < ncorners; k++)
         {
             x = cornerpos[k];
-            MI_S32 score = prev[x];
+            DT_S32 score = prev[x];
             if (!nonmax_suppression ||
                (score > prev[x + 1]  && score > prev[x - 1] && score > pprev[x - 1] && score > pprev[x] &&
                 score > pprev[x + 1] && score > curr[x - 1] && score > curr[x]      && score > curr[x + 1]))
             {
-                key_points.emplace_back(KeyPoint(static_cast<MI_F32>(x), static_cast<MI_F32>(y - 1), 7.f, -1, static_cast<MI_F32>(score)));
+                key_points.emplace_back(KeyPoint(static_cast<DT_F32>(x), static_cast<DT_F32>(y - 1), 7.f, -1, static_cast<DT_F32>(score)));
             }
         }
     }
@@ -357,8 +357,8 @@ static Status FastNoneImpl(Context *ctx, const Mat &mat, std::vector<KeyPoint> &
 FastNone::FastNone(Context *ctx, const OpTarget &target) : FastImpl(ctx, target)
 {}
 
-Status FastNone::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 threshold,
-                         MI_BOOL nonmax_suppression, FastDetectorType type, MI_U32 max_num_corners)
+Status FastNone::SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 threshold,
+                         DT_BOOL nonmax_suppression, FastDetectorType type, DT_U32 max_num_corners)
 {
     if (FastImpl::SetArgs(src, key_points, threshold, nonmax_suppression, type, max_num_corners) != Status::OK)
     {
@@ -379,7 +379,7 @@ Status FastNone::Run()
 {
     Status ret = Status::ERROR;
     const Mat *src = dynamic_cast<const Mat*>(m_src);
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src mat is null");
         return Status::ERROR;

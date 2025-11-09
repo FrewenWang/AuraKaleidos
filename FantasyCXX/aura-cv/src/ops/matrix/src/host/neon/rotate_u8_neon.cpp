@@ -3,12 +3,12 @@
 namespace aura
 {
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 1>::operator()(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                       MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_90, 1>::operator()(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                       DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
     AURA_UNUSED(src_width);
-    MI_U32 src_addr = src_y * src_step + src_x;
-    MI_U32 dst_addr = src_x * dst_step + src_height - src_y - 8;
+    DT_U32 src_addr = src_y * src_step + src_x;
+    DT_U32 dst_addr = src_x * dst_step + src_height - src_y - 8;
 
     uint8x8_t vdu8_line0 = neon::vload1(&src_data[src_addr]);
     uint8x8_t vdu8_line1 = neon::vload1(&src_data[src_addr += src_step]);
@@ -53,12 +53,12 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 1>::operator()(MI_U8 *
     neon::vstore(&dst_data[dst_addr += dst_step], vdu8_out7);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 2>::operator()(MI_U16 *src_data, MI_U16 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                       MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_90, 2>::operator()(DT_U16 *src_data, DT_U16 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                       DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
     AURA_UNUSED(src_width);
-    MI_U32 src_addr = src_y * src_step + src_x;
-    MI_U32 dst_addr = src_x * dst_step + src_height - src_y - 8;
+    DT_U32 src_addr = src_y * src_step + src_x;
+    DT_U32 dst_addr = src_x * dst_step + src_height - src_y - 8;
 
     uint16x8_t vqu16_line0 = neon::vload1q(&src_data[src_addr]);
     uint16x8_t vqu16_line1 = neon::vload1q(&src_data[src_addr += src_step]);
@@ -98,12 +98,12 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 2>::operator()(MI_U16 
     neon::vstore(&dst_data[dst_addr += dst_step], vqu16_out7);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 3>::operator()(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                       MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_90, 3>::operator()(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                       DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
     AURA_UNUSED(src_width);
-    MI_U32 src_addr = src_y * src_step + src_x * 3;
-    MI_U32 dst_addr = src_x * dst_step + (src_height - src_y - 8) * 3;
+    DT_U32 src_addr = src_y * src_step + src_x * 3;
+    DT_U32 dst_addr = src_x * dst_step + (src_height - src_y - 8) * 3;
 
     uint8x8x3_t v3du8_line0 = neon::vload3(&src_data[src_addr]);
     uint8x8x3_t v3du8_line1 = neon::vload3(&src_data[src_addr += src_step]);
@@ -197,12 +197,12 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 3>::operator()(MI_U8 *
     neon::vstore(&dst_data[dst_addr += dst_step], v3du8_out7);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 4>::operator()(MI_U32 *src_data, MI_U32 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                       MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_90, 4>::operator()(DT_U32 *src_data, DT_U32 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                       DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
     AURA_UNUSED(src_width);
-    MI_U32 src_addr = src_y * src_step + src_x;
-    MI_U32 dst_addr = src_x * dst_step + src_height - src_y - 4;
+    DT_U32 src_addr = src_y * src_step + src_x;
+    DT_U32 dst_addr = src_x * dst_step + src_height - src_y - 4;
 
     uint32x4_t vqu32_line0 = neon::vload1q(&src_data[src_addr]);
     uint32x4_t vqu32_line1 = neon::vload1q(&src_data[src_addr += src_step]);
@@ -223,11 +223,11 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_90, 4>::operator()(MI_U32 
     neon::vstore(&dst_data[dst_addr += dst_step], vqu32_out3);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 1>::operator()(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                        MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_180, 1>::operator()(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                        DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
-    MI_U32 src_addr = src_y * src_step + src_x;
-    MI_U32 dst_addr = (src_height - 8 - src_y) * dst_step + src_width - 8 - src_x;
+    DT_U32 src_addr = src_y * src_step + src_x;
+    DT_U32 dst_addr = (src_height - 8 - src_y) * dst_step + src_width - 8 - src_x;
 
     uint8x8_t vdu8_line0 = neon::vload1(&src_data[src_addr]);
     uint8x8_t vdu8_line1 = neon::vload1(&src_data[src_addr += src_step]);
@@ -266,11 +266,11 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 1>::operator()(MI_U8 
     neon::vstore(&dst_data[dst_addr += dst_step], vdu8_out7);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 2>::operator()(MI_U16 *src_data, MI_U16 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                        MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_180, 2>::operator()(DT_U16 *src_data, DT_U16 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                        DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
-    MI_U32 src_addr = src_y * src_step + src_x;
-    MI_U32 dst_addr = (src_height - 8 - src_y) * dst_step + src_width - 8 - src_x;
+    DT_U32 src_addr = src_y * src_step + src_x;
+    DT_U32 dst_addr = (src_height - 8 - src_y) * dst_step + src_width - 8 - src_x;
 
     uint16x8_t vqu16_line0 = neon::vload1q(&src_data[src_addr]);
     uint16x8_t vqu16_line1 = neon::vload1q(&src_data[src_addr += src_step]);
@@ -309,11 +309,11 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 2>::operator()(MI_U16
     neon::vstore(&dst_data[dst_addr += dst_step], vqu16_out7);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 3>::operator()(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                        MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_180, 3>::operator()(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                        DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
-    MI_U32 src_addr = src_y * src_step + (src_x * 3);
-    MI_U32 dst_addr = (src_height - 8 - src_y) * dst_step + (src_width - 8 - src_x) * 3;
+    DT_U32 src_addr = src_y * src_step + (src_x * 3);
+    DT_U32 dst_addr = (src_height - 8 - src_y) * dst_step + (src_width - 8 - src_x) * 3;
 
     uint8x8x3_t v3du8_line0 = neon::vload3(&src_data[src_addr]);
     uint8x8x3_t v3du8_line1 = neon::vload3(&src_data[src_addr += src_step]);
@@ -389,11 +389,11 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 3>::operator()(MI_U8 
     neon::vstore(&dst_data[dst_addr += dst_step], v3du8_out7);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 4>::operator()(MI_U32 *src_data, MI_U32 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                        MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_180, 4>::operator()(DT_U32 *src_data, DT_U32 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                        DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
-    MI_U32 src_addr = src_y * src_step + src_x;
-    MI_U32 dst_addr = (src_height - 4 - src_y) * dst_step + src_width - 4 - src_x;
+    DT_U32 src_addr = src_y * src_step + src_x;
+    DT_U32 dst_addr = (src_height - 4 - src_y) * dst_step + src_width - 4 - src_x;
 
     uint32x4_t vqu32_line0 = neon::vload1q(&src_data[src_addr]);
     uint32x4_t vqu32_line1 = neon::vload1q(&src_data[src_addr += src_step]);
@@ -416,12 +416,12 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_180, 4>::operator()(MI_U32
     neon::vstore(&dst_data[dst_addr += dst_step], vqu32_out3);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 1>::operator()(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                        MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_270, 1>::operator()(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                        DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
     AURA_UNUSED(src_height);
-    MI_U32 src_addr = src_y * src_step + src_x;
-    MI_U32 dst_addr = (src_width - 8 - src_x) * dst_step + src_y;
+    DT_U32 src_addr = src_y * src_step + src_x;
+    DT_U32 dst_addr = (src_width - 8 - src_x) * dst_step + src_y;
 
     uint8x8_t vdu8_line0 = neon::vload1(&src_data[src_addr]);
     uint8x8_t vdu8_line1 = neon::vload1(&src_data[src_addr += src_step]);
@@ -466,12 +466,12 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 1>::operator()(MI_U8 
     neon::vstore(&dst_data[dst_addr += dst_step], vdu8_out7);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 2>::operator()(MI_U16 *src_data, MI_U16 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                        MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_270, 2>::operator()(DT_U16 *src_data, DT_U16 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                        DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
     AURA_UNUSED(src_height);
-    MI_U32 src_addr = src_y * src_step + src_x;
-    MI_U32 dst_addr = (src_width - 8 - src_x) * dst_step + src_y;
+    DT_U32 src_addr = src_y * src_step + src_x;
+    DT_U32 dst_addr = (src_width - 8 - src_x) * dst_step + src_y;
 
     uint16x8_t vqu16_line0 = neon::vload1q(&src_data[src_addr]);
     uint16x8_t vqu16_line1 = neon::vload1q(&src_data[src_addr += src_step]);
@@ -511,12 +511,12 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 2>::operator()(MI_U16
     neon::vstore(&dst_data[dst_addr += dst_step], vqu16_out7);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 3>::operator()(MI_U8 *src_data, MI_U8 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                        MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_270, 3>::operator()(DT_U8 *src_data, DT_U8 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                        DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
     AURA_UNUSED(src_height);
-    MI_U32 src_addr = src_y * src_step + (src_x * 3);
-    MI_U32 dst_addr = (src_width - 8 - src_x) * dst_step + (src_y * 3);
+    DT_U32 src_addr = src_y * src_step + (src_x * 3);
+    DT_U32 dst_addr = (src_width - 8 - src_x) * dst_step + (src_y * 3);
 
     uint8x8x3_t v3du8_line0 = neon::vload3(&src_data[src_addr]);
     uint8x8x3_t v3du8_line1 = neon::vload3(&src_data[src_addr += src_step]);
@@ -610,12 +610,12 @@ AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 3>::operator()(MI_U8 
     neon::vstore(&dst_data[dst_addr += dst_step], v3du8_out7);
 }
 
-AURA_VOID RotateNeonFunctor<MI_U8, RotateType::ROTATE_270, 4>::operator()(MI_U32 *src_data, MI_U32 *dst_data, MI_U32 src_step, MI_U32 dst_step,
-                                                                        MI_U32 src_width, MI_U32 src_height, MI_U32 src_x, MI_U32 src_y)
+DT_VOID RotateNeonFunctor<DT_U8, RotateType::ROTATE_270, 4>::operator()(DT_U32 *src_data, DT_U32 *dst_data, DT_U32 src_step, DT_U32 dst_step,
+                                                                        DT_U32 src_width, DT_U32 src_height, DT_U32 src_x, DT_U32 src_y)
 {
     AURA_UNUSED(src_height);
-    MI_U32 src_addr = src_y * src_step + src_x;
-    MI_U32 dst_addr = (src_width - 4 - src_x) * dst_step + src_y;
+    DT_U32 src_addr = src_y * src_step + src_x;
+    DT_U32 dst_addr = (src_width - 4 - src_x) * dst_step + src_y;
 
     uint32x4_t vqu32_line0 = neon::vload1q(&src_data[src_addr]);
     uint32x4_t vqu32_line1 = neon::vload1q(&src_data[src_addr += src_step]);

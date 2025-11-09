@@ -30,38 +30,38 @@ namespace xtensa
  *
  * @return Size of the element type in bytes.
  */
-AURA_INLINE MI_S32 ElemTypeSize(ElemType elem_type)
+AURA_INLINE DT_S32 ElemTypeSize(ElemType elem_type)
 {
-    MI_S32 elem_size = 0;
+    DT_S32 elem_size = 0;
 
     switch (elem_type)
     {
         case ElemType::U8:
         case ElemType::S8:
         {
-            elem_size = sizeof(MI_U8);
+            elem_size = sizeof(DT_U8);
             break;
         }
         case ElemType::U16:
         case ElemType::S16:
         {
-            elem_size = sizeof(MI_U16);
+            elem_size = sizeof(DT_U16);
             break;
         }
         case ElemType::U32:
         case ElemType::S32:
         {
-            elem_size = sizeof(MI_U32);
+            elem_size = sizeof(DT_U32);
             break;
         }
         case ElemType::F32:
         {
-            elem_size = sizeof(MI_F32);
+            elem_size = sizeof(DT_F32);
             break;
         }
         case ElemType::F64:
         {
-            elem_size = sizeof(MI_F64);
+            elem_size = sizeof(DT_F64);
             break;
         }
         default:
@@ -101,7 +101,7 @@ public:
      */
     Mat(ElemType elem_type, Sizes3 &sizes, const Buffer &buffer, const Sizes &strides = Sizes())
     {
-        MI_S64 total_bytes = static_cast<MI_S64>(strides.m_width) * strides.m_height;
+        DT_S64 total_bytes = static_cast<DT_S64>(strides.m_width) * strides.m_height;
 
         m_elem_type   = elem_type;
         m_sizes       = sizes;
@@ -115,7 +115,7 @@ public:
      *
      * @return Pointer to the raw data of the matrix.
      */
-    AURA_VOID* GetData()
+    DT_VOID* GetData()
     {
         return m_buffer.m_data;
     };
@@ -125,7 +125,7 @@ public:
      *
      * @return Const pointer to the raw data of the matrix.
      */
-    const AURA_VOID* GetData() const
+    const DT_VOID* GetData() const
     {
         return m_buffer.m_data;
     };
@@ -140,14 +140,14 @@ public:
      * @return Pointer to the specified row of the matrix.
      */
     template<typename Tp>
-    Tp* Ptr(MI_S32 row)
+    Tp* Ptr(DT_S32 row)
     {
-        const MI_S32 off = row * m_strides.m_width;
+        const DT_S32 off = row * m_strides.m_width;
         if (off < m_total_bytes)
         {
             return m_buffer.GetData<Tp*>(off);
         }
-        return MI_NULL;
+        return DT_NULL;
     };
 
     /**
@@ -185,7 +185,7 @@ public:
      *
      * @return Total bytes occupied by the array.
      */
-    MI_S64 GetTotalBytes() const
+    DT_S64 GetTotalBytes() const
     {
         return m_total_bytes;
     };
@@ -195,7 +195,7 @@ public:
      *
      * @return Row pitch of the array.
      */
-    MI_S32 GetRowPitch() const
+    DT_S32 GetRowPitch() const
     {
         return m_strides.m_width;
     };
@@ -205,9 +205,9 @@ public:
      *
      * @return Row step of the array.
      */
-    MI_S32 GetRowStep() const
+    DT_S32 GetRowStep() const
     {
-        MI_S32 pixels = ElemTypeSize(m_elem_type) * m_sizes.m_channel;
+        DT_S32 pixels = ElemTypeSize(m_elem_type) * m_sizes.m_channel;
 
         if (0 == pixels)
         {
@@ -224,7 +224,7 @@ public:
      *
      * @return True if the matrix is valid, false otherwise.
      */
-    MI_BOOL IsValid() const
+    DT_BOOL IsValid() const
     {
         return (m_total_bytes > 0 && m_buffer.IsValid() && m_elem_type != ElemType::INVALID);
     }
@@ -236,7 +236,7 @@ public:
      *
      * @return True if the arrays are equal, false otherwise.
      */
-    MI_BOOL IsEqual(const Mat &mat) const
+    DT_BOOL IsEqual(const Mat &mat) const
     {
         return ((mat.GetElemType() == m_elem_type) && (mat.GetSizes() == m_sizes));
     }
@@ -245,7 +245,7 @@ private:
     ElemType   m_elem_type;        /*!< Element type of the mat. */
     Sizes3     m_sizes;            /*!< Sizes of the mat in three dimensions. */
     Sizes      m_strides;          /*!< Strides of the mat. */
-    MI_S64     m_total_bytes;      /*!< Total number of bytes occupied by the mat. */
+    DT_S64     m_total_bytes;      /*!< Total number of bytes occupied by the mat. */
     Buffer     m_buffer;           /*!< Buffer containing array data. */
 };
 

@@ -58,8 +58,8 @@ AURA_INLINE Status CvIntegral(Context *ctx, Mat &src, Mat &dst0, Mat &dst1)
         !(src.GetElemType() == ElemType::U16 && dst0.GetElemType() == ElemType::F32) &&
         !(src.GetElemType() == ElemType::S16 && dst0.GetElemType() == ElemType::F32))
     {
-        MI_S32 dst0_cv_type = ElemTypeToOpencv(dst0.GetElemType(), dst0.GetSizes().m_channel);
-        MI_S32 dst1_cv_type = ElemTypeToOpencv(dst1.GetElemType(), dst1.GetSizes().m_channel);
+        DT_S32 dst0_cv_type = ElemTypeToOpencv(dst0.GetElemType(), dst0.GetSizes().m_channel);
+        DT_S32 dst1_cv_type = ElemTypeToOpencv(dst1.GetElemType(), dst1.GetSizes().m_channel);
 
         cv::Mat cv_src    = MatToOpencv(src);
         cv::Mat cv_dst    = MatToOpencv(dst0);
@@ -81,7 +81,7 @@ AURA_INLINE Status CvIntegral(Context *ctx, Mat &src, Mat &dst0, Mat &dst1)
     return ret;
 }
 
-AURA_INLINE Status CvIntegralNorm(Context *ctx, Mat &src, Mat &dst, MI_S32 type)
+AURA_INLINE Status CvIntegralNorm(Context *ctx, Mat &src, Mat &dst, DT_S32 type)
 {
     AURA_UNUSED(ctx);
     Status ret = Status::OK;
@@ -95,7 +95,7 @@ AURA_INLINE Status CvIntegralNorm(Context *ctx, Mat &src, Mat &dst, MI_S32 type)
             !(src.GetElemType() == ElemType::U16 && dst.GetElemType() == ElemType::F32) &&
             !(src.GetElemType() == ElemType::S16 && dst.GetElemType() == ElemType::F32))
         {
-            MI_S32 dst0_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
+            DT_S32 dst0_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
 
             cv::Mat cv_src = MatToOpencv(src);
             cv::Mat cv_dst = MatToOpencv(dst);
@@ -114,7 +114,7 @@ AURA_INLINE Status CvIntegralNorm(Context *ctx, Mat &src, Mat &dst, MI_S32 type)
         {
             Mat dst_temp = dst.Clone();
 
-            MI_S32 dst1_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
+            DT_S32 dst1_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
 
             cv::Mat cv_src    = MatToOpencv(src);
             cv::Mat cv_dst    = MatToOpencv(dst_temp);
@@ -143,14 +143,14 @@ AURA_INLINE Status CvIntegralNorm(Context *ctx, Mat &src, Mat &dst, MI_S32 type)
 }
 
 static Status MatCompareIntegral(Context *ctx, const Mat &src, const Mat &ref,
-                                 MatCmpResult &result, MI_F32 tolerate = 1, MI_F32 step = 1, MI_F64 cmp_eps = 1e-6)
+                                 MatCmpResult &result, DT_F32 tolerate = 1, DT_F32 step = 1, DT_F64 cmp_eps = 1e-6)
 {
     Status ret = Status::OK;
 
     if (src.GetElemType() != ref.GetElemType())
     {
-        AURA_LOGE(ctx, AURA_TAG, "elem type not match\n", MI_TRUE);
-        result.status = MI_FALSE;
+        AURA_LOGE(ctx, AURA_TAG, "elem type not match\n", DT_TRUE);
+        result.status = DT_FALSE;
         return Status::ERROR;
     }
     if ((ElemType::F32 == src.GetElemType()) || (ElemType::F64 == src.GetElemType()))
@@ -176,21 +176,21 @@ static Status MatCompareIntegralBorder(Context *ctx, const Mat &dst, const Mat &
 
     if (dst.GetElemType() != ref.GetElemType())
     {
-        AURA_LOGE(ctx, AURA_TAG, "elem type not match\n", MI_TRUE);
-        result.status = MI_FALSE;
+        AURA_LOGE(ctx, AURA_TAG, "elem type not match\n", DT_TRUE);
+        result.status = DT_FALSE;
         return Status::ERROR;
     }
 
-    MI_F32 tolerate = 1;
-    MI_F32 step = 1;
-    MI_F64 cmp_eps = 1e-6;
+    DT_F32 tolerate = 1;
+    DT_F32 step = 1;
+    DT_F64 cmp_eps = 1e-6;
 
     Sizes3 size = dst.GetSizes() + Sizes3(1, 1, 0);
     Mat pad_mat(ctx, dst.GetElemType(), size);
     if (IMakeBorder(ctx, dst, pad_mat, 1, 0, 1, 0, BorderType::CONSTANT, Scalar(0, 0, 0, 0), OpTarget::None()) != Status::OK)
     {
-        AURA_LOGE(ctx, AURA_TAG, "IMakeBorder error\n", MI_FALSE);
-        result.status = MI_FALSE;
+        AURA_LOGE(ctx, AURA_TAG, "IMakeBorder error\n", DT_FALSE);
+        result.status = DT_FALSE;
         return Status::ERROR;
     }
 
@@ -217,7 +217,7 @@ public:
     MatrixIntegralTest(Context *ctx, IntegralParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get nex param set
         IntegralParam run_param(GetParam((index)));
@@ -250,7 +250,7 @@ public:
 
         // run normal interface
         using integral_func = Status (*)(Context *, const Mat &, Mat &, Mat &, const OpTarget &);
-        MI_S32 loop_count   = stress_count ? stress_count : 10;
+        DT_S32 loop_count   = stress_count ? stress_count : 10;
         Status status_exec  = Status::OK;
 
         if (dst1.IsValid() && (!dst0.IsValid())) // Sequare mode, less data type

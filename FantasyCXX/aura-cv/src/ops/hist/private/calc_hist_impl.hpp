@@ -24,24 +24,24 @@ class CalcHistImpl : public OpImpl
 public:
     CalcHistImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &hist, MI_S32 hist_size, 
-                           const Scalar &ranges, const Array *mask = NULL, MI_BOOL accumulate = MI_FALSE);
+    virtual Status SetArgs(const Array *src, DT_S32 channel, std::vector<DT_U32> &hist, DT_S32 hist_size, 
+                           const Scalar &ranges, const Array *mask = NULL, DT_BOOL accumulate = DT_FALSE);
 
     std::vector<const Array*> GetInputArrays() const override;
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    MI_S32   m_channel;
-    MI_S32   m_hist_size;
+    DT_S32   m_channel;
+    DT_S32   m_hist_size;
     Scalar   m_ranges;
-    MI_BOOL  m_accumulate;
+    DT_BOOL  m_accumulate;
 
     const Array *m_src;
     const Array *m_mask;
-    std::vector<MI_U32> *m_hist;
+    std::vector<DT_U32> *m_hist;
 };
 
 class CalcHistNone : public CalcHistImpl
@@ -49,8 +49,8 @@ class CalcHistNone : public CalcHistImpl
 public:
     CalcHistNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &hist, MI_S32 hist_size, 
-                   const Scalar &ranges, const Array *mask = NULL, MI_BOOL accumulate = MI_FALSE) override;
+    Status SetArgs(const Array *src, DT_S32 channel, std::vector<DT_U32> &hist, DT_S32 hist_size, 
+                   const Scalar &ranges, const Array *mask = NULL, DT_BOOL accumulate = DT_FALSE) override;
 
     Status Run() override;
 };
@@ -61,8 +61,8 @@ class CalcHistHvx : public CalcHistImpl
 public:
     CalcHistHvx(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &hist, MI_S32 hist_size, 
-                   const Scalar &ranges, const Array *mask = NULL, MI_BOOL accumulate = MI_FALSE) override;
+    Status SetArgs(const Array *src, DT_S32 channel, std::vector<DT_U32> &hist, DT_S32 hist_size, 
+                   const Scalar &ranges, const Array *mask = NULL, DT_BOOL accumulate = DT_FALSE) override;
 
     Status Run() override;
 
@@ -72,8 +72,8 @@ private:
     std::string m_profiling_string;
 };
 
-using CalcHistInParam  = HexagonRpcParamType<Mat, MI_S32, std::vector<MI_U32>, MI_S32, Scalar, Mat, MI_BOOL>;
-using CalcHistOutParam = HexagonRpcParamType<std::vector<MI_U32>>;
+using CalcHistInParam  = HexagonRpcParamType<Mat, DT_S32, std::vector<DT_U32>, DT_S32, Scalar, Mat, DT_BOOL>;
+using CalcHistOutParam = HexagonRpcParamType<std::vector<DT_U32>>;
 #  define AURA_OPS_HIST_CALCHIST_OP_NAME          "CalcHist"
 
 #endif // (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))

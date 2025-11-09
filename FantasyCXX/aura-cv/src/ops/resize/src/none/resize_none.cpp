@@ -31,7 +31,7 @@ Status ResizeNone::Run()
 
     Status ret = Status::ERROR;
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;

@@ -72,22 +72,22 @@ std::shared_ptr<aura::Context> CreateContext()
     config.SetWorkerPool("AuraSample", aura::CpuAffinity::BIG, aura::CpuAffinity::LITTLE);  // 设置线程池
 
 #if defined(AURA_ENABLE_OPENCL)
-    config.SetCLConf(MI_TRUE, "/data/local/tmp", "aura_unit_test"); // 设置OpenCL配置
+    config.SetCLConf(DT_TRUE, "/data/local/tmp", "aura_unit_test"); // 设置OpenCL配置
 #endif
 
 #if defined(AURA_ENABLE_HEXAGON)
-    config.SetHexagonConf(MI_TRUE, MI_TRUE, "aura_hexagon");        // 设置Hexagon配置
+    config.SetHexagonConf(DT_TRUE, DT_TRUE, "aura_hexagon");        // 设置Hexagon配置
 #endif
 
 #if defined(AURA_ENABLE_XTENSA)
-    config.SetXtensaConf(MI_TRUE, "aura_xtensa_pil.so", XtensaPriorityLevel::PRIORITY_HIGH);  // 设置Xtensa配置
+    config.SetXtensaConf(DT_TRUE, "aura_xtensa_pil.so", XtensaPriorityLevel::PRIORITY_HIGH);  // 设置Xtensa配置
 #endif
 
     std::shared_ptr<aura::Context> ctx = std::make_shared<aura::Context>(config);           // 创建上下文
     if (ctx->Initialize() != aura::Status::OK)                      // 初始化上下文
     {
         AURA_LOGE(ctx, "AURA_GAUSSIAN_SAMPLE", "aura::Context::Initialize() failed\n");     // 打印错误信息
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return ctx;
@@ -138,7 +138,7 @@ aura::Status GaussianBlur(aura::Context* ctx)
 int main()
 {
     std::shared_ptr<aura::Context> ctx = CreateContext();
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return -1;
     }

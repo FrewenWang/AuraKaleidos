@@ -9,12 +9,12 @@
 namespace aura
 {
 
-AURA_INLINE HVX_Vector Q6_V_vlalign_safe_VVR(HVX_Vector v_u, HVX_Vector v_v, MI_S32 align)
+AURA_INLINE HVX_Vector Q6_V_vlalign_safe_VVR(HVX_Vector v_u, HVX_Vector v_v, DT_S32 align)
 {
     return (AURA_HVLEN == align) ? v_v : Q6_V_vlalign_VVR(v_u, v_v, align);
 }
 
-AURA_INLINE HVX_Vector Q6_V_valign_safe_VVR(HVX_Vector v_u, HVX_Vector v_v, MI_S32 align)
+AURA_INLINE HVX_Vector Q6_V_valign_safe_VVR(HVX_Vector v_u, HVX_Vector v_v, DT_S32 align)
 {
     return (AURA_HVLEN == align) ? v_u : Q6_V_valign_VVR(v_u, v_v, align);
 }

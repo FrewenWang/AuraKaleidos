@@ -49,8 +49,8 @@ struct AURA_EXPORTS MatDesc
      */
     struct RandRange
     {
-        MI_F32 min; /*!< Minimum value of the range. */
-        MI_F32 max; /*!< Maximum value of the range. */
+        DT_F32 min; /*!< Minimum value of the range. */
+        DT_F32 max; /*!< Maximum value of the range. */
     };
 
     /**
@@ -59,20 +59,20 @@ struct AURA_EXPORTS MatDesc
     struct DerivedParam
     {
         Mat    *base; /*!< Pointer to the base matrix. */
-        MI_F32 alpha; /*!< Alpha parameter for derivation. */
-        MI_F32 beta;  /*!< Beta parameter for derivation. */
+        DT_F32 alpha; /*!< Alpha parameter for derivation. */
+        DT_F32 beta;  /*!< Beta parameter for derivation. */
     };
 
     Type type;        /*!< Type of the matrix. */
     union
     {
-        MI_CHAR      file_path[MAT_FACTORY_MAX_PATH];   /*!< File path for FILE type. */
+        DT_CHAR      file_path[MAT_FACTORY_MAX_PATH];   /*!< File path for FILE type. */
         RandRange    rand_range;                        /*!< Range for RAND type. */
         DerivedParam derived_param;                     /*!< Parameters for DERIVED type. */
     } param;
 
     ElemType elem_type; /*!< Element type of the matrix. */
-    MI_S32   mem_type;  /*!< Memory type of the matrix. */
+    DT_S32   mem_type;  /*!< Memory type of the matrix. */
     Sizes3   sizes;     /*!< Sizes of the matrix. */
     Sizes    strides;   /*!< Strides of the matrix. */
 };
@@ -84,7 +84,7 @@ struct AURA_EXPORTS MatInfo
 {
     MatDesc desc;       /*!< Description of the matrix. */
     Mat     mat;        /*!< Actual matrix. */
-    MI_BOOL available;  /*!< Flag indicating if the matrix is available. */
+    DT_BOOL available;  /*!< Flag indicating if the matrix is available. */
 };
 
 /**
@@ -105,8 +105,8 @@ public:
      * @param seed The seed for the random number generator (default is std::mt19937_64::default_seed).
      */
     MatFactory(Context *ctx,
-               MI_S64 max_mem = 1024,
-               MI_S64 seed = std::mt19937_64::default_seed) : m_ctx(ctx), m_total_mem(0),
+               DT_S64 max_mem = 1024,
+               DT_S64 seed = std::mt19937_64::default_seed) : m_ctx(ctx), m_total_mem(0),
                                                               m_rand_seed(seed), m_rand_engine(m_rand_seed)
     {
         m_max_mem = (max_mem << 20); // convert MB into Byte
@@ -138,7 +138,7 @@ public:
      * @return The empty matrix.
      */
     Mat GetEmptyMat(const ElemType &elem_type, const Sizes3 &sizes, 
-                    MI_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
+                    DT_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
 
     /**
      * @brief Get a matrix with random data.
@@ -152,8 +152,8 @@ public:
      * 
      * @return The matrix with random data.
      */
-    Mat GetRandomMat(MI_F32 min, MI_F32 max, const ElemType &elem_type, const Sizes3 &sizes, 
-                     MI_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
+    Mat GetRandomMat(DT_F32 min, DT_F32 max, const ElemType &elem_type, const Sizes3 &sizes, 
+                     DT_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
 
     /**
      * @brief Get a matrix derived from a base matrix. (dst pixel = alpha * src pixel + beta)
@@ -168,8 +168,8 @@ public:
      * 
      * @return The derived matrix.
      */
-    Mat GetDerivedMat(MI_F32 alpha, MI_F32 beta, const ElemType &elem_type, const Sizes3 &sizes, 
-                      MI_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes(),
+    Mat GetDerivedMat(DT_F32 alpha, DT_F32 beta, const ElemType &elem_type, const Sizes3 &sizes, 
+                      DT_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes(),
                       const std::string &file_path = std::string());
 
     /**
@@ -184,7 +184,7 @@ public:
      * @return The matrix loaded from the file.
      */
     Mat GetFileMat(const std::string &file_path, const ElemType &elem_type, const Sizes3 &sizes, 
-                   MI_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
+                   DT_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
 
     /**
      * @brief Load matrices into the base list from a file.
@@ -198,14 +198,14 @@ public:
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
     Status LoadBaseMat(const std::string &file_path, const ElemType &elem_type, const Sizes3 &sizes, 
-                       MI_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
+                       DT_S32 mem_type = AURA_MEM_DEFAULT, const Sizes &strides = Sizes());
 
     /**
      * @brief Put a Mat object back into the MatFactory's dynamic list.
      *
      * @param mat Reference to the Mat object to be put back into the dynamic list.
      */
-    AURA_VOID PutMats(Mat &mat);
+    DT_VOID PutMats(Mat &mat);
 
     /**
      * @brief Put multiple Mat objects back into the MatFactory's dynamic list.
@@ -214,7 +214,7 @@ public:
      * @param mats Additional Mat objects to be put back into the dynamic list.
      */
     template<typename... Mats>
-    AURA_VOID PutMats(Mat &mat, Mats &&... mats)
+    DT_VOID PutMats(Mat &mat, Mats &&... mats)
     {
         PutMats(mat);
         PutMats(mats...);
@@ -223,22 +223,22 @@ public:
     /**
      * @brief Puts all Mat objects in the MatFactory's dynamic list back for reuse.
      */
-    AURA_VOID PutAllMats();
+    DT_VOID PutAllMats();
 
     /**
      * @brief Clear all matrices from the factory.
      */
-    AURA_VOID Clear();
+    DT_VOID Clear();
 
     /**
      * @brief Print information about matrices in the factory.
      */
-    AURA_VOID PrintInfo();
+    DT_VOID PrintInfo();
 
     /**
      * @brief Check the total memory used by matrices in the factory.
      */
-    AURA_VOID CheckTotalMemory();
+    DT_VOID CheckTotalMemory();
 
 private:
     /**
@@ -249,7 +249,7 @@ private:
      * 
      * @return The pointer to the base matrix if found, otherwise nullptr.
      */
-    Mat* FindBaseMat(const MI_S32 channel, const std::string &file_path);
+    Mat* FindBaseMat(const DT_S32 channel, const std::string &file_path);
 
     /**
      * @brief Find a dynamic matrix based on the provided description.
@@ -288,7 +288,7 @@ private:
      * 
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status CreateMat(Mat &mat, MI_F32 min, MI_F32 max);
+    Status CreateMat(Mat &mat, DT_F32 min, DT_F32 max);
 
     /**
      * @brief Create a matrix by deriving it from a base matrix.
@@ -300,12 +300,12 @@ private:
      * 
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status CreateMat(const Mat &src, Mat &dst, MI_F32 alpha = 1.0f, MI_F32 beta = 0.0f);
+    Status CreateMat(const Mat &src, Mat &dst, DT_F32 alpha = 1.0f, DT_F32 beta = 0.0f);
 
     Context            *m_ctx;              /*!< The context associated with the matrices. */
-    MI_S64             m_max_mem;           /*!< The maximum memory allowed for matrices in megabytes. */
-    MI_S64             m_total_mem;         /*!< The total memory used by matrices in the factory. */
-    MI_S64             m_rand_seed;         /*!< The seed for the random number generator. */
+    DT_S64             m_max_mem;           /*!< The maximum memory allowed for matrices in megabytes. */
+    DT_S64             m_total_mem;         /*!< The total memory used by matrices in the factory. */
+    DT_S64             m_rand_seed;         /*!< The seed for the random number generator. */
     std::mt19937_64    m_rand_engine;       /*!< The random number generator engine. */
     std::mutex         m_handle_lock;       /*!< Mutex for handling concurrent access to the factory. */
     std::list<MatInfo> m_dynamic_list;      /*!< List of dynamic matrices, deletes head matrix when memory exceeds the limit. */

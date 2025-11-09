@@ -15,8 +15,8 @@ public:
     ~AllocatorVtcm()
     {};
 
-    Buffer Allocate(MI_S64 size, MI_S32 align = 0) override; // align != 0 is for single page, size will be aligned to 128 by default
-    AURA_VOID Free(Buffer &) override;
+    Buffer Allocate(DT_S64 size, DT_S32 align = 0) override; // align != 0 is for single page, size will be aligned to 128 by default
+    DT_VOID Free(Buffer &) override;
 
     Status Map(const Buffer &) override;
     Status Unmap(const Buffer &) override;

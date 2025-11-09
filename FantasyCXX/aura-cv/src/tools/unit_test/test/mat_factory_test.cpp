@@ -5,7 +5,7 @@ using namespace aura;
 
 AURA_TEST_PARAM(FactoryParam,
                 ElemType, elem_type,
-                MI_S32,   channel);
+                DT_S32,   channel);
 
 static FactoryParam::TupleTable g_factory_table_none
 {
@@ -37,7 +37,7 @@ public:
         m_factory.PrintInfo();
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32) override
     {
         FactoryParam param(GetParam((index)));
 
@@ -47,24 +47,24 @@ public:
         AURA_LOGD(m_ctx, AURA_TAG, param_str.c_str());
 
         ElemType elem_type = param.elem_type;
-        MI_S32 nchannel     = param.channel;
+        DT_S32 nchannel     = param.channel;
 
         Sizes3 size0{64, 64, nchannel};
 
         Mat mat0 = m_factory.GetFileMat(data_file + "baboon_512x512.rgb", elem_type, size0);
-        AURA_CHECK_EQ(m_ctx, mat0.IsValid(), MI_TRUE, "mat is invalid");
+        AURA_CHECK_EQ(m_ctx, mat0.IsValid(), DT_TRUE, "mat is invalid");
 
         Sizes3 size1{512, 512, nchannel};
         Mat mat1 = m_factory.GetRandomMat(0, 1000, elem_type, size1);
-        AURA_CHECK_EQ(m_ctx, mat1.IsValid(), MI_TRUE, "mat is invalid");
+        AURA_CHECK_EQ(m_ctx, mat1.IsValid(), DT_TRUE, "mat is invalid");
 
         Sizes3 size2{512, 512, nchannel};
         Mat mat2 = m_factory.GetDerivedMat(2, 1, elem_type, size2);
-        AURA_CHECK_EQ(m_ctx, mat2.IsValid(), MI_TRUE, "mat is invalid");
+        AURA_CHECK_EQ(m_ctx, mat2.IsValid(), DT_TRUE, "mat is invalid");
 
         Sizes3 size3{2048, 3060, nchannel};
         Mat mat3 = m_factory.GetEmptyMat(elem_type, size3);
-        AURA_CHECK_EQ(m_ctx, mat3.IsValid(), MI_TRUE, "mat is invalid");
+        AURA_CHECK_EQ(m_ctx, mat3.IsValid(), DT_TRUE, "mat is invalid");
 
         m_factory.PutMats(mat0, mat1, mat2, mat3);
         m_factory.PrintInfo();
@@ -109,7 +109,7 @@ NEW_TESTCASE(unit_test, mat_factory, overflow)
 
     AURA_LOGD(ctx, AURA_TAG, "############################## ADD MAT ##############################\n");
     // Add mat, but not to exceed the memory limit
-    for (MI_S32 i = 0; i < 7; i++)
+    for (DT_S32 i = 0; i < 7; i++)
     {
         AURA_LOGD(ctx, AURA_TAG, "====================> %d\n", i);
         Mat mat0 = mf.GetRandomMat(i, 2 * i, ElemType::U8, Sizes(720, 1080));
@@ -123,7 +123,7 @@ NEW_TESTCASE(unit_test, mat_factory, overflow)
 
     AURA_LOGD(ctx, AURA_TAG, "############################## REUSE MAT ##############################\n");
     // test reusage
-    for (MI_S32 i = 0; i < 7; i++)
+    for (DT_S32 i = 0; i < 7; i++)
     {
         AURA_LOGD(ctx, AURA_TAG, "====================> %d\n", i);
         Mat mat0 = mf.GetRandomMat(i, 2 * i, ElemType::U8, Sizes(720, 1080));
@@ -143,7 +143,7 @@ NEW_TESTCASE(unit_test, mat_factory, overflow)
 
     AURA_LOGD(ctx, AURA_TAG, "############################## OVERFLOW TEST ##############################\n");
     // test overlfow
-    for (MI_S32 i = 7; i < 10; i++)
+    for (DT_S32 i = 7; i < 10; i++)
     {
         AURA_LOGD(ctx, AURA_TAG, "====================> %d\n", i);
         Mat mat0 = mf.GetRandomMat(i, 2 * i, ElemType::U8, Sizes(720, 1080));
@@ -157,7 +157,7 @@ NEW_TESTCASE(unit_test, mat_factory, overflow)
     }
 
     AURA_LOGD(ctx, AURA_TAG, "############################## PutAllMats TEST ##############################\n");
-    for (MI_S32 i = 7; i < 10; i++)
+    for (DT_S32 i = 7; i < 10; i++)
     {
         AURA_LOGD(ctx, AURA_TAG, "====================> %d\n", i);
         Mat mat0 = mf.GetRandomMat(i, 2 * i, ElemType::U8, Sizes(720, 1080));

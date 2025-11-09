@@ -13,7 +13,7 @@ class NormalizeImpl : public OpImpl
 public:
     NormalizeImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta, NormType type);
+    virtual Status SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta, NormType type);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -21,14 +21,14 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
 
     const Array *m_src;
     Array       *m_dst;
-    MI_F32       m_alpha;
-    MI_F32       m_beta;
+    DT_F32       m_alpha;
+    DT_F32       m_beta;
     NormType     m_type;
 };
 
@@ -37,7 +37,7 @@ class NormalizeNone : public NormalizeImpl
 public:
     NormalizeNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta, NormType type) override;
+    Status SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta, NormType type) override;
 
     Status Run() override;
 };
@@ -48,7 +48,7 @@ class NormalizeNeon : public NormalizeImpl
 public:
     NormalizeNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta, NormType type) override;
+    Status SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta, NormType type) override;
 
     Status Run() override;
 };

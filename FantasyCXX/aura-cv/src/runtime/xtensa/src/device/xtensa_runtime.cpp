@@ -11,18 +11,18 @@ namespace aura
 namespace xtensa
 {
 
-MI_S32 VdspRpcCall(const MI_CHAR *name, MI_U8 *param, MI_S32 param_len)
+DT_S32 VdspRpcCall(const DT_CHAR *name, DT_U8 *param, DT_S32 param_len)
 {
-    if (MI_NULL == param)
+    if (DT_NULL == param)
     {
         AURA_XTENSA_LOG("input null\n");
         return AURA_XTENSA_ERROR;
     }
 
-    MI_S32 ret = AURA_XTENSA_ERROR;
+    DT_S32 ret = AURA_XTENSA_ERROR;
 
-    XtensaRpcFuncRegister *ptr = MI_NULL;
-    for (MI_U32 i = 0; i < (sizeof(g_rpc_func_map) / sizeof(g_rpc_func_map[0])); i++)
+    XtensaRpcFuncRegister *ptr = DT_NULL;
+    for (DT_U32 i = 0; i < (sizeof(g_rpc_func_map) / sizeof(g_rpc_func_map[0])); i++)
     {
         if (Strcmp(name, g_rpc_func_map[i].name) == 0)
         {
@@ -31,14 +31,14 @@ MI_S32 VdspRpcCall(const MI_CHAR *name, MI_U8 *param, MI_S32 param_len)
         }
     }
 
-    if ((MI_NULL == ptr) || (MI_NULL == ptr->func))
+    if ((DT_NULL == ptr) || (DT_NULL == ptr->func))
     {
         AURA_XTENSA_LOG("module(%s) do not support\n", name);
         return AURA_XTENSA_ERROR;
     }
 
     XtensaRpcParam rpc_param(param, param_len);
-    ret = (MI_S32)ptr->func(g_symbol_tray->pTMObj, rpc_param);
+    ret = (DT_S32)ptr->func(g_symbol_tray->pTMObj, rpc_param);
     if (AURA_XTENSA_OK != ret)
     {
         AURA_XTENSA_LOG("ptr->call_func failed!\n");

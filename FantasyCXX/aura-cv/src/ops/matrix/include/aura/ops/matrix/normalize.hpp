@@ -56,7 +56,7 @@ public:
      *
      * For more details, please refer to @ref normlizes_details
      */
-    Status SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta, NormType type);
+    Status SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta, NormType type);
 };
 
 /**
@@ -85,7 +85,7 @@ public:
  *
  * @note N is positive integer. Src and dst must have same size and data type.
  */
-AURA_EXPORTS Status INormalize(Context *ctx, const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta, NormType type, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status INormalize(Context *ctx, const Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta, NormType type, const OpTarget &target = OpTarget::Default());
 
 /**
  * @}

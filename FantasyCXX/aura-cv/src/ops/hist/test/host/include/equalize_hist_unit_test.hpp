@@ -25,8 +25,8 @@ AURA_TEST_PARAM(EqualizeHistParam,
 static Status CvEqualizeHist(Context *ctx, Mat &src, Mat &dst)
 {
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
-    MI_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
+    DT_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
     if (src_cv_type != -1 && dst_cv_type != -1)
     {
         cv::Mat cv_src = MatToOpencv(src);
@@ -64,7 +64,7 @@ public:
         }
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         EqualizeHistParam run_param(GetParam((index)));
 
@@ -72,7 +72,7 @@ public:
         Mat dst = m_factory.GetEmptyMat(ElemType::U8, run_param.mat_sizes.m_sizes, AURA_MEM_DEFAULT, run_param.mat_sizes.m_strides);
         Mat ref = m_factory.GetEmptyMat(ElemType::U8, run_param.mat_sizes.m_sizes, AURA_MEM_DEFAULT, run_param.mat_sizes.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;

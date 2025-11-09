@@ -52,7 +52,7 @@ public:
         }
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         TransposeParam run_param(GetParam((index)));
@@ -71,7 +71,7 @@ public:
         Mat ref = m_factory.GetEmptyMat(run_param.elem_type, dst_sz,
                                               AURA_MEM_DEFAULT, run_param.mat_size.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
+        DT_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;

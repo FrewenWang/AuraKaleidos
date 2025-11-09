@@ -14,30 +14,30 @@ namespace aura
 #if defined(AURA_ENABLE_NEON)
 template <typename Tp> struct CvtDstVec;
 
-template <> struct CvtDstVec<MI_U8>  { using VType = uint8x8_t;     };
-template <> struct CvtDstVec<MI_S8>  { using VType = int8x8_t;      };
-template <> struct CvtDstVec<MI_U16> { using VType = uint16x8_t;    };
-template <> struct CvtDstVec<MI_S16> { using VType = int16x8_t;     };
-template <> struct CvtDstVec<MI_U32> { using VType = uint32x4x2_t;  };
-template <> struct CvtDstVec<MI_S32> { using VType = int32x4x2_t;   };
+template <> struct CvtDstVec<DT_U8>  { using VType = uint8x8_t;     };
+template <> struct CvtDstVec<DT_S8>  { using VType = int8x8_t;      };
+template <> struct CvtDstVec<DT_U16> { using VType = uint16x8_t;    };
+template <> struct CvtDstVec<DT_S16> { using VType = int16x8_t;     };
+template <> struct CvtDstVec<DT_U32> { using VType = uint32x4x2_t;  };
+template <> struct CvtDstVec<DT_S32> { using VType = int32x4x2_t;   };
 template <> struct CvtDstVec<MI_F16> { using VType = float16x8_t;   };
-template <> struct CvtDstVec<MI_F32> { using VType = float32x4x2_t; };
+template <> struct CvtDstVec<DT_F32> { using VType = float32x4x2_t; };
 
-template <typename Tp, typename std::enable_if<(std::is_same<Tp, MI_F32>::value)>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<(std::is_same<Tp, DT_F32>::value)>::type* = DT_NULL>
 AURA_ALWAYS_INLINE float32x4x2_t CvtFromF32Pair(const float32x4x2_t &v)
 {
     return v;
 }
 
 #  if defined(AURA_ENABLE_NEON_FP16)
-template <typename Tp, typename std::enable_if<(std::is_same<Tp, MI_F16>::value)>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<(std::is_same<Tp, MI_F16>::value)>::type* = DT_NULL>
 AURA_ALWAYS_INLINE float16x8_t CvtFromF32Pair(const float32x4x2_t &v)
 {
     return neon::vcombine(neon::vcvt<MI_F16>(v.val[0]), neon::vcvt<MI_F16>(v.val[1]));
 }
 #  endif // AURA_ENABLE_NEON_FP16
 
-template <typename Tp, typename std::enable_if<(std::is_same<Tp, MI_S32>::value) || (std::is_same<Tp, MI_U32>::value)>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<(std::is_same<Tp, DT_S32>::value) || (std::is_same<Tp, DT_U32>::value)>::type* = DT_NULL>
 AURA_ALWAYS_INLINE typename CvtDstVec<Tp>::VType CvtFromF32Pair(const float32x4x2_t &v)
 {
     using VType = typename CvtDstVec<Tp>::VType;
@@ -49,7 +49,7 @@ AURA_ALWAYS_INLINE typename CvtDstVec<Tp>::VType CvtFromF32Pair(const float32x4x
     return v2q;
 }
 
-template <typename Tp, typename std::enable_if<(std::is_same<Tp, MI_S16>::value) || (std::is_same<Tp, MI_U16>::value)>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<(std::is_same<Tp, DT_S16>::value) || (std::is_same<Tp, DT_U16>::value)>::type* = DT_NULL>
 AURA_ALWAYS_INLINE typename CvtDstVec<Tp>::VType CvtFromF32Pair(const float32x4x2_t &v)
 {
     using Type  = typename Promote<Tp>::Type;
@@ -60,7 +60,7 @@ AURA_ALWAYS_INLINE typename CvtDstVec<Tp>::VType CvtFromF32Pair(const float32x4x
     return neon::vcombine(neon::vqmovn(v_promote.val[0]), neon::vqmovn(v_promote.val[1]));
 }
 
-template <typename Tp, typename std::enable_if<(std::is_same<Tp, MI_S8>::value) || (std::is_same<Tp, MI_U8>::value)>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<(std::is_same<Tp, DT_S8>::value) || (std::is_same<Tp, DT_U8>::value)>::type* = DT_NULL>
 AURA_ALWAYS_INLINE typename CvtDstVec<Tp>::VType CvtFromF32Pair(const float32x4x2_t &v)
 {
     using Type  = typename Promote<Tp>::Type;
@@ -71,8 +71,8 @@ AURA_ALWAYS_INLINE typename CvtDstVec<Tp>::VType CvtFromF32Pair(const float32x4x
     return neon::vqmovn(v_promote);
 }
 
-template <typename Dt, typename std::enable_if<((sizeof(Dt) < 4))>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID StoreF32PairAs(Dt *p, const float32x4x2_t &v)
+template <typename Dt, typename std::enable_if<((sizeof(Dt) < 4))>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID StoreF32PairAs(Dt *p, const float32x4x2_t &v)
 {
     using VType = typename CvtDstVec<Dt>::VType;
 
@@ -80,8 +80,8 @@ AURA_ALWAYS_INLINE AURA_VOID StoreF32PairAs(Dt *p, const float32x4x2_t &v)
     neon::vstore(p, vq);
 }
 
-template <typename Dt, typename std::enable_if<((sizeof(Dt) == 4))>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID StoreF32PairAs(Dt *p, const float32x4x2_t &v)
+template <typename Dt, typename std::enable_if<((sizeof(Dt) == 4))>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID StoreF32PairAs(Dt *p, const float32x4x2_t &v)
 {
     using VType = typename CvtDstVec<Dt>::VType;
 
@@ -91,12 +91,12 @@ AURA_ALWAYS_INLINE AURA_VOID StoreF32PairAs(Dt *p, const float32x4x2_t &v)
 }
 #endif
 
-AURA_ALWAYS_INLINE MI_BOOL IsPowOf2(MI_S32 n)
+AURA_ALWAYS_INLINE DT_BOOL IsPowOf2(DT_S32 n)
 {
     return n && !(n & (n - 1));
 }
 
-AURA_ALWAYS_INLINE MI_U16 FFTBitReverseU16(MI_U16 value, MI_U8 bit_num)
+AURA_ALWAYS_INLINE DT_U16 FFTBitReverseU16(DT_U16 value, DT_U8 bit_num)
 {
     value = ((value & 0x5555) << 1) | ((value & 0xAAAA) >> 1);
     value = ((value & 0x3333) << 2) | ((value & 0xCCCC) >> 2);
@@ -105,78 +105,78 @@ AURA_ALWAYS_INLINE MI_U16 FFTBitReverseU16(MI_U16 value, MI_U8 bit_num)
     return value >> (16 - bit_num);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID GetReverseIndex(MI_U16 *idx_table, MI_S32 n)
+AURA_ALWAYS_INLINE DT_VOID GetReverseIndex(DT_U16 *idx_table, DT_S32 n)
 {
     if (!IsPowOf2(n))
     {
         return;
     }
 
-    MI_U8 levels = static_cast<MI_U8>(Log2((MI_F32) n));
+    DT_U8 levels = static_cast<DT_U8>(Log2((DT_F32) n));
 
-    for (MI_U16 i = 0; i < n; ++i)
+    for (DT_U16 i = 0; i < n; ++i)
     {
         idx_table[i] = FFTBitReverseU16(i, levels);
     }
 }
 
-template <MI_U8 IS_INVERSE>
-AURA_ALWAYS_INLINE AURA_VOID GetDftExpTable(std::complex<MI_F32> *exp_table, MI_S32 n)
+template <DT_U8 IS_INVERSE>
+AURA_ALWAYS_INLINE DT_VOID GetDftExpTable(std::complex<DT_F32> *exp_table, DT_S32 n)
 {
-    MI_S32 half_n = n / 2;
-    MI_F32 pi_pe = (IS_INVERSE ? 2.0f : -2.0f) * AURA_PI / n;
+    DT_S32 half_n = n / 2;
+    DT_F32 pi_pe = (IS_INVERSE ? 2.0f : -2.0f) * AURA_PI / n;
 
-    for (MI_S32 i = 0; i < half_n; ++i)
+    for (DT_S32 i = 0; i < half_n; ++i)
     {
-        MI_F32 theta = pi_pe * i;
+        DT_F32 theta = pi_pe * i;
         exp_table[i].real(Cos(theta));
         exp_table[i].imag(Sin(theta));
     }
 }
 
-template <MI_U8 IS_INVERSE>
-AURA_ALWAYS_INLINE AURA_VOID GetBlueSteinExpTable(std::complex<MI_F32> *exp_table, MI_S32 n)
+template <DT_U8 IS_INVERSE>
+AURA_ALWAYS_INLINE DT_VOID GetBlueSteinExpTable(std::complex<DT_F32> *exp_table, DT_S32 n)
 {
-    MI_F32 pi_pe = (IS_INVERSE ? 1.0f : -1.0f) * AURA_PI / n;
+    DT_F32 pi_pe = (IS_INVERSE ? 1.0f : -1.0f) * AURA_PI / n;
 
-    for (MI_S32 i = 0; i < n; i++)
+    for (DT_S32 i = 0; i < n; i++)
     {
-        MI_S32 temp = (MI_S32) i * i;
+        DT_S32 temp = (DT_S32) i * i;
         temp %= (2 * n);
-        MI_F32 angle = pi_pe * temp;
+        DT_F32 angle = pi_pe * temp;
         exp_table[i].real(Cos(angle));
         exp_table[i].imag(Sin(angle));
     }
 }
 
-template <typename Tp, MI_U8 IS_INVERSE>
-AURA_VOID DftRadix2RowProcCol1None(const Mat &src, Mat &dst)
+template <typename Tp, DT_U8 IS_INVERSE>
+DT_VOID DftRadix2RowProcCol1None(const Mat &src, Mat &dst)
 {
     Sizes3 sz     = src.GetSizes();
-    MI_S32 height = sz.m_height;
+    DT_S32 height = sz.m_height;
 
-    for (MI_S32 y = 0; y < height; ++y)
+    for (DT_S32 y = 0; y < height; ++y)
     {
         const Tp *src_row = src.Ptr<Tp>(y);
-        MI_F32 *dst_row = dst.Ptr<MI_F32>(y);
+        DT_F32 *dst_row = dst.Ptr<DT_F32>(y);
 
-        dst_row[0] = SaturateCast<MI_F32>(src_row[0]);
-        dst_row[1] = IS_INVERSE ? SaturateCast<MI_F32>(src_row[1]) : 0.0f;
+        dst_row[0] = SaturateCast<DT_F32>(src_row[0]);
+        dst_row[1] = IS_INVERSE ? SaturateCast<DT_F32>(src_row[1]) : 0.0f;
     }
 }
 
-template <typename Tp, MI_U8 IS_INVERSE>
-AURA_VOID DftRadix2RowProcCol2None(const Mat &src, Mat &dst)
+template <typename Tp, DT_U8 IS_INVERSE>
+DT_VOID DftRadix2RowProcCol2None(const Mat &src, Mat &dst)
 {
     Sizes3 sz     = src.GetSizes();
-    MI_S32 height = sz.m_height;
+    DT_S32 height = sz.m_height;
 
     if (IS_INVERSE)
     {
-        for (MI_S32 y = 0; y < height; ++y)
+        for (DT_S32 y = 0; y < height; ++y)
         {
-            const std::complex<MI_F32> *src_row = src.Ptr<std::complex<MI_F32>>(y);
-            std::complex<MI_F32> *dst_row = dst.Ptr<std::complex<MI_F32>>(y);
+            const std::complex<DT_F32> *src_row = src.Ptr<std::complex<DT_F32>>(y);
+            std::complex<DT_F32> *dst_row = dst.Ptr<std::complex<DT_F32>>(y);
 
             dst_row[0] = (src_row[0] + src_row[1]) / 2.0f;
             dst_row[1] = (src_row[0] - src_row[1]) / 2.0f;
@@ -184,31 +184,31 @@ AURA_VOID DftRadix2RowProcCol2None(const Mat &src, Mat &dst)
     }
     else
     {
-        for (MI_S32 y = 0; y < height; ++y)
+        for (DT_S32 y = 0; y < height; ++y)
         {
             const Tp *src_row = src.Ptr<Tp>(y);
-            MI_F32 *dst_row = dst.Ptr<MI_F32>(y);
+            DT_F32 *dst_row = dst.Ptr<DT_F32>(y);
 
-            dst_row[0] = SaturateCast<MI_F32>(src_row[0]) + SaturateCast<MI_F32>(src_row[1]);
+            dst_row[0] = SaturateCast<DT_F32>(src_row[0]) + SaturateCast<DT_F32>(src_row[1]);
             dst_row[1] = 0.0f;
-            dst_row[2] = SaturateCast<MI_F32>(src_row[0]) - SaturateCast<MI_F32>(src_row[1]);
+            dst_row[2] = SaturateCast<DT_F32>(src_row[0]) - SaturateCast<DT_F32>(src_row[1]);
             dst_row[3] = 0.0f;
         }
     }
 }
 
-AURA_ALWAYS_INLINE AURA_VOID ButterflyTransformNone(std::complex<MI_F32> *src, MI_S32 start_level, MI_S32 n,
-                                                  MI_BOOL with_scale, const std::complex<MI_F32> *exp_table)
+AURA_ALWAYS_INLINE DT_VOID ButterflyTransformNone(std::complex<DT_F32> *src, DT_S32 start_level, DT_S32 n,
+                                                  DT_BOOL with_scale, const std::complex<DT_F32> *exp_table)
 {
-    for (MI_S32 size = start_level; size <= n; size *= 2)
+    for (DT_S32 size = start_level; size <= n; size *= 2)
     {
-        MI_S32 half_size = size / 2;
-        MI_S32 table_step = n / size;
-        for (MI_S32 i = 0; i < n; i += size)
+        DT_S32 half_size = size / 2;
+        DT_S32 table_step = n / size;
+        for (DT_S32 i = 0; i < n; i += size)
         {
-            for (MI_S32 j = i, k = 0; j < i + half_size; j++, k += table_step)
+            for (DT_S32 j = i, k = 0; j < i + half_size; j++, k += table_step)
             {
-                std::complex<MI_F32> temp = src[j + half_size] * exp_table[k];
+                std::complex<DT_F32> temp = src[j + half_size] * exp_table[k];
                 src[j + half_size] = src[j] - temp;
                 src[j] += temp;
             }
@@ -217,7 +217,7 @@ AURA_ALWAYS_INLINE AURA_VOID ButterflyTransformNone(std::complex<MI_F32> *src, M
 
     if (with_scale)
     {
-        for (MI_S32 i = 0; i < n; ++i)
+        for (DT_S32 i = 0; i < n; ++i)
         {
             src[i] /= n;
         }
@@ -237,7 +237,7 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
 
@@ -257,8 +257,8 @@ public:
 };
 
 #if defined(AURA_ENABLE_NEON)
-AURA_VOID ButterflyTransformNeon(std::complex<MI_F32> *src, MI_S32 start_level, MI_S32 n, MI_BOOL with_scale,
-                               const std::complex<MI_F32> *dft_exp_table);
+DT_VOID ButterflyTransformNeon(std::complex<DT_F32> *src, DT_S32 start_level, DT_S32 n, DT_BOOL with_scale,
+                               const std::complex<DT_F32> *dft_exp_table);
 
 class DftNeon : public DftImpl
 {
@@ -290,9 +290,9 @@ public:
     static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type);
 
 private:
-    MI_S32                m_buffer_pitch;
-    MI_S32                m_local_buffer_bytes;
-    MI_S32                m_exp_total_bytes;
+    DT_S32                m_buffer_pitch;
+    DT_S32                m_local_buffer_bytes;
+    DT_S32                m_exp_total_bytes;
     std::vector<CLKernel> m_cl_kernels;
     Mat                   m_param;
     CLMem                 m_cl_src;
@@ -308,7 +308,7 @@ class InverseDftImpl : public OpImpl
 public:
     InverseDftImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_BOOL with_scale);
+    virtual Status SetArgs(const Array *src, Array *dst, DT_BOOL with_scale);
 
     Status Initialize() override;
 
@@ -320,14 +320,14 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
 
     const Array *m_src;
     Array       *m_dst;
     Mat         m_mid;
-    MI_S32      m_with_scale;
+    DT_S32      m_with_scale;
 };
 
 class InverseDftNone : public InverseDftImpl
@@ -335,7 +335,7 @@ class InverseDftNone : public InverseDftImpl
 public:
     InverseDftNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_BOOL with_scale) override;
+    Status SetArgs(const Array *src, Array *dst, DT_BOOL with_scale) override;
 
     Status Run() override;
 
@@ -347,7 +347,7 @@ class InverseDftNeon : public InverseDftImpl
 public:
     InverseDftNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_BOOL with_scale) override;
+    Status SetArgs(const Array *src, Array *dst, DT_BOOL with_scale) override;
 
     Status Run() override;
 };
@@ -359,7 +359,7 @@ class InverseDftCL : public InverseDftImpl
 public:
     InverseDftCL(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_BOOL with_scale) override;
+    Status SetArgs(const Array *src, Array *dst, DT_BOOL with_scale) override;
 
     Status Initialize() override;
 
@@ -369,12 +369,12 @@ public:
 
     std::string ToString() const override;
 
-    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, MI_S32 with_scale, MI_BOOL is_dst_c1);
+    static std::vector<CLKernel> GetCLKernels(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, DT_S32 with_scale, DT_BOOL is_dst_c1);
 
 private:
-    MI_S32                m_buffer_pitch;
-    MI_S32                m_local_buffer_bytes;
-    MI_S32                m_exp_total_bytes;
+    DT_S32                m_buffer_pitch;
+    DT_S32                m_local_buffer_bytes;
+    DT_S32                m_exp_total_bytes;
     std::vector<CLKernel> m_cl_kernels;
     Mat                   m_param;
     CLMem                 m_cl_src;

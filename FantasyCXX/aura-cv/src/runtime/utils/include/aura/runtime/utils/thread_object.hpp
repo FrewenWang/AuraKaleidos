@@ -12,7 +12,7 @@
 #  define THREAD_ID                 qurt_thread_t
 #  define THIS_THREAD_ID            qurt_thread_get_id()
 #elif defined(AURA_BUILD_XPLORER)
-#  define  THREAD_ID                MI_S32
+#  define  THREAD_ID                DT_S32
 #  define  THIS_THREAD_ID           0
 #else
 #  define  THREAD_ID                std::thread::id
@@ -69,11 +69,11 @@ public:
     {
         for (auto &id : thread_ids)
         {
-            Tp *new_object = MI_NULL;
+            Tp *new_object = DT_NULL;
 
             new_object = GetObject(id, std::forward<ArgsType>(args)...);
 
-            if (MI_NULL == new_object)
+            if (DT_NULL == new_object)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "Failed to get object.");
             }
@@ -100,18 +100,18 @@ public:
     * 
     * This function searches through a linked list of `Node` nodes to find 
     * an object associated with the specified thread ID. If the object is found, a pointer 
-    * to it is returned; otherwise, `MI_NULL` is returned.
+    * to it is returned; otherwise, `DT_NULL` is returned.
     *
     * @param id The thread identifier. If not provided, defaults to `THIS_THREAD_ID`.
     * 
     * @return Tp* A pointer to the object of type `Tp` associated with the specified thread, 
-    *             or `MI_NULL` if the object is not found.
+    *             or `DT_NULL` if the object is not found.
     */
     Tp* GetObject(const THREAD_ID id = THIS_THREAD_ID)
     {
         // only find
         Node *cur_node = m_first_node.next;
-        while (cur_node != MI_NULL)
+        while (cur_node != DT_NULL)
         {
             if (id == cur_node->thread_id)
             {
@@ -121,7 +121,7 @@ public:
             cur_node = cur_node->next;
         }
 
-        return MI_NULL;
+        return DT_NULL;
     }
 
     /**
@@ -143,7 +143,7 @@ public:
     {
         // 1. find
         Tp *ret_object = GetObject(id);
-        if (ret_object != MI_NULL)
+        if (ret_object != DT_NULL)
         {
             return ret_object;
         }
@@ -156,24 +156,24 @@ public:
 
             Tp *new_object = Create<Tp>(m_ctx, std::forward<ArgsType>(args)...);
 
-            if (MI_NULL == new_object)
+            if (DT_NULL == new_object)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "Failed to create object.");
-                return MI_NULL;
+                return DT_NULL;
             }
 
             Node *new_node = static_cast<Node*>(AURA_ALLOC(m_ctx, sizeof(Node)));
-            if (MI_NULL == new_node)
+            if (DT_NULL == new_node)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "Node create failed.");
                 Delete<Tp>(m_ctx, &new_object);
-                return MI_NULL;
+                return DT_NULL;
             }
             else
             {
                 new_node->thread_id = id;
                 new_node->object    = new_object;
-                new_node->next      = MI_NULL;
+                new_node->next      = DT_NULL;
             }
 
             m_last_node->next = new_node;
@@ -182,17 +182,17 @@ public:
             return new_object;
         }
 
-        return MI_NULL;
+        return DT_NULL;
     }
 
     /**
      * @brief Releases all Tp objects.
      */
-    AURA_VOID Clear()
+    DT_VOID Clear()
     {
         Node *cur_node = m_first_node.next;
 
-        while (cur_node != MI_NULL)
+        while (cur_node != DT_NULL)
         {
             Node *next = cur_node->next;
 
@@ -206,10 +206,10 @@ public:
 private:
     struct Node
     {
-        Node() : object(MI_NULL), next(MI_NULL)
+        Node() : object(DT_NULL), next(DT_NULL)
         {}
 
-        Node(const THREAD_ID id, Tp *data, Node *next_obj = MI_NULL)
+        Node(const THREAD_ID id, Tp *data, Node *next_obj = DT_NULL)
              : thread_id(id), object(data), next(next_obj)
         {}
 

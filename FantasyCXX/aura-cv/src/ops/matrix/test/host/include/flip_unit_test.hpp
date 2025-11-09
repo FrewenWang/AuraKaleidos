@@ -15,9 +15,9 @@ AURA_TEST_PARAM(FlipParam,
                 FlipType,  flip_type,
                 OpTarget,  target);
 
-AURA_INLINE MI_S32 MatrixFlipTypeToOpenCV(FlipType type)
+AURA_INLINE DT_S32 MatrixFlipTypeToOpenCV(FlipType type)
 {
-    MI_S32 ret = 0;
+    DT_S32 ret = 0;
 
     switch (type)
     {
@@ -49,7 +49,7 @@ AURA_INLINE MI_S32 MatrixFlipTypeToOpenCV(FlipType type)
 AURA_INLINE Status CvFlip(Mat &src, Mat &dst, FlipType type)
 {
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 cv_type = MatrixFlipTypeToOpenCV(type);
+    DT_S32 cv_type = MatrixFlipTypeToOpenCV(type);
 
     cv::Mat cv_src = MatToOpencv(src);
     cv::Mat cv_dst = MatToOpencv(dst);
@@ -69,7 +69,7 @@ public:
     MatrixFlipTest(Context *ctx, FlipParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         FlipParam run_param(GetParam((index)));
@@ -79,7 +79,7 @@ public:
         Mat dst = m_factory.GetEmptyMat(run_param.elem_type, run_param.mat_size.m_sizes, AURA_MEM_DEFAULT, run_param.mat_size.m_strides);
         Mat ref = m_factory.GetEmptyMat(run_param.elem_type, run_param.mat_size.m_sizes, AURA_MEM_DEFAULT, run_param.mat_size.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
+        DT_S32 loop_count = stress_count ? stress_count : (TargetType::NONE == run_param.target.m_type ? 5 : 10);
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;

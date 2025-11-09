@@ -20,7 +20,7 @@ using namespace aura;
 AURA_TEST_PARAM(LaplacianParam,
                 MatElemPair, elem_type,
                 MatSize,     mat_size,
-                MI_S32,      ksize,
+                DT_S32,      ksize,
                 BorderType,  border_type,
                 OpTarget,    target);
 
@@ -35,7 +35,7 @@ static Status CvLaplacian(Context *ctx, Mat &src, Mat &dst, LaplacianParam &para
 #if !defined(AURA_BUILD_XPLORER)
     cv::Mat src_mat = MatToOpencv(src);
     cv::Mat ref_mat = MatToOpencv(dst);
-    MI_S32 ddepth   = ElemTypeToOpencv(dst.GetElemType(), 1);
+    DT_S32 ddepth   = ElemTypeToOpencv(dst.GetElemType(), 1);
     cv::Laplacian(src_mat, ref_mat, ddepth, param.ksize, 1.0, 0.0, BorderTypeToOpencv(param.border_type));
 #else
     AURA_UNUSED(dst);
@@ -64,7 +64,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         LaplacianParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -88,7 +88,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         LaplacianParam run_param(GetParam((index)));
@@ -113,12 +113,12 @@ public:
 
         Scalar border_value = Scalar(0, 0, 0, 0);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
-        MI_F64 tolerate = 1.f;
+        DT_F64 tolerate = 1.f;
 
         // run interface
         result.param  = BorderTypeToString(run_param.border_type) + " | ksize:" + std::to_string(run_param.ksize);

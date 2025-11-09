@@ -12,11 +12,11 @@ public:
     AllocatorHeap() : Allocator(AURA_MEM_HEAP, "heap")
     {};
 
-    ~AllocatorHeap(AURA_VOID)
+    ~AllocatorHeap(DT_VOID)
     {};
 
-    Buffer Allocate(MI_S64 size, MI_S32 align = 0) override;
-    AURA_VOID Free(Buffer &) override;
+    Buffer Allocate(DT_S64 size, DT_S32 align = 0) override;
+    DT_VOID Free(Buffer &) override;
 
     Status Map(const Buffer &) override;
     Status Unmap(const Buffer &) override;

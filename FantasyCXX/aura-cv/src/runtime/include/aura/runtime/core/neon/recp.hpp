@@ -22,14 +22,14 @@ DECLFUN(float32x4_t,  float32x4_t,  vrecpeq, f32)
 #undef DECLFUN
 
 template <typename T>
-inline typename std::enable_if<std::is_same<T, MI_F32>::value, float32x2_t>::type
+inline typename std::enable_if<std::is_same<T, DT_F32>::value, float32x2_t>::type
 vrecps(const float32x2_t &v, const float32x2_t &u)
 {
     return vrecps_f32(v, u);
 }
 
 template <typename T>
-inline typename std::enable_if<std::is_same<T, MI_F32>::value, float32x4_t>::type
+inline typename std::enable_if<std::is_same<T, DT_F32>::value, float32x4_t>::type
 vrecps(const float32x4_t &v, const float32x4_t &u)
 {
     return vrecpsq_f32(v, u);

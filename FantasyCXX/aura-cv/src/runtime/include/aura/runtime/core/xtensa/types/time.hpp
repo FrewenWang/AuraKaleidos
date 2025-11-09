@@ -34,10 +34,10 @@ struct AURA_EXPORTS Time
     * @param millisec The millisecond component of the time (default is 0).
     * @param microsec The microsecond component of the time (default is 0).
     */
-    Time(MI_S64 second = 0, MI_S32 millisec = 0, MI_S32 microsec = 0)
+    Time(DT_S64 second = 0, DT_S32 millisec = 0, DT_S32 microsec = 0)
     {
-        MI_S32 ms_carry  = 0;
-        MI_S32 sec_carry = 0;
+        DT_S32 ms_carry  = 0;
+        DT_S32 sec_carry = 0;
 
         ms_carry = microsec / 1000;
         us = microsec % 1000;
@@ -53,7 +53,7 @@ struct AURA_EXPORTS Time
      *
      * @return The time in seconds as a floating-point number.
      */
-    MI_F64 AsSec()
+    DT_F64 AsSec()
     {
         return sec + ms / 1000.0 + us / 1000000.0;
     }
@@ -63,7 +63,7 @@ struct AURA_EXPORTS Time
      *
      * @return The time in milliseconds as a floating-point number.
      */
-    MI_F64 AsMilliSec()
+    DT_F64 AsMilliSec()
     {
         return sec * 1000 + ms + us / 1000.0;
     }
@@ -73,14 +73,14 @@ struct AURA_EXPORTS Time
      *
      * @return The time in microseconds as a 64-bit integer.
      */
-    MI_S64 AsMicroSec()
+    DT_S64 AsMicroSec()
     {
         return sec * 1000000 + ms * 1000 + us;
     }
 
-    MI_S64 sec;  /*!< The second component of the time. */
-    MI_S32 ms;   /*!< The millisecond component of the time. */
-    MI_S32 us;   /*!< The microsecond component of the time. */
+    DT_S64 sec;  /*!< The second component of the time. */
+    DT_S32 ms;   /*!< The millisecond component of the time. */
+    DT_S32 us;   /*!< The microsecond component of the time. */
 };
 
 /**
@@ -91,14 +91,14 @@ struct AURA_EXPORTS Time
  *
  * @return `true` if the Time objects are equal, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator==(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator==(const Time &t0, const Time &t1)
 {
     if (t0.sec == t1.sec && t0.ms == t1.ms && t0.us == t1.us)
     {
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
-    return MI_FALSE;
+    return DT_FALSE;
 }
 
 /**
@@ -109,7 +109,7 @@ AURA_INLINE MI_BOOL operator==(const Time &t0, const Time &t1)
  *
  * @return `true` if the Time objects are not equal, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator!=(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator!=(const Time &t0, const Time &t1)
 {
     return !(t0 == t1);
 }
@@ -122,19 +122,19 @@ AURA_INLINE MI_BOOL operator!=(const Time &t0, const Time &t1)
  *
  * @return `true` if t0 is greater than t1, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator>(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator>(const Time &t0, const Time &t1)
 {
     if (t0.sec != t1.sec)
     {
-        return (t0.sec > t1.sec) ? MI_TRUE : MI_FALSE;
+        return (t0.sec > t1.sec) ? DT_TRUE : DT_FALSE;
     }
 
     if (t0.ms != t1.ms)
     {
-        return (t0.ms > t1.ms) ? MI_TRUE : MI_FALSE;
+        return (t0.ms > t1.ms) ? DT_TRUE : DT_FALSE;
     }
 
-    return (t0.us > t1.us) ? MI_TRUE : MI_FALSE;
+    return (t0.us > t1.us) ? DT_TRUE : DT_FALSE;
 }
 
 /**
@@ -145,7 +145,7 @@ AURA_INLINE MI_BOOL operator>(const Time &t0, const Time &t1)
  *
  * @return `true` if t0 is greater than or equal to t1, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator>=(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator>=(const Time &t0, const Time &t1)
 {
     return (t0 > t1 || t0 == t1);
 }
@@ -158,7 +158,7 @@ AURA_INLINE MI_BOOL operator>=(const Time &t0, const Time &t1)
  *
  * @return `true` if t0 is less than t1, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator<(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator<(const Time &t0, const Time &t1)
 {
     return !(t0 >= t1);
 }
@@ -171,7 +171,7 @@ AURA_INLINE MI_BOOL operator<(const Time &t0, const Time &t1)
  *
  * @return `true` if t0 is less than or equal to t1, `false` otherwise.
  */
-AURA_INLINE MI_BOOL operator<=(const Time &t0, const Time &t1)
+AURA_INLINE DT_BOOL operator<=(const Time &t0, const Time &t1)
 {
     return !(t0 > t1);
 }
@@ -240,11 +240,11 @@ AURA_INLINE Time operator+(const Time &t0, const Time &t1)
 {
     Time sum;
 
-    MI_S32 ms_carry  = 0;
-    MI_S32 sec_carry = 0;
+    DT_S32 ms_carry  = 0;
+    DT_S32 sec_carry = 0;
 
     // us
-    MI_S64 sum_us = t0.us + t1.us;
+    DT_S64 sum_us = t0.us + t1.us;
     if (sum_us >= 1000)
     {
         sum.us = sum_us - 1000;
@@ -256,7 +256,7 @@ AURA_INLINE Time operator+(const Time &t0, const Time &t1)
     }
 
     // ms
-    MI_S64 sum_ms = t0.ms + t1.ms + ms_carry;
+    DT_S64 sum_ms = t0.ms + t1.ms + ms_carry;
     if (sum_ms >= 1000)
     {
         sum.ms = sum_ms - 1000;

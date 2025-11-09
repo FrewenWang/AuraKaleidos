@@ -5,19 +5,19 @@
 namespace aura
 {
 
-static Status CvtBgr2BgraNeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status CvtBgr2BgraNeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width       = src.GetSizes().m_width;
-    MI_S32 width_align = width & (-16);
+    DT_S32 width       = src.GetSizes().m_width;
+    DT_S32 width_align = width & (-16);
 
     uint8x16x4_t v4qu8_dst;
     neon::vdup(v4qu8_dst.val[3], 255);
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8 *dst_row       = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8 *dst_row       = dst.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0, ix = 0, ox = 0;
+        DT_S32 x = 0, ix = 0, ox = 0;
         for (; x < width_align; x += 16, ix += 48, ox += 64)
         {
 LOOP_BODY:
@@ -57,13 +57,13 @@ Status CvtBgr2BgraNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &t
     }
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 height = src.GetSizes().m_height;
     if (wp->ParallelFor(0, height, CvtBgr2BgraNeonImpl, std::cref(src), std::ref(dst)) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "ParallelFor run failed");
@@ -73,18 +73,18 @@ Status CvtBgr2BgraNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &t
     return Status::OK;
 }
 
-static Status CvtBgra2BgrNeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status CvtBgra2BgrNeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width        = src.GetSizes().m_width;
-    MI_S32 width_align  = width & (-16);
+    DT_S32 width        = src.GetSizes().m_width;
+    DT_S32 width_align  = width & (-16);
 
     uint8x16x3_t v3qu8_dst;
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8 *dst_row       = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8 *dst_row       = dst.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0, ix = 0, ox = 0;
+        DT_S32 x = 0, ix = 0, ox = 0;
         for (; x < width_align; x += 16, ix += 64, ox += 48)
         {
 LOOP_BODY:
@@ -124,13 +124,13 @@ Status CvtBgra2BgrNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &t
     }
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 height = src.GetSizes().m_height;
     if (wp->ParallelFor(0, height, CvtBgra2BgrNeonImpl, std::cref(src), std::ref(dst)) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "ParallelFor run failed");
@@ -140,17 +140,17 @@ Status CvtBgra2BgrNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &t
     return Status::OK;
 }
 
-static Status CvtBgr2RgbNeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status CvtBgr2RgbNeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width        = src.GetSizes().m_width;
-    MI_S32 width_align  = width & (-16);
+    DT_S32 width        = src.GetSizes().m_width;
+    DT_S32 width_align  = width & (-16);
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8 *dst_row       = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8 *dst_row       = dst.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align * 3; x += 48)
         {
 LOOP_BODY:
@@ -187,13 +187,13 @@ Status CvtBgr2RgbNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &ta
     }
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 height = src.GetSizes().m_height;
     if (wp->ParallelFor(0, height, CvtBgr2RgbNeonImpl, std::cref(src), std::ref(dst)) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(ctx, "ParallelFor run failed");
@@ -203,31 +203,31 @@ Status CvtBgr2RgbNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &ta
     return Status::OK;
 }
 
-template <MI_S32 IC>
-static Status CvtBgr2GrayNeonImpl(const Mat &src, Mat &dst, MI_BOOL swapb, MI_S32 start_row, MI_S32 end_row)
+template <DT_S32 IC>
+static Status CvtBgr2GrayNeonImpl(const Mat &src, Mat &dst, DT_BOOL swapb, DT_S32 start_row, DT_S32 end_row)
 {
-    using MVqType = typename neon::MQVector<MI_U8, IC>::MVType;
+    using MVqType = typename neon::MQVector<DT_U8, IC>::MVType;
 
-    MI_S32 width       = src.GetSizes().m_width;
-    MI_S32 ichannel    = src.GetSizes().m_channel;
-    MI_S32 width_align = width & (-16);
-    MI_S32 ioffset     = ichannel * 16;
+    DT_S32 width       = src.GetSizes().m_width;
+    DT_S32 ichannel    = src.GetSizes().m_channel;
+    DT_S32 width_align = width & (-16);
+    DT_S32 ioffset     = ichannel * 16;
 
-    MI_U16 b_coeff = Bgr2GrayParam::BC;
-    MI_U16 g_coeff = Bgr2GrayParam::GC;
-    MI_U16 r_coeff = Bgr2GrayParam::RC;
+    DT_U16 b_coeff = Bgr2GrayParam::BC;
+    DT_U16 g_coeff = Bgr2GrayParam::GC;
+    DT_U16 r_coeff = Bgr2GrayParam::RC;
     if (swapb)
     {
         Swap(b_coeff, r_coeff);
     }
 
     MVqType mvqu8_src;
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8 *dst_row       = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8 *dst_row       = dst.Ptr<DT_U8>(y);
 
-        MI_S32 ix = 0, ox = 0;
+        DT_S32 ix = 0, ox = 0;
         for (; ox < width_align; ix += ioffset, ox += 16)
         {
 LOOP_BODY:
@@ -277,7 +277,7 @@ LOOP_BODY:
     return Status::OK;
 }
 
-Status CvtBgr2GrayNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, const OpTarget &target)
+Status CvtBgr2GrayNeon(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapb, const OpTarget &target)
 {
     AURA_UNUSED(target);
     Status ret = Status::ERROR;
@@ -295,14 +295,14 @@ Status CvtBgr2GrayNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, co
     }
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 ichannel = src.GetSizes().m_channel;
-    MI_S32 height   = src.GetSizes().m_height;
+    DT_S32 ichannel = src.GetSizes().m_channel;
+    DT_S32 height   = src.GetSizes().m_height;
 
     switch (ichannel)
     {
@@ -341,18 +341,18 @@ Status CvtBgr2GrayNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapb, co
     AURA_RETURN(ctx, ret);
 }
 
-static Status CvtGray2BgrNeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status CvtGray2BgrNeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width       = src.GetSizes().m_width;
-    MI_S32 width_align = width & (-16);
+    DT_S32 width       = src.GetSizes().m_width;
+    DT_S32 width_align = width & (-16);
 
     uint8x16x3_t v3qu8_dst;
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8 *dst_row       = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8 *dst_row       = dst.Ptr<DT_U8>(y);
 
-        MI_S32 ix = 0, ox = 0;
+        DT_S32 ix = 0, ox = 0;
         for (; ix < width_align; ix += 16, ox += 48)
         {
 LOOP_BODY:
@@ -373,19 +373,19 @@ LOOP_BODY:
     return Status::OK;
 }
 
-static Status CvtGray2BgraNeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status CvtGray2BgraNeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width       = src.GetSizes().m_width;
-    MI_S32 width_align = width & (-16);
+    DT_S32 width       = src.GetSizes().m_width;
+    DT_S32 width_align = width & (-16);
 
     uint8x16x4_t v4qu8_dst;
     neon::vdup(v4qu8_dst.val[3], 255);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
-        MI_U8 *dst_row       = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
+        DT_U8 *dst_row       = dst.Ptr<DT_U8>(y);
 
-        MI_S32 ix = 0, ox = 0;
+        DT_S32 ix = 0, ox = 0;
         for (; ix < width_align; ix += 16, ox += 64)
         {
 LOOP_BODY:
@@ -424,14 +424,14 @@ Status CvtGray2BgrNeon(Context *ctx, const Mat &src, Mat &dst, const OpTarget &t
     }
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return ret;
     }
 
-    MI_S32 ochannel = dst.GetSizes().m_channel;
-    MI_S32 height   = src.GetSizes().m_height;
+    DT_S32 ochannel = dst.GetSizes().m_channel;
+    DT_S32 height   = src.GetSizes().m_height;
     switch (ochannel)
     {
         case 3:

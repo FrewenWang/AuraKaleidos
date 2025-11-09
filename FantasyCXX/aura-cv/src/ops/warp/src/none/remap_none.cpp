@@ -10,8 +10,8 @@
 namespace aura
 {
 
-// save MI_F32 table
-static MI_U32 bn_tab_f[REMAP_INTER_TAB_SIZE2 << 2] =
+// save DT_F32 table
+static DT_U32 bn_tab_f[REMAP_INTER_TAB_SIZE2 << 2] =
 {
     0x3f800000, 0x00000000, 0x00000000, 0x00000000, 0x3f780000, 0x3d000000, 0x00000000, 0x00000000, 0x3f700000, 0x3d800000, 0x00000000, 0x00000000, 0x3f680000, 0x3dc00000, 0x00000000, 0x00000000,
     0x3f600000, 0x3e000000, 0x00000000, 0x00000000, 0x3f580000, 0x3e200000, 0x00000000, 0x00000000, 0x3f500000, 0x3e400000, 0x00000000, 0x00000000, 0x3f480000, 0x3e600000, 0x00000000, 0x00000000,
@@ -271,8 +271,8 @@ static MI_U32 bn_tab_f[REMAP_INTER_TAB_SIZE2 << 2] =
     0x3b800000, 0x3ce00000, 0x3df80000, 0x3f590000, 0x3b400000, 0x3ce80000, 0x3dba0000, 0x3f60c000, 0x3b000000, 0x3cf00000, 0x3d780000, 0x3f688000, 0x3a800000, 0x3cf80000, 0x3cf80000, 0x3f704000,
 };
 
-// save MI_S16 table
-static MI_U16 bn_tab_i[REMAP_INTER_TAB_SIZE2 << 2]
+// save DT_S16 table
+static DT_U16 bn_tab_i[REMAP_INTER_TAB_SIZE2 << 2]
 {
     0x7fff, 0x0000, 0x0000, 0x0000, 0x7c00, 0x0400, 0x0000, 0x0000, 0x7800, 0x0800, 0x0000, 0x0000, 0x7400, 0x0c00, 0x0000, 0x0000, 0x7000, 0x1000, 0x0000, 0x0000, 0x6c00, 0x1400, 0x0000, 0x0000, 0x6800, 0x1800, 0x0000, 0x0000, 0x6400, 0x1c00, 0x0000, 0x0000,
     0x6000, 0x2000, 0x0000, 0x0000, 0x5c00, 0x2400, 0x0000, 0x0000, 0x5800, 0x2800, 0x0000, 0x0000, 0x5400, 0x2c00, 0x0000, 0x0000, 0x5000, 0x3000, 0x0000, 0x0000, 0x4c00, 0x3400, 0x0000, 0x0000, 0x4800, 0x3800, 0x0000, 0x0000, 0x4400, 0x3c00, 0x0000, 0x0000,
@@ -404,8 +404,8 @@ static MI_U16 bn_tab_i[REMAP_INTER_TAB_SIZE2 << 2]
     0x0100, 0x0300, 0x1f00, 0x5d00, 0x00e0, 0x0320, 0x1b20, 0x60e0, 0x00c0, 0x0340, 0x1740, 0x64c0, 0x00a0, 0x0360, 0x1360, 0x68a0, 0x0080, 0x0380, 0x0f80, 0x6c80, 0x0060, 0x03a0, 0x0ba0, 0x7060, 0x0040, 0x03c0, 0x07c0, 0x7440, 0x0020, 0x03e0, 0x03e0, 0x7820,
 };
 
-// save MI_F32 table
-static MI_U32 cu_tab_f[REMAP_INTER_TAB_SIZE2 << 4]
+// save DT_F32 table
+static DT_U32 cu_tab_f[REMAP_INTER_TAB_SIZE2 << 4]
 {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x3f800000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x80000000, 0x00000000, 0x00000000, 0x80000000, 0xbcb43000, 0x3f7f7280, 0x3ccbb000, 0xba3a0000, 0x80000000, 0x00000000, 0x00000000, 0x80000000, 0x80000000, 0x00000000, 0x00000000, 0x80000000,
@@ -1433,8 +1433,8 @@ static MI_U32 cu_tab_f[REMAP_INTER_TAB_SIZE2 << 4]
     0x35072400, 0xb793fde0, 0xba399931, 0x3782eae0, 0xb793fde0, 0x3a221099, 0x3ccb3f6a, 0xba0f5df1, 0xba399931, 0x3ccb3f6a, 0x3f7ee54e, 0xbcb3cc67, 0x3782eae0, 0xba0f5df1, 0xbcb3cc67, 0x39fda712,
 };
 
-// save MI_S16 table
-static MI_U16 cu_tab_i[REMAP_INTER_TAB_SIZE2 << 4]
+// save DT_S16 table
+static DT_U16 cu_tab_i[REMAP_INTER_TAB_SIZE2 << 4]
 {
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x7fff, 0x0000, 0x0000, 0x0000, 0x0000, 0x0001, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xfd2f, 0x7fb9, 0x032f, 0xffe9, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
     0x0000, 0x0000, 0x0000, 0x0000, 0xfaba, 0x7eea, 0x06b6, 0xffa6, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xf89c, 0x7d9a, 0x0a8e, 0xff3c, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -1951,40 +1951,40 @@ static MI_U16 cu_tab_i[REMAP_INTER_TAB_SIZE2 << 4]
 
 };
 
-static AURA_VOID* InitTab2D(ElemType elem_type, InterpType interp_type)
+static DT_VOID* InitTab2D(ElemType elem_type, InterpType interp_type)
 {
     if (InterpType::LINEAR == interp_type)
     {
-        return ((ElemType::U8 == elem_type) ? (AURA_VOID*)bn_tab_i : (AURA_VOID*)bn_tab_f);
+        return ((ElemType::U8 == elem_type) ? (DT_VOID*)bn_tab_i : (DT_VOID*)bn_tab_f);
     }
 
     if (interp_type == InterpType::CUBIC)
     {
-        return ((ElemType::U8 == elem_type) ? (AURA_VOID*)cu_tab_i : (AURA_VOID*)cu_tab_f);
+        return ((ElemType::U8 == elem_type) ? (DT_VOID*)cu_tab_i : (DT_VOID*)cu_tab_f);
     }
 
-    return MI_NULL;
+    return DT_NULL;
 }
 
 template <typename Tp>
 struct RemapTraits
 {
-    using WeightType = typename std::conditional<std::is_same<Tp, MI_U8>::value, MI_S16, MI_F32>::type;
-    using SumType    = typename std::conditional<std::is_same<Tp, MI_U8>::value, MI_S32, MI_F32>::type;
+    using WeightType = typename std::conditional<std::is_same<Tp, DT_U8>::value, DT_S16, DT_F32>::type;
+    using SumType    = typename std::conditional<std::is_same<Tp, DT_U8>::value, DT_S32, DT_F32>::type;
 
 #if defined(AURA_BUILD_HOST)
-    using InterType = typename std::conditional<std::is_same<Tp, MI_F16>::value, MI_F32, Tp>::type;
+    using InterType = typename std::conditional<std::is_same<Tp, MI_F16>::value, DT_F32, Tp>::type;
 #else
     using InterType   = Tp;
 #endif
 
-    static constexpr MI_U32 Q = std::is_same<Tp, MI_U8>::value ? 15 : 0;
+    static constexpr DT_U32 Q = std::is_same<Tp, DT_U8>::value ? 15 : 0;
 };
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<(BorderType::CONSTANT == BORDER_TYPE)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID RemapNnBorderCore(const Tp *src_row, Tp *dst_row, MI_S32 x, MI_S32 idx, MI_S32 idy, MI_S32 height,
-                                             MI_S32 width, MI_S32 istep, const std::vector<Tp> &border_value)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<(BorderType::CONSTANT == BORDER_TYPE)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID RemapNnBorderCore(const Tp *src_row, Tp *dst_row, DT_S32 x, DT_S32 idx, DT_S32 idy, DT_S32 height,
+                                             DT_S32 width, DT_S32 istep, const std::vector<Tp> &border_value)
 {
     AURA_UNUSED(src_row);
     AURA_UNUSED(idx);
@@ -1993,33 +1993,33 @@ AURA_ALWAYS_INLINE AURA_VOID RemapNnBorderCore(const Tp *src_row, Tp *dst_row, M
     AURA_UNUSED(width);
     AURA_UNUSED(istep);
 
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         dst_row[x * C + ch] = border_value[ch];
     }
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<(BorderType::CONSTANT != BORDER_TYPE)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID RemapNnBorderCore(const Tp *src_row, Tp *dst_row, MI_S32 x, MI_S32 idx, MI_S32 idy, MI_S32 height,
-                                             MI_S32 width, MI_S32 istep, const std::vector<Tp> &border_value)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<(BorderType::CONSTANT != BORDER_TYPE)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID RemapNnBorderCore(const Tp *src_row, Tp *dst_row, DT_S32 x, DT_S32 idx, DT_S32 idy, DT_S32 height,
+                                             DT_S32 width, DT_S32 istep, const std::vector<Tp> &border_value)
 {
     AURA_UNUSED(border_value);
 
-    MI_S32 idx_new = GetBorderIdx<BORDER_TYPE>(idx, width);
-    MI_S32 idy_new = GetBorderIdx<BORDER_TYPE>(idy, height);
+    DT_S32 idx_new = GetBorderIdx<BORDER_TYPE>(idx, width);
+    DT_S32 idy_new = GetBorderIdx<BORDER_TYPE>(idy, height);
 
-    MI_S32 offset = idy_new * istep + idx_new * C;
-    for (MI_S32 ch = 0; ch < C; ch++)
+    DT_S32 offset = idy_new * istep + idx_new * C;
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         dst_row[x * C + ch] = src_row[offset + ch];
     }
 }
 
-template <typename Tp, typename MapType, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<(std::is_same<MapType, MI_F32>::value || std::is_same<MapType, MI_S16>::value)>::type* = MI_NULL>
+template <typename Tp, typename MapType, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<(std::is_same<MapType, DT_F32>::value || std::is_same<MapType, DT_S16>::value)>::type* = DT_NULL>
 static Status RemapNnNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &map, const std::vector<Tp> &border_value,
-                              MI_S32 start_width, MI_S32 end_width, MI_S32 start_row, MI_S32 end_row)
+                              DT_S32 start_width, DT_S32 end_width, DT_S32 start_row, DT_S32 end_row)
 {
     if (map.GetSizes().m_channel != 2)
     {
@@ -2028,28 +2028,28 @@ static Status RemapNnNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat 
     }
 
     Sizes3 isizes      = src.GetSizes();
-    MI_U16 iheight     = isizes.m_height;
-    MI_U16 iwidth      = isizes.m_width;
-    MI_S32 istep       = src.GetStrides().m_width / ElemTypeSize(src.GetElemType());
+    DT_U16 iheight     = isizes.m_height;
+    DT_U16 iwidth      = isizes.m_width;
+    DT_S32 istep       = src.GetStrides().m_width / ElemTypeSize(src.GetElemType());
     const Tp *src_data = src.Ptr<Tp>(0);
-    MI_BOOL is_block   = map.GetSizes().m_height != dst.GetSizes().m_height;
+    DT_BOOL is_block   = map.GetSizes().m_height != dst.GetSizes().m_height;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         Tp            *dst_row = dst.Ptr<Tp>(y);
         const MapType *map_row = is_block ? map.Ptr<MapType>(y - start_row) : map.Ptr<MapType>(y);
 
-        MI_S16 idx, idy;
-        MI_S32 offset;
-        for (MI_S32 x = start_width; x < end_width; x++)
+        DT_S16 idx, idy;
+        DT_S32 offset;
+        for (DT_S32 x = start_width; x < end_width; x++)
         {
-            idx = SaturateCast<MI_S16>(map_row[(x - start_width) << 1]);
-            idy = SaturateCast<MI_S16>(map_row[((x - start_width) << 1) + 1]);
+            idx = SaturateCast<DT_S16>(map_row[(x - start_width) << 1]);
+            idy = SaturateCast<DT_S16>(map_row[((x - start_width) << 1) + 1]);
 
-            if ((MI_U16)idx < iwidth && (MI_U16)idy < iheight)
+            if ((DT_U16)idx < iwidth && (DT_U16)idy < iheight)
             {
                 offset = idy * istep + idx * C;
-                for (MI_S32 ch = 0; ch < C; ch++)
+                for (DT_S32 ch = 0; ch < C; ch++)
                 {
                     dst_row[x * C + ch] = src_data[offset + ch];
                 }
@@ -2064,10 +2064,10 @@ static Status RemapNnNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat 
     return Status::OK;
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<(BorderType::CONSTANT == BORDER_TYPE)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID RemapBnBorderCore(const Tp *src_row, Tp *dst_row, MI_S32 x, MI_S32 idx, MI_S32 idy, AURA_VOID *bn_tab,
-                                             MI_S32 height, MI_S32 width, MI_S32 istep, const std::vector<Tp> &border_value)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<(BorderType::CONSTANT == BORDER_TYPE)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID RemapBnBorderCore(const Tp *src_row, Tp *dst_row, DT_S32 x, DT_S32 idx, DT_S32 idy, DT_VOID *bn_tab,
+                                             DT_S32 height, DT_S32 width, DT_S32 istep, const std::vector<Tp> &border_value)
 {
     using WeightType = typename RemapTraits<Tp>::WeightType;
     using SumType    = typename RemapTraits<Tp>::SumType;
@@ -2077,19 +2077,19 @@ AURA_ALWAYS_INLINE AURA_VOID RemapBnBorderCore(const Tp *src_row, Tp *dst_row, M
 
     if (idx + 1 < 0 || idx >= width || idy + 1 < 0 || idy >= height)
     {
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             dst_row[x * C + ch] = border_value[ch];
         }
     }
     else
     {
-        MI_S32 idx0_new = GetBorderIdx<BORDER_TYPE>(idx,     width);
-        MI_S32 idx1_new = GetBorderIdx<BORDER_TYPE>(idx + 1, width);
-        MI_S32 idy0_new = GetBorderIdx<BORDER_TYPE>(idy,     height);
-        MI_S32 idy1_new = GetBorderIdx<BORDER_TYPE>(idy + 1, height);
+        DT_S32 idx0_new = GetBorderIdx<BORDER_TYPE>(idx,     width);
+        DT_S32 idx1_new = GetBorderIdx<BORDER_TYPE>(idx + 1, width);
+        DT_S32 idy0_new = GetBorderIdx<BORDER_TYPE>(idy,     height);
+        DT_S32 idy1_new = GetBorderIdx<BORDER_TYPE>(idy + 1, height);
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             Tp value00  = idx0_new >= 0 && idy0_new >= 0 ? src_row[idy0_new * istep + idx0_new * C + ch] : border_value[ch];
             Tp value01  = idx1_new >= 0 && idy0_new >= 0 ? src_row[idy0_new * istep + idx1_new * C + ch] : border_value[ch];
@@ -2104,10 +2104,10 @@ AURA_ALWAYS_INLINE AURA_VOID RemapBnBorderCore(const Tp *src_row, Tp *dst_row, M
     }
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<(BorderType::CONSTANT != BORDER_TYPE)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID RemapBnBorderCore(const Tp *src_row, Tp *dst_row, MI_S32 x, MI_S32 idx, MI_S32 idy, AURA_VOID *bn_tab,
-                                             MI_S32 height, MI_S32 width, MI_S32 istep, const std::vector<Tp> &border_value)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<(BorderType::CONSTANT != BORDER_TYPE)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID RemapBnBorderCore(const Tp *src_row, Tp *dst_row, DT_S32 x, DT_S32 idx, DT_S32 idy, DT_VOID *bn_tab,
+                                             DT_S32 height, DT_S32 width, DT_S32 istep, const std::vector<Tp> &border_value)
 {
     AURA_UNUSED(border_value);
 
@@ -2117,12 +2117,12 @@ AURA_ALWAYS_INLINE AURA_VOID RemapBnBorderCore(const Tp *src_row, Tp *dst_row, M
 
     WeightType *wtab = (WeightType *)bn_tab;
 
-    MI_S32 idx0_new = GetBorderIdx<BORDER_TYPE>(idx,     width);
-    MI_S32 idx1_new = GetBorderIdx<BORDER_TYPE>(idx + 1, width);
-    MI_S32 idy0_new = GetBorderIdx<BORDER_TYPE>(idy,     height);
-    MI_S32 idy1_new = GetBorderIdx<BORDER_TYPE>(idy + 1, height);
+    DT_S32 idx0_new = GetBorderIdx<BORDER_TYPE>(idx,     width);
+    DT_S32 idx1_new = GetBorderIdx<BORDER_TYPE>(idx + 1, width);
+    DT_S32 idy0_new = GetBorderIdx<BORDER_TYPE>(idy,     height);
+    DT_S32 idy1_new = GetBorderIdx<BORDER_TYPE>(idy + 1, height);
 
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         SumType sum = (InterType)(src_row[idy0_new * istep + idx0_new * C + ch]) * wtab[0] +
                       (InterType)(src_row[idy0_new * istep + idx1_new * C + ch]) * wtab[1] +
@@ -2133,10 +2133,10 @@ AURA_ALWAYS_INLINE AURA_VOID RemapBnBorderCore(const Tp *src_row, Tp *dst_row, M
     }
 }
 
-template <typename Tp, typename MapType, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<(std::is_same<MapType, MI_F32>::value || std::is_same<MapType, MI_S16>::value)>::type* = MI_NULL>
-static Status RemapBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &map, AURA_VOID *bn_tab, const std::vector<Tp> &border_value,
-                              MI_S32 start_width, MI_S32 end_width, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, typename MapType, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<(std::is_same<MapType, DT_F32>::value || std::is_same<MapType, DT_S16>::value)>::type* = DT_NULL>
+static Status RemapBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &map, DT_VOID *bn_tab, const std::vector<Tp> &border_value,
+                              DT_S32 start_width, DT_S32 end_width, DT_S32 start_row, DT_S32 end_row)
 {
     if (map.GetSizes().m_channel != 2)
     {
@@ -2151,38 +2151,38 @@ static Status RemapBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat 
     const WeightType *wtab = (const WeightType *)bn_tab;
 
     Sizes3 isizes      = src.GetSizes();
-    MI_S32 iheight     = isizes.m_height;
-    MI_S32 iwidth      = isizes.m_width;
-    MI_S32 istep       = src.GetStrides().m_width / ElemTypeSize(src.GetElemType());
-    MI_BOOL is_block   = map.GetSizes().m_height != dst.GetSizes().m_height;
+    DT_S32 iheight     = isizes.m_height;
+    DT_S32 iwidth      = isizes.m_width;
+    DT_S32 istep       = src.GetStrides().m_width / ElemTypeSize(src.GetElemType());
+    DT_BOOL is_block   = map.GetSizes().m_height != dst.GetSizes().m_height;
     const Tp *src_data = src.Ptr<Tp>(0);
 
-    MI_S16 idx, idy;
-    MI_U16 idw;
+    DT_S16 idx, idy;
+    DT_U16 idw;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         Tp            *dst_row = dst.Ptr<Tp>(y);
         const MapType *map_row = is_block ? map.Ptr<MapType>(y - start_row) : map.Ptr<MapType>(y);
 
-        for (MI_S32 x = start_width; x < end_width; x++)
+        for (DT_S32 x = start_width; x < end_width; x++)
         {
-            MI_S32 new_x = x - start_width;
-            MI_S32 val_x = Round((MI_F32)map_row[new_x << 1] * REMAP_INTER_TAB_SIZE);
-            MI_S32 val_y = Round((MI_F32)map_row[(new_x << 1) + 1] * REMAP_INTER_TAB_SIZE);
-            MI_S32 val_a = (val_y & (REMAP_INTER_TAB_SIZE - 1)) * REMAP_INTER_TAB_SIZE + (val_x & (REMAP_INTER_TAB_SIZE - 1));
-            idx          = SaturateCast<MI_S16>(val_x >> REMAP_SCALE_BITS_HALF);
-            idy          = SaturateCast<MI_S16>(val_y >> REMAP_SCALE_BITS_HALF);
-            idw          = (MI_U16)(val_a & (REMAP_INTER_TAB_SIZE2 - 1)) << 2;
+            DT_S32 new_x = x - start_width;
+            DT_S32 val_x = Round((DT_F32)map_row[new_x << 1] * REMAP_INTER_TAB_SIZE);
+            DT_S32 val_y = Round((DT_F32)map_row[(new_x << 1) + 1] * REMAP_INTER_TAB_SIZE);
+            DT_S32 val_a = (val_y & (REMAP_INTER_TAB_SIZE - 1)) * REMAP_INTER_TAB_SIZE + (val_x & (REMAP_INTER_TAB_SIZE - 1));
+            idx          = SaturateCast<DT_S16>(val_x >> REMAP_SCALE_BITS_HALF);
+            idy          = SaturateCast<DT_S16>(val_y >> REMAP_SCALE_BITS_HALF);
+            idw          = (DT_U16)(val_a & (REMAP_INTER_TAB_SIZE2 - 1)) << 2;
 
             WeightType w00 = wtab[idw + 0];
             WeightType w01 = wtab[idw + 1];
             WeightType w10 = wtab[idw + 2];
             WeightType w11 = wtab[idw + 3];
 
-            if (((MI_U16)idx + 1) < iwidth && ((MI_U16)idy + 1) < iheight)
+            if (((DT_U16)idx + 1) < iwidth && ((DT_U16)idy + 1) < iheight)
             {
-                for (MI_S32 ch = 0; ch < C; ch++)
+                for (DT_S32 ch = 0; ch < C; ch++)
                 {
                     SumType sum = (InterType)src_data[idy * istep + idx * C + ch] * w00 +
                                   (InterType)src_data[idy * istep + (idx + 1) * C + ch] * w01 +
@@ -2194,7 +2194,7 @@ static Status RemapBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat 
             }
             else
             {
-                AURA_VOID *wtab_cur = (AURA_VOID*)(wtab + idw);
+                DT_VOID *wtab_cur = (DT_VOID*)(wtab + idw);
                 RemapBnBorderCore<Tp, BORDER_TYPE, C>(src_data, dst_row, x, idx, idy, wtab_cur,
                                                       iheight, iwidth, istep, border_value);
             }
@@ -2204,10 +2204,10 @@ static Status RemapBnNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat 
     return Status::OK;
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<(BorderType::CONSTANT == BORDER_TYPE)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID RemapCuBorderCore(const Tp *src_row, Tp *dst_row, MI_S32 x, MI_S32 idx, MI_S32 idy, AURA_VOID *bn_tab,
-                                             MI_S32 height, MI_S32 width, MI_S32 istep, const std::vector<Tp> &border_value)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<(BorderType::CONSTANT == BORDER_TYPE)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID RemapCuBorderCore(const Tp *src_row, Tp *dst_row, DT_S32 x, DT_S32 idx, DT_S32 idy, DT_VOID *bn_tab,
+                                             DT_S32 height, DT_S32 width, DT_S32 istep, const std::vector<Tp> &border_value)
 {
     using WeightType = typename RemapTraits<Tp>::WeightType;
     using SumType    = typename RemapTraits<Tp>::SumType;
@@ -2217,24 +2217,24 @@ AURA_ALWAYS_INLINE AURA_VOID RemapCuBorderCore(const Tp *src_row, Tp *dst_row, M
 
     if (idx + 3 < 0 || idx >= width || idy + 3 < 0 || idy >= height)
     {
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             dst_row[x * C + ch] = border_value[ch];
         }
     }
     else
     {
-        MI_S32 idx_new[4], idy_new[4];
-        for (MI_S32 i = 0; i < 4; i++)
+        DT_S32 idx_new[4], idy_new[4];
+        for (DT_S32 i = 0; i < 4; i++)
         {
             idx_new[i] = GetBorderIdx<BORDER_TYPE>(idx + i, width);
             idy_new[i] = GetBorderIdx<BORDER_TYPE>(idy + i, height);
         }
 
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             SumType sum = 0;
-            for (MI_S32 j = 0; j < 4; j++)
+            for (DT_S32 j = 0; j < 4; j++)
             {
                 Tp value0 = idx_new[0] >= 0 && idy_new[j] >= 0 ? src_row[idy_new[j] * istep + idx_new[0] * C + ch] : border_value[ch];
                 Tp value1 = idx_new[1] >= 0 && idy_new[j] >= 0 ? src_row[idy_new[j] * istep + idx_new[1] * C + ch] : border_value[ch];
@@ -2250,10 +2250,10 @@ AURA_ALWAYS_INLINE AURA_VOID RemapCuBorderCore(const Tp *src_row, Tp *dst_row, M
     }
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<(BorderType::CONSTANT != BORDER_TYPE)>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID RemapCuBorderCore(const Tp *src_row, Tp *dst_row, MI_S32 x, MI_S32 idx, MI_S32 idy, AURA_VOID *bn_tab,
-                                             MI_S32 height, MI_S32 width, MI_S32 istep, const std::vector<Tp> &border_value)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<(BorderType::CONSTANT != BORDER_TYPE)>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID RemapCuBorderCore(const Tp *src_row, Tp *dst_row, DT_S32 x, DT_S32 idx, DT_S32 idy, DT_VOID *bn_tab,
+                                             DT_S32 height, DT_S32 width, DT_S32 istep, const std::vector<Tp> &border_value)
 {
     AURA_UNUSED(border_value);
 
@@ -2263,17 +2263,17 @@ AURA_ALWAYS_INLINE AURA_VOID RemapCuBorderCore(const Tp *src_row, Tp *dst_row, M
 
     WeightType *wtab = (WeightType *)bn_tab;
 
-    MI_S32 idx_new[4], idy_new[4];
-    for (MI_S32 i = 0; i < 4; i++)
+    DT_S32 idx_new[4], idy_new[4];
+    for (DT_S32 i = 0; i < 4; i++)
     {
         idx_new[i] = GetBorderIdx<BORDER_TYPE>(idx + i, width);
         idy_new[i] = GetBorderIdx<BORDER_TYPE>(idy + i, height);
     }
 
-    for (MI_S32 ch = 0; ch < C; ch++)
+    for (DT_S32 ch = 0; ch < C; ch++)
     {
         SumType sum = 0;
-        for (MI_S32 j = 0; j < 4; j++)
+        for (DT_S32 j = 0; j < 4; j++)
         {
             sum += (InterType)(src_row[idy_new[j] * istep + idx_new[0] * C + ch]) * wtab[(j << 2) + 0] +
                    (InterType)(src_row[idy_new[j] * istep + idx_new[1] * C + ch]) * wtab[(j << 2) + 1] +
@@ -2284,10 +2284,10 @@ AURA_ALWAYS_INLINE AURA_VOID RemapCuBorderCore(const Tp *src_row, Tp *dst_row, M
     }
 }
 
-template <typename Tp, typename MapType, BorderType BORDER_TYPE, MI_S32 C,
-          typename std::enable_if<(std::is_same<MapType, MI_F32>::value || std::is_same<MapType, MI_S16>::value)>::type* = MI_NULL>
-static Status RemapCuNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &map, AURA_VOID *cu_tab, const std::vector<Tp> &border_value,
-                              MI_S32 start_width, MI_S32 end_width, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, typename MapType, BorderType BORDER_TYPE, DT_S32 C,
+          typename std::enable_if<(std::is_same<MapType, DT_F32>::value || std::is_same<MapType, DT_S16>::value)>::type* = DT_NULL>
+static Status RemapCuNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat &map, DT_VOID *cu_tab, const std::vector<Tp> &border_value,
+                              DT_S32 start_width, DT_S32 end_width, DT_S32 start_row, DT_S32 end_row)
 {
     if (map.GetSizes().m_channel != 2)
     {
@@ -2302,38 +2302,38 @@ static Status RemapCuNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat 
     const WeightType *wtab = (const WeightType *)cu_tab;
 
     Sizes3 isizes      = src.GetSizes();
-    MI_S32 iheight     = isizes.m_height;
-    MI_S32 iwidth      = isizes.m_width;
-    MI_S32 istep       = src.GetStrides().m_width / ElemTypeSize(src.GetElemType());
-    MI_BOOL is_block   = map.GetSizes().m_height != dst.GetSizes().m_height;
+    DT_S32 iheight     = isizes.m_height;
+    DT_S32 iwidth      = isizes.m_width;
+    DT_S32 istep       = src.GetStrides().m_width / ElemTypeSize(src.GetElemType());
+    DT_BOOL is_block   = map.GetSizes().m_height != dst.GetSizes().m_height;
     const Tp *src_data = src.Ptr<Tp>(0);
 
-    MI_S16 idx, idy;
-    MI_U16 idw;
+    DT_S16 idx, idy;
+    DT_U16 idw;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         Tp            *dst_row = dst.Ptr<Tp>(y);
         const MapType *map_row = is_block ? map.Ptr<MapType>(y - start_row) : map.Ptr<MapType>(y);
 
-        for (MI_S32 x = start_width; x < end_width; x++)
+        for (DT_S32 x = start_width; x < end_width; x++)
         {
-            MI_S32 new_x = x - start_width;
-            MI_S32 val_x = Round((MI_F32)map_row[new_x << 1] * REMAP_INTER_TAB_SIZE);
-            MI_S32 val_y = Round((MI_F32)map_row[(new_x << 1) + 1] * REMAP_INTER_TAB_SIZE);
-            MI_S32 val_a = (val_y & (REMAP_INTER_TAB_SIZE - 1)) * REMAP_INTER_TAB_SIZE + (val_x & (REMAP_INTER_TAB_SIZE - 1));
-            idx          = SaturateCast<MI_S16>(val_x >> REMAP_SCALE_BITS_HALF) - 1;
-            idy          = SaturateCast<MI_S16>(val_y >> REMAP_SCALE_BITS_HALF) - 1;
-            idw          = (MI_U16)(val_a & (REMAP_INTER_TAB_SIZE2 - 1)) << 4;
+            DT_S32 new_x = x - start_width;
+            DT_S32 val_x = Round((DT_F32)map_row[new_x << 1] * REMAP_INTER_TAB_SIZE);
+            DT_S32 val_y = Round((DT_F32)map_row[(new_x << 1) + 1] * REMAP_INTER_TAB_SIZE);
+            DT_S32 val_a = (val_y & (REMAP_INTER_TAB_SIZE - 1)) * REMAP_INTER_TAB_SIZE + (val_x & (REMAP_INTER_TAB_SIZE - 1));
+            idx          = SaturateCast<DT_S16>(val_x >> REMAP_SCALE_BITS_HALF) - 1;
+            idy          = SaturateCast<DT_S16>(val_y >> REMAP_SCALE_BITS_HALF) - 1;
+            idw          = (DT_U16)(val_a & (REMAP_INTER_TAB_SIZE2 - 1)) << 4;
 
             const WeightType *weights = wtab + idw;
 
-            if (((MI_U16)idx + 3) < iwidth && ((MI_U16)idy + 3) < iheight)
+            if (((DT_U16)idx + 3) < iwidth && ((DT_U16)idy + 3) < iheight)
             {
-                for (MI_S32 ch = 0; ch < C; ch++)
+                for (DT_S32 ch = 0; ch < C; ch++)
                 {
                     SumType sum = 0;
-                    for (MI_S32 j = 0; j < 4; j++)
+                    for (DT_S32 j = 0; j < 4; j++)
                     {
                         sum += (InterType)(src_data[(idy + j) * istep + (idx + 0) * C + ch]) * weights[(j << 2) + 0] +
                                (InterType)(src_data[(idy + j) * istep + (idx + 1) * C + ch]) * weights[(j << 2) + 1] +
@@ -2346,7 +2346,7 @@ static Status RemapCuNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat 
             }
             else
             {
-                RemapCuBorderCore<Tp, BORDER_TYPE, C>(src_data, dst_row, x, idx, idy, (AURA_VOID*)weights,
+                RemapCuBorderCore<Tp, BORDER_TYPE, C>(src_data, dst_row, x, idx, idy, (DT_VOID*)weights,
                                                       iheight, iwidth, istep, border_value);
             }
         }
@@ -2355,7 +2355,7 @@ static Status RemapCuNoneImpl(Context *ctx, const Mat &src, Mat &dst, const Mat 
     return Status::OK;
 }
 
-template <typename Tp, typename MapType, BorderType BORDER_TYPE, MI_S32 C>
+template <typename Tp, typename MapType, BorderType BORDER_TYPE, DT_S32 C>
 static Status RemapNoneHelper(Context *ctx, const Mat &src, Mat &dst, const Mat &map, InterpType interp_type,
                               const std::vector<Tp> &border_value, const OpTarget &target)
 {
@@ -2363,10 +2363,10 @@ static Status RemapNoneHelper(Context *ctx, const Mat &src, Mat &dst, const Mat 
 
     Status ret = Status::ERROR;
 
-    MI_S32 height    = dst.GetSizes().m_height;
-    MI_S32 width     = dst.GetSizes().m_width;
+    DT_S32 height    = dst.GetSizes().m_height;
+    DT_S32 width     = dst.GetSizes().m_width;
 
-    AURA_VOID *tab_ptr = InitTab2D(src.GetElemType(), interp_type);
+    DT_VOID *tab_ptr = InitTab2D(src.GetElemType(), interp_type);
 
     switch (interp_type)
     {
@@ -2375,13 +2375,13 @@ static Status RemapNoneHelper(Context *ctx, const Mat &src, Mat &dst, const Mat 
             if (target.m_data.none.enable_mt)
             {
                 WorkerPool *wp = ctx->GetWorkerPool();
-                if (MI_NULL == wp)
+                if (DT_NULL == wp)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                     return Status::ERROR;
                 }
 
-                ret = wp->ParallelFor(static_cast<MI_S32>(0), height, RemapNnNoneImpl<Tp, MapType, BORDER_TYPE, C>, ctx, std::cref(src),
+                ret = wp->ParallelFor(static_cast<DT_S32>(0), height, RemapNnNoneImpl<Tp, MapType, BORDER_TYPE, C>, ctx, std::cref(src),
                                       std::ref(dst), std::cref(map), std::cref(border_value), 0, width);
             }
             else
@@ -2397,13 +2397,13 @@ static Status RemapNoneHelper(Context *ctx, const Mat &src, Mat &dst, const Mat 
             if (target.m_data.none.enable_mt)
             {
                 WorkerPool *wp = ctx->GetWorkerPool();
-                if (MI_NULL == wp)
+                if (DT_NULL == wp)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                     return Status::ERROR;
                 }
 
-                ret = wp->ParallelFor(static_cast<MI_S32>(0), height, RemapBnNoneImpl<Tp, MapType, BORDER_TYPE, C>, ctx, std::cref(src),
+                ret = wp->ParallelFor(static_cast<DT_S32>(0), height, RemapBnNoneImpl<Tp, MapType, BORDER_TYPE, C>, ctx, std::cref(src),
                                       std::ref(dst), std::cref(map), tab_ptr, std::cref(border_value), 0, width);
             }
             else
@@ -2418,13 +2418,13 @@ static Status RemapNoneHelper(Context *ctx, const Mat &src, Mat &dst, const Mat 
             if (target.m_data.none.enable_mt)
             {
                 WorkerPool *wp = ctx->GetWorkerPool();
-                if (MI_NULL == wp)
+                if (DT_NULL == wp)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                     return Status::ERROR;
                 }
 
-                ret = wp->ParallelFor(static_cast<MI_S32>(0), height, RemapCuNoneImpl<Tp, MapType, BORDER_TYPE, C>, ctx, std::cref(src),
+                ret = wp->ParallelFor(static_cast<DT_S32>(0), height, RemapCuNoneImpl<Tp, MapType, BORDER_TYPE, C>, ctx, std::cref(src),
                                       std::ref(dst), std::cref(map), tab_ptr, std::cref(border_value), 0, width);
             }
             else
@@ -2552,7 +2552,7 @@ static Status RemapNoneHelper(Context *ctx, const Mat &src, Mat &dst, const Mat 
 #if defined(AURA_BUILD_HOST)
         case ElemType::F32:
         {
-            ret = RemapNoneHelper<Tp, MI_F32>(ctx, src, dst, map, interp_type, border_type, border_value, target);
+            ret = RemapNoneHelper<Tp, DT_F32>(ctx, src, dst, map, interp_type, border_type, border_value, target);
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(ctx, "RemapNoneHelper failed! map format is F32C2.\n");
@@ -2565,7 +2565,7 @@ static Status RemapNoneHelper(Context *ctx, const Mat &src, Mat &dst, const Mat 
         {
             if (interp_type == InterpType::NEAREST)
             {
-                ret = RemapNoneHelper<Tp, MI_S16>(ctx, src, dst, map, interp_type, border_type, border_value, target);
+                ret = RemapNoneHelper<Tp, DT_S16>(ctx, src, dst, map, interp_type, border_type, border_value, target);
                 if (ret != Status::OK)
                 {
                     AURA_ADD_ERROR_STRING(ctx, "RemapNoneHelper failed! map format is S16C2. \n");
@@ -2628,60 +2628,60 @@ Status RemapNone::Run()
     {
         case ElemType::U8:
         {
-            ret = RemapNoneHelper<MI_U8>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
+            ret = RemapNoneHelper<DT_U8>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is MI_U8\n");
+                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is DT_U8\n");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            ret = RemapNoneHelper<MI_S8>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
+            ret = RemapNoneHelper<DT_S8>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is MI_S8\n");
+                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is DT_S8\n");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = RemapNoneHelper<MI_U16>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
+            ret = RemapNoneHelper<DT_U16>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is MI_U16\n");
+                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is DT_U16\n");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = RemapNoneHelper<MI_S16>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
+            ret = RemapNoneHelper<DT_S16>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is MI_S16\n");
+                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is DT_S16\n");
             }
             break;
         }
 
         case ElemType::S32:
         {
-            ret = RemapNoneHelper<MI_S32>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
+            ret = RemapNoneHelper<DT_S32>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is MI_S32\n");
+                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is DT_S32\n");
             }
             break;
         }
 
         case ElemType::U32:
         {
-            ret = RemapNoneHelper<MI_U32>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
+            ret = RemapNoneHelper<DT_U32>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is MI_U32\n");
+                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is DT_U32\n");
             }
             break;
         }
@@ -2699,10 +2699,10 @@ Status RemapNone::Run()
 
         case ElemType::F32:
         {
-            ret = RemapNoneHelper<MI_F32>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
+            ret = RemapNoneHelper<DT_F32>(m_ctx, *src, *dst, *map, m_interp_type, m_border_type, m_border_value, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is MI_F32\n");
+                AURA_ADD_ERROR_STRING(m_ctx, "RemapNoneHelper failed! ElemType is DT_F32\n");
             }
             break;
         }

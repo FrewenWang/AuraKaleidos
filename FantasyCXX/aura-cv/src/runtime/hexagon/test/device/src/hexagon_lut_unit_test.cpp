@@ -7,12 +7,12 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Vb_vlut128_VbVb
     {
-        MI_U8 table[128];
-        MI_U8 idx[128];
-        MI_U8 dst[128];
-        MI_U8 ref[128];
+        DT_U8 table[128];
+        DT_U8 idx[128];
+        DT_U8 dst[128];
+        DT_U8 ref[128];
 
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             table[i] = i;
             idx[i] = 127 - i;
@@ -29,16 +29,16 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // // Q6_Vb_vlut256_VbVbX2
     {
-        MI_U8 table[256];
-        MI_U8 idx[128];
-        MI_U8 dst[128];
-        MI_U8 ref[128];
+        DT_U8 table[256];
+        DT_U8 idx[128];
+        DT_U8 dst[128];
+        DT_U8 ref[128];
 
-        for (MI_S32 i = 0; i < 256; i++)
+        for (DT_S32 i = 0; i < 256; i++)
         {
             table[i] = i;
         }
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             idx[i] = i * 2;
             ref[i] = table[idx[i]];
@@ -57,16 +57,16 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Vb_vlut512_WhVbX4
     {
-        MI_U8 table[512];
-        MI_U16 idx[128];
-        MI_U8 dst[128];
-        MI_U8 ref[128];
+        DT_U8 table[512];
+        DT_U16 idx[128];
+        DT_U8 dst[128];
+        DT_U8 ref[128];
 
-        for (MI_S32 i = 0; i < 512; i++)
+        for (DT_S32 i = 0; i < 512; i++)
         {
             table[i] = i;
         }
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             idx[i] = i * 4;
             ref[i] = table[idx[i]];
@@ -89,16 +89,16 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Vb_vlut1024_WhVbX8
     {
-        MI_U8 table[1024];
-        MI_U16 idx[128];
-        MI_U8 dst[128];
-        MI_U8 ref[128];
+        DT_U8 table[1024];
+        DT_U16 idx[128];
+        DT_U8 dst[128];
+        DT_U8 ref[128];
 
-        for (MI_S32 i = 0; i < 1024; i++)
+        for (DT_S32 i = 0; i < 1024; i++)
         {
             table[i] = i;
         }
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             idx[i] = i * 8;
             ref[i] = table[idx[i]];
@@ -109,7 +109,7 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
         mvu16_idx.val[1] = vmemu(idx + AURA_HVLEN / 2);
 
         HVX_VectorX8 mvd8_shuff_table;
-        for (MI_S32 i = 0; i < 8; i++)
+        for (DT_S32 i = 0; i < 8; i++)
         {
             mvd8_shuff_table.val[i] =  Q6_Vb_vshuff_Vb(vmemu(table + i * AURA_HVLEN));
         }
@@ -120,12 +120,12 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Wh_vlut128_VbVhX2
     {
-        MI_U16 table[128];
-        MI_U8 idx[128];
-        MI_U16 dst[128];
-        MI_U16 ref[128];
+        DT_U16 table[128];
+        DT_U8 idx[128];
+        DT_U16 dst[128];
+        DT_U16 ref[128];
 
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             table[i] = i;
             idx[i] = 127 - i;
@@ -148,12 +148,12 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Wh_vlutshuff128_VbVhX2
     {
-        MI_U16 table[128];
-        MI_U8 idx[128];
-        MI_U16 dst[128];
-        MI_U16 ref[128];
+        DT_U16 table[128];
+        DT_U8 idx[128];
+        DT_U16 dst[128];
+        DT_U16 ref[128];
 
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             table[i] = i;
             idx[i] = 127 - i;
@@ -175,16 +175,16 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Wh_vlut256_VbVhX4
     {
-        MI_U16 table[256];
-        MI_U8 idx[128];
-        MI_U16 dst[128];
-        MI_U16 ref[128];
+        DT_U16 table[256];
+        DT_U8 idx[128];
+        DT_U16 dst[128];
+        DT_U16 ref[128];
 
-        for (MI_S32 i = 0; i < 256; i++)
+        for (DT_S32 i = 0; i < 256; i++)
         {
             table[i] = i;
         }
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             idx[i] = i * 2;
             ref[i] = table[idx[i]];
@@ -208,16 +208,16 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Wh_vlutshuff256_VbVhX4
     {
-        MI_U16 table[256];
-        MI_U8 idx[128];
-        MI_U16 dst[128];
-        MI_U16 ref[128];
+        DT_U16 table[256];
+        DT_U8 idx[128];
+        DT_U16 dst[128];
+        DT_U16 ref[128];
 
-        for (MI_S32 i = 0; i < 256; i++)
+        for (DT_S32 i = 0; i < 256; i++)
         {
             table[i] = i;
         }
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             idx[i] = i * 2;
             ref[i] = table[idx[i]];
@@ -240,16 +240,16 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Wh_vlut512_WhVhX8
     {
-        MI_U16 table[512];
-        MI_U16 idx[128];
-        MI_U16 dst[128];
-        MI_U16 ref[128];
+        DT_U16 table[512];
+        DT_U16 idx[128];
+        DT_U16 dst[128];
+        DT_U16 ref[128];
 
-        for (MI_S32 i = 0; i < 512; i++)
+        for (DT_S32 i = 0; i < 512; i++)
         {
             table[i] = i;
         }
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             idx[i] = i * 4;
             ref[i] = table[idx[i]];
@@ -260,7 +260,7 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
         mvu16_idx.val[1] = vmemu(idx + AURA_HVLEN / 2);
 
         HVX_VectorX8 mvd16_shuff_table;
-        for (MI_S32 i = 0; i < 8; i++)
+        for (DT_S32 i = 0; i < 8; i++)
         {
             mvd16_shuff_table.val[i] = Q6_Vh_vshuff_Vh(vmemu(table + AURA_HVLEN / 2 * i));
         }
@@ -275,16 +275,16 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Wh_vlutshuff512_WhVhX8
     {
-        MI_U16 table[512];
-        MI_U16 idx[128];
-        MI_U16 dst[128];
-        MI_U16 ref[128];
+        DT_U16 table[512];
+        DT_U16 idx[128];
+        DT_U16 dst[128];
+        DT_U16 ref[128];
 
-        for (MI_S32 i = 0; i < 512; i++)
+        for (DT_S32 i = 0; i < 512; i++)
         {
             table[i] = i;
         }
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             idx[i] = i * 4;
             ref[i] = table[idx[i]];
@@ -296,7 +296,7 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
         mvu16_idx.val[1] = vmemu(idx + AURA_HVLEN / 2);
 
         HVX_VectorX8 mvd16_shuff_table;
-        for (MI_S32 i = 0; i < 8; i++)
+        for (DT_S32 i = 0; i < 8; i++)
         {
             mvd16_shuff_table.val[i] = Q6_Vh_vshuff_Vh(vmemu(table + AURA_HVLEN / 2 * i));
         }
@@ -310,16 +310,16 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Vh_vlut1024_WhVhX16
     {
-        MI_U16 table[1024];
-        MI_U16 idx[128];
-        MI_U16 dst[128];
-        MI_U16 ref[128];
+        DT_U16 table[1024];
+        DT_U16 idx[128];
+        DT_U16 dst[128];
+        DT_U16 ref[128];
 
-        for (MI_S32 i = 0; i < 1024; i++)
+        for (DT_S32 i = 0; i < 1024; i++)
         {
             table[i] = i;
         }
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             idx[i] = i * 8;
             ref[i] = table[idx[i]];
@@ -330,7 +330,7 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
         mvu16_idx.val[1] = vmemu(idx + AURA_HVLEN / 2);
 
         HVX_VectorX16 mvd16_shuff_table;
-        for (MI_S32 i = 0; i < 16; i++)
+        for (DT_S32 i = 0; i < 16; i++)
         {
             mvd16_shuff_table.val[i] = Q6_Vh_vshuff_Vh(vmemu(table + AURA_HVLEN / 2 * i));
         }
@@ -345,16 +345,16 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
 
     // Q6_Vh_vlutshuff1024_WhVhX16
     {
-        MI_U16 table[1024];
-        MI_U16 idx[128];
-        MI_U16 dst[128];
-        MI_U16 ref[128];
+        DT_U16 table[1024];
+        DT_U16 idx[128];
+        DT_U16 dst[128];
+        DT_U16 ref[128];
 
-        for (MI_S32 i = 0; i < 1024; i++)
+        for (DT_S32 i = 0; i < 1024; i++)
         {
             table[i] = i;
         }
-        for (MI_S32 i = 0; i < 128; i++)
+        for (DT_S32 i = 0; i < 128; i++)
         {
             idx[i] = i * 8;
             ref[i] = table[idx[i]];
@@ -365,7 +365,7 @@ NEW_TESTCASE(runtime_hexagon_instructions_lut_test)
         mvu16_idx.val[1] = vmemu(idx + AURA_HVLEN / 2);
 
         HVX_VectorX16 mvd16_shuff_table;
-        for (MI_S32 i = 0; i < 16; i++)
+        for (DT_S32 i = 0; i < 16; i++)
         {
             mvd16_shuff_table.val[i] = Q6_Vh_vshuff_Vh(vmemu(table + AURA_HVLEN / 2 * i));
         }

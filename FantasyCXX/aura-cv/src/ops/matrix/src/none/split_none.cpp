@@ -8,19 +8,19 @@ namespace aura
 {
 
 template <typename Tp>
-AURA_INLINE AURA_VOID SplitRow(MI_S32 width, const Tp *src_row, MI_S32 src_ch, const std::vector<MI_S32> &ch_offsets,
-                             const std::vector<Tp*> &dst_rows, const std::vector<MI_S32> &ochannels)
+AURA_INLINE DT_VOID SplitRow(DT_S32 width, const Tp *src_row, DT_S32 src_ch, const std::vector<DT_S32> &ch_offsets,
+                             const std::vector<Tp*> &dst_rows, const std::vector<DT_S32> &ochannels)
 {
-    MI_S32 dst_count = dst_rows.size();
+    DT_S32 dst_count = dst_rows.size();
 
-    for (MI_S32 x = 0; x < width; ++x)
+    for (DT_S32 x = 0; x < width; ++x)
     {
-        for (MI_S32 n = 0; n < dst_count; ++n)
+        for (DT_S32 n = 0; n < dst_count; ++n)
         {
             const Tp *src_ptr = src_row + x * src_ch + ch_offsets[n];
             Tp *dst_ptr       = dst_rows[n] + x * ochannels[n];
 
-            for (MI_S32 ch = 0; ch < ochannels[n]; ++ch)
+            for (DT_S32 ch = 0; ch < ochannels[n]; ++ch)
             {
                 dst_ptr[ch] = src_ptr[ch];
             }
@@ -29,21 +29,21 @@ AURA_INLINE AURA_VOID SplitRow(MI_S32 width, const Tp *src_row, MI_S32 src_ch, c
 }
 
 template <typename Tp>
-static Status SplitNoneImpl(const Mat &src, std::vector<Mat*> &dst, const std::vector<MI_S32> &ochannels,
-                            const std::vector<MI_S32> &ch_offsets, MI_S32 dst_count, MI_S32 start_row, MI_S32 end_row)
+static Status SplitNoneImpl(const Mat &src, std::vector<Mat*> &dst, const std::vector<DT_S32> &ochannels,
+                            const std::vector<DT_S32> &ch_offsets, DT_S32 dst_count, DT_S32 start_row, DT_S32 end_row)
 {
     Sizes3 src_sz = src.GetSizes();
 
-    const MI_S32 width    = src_sz.m_width;
-    const MI_S32 ichannel = src_sz.m_channel;
+    const DT_S32 width    = src_sz.m_width;
+    const DT_S32 ichannel = src_sz.m_channel;
 
-    std::vector<Tp*> dst_rows(dst_count, MI_NULL);
+    std::vector<Tp*> dst_rows(dst_count, DT_NULL);
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
         const Tp *src_ptr = src.Ptr<Tp>(y);
 
-        for (MI_S32 n = 0; n < dst_count; ++n)
+        for (DT_S32 n = 0; n < dst_count; ++n)
         {
             dst_rows[n] = dst[n]->Ptr<Tp>(y);
         }
@@ -57,46 +57,46 @@ static Status SplitNoneImpl(const Mat &src, std::vector<Mat*> &dst, const std::v
 template <typename Tp>
 static Status SplitNoneHelper(Context *ctx, const Mat &src, std::vector<Mat*> &dst, OpTarget &target)
 {
-    MI_S32 dst_count = dst.size();
+    DT_S32 dst_count = dst.size();
 
     if (1 == dst_count)
     {
         return src.CopyTo(*(dst[0]));
     }
 
-    std::vector<MI_S32> ochannels;
+    std::vector<DT_S32> ochannels;
 
-    for (MI_S32 n = 0; n < dst_count; ++n)
+    for (DT_S32 n = 0; n < dst_count; ++n)
     {
         ochannels.emplace_back(dst[n]->GetSizes().m_channel);
     }
 
-    std::vector<MI_S32> ch_offsets(dst_count, 0);
+    std::vector<DT_S32> ch_offsets(dst_count, 0);
 
-    for (MI_S32 n = 1; n < dst_count; ++n)
+    for (DT_S32 n = 1; n < dst_count; ++n)
     {
         ch_offsets[n] = ch_offsets[n - 1] + ochannels[n - 1];
     }
 
     Status ret = Status::ERROR;
 
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 height = src.GetSizes().m_height;
 
     if (target.m_data.none.enable_mt)
     {
         WorkerPool *wp = ctx->GetWorkerPool();
-        if (MI_NULL == wp)
+        if (DT_NULL == wp)
         {
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
             return Status::ERROR;
         }
 
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), height, SplitNoneImpl<Tp>, src, dst,
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), height, SplitNoneImpl<Tp>, src, dst,
                               ochannels, ch_offsets, dst_count);
     }
     else
     {
-        ret = SplitNoneImpl<Tp>(src, dst, ochannels, ch_offsets, dst_count, static_cast<MI_S32>(0), height);
+        ret = SplitNoneImpl<Tp>(src, dst, ochannels, ch_offsets, dst_count, static_cast<DT_S32>(0), height);
     }
 
     AURA_RETURN(ctx, ret);
@@ -139,7 +139,7 @@ Status SplitNone::Run()
     for (auto& mat:m_dst)
     {
         Mat *dst_mat = dynamic_cast<Mat*>(mat);
-        if (MI_NULL == dst_mat)
+        if (DT_NULL == dst_mat)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "dynamic_cast dst failed.");
             return Status::ERROR;
@@ -147,7 +147,7 @@ Status SplitNone::Run()
         dst.push_back(dst_mat);
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;
@@ -160,10 +160,10 @@ Status SplitNone::Run()
         case ElemType::U8:
         case ElemType::S8:
         {
-            ret = SplitNoneHelper<MI_U8>(m_ctx, *src, dst, m_target);
+            ret = SplitNoneHelper<DT_U8>(m_ctx, *src, dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "SplitNoneHelper<MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "SplitNoneHelper<DT_U8> failed.");
             }
             break;
         }
@@ -174,10 +174,10 @@ Status SplitNone::Run()
         case ElemType::F16:
 #endif
         {
-            ret = SplitNoneHelper<MI_U16>(m_ctx, *src, dst, m_target);
+            ret = SplitNoneHelper<DT_U16>(m_ctx, *src, dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "SplitNoneHelper<MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "SplitNoneHelper<DT_U16> failed.");
             }
             break;
         }
@@ -188,10 +188,10 @@ Status SplitNone::Run()
         case ElemType::F32:
 #endif
         {
-            ret = SplitNoneHelper<MI_U32>(m_ctx, *src, dst, m_target);
+            ret = SplitNoneHelper<DT_U32>(m_ctx, *src, dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "SplitNoneHelper<MI_U32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "SplitNoneHelper<DT_U32> failed.");
             }
             break;
         }

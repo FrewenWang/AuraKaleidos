@@ -39,7 +39,7 @@ static Status CvWarpAffine(Mat &src, Mat &dst, Mat &matrix, InterpType interp_ty
     cv::Mat cv_dst = MatToOpencv(dst);
     cv::Mat cv_mat = MatToOpencv(matrix);
 
-    cv::warpAffine(cv_src, cv_dst, cv_mat, cv::Size(cv_dst.cols, cv_dst.rows), static_cast<MI_S32>(interp_type), BorderTypeToOpencv(border_type));
+    cv::warpAffine(cv_src, cv_dst, cv_mat, cv::Size(cv_dst.cols, cv_dst.rows), static_cast<DT_S32>(interp_type), BorderTypeToOpencv(border_type));
 #else
     AURA_UNUSED(src);
     AURA_UNUSED(dst);
@@ -70,7 +70,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         WarpAffineParam run_param(GetParam(index));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -93,7 +93,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         WarpAffineParam run_param(GetParam(index));
@@ -114,13 +114,13 @@ public:
         Point2 center = Point2(mat_size.m_sizes.m_width / 2, mat_size.m_sizes.m_height / 2);
         Mat    matrix = GetRotationMatrix2D(m_ctx, center, -10.0, 1.1);
 
-        MI_S32 coord_stride = ((coord_size.m_width + 128) & (-128)) * coord_size.m_channel * ElemTypeSize(ElemType::S16);
+        DT_S32 coord_stride = ((coord_size.m_width + 128) & (-128)) * coord_size.m_channel * ElemTypeSize(ElemType::S16);
         Mat    dst_coord    = m_factory.GetEmptyMat(ElemType::S16, coord_size, AURA_MEM_DEFAULT, aura::Sizes(coord_size.m_height, coord_stride));
         Mat    ref_coord    = m_factory.GetEmptyMat(ElemType::S16, coord_size, AURA_MEM_DEFAULT, aura::Sizes(coord_size.m_height, coord_stride));
 
         Scalar border_value(0, 0, 0, 0);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime     time_val;
         MatCmpResult cmp_result;

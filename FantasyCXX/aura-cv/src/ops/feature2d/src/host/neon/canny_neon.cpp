@@ -7,32 +7,32 @@
 namespace aura
 {
 
-static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map, std::deque<MI_U8*> &border_peaks_parallel, ThreadBuffer &thread_buffer,
-                            std::mutex &mutex, MI_S32 low_thresh, MI_S32 high_thresh, MI_BOOL l2_gradient, MI_S32 start_row, MI_S32 end_row)
+static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map, std::deque<DT_U8*> &border_peaks_parallel, ThreadBuffer &thread_buffer,
+                            std::mutex &mutex, DT_S32 low_thresh, DT_S32 high_thresh, DT_BOOL l2_gradient, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 iwidth  = dx.GetSizes().m_width;
-    MI_S32 iheight = dx.GetSizes().m_height;
-    MI_S32 channel = dx.GetSizes().m_channel;
-    MI_S32 map_w   = map.GetSizes().m_width;
+    DT_S32 iwidth  = dx.GetSizes().m_width;
+    DT_S32 iheight = dx.GetSizes().m_height;
+    DT_S32 channel = dx.GetSizes().m_channel;
+    DT_S32 map_w   = map.GetSizes().m_width;
     start_row      = start_row << 4;
     end_row        = Min(end_row << 4, iheight);
 
-    MI_S32 start_row_idx = Max(0, (start_row - 1));
-    MI_S32 end_row_idx   = Min(iheight, (end_row + 1));
+    DT_S32 start_row_idx = Max(0, (start_row - 1));
+    DT_S32 end_row_idx   = Min(iheight, (end_row + 1));
 
-    MI_S32 *buffer       = MI_NULL;
-    const MI_S16 *dx_row = MI_NULL;
-    const MI_S16 *dy_row = MI_NULL;
-    MI_S16 *dx_c         = MI_NULL;
-    MI_S16 *dy_c         = MI_NULL;
-    MI_S16 *dx_n         = MI_NULL;
-    MI_S16 *dy_n         = MI_NULL;
-    MI_S16 *dx_max       = MI_NULL;
-    MI_S16 *dy_max       = MI_NULL;
+    DT_S32 *buffer       = DT_NULL;
+    const DT_S16 *dx_row = DT_NULL;
+    const DT_S16 *dy_row = DT_NULL;
+    DT_S16 *dx_c         = DT_NULL;
+    DT_S16 *dy_c         = DT_NULL;
+    DT_S16 *dx_n         = DT_NULL;
+    DT_S16 *dy_n         = DT_NULL;
+    DT_S16 *dx_max       = DT_NULL;
+    DT_S16 *dy_max       = DT_NULL;
 
     if (channel > 1)
     {
-        MI_U8 *rows = thread_buffer.GetThreadData<MI_U8>();
+        DT_U8 *rows = thread_buffer.GetThreadData<DT_U8>();
 
         if (!rows)
         {
@@ -40,17 +40,17 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
             return Status::ERROR;
         }
 
-        dx_max = reinterpret_cast<MI_S16*>(rows);
-        dy_max = reinterpret_cast<MI_S16*>(rows + 2 * iwidth * sizeof(MI_S16));
+        dx_max = reinterpret_cast<DT_S16*>(rows);
+        dy_max = reinterpret_cast<DT_S16*>(rows + 2 * iwidth * sizeof(DT_S16));
         dx_c   = dx_max;
         dx_n   = dx_c + iwidth;
         dy_c   = dy_max;
         dy_n   = dy_c + iwidth;
-        buffer = reinterpret_cast<MI_S32*>(rows + 4 * iwidth * sizeof(MI_S16));
+        buffer = reinterpret_cast<DT_S32*>(rows + 4 * iwidth * sizeof(DT_S16));
     }
     else
     {
-        MI_U8 *rows = thread_buffer.GetThreadData<MI_U8>();
+        DT_U8 *rows = thread_buffer.GetThreadData<DT_U8>();
 
         if (!rows)
         {
@@ -58,17 +58,17 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
             return Status::ERROR;
         }
 
-        buffer = reinterpret_cast<MI_S32*>(rows);
+        buffer = reinterpret_cast<DT_S32*>(rows);
     }
 
-    std::deque<MI_U8*> stack, border_peaks_local;;
-    MI_S32 *mag_p = buffer + 1;
-    MI_S32 *mag_c = mag_p + map_w * channel;
-    MI_S32 *mag_n = mag_c + map_w * channel;
+    std::deque<DT_U8*> stack, border_peaks_local;;
+    DT_S32 *mag_p = buffer + 1;
+    DT_S32 *mag_c = mag_p + map_w * channel;
+    DT_S32 *mag_n = mag_c + map_w * channel;
 
     if(start_row_idx == start_row)
     {
-        memset(mag_n - 1, 0, map_w * sizeof(MI_S32));
+        memset(mag_n - 1, 0, map_w * sizeof(DT_S32));
     }
     else
     {
@@ -82,19 +82,19 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
     //   0 - the pixel might belong to an edge
     //   1 - the pixel can not belong to an edge
     //   2 - the pixel does belong to an edge
-    for (MI_S32 y = start_row_idx; y <= end_row; ++y)
+    for (DT_S32 y = start_row_idx; y <= end_row; ++y)
     {
         Swap(mag_n, mag_c);
         Swap(mag_n, mag_p);
 
         if (y < end_row_idx)
         {
-            dx_row = dx.Ptr<MI_S16>(y);
-            dy_row = dy.Ptr<MI_S16>(y);
-            MI_S32 width = iwidth * channel;
-            constexpr MI_S32 ELEM_COUNTS = 8;
-            MI_S32 width_align8 = width & (-ELEM_COUNTS);
-            MI_S32 x = 0;
+            dx_row = dx.Ptr<DT_S16>(y);
+            dy_row = dy.Ptr<DT_S16>(y);
+            DT_S32 width = iwidth * channel;
+            constexpr DT_S32 ELEM_COUNTS = 8;
+            DT_S32 width_align8 = width & (-ELEM_COUNTS);
+            DT_S32 x = 0;
 
             if (l2_gradient)
             {
@@ -113,7 +113,7 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
                 }
                 for (; x < width; ++x)
                 {
-                    mag_n[x] = static_cast<MI_S32>(dx_row[x]) * dx_row[x] + static_cast<MI_S32>(dy_row[x]) * dy_row[x];
+                    mag_n[x] = static_cast<DT_S32>(dx_row[x]) * dx_row[x] + static_cast<DT_S32>(dy_row[x]) * dy_row[x];
                 }
             }
             else
@@ -133,7 +133,7 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
                 }
                 for (; x < width; ++x)
                 {
-                    mag_n[x] = Abs(static_cast<MI_S32>(dx_row[x])) + Abs(static_cast<MI_S32>(dy_row[x]));
+                    mag_n[x] = Abs(static_cast<DT_S32>(dx_row[x])) + Abs(static_cast<DT_S32>(dy_row[x]));
                 }
             }
 
@@ -142,11 +142,11 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
                 Swap(dx_n, dx_c);
                 Swap(dy_n, dy_c);
 
-                for (MI_S32 x = 0, k = 0; x < iwidth; ++x, k += channel)
+                for (DT_S32 x = 0, k = 0; x < iwidth; ++x, k += channel)
                 {
-                    MI_S32 max_idx = k;
+                    DT_S32 max_idx = k;
 
-                    for (MI_S32 c = 1; c < channel; ++c)
+                    for (DT_S32 c = 1; c < channel; ++c)
                     {
                         if (mag_n[k + c] > mag_n[max_idx])
                         {
@@ -169,7 +169,7 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
         }
         else
         {
-            memset(mag_n - 1, 0, map_w * sizeof(MI_S32));
+            memset(mag_n - 1, 0, map_w * sizeof(DT_S32));
 
             if (channel > 1)
             {
@@ -180,14 +180,14 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
 
         // From here actual src row is (y - 1)
         // Set left and right border to 1
-        MI_U8 *map_row = map.Ptr<MI_U8>(y) + 1;
+        DT_U8 *map_row = map.Ptr<DT_U8>(y) + 1;
         map_row[-1] = 1;
         map_row[iwidth] = 1;
 
         if(1 == channel)
         {
-            dx_row = dx.Ptr<MI_S16>(y - 1);
-            dy_row = dy.Ptr<MI_S16>(y - 1);
+            dx_row = dx.Ptr<DT_S16>(y - 1);
+            dy_row = dy.Ptr<DT_S16>(y - 1);
         }
         else
         {
@@ -195,17 +195,17 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
             dy_row = dy_c;
         }
 
-        constexpr MI_S32 tg22 = 13573; // tan22.5*(1<<15)
-        for (MI_S32 x = 0; x < iwidth; ++x)
+        constexpr DT_S32 tg22 = 13573; // tan22.5*(1<<15)
+        for (DT_S32 x = 0; x < iwidth; ++x)
         {
-            MI_S32 m = mag_c[x];
+            DT_S32 m = mag_c[x];
             if (m > low_thresh)
             {
-                MI_S16 xs = dx_row[x];
-                MI_S16 ys = dy_row[x];
-                MI_S32 xu = Abs(xs);
-                MI_S32 yu = Abs(ys) << 15;
-                MI_S32 tg22x = xu * tg22;
+                DT_S16 xs = dx_row[x];
+                DT_S16 ys = dy_row[x];
+                DT_S32 xu = Abs(xs);
+                DT_S32 yu = Abs(ys) << 15;
+                DT_S32 tg22x = xu * tg22;
 
                 if (yu < tg22x)
                 {
@@ -217,7 +217,7 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
                 }
                 else
                 {
-                    MI_S32 tg67x = tg22x + (xu << 16); // tan67.5
+                    DT_S32 tg67x = tg22x + (xu << 16); // tan67.5
                     if (yu > tg67x)
                     {
                         if ((m > mag_p[x]) && (m >= mag_n[x]))
@@ -228,7 +228,7 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
                     }
                     else
                     {
-                        MI_S32 s = (xs ^ ys) < 0 ? -1 : 1;
+                        DT_S32 s = (xs ^ ys) < 0 ? -1 : 1;
 
                         if ((m > mag_p[x - s]) && (m > mag_n[x + s]))
                         {
@@ -244,14 +244,14 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
     }
 
     // Not for first row of first slice or last row of last slice
-    MI_U8 *map_start  = map.Ptr<MI_U8>(0);
-    MI_U8 *map_lower  = (start_row_idx == 0) ? map_start : (map_start + (start_row + 2) * map_w);
-    MI_U8 *data_limit = map_start + map.GetSizes().m_height * map_w;
-    MI_U32 map_diff   = static_cast<MI_U32>(((end_row_idx == iheight) ? data_limit : (map_start + end_row * map_w)) - map_lower);
+    DT_U8 *map_start  = map.Ptr<DT_U8>(0);
+    DT_U8 *map_lower  = (start_row_idx == 0) ? map_start : (map_start + (start_row + 2) * map_w);
+    DT_U8 *data_limit = map_start + map.GetSizes().m_height * map_w;
+    DT_U32 map_diff   = static_cast<DT_U32>(((end_row_idx == iheight) ? data_limit : (map_start + end_row * map_w)) - map_lower);
 
     while (!stack.empty())
     {
-        MI_U8 *m = stack.back();
+        DT_U8 *m = stack.back();
         stack.pop_back();
 
         if((unsigned)(m - map_lower) < map_diff)
@@ -292,7 +292,7 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
         else
         {
             border_peaks_local.push_back(m);
-            MI_S64 map_step2 = m < map_lower ? map_w : -map_w;
+            DT_S64 map_step2 = m < map_lower ? map_w : -map_w;
 
             if (!m[-1])
             {
@@ -326,29 +326,29 @@ static Status CannyNeonImpl(Context *ctx, const Mat &dx, const Mat &dy, Mat &map
     return Status::OK;
 }
 
-static Status CannyFinalNeonImpl(Mat &map, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status CannyFinalNeonImpl(Mat &map, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width = dst.GetSizes().m_width;
-    constexpr MI_S32 ELEM_COUNTS = 16;
-    MI_S32 width_align16 = width & (-ELEM_COUNTS);
+    DT_S32 width = dst.GetSizes().m_width;
+    constexpr DT_S32 ELEM_COUNTS = 16;
+    DT_S32 width_align16 = width & (-ELEM_COUNTS);
 
-    for (MI_S32 y = start_row; y < end_row; ++y)
+    for (DT_S32 y = start_row; y < end_row; ++y)
     {
-        MI_U8 *map_c = map.Ptr<MI_U8>(y + 1) + 1;
-        MI_U8 *dst_c = dst.Ptr<MI_U8>(y);
-        MI_S32 x = 0;
+        DT_U8 *map_c = map.Ptr<DT_U8>(y + 1) + 1;
+        DT_U8 *dst_c = dst.Ptr<DT_U8>(y);
+        DT_S32 x = 0;
 
         for (; x < width_align16; x += ELEM_COUNTS)
         {
             uint8x16_t vqu8_map    = neon::vload1q(map_c + x);
             uint8x16_t vqu8_map0   = neon::vshr_n<1>(vqu8_map);
-            uint8x16_t vqu8_result = neon::vmul(vqu8_map0, (MI_U8)(255));
+            uint8x16_t vqu8_result = neon::vmul(vqu8_map0, (DT_U8)(255));
             neon::vstore(dst_c + x, vqu8_result);
         }
 
         for (; x < width; ++x)
         {
-            dst_c[x] = static_cast<MI_U8>(-(map_c[x] >> 1));
+            dst_c[x] = static_cast<DT_U8>(-(map_c[x] >> 1));
         }
     }
 
@@ -358,8 +358,8 @@ static Status CannyFinalNeonImpl(Mat &map, Mat &dst, MI_S32 start_row, MI_S32 en
 CannyNeon::CannyNeon(Context *ctx, const OpTarget &target) : CannyImpl(ctx, target)
 {}
 
-Status CannyNeon::SetArgs(const Array *src, Array *dst, MI_F64 low_thresh, MI_F64 high_thresh,
-                          MI_S32 aperture_size, MI_BOOL l2_gradient)
+Status CannyNeon::SetArgs(const Array *src, Array *dst, DT_F64 low_thresh, DT_F64 high_thresh,
+                          DT_S32 aperture_size, DT_BOOL l2_gradient)
 {
     if (CannyImpl::SetArgs(src, dst, low_thresh, high_thresh, aperture_size, l2_gradient) != Status::OK)
     {
@@ -376,8 +376,8 @@ Status CannyNeon::SetArgs(const Array *src, Array *dst, MI_F64 low_thresh, MI_F6
     return Status::OK;
 }
 
-Status CannyNeon::SetArgs(const Array *dx, const Array *dy, Array *dst, MI_F64 low_thresh,
-                          MI_F64 high_thresh, MI_BOOL l2_gradient)
+Status CannyNeon::SetArgs(const Array *dx, const Array *dy, Array *dst, DT_F64 low_thresh,
+                          DT_F64 high_thresh, DT_BOOL l2_gradient)
 {
     if (CannyImpl::SetArgs(dx, dy, dst, low_thresh, high_thresh, l2_gradient) != Status::OK)
     {
@@ -401,26 +401,26 @@ Status CannyNeon::Run()
     const Mat *src_dy = dynamic_cast<const Mat*>(m_dy);
     Mat *dst = dynamic_cast<Mat *>(m_dst);
 
-    if ((MI_NULL == src) && m_is_aperture)
+    if ((DT_NULL == src) && m_is_aperture)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;
     }
 
-    if (((MI_NULL == src_dx) || (MI_NULL == src_dy)) && !m_is_aperture)
+    if (((DT_NULL == src_dx) || (DT_NULL == src_dy)) && !m_is_aperture)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "m_dx m_dy is null");
         return Status::ERROR;
     }
 
-    if (MI_NULL == dst)
+    if (DT_NULL == dst)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dst is null");
         return Status::ERROR;
     }
 
     WorkerPool *wp = m_ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "GetWorkerPool fail");
         return Status::ERROR;
@@ -430,7 +430,7 @@ Status CannyNeon::Run()
 
     if (m_is_aperture)
     {
-        MI_F64 scale = 1.0;
+        DT_F64 scale = 1.0;
 
         if (7 == m_aperture_size)
         {
@@ -460,8 +460,8 @@ Status CannyNeon::Run()
             }
         }
 
-        MI_S32 low  = static_cast<MI_S32>(Floor(m_low_thresh));
-        MI_S32 high = static_cast<MI_S32>(Floor(m_high_thresh));
+        DT_S32 low  = static_cast<DT_S32>(Floor(m_low_thresh));
+        DT_S32 high = static_cast<DT_S32>(Floor(m_high_thresh));
 
         Sizes3 size = src->GetSizes();
         Mat dx(m_ctx, ElemType::S16, size);
@@ -475,11 +475,11 @@ Status CannyNeon::Run()
             return Status::ERROR;
         }
 
-        MI_S32 iwidth  = src->GetSizes().m_width;
-        MI_S32 iheight = src->GetSizes().m_height;
-        MI_S32 channel = src->GetSizes().m_channel;
-        MI_S32 map_w   = (iwidth + 2);
-        MI_S32 map_h   = iheight + 2;
+        DT_S32 iwidth  = src->GetSizes().m_width;
+        DT_S32 iheight = src->GetSizes().m_height;
+        DT_S32 channel = src->GetSizes().m_channel;
+        DT_S32 map_w   = (iwidth + 2);
+        DT_S32 map_h   = iheight + 2;
 
         Mat map(m_ctx, ElemType::U8, Sizes3(map_h, map_w, 1));
         if (!map.IsValid())
@@ -488,28 +488,28 @@ Status CannyNeon::Run()
             return Status::ERROR;
         }
 
-        MI_U8 *map_t = map.Ptr<MI_U8>(0);
-        MI_U8 *map_b = map.Ptr<MI_U8>(iheight + 1);
+        DT_U8 *map_t = map.Ptr<DT_U8>(0);
+        DT_U8 *map_b = map.Ptr<DT_U8>(iheight + 1);
 
-        for (MI_S32 x = 0; x < map_w; ++x)
+        for (DT_S32 x = 0; x < map_w; ++x)
         {
             map_t[x] = 1;
             map_b[x] = 1;
         }
 
-        MI_S32 buffer_size = 0;
+        DT_S32 buffer_size = 0;
         if (channel > 1)
         {
-            buffer_size = (4 * iwidth * sizeof(MI_S16)) + (3 * (map_w * channel) * sizeof(MI_S32));
+            buffer_size = (4 * iwidth * sizeof(DT_S16)) + (3 * (map_w * channel) * sizeof(DT_S32));
         }
         else
         {
-            buffer_size = 3 * (map_w * channel) * sizeof(MI_S32);
+            buffer_size = 3 * (map_w * channel) * sizeof(DT_S32);
         }
 
         ThreadBuffer thread_buffer(m_ctx, buffer_size);
 
-        std::deque<MI_U8*> border_peaks_parallel;
+        std::deque<DT_U8*> border_peaks_parallel;
         std::mutex mutex;
 
         ret = wp->ParallelFor(0, AURA_ALIGN(src->GetSizes().m_height, 16) / 16, CannyNeonImpl, m_ctx, std::cref(dx), std::ref(dy), std::ref(map),
@@ -523,7 +523,7 @@ Status CannyNeon::Run()
         // process borderPeaksParallel
         while (!border_peaks_parallel.empty())
         {
-            MI_U8* m = border_peaks_parallel.back();
+            DT_U8* m = border_peaks_parallel.back();
             border_peaks_parallel.pop_back();
 
             if (!m[-map_w - 1])
@@ -597,38 +597,38 @@ Status CannyNeon::Run()
             }
         }
 
-        MI_S32 low  = static_cast<MI_S32>(Floor(m_low_thresh));
-        MI_S32 high = static_cast<MI_S32>(Floor(m_high_thresh));
+        DT_S32 low  = static_cast<DT_S32>(Floor(m_low_thresh));
+        DT_S32 high = static_cast<DT_S32>(Floor(m_high_thresh));
 
-        MI_S32 iwidth  = src_dx->GetSizes().m_width;
-        MI_S32 iheight = src_dx->GetSizes().m_height;
-        MI_S32 channel = src_dx->GetSizes().m_channel;
-        MI_S32 map_w   = (iwidth + 2);
-        MI_S32 map_h   = iheight + 2;
+        DT_S32 iwidth  = src_dx->GetSizes().m_width;
+        DT_S32 iheight = src_dx->GetSizes().m_height;
+        DT_S32 channel = src_dx->GetSizes().m_channel;
+        DT_S32 map_w   = (iwidth + 2);
+        DT_S32 map_h   = iheight + 2;
 
         Mat map(m_ctx, ElemType::U8, Sizes3(map_h, map_w, 1));
-        MI_U8 *map_t = map.Ptr<MI_U8>(0);
-        MI_U8 *map_b = map.Ptr<MI_U8>(iheight + 1);
+        DT_U8 *map_t = map.Ptr<DT_U8>(0);
+        DT_U8 *map_b = map.Ptr<DT_U8>(iheight + 1);
 
-        for (MI_S32 x = 0; x < map_w; ++x)
+        for (DT_S32 x = 0; x < map_w; ++x)
         {
             map_t[x] = 1;
             map_b[x] = 1;
         }
 
-        MI_S32 buffer_size = 0;
+        DT_S32 buffer_size = 0;
         if (channel > 1)
         {
-            buffer_size = (4 * iwidth * sizeof(MI_S16)) + (3 * (map_w * channel) * sizeof(MI_S32));
+            buffer_size = (4 * iwidth * sizeof(DT_S16)) + (3 * (map_w * channel) * sizeof(DT_S32));
         }
         else
         {
-            buffer_size = 3 * (map_w * channel) * sizeof(MI_S32);
+            buffer_size = 3 * (map_w * channel) * sizeof(DT_S32);
         }
 
         ThreadBuffer thread_buffer(m_ctx, buffer_size);
 
-        std::deque<MI_U8*> border_peaks_parallel;
+        std::deque<DT_U8*> border_peaks_parallel;
         std::mutex mutex;
 
         ret = wp->ParallelFor(0, AURA_ALIGN(src_dx->GetSizes().m_height, 16) / 16, CannyNeonImpl, m_ctx, std::cref(*src_dx), std::ref(*src_dy), std::ref(map),
@@ -642,7 +642,7 @@ Status CannyNeon::Run()
         // process borderPeaksParallel
         while (!border_peaks_parallel.empty())
         {
-            MI_U8* m = border_peaks_parallel.back();
+            DT_U8* m = border_peaks_parallel.back();
             border_peaks_parallel.pop_back();
 
             if (!m[-map_w - 1])

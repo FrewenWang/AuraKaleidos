@@ -19,8 +19,8 @@ class AdaptiveThresholdImpl : public OpImpl
 public:
     AdaptiveThresholdImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_F32 max_val, AdaptiveThresholdMethod method,
-                           MI_S32 type, MI_S32 block_size, MI_F32 delta);
+    virtual Status SetArgs(const Array *src, Array *dst, DT_F32 max_val, AdaptiveThresholdMethod method,
+                           DT_S32 type, DT_S32 block_size, DT_F32 delta);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -28,15 +28,15 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
     AdaptiveThresholdMethod m_method;
 
-    MI_F32       m_max_val;
-    MI_S32       m_type;
-    MI_S32       m_block_size;
-    MI_F32       m_delta;
+    DT_F32       m_max_val;
+    DT_S32       m_type;
+    DT_S32       m_block_size;
+    DT_F32       m_delta;
 
     const Array *m_src;
     Array       *m_dst;
@@ -47,8 +47,8 @@ class AdaptiveThresholdNone : public AdaptiveThresholdImpl
 public:
     AdaptiveThresholdNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 max_val, AdaptiveThresholdMethod method,
-                   MI_S32 type, MI_S32 block_size, MI_F32 delta) override;
+    Status SetArgs(const Array *src, Array *dst, DT_F32 max_val, AdaptiveThresholdMethod method,
+                   DT_S32 type, DT_S32 block_size, DT_F32 delta) override;
 
     Status Run() override;
 };

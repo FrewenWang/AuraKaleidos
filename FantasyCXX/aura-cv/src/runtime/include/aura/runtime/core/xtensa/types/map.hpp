@@ -40,7 +40,7 @@ namespace xtensa
  * @tparam KEY_MAX_SIZE Maximum size of the key string.
  * @tparam MAP_MAX_SIZE Maximum size of the map.
  */
-template <typename Tp, MI_S32 KEY_MAX_SIZE = AURA_STRING_DEFAULT_MAX_SIZE, MI_S32 MAP_MAX_SIZE = AURA_DEFAULT_MAP_MAX_SIZE>
+template <typename Tp, DT_S32 KEY_MAX_SIZE = AURA_STRING_DEFAULT_MAX_SIZE, DT_S32 MAP_MAX_SIZE = AURA_DEFAULT_MAP_MAX_SIZE>
 class map
 {
 public:
@@ -61,7 +61,7 @@ public:
      */
     map(std::initializer_list<std::pair<string_<KEY_MAX_SIZE>, Tp>> lists) : m_size(0)
     {
-        MI_BOOL ret = MI_FALSE;
+        DT_BOOL ret = DT_FALSE;
         for (const auto &list : lists)
         {
             ret = insert(list.first.c_str(), list.second);
@@ -189,7 +189,7 @@ public:
      * @param k The key to access or insert.
      * @return Reference to the value associated with the key.
      */
-    Tp& operator[](const  MI_CHAR *k)
+    Tp& operator[](const  DT_CHAR *k)
     {
         iterator it = find(k);
         if (it != end())
@@ -197,7 +197,7 @@ public:
             return it->second;
         }
 
-        MI_BOOL ret = insert(k, Tp{});
+        DT_BOOL ret = insert(k, Tp{});
         if (!ret)
         {
             AURA_XTENSA_LOG("insert(%s) failed!\n", k);
@@ -215,7 +215,7 @@ public:
      * @param k The key(char pointer) to access or insert.
      * @return Const reference to the const value associated with the key.
      */
-    const Tp& operator[](const  MI_CHAR *k) const
+    const Tp& operator[](const  DT_CHAR *k) const
     {
         const_iterator it = find(k);
         if (it != end())
@@ -248,26 +248,26 @@ public:
      * @param v The value to insert.
      * @return True if the insertion was successful, otherwise False.
      */
-    MI_BOOL insert(const MI_CHAR *k, const Tp &v)
+    DT_BOOL insert(const DT_CHAR *k, const Tp &v)
     {
         if (m_size >= MAP_MAX_SIZE)
         {
             AURA_XTENSA_LOG("The map size reach the max size!\n");
-            return MI_FALSE;
+            return DT_FALSE;
         }
 
-        for (MI_S32 i = 0; i < m_size; ++i)
+        for (DT_S32 i = 0; i < m_size; ++i)
         {
             if (0 == Strcmp(m_data[i].first.c_str(), k))
             {
                 m_data[i].second = v;
-                return MI_TRUE;
+                return DT_TRUE;
             }
         }
 
         m_data[m_size++] = { k, v };
 
-        return MI_TRUE;
+        return DT_TRUE;
     }
 
     /**
@@ -279,7 +279,7 @@ public:
      * @param v The value to insert.
      * @return True if the insertion was successful, otherwise False.
      */
-    MI_BOOL insert(const string_<KEY_MAX_SIZE> &k, const Tp &v)
+    DT_BOOL insert(const string_<KEY_MAX_SIZE> &k, const Tp &v)
     {
         return insert(k.c_str(), v);
     }
@@ -290,24 +290,24 @@ public:
      * @param k The key of the element to erase.
      * @return True if the erase was successful (element found and removed), otherwise False.
      */
-    MI_BOOL erase(const string_<KEY_MAX_SIZE> &k)
+    DT_BOOL erase(const string_<KEY_MAX_SIZE> &k)
     {
-        for (MI_S32 i = 0; i < m_size; ++i)
+        for (DT_S32 i = 0; i < m_size; ++i)
         {
             if (0 == Strcmp(m_data[i].first.c_str(), k.c_str()))
             {
-                for (MI_S32 j = i; j < m_size - 1; ++j)
+                for (DT_S32 j = i; j < m_size - 1; ++j)
                 {
                     m_data[j].first = m_data[j + 1].first;
                     m_data[j].second = m_data[j + 1].second;
                 }
                 --m_size;
 
-                return MI_TRUE;
+                return DT_TRUE;
             }
         }
 
-        return MI_FALSE;
+        return DT_FALSE;
     }
 
     /**
@@ -316,7 +316,7 @@ public:
      * @param k The key of the element to erase.
      * @return True if the erase was successful (element found and removed), otherwise False.
      */
-    MI_BOOL erase(const MI_CHAR *k)
+    DT_BOOL erase(const DT_CHAR *k)
     {
         string_<KEY_MAX_SIZE> str(k);
         return erase(str);
@@ -328,9 +328,9 @@ public:
      * @param k The key(char pointer) to access.
      * @return Reference to the value associated with the key.
      */
-    Tp& at(const MI_CHAR *k)
+    Tp& at(const DT_CHAR *k)
     {
-        for (MI_S32 i = 0; i < m_size; ++i)
+        for (DT_S32 i = 0; i < m_size; ++i)
         {
             if (0 == Strcmp(m_data[i].first.c_str(), k))
             {
@@ -349,9 +349,9 @@ public:
      * @param k The key(char pointer) to access.
      * @return Const reference to the const value associated with the key.
      */
-    const Tp& at(const MI_CHAR *k) const
+    const Tp& at(const DT_CHAR *k) const
     {
-        for (MI_S32 i = 0; i < m_size; ++i)
+        for (DT_S32 i = 0; i < m_size; ++i)
         {
             if (0 == Strcmp(m_data[i].first.c_str(), k))
             {
@@ -392,9 +392,9 @@ public:
      * @param k The key(char pointer) to search for.
      * @return Iterator pointing to the element if found, otherwise end() iterator.
      */
-    iterator find(const MI_CHAR *k)
+    iterator find(const DT_CHAR *k)
     {
-        for (MI_S32 i = 0; i < m_size; ++i)
+        for (DT_S32 i = 0; i < m_size; ++i)
         {
             if (0 == Strcmp(m_data[i].first.c_str(), k))
             {
@@ -411,9 +411,9 @@ public:
      * @param k The key(char pointer) to search for.
      * @return Const_iterator pointing to the element if found, otherwise end() const_iterator.
      */
-    const_iterator find(const MI_CHAR *k) const
+    const_iterator find(const DT_CHAR *k) const
     {
-        for (MI_S32 i = 0; i < m_size; ++i)
+        for (DT_S32 i = 0; i < m_size; ++i)
         {
             if (0 == Strcmp(m_data[i].first.c_str(), k))
             {
@@ -452,10 +452,10 @@ public:
      * @param k The key (char pointer) to search for.
      * @return The number of occurrences of the specified key within the container.
      */
-    MI_S32 count(const MI_CHAR *k)
+    DT_S32 count(const DT_CHAR *k)
     {
-        MI_S32 cnt = 0;
-        for (MI_S32 i = 0; i < m_size; ++i)
+        DT_S32 cnt = 0;
+        for (DT_S32 i = 0; i < m_size; ++i)
         {
             if (0 == Strcmp(m_data[i].first.c_str(), k))
             {
@@ -472,7 +472,7 @@ public:
      * @param k The key (string) to search for.
      * @return The number of occurrences of the specified key within the container.
      */
-    MI_S32 count(const string_<KEY_MAX_SIZE> &k)
+    DT_S32 count(const string_<KEY_MAX_SIZE> &k)
     {
         return count(k.c_str());
     }
@@ -482,7 +482,7 @@ public:
      *
      * @return The number of elements in the map.
      */
-    MI_S32 size() const
+    DT_S32 size() const
     {
         return m_size;
     }
@@ -492,13 +492,13 @@ public:
      *
      * @return True if the map is empty, otherwise False.
      */
-    MI_BOOL empty()
+    DT_BOOL empty()
     {
         if (0 == m_size)
         {
-            return MI_TRUE;
+            return DT_TRUE;
         }
-        return MI_FALSE;
+        return DT_FALSE;
     }
 
     /**
@@ -513,7 +513,7 @@ public:
 
 private:
     std::pair<string_<KEY_MAX_SIZE>, Tp> m_data[MAP_MAX_SIZE]; /*!< Array of key-value pairs. */
-    MI_S32                               m_size;               /*!< Current size of the map. */
+    DT_S32                               m_size;               /*!< Current size of the map. */
 };
 
 /**

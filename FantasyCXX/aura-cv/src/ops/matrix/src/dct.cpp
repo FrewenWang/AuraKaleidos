@@ -40,12 +40,12 @@ Dct::Dct(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status Dct::SetArgs(const Array *src, Array *dst)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src || MI_NULL == dst))
+    if ((DT_NULL == src || DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dst or src null ptr");
         return Status::ERROR;
@@ -74,13 +74,13 @@ Status Dct::SetArgs(const Array *src, Array *dst)
         }
     }
 
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateDctImpl(m_ctx, impl_target);
     }
 
     DctImpl *dct_impl = dynamic_cast<DctImpl *>(m_impl.get());
-    if (MI_NULL == dct_impl)
+    if (DT_NULL == dct_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dct_impl is null ptr");
         return Status::ERROR;
@@ -109,24 +109,24 @@ DctImpl::DctImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Dct", targ
 
 Status DctImpl::SetArgs(const Array *src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dct / dst mat is null");
         return Status::ERROR;
     }
 
-    if ((MI_FALSE == src->IsValid()) || (MI_FALSE == dst->IsValid()))
+    if ((DT_FALSE == src->IsValid()) || (DT_FALSE == dst->IsValid()))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dct / dst mat not vaild");
         return Status::ERROR;
     }
 
-    if (MI_FALSE == src->IsSizesEqual(*dst))
+    if (DT_FALSE == src->IsSizesEqual(*dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dct and dst mat not meeting the requirement of equal size");
         return Status::ERROR;
@@ -169,7 +169,7 @@ std::string DctImpl::ToString() const
     return str;
 }
 
-AURA_VOID DctImpl::Dump(const std::string &prefix) const
+DT_VOID DctImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -219,12 +219,12 @@ InverseDct::InverseDct(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status InverseDct::SetArgs(const Array *src, Array *dst)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src || MI_NULL == dst))
+    if ((DT_NULL == src || DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dst or src null ptr");
         return Status::ERROR;
@@ -232,13 +232,13 @@ Status InverseDct::SetArgs(const Array *src, Array *dst)
 
     OpTarget impl_target = m_target;
 
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateIDctImpl(m_ctx, impl_target);
     }
 
     IDctImpl *idct_impl = dynamic_cast<IDctImpl *>(m_impl.get());
-    if (MI_NULL == idct_impl)
+    if (DT_NULL == idct_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dct_impl is null ptr");
         return Status::ERROR;
@@ -262,29 +262,29 @@ AURA_EXPORTS Status IInverseDct(Context *ctx, const Mat &src, Mat &dst, const Op
     return OpCall(ctx, idct, &src, &dst);
 }
 
-IDctImpl::IDctImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "IDct", target), m_src(MI_NULL), m_dst(MI_NULL)
+IDctImpl::IDctImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "IDct", target), m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
 Status IDctImpl::SetArgs(const Array *src, Array *dst)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dct / dst mat is null");
         return Status::ERROR;
     }
 
-    if ((MI_FALSE == src->IsValid()) || (MI_FALSE == dst->IsValid()))
+    if ((DT_FALSE == src->IsValid()) || (DT_FALSE == dst->IsValid()))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dct / dst mat not vaild");
         return Status::ERROR;
     }
 
-    if (MI_FALSE == src->IsSizesEqual(*dst))
+    if (DT_FALSE == src->IsSizesEqual(*dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dct and dst size not equal");
         return Status::ERROR;
@@ -328,7 +328,7 @@ std::string IDctImpl::ToString() const
     return str;
 }
 
-AURA_VOID IDctImpl::Dump(const std::string &prefix) const
+DT_VOID IDctImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -346,7 +346,7 @@ AURA_VOID IDctImpl::Dump(const std::string &prefix) const
 
 Status IDctImpl::Initialize()
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -361,7 +361,7 @@ Status IDctImpl::Initialize()
     {
         Sizes3 dst_sz = m_dst->GetSizes();
         m_mid = Mat(m_ctx, ElemType::F32, dst_sz, AURA_MEM_DEFAULT);
-        if (MI_FALSE == m_mid.IsValid())
+        if (DT_FALSE == m_mid.IsValid())
         {
             AURA_ADD_ERROR_STRING(m_ctx, "Create m_mid mat failed.");
             return Status::ERROR;

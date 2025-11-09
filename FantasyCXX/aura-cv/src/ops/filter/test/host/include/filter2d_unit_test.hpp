@@ -12,11 +12,11 @@ using namespace aura;
 AURA_TEST_PARAM(Filter2dParam,
                 MatElemPair, elem_type,
                 MatSize,     mat_size,
-                MI_S32,      ksize,
+                DT_S32,      ksize,
                 BorderType,  border_type,
                 OpTarget,    target);
 
-static Status CvFilter2D(Context *ctx, Mat &src, Mat &dst, Mat &kernel, MI_F64 delta, BorderType border_type)
+static Status CvFilter2D(Context *ctx, Mat &src, Mat &dst, Mat &kernel, DT_F64 delta, BorderType border_type)
 {
     AURA_UNUSED(ctx);
 
@@ -55,7 +55,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         Filter2dParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -77,7 +77,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         Filter2dParam run_param(GetParam((index)));
@@ -102,7 +102,7 @@ public:
         }
 
         // creat iauras
-        MI_BOOL promote_fp16 = ElemType::F16 == src_elem_type && TargetType::NONE == run_param.target.m_type;
+        DT_BOOL promote_fp16 = ElemType::F16 == src_elem_type && TargetType::NONE == run_param.target.m_type;
         ElemType ref_elem_type = promote_fp16 ? ElemType::F32 : dst_elem_type;
 
         const Sizes3 ker_sizes(run_param.ksize, run_param.ksize);
@@ -113,12 +113,12 @@ public:
         Mat ref = m_factory.GetEmptyMat(ref_elem_type, mat_size.m_sizes, AURA_MEM_DEFAULT, mat_size.m_strides);
         Scalar border_value{0, 0, 0, 0};
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
-        MI_F32 delta = 0.0f;
+        DT_F32 delta = 0.0f;
 
         result.param  = BorderTypeToString(run_param.border_type) + " | ksize:" + std::to_string(run_param.ksize);
         result.input  = mat_size.ToString() + " " + ElemTypesToString(src_elem_type);

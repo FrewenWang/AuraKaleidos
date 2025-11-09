@@ -13,46 +13,46 @@ namespace aura
 #define DST(y, x)  orow##y[x]
 
 template <typename Tp>
-AURA_ALWAYS_INLINE AURA_VOID Dft4x4(const Tp *src, MI_S32 istep, std::complex<MI_F32> *dst, MI_S32 ostep)
+AURA_ALWAYS_INLINE DT_VOID Dft4x4(const Tp *src, DT_S32 istep, std::complex<DT_F32> *dst, DT_S32 ostep)
 {
     const Tp *irow0 = src;
     const Tp *irow1 = src + istep;
     const Tp *irow2 = src + istep * 2;
     const Tp *irow3 = src + istep * 3;
 
-    std::complex<MI_F32> *orow0 = dst;
-    std::complex<MI_F32> *orow1 = dst + ostep;
-    std::complex<MI_F32> *orow2 = dst + ostep * 2;
-    std::complex<MI_F32> *orow3 = dst + ostep * 3;
+    std::complex<DT_F32> *orow0 = dst;
+    std::complex<DT_F32> *orow1 = dst + ostep;
+    std::complex<DT_F32> *orow2 = dst + ostep * 2;
+    std::complex<DT_F32> *orow3 = dst + ostep * 3;
 
-    MI_F32 sum00_02 = (MI_F32)(SRC(0, 0)) + (MI_F32)(SRC(0, 2));
-    MI_F32 sub00_02 = (MI_F32)(SRC(0, 0)) - (MI_F32)(SRC(0, 2));
-    MI_F32 sum01_03 = (MI_F32)(SRC(0, 1)) + (MI_F32)(SRC(0, 3));
-    MI_F32 sub01_03 = (MI_F32)(SRC(0, 1)) - (MI_F32)(SRC(0, 3));
-    MI_F32 sum10_12 = (MI_F32)(SRC(1, 0)) + (MI_F32)(SRC(1, 2));
-    MI_F32 sub10_12 = (MI_F32)(SRC(1, 0)) - (MI_F32)(SRC(1, 2));
-    MI_F32 sum11_13 = (MI_F32)(SRC(1, 1)) + (MI_F32)(SRC(1, 3));
-    MI_F32 sub11_13 = (MI_F32)(SRC(1, 1)) - (MI_F32)(SRC(1, 3));
-    MI_F32 sum20_22 = (MI_F32)(SRC(2, 0)) + (MI_F32)(SRC(2, 2));
-    MI_F32 sub20_22 = (MI_F32)(SRC(2, 0)) - (MI_F32)(SRC(2, 2));
-    MI_F32 sum21_23 = (MI_F32)(SRC(2, 1)) + (MI_F32)(SRC(2, 3));
-    MI_F32 sub21_23 = (MI_F32)(SRC(2, 1)) - (MI_F32)(SRC(2, 3));
-    MI_F32 sum30_32 = (MI_F32)(SRC(3, 0)) + (MI_F32)(SRC(3, 2));
-    MI_F32 sub30_32 = (MI_F32)(SRC(3, 0)) - (MI_F32)(SRC(3, 2));
-    MI_F32 sum31_33 = (MI_F32)(SRC(3, 1)) + (MI_F32)(SRC(3, 3));
-    MI_F32 sub31_33 = (MI_F32)(SRC(3, 1)) - (MI_F32)(SRC(3, 3));
+    DT_F32 sum00_02 = (DT_F32)(SRC(0, 0)) + (DT_F32)(SRC(0, 2));
+    DT_F32 sub00_02 = (DT_F32)(SRC(0, 0)) - (DT_F32)(SRC(0, 2));
+    DT_F32 sum01_03 = (DT_F32)(SRC(0, 1)) + (DT_F32)(SRC(0, 3));
+    DT_F32 sub01_03 = (DT_F32)(SRC(0, 1)) - (DT_F32)(SRC(0, 3));
+    DT_F32 sum10_12 = (DT_F32)(SRC(1, 0)) + (DT_F32)(SRC(1, 2));
+    DT_F32 sub10_12 = (DT_F32)(SRC(1, 0)) - (DT_F32)(SRC(1, 2));
+    DT_F32 sum11_13 = (DT_F32)(SRC(1, 1)) + (DT_F32)(SRC(1, 3));
+    DT_F32 sub11_13 = (DT_F32)(SRC(1, 1)) - (DT_F32)(SRC(1, 3));
+    DT_F32 sum20_22 = (DT_F32)(SRC(2, 0)) + (DT_F32)(SRC(2, 2));
+    DT_F32 sub20_22 = (DT_F32)(SRC(2, 0)) - (DT_F32)(SRC(2, 2));
+    DT_F32 sum21_23 = (DT_F32)(SRC(2, 1)) + (DT_F32)(SRC(2, 3));
+    DT_F32 sub21_23 = (DT_F32)(SRC(2, 1)) - (DT_F32)(SRC(2, 3));
+    DT_F32 sum30_32 = (DT_F32)(SRC(3, 0)) + (DT_F32)(SRC(3, 2));
+    DT_F32 sub30_32 = (DT_F32)(SRC(3, 0)) - (DT_F32)(SRC(3, 2));
+    DT_F32 sum31_33 = (DT_F32)(SRC(3, 1)) + (DT_F32)(SRC(3, 3));
+    DT_F32 sub31_33 = (DT_F32)(SRC(3, 1)) - (DT_F32)(SRC(3, 3));
 
     // 0. calc F(2u, 2v)  (u, v) = (0, 0)/(0, 1)/(1, 0)/(1, 1)  -> DST(0, 0), DST(0, 2), DST(2, 0), DST(2, 2)
     {
-        MI_F32 t0 = sum00_02 + sum20_22; // (m, n) = (0, 0)
-        MI_F32 t1 = sum01_03 + sum21_23; // (m, n) = (0, 1)
-        MI_F32 t2 = sum10_12 + sum30_32; // (m, n) = (1, 0)
-        MI_F32 t3 = sum11_13 + sum31_33; // (m, n) = (1, 1)
+        DT_F32 t0 = sum00_02 + sum20_22; // (m, n) = (0, 0)
+        DT_F32 t1 = sum01_03 + sum21_23; // (m, n) = (0, 1)
+        DT_F32 t2 = sum10_12 + sum30_32; // (m, n) = (1, 0)
+        DT_F32 t3 = sum11_13 + sum31_33; // (m, n) = (1, 1)
 
-        MI_F32 sum01 = t0 + t1;
-        MI_F32 sub01 = t0 - t1;
-        MI_F32 sum23 = t2 + t3;
-        MI_F32 sub23 = t2 - t3;
+        DT_F32 sum01 = t0 + t1;
+        DT_F32 sub01 = t0 - t1;
+        DT_F32 sum23 = t2 + t3;
+        DT_F32 sub23 = t2 - t3;
 
         DST(0, 0) = {sum01 + sum23, 0};
         DST(0, 2) = {sub01 + sub23, 0};
@@ -62,15 +62,15 @@ AURA_ALWAYS_INLINE AURA_VOID Dft4x4(const Tp *src, MI_S32 istep, std::complex<MI
 
     // 1. calc F(2u, 2v + 1)  (u, v) = (0, 0)/(0, 1)/(1, 0)/(1, 1)  -> DST(0, 1), DST(0, 3), DST(2, 1), DST(2, 3)
     {
-        MI_F32 t0 = sub00_02 + sub20_22; // (m, n) = (0, 0)
-        MI_F32 t1 = sub01_03 + sub21_23; // (m, n) = (0, 1)
-        MI_F32 t2 = sub10_12 + sub30_32; // (m, n) = (1, 0)
-        MI_F32 t3 = sub11_13 + sub31_33; // (m, n) = (1, 1)
+        DT_F32 t0 = sub00_02 + sub20_22; // (m, n) = (0, 0)
+        DT_F32 t1 = sub01_03 + sub21_23; // (m, n) = (0, 1)
+        DT_F32 t2 = sub10_12 + sub30_32; // (m, n) = (1, 0)
+        DT_F32 t3 = sub11_13 + sub31_33; // (m, n) = (1, 1)
 
-        MI_F32 sum02 = t0 + t2;
-        MI_F32 sub02 = t0 - t2;
-        MI_F32 sum13 = t1 + t3;
-        MI_F32 sub13 = t1 - t3;
+        DT_F32 sum02 = t0 + t2;
+        DT_F32 sub02 = t0 - t2;
+        DT_F32 sum13 = t1 + t3;
+        DT_F32 sub13 = t1 - t3;
 
         DST(0, 1) = {sum02, -sum13};
         DST(0, 3) = {sum02,  sum13};
@@ -80,15 +80,15 @@ AURA_ALWAYS_INLINE AURA_VOID Dft4x4(const Tp *src, MI_S32 istep, std::complex<MI
 
     // 2. calc F(2*u + 1, 2v)
     {
-        MI_F32 t0 = sum00_02 - sum20_22; // (m, n) = (0, 0)
-        MI_F32 t1 = sum01_03 - sum21_23; // (m, n) = (0, 1)
-        MI_F32 t2 = sum10_12 - sum30_32; // (m, n) = (1, 0)
-        MI_F32 t3 = sum11_13 - sum31_33; // (m, n) = (1, 1)
+        DT_F32 t0 = sum00_02 - sum20_22; // (m, n) = (0, 0)
+        DT_F32 t1 = sum01_03 - sum21_23; // (m, n) = (0, 1)
+        DT_F32 t2 = sum10_12 - sum30_32; // (m, n) = (1, 0)
+        DT_F32 t3 = sum11_13 - sum31_33; // (m, n) = (1, 1)
 
-        MI_F32 sum01 = t0 + t1;
-        MI_F32 sub01 = t0 - t1;
-        MI_F32 sum23 = t2 + t3;
-        MI_F32 sub23 = t2 - t3;
+        DT_F32 sum01 = t0 + t1;
+        DT_F32 sub01 = t0 - t1;
+        DT_F32 sum23 = t2 + t3;
+        DT_F32 sub23 = t2 - t3;
 
         DST(1, 0) = {sum01, -sum23};
         DST(1, 2) = {sub01, -sub23};
@@ -98,15 +98,15 @@ AURA_ALWAYS_INLINE AURA_VOID Dft4x4(const Tp *src, MI_S32 istep, std::complex<MI
 
     // 3. calc F(2*u + 1, 2*v + 1)
     {
-        MI_F32 t0 = sub00_02 - sub20_22; // (m, n) = (0, 0)
-        MI_F32 t1 = sub01_03 - sub21_23; // (m, n) = (0, 1)
-        MI_F32 t2 = sub10_12 - sub30_32; // (m, n) = (1, 0)
-        MI_F32 t3 = sub11_13 - sub31_33; // (m, n) = (1, 1)
+        DT_F32 t0 = sub00_02 - sub20_22; // (m, n) = (0, 0)
+        DT_F32 t1 = sub01_03 - sub21_23; // (m, n) = (0, 1)
+        DT_F32 t2 = sub10_12 - sub30_32; // (m, n) = (1, 0)
+        DT_F32 t3 = sub11_13 - sub31_33; // (m, n) = (1, 1)
 
-        MI_F32 sum03 = t0 + t3;
-        MI_F32 sub03 = t0 - t3;
-        MI_F32 sum12 = t1 + t2;
-        MI_F32 sub12 = t1 - t2;
+        DT_F32 sum03 = t0 + t3;
+        DT_F32 sub03 = t0 - t3;
+        DT_F32 sum12 = t1 + t2;
+        DT_F32 sub12 = t1 - t2;
 
         DST(1, 1) = {sub03, -sum12};
         DST(1, 3) = {sum03,  sub12};
@@ -121,17 +121,17 @@ AURA_ALWAYS_INLINE AURA_VOID Dft4x4(const Tp *src, MI_S32 istep, std::complex<MI
 template <typename Tp>
 static Status GridDft4x4NoneImpl(const Mat &src, Mat &dst)
 {
-    MI_S32 istep = src.GetRowPitch() / sizeof(Tp);
-    MI_S32 ostep = dst.GetRowPitch() / sizeof(MI_F32) / 2;
+    DT_S32 istep = src.GetRowPitch() / sizeof(Tp);
+    DT_S32 ostep = dst.GetRowPitch() / sizeof(DT_F32) / 2;
 
-    for (MI_S32 h = 0; h < src.GetSizes().m_height; h += 4)
+    for (DT_S32 h = 0; h < src.GetSizes().m_height; h += 4)
     {
         const Tp *src_row = src.Ptr<Tp>(h);
-        std::complex<MI_F32> *dst_row = dst.Ptr<std::complex<MI_F32>>(h);
-        for (MI_S32 w = 0; w < src.GetSizes().m_width; w += 4)
+        std::complex<DT_F32> *dst_row = dst.Ptr<std::complex<DT_F32>>(h);
+        for (DT_S32 w = 0; w < src.GetSizes().m_width; w += 4)
         {
             const Tp *src_data = src_row + w;
-            std::complex<MI_F32> *dst_data = dst_row + w;
+            std::complex<DT_F32> *dst_data = dst_row + w;
 
             Dft4x4(src_data, istep, dst_data, ostep);
         }
@@ -141,16 +141,16 @@ static Status GridDft4x4NoneImpl(const Mat &src, Mat &dst)
 }
 
 template <typename Tp>
-AURA_ALWAYS_INLINE AURA_VOID RowGridDft1x8(Tp *src, std::complex<MI_F32> *dst, std::complex<MI_F32> *dft_row_exp_table,
-                                         std::complex<MI_F32> *row_real_exp_table)
+AURA_ALWAYS_INLINE DT_VOID RowGridDft1x8(Tp *src, std::complex<DT_F32> *dst, std::complex<DT_F32> *dft_row_exp_table,
+                                         std::complex<DT_F32> *row_real_exp_table)
 {
-    std::complex<MI_F32> src0, src1, src2, src3;
-    src0.real((MI_F32)src[0]); src0.imag((MI_F32)src[1]);
-    src1.real((MI_F32)src[4]); src1.imag((MI_F32)src[5]);
-    src2.real((MI_F32)src[2]); src2.imag((MI_F32)src[3]);
-    src3.real((MI_F32)src[6]); src3.imag((MI_F32)src[7]);
+    std::complex<DT_F32> src0, src1, src2, src3;
+    src0.real((DT_F32)src[0]); src0.imag((DT_F32)src[1]);
+    src1.real((DT_F32)src[4]); src1.imag((DT_F32)src[5]);
+    src2.real((DT_F32)src[2]); src2.imag((DT_F32)src[3]);
+    src3.real((DT_F32)src[6]); src3.imag((DT_F32)src[7]);
 
-    std::complex<MI_F32> temp;
+    std::complex<DT_F32> temp;
     temp = src1;
     src1 = src0 - temp;
     src0 += temp;
@@ -166,33 +166,33 @@ AURA_ALWAYS_INLINE AURA_VOID RowGridDft1x8(Tp *src, std::complex<MI_F32> *dst, s
     src1 += temp;
     // cal conj row dft
     {
-        std::complex<MI_F32> yk_conj = std::conj(src3);
-        std::complex<MI_F32> fk = std::complex<MI_F32>(0.5f, 0.0f) * (src1 + yk_conj);
-        std::complex<MI_F32> gk = std::complex<MI_F32>(0.0f, 0.5f) * (yk_conj - src1);
-        std::complex<MI_F32> result = fk + row_real_exp_table[1] * gk;
+        std::complex<DT_F32> yk_conj = std::conj(src3);
+        std::complex<DT_F32> fk = std::complex<DT_F32>(0.5f, 0.0f) * (src1 + yk_conj);
+        std::complex<DT_F32> gk = std::complex<DT_F32>(0.0f, 0.5f) * (yk_conj - src1);
+        std::complex<DT_F32> result = fk + row_real_exp_table[1] * gk;
 
         dst[1] = result;
         dst[7] = std::conj(result);
 
-        fk  = std::complex<MI_F32>(0.5f, 0.0f) * (src2 + std::conj(src2));
-        gk  = std::complex<MI_F32>(0.0f, 0.5f) * (std::conj(src2) - src2);
+        fk  = std::complex<DT_F32>(0.5f, 0.0f) * (src2 + std::conj(src2));
+        gk  = std::complex<DT_F32>(0.0f, 0.5f) * (std::conj(src2) - src2);
         result = fk + row_real_exp_table[2] * gk;
 
         dst[2] = result;
         dst[6] = std::conj(result);
 
-        fk  = std::complex<MI_F32>(0.5f, 0.0f) * (src3 + std::conj(src1));
-        gk  = std::complex<MI_F32>(0.0f, 0.5f) * (std::conj(src1) - src3);
+        fk  = std::complex<DT_F32>(0.5f, 0.0f) * (src3 + std::conj(src1));
+        gk  = std::complex<DT_F32>(0.0f, 0.5f) * (std::conj(src1) - src3);
         result = fk + row_real_exp_table[3] * gk;
 
         dst[3] = result;
         dst[5] = std::conj(result);
     }
 
-    std::complex<MI_F32> y0 = src0;
-    std::complex<MI_F32> y0_conj = std::conj(y0);
-    std::complex<MI_F32> f0 = std::complex<MI_F32>(0.5f, 0.0f) * (y0 + y0_conj);
-    std::complex<MI_F32> g0 = std::complex<MI_F32>(0.0f, 0.5f) * (y0_conj - y0);
+    std::complex<DT_F32> y0 = src0;
+    std::complex<DT_F32> y0_conj = std::conj(y0);
+    std::complex<DT_F32> f0 = std::complex<DT_F32>(0.5f, 0.0f) * (y0 + y0_conj);
+    std::complex<DT_F32> g0 = std::complex<DT_F32>(0.0f, 0.5f) * (y0_conj - y0);
     dst[0] = f0 + g0;
     dst[4] = f0 - g0;
     // clear
@@ -200,12 +200,12 @@ AURA_ALWAYS_INLINE AURA_VOID RowGridDft1x8(Tp *src, std::complex<MI_F32> *dst, s
     dst[4].imag(0.0f);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID ColGridDft8x8(std::complex<MI_F32> src[][8], std::complex<MI_F32> *exp_table, std::complex<MI_F32> *dst, MI_S32 ostep)
+AURA_ALWAYS_INLINE DT_VOID ColGridDft8x8(std::complex<DT_F32> src[][8], std::complex<DT_F32> *exp_table, std::complex<DT_F32> *dst, DT_S32 ostep)
 {
     // butterfly size is 2, and update src data
-    for (MI_S32 j = 0; j < 8; j++)
+    for (DT_S32 j = 0; j < 8; j++)
     {
-        std::complex<MI_F32> temp = src[1][j];
+        std::complex<DT_F32> temp = src[1][j];
         src[1][j] = src[0][j] - temp;
         src[0][j] += temp;
         temp = src[3][j];
@@ -220,9 +220,9 @@ AURA_ALWAYS_INLINE AURA_VOID ColGridDft8x8(std::complex<MI_F32> src[][8], std::c
     }
 
     // butterfly size is 4, and update src data
-    for (MI_S32 j = 0; j < 8; j++)
+    for (DT_S32 j = 0; j < 8; j++)
     {
-        std::complex<MI_F32> temp = src[2][j];
+        std::complex<DT_F32> temp = src[2][j];
         src[2][j] = src[0][j] - temp;
         src[0][j] += temp;
 
@@ -240,9 +240,9 @@ AURA_ALWAYS_INLINE AURA_VOID ColGridDft8x8(std::complex<MI_F32> src[][8], std::c
     }
 
     // butterfly size is 8, and store result to dst
-    for (MI_S32 j = 0; j < 8; j++)
+    for (DT_S32 j = 0; j < 8; j++)
     {
-        std::complex<MI_F32> temp = src[4][j];
+        std::complex<DT_F32> temp = src[4][j];
         dst[4 * ostep + j] = src[0][j] - temp;
         dst[j] = src[0][j] + temp;
 
@@ -264,19 +264,19 @@ template <typename Tp>
 static Status GridDft8x8NoneImpl(const Mat &src, Mat &dst)
 {
     const Sizes3 sz     = src.GetSizes();
-    const MI_S32 width  = sz.m_width;
-    const MI_S32 height = sz.m_height;
-    const MI_S32 ostep  = dst.GetRowStep();
+    const DT_S32 width  = sz.m_width;
+    const DT_S32 height = sz.m_height;
+    const DT_S32 ostep  = dst.GetRowStep();
 
-    std::complex<MI_F32> row_dft_result[8][8];
-    std::complex<MI_F32> exp_table[4];
-    std::complex<MI_F32> dft_row_exp_table[2];
-    std::complex<MI_F32> row_real_exp_table[4];
+    std::complex<DT_F32> row_dft_result[8][8];
+    std::complex<DT_F32> exp_table[4];
+    std::complex<DT_F32> dft_row_exp_table[2];
+    std::complex<DT_F32> row_real_exp_table[4];
     GetDftExpTable<0>(dft_row_exp_table,  4);
     GetDftExpTable<0>(row_real_exp_table, 8);
     GetDftExpTable<0>(exp_table,          8);
 
-    for (MI_S32 y = 0; y < height; y += 8)
+    for (DT_S32 y = 0; y < height; y += 8)
     {
         const Tp *src_row0 = src.Ptr<Tp>(y);
         const Tp *src_row1 = src.Ptr<Tp>(y + 1);
@@ -286,8 +286,8 @@ static Status GridDft8x8NoneImpl(const Mat &src, Mat &dst)
         const Tp *src_row5 = src.Ptr<Tp>(y + 5);
         const Tp *src_row6 = src.Ptr<Tp>(y + 6);
         const Tp *src_row7 = src.Ptr<Tp>(y + 7);
-        std::complex<MI_F32> *dst_ptr = dst.Ptr<std::complex<MI_F32>>(y);
-        for (MI_S32 x = 0; x < width; x += 8)
+        std::complex<DT_F32> *dst_ptr = dst.Ptr<std::complex<DT_F32>>(y);
+        for (DT_S32 x = 0; x < width; x += 8)
         {
             RowGridDft1x8(src_row0 + x, row_dft_result[0], dft_row_exp_table, row_real_exp_table);
             RowGridDft1x8(src_row1 + x, row_dft_result[4], dft_row_exp_table, row_real_exp_table);
@@ -305,49 +305,49 @@ static Status GridDft8x8NoneImpl(const Mat &src, Mat &dst)
     return Status::OK;
 }
 
-template <typename Tp, MI_S32 GRID_LEN>
-static Status GridDftNxN(const Mat &src, Mat &dst, MI_U16 *idx_x_table, MI_U16 *idx_y_table, 
-                  std::complex<MI_F32> *dft_row_exp_table, std::complex<MI_F32> *row_real_exp_table,
-                  MI_S32 width_offset, MI_S32 height_offset)
+template <typename Tp, DT_S32 GRID_LEN>
+static Status GridDftNxN(const Mat &src, Mat &dst, DT_U16 *idx_x_table, DT_U16 *idx_y_table, 
+                  std::complex<DT_F32> *dft_row_exp_table, std::complex<DT_F32> *row_real_exp_table,
+                  DT_S32 width_offset, DT_S32 height_offset)
 {
-    constexpr MI_S32 HALF_GRID = GRID_LEN / 2;
-    const MI_S32 ostep  = dst.GetRowStep();
+    constexpr DT_S32 HALF_GRID = GRID_LEN / 2;
+    const DT_S32 ostep  = dst.GetRowStep();
 
-    std::complex<MI_F32> *dst_ptr = dst.Ptr<std::complex<MI_F32>>(height_offset);
-    std::complex<MI_F32> buffer[HALF_GRID];
-    std::complex<MI_F32> dst_complex[GRID_LEN][GRID_LEN];
+    std::complex<DT_F32> *dst_ptr = dst.Ptr<std::complex<DT_F32>>(height_offset);
+    std::complex<DT_F32> buffer[HALF_GRID];
+    std::complex<DT_F32> dst_complex[GRID_LEN][GRID_LEN];
 
-    for (MI_S32 y_grid = 0; y_grid < GRID_LEN; y_grid++)
+    for (DT_S32 y_grid = 0; y_grid < GRID_LEN; y_grid++)
     {
         const Tp *src_row = src.Ptr<Tp>(y_grid + height_offset);
-        MI_S32 y_grid_index = idx_y_table[y_grid];
+        DT_S32 y_grid_index = idx_y_table[y_grid];
 
-        for (MI_S32 x_grid = 0; x_grid < HALF_GRID; x_grid++)
+        for (DT_S32 x_grid = 0; x_grid < HALF_GRID; x_grid++)
         {
-            MI_S32 idx = idx_x_table[x_grid];
-            buffer[x_grid].real(SaturateCast<MI_F32>(src_row[width_offset + 2 * idx]));
-            buffer[x_grid].imag(SaturateCast<MI_F32>(src_row[width_offset + 2 * idx + 1]));
+            DT_S32 idx = idx_x_table[x_grid];
+            buffer[x_grid].real(SaturateCast<DT_F32>(src_row[width_offset + 2 * idx]));
+            buffer[x_grid].imag(SaturateCast<DT_F32>(src_row[width_offset + 2 * idx + 1]));
         }
 
-        ButterflyTransformNone(buffer, 2, HALF_GRID, MI_FALSE, dft_row_exp_table);
+        ButterflyTransformNone(buffer, 2, HALF_GRID, DT_FALSE, dft_row_exp_table);
 
-        for (MI_S32 x_grid = 1; x_grid < HALF_GRID; x_grid++)
+        for (DT_S32 x_grid = 1; x_grid < HALF_GRID; x_grid++)
         {
-            std::complex<MI_F32> yk = buffer[x_grid];
-            std::complex<MI_F32> yk_conj = std::conj(buffer[HALF_GRID - x_grid]);
+            std::complex<DT_F32> yk = buffer[x_grid];
+            std::complex<DT_F32> yk_conj = std::conj(buffer[HALF_GRID - x_grid]);
 
-            std::complex<MI_F32> fk = std::complex<MI_F32>(0.5f, 0.0f) * (yk + yk_conj);
-            std::complex<MI_F32> gk = std::complex<MI_F32>(0.0f, 0.5f) * (yk_conj - yk);
+            std::complex<DT_F32> fk = std::complex<DT_F32>(0.5f, 0.0f) * (yk + yk_conj);
+            std::complex<DT_F32> gk = std::complex<DT_F32>(0.0f, 0.5f) * (yk_conj - yk);
 
-            std::complex<MI_F32> result = fk + row_real_exp_table[x_grid] * gk;
+            std::complex<DT_F32> result = fk + row_real_exp_table[x_grid] * gk;
             dst_complex[y_grid_index][x_grid] = result;
             dst_complex[y_grid_index][GRID_LEN - x_grid] = std::conj(result);
         }
 
-        std::complex<MI_F32> y0 = buffer[0];
-        std::complex<MI_F32> y0_conj = std::conj(y0);
-        std::complex<MI_F32> f0 = std::complex<MI_F32>(0.5f, 0.0f) * (y0 + y0_conj);
-        std::complex<MI_F32> g0 = std::complex<MI_F32>(0.0f, 0.5f) * (y0_conj - y0);
+        std::complex<DT_F32> y0 = buffer[0];
+        std::complex<DT_F32> y0_conj = std::conj(y0);
+        std::complex<DT_F32> f0 = std::complex<DT_F32>(0.5f, 0.0f) * (y0 + y0_conj);
+        std::complex<DT_F32> g0 = std::complex<DT_F32>(0.0f, 0.5f) * (y0_conj - y0);
         dst_complex[y_grid_index][0] = f0 + g0;
         dst_complex[y_grid_index][HALF_GRID] = f0 - g0;
 
@@ -355,24 +355,24 @@ static Status GridDftNxN(const Mat &src, Mat &dst, MI_U16 *idx_x_table, MI_U16 *
         dst_complex[y_grid_index][0].imag(0.0f);
         dst_complex[y_grid_index][HALF_GRID].imag(0.0f);
     }
-    std::complex<MI_F32> *row_result = &dst_complex[0][0];
+    std::complex<DT_F32> *row_result = &dst_complex[0][0];
 
     // col grid dft
-    std::complex<MI_F32> exp_table[HALF_GRID];
+    std::complex<DT_F32> exp_table[HALF_GRID];
     GetDftExpTable<0>(exp_table, GRID_LEN);
 
-    for (MI_S32 size = 2; size < GRID_LEN; size *= 2)
+    for (DT_S32 size = 2; size < GRID_LEN; size *= 2)
     {
-        MI_S32 half_size = size / 2;
-        MI_S32 table_step = GRID_LEN / size;
+        DT_S32 half_size = size / 2;
+        DT_S32 table_step = GRID_LEN / size;
 
-        for (MI_S32 i = 0; i < GRID_LEN; i += size)
+        for (DT_S32 i = 0; i < GRID_LEN; i += size)
         {
-            for (MI_S32 j = i, k = 0; j < i + half_size; j++, k += table_step)
+            for (DT_S32 j = i, k = 0; j < i + half_size; j++, k += table_step)
             {
-                for (MI_S32 row_index = 0; row_index < GRID_LEN; row_index++)
+                for (DT_S32 row_index = 0; row_index < GRID_LEN; row_index++)
                 {
-                    std::complex<MI_F32> temp = dst_complex[j + half_size][row_index] * exp_table[k];
+                    std::complex<DT_F32> temp = dst_complex[j + half_size][row_index] * exp_table[k];
                     dst_complex[j + half_size][row_index] = dst_complex[j][row_index] - temp;
                     dst_complex[j][row_index] += temp;
                 }
@@ -381,17 +381,17 @@ static Status GridDftNxN(const Mat &src, Mat &dst, MI_U16 *idx_x_table, MI_U16 *
     }
 
     // last butterfly
-    for (MI_S32 j = 0, k = 0; j < HALF_GRID; j++, k++)
+    for (DT_S32 j = 0, k = 0; j < HALF_GRID; j++, k++)
     {
-        std::complex<MI_F32> *dst_shift     = dst_ptr + j * ostep;
-        std::complex<MI_F32> *row_result_shift = row_result + j * GRID_LEN;
+        std::complex<DT_F32> *dst_shift     = dst_ptr + j * ostep;
+        std::complex<DT_F32> *row_result_shift = row_result + j * GRID_LEN;
 
-        std::complex<MI_F32> *dst_half_shift     = dst_ptr + (j + HALF_GRID) * ostep;
-        std::complex<MI_F32> *row_result_half_shift = row_result + (j + HALF_GRID) * GRID_LEN;
+        std::complex<DT_F32> *dst_half_shift     = dst_ptr + (j + HALF_GRID) * ostep;
+        std::complex<DT_F32> *row_result_half_shift = row_result + (j + HALF_GRID) * GRID_LEN;
 
-        for (MI_S32 row_index = 0; row_index < GRID_LEN; row_index++)
+        for (DT_S32 row_index = 0; row_index < GRID_LEN; row_index++)
         {
-            std::complex<MI_F32> temp = row_result_half_shift[row_index] * exp_table[k];
+            std::complex<DT_F32> temp = row_result_half_shift[row_index] * exp_table[k];
             dst_half_shift[width_offset + row_index] = row_result_shift[row_index] - temp;
             dst_shift[width_offset + row_index]      = row_result_shift[row_index] + temp;
         }
@@ -400,28 +400,28 @@ static Status GridDftNxN(const Mat &src, Mat &dst, MI_U16 *idx_x_table, MI_U16 *
     return Status::OK;
 }
 
-template <typename Tp, MI_S32 GRID_LEN>
+template <typename Tp, DT_S32 GRID_LEN>
 static Status GridDftNoneImpl(const Mat &src, Mat &dst)
 {
     const Sizes3 sz = src.GetSizes();
-    const MI_S32 width = sz.m_width;
-    const MI_S32 height = sz.m_height;
+    const DT_S32 width = sz.m_width;
+    const DT_S32 height = sz.m_height;
 
-    constexpr MI_S32 HALF_GRID = GRID_LEN / 2;
+    constexpr DT_S32 HALF_GRID = GRID_LEN / 2;
 
-    MI_U16 idx_x_table[HALF_GRID] = {0};
-    MI_U16 idx_y_table[GRID_LEN]  = {0};
+    DT_U16 idx_x_table[HALF_GRID] = {0};
+    DT_U16 idx_y_table[GRID_LEN]  = {0};
     GetReverseIndex(idx_x_table, HALF_GRID);
     GetReverseIndex(idx_y_table, GRID_LEN);
 
-    std::complex<MI_F32> dft_row_exp_table[HALF_GRID];
-    std::complex<MI_F32> row_real_exp_table[GRID_LEN];
+    std::complex<DT_F32> dft_row_exp_table[HALF_GRID];
+    std::complex<DT_F32> row_real_exp_table[GRID_LEN];
     GetDftExpTable<0>(dft_row_exp_table, HALF_GRID);
     GetDftExpTable<0>(row_real_exp_table, GRID_LEN);
 
-    for (MI_S32 y = 0; y < height; y += GRID_LEN)
+    for (DT_S32 y = 0; y < height; y += GRID_LEN)
     {
-        for (MI_S32 x = 0; x < width; x += GRID_LEN)
+        for (DT_S32 x = 0; x < width; x += GRID_LEN)
         {
             GridDftNxN<Tp, GRID_LEN>(src, dst, idx_x_table, idx_y_table, dft_row_exp_table, row_real_exp_table, x, y);
         }
@@ -430,21 +430,21 @@ static Status GridDftNoneImpl(const Mat &src, Mat &dst)
     return Status::OK;
 }
 
-static Status GridDftCommonNoneImpl(Context *ctx, const Mat &src, Mat &dst, MI_S32 grid_len, const OpTarget &target)
+static Status GridDftCommonNoneImpl(Context *ctx, const Mat &src, Mat &dst, DT_S32 grid_len, const OpTarget &target)
 {
     AURA_UNUSED(target);
     Status ret = Status::OK;
 
-    MI_S32 height = src.GetSizes().m_height;
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 grid_rows = height / grid_len;
-    MI_S32 grid_cols = width  / grid_len;
-    for (MI_S32 i = 0; i < grid_rows; i++)
+    DT_S32 height = src.GetSizes().m_height;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 grid_rows = height / grid_len;
+    DT_S32 grid_cols = width  / grid_len;
+    for (DT_S32 i = 0; i < grid_rows; i++)
     {
-        for (MI_S32 j = 0; j < grid_cols; j++)
+        for (DT_S32 j = 0; j < grid_cols; j++)
         {
-            MI_S32 x = j * grid_len;
-            MI_S32 y = i * grid_len;
+            DT_S32 x = j * grid_len;
+            DT_S32 y = i * grid_len;
             Rect roi(x, y, grid_len, grid_len);
             Mat src_grid = src.Roi(roi);
             Mat dst_grid = dst.Roi(roi);
@@ -461,7 +461,7 @@ static Status GridDftCommonNoneImpl(Context *ctx, const Mat &src, Mat &dst, MI_S
 }
 
 template <typename Tp>
-static Status GridDftNoneHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 grid_len, const OpTarget &target)
+static Status GridDftNoneHelper(Context *ctx, const Mat &src, Mat &dst, DT_S32 grid_len, const OpTarget &target)
 {
     Status ret = Status::ERROR;
     switch (grid_len)
@@ -499,7 +499,7 @@ static Status GridDftNoneHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 g
 GridDftNone::GridDftNone(Context *ctx, const OpTarget &target) : GridDftImpl(ctx, target)
 {}
 
-Status GridDftNone::SetArgs(const Array *src, Array *dst, MI_S32 grid_len)
+Status GridDftNone::SetArgs(const Array *src, Array *dst, DT_S32 grid_len)
 {
     if (GridDftImpl::SetArgs(src, dst, grid_len) != Status::OK)
     {
@@ -515,7 +515,7 @@ Status GridDftNone::SetArgs(const Array *src, Array *dst, MI_S32 grid_len)
 
     if (ElemType::F64 == src->GetElemType())
     {
-        AURA_ADD_ERROR_STRING(m_ctx, "current src does not support MI_F64 type.");
+        AURA_ADD_ERROR_STRING(m_ctx, "current src does not support DT_F64 type.");
         return Status::ERROR;
     }
 
@@ -527,7 +527,7 @@ Status GridDftNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
@@ -539,32 +539,32 @@ Status GridDftNone::Run()
     {
         case ElemType::U8:
         {
-            ret = GridDftNoneHelper<MI_U8>(m_ctx, *src, *dst, m_grid_len, m_target);
+            ret = GridDftNoneHelper<DT_U8>(m_ctx, *src, *dst, m_grid_len, m_target);
             break;
         }
         case ElemType::S8:
         {
-            ret = GridDftNoneHelper<MI_S8>(m_ctx, *src, *dst, m_grid_len, m_target);
+            ret = GridDftNoneHelper<DT_S8>(m_ctx, *src, *dst, m_grid_len, m_target);
             break;
         }
         case ElemType::U16:
         {
-            ret = GridDftNoneHelper<MI_U16>(m_ctx, *src, *dst, m_grid_len, m_target);
+            ret = GridDftNoneHelper<DT_U16>(m_ctx, *src, *dst, m_grid_len, m_target);
             break;
         }
         case ElemType::S16:
         {
-            ret = GridDftNoneHelper<MI_S16>(m_ctx, *src, *dst, m_grid_len, m_target);
+            ret = GridDftNoneHelper<DT_S16>(m_ctx, *src, *dst, m_grid_len, m_target);
             break;
         }
         case ElemType::U32:
         {
-            ret = GridDftNoneHelper<MI_U32>(m_ctx, *src, *dst, m_grid_len, m_target);
+            ret = GridDftNoneHelper<DT_U32>(m_ctx, *src, *dst, m_grid_len, m_target);
             break;
         }
         case ElemType::S32:
         {
-            ret = GridDftNoneHelper<MI_S32>(m_ctx, *src, *dst, m_grid_len, m_target);
+            ret = GridDftNoneHelper<DT_S32>(m_ctx, *src, *dst, m_grid_len, m_target);
             break;
         }
 #if defined(AURA_BUILD_HOST)
@@ -575,7 +575,7 @@ Status GridDftNone::Run()
         }
         case ElemType::F32:
         {
-            ret = GridDftNoneHelper<MI_F32>(m_ctx, *src, *dst, m_grid_len, m_target);
+            ret = GridDftNoneHelper<DT_F32>(m_ctx, *src, *dst, m_grid_len, m_target);
             break;
         }
 #endif // AURA_BUILD_HOST
@@ -590,8 +590,8 @@ Status GridDftNone::Run()
     AURA_RETURN(m_ctx, ret);
 }
 
-template <typename Tp, MI_S32 C>
-AURA_ALWAYS_INLINE AURA_VOID ConvertComplex(Tp *dst, MI_S32 dst_offset, std::complex<MI_F32> complex_src)
+template <typename Tp, DT_S32 C>
+AURA_ALWAYS_INLINE DT_VOID ConvertComplex(Tp *dst, DT_S32 dst_offset, std::complex<DT_F32> complex_src)
 {
     if (1 == C)
     {
@@ -604,14 +604,14 @@ AURA_ALWAYS_INLINE AURA_VOID ConvertComplex(Tp *dst, MI_S32 dst_offset, std::com
     }
 }
 
-template <typename Tp, MI_S32 C>
-AURA_ALWAYS_INLINE AURA_VOID IDft4x4(const std::complex<MI_F32> *src_row0, const std::complex<MI_F32> *src_row1,
-                                   const std::complex<MI_F32> *src_row2, const std::complex<MI_F32> *src_row3,
-                                   MI_BOOL with_scale, Tp *dst, MI_S32 ostep)
+template <typename Tp, DT_S32 C>
+AURA_ALWAYS_INLINE DT_VOID IDft4x4(const std::complex<DT_F32> *src_row0, const std::complex<DT_F32> *src_row1,
+                                   const std::complex<DT_F32> *src_row2, const std::complex<DT_F32> *src_row3,
+                                   DT_BOOL with_scale, Tp *dst, DT_S32 ostep)
 {
-    MI_F32 n = with_scale ? 4.0f : 1.0f;
-    std::complex<MI_F32> exp_table = {0, 1};
-    std::complex<MI_F32> row_dft_result[4][4];
+    DT_F32 n = with_scale ? 4.0f : 1.0f;
+    std::complex<DT_F32> exp_table = {0, 1};
+    std::complex<DT_F32> row_dft_result[4][4];
     // butterfly size is 2
     row_dft_result[0][0] = src_row0[0] + src_row0[2];
     row_dft_result[0][1] = src_row0[0] - src_row0[2];
@@ -634,7 +634,7 @@ AURA_ALWAYS_INLINE AURA_VOID IDft4x4(const std::complex<MI_F32> *src_row0, const
     row_dft_result[3][3] = src_row3[1] - src_row3[3];
 
     // butterfly size is 4
-    std::complex<MI_F32> temp;
+    std::complex<DT_F32> temp;
     temp = row_dft_result[0][2];
     row_dft_result[0][2] = (row_dft_result[0][0] - temp) / n;
     row_dft_result[0][0] = (row_dft_result[0][0] + temp) / n;
@@ -664,7 +664,7 @@ AURA_ALWAYS_INLINE AURA_VOID IDft4x4(const std::complex<MI_F32> *src_row0, const
     row_dft_result[3][1] = (row_dft_result[3][1] + temp) / n;
 
     // col idft
-    for (MI_S32 j = 0; j < 4; j++)
+    for (DT_S32 j = 0; j < 4; j++)
     {
         temp = row_dft_result[1][j];
         row_dft_result[1][j] = row_dft_result[0][j] - temp;
@@ -674,7 +674,7 @@ AURA_ALWAYS_INLINE AURA_VOID IDft4x4(const std::complex<MI_F32> *src_row0, const
         row_dft_result[2][j] += temp;
     }
 
-    for (MI_S32 j = 0; j < 4; j++)
+    for (DT_S32 j = 0; j < 4; j++)
     {
         temp = row_dft_result[2][j];
         ConvertComplex<Tp, C>(dst, 2 * ostep + j * C, (row_dft_result[0][j] - temp) / n);
@@ -686,24 +686,24 @@ AURA_ALWAYS_INLINE AURA_VOID IDft4x4(const std::complex<MI_F32> *src_row0, const
     }
 }
 
-template <typename Tp, MI_S32 C>
-static Status GridIDft4x4NoneImpl(const Mat &src, Mat &dst, MI_BOOL with_scale)
+template <typename Tp, DT_S32 C>
+static Status GridIDft4x4NoneImpl(const Mat &src, Mat &dst, DT_BOOL with_scale)
 {
     Sizes3 size   = dst.GetSizes();
-    MI_S32 width  = size.m_width;
-    MI_S32 height = size.m_height;
-    MI_S32 ostep  = dst.GetRowPitch() / sizeof(Tp);
+    DT_S32 width  = size.m_width;
+    DT_S32 height = size.m_height;
+    DT_S32 ostep  = dst.GetRowPitch() / sizeof(Tp);
 
-    for (MI_S32 h = 0; h < height; h += 4)
+    for (DT_S32 h = 0; h < height; h += 4)
     {
-        const std::complex<MI_F32> *src_row0 = src.Ptr<std::complex<MI_F32>>(h);
-        const std::complex<MI_F32> *src_row1 = src.Ptr<std::complex<MI_F32>>(h + 1);
-        const std::complex<MI_F32> *src_row2 = src.Ptr<std::complex<MI_F32>>(h + 2);
-        const std::complex<MI_F32> *src_row3 = src.Ptr<std::complex<MI_F32>>(h + 3);
+        const std::complex<DT_F32> *src_row0 = src.Ptr<std::complex<DT_F32>>(h);
+        const std::complex<DT_F32> *src_row1 = src.Ptr<std::complex<DT_F32>>(h + 1);
+        const std::complex<DT_F32> *src_row2 = src.Ptr<std::complex<DT_F32>>(h + 2);
+        const std::complex<DT_F32> *src_row3 = src.Ptr<std::complex<DT_F32>>(h + 3);
 
         Tp *dst_row = dst.Ptr<Tp>(h);
 
-        for (MI_S32 w = 0; w < width; w += 4)
+        for (DT_S32 w = 0; w < width; w += 4)
         {
             IDft4x4<Tp, C>(src_row0 + w, src_row2 + w, src_row1 + w, src_row3 + w, with_scale,
                            dst_row + w * C, ostep);
@@ -713,14 +713,14 @@ static Status GridIDft4x4NoneImpl(const Mat &src, Mat &dst, MI_BOOL with_scale)
     return Status::OK;
 }
 
-static AURA_VOID RowGridIDft1x8(const std::complex<MI_F32> *src, std::complex<MI_F32> *dst, MI_BOOL with_scale,
-                              MI_U16 *idx_table, std::complex<MI_F32> *dft_row_exp_table)
+static DT_VOID RowGridIDft1x8(const std::complex<DT_F32> *src, std::complex<DT_F32> *dst, DT_BOOL with_scale,
+                              DT_U16 *idx_table, std::complex<DT_F32> *dft_row_exp_table)
 {
     // butterfly size is 2
-    for (MI_S32 x = 0; x < 8; x += 2)
+    for (DT_S32 x = 0; x < 8; x += 2)
     {
-        MI_U16 idx0 = idx_table[x];
-        MI_U16 idx1 = idx_table[x + 1];
+        DT_U16 idx0 = idx_table[x];
+        DT_U16 idx1 = idx_table[x + 1];
         dst[x]      = src[idx0] + src[idx1];
         dst[x + 1]  = src[idx0] - src[idx1];
     }
@@ -728,16 +728,16 @@ static AURA_VOID RowGridIDft1x8(const std::complex<MI_F32> *src, std::complex<MI
     ButterflyTransformNone(dst, 4, 8, with_scale, dft_row_exp_table);
 }
 
-template <typename Tp, MI_S32 C>
-AURA_ALWAYS_INLINE AURA_VOID ColGridIDft8x8(std::complex<MI_F32> src[][8], std::complex<MI_F32> *exp_table,
-                                          MI_BOOL with_scale, Tp *dst, MI_S32 ostep)
+template <typename Tp, DT_S32 C>
+AURA_ALWAYS_INLINE DT_VOID ColGridIDft8x8(std::complex<DT_F32> src[][8], std::complex<DT_F32> *exp_table,
+                                          DT_BOOL with_scale, Tp *dst, DT_S32 ostep)
 {
-    MI_F32 n = with_scale ? 8.0f : 1.0f;
+    DT_F32 n = with_scale ? 8.0f : 1.0f;
 
     // butterfly size is 2, and update src data
-    for (MI_S32 j = 0; j < 8; j++)
+    for (DT_S32 j = 0; j < 8; j++)
     {
-        std::complex<MI_F32> temp = src[1][j];
+        std::complex<DT_F32> temp = src[1][j];
         src[1][j] = src[0][j] - temp;
         src[0][j] += temp;
         temp = src[3][j];
@@ -752,9 +752,9 @@ AURA_ALWAYS_INLINE AURA_VOID ColGridIDft8x8(std::complex<MI_F32> src[][8], std::
     }
 
     // butterfly size is 4, and update src data
-    for (MI_S32 j = 0; j < 8; j++)
+    for (DT_S32 j = 0; j < 8; j++)
     {
-        std::complex<MI_F32> temp = src[2][j];
+        std::complex<DT_F32> temp = src[2][j];
         src[2][j] = src[0][j] - temp;
         src[0][j] += temp;
 
@@ -772,9 +772,9 @@ AURA_ALWAYS_INLINE AURA_VOID ColGridIDft8x8(std::complex<MI_F32> src[][8], std::
     }
 
     // butterfly size is 8, and store result to dst
-    for (MI_S32 j = 0; j < 8; j++)
+    for (DT_S32 j = 0; j < 8; j++)
     {
-        std::complex<MI_F32> temp = src[4][j];
+        std::complex<DT_F32> temp = src[4][j];
         ConvertComplex<Tp, C>(dst, 4 * ostep + j * C, (src[0][j] - temp) / n);
         ConvertComplex<Tp, C>(dst,             j * C, (src[0][j] + temp) / n);
 
@@ -792,37 +792,37 @@ AURA_ALWAYS_INLINE AURA_VOID ColGridIDft8x8(std::complex<MI_F32> src[][8], std::
     }
 }
 
-template <typename Tp, MI_S32 C>
-static Status GridIDft8x8NoneImpl(const Mat &src, Mat &dst, MI_BOOL with_scale)
+template <typename Tp, DT_S32 C>
+static Status GridIDft8x8NoneImpl(const Mat &src, Mat &dst, DT_BOOL with_scale)
 {
     Sizes3 size    = dst.GetSizes();
-    MI_S32 width   = size.m_width;
-    MI_S32 height  = size.m_height;
-    MI_S32 channel = size.m_channel;
+    DT_S32 width   = size.m_width;
+    DT_S32 height  = size.m_height;
+    DT_S32 channel = size.m_channel;
 
-    MI_S32 ostep = dst.GetRowPitch() / sizeof(Tp);
+    DT_S32 ostep = dst.GetRowPitch() / sizeof(Tp);
 
-    std::complex<MI_F32> row_dft_result[8][8];
-    std::complex<MI_F32> dft_row_exp_table[4];
+    std::complex<DT_F32> row_dft_result[8][8];
+    std::complex<DT_F32> dft_row_exp_table[4];
     GetDftExpTable<1>(dft_row_exp_table, 8);
 
-    MI_U16 idx_table[8];
+    DT_U16 idx_table[8];
     GetReverseIndex(idx_table, 8);
 
-    for (MI_S32 h = 0; h < height; h += 8)
+    for (DT_S32 h = 0; h < height; h += 8)
     {
-        const std::complex<MI_F32> *src_row0 = src.Ptr<std::complex<MI_F32>>(h);
-        const std::complex<MI_F32> *src_row1 = src.Ptr<std::complex<MI_F32>>(h + 1);
-        const std::complex<MI_F32> *src_row2 = src.Ptr<std::complex<MI_F32>>(h + 2);
-        const std::complex<MI_F32> *src_row3 = src.Ptr<std::complex<MI_F32>>(h + 3);
-        const std::complex<MI_F32> *src_row4 = src.Ptr<std::complex<MI_F32>>(h + 4);
-        const std::complex<MI_F32> *src_row5 = src.Ptr<std::complex<MI_F32>>(h + 5);
-        const std::complex<MI_F32> *src_row6 = src.Ptr<std::complex<MI_F32>>(h + 6);
-        const std::complex<MI_F32> *src_row7 = src.Ptr<std::complex<MI_F32>>(h + 7);
+        const std::complex<DT_F32> *src_row0 = src.Ptr<std::complex<DT_F32>>(h);
+        const std::complex<DT_F32> *src_row1 = src.Ptr<std::complex<DT_F32>>(h + 1);
+        const std::complex<DT_F32> *src_row2 = src.Ptr<std::complex<DT_F32>>(h + 2);
+        const std::complex<DT_F32> *src_row3 = src.Ptr<std::complex<DT_F32>>(h + 3);
+        const std::complex<DT_F32> *src_row4 = src.Ptr<std::complex<DT_F32>>(h + 4);
+        const std::complex<DT_F32> *src_row5 = src.Ptr<std::complex<DT_F32>>(h + 5);
+        const std::complex<DT_F32> *src_row6 = src.Ptr<std::complex<DT_F32>>(h + 6);
+        const std::complex<DT_F32> *src_row7 = src.Ptr<std::complex<DT_F32>>(h + 7);
 
         Tp *dst_row = dst.Ptr<Tp>(h);
 
-        for (MI_S32 w = 0; w < width; w += 8)
+        for (DT_S32 w = 0; w < width; w += 8)
         {
             RowGridIDft1x8(src_row0 + w, row_dft_result[0], with_scale, idx_table, dft_row_exp_table);
             RowGridIDft1x8(src_row1 + w, row_dft_result[4], with_scale, idx_table, dft_row_exp_table);
@@ -840,27 +840,27 @@ static Status GridIDft8x8NoneImpl(const Mat &src, Mat &dst, MI_BOOL with_scale)
     return Status::OK;
 }
 
-template <typename Tp, MI_S32 GRID_LEN, MI_S32 C>
-static Status GridIDftNxN(const Mat &src, Mat &dst, MI_U16 *idx_table, std::complex<MI_F32> *exp_table, 
-                   MI_BOOL with_scale, MI_S32 width_offset, MI_S32 height_offset)
+template <typename Tp, DT_S32 GRID_LEN, DT_S32 C>
+static Status GridIDftNxN(const Mat &src, Mat &dst, DT_U16 *idx_table, std::complex<DT_F32> *exp_table, 
+                   DT_BOOL with_scale, DT_S32 width_offset, DT_S32 height_offset)
 {
-    constexpr MI_S32 HALF_GRID = GRID_LEN / 2;
-    const MI_S32 ostep  = dst.GetRowPitch() / sizeof(Tp);
+    constexpr DT_S32 HALF_GRID = GRID_LEN / 2;
+    const DT_S32 ostep  = dst.GetRowPitch() / sizeof(Tp);
     
-    MI_F32 n = with_scale ? (MI_F32)GRID_LEN : 1.0f;
+    DT_F32 n = with_scale ? (DT_F32)GRID_LEN : 1.0f;
 
     Tp *dst_ptr = dst.Ptr<Tp>(height_offset);
-    std::complex<MI_F32> row_dft_result[GRID_LEN][GRID_LEN];
+    std::complex<DT_F32> row_dft_result[GRID_LEN][GRID_LEN];
 
-    for (MI_S32 y_grid = 0; y_grid < GRID_LEN; y_grid++)
+    for (DT_S32 y_grid = 0; y_grid < GRID_LEN; y_grid++)
     {
-        const std::complex<MI_F32> *src_row = src.Ptr<std::complex<MI_F32>>(y_grid + height_offset);
-        MI_S32 y_grid_index = idx_table[y_grid];
+        const std::complex<DT_F32> *src_row = src.Ptr<std::complex<DT_F32>>(y_grid + height_offset);
+        DT_S32 y_grid_index = idx_table[y_grid];
 
-        for (MI_S32 x = 0; x < GRID_LEN; x += 2)
+        for (DT_S32 x = 0; x < GRID_LEN; x += 2)
         {
-            MI_U16 idx0 = idx_table[x];
-            MI_U16 idx1 = idx_table[x + 1];
+            DT_U16 idx0 = idx_table[x];
+            DT_U16 idx1 = idx_table[x + 1];
             row_dft_result[y_grid_index][x]     = src_row[width_offset + idx0] + src_row[width_offset + idx1];
             row_dft_result[y_grid_index][x + 1] = src_row[width_offset + idx0] - src_row[width_offset + idx1];
         }
@@ -868,21 +868,21 @@ static Status GridIDftNxN(const Mat &src, Mat &dst, MI_U16 *idx_table, std::comp
         ButterflyTransformNone(&row_dft_result[y_grid_index][0], 4, GRID_LEN, with_scale, exp_table);
     }
 
-    std::complex<MI_F32> *row_result = &row_dft_result[0][0];
+    std::complex<DT_F32> *row_result = &row_dft_result[0][0];
 
     // col grid dft
-    for (MI_S32 size = 2; size < GRID_LEN; size *= 2)
+    for (DT_S32 size = 2; size < GRID_LEN; size *= 2)
     {
-        MI_S32 half_size = size / 2;
-        MI_S32 table_step = GRID_LEN / size;
+        DT_S32 half_size = size / 2;
+        DT_S32 table_step = GRID_LEN / size;
 
-        for (MI_S32 i = 0; i < GRID_LEN; i += size)
+        for (DT_S32 i = 0; i < GRID_LEN; i += size)
         {
-            for (MI_S32 j = i, k = 0; j < i + half_size; j++, k += table_step)
+            for (DT_S32 j = i, k = 0; j < i + half_size; j++, k += table_step)
             {
-                for (MI_S32 row_index = 0; row_index < GRID_LEN; row_index++)
+                for (DT_S32 row_index = 0; row_index < GRID_LEN; row_index++)
                 {
-                    std::complex<MI_F32> temp = row_dft_result[j + half_size][row_index] * exp_table[k];
+                    std::complex<DT_F32> temp = row_dft_result[j + half_size][row_index] * exp_table[k];
                     row_dft_result[j + half_size][row_index] = row_dft_result[j][row_index] - temp;
                     row_dft_result[j][row_index] += temp;
                 }
@@ -891,17 +891,17 @@ static Status GridIDftNxN(const Mat &src, Mat &dst, MI_U16 *idx_table, std::comp
     }
 
     // last butterfly
-    for (MI_S32 j = 0, k = 0; j < HALF_GRID; j++, k++)
+    for (DT_S32 j = 0, k = 0; j < HALF_GRID; j++, k++)
     {
         Tp *dst_shift      = dst_ptr + j * ostep;
         Tp *dst_half_shift = dst_ptr + (j + HALF_GRID) * ostep;
 
-        std::complex<MI_F32> *row_result_shift      = row_result + j * GRID_LEN;
-        std::complex<MI_F32> *row_result_half_shift = row_result + (j + HALF_GRID) * GRID_LEN;
+        std::complex<DT_F32> *row_result_shift      = row_result + j * GRID_LEN;
+        std::complex<DT_F32> *row_result_half_shift = row_result + (j + HALF_GRID) * GRID_LEN;
 
-        for (MI_S32 row_index = 0; row_index < GRID_LEN; row_index++)
+        for (DT_S32 row_index = 0; row_index < GRID_LEN; row_index++)
         {
-            std::complex<MI_F32> temp = row_result_half_shift[row_index] * exp_table[k];
+            std::complex<DT_F32> temp = row_result_half_shift[row_index] * exp_table[k];
             ConvertComplex<Tp, C>(dst_half_shift, (width_offset + row_index) * C, (row_result_shift[row_index] - temp) / n);
             ConvertComplex<Tp, C>(dst_shift,      (width_offset + row_index) * C, (row_result_shift[row_index] + temp) / n);
         }
@@ -910,22 +910,22 @@ static Status GridIDftNxN(const Mat &src, Mat &dst, MI_U16 *idx_table, std::comp
     return Status::OK;
 }
 
-template <typename Tp, MI_S32 GRID_LEN, MI_S32 C>
-static Status GridIDftNoneImpl(const Mat &src, Mat &dst, MI_BOOL with_scale)
+template <typename Tp, DT_S32 GRID_LEN, DT_S32 C>
+static Status GridIDftNoneImpl(const Mat &src, Mat &dst, DT_BOOL with_scale)
 {
     const Sizes3 sz = dst.GetSizes();
-    const MI_S32 width  = sz.m_width;
-    const MI_S32 height = sz.m_height;
+    const DT_S32 width  = sz.m_width;
+    const DT_S32 height = sz.m_height;
 
-    MI_U16 idx_table[GRID_LEN] = {0};
+    DT_U16 idx_table[GRID_LEN] = {0};
     GetReverseIndex(idx_table, GRID_LEN);
 
-    std::complex<MI_F32> dft_row_exp_table[GRID_LEN];
+    std::complex<DT_F32> dft_row_exp_table[GRID_LEN];
     GetDftExpTable<1>(dft_row_exp_table, GRID_LEN);
 
-    for (MI_S32 y = 0; y < height; y += GRID_LEN)
+    for (DT_S32 y = 0; y < height; y += GRID_LEN)
     {
-        for (MI_S32 x = 0; x < width; x += GRID_LEN)
+        for (DT_S32 x = 0; x < width; x += GRID_LEN)
         {
             GridIDftNxN<Tp, GRID_LEN, C>(src, dst, idx_table, dft_row_exp_table, with_scale, x, y);
         }
@@ -934,23 +934,23 @@ static Status GridIDftNoneImpl(const Mat &src, Mat &dst, MI_BOOL with_scale)
     return Status::OK;
 }
 
-template <typename Tp, MI_S32 C>
-static Status GridIDft16x16NoneImpl(const Mat &src, Mat &dst, MI_BOOL with_scale)
+template <typename Tp, DT_S32 C>
+static Status GridIDft16x16NoneImpl(const Mat &src, Mat &dst, DT_BOOL with_scale)
 {
     return GridIDftNoneImpl<Tp, 16, C>(src, dst, with_scale);
 }
 
-template <typename Tp, MI_S32 C>
-static Status GridIDft32x32NoneImpl(const Mat &src, Mat &dst, MI_BOOL with_scale)
+template <typename Tp, DT_S32 C>
+static Status GridIDft32x32NoneImpl(const Mat &src, Mat &dst, DT_BOOL with_scale)
 {
     return GridIDftNoneImpl<Tp, 32, C>(src, dst, with_scale);
 }
 
 template <typename Tp>
-static Status GridIDftNoneHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 grid_len, MI_BOOL with_scale)
+static Status GridIDftNoneHelper(Context *ctx, const Mat &src, Mat &dst, DT_S32 grid_len, DT_BOOL with_scale)
 {
     Status ret = Status::OK;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 channel = dst.GetSizes().m_channel;
     switch (grid_len)
     {
         case 4:
@@ -1015,7 +1015,7 @@ static Status GridIDftNoneHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 
 GridIDftNone::GridIDftNone(Context *ctx, const OpTarget &target) : GridIDftImpl(ctx, target)
 {}
 
-Status GridIDftNone::SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_BOOL with_scale)
+Status GridIDftNone::SetArgs(const Array *src, Array *dst, DT_S32 grid_len, DT_BOOL with_scale)
 {
     if (GridIDftImpl::SetArgs(src, dst, grid_len, with_scale) != Status::OK)
     {
@@ -1029,14 +1029,14 @@ Status GridIDftNone::SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_B
         return Status::ERROR;
     }
 
-    MI_S32 dst_channel    = dst->GetSizes().m_channel;
+    DT_S32 dst_channel    = dst->GetSizes().m_channel;
     ElemType dst_elemtype = dst->GetElemType();
 
     if (1 == dst_channel)
     {
         if (ElemType::F64 == dst_elemtype)
         {
-            AURA_ADD_ERROR_STRING(m_ctx, "when dst channel is 1, current dst does not support MI_F64 type.");
+            AURA_ADD_ERROR_STRING(m_ctx, "when dst channel is 1, current dst does not support DT_F64 type.");
             return Status::ERROR;
         }
     }
@@ -1044,7 +1044,7 @@ Status GridIDftNone::SetArgs(const Array *src, Array *dst, MI_S32 grid_len, MI_B
     {
         if (dst_elemtype != ElemType::F32)
         {
-            AURA_ADD_ERROR_STRING(m_ctx, "when dst channel is 2, current dst only support MI_F32 type.");
+            AURA_ADD_ERROR_STRING(m_ctx, "when dst channel is 2, current dst only support DT_F32 type.");
             return Status::ERROR;
         }
     }
@@ -1062,7 +1062,7 @@ Status GridIDftNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
@@ -1073,32 +1073,32 @@ Status GridIDftNone::Run()
     {
         case ElemType::U8:
         {
-            ret = GridIDftNoneHelper<MI_U8>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
+            ret = GridIDftNoneHelper<DT_U8>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
             break;
         }
         case ElemType::S8:
         {
-            ret = GridIDftNoneHelper<MI_S8>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
+            ret = GridIDftNoneHelper<DT_S8>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
             break;
         }
         case ElemType::U16:
         {
-            ret = GridIDftNoneHelper<MI_U16>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
+            ret = GridIDftNoneHelper<DT_U16>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
             break;
         }
         case ElemType::S16:
         {
-            ret = GridIDftNoneHelper<MI_S16>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
+            ret = GridIDftNoneHelper<DT_S16>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
             break;
         }
         case ElemType::U32:
         {
-            ret = GridIDftNoneHelper<MI_U32>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
+            ret = GridIDftNoneHelper<DT_U32>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
             break;
         }
         case ElemType::S32:
         {
-            ret = GridIDftNoneHelper<MI_S32>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
+            ret = GridIDftNoneHelper<DT_S32>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
             break;
         }
 #if defined(AURA_BUILD_HOST)
@@ -1109,7 +1109,7 @@ Status GridIDftNone::Run()
         }
         case ElemType::F32:
         {
-            ret = GridIDftNoneHelper<MI_F32>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
+            ret = GridIDftNoneHelper<DT_F32>(m_ctx, *src, *dst, m_grid_len, m_with_scale);
             break;
         }
 #endif // AURA_BUILD_HOST

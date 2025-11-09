@@ -12,8 +12,8 @@ struct ModelList
     std::string ref_file;
 };
 
-static Status HtpNNExecutorRun(Context *ctx, Mat &src, Mat &dst, std::string &minn_file, MI_S32 forward_count,
-                               MI_S32 &cur_count, MI_S32 total_count)
+static Status HtpNNExecutorRun(Context *ctx, Mat &src, Mat &dst, std::string &minn_file, DT_S32 forward_count,
+                               DT_S32 &cur_count, DT_S32 total_count)
 {
     Status ret = Status::ERROR;
 
@@ -22,20 +22,20 @@ static Status HtpNNExecutorRun(Context *ctx, Mat &src, Mat &dst, std::string &mi
     NNConfig config;
     Time start_time, create_exe_time, init_time, exe_time, delete_time;
 
-    HexagonEngine *engine = MI_NULL;
+    HexagonEngine *engine = DT_NULL;
     aura::HtpNNExecutor htp_nn_executor(ctx);
-    MI_S32 step = forward_count / 3 + 1;
+    DT_S32 step = forward_count / 3 + 1;
     std::vector<std::string> htp_perf_level = {"perf_low", "perf_normal", "perf_high"};
     std::vector<std::string> hmx_perf_level = {"perf_low", "perf_normal", "perf_high"};
 
     engine = ctx->GetHexagonEngine();
-    if (MI_NULL == engine)
+    if (DT_NULL == engine)
     {
         AURA_LOGE(ctx, AURA_TAG, "engine is null\n");
         return ret;
     }
 
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     start_time = Time::Now();
     config["perf_level"] = htp_perf_level[cur_count % 3];
@@ -56,7 +56,7 @@ static Status HtpNNExecutorRun(Context *ctx, Mat &src, Mat &dst, std::string &mi
     input.insert(std::make_pair("input", src));
     output.insert(std::make_pair("InceptionV3/Predictions/Reshape_1", dst));
 
-    for (MI_S32 iter = 0; iter < forward_count; iter++)
+    for (DT_S32 iter = 0; iter < forward_count; iter++)
     {
         start_time = Time::Now();
         HexagonRpcParam rpc_param(ctx);
@@ -88,7 +88,7 @@ EXIT:
     htp_nn_executor.DeInitialize();
     delete_time = Time::Now() - start_time;
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
     AURA_LOGD(ctx, AURA_TAG, "backend = %s, delete time = %s\n", "NPU", delete_time.ToString().c_str());
 
     return ret;
@@ -103,7 +103,7 @@ static TestResult HtpNNExecutorTest(ModelList model_list)
     std::string qnn_path   = data_path + "qnn/";
     std::string input_file = data_path + "trash_1x299x299x3_u8.bin";
 
-    MI_S32 forward_count = 5;
+    DT_S32 forward_count = 5;
 
     Mat dst(ctx, ElemType::U8, Sizes3(1, 1, 1001));
     Mat src     = factory.GetFileMat(input_file, ElemType::U8, {299, 299, 3});
@@ -114,8 +114,8 @@ static TestResult HtpNNExecutorTest(ModelList model_list)
     TestResult result;
     MatCmpResult cmp_result;
 
-    MI_S32 cur_count = 0;
-    MI_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
+    DT_S32 cur_count = 0;
+    DT_S32 loop_count = UnitTest::GetInstance()->IsStressMode() ? UnitTest::GetInstance()->GetStressCount() : 10;
 
     Status status_exec = Executor(loop_count, 2, time_val, HtpNNExecutorRun, ctx, src, dst, qnn_path + model_list.minn_file,
                                   forward_count, cur_count, loop_count);

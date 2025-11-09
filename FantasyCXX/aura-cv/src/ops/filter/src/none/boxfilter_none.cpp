@@ -14,56 +14,56 @@ struct BoxFilterTraits
 };
 
 template <>
-struct BoxFilterTraits<MI_U8>
+struct BoxFilterTraits<DT_U8>
 {
-    using InterType = MI_U32;
+    using InterType = DT_U32;
 };
 
 template <>
-struct BoxFilterTraits<MI_S8>
+struct BoxFilterTraits<DT_S8>
 {
-    using InterType = MI_S32;
+    using InterType = DT_S32;
 };
 
 template <typename Tp>
-static Status BoxFilterNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 ksize, MI_S32 start_row, MI_S32 end_row)
+static Status BoxFilterNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 ksize, DT_S32 start_row, DT_S32 end_row)
 {
     using InterType = typename BoxFilterTraits<Tp>::InterType;
 
-    MI_S32 ksize_sq = ksize * ksize;
+    DT_S32 ksize_sq = ksize * ksize;
 
     const Sizes3 isizes  = src.GetSizes();
     const Sizes3 osizes  = dst.GetSizes();
-    const MI_S32 iwidth  = isizes.m_width;
-    const MI_S32 owidth  = osizes.m_width;
-    const MI_S32 channel = isizes.m_channel;
-    MI_S32 ksh = ksize >> 1;
+    const DT_S32 iwidth  = isizes.m_width;
+    const DT_S32 owidth  = osizes.m_width;
+    const DT_S32 channel = isizes.m_channel;
+    DT_S32 ksh = ksize >> 1;
 
     std::vector<const Tp*> src_rows(ksize);
-    for (MI_S32 k = 0; k < ksize; k++)
+    for (DT_S32 k = 0; k < ksize; k++)
     {
         src_rows[k] = src.Ptr<Tp>(start_row + k);
     }
 
     InterType *sum_row = thread_buffer.GetThreadData<InterType>();
 
-    if (MI_NULL == sum_row)
+    if (DT_NULL == sum_row)
     {
         AURA_ADD_ERROR_STRING(ctx, "Get Buffer failed");
         return Status::ERROR;
     }
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         // calc vertical sum (iwidth = owidth + ksize/2 * 2)
-        for (MI_S32 x = 0; x < iwidth; x++)
+        for (DT_S32 x = 0; x < iwidth; x++)
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 InterType sum = 0;
-                MI_S32 index  = x * channel + ch;
+                DT_S32 index  = x * channel + ch;
 
-                for (MI_S32 k = 0; k < ksh; k++)
+                for (DT_S32 k = 0; k < ksh; k++)
                 {
                     Tp top = src_rows[k][index];
                     Tp bot = src_rows[ksize - k - 1][index];
@@ -79,13 +79,13 @@ static Status BoxFilterNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBu
         Tp *dst_row = dst.Ptr<Tp>(y);
 
         // calc horizontal sum
-        for (MI_S32 x = 0; x < owidth; x++)
+        for (DT_S32 x = 0; x < owidth; x++)
         {
-            for (MI_S32 ch = 0; ch < channel; ch++)
+            for (DT_S32 ch = 0; ch < channel; ch++)
             {
                 InterType sum_kernel = 0;
 
-                for (MI_S32 k = 0; k < ksh; k++)
+                for (DT_S32 k = 0; k < ksh; k++)
                 {
                     sum_kernel += (sum_row[(x + k) * channel + ch] + sum_row[(x + ksize - k - 1) * channel + ch]);
                 }
@@ -97,7 +97,7 @@ static Status BoxFilterNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBu
             }
         }
 
-        for (MI_S32 i = 0; i < ksize - 1; i++)
+        for (DT_S32 i = 0; i < ksize - 1; i++)
         {
             src_rows[i] = src_rows[i + 1];
         }
@@ -110,7 +110,7 @@ static Status BoxFilterNoneImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBu
 BoxFilterNone::BoxFilterNone(Context *ctx, const OpTarget &target) : BoxFilterImpl(ctx, target)
 {}
 
-Status BoxFilterNone::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+Status BoxFilterNone::SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                               BorderType border_type, const Scalar &border_value)
 {
     if (BoxFilterImpl::SetArgs(src, dst, ksize, border_type, border_value) != Status::OK)
@@ -137,7 +137,7 @@ Status BoxFilterNone::Initialize()
     }
 
     // Get border mat sizes
-    MI_S32 ksh          = m_ksize >> 1;
+    DT_S32 ksh          = m_ksize >> 1;
     Sizes3 border_sizes = m_src->GetSizes() + Sizes3(ksh << 1, ksh << 1, 0);
     m_src_border        = Mat(m_ctx, m_src->GetElemType(), border_sizes);
 
@@ -155,14 +155,14 @@ Status BoxFilterNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
     }
 
     // Get border mat sizes
-    MI_S32 ksh = m_ksize >> 1;
+    DT_S32 ksh = m_ksize >> 1;
     if (IMakeBorder(m_ctx, *src, m_src_border, ksh, ksh, ksh, ksh, m_border_type, m_border_value, OpTarget::None()) != Status::OK)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "make border fail..");
@@ -171,15 +171,15 @@ Status BoxFilterNone::Run()
 
     Status ret = Status::ERROR;
 
-    MI_S32 oheight  = dst->GetSizes().m_height;
-    MI_S32 iwidth   = m_src_border.GetSizes().m_width;
-    MI_S32 ichannel = m_src_border.GetSizes().m_channel;
+    DT_S32 oheight  = dst->GetSizes().m_height;
+    DT_S32 iwidth   = m_src_border.GetSizes().m_width;
+    DT_S32 ichannel = m_src_border.GetSizes().m_channel;
 
 #define BOX_FILTER_NONE_IMPL(type)                                                                                      \
     if (m_target.m_data.none.enable_mt)                                                                                 \
     {                                                                                                                   \
         WorkerPool *wp = m_ctx->GetWorkerPool();                                                                        \
-        if (MI_NULL == wp)                                                                                              \
+        if (DT_NULL == wp)                                                                                              \
         {                                                                                                               \
             AURA_ADD_ERROR_STRING(m_ctx, "GetWorkerpool failed");                                                       \
             return Status::ERROR;                                                                                       \
@@ -187,24 +187,24 @@ Status BoxFilterNone::Run()
                                                                                                                         \
         using InterType = typename BoxFilterTraits<type>::InterType;                                                    \
                                                                                                                         \
-        MI_S32 buffer_size = iwidth * ichannel * sizeof(InterType);                                                     \
+        DT_S32 buffer_size = iwidth * ichannel * sizeof(InterType);                                                     \
         ThreadBuffer thread_buffer(m_ctx, buffer_size);                                                                 \
                                                                                                                         \
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), oheight, BoxFilterNoneImpl<type>, m_ctx, std::cref(m_src_border), \
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), oheight, BoxFilterNoneImpl<type>, m_ctx, std::cref(m_src_border), \
                               std::ref(*dst), std::ref(thread_buffer), m_ksize);                                        \
     }                                                                                                                   \
     else                                                                                                                \
     {                                                                                                                   \
         using InterType = typename BoxFilterTraits<type>::InterType;                                                    \
                                                                                                                         \
-        MI_S32 buffer_size = iwidth * ichannel * sizeof(InterType);                                                     \
+        DT_S32 buffer_size = iwidth * ichannel * sizeof(InterType);                                                     \
         ThreadBuffer thread_buffer(m_ctx, buffer_size);                                                                 \
                                                                                                                         \
         ret = BoxFilterNoneImpl<type>(m_ctx, m_src_border, *dst, thread_buffer, m_ksize, 0, oheight);                   \
     }                                                                                                                   \
     if (ret != Status::OK)                                                                                              \
     {                                                                                                                   \
-        MI_CHAR error_msg[128];                                                                                         \
+        DT_CHAR error_msg[128];                                                                                         \
         std::snprintf(error_msg, sizeof(error_msg), "BoxFilterNoneImpl<%s> failed", #type);                             \
         AURA_ADD_ERROR_STRING(m_ctx, error_msg);                                                                        \
     }
@@ -213,37 +213,37 @@ Status BoxFilterNone::Run()
     {
         case ElemType::U8:
         {
-            BOX_FILTER_NONE_IMPL(MI_U8)
+            BOX_FILTER_NONE_IMPL(DT_U8)
             break;
         }
 
         case ElemType::S8:
         {
-            BOX_FILTER_NONE_IMPL(MI_S8)
+            BOX_FILTER_NONE_IMPL(DT_S8)
             break;
         }
 
         case ElemType::U16:
         {
-            BOX_FILTER_NONE_IMPL(MI_U16)
+            BOX_FILTER_NONE_IMPL(DT_U16)
             break;
         }
 
         case ElemType::S16:
         {
-            BOX_FILTER_NONE_IMPL(MI_S16)
+            BOX_FILTER_NONE_IMPL(DT_S16)
             break;
         }
 
         case ElemType::U32:
         {
-            BOX_FILTER_NONE_IMPL(MI_U32)
+            BOX_FILTER_NONE_IMPL(DT_U32)
             break;
         }
 
         case ElemType::S32:
         {
-            BOX_FILTER_NONE_IMPL(MI_S32)
+            BOX_FILTER_NONE_IMPL(DT_S32)
             break;
         }
 
@@ -257,7 +257,7 @@ Status BoxFilterNone::Run()
 
         case ElemType::F32:
         {
-            BOX_FILTER_NONE_IMPL(MI_F32)
+            BOX_FILTER_NONE_IMPL(DT_F32)
             break;
         }
 

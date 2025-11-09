@@ -23,7 +23,7 @@ Status IntegralHvx::SetArgs(const Array *src, Array *dst, Array *dst_sq)
     }
 
     // dst must be non-null and mat type
-    if (MI_NULL == dst)
+    if (DT_NULL == dst)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dst is nullptr");
         return Status::ERROR;
@@ -42,7 +42,7 @@ Status IntegralHvx::SetArgs(const Array *src, Array *dst, Array *dst_sq)
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1 && ch != 2)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2");
@@ -57,10 +57,10 @@ Status IntegralHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst = dynamic_cast<Mat*>(m_dst);
     Mat *dst_sq = dynamic_cast<Mat*>(m_dst_sq);
-    Mat dst0 = (dst != MI_NULL) ? *dst : Mat();
-    Mat dst1 = (dst_sq != MI_NULL) ? *dst_sq : Mat();
+    Mat dst0 = (dst != DT_NULL) ? *dst : Mat();
+    Mat dst1 = (dst_sq != DT_NULL) ? *dst_sq : Mat();
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is nullptr");
         return Status::ERROR;
@@ -82,7 +82,7 @@ Status IntegralHvx::Run()
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
     ret = engine->Run(AURA_OPS_MATRIX_PACKAGE_NAME, AURA_OPS_MATRIX_INTEGRAL_OP_NAME, rpc_param, &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }

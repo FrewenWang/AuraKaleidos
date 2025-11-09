@@ -22,15 +22,15 @@ class AURA_EXPORTS Profiler
 public:
     Profiler(Context *ctx);
 
-    MI_BOOL IsEnablePerf() const;
-    AURA_VOID Initialize(MI_BOOL enable_perf);
+    DT_BOOL IsEnablePerf() const;
+    DT_VOID Initialize(DT_BOOL enable_perf);
 
     Status AddNewNode(Node *node);
     Status AddNodeProfiling(Node *node, const Time &start, const Time &end, Status result, NodeExecType exec_type);
     Status UpdateNodeOutputs(const std::string &node_name, const std::vector<const Array*> &outputs);
 
     // array
-    Status AddCreateArrayProfiling(const std::string &name, const Array *array, const Time &start, const Time &end, MI_BOOL add_buffer = MI_TRUE);
+    Status AddCreateArrayProfiling(const std::string &name, const Array *array, const Time &start, const Time &end, DT_BOOL add_buffer = DT_TRUE);
     Status AddDeleteArrayProfiling(const Array *array, const Buffer &buffer, const Time &start, const Time &end);
 
     // buffer

@@ -62,15 +62,15 @@ static std::shared_ptr<GaussianImpl> CreateGaussianImpl(Context *ctx, const OpTa
 Gaussian::Gaussian(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Gaussian::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+Status Gaussian::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                          BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -110,14 +110,14 @@ Status Gaussian::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigm
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateGaussianImpl(m_ctx, impl_target);
     }
 
     // run initialize
     GaussianImpl *gaussian_impl = dynamic_cast<GaussianImpl*>(m_impl.get());
-    if (MI_NULL == gaussian_impl)
+    if (DT_NULL == gaussian_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "gaussian_impl is null ptr");
         return Status::ERROR;
@@ -128,10 +128,10 @@ Status Gaussian::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigm
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Gaussian::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type)
+Status Gaussian::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -153,7 +153,7 @@ Status Gaussian::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, 
     return Status::OK;
 }
 
-AURA_EXPORTS Status IGaussian(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MI_F32 sigma,
+AURA_EXPORTS Status IGaussian(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, DT_F32 sigma,
                               BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     // 实例化高斯模糊的对象
@@ -164,13 +164,13 @@ AURA_EXPORTS Status IGaussian(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksi
 
 GaussianImpl::GaussianImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, AURA_OPS_FILTER_GAUSSIAN_OP_NAME, target),
                                                                    m_ksize(0), m_sigma(0.f), m_border_type(BorderType::REFLECT_101),
-                                                                   m_src(MI_NULL), m_dst(MI_NULL)
+                                                                   m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status GaussianImpl::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+Status GaussianImpl::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                              BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -223,7 +223,7 @@ std::string GaussianImpl::ToString() const
 {
     std::string str;
 
-    MI_CHAR sigma_str[20];
+    DT_CHAR sigma_str[20];
     snprintf(sigma_str, sizeof(sigma_str), "%.2f", m_sigma);
 
     str = "op(Gaussian)";
@@ -235,7 +235,7 @@ std::string GaussianImpl::ToString() const
     return str;
 }
 
-AURA_VOID GaussianImpl::Dump(const std::string &prefix) const
+DT_VOID GaussianImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -251,11 +251,11 @@ AURA_VOID GaussianImpl::Dump(const std::string &prefix) const
     AURA_JSON_SERIALIZE(m_ctx, json_wrapper, m_src, m_dst, m_ksize, m_sigma, m_border_type, m_border_value);
 }
 
-std::vector<MI_F32> GetGaussianKernel(MI_S32 ksize, MI_F32 sigma)
+std::vector<DT_F32> GetGaussianKernel(DT_S32 ksize, DT_F32 sigma)
 {
-    std::vector<MI_F32> kernel(ksize, 0);
-    constexpr MI_S32 small_gaussian_size = 7;
-    constexpr MI_F32 small_gaussian_tab[][small_gaussian_size] =
+    std::vector<DT_F32> kernel(ksize, 0);
+    constexpr DT_S32 small_gaussian_size = 7;
+    constexpr DT_F32 small_gaussian_tab[][small_gaussian_size] =
     {
         {1.f},
         {0.25f, 0.5f, 0.25f},
@@ -265,31 +265,31 @@ std::vector<MI_F32> GetGaussianKernel(MI_S32 ksize, MI_F32 sigma)
 
     if ((ksize <= small_gaussian_size) && (sigma <= 0))
     {
-        const MI_F32 *t_ptr = small_gaussian_tab[ksize >> 1];
-        for (MI_S32 i = 0; i < ksize; i++)
+        const DT_F32 *t_ptr = small_gaussian_tab[ksize >> 1];
+        for (DT_S32 i = 0; i < ksize; i++)
         {
             kernel[i] = t_ptr[i];
         }
         return kernel;
     }
 
-    std::vector<MI_F32> vec_kernel(ksize, 0);
-    MI_F64 sigma_value = sigma > 0 ? static_cast<MI_F64>(sigma) : ((ksize - 1) * 0.5 - 1) * 0.3 + 0.8;
-    MI_F64 sigma2 = -0.5 / (sigma_value * sigma_value);
-    MI_F64 sum = 0;
+    std::vector<DT_F32> vec_kernel(ksize, 0);
+    DT_F64 sigma_value = sigma > 0 ? static_cast<DT_F64>(sigma) : ((ksize - 1) * 0.5 - 1) * 0.3 + 0.8;
+    DT_F64 sigma2 = -0.5 / (sigma_value * sigma_value);
+    DT_F64 sum = 0;
 
-    for (MI_S32 i = 0; i < ksize; i++)
+    for (DT_S32 i = 0; i < ksize; i++)
     {
-        MI_F64 x = i - (ksize - 1) * 0.5;
-        vec_kernel[i] = static_cast<MI_F32>(Exp(sigma2 * x * x));
+        DT_F64 x = i - (ksize - 1) * 0.5;
+        vec_kernel[i] = static_cast<DT_F32>(Exp(sigma2 * x * x));
         sum += vec_kernel[i];
     }
 
     sum = 1.0 / sum;
 
-    for (MI_S32 i = 0; i < ksize; i++)
+    for (DT_S32 i = 0; i < ksize; i++)
     {
-        kernel[i] = static_cast<MI_F32>(vec_kernel[i] * sum);
+        kernel[i] = static_cast<DT_F32>(vec_kernel[i] * sum);
     }
 
     return kernel;

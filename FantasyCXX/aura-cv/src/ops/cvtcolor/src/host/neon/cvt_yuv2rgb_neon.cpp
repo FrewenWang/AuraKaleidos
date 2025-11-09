@@ -5,21 +5,21 @@
 namespace aura
 {
 
-template <MI_U32 MODE>
-AURA_ALWAYS_INLINE AURA_VOID Uv2Rgbuv(uint8x8_t vdu8_u, uint8x8_t vdu8_v,
+template <DT_U32 MODE>
+AURA_ALWAYS_INLINE DT_VOID Uv2Rgbuv(uint8x8_t vdu8_u, uint8x8_t vdu8_v,
                                     int32x4x2_t &v2qs32_ruv, int32x4x2_t &v2qs32_guv, int32x4x2_t &v2qs32_buv)
 {
    
     /// 
     int16x8_t vqs16_val128;
     int32x4_t vqs32_round;
-    neon::vdup(vqs16_val128, static_cast<MI_S16>(128));
-    neon::vdup(vqs32_round, static_cast<MI_S32>(1 << (CVTCOLOR_COEF_BITS - 1)));
+    neon::vdup(vqs16_val128, static_cast<DT_S16>(128));
+    neon::vdup(vqs32_round, static_cast<DT_S32>(1 << (CVTCOLOR_COEF_BITS - 1)));
 
-    constexpr MI_S32 V2R = Yuv2RgbParamTraits<MODE>::V2R;
-    constexpr MI_S32 V2G = Yuv2RgbParamTraits<MODE>::V2G;
-    constexpr MI_S32 U2G = Yuv2RgbParamTraits<MODE>::U2G;
-    constexpr MI_S32 U2B = Yuv2RgbParamTraits<MODE>::U2B;
+    constexpr DT_S32 V2R = Yuv2RgbParamTraits<MODE>::V2R;
+    constexpr DT_S32 V2G = Yuv2RgbParamTraits<MODE>::V2G;
+    constexpr DT_S32 U2G = Yuv2RgbParamTraits<MODE>::U2G;
+    constexpr DT_S32 U2B = Yuv2RgbParamTraits<MODE>::U2B;
 
     int16x8_t vqs16_u = neon::vreinterpret(neon::vmovl(vdu8_u));
     int16x8_t vqs16_v = neon::vreinterpret(neon::vmovl(vdu8_v));
@@ -43,17 +43,17 @@ AURA_ALWAYS_INLINE AURA_VOID Uv2Rgbuv(uint8x8_t vdu8_u, uint8x8_t vdu8_v,
     v2qs32_buv.val[1] = neon::vmla(vqs32_round, vqs32_u_hi, U2B);
 }
 
-template <MI_U32 MODE>
-AURA_ALWAYS_INLINE AURA_VOID Yrgbuv2Rgb(uint8x8_t vdu8_y, int32x4x2_t v2qs32_ruv, int32x4x2_t v2qs32_guv, int32x4x2_t v2qs32_buv,
+template <DT_U32 MODE>
+AURA_ALWAYS_INLINE DT_VOID Yrgbuv2Rgb(uint8x8_t vdu8_y, int32x4x2_t v2qs32_ruv, int32x4x2_t v2qs32_guv, int32x4x2_t v2qs32_buv,
                                       uint8x8_t &vdu8_r, uint8x8_t &vdu8_g, uint8x8_t &vdu8_b)
 {
-    constexpr MI_S32 Y2RGB = Yuv2RgbParamTraits<MODE>::Y2RGB;
+    constexpr DT_S32 Y2RGB = Yuv2RgbParamTraits<MODE>::Y2RGB;
 
     int16x8_t vqs16_y;
     if (!MODE)
     {
         uint8x8_t vu8_val16;
-        neon::vdup(vu8_val16, static_cast<MI_U8>(16));
+        neon::vdup(vu8_val16, static_cast<DT_U8>(16));
         vqs16_y = neon::vreinterpret(neon::vmovl(neon::vqsub(vdu8_y, vu8_val16)));
     }
     else
@@ -85,30 +85,30 @@ AURA_ALWAYS_INLINE AURA_VOID Yrgbuv2Rgb(uint8x8_t vdu8_y, int32x4x2_t v2qs32_ruv
     vdu8_b       = neon::vqmovun(neon::vcombine(vds16_sum_lo, vds16_sum_hi));
 }
 
-template <MI_U32 MODE>
-static Status CvtNv2RgbNeonImpl(const Mat &src_y, const Mat &src_uv, Mat &dst, MI_BOOL swapuv, MI_S32 start_row, MI_S32 end_row)
+template <DT_U32 MODE>
+static Status CvtNv2RgbNeonImpl(const Mat &src_y, const Mat &src_uv, Mat &dst, DT_BOOL swapuv, DT_S32 start_row, DT_S32 end_row)
 {
     /// 获取输出的RGB的的width
-    const MI_S32 width       = dst.GetSizes().m_width;
+    const DT_S32 width       = dst.GetSizes().m_width;
     /// 将这个图像的宽度对齐到16的整数倍。后续进行
-    const MI_S32 width_align = width & (-16);
+    const DT_S32 width_align = width & (-16);
 
-    const MI_S32 uidx = swapuv;
-    const MI_S32 vidx = 1 - uidx;
+    const DT_S32 uidx = swapuv;
+    const DT_S32 vidx = 1 - uidx;
     // 注意：这个地方传入的end_row 是UV分量的
-    for (MI_S32 y = start_row; y < end_row; y += 1)
+    for (DT_S32 y = start_row; y < end_row; y += 1)
     {
         /// 找到Y分量的对应的当前行和下一行
-        const MI_U8 *src_y_c  = src_y.Ptr<MI_U8>(2 * y);
-        const MI_U8 *src_y_n  = src_y.Ptr<MI_U8>(2 * y + 1);
+        const DT_U8 *src_y_c  = src_y.Ptr<DT_U8>(2 * y);
+        const DT_U8 *src_y_n  = src_y.Ptr<DT_U8>(2 * y + 1);
         /// 找到UV分量的当前行
-        const MI_U8 *src_uv_c = src_uv.Ptr<MI_U8>(y);
+        const DT_U8 *src_uv_c = src_uv.Ptr<DT_U8>(y);
 
-        MI_U8 *dst_c = dst.Ptr<MI_U8>(2 * y);
-        MI_U8 *dst_n = dst.Ptr<MI_U8>(2 * y + 1);
+        DT_U8 *dst_c = dst.Ptr<DT_U8>(2 * y);
+        DT_U8 *dst_n = dst.Ptr<DT_U8>(2 * y + 1);
 
-        // TODO 这个地方MI_S32 x = 0放在外部，是不是故意为之？？有什么特殊意义？？
-        MI_S32 x = 0;
+        // TODO 这个地方DT_S32 x = 0放在外部，是不是故意为之？？有什么特殊意义？？
+        DT_S32 x = 0;
         /// 对齐到16的整数倍之后，我们一次性处理16个元素
         for (; x < width_align; x += 16)
         {
@@ -162,7 +162,7 @@ LOOP_BODY:
     return Status::OK;
 }
 
-Status CvtNv2RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst, MI_BOOL swapuv, CvtColorType type, const OpTarget &target)
+Status CvtNv2RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst, DT_BOOL swapuv, CvtColorType type, const OpTarget &target)
 {
     AURA_UNUSED(target);
     Status ret = Status::ERROR;
@@ -181,10 +181,10 @@ Status CvtNv2RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst
         return ret;
     }
 
-    MI_S32 height = src_uv.GetSizes().m_height;
+    DT_S32 height = src_uv.GetSizes().m_height;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -195,14 +195,14 @@ Status CvtNv2RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst
         case CvtColorType::YUV2RGB_NV12:
         case CvtColorType::YUV2RGB_NV21:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtNv2RgbNeonImpl<0>, std::cref(src_y), std::cref(src_uv), std::ref(dst), swapuv);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtNv2RgbNeonImpl<0>, std::cref(src_y), std::cref(src_uv), std::ref(dst), swapuv);
             break;
         }
 
         case CvtColorType::YUV2RGB_NV12_601:
         case CvtColorType::YUV2RGB_NV21_601:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtNv2RgbNeonImpl<1>, std::cref(src_y), std::cref(src_uv), std::ref(dst), swapuv);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtNv2RgbNeonImpl<1>, std::cref(src_y), std::cref(src_uv), std::ref(dst), swapuv);
             break;
         }
 
@@ -216,24 +216,24 @@ Status CvtNv2RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_uv, Mat &dst
     AURA_RETURN(ctx, ret);
 }
 
-template <MI_U32 MODE>
-static Status CvtY4202RgbNeonImpl(const Mat &imat0, const Mat &imat1, const Mat &imat2, Mat &omat, MI_BOOL swapuv, MI_S32 start_row, MI_S32 end_row)
+template <DT_U32 MODE>
+static Status CvtY4202RgbNeonImpl(const Mat &imat0, const Mat &imat1, const Mat &imat2, Mat &omat, DT_BOOL swapuv, DT_S32 start_row, DT_S32 end_row)
 {
     /// 
-    const MI_S32 width       = omat.GetSizes().m_width;
-    const MI_S32 width_align = width & (-16);
+    const DT_S32 width       = omat.GetSizes().m_width;
+    const DT_S32 width_align = width & (-16);
 
-    for (MI_S32 y = start_row; y < end_row; y += 1)
+    for (DT_S32 y = start_row; y < end_row; y += 1)
     {
-        const MI_U8 *src_y_c = imat0.Ptr<MI_U8>(2 * y);
-        const MI_U8 *src_y_n = imat0.Ptr<MI_U8>(2 * y + 1);
-        const MI_U8 *src_u_c = swapuv ? imat2.Ptr<MI_U8>(y) : imat1.Ptr<MI_U8>(y);
-        const MI_U8 *src_v_c = swapuv ? imat1.Ptr<MI_U8>(y) : imat2.Ptr<MI_U8>(y);
+        const DT_U8 *src_y_c = imat0.Ptr<DT_U8>(2 * y);
+        const DT_U8 *src_y_n = imat0.Ptr<DT_U8>(2 * y + 1);
+        const DT_U8 *src_u_c = swapuv ? imat2.Ptr<DT_U8>(y) : imat1.Ptr<DT_U8>(y);
+        const DT_U8 *src_v_c = swapuv ? imat1.Ptr<DT_U8>(y) : imat2.Ptr<DT_U8>(y);
 
-        MI_U8 *dst_c = omat.Ptr<MI_U8>(2 * y);
-        MI_U8 *dst_n = omat.Ptr<MI_U8>(2 * y + 1);
+        DT_U8 *dst_c = omat.Ptr<DT_U8>(2 * y);
+        DT_U8 *dst_n = omat.Ptr<DT_U8>(2 * y + 1);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += 16)
         {
 LOOP_BODY:
@@ -283,7 +283,7 @@ LOOP_BODY:
     return Status::OK;
 }
 
-Status CvtY4202RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, MI_BOOL swapuv, CvtColorType type, const OpTarget &target)
+Status CvtY4202RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, DT_BOOL swapuv, CvtColorType type, const OpTarget &target)
 {
     AURA_UNUSED(target);
     Status ret = Status::ERROR;
@@ -303,10 +303,10 @@ Status CvtY4202RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const M
         return ret;
     }
 
-    MI_S32 height = src_u.GetSizes().m_height;
+    DT_S32 height = src_u.GetSizes().m_height;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -317,7 +317,7 @@ Status CvtY4202RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const M
         case CvtColorType::YUV2RGB_YU12:
         case CvtColorType::YUV2RGB_YV12:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtY4202RgbNeonImpl<0>, std::cref(src_y), std::cref(src_u), std::cref(src_v),
+            ret = wp->ParallelFor((DT_S32)0, height, CvtY4202RgbNeonImpl<0>, std::cref(src_y), std::cref(src_u), std::cref(src_v),
                                   std::ref(dst), swapuv);
             break;
         }
@@ -325,7 +325,7 @@ Status CvtY4202RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const M
         case CvtColorType::YUV2RGB_YU12_601:
         case CvtColorType::YUV2RGB_YV12_601:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtY4202RgbNeonImpl<1>, std::cref(src_y), std::cref(src_u), std::cref(src_v),
+            ret = wp->ParallelFor((DT_S32)0, height, CvtY4202RgbNeonImpl<1>, std::cref(src_y), std::cref(src_u), std::cref(src_v),
                                   std::ref(dst), swapuv);
             break;
         }
@@ -340,21 +340,21 @@ Status CvtY4202RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const M
     AURA_RETURN(ctx, ret);
 }
 
-template <MI_U32 MODE>
-static Status CvtY4222RgbNeonImpl(const Mat &src, Mat &dst, MI_BOOL swapuv, MI_BOOL swapy, MI_S32 start_row, MI_S32 end_row)
+template <DT_U32 MODE>
+static Status CvtY4222RgbNeonImpl(const Mat &src, Mat &dst, DT_BOOL swapuv, DT_BOOL swapy, DT_S32 start_row, DT_S32 end_row)
 {
-    const MI_S32 width       = dst.GetSizes().m_width;
-    const MI_S32 width_align = width & (-16);
+    const DT_S32 width       = dst.GetSizes().m_width;
+    const DT_S32 width_align = width & (-16);
 
-    const MI_S32 uidx = 1 - swapy + swapuv * 2;
-    const MI_S32 vidx = (2 + uidx) % 4;
+    const DT_S32 uidx = 1 - swapy + swapuv * 2;
+    const DT_S32 vidx = (2 + uidx) % 4;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U8 *src_c = src.Ptr<MI_U8>(y);
-        MI_U8       *dst_c = dst.Ptr<MI_U8>(y);
+        const DT_U8 *src_c = src.Ptr<DT_U8>(y);
+        DT_U8       *dst_c = dst.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += 16)
         {
 LOOP_BODY:
@@ -392,7 +392,7 @@ LOOP_BODY:
     return Status::OK;
 }
 
-Status CvtY4222RgbNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapuv, MI_BOOL swapy, CvtColorType type, const OpTarget &target)
+Status CvtY4222RgbNeon(Context *ctx, const Mat &src, Mat &dst, DT_BOOL swapuv, DT_BOOL swapy, CvtColorType type, const OpTarget &target)
 {
     AURA_UNUSED(target);
     Status ret = Status::ERROR;
@@ -410,10 +410,10 @@ Status CvtY4222RgbNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapuv, M
         return ret;
     }
 
-    MI_S32 height = src.GetSizes().m_height;
+    DT_S32 height = src.GetSizes().m_height;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -425,7 +425,7 @@ Status CvtY4222RgbNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapuv, M
         case CvtColorType::YUV2RGB_YUYV:
         case CvtColorType::YUV2RGB_YVYU:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtY4222RgbNeonImpl<0>, std::cref(src), std::ref(dst), swapuv, swapy);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtY4222RgbNeonImpl<0>, std::cref(src), std::ref(dst), swapuv, swapy);
             break;
         }
 
@@ -433,7 +433,7 @@ Status CvtY4222RgbNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapuv, M
         case CvtColorType::YUV2RGB_YUYV_601:
         case CvtColorType::YUV2RGB_YVYU_601:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtY4222RgbNeonImpl<1>, std::cref(src), std::ref(dst), swapuv, swapy);
+            ret = wp->ParallelFor((DT_S32)0, height, CvtY4222RgbNeonImpl<1>, std::cref(src), std::ref(dst), swapuv, swapy);
             break;
         }
 
@@ -447,21 +447,21 @@ Status CvtY4222RgbNeon(Context *ctx, const Mat &src, Mat &dst, MI_BOOL swapuv, M
     AURA_RETURN(ctx, ret);
 }
 
-template <MI_U32 MODE>
-static Status CvtY4442RgbNeonImpl(const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+template <DT_U32 MODE>
+static Status CvtY4442RgbNeonImpl(const Mat &src_y, const Mat &src_u, const Mat &src_v, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    const MI_S32 width       = dst.GetSizes().m_width;
-    const MI_S32 width_align = width & (-8);
+    const DT_S32 width       = dst.GetSizes().m_width;
+    const DT_S32 width_align = width & (-8);
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        const MI_U8 *src_y_c = src_y.Ptr<MI_U8>(y);
-        const MI_U8 *src_u_c = src_u.Ptr<MI_U8>(y);
-        const MI_U8 *src_v_c = src_v.Ptr<MI_U8>(y);
+        const DT_U8 *src_y_c = src_y.Ptr<DT_U8>(y);
+        const DT_U8 *src_u_c = src_u.Ptr<DT_U8>(y);
+        const DT_U8 *src_v_c = src_v.Ptr<DT_U8>(y);
 
-        MI_U8 *dst_c = dst.Ptr<MI_U8>(y);
+        DT_U8 *dst_c = dst.Ptr<DT_U8>(y);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align; x += 8)
         {
 LOOP_BODY:
@@ -501,10 +501,10 @@ Status CvtY4442RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const M
         return ret;
     }
 
-    MI_S32 height = dst.GetSizes().m_height;
+    DT_S32 height = dst.GetSizes().m_height;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -514,13 +514,13 @@ Status CvtY4442RgbNeon(Context *ctx, const Mat &src_y, const Mat &src_u, const M
     {
         case CvtColorType::YUV2RGB_Y444:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtY4442RgbNeonImpl<0>, std::cref(src_y), std::cref(src_u), std::cref(src_v), std::ref(dst));
+            ret = wp->ParallelFor((DT_S32)0, height, CvtY4442RgbNeonImpl<0>, std::cref(src_y), std::cref(src_u), std::cref(src_v), std::ref(dst));
             break;
         }
 
         case CvtColorType::YUV2RGB_Y444_601:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, CvtY4442RgbNeonImpl<1>, std::cref(src_y), std::cref(src_u), std::cref(src_v), std::ref(dst));
+            ret = wp->ParallelFor((DT_S32)0, height, CvtY4442RgbNeonImpl<1>, std::cref(src_y), std::cref(src_u), std::cref(src_v), std::ref(dst));
             break;
         }
 

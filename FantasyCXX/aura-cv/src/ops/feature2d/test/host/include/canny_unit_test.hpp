@@ -12,22 +12,22 @@ using namespace aura;
 AURA_TEST_PARAM(CannyPixelParam,
                 ElemType, elem_type,
                 MatSize,  imat_sizes,
-                MI_F64,   low_thresh,
-                MI_F64,   high_thresh,
-                MI_S32,   aperture_size,
-                MI_BOOL,  l2_gradient,
+                DT_F64,   low_thresh,
+                DT_F64,   high_thresh,
+                DT_S32,   aperture_size,
+                DT_BOOL,  l2_gradient,
                 OpTarget, target);
 
 AURA_TEST_PARAM(CannyGradientParam,
                 ElemType, imat_elem_type,
                 ElemType, omat_elem_type,
                 MatSize,  imat_sizes,
-                MI_F64,   low_thresh,
-                MI_F64,   high_thresh,
-                MI_BOOL,  l2_gradient,
+                DT_F64,   low_thresh,
+                DT_F64,   high_thresh,
+                DT_BOOL,  l2_gradient,
                 OpTarget, target);
 
-static Status CvCanny(Context *ctx, Mat &src, Mat &dst, MI_F64 low_thresh, MI_F64 high_thresh, MI_S32 aperture_size, MI_BOOL l2_gradient)
+static Status CvCanny(Context *ctx, Mat &src, Mat &dst, DT_F64 low_thresh, DT_F64 high_thresh, DT_S32 aperture_size, DT_BOOL l2_gradient)
 {
     if ((src.GetElemType() != ElemType::U8) || (dst.GetElemType() != ElemType::U8))
     {
@@ -36,11 +36,11 @@ static Status CvCanny(Context *ctx, Mat &src, Mat &dst, MI_F64 low_thresh, MI_F6
     }
 
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
-    MI_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
-    MI_S32 src_cn = src.GetSizes().m_channel;
-    MI_S32 dst_cn = dst.GetSizes().m_channel;
-    MI_S32 cv_type = 0;
+    DT_S32 src_cv_type = ElemTypeToOpencv(src.GetElemType(), src.GetSizes().m_channel);
+    DT_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
+    DT_S32 src_cn = src.GetSizes().m_channel;
+    DT_S32 dst_cn = dst.GetSizes().m_channel;
+    DT_S32 cv_type = 0;
 
     if ((CV_8UC(src_cn) != src_cv_type) || (CV_8UC(dst_cn) != dst_cv_type))
     {
@@ -69,7 +69,7 @@ static Status CvCanny(Context *ctx, Mat &src, Mat &dst, MI_F64 low_thresh, MI_F6
     return Status::OK;
 }
 
-static Status CvCanny(Context *ctx, Mat &dx, Mat &dy, Mat &dst, MI_F64 low_thresh, MI_F64 high_thresh, MI_BOOL l2_gradient)
+static Status CvCanny(Context *ctx, Mat &dx, Mat &dy, Mat &dst, DT_F64 low_thresh, DT_F64 high_thresh, DT_BOOL l2_gradient)
 {
     if ((dx.GetElemType() != ElemType::S16) || (dy.GetElemType() != ElemType::S16) || (dst.GetElemType() != ElemType::U8))
     {
@@ -78,13 +78,13 @@ static Status CvCanny(Context *ctx, Mat &dx, Mat &dy, Mat &dst, MI_F64 low_thres
     }
 
 #if !defined(AURA_BUILD_XPLORER)
-    MI_S32 dx_cv_type  = ElemTypeToOpencv(dx.GetElemType(), dx.GetSizes().m_channel);
-    MI_S32 dy_cv_type  = ElemTypeToOpencv(dy.GetElemType(), dy.GetSizes().m_channel);
-    MI_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
-    MI_S32 dx_cn   = dx.GetSizes().m_channel;
-    MI_S32 dy_cn   = dy.GetSizes().m_channel;
-    MI_S32 dst_cn  = dst.GetSizes().m_channel;
-    MI_S32 cv_type = 0;
+    DT_S32 dx_cv_type  = ElemTypeToOpencv(dx.GetElemType(), dx.GetSizes().m_channel);
+    DT_S32 dy_cv_type  = ElemTypeToOpencv(dy.GetElemType(), dy.GetSizes().m_channel);
+    DT_S32 dst_cv_type = ElemTypeToOpencv(dst.GetElemType(), dst.GetSizes().m_channel);
+    DT_S32 dx_cn   = dx.GetSizes().m_channel;
+    DT_S32 dy_cn   = dy.GetSizes().m_channel;
+    DT_S32 dst_cn  = dst.GetSizes().m_channel;
+    DT_S32 cv_type = 0;
 
     if ((CV_16SC(dx_cn) != dx_cv_type) || (CV_16SC(dy_cn) != dy_cv_type) || (CV_8UC(dst_cn) != dst_cv_type))
     {
@@ -131,7 +131,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         CannyPixelParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -153,10 +153,10 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
-        using AuraCannyFunc = Status(*)(Context*, const Mat&, Mat&, MI_F64, MI_F64, MI_S32, MI_BOOL, const OpTarget&);
-        using CvCannyFunc   = Status(*)(Context*, Mat&, Mat&, MI_F64, MI_F64, MI_S32, MI_BOOL);
+        using AuraCannyFunc = Status(*)(Context*, const Mat&, Mat&, DT_F64, DT_F64, DT_S32, DT_BOOL, const OpTarget&);
+        using CvCannyFunc   = Status(*)(Context*, Mat&, Mat&, DT_F64, DT_F64, DT_S32, DT_BOOL);
 
         // get next param set
         CannyPixelParam run_param(GetParam((index)));
@@ -172,7 +172,7 @@ public:
         Mat dst = m_factory.GetEmptyMat(run_param.elem_type, omat_size, AURA_MEM_DEFAULT, omat_strides);
         Mat ref = m_factory.GetEmptyMat(run_param.elem_type, omat_size, AURA_MEM_DEFAULT, omat_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;
@@ -264,7 +264,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         CannyGradientParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -286,10 +286,10 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
-        using AuraCannyFunc = Status(*)(Context*, const Mat&, const Mat&, Mat&, MI_F64 , MI_F64, MI_BOOL, const OpTarget&);
-        using CvCannyFunc   = Status(*)(Context*, Mat&, Mat&, Mat&, MI_F64, MI_F64, MI_BOOL);
+        using AuraCannyFunc = Status(*)(Context*, const Mat&, const Mat&, Mat&, DT_F64 , DT_F64, DT_BOOL, const OpTarget&);
+        using CvCannyFunc   = Status(*)(Context*, Mat&, Mat&, Mat&, DT_F64, DT_F64, DT_BOOL);
 
         // get next param set
         CannyGradientParam run_param(GetParam((index)));
@@ -306,7 +306,7 @@ public:
         Mat dst = m_factory.GetEmptyMat(run_param.omat_elem_type, omat_size, AURA_MEM_DEFAULT, omat_strides);
         Mat ref = m_factory.GetEmptyMat(run_param.omat_elem_type, omat_size, AURA_MEM_DEFAULT, omat_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;

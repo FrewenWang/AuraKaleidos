@@ -20,16 +20,16 @@ struct MorphFunctor<Tp, MorphType::DILATE>
     Tp operator()(const Tp a, const Tp b) const { return Max(a, b); }
 };
 
-static MI_S32 CountNonZero(const Mat &mat)
+static DT_S32 CountNonZero(const Mat &mat)
 {
-    const MI_S32 height = mat.GetSizes().m_height;
-    const MI_S32 width  = mat.GetSizes().m_width;
-    MI_S32 nonzero      = 0;
+    const DT_S32 height = mat.GetSizes().m_height;
+    const DT_S32 width  = mat.GetSizes().m_width;
+    DT_S32 nonzero      = 0;
 
-    for (MI_S32 y = 0; y < height; y++)
+    for (DT_S32 y = 0; y < height; y++)
     {
-        const MI_U8 *mat_row = mat.Ptr<MI_U8>(y);
-        for (MI_S32 x = 0; x < width; x++)
+        const DT_U8 *mat_row = mat.Ptr<DT_U8>(y);
+        for (DT_S32 x = 0; x < width; x++)
         {
             nonzero += (mat_row[x] > 0) ? 1 : 0;
         }
@@ -38,7 +38,7 @@ static MI_S32 CountNonZero(const Mat &mat)
     return nonzero;
 }
 
-static Mat MorphKernelMat(Context *ctx, MorphShape shape, MI_S32 ksize)
+static Mat MorphKernelMat(Context *ctx, MorphShape shape, DT_S32 ksize)
 {
     Mat kmat(ctx, ElemType::U8, Sizes3(ksize, ksize));
     if (!kmat.IsValid())
@@ -47,18 +47,18 @@ static Mat MorphKernelMat(Context *ctx, MorphShape shape, MI_S32 ksize)
         return Mat();
     }
 
-    const MI_S32 height = ksize;
-    const MI_S32 width  = ksize;
-    const MI_S32 ksh    = ksize / 2;
+    const DT_S32 height = ksize;
+    const DT_S32 width  = ksize;
+    const DT_S32 ksh    = ksize / 2;
 
     switch (shape)
     {
         case MorphShape::RECT:
         {
-            for (MI_S32 y = 0; y < height; y++)
+            for (DT_S32 y = 0; y < height; y++)
             {
-                MI_U8 *ker_row = kmat.Ptr<MI_U8>(y);
-                for (MI_S32 x = 0; x < width; x++)
+                DT_U8 *ker_row = kmat.Ptr<DT_U8>(y);
+                for (DT_S32 x = 0; x < width; x++)
                 {
                     ker_row[x] = 1;
                 }
@@ -69,12 +69,12 @@ static Mat MorphKernelMat(Context *ctx, MorphShape shape, MI_S32 ksize)
 
         case MorphShape::CROSS:
         {
-            for (MI_S32 y = 0; y < height; y++)
+            for (DT_S32 y = 0; y < height; y++)
             {
-                MI_U8 *ker_row = kmat.Ptr<MI_U8>(y);
+                DT_U8 *ker_row = kmat.Ptr<DT_U8>(y);
                 if (y == ksh)
                 {
-                    for (MI_S32 x = 0; x < width; x++)
+                    for (DT_S32 x = 0; x < width; x++)
                     {
                         ker_row[x] = 1;
                     }
@@ -90,19 +90,19 @@ static Mat MorphKernelMat(Context *ctx, MorphShape shape, MI_S32 ksize)
 
         case MorphShape::ELLIPSE:
         {
-            MI_S32 r      = height >> 1;
-            MI_S32 c      = width >> 1;
-            MI_F64 inv_r2 = r ? (1. / (r * r)) : 0;
-            for (MI_S32 y = 0; y < height; y++)
+            DT_S32 r      = height >> 1;
+            DT_S32 c      = width >> 1;
+            DT_F64 inv_r2 = r ? (1. / (r * r)) : 0;
+            for (DT_S32 y = 0; y < height; y++)
             {
-                MI_U8 *ker_row = kmat.Ptr<MI_U8>(y);
-                MI_S32 dy      = y - r;
-                MI_S32 x = 0, x0 = 0, x1 = 0;
+                DT_U8 *ker_row = kmat.Ptr<DT_U8>(y);
+                DT_S32 dy      = y - r;
+                DT_S32 x = 0, x0 = 0, x1 = 0;
                 if (Abs(dy) <= r)
                 {
-                    MI_S32 dx = SaturateCast<int>(c * Sqrt((r * r - dy * dy) * inv_r2));
-                    x0        = Max<MI_S32>(c - dx, 0);
-                    x1        = Min<MI_S32>(c + dx + 1, width);
+                    DT_S32 dx = SaturateCast<int>(c * Sqrt((r * r - dy * dy) * inv_r2));
+                    x0        = Max<DT_S32>(c - dx, 0);
+                    x1        = Min<DT_S32>(c + dx + 1, width);
                 }
 
                 for (; x < x0; x++)
@@ -131,34 +131,34 @@ static Mat MorphKernelMat(Context *ctx, MorphShape shape, MI_S32 ksize)
 }
 
 template <typename Tp, MorphType MORPH_TYPE>
-static Status MorphNoneCore(const Mat &src, Mat &dst, const std::vector<Point2i> &coords, MI_S32 ksize, MI_S32 start_row, MI_S32 end_row)
+static Status MorphNoneCore(const Mat &src, Mat &dst, const std::vector<Point2i> &coords, DT_S32 ksize, DT_S32 start_row, DT_S32 end_row)
 {
     auto Functor = MorphFunctor<Tp, MORPH_TYPE>();
 
-    const MI_S32 nz = coords.size();
-    std::vector<const Tp*> src_row(ksize, MI_NULL);
-    std::vector<const Tp*> src_ptr(nz, MI_NULL);
+    const DT_S32 nz = coords.size();
+    std::vector<const Tp*> src_row(ksize, DT_NULL);
+    std::vector<const Tp*> src_ptr(nz, DT_NULL);
 
-    const MI_S32 channel = dst.GetSizes().m_channel;
-    const MI_S32 width   = dst.GetSizes().m_width * channel;
+    const DT_S32 channel = dst.GetSizes().m_channel;
+    const DT_S32 width   = dst.GetSizes().m_width * channel;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
-        for (MI_S32 dy = 0; dy < ksize; dy++)
+        for (DT_S32 dy = 0; dy < ksize; dy++)
         {
             src_row[dy] = src.Ptr<Tp>(y + dy);
         }
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        for (MI_S32 k = 0; k < nz; k++)
+        for (DT_S32 k = 0; k < nz; k++)
         {
             src_ptr[k] = src_row[coords[k].m_y] + coords[k].m_x * channel;
         }
 
-        for (MI_S32 x = 0; x < width; x++)
+        for (DT_S32 x = 0; x < width; x++)
         {
             Tp val = src_ptr[0][x];
-            for (MI_S32 k = 0; k < nz; k++)
+            for (DT_S32 k = 0; k < nz; k++)
             {
                 val = Functor(val, src_ptr[k][x]);
             }
@@ -170,14 +170,14 @@ static Status MorphNoneCore(const Mat &src, Mat &dst, const std::vector<Point2i>
 }
 
 template <typename Tp, MorphType MORPH_TYPE>
-static Status MorphNoneImpl(Context *ctx, const Mat &src, Mat &dst, Mat &src_border, const Mat &kmat, MI_S32 iterations, const OpTarget &target)
+static Status MorphNoneImpl(Context *ctx, const Mat &src, Mat &dst, Mat &src_border, const Mat &kmat, DT_S32 iterations, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
     // preprocess kernel
-    const MI_S32 ksize = kmat.GetSizes().m_width;
-    MI_S32 ksh         = ksize >> 1;
-    MI_S32 nz          = CountNonZero(kmat);
+    const DT_S32 ksize = kmat.GetSizes().m_width;
+    DT_S32 ksh         = ksize >> 1;
+    DT_S32 nz          = CountNonZero(kmat);
     std::vector<Point2i> coords(nz);
 
     if (0 == nz)
@@ -186,13 +186,13 @@ static Status MorphNoneImpl(Context *ctx, const Mat &src, Mat &dst, Mat &src_bor
         return Status::ERROR;
     }
 
-    MI_S32 idx = 0;
-    for (MI_S32 y = 0; y < ksize; y++)
+    DT_S32 idx = 0;
+    for (DT_S32 y = 0; y < ksize; y++)
     {
-        const MI_U8 *ker_row = kmat.Ptr<MI_U8>(y);
-        for (MI_S32 x = 0; x < ksize; x++)
+        const DT_U8 *ker_row = kmat.Ptr<DT_U8>(y);
+        for (DT_S32 x = 0; x < ksize; x++)
         {
-            MI_U8 val = ker_row[x];
+            DT_U8 val = ker_row[x];
             if (0 == val)
             {
                 continue;
@@ -201,7 +201,7 @@ static Status MorphNoneImpl(Context *ctx, const Mat &src, Mat &dst, Mat &src_bor
         }
     }
 
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
     // basic implementation
     {
@@ -214,13 +214,13 @@ static Status MorphNoneImpl(Context *ctx, const Mat &src, Mat &dst, Mat &src_bor
         if (target.m_data.none.enable_mt)
         {
             WorkerPool *wp = ctx->GetWorkerPool();
-            if (MI_NULL == wp)
+            if (DT_NULL == wp)
             {
                 AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                 return Status::ERROR;
             }
 
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), oheight, MorphNoneCore<Tp, MORPH_TYPE>, std::cref(src_border),
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), oheight, MorphNoneCore<Tp, MORPH_TYPE>, std::cref(src_border),
                                   std::ref(dst), std::cref(coords), ksize);
         }
         else
@@ -235,7 +235,7 @@ static Status MorphNoneImpl(Context *ctx, const Mat &src, Mat &dst, Mat &src_bor
     }
 
     // iterative processing
-    for (MI_S32 iter = 1; iter < iterations; iter++)
+    for (DT_S32 iter = 1; iter < iterations; iter++)
     {
         if (IMakeBorder(ctx, dst, src_border, ksh, ksh, ksh, ksh, BorderType::REPLICATE, Scalar(), target) != Status::OK)
         {
@@ -246,13 +246,13 @@ static Status MorphNoneImpl(Context *ctx, const Mat &src, Mat &dst, Mat &src_bor
         if (target.m_data.none.enable_mt)
         {
             WorkerPool *wp = ctx->GetWorkerPool();
-            if (MI_NULL == wp)
+            if (DT_NULL == wp)
             {
                 AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
                 return Status::ERROR;
             }
 
-            ret = wp->ParallelFor(static_cast<MI_S32>(0), oheight, MorphNoneCore<Tp, MORPH_TYPE>, std::cref(src_border),
+            ret = wp->ParallelFor(static_cast<DT_S32>(0), oheight, MorphNoneCore<Tp, MORPH_TYPE>, std::cref(src_border),
                                   std::ref(dst), std::cref(coords), ksize);
         }
         else
@@ -270,7 +270,7 @@ static Status MorphNoneImpl(Context *ctx, const Mat &src, Mat &dst, Mat &src_bor
 }
 
 template <typename Tp>
-Status MorphNoneHelper(Context *ctx, const Mat &src, Mat &dst, Mat &src_border, const Mat &kmat, MorphType type, MI_S32 iterations, const OpTarget &target)
+Status MorphNoneHelper(Context *ctx, const Mat &src, Mat &dst, Mat &src_border, const Mat &kmat, MorphType type, DT_S32 iterations, const OpTarget &target)
 {
     Status ret = Status::ERROR;
 
@@ -309,7 +309,7 @@ Status MorphNoneHelper(Context *ctx, const Mat &src, Mat &dst, Mat &src_border, 
 MorphNone::MorphNone(Context *ctx, MorphType type, const OpTarget &target) : MorphImpl(ctx, type, target)
 {}
 
-Status MorphNone::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape, MI_S32 iterations)
+Status MorphNone::SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape, DT_S32 iterations)
 {
     if (MorphImpl::SetArgs(src, dst, ksize, shape, iterations) != Status::OK)
     {
@@ -347,7 +347,7 @@ Status MorphNone::Initialize()
         return Status::ERROR;
     }
 
-    MI_S32 ksh          = m_ksize >> 1;
+    DT_S32 ksh          = m_ksize >> 1;
     Sizes3 border_sizes = m_src->GetSizes() + Sizes3(ksh << 1, ksh << 1, 0);
     m_src_border        = Mat(m_ctx, m_src->GetElemType(), border_sizes);
 
@@ -365,7 +365,7 @@ Status MorphNone::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src dst is null");
         return Status::ERROR;
@@ -377,30 +377,30 @@ Status MorphNone::Run()
     {
         case ElemType::U8:
         {
-            ret = MorphNoneHelper<MI_U8>(m_ctx, *src, *dst, m_src_border, m_kmat, m_type, m_iterations, m_target);
+            ret = MorphNoneHelper<DT_U8>(m_ctx, *src, *dst, m_src_border, m_kmat, m_type, m_iterations, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MorphNoneHelper<MI_U8> run failed!");
+                AURA_ADD_ERROR_STRING(m_ctx, "MorphNoneHelper<DT_U8> run failed!");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = MorphNoneHelper<MI_U16>(m_ctx, *src, *dst, m_src_border, m_kmat, m_type, m_iterations, m_target);
+            ret = MorphNoneHelper<DT_U16>(m_ctx, *src, *dst, m_src_border, m_kmat, m_type, m_iterations, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MorphNoneHelper<MI_U16> run failed!");
+                AURA_ADD_ERROR_STRING(m_ctx, "MorphNoneHelper<DT_U16> run failed!");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = MorphNoneHelper<MI_S16>(m_ctx, *src, *dst, m_src_border, m_kmat, m_type, m_iterations, m_target);
+            ret = MorphNoneHelper<DT_S16>(m_ctx, *src, *dst, m_src_border, m_kmat, m_type, m_iterations, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MorphNoneHelper<MI_S16> run failed!");
+                AURA_ADD_ERROR_STRING(m_ctx, "MorphNoneHelper<DT_S16> run failed!");
             }
             break;
         }
@@ -418,10 +418,10 @@ Status MorphNone::Run()
 
         case ElemType::F32:
         {
-            ret = MorphNoneHelper<MI_F32>(m_ctx, *src, *dst, m_src_border, m_kmat, m_type, m_iterations, m_target);
+            ret = MorphNoneHelper<DT_F32>(m_ctx, *src, *dst, m_src_border, m_kmat, m_type, m_iterations, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MorphNoneHelper<MI_F32> run failed!");
+                AURA_ADD_ERROR_STRING(m_ctx, "MorphNoneHelper<DT_F32> run failed!");
             }
             break;
         }

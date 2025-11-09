@@ -102,8 +102,8 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent. 
      */
-    Status SetArgs(const Array *src, std::vector<KeyPoint> &key_points, MI_S32 threshold, MI_BOOL nonmax_suppression,
-                   FastDetectorType type = FastDetectorType::FAST_9_16, MI_U32 max_num_corners = 3000);
+    Status SetArgs(const Array *src, std::vector<KeyPoint> &key_points, DT_S32 threshold, DT_BOOL nonmax_suppression,
+                   FastDetectorType type = FastDetectorType::FAST_9_16, DT_U32 max_num_corners = 3000);
 };
 
 /**
@@ -116,7 +116,7 @@ public:
  * @param src The input iaura, And see the below for the supported data types.
  * @param key_points The output vector containing the detected keypoints.
  * @param threshold The threshold for the FAST detector.
- * @param nonmax_suppression Flag indicating whether to use non-maximum suppression (default is MI_TRUE).
+ * @param nonmax_suppression Flag indicating whether to use non-maximum suppression (default is DT_TRUE).
  * @param type The type of FAST corner detector (default is FastDetectorType::FAST_9_16).
  * @param max_num_corners The maximum number of corners to detect (default is 3000).
  * @param target The platform on which this function runs
@@ -130,9 +130,9 @@ public:
  * NEON      | U8C1             | FAST_9_16
  * HVX       | U8C1             | FAST_9_16
  */
-AURA_EXPORTS Status IFast(Context *ctx, const Mat &src, std::vector<KeyPoint> &key_points, MI_S32 threshold,
-                          MI_BOOL nonmax_suppression, FastDetectorType type = FastDetectorType::FAST_9_16,
-                          MI_U32 max_num_corners = 3000, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IFast(Context *ctx, const Mat &src, std::vector<KeyPoint> &key_points, DT_S32 threshold,
+                          DT_BOOL nonmax_suppression, FastDetectorType type = FastDetectorType::FAST_9_16,
+                          DT_U32 max_num_corners = 3000, const OpTarget &target = OpTarget::Default());
 /**
  * @}
 */

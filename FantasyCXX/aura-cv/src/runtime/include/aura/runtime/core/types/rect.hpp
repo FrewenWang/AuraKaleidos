@@ -314,7 +314,7 @@ public:
      *
      * @return Returns true if rectangles are equal, false otherwise.
      */
-    MI_BOOL operator==(const Rect_ &rect) const
+    DT_BOOL operator==(const Rect_ &rect) const
     {
         return (m_x == rect.m_x) && (rect.m_width == m_width)
                 && (m_y == rect.m_y) && (rect.m_height == m_height);
@@ -327,7 +327,7 @@ public:
      *
      * @return Returns true if rectangles are not equal, false otherwise.
      */
-    MI_BOOL operator!=(const Rect_ &rect) const
+    DT_BOOL operator!=(const Rect_ &rect) const
     {
         return (m_x != rect.m_x) || (rect.m_width != m_width)
                 || (m_y != rect.m_y) || (rect.m_height != m_height);
@@ -454,7 +454,7 @@ public:
      *
      * @return True if the rectangle is empty, otherwise false.
      */
-    MI_BOOL Empty() const
+    DT_BOOL Empty() const
     {
         return m_width <= 0 || m_height <= 0;
     }
@@ -466,7 +466,7 @@ public:
      *
      * @return True if the point is contained within the rectangle, otherwise false.
      */
-    MI_BOOL Contains(const Point2_<Tp0> &pt) const
+    DT_BOOL Contains(const Point2_<Tp0> &pt) const
     {
         return (m_x <= pt.m_x) && (pt.m_x < m_x + m_width)
                 && (m_y <= pt.m_y) && (pt.m_y < m_y + m_height);
@@ -478,9 +478,9 @@ public:
     Tp0 m_height;  /*!< The height of the rectangle. */
 };
 
-typedef Rect_<MI_S32> Rect2i;
-typedef Rect_<MI_F32> Rect2f;
-typedef Rect_<MI_F64> Rect2d;
+typedef Rect_<DT_S32> Rect2i;
+typedef Rect_<DT_F32> Rect2f;
+typedef Rect_<DT_F64> Rect2d;
 typedef Rect2i Rect;
 
 /**

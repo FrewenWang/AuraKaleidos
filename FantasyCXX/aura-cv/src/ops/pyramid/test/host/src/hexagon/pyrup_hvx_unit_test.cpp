@@ -47,10 +47,10 @@ static PyrUpParam::TupleTable g_pyrup_table_hvx
 NEW_TESTCASE(pyramid, PyrUp, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     PyrUpTest test(UnitTest::GetInstance()->GetContext(), g_pyrup_table_hvx);
     test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

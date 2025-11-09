@@ -4,10 +4,10 @@ aura::Status MakeBorderSampleTest(aura::Context *ctx, aura::TargetType type)
 {
     AURA_LOGD(ctx, SAMPLE_TAG, "=================== MakeBorderSampleTest Begin ===================\n");
 
-    MI_S32 top    = 5;
-    MI_S32 bottom = 5;
-    MI_S32 left   = 5;
-    MI_S32 right  = 5;
+    DT_S32 top    = 5;
+    DT_S32 bottom = 5;
+    DT_S32 left   = 5;
+    DT_S32 right  = 5;
     
     aura::Scalar border_value(1, 2, 3, 4);
 

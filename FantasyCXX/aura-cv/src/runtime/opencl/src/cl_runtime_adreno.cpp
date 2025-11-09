@@ -60,8 +60,8 @@ Status AdrenoCLRuntime::Initialize()
         }
 
         cl_int cl_err = CL_SUCCESS;
-        const cl_context_properties* props = cl_properties.empty() ? MI_NULL : cl_properties.data();
-        m_cl_context = std::make_shared<cl::Context>(*m_cl_device, props, MI_NULL, MI_NULL, &cl_err);
+        const cl_context_properties* props = cl_properties.empty() ? DT_NULL : cl_properties.data();
+        m_cl_context = std::make_shared<cl::Context>(*m_cl_device, props, DT_NULL, DT_NULL, &cl_err);
 
         if (CL_SUCCESS != cl_err)
         {
@@ -105,7 +105,7 @@ Status AdrenoCLRuntime::Initialize()
     m_cl_device->getInfo(CL_DEVICE_EXT_MEM_PADDING_IN_BYTES_QCOM, &m_qcom_ext_mem_padding);
     m_cl_device->getInfo(CL_DEVICE_PAGE_SIZE_QCOM, &m_qcom_page_size);
 
-    m_valid = MI_TRUE;
+    m_valid = DT_TRUE;
 
     //svm register
     RegisterSvmAllocator();
@@ -119,7 +119,7 @@ Status AdrenoCLRuntime::CreateCLProgram(const std::string &extenal_version)
     {
         std::string cl_driver_version = m_cl_device->getInfo<CL_DRIVER_VERSION>();
 
-        MI_S32 index = cl_driver_version.find("Compiler");
+        DT_S32 index = cl_driver_version.find("Compiler");
         if (index != -1)
         {
             std::string match_str = cl_driver_version.substr(index + 8);
@@ -141,11 +141,11 @@ Status AdrenoCLRuntime::CreateCLProgram(const std::string &extenal_version)
     return Status::ERROR;
 }
 
-MI_S32 AdrenoCLRuntime::GetIauraRowPitch(MI_S32 width, MI_S32 height, cl_iaura_format cl_fmt) const
+DT_S32 AdrenoCLRuntime::GetIauraRowPitch(DT_S32 width, DT_S32 height, cl_iaura_format cl_fmt) const
 {
     size_t row_pitch = 0;
 
-    if (MI_NULL == m_ctx || MI_NULL == m_cl_device)
+    if (DT_NULL == m_ctx || DT_NULL == m_cl_device)
     {
         return row_pitch;
     }
@@ -159,14 +159,14 @@ MI_S32 AdrenoCLRuntime::GetIauraRowPitch(MI_S32 width, MI_S32 height, cl_iaura_f
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
     }
 
-    return static_cast<MI_S32>(row_pitch);
+    return static_cast<DT_S32>(row_pitch);
 }
 
-MI_S32 AdrenoCLRuntime::GetIauraSlicePitch(MI_S32 width, MI_S32 height, cl_iaura_format cl_fmt) const
+DT_S32 AdrenoCLRuntime::GetIauraSlicePitch(DT_S32 width, DT_S32 height, cl_iaura_format cl_fmt) const
 {
     size_t slice_pitch = 0;
 
-    if (MI_NULL == m_ctx || MI_NULL == m_cl_device)
+    if (DT_NULL == m_ctx || DT_NULL == m_cl_device)
     {
         return slice_pitch;
     }
@@ -180,31 +180,31 @@ MI_S32 AdrenoCLRuntime::GetIauraSlicePitch(MI_S32 width, MI_S32 height, cl_iaura
         AURA_ADD_ERROR_STRING(m_ctx, "get cl iaura3d row pitch failed");
     }
 
-    return static_cast<MI_S32>(slice_pitch);
+    return static_cast<DT_S32>(slice_pitch);
 }
 
-MI_S32 AdrenoCLRuntime::GetCLAddrAlignSize() const
+DT_S32 AdrenoCLRuntime::GetCLAddrAlignSize() const
 {
-    MI_S32 addr_align_size = 128;
+    DT_S32 addr_align_size = 128;
 
     return addr_align_size;
 }
 
-MI_BOOL AdrenoCLRuntime::IsMemShareSupported() const
+DT_BOOL AdrenoCLRuntime::IsMemShareSupported() const
 {
     return ((AdrenoCLIonType::CL_ION_CACHED == m_cl_ion_type) || (AdrenoCLIonType::CL_ION_UNCACHED == m_cl_ion_type));
 }
 
-MI_S32 AdrenoCLRuntime::GetCLLengthAlignSize() const
+DT_S32 AdrenoCLRuntime::GetCLLengthAlignSize() const
 {
     return m_iaura_pitch_align;
 }
 
-MI_S32 AdrenoCLRuntime::GetCLSliceAlignSize(const cl_iaura_format &cl_fmt, size_t width, size_t height) const
+DT_S32 AdrenoCLRuntime::GetCLSliceAlignSize(const cl_iaura_format &cl_fmt, size_t width, size_t height) const
 {
     size_t slice_align = 4096;
 
-    if (MI_NULL == m_ctx || MI_NULL == m_cl_device)
+    if (DT_NULL == m_ctx || DT_NULL == m_cl_device)
     {
         return slice_align;
     }
@@ -219,7 +219,7 @@ MI_S32 AdrenoCLRuntime::GetCLSliceAlignSize(const cl_iaura_format &cl_fmt, size_
         }
     }
 
-    return static_cast<MI_S32>(slice_align);
+    return static_cast<DT_S32>(slice_align);
 }
 
 std::vector<cl_context_properties> AdrenoCLRuntime::ParseContextProps(CLPerfLevel cl_perf_level, CLPriorityLevel cl_priority_level)
@@ -298,7 +298,7 @@ std::vector<cl_context_properties> AdrenoCLRuntime::ParseContextProps(CLPerfLeve
 
 cl::Buffer* AdrenoCLRuntime::InitCLBuffer(const Buffer &buffer, cl_mem_flags cl_flags, CLMemSyncMethod &cl_sync_method)
 {
-    cl::Buffer *cl_buffer = MI_NULL;
+    cl::Buffer *cl_buffer = DT_NULL;
 
     if (AURA_MEM_SVM == buffer.m_type)
     {
@@ -321,8 +321,8 @@ cl::Buffer* AdrenoCLRuntime::InitCLBuffer(const Buffer &buffer, cl_mem_flags cl_
 
         if (CL_SUCCESS == cl_err)
         {
-            MI_S32 roi_offset = buffer.GetOffset();
-            MI_S32 addr_align_size = GetCLAddrAlignSize();
+            DT_S32 roi_offset = buffer.GetOffset();
+            DT_S32 addr_align_size = GetCLAddrAlignSize();
 
             if (roi_offset > 0)
             {
@@ -358,7 +358,7 @@ cl::Buffer* AdrenoCLRuntime::InitCLBuffer(const Buffer &buffer, cl_mem_flags cl_
             if (CL_SUCCESS == cl_err && cl_buffer)
             {
                 std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
-                m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_buffer), sizeof(cl::Buffer));
+                m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_buffer), sizeof(cl::Buffer));
             }
         }
     }
@@ -370,7 +370,7 @@ cl::Iaura2D* AdrenoCLRuntime::InitCLIaura2D(const Buffer &buffer, cl_mem_flags c
                                             size_t height, size_t pitch, CLMemSyncMethod &cl_sync_method)
 {
     cl_int cl_err           = CL_SUCCESS;
-    cl::Iaura2D *cl_iaura2d = MI_NULL;
+    cl::Iaura2D *cl_iaura2d = DT_NULL;
 
     if (AURA_MEM_SVM == buffer.m_type)
     {
@@ -400,14 +400,14 @@ cl::Iaura2D* AdrenoCLRuntime::InitCLIaura2D(const Buffer &buffer, cl_mem_flags c
         if (CL_SUCCESS == cl_err)
         {
             std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
-            m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_iaura2d), sizeof(cl::Iaura2D));
+            m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_iaura2d), sizeof(cl::Iaura2D));
         }
         else
         {
             if (cl_iaura2d)
             {
                 delete cl_iaura2d;
-                cl_iaura2d = MI_NULL;
+                cl_iaura2d = DT_NULL;
             }
         }
     }
@@ -419,9 +419,9 @@ cl::Iaura3D* AdrenoCLRuntime::InitCLIaura3D(const Buffer &buffer, cl_mem_flags c
                                             size_t height, size_t depth, size_t row_pitch, size_t slice_pitch, CLMemSyncMethod &cl_sync_method)
 {
     cl_int cl_err           = CL_SUCCESS;
-    cl::Iaura3D *cl_iaura3d = MI_NULL;
+    cl::Iaura3D *cl_iaura3d = DT_NULL;
 
-    MI_S32 slice_align = GetCLSliceAlignSize(cl_fmt, width, height);
+    DT_S32 slice_align = GetCLSliceAlignSize(cl_fmt, width, height);
 
     if ((AURA_MEM_DMA_BUF_HEAP == buffer.m_type) && IsMemShareSupported() && (buffer.GetOffset() == 0) &&
         (row_pitch % GetCLLengthAlignSize() == 0) && slice_pitch % slice_align == 0)
@@ -443,14 +443,14 @@ cl::Iaura3D* AdrenoCLRuntime::InitCLIaura3D(const Buffer &buffer, cl_mem_flags c
         if (CL_SUCCESS == cl_err)
         {
             std::lock_guard<std::mutex> guard(m_cl_membk_mutex);
-            m_cl_membk.emplace(reinterpret_cast<MI_UPTR_T>(cl_iaura3d), sizeof(cl::Iaura3D));
+            m_cl_membk.emplace(reinterpret_cast<DT_UPTR_T>(cl_iaura3d), sizeof(cl::Iaura3D));
         }
         else
         {
             if (cl_iaura3d)
             {
                 delete cl_iaura3d;
-                cl_iaura3d = MI_NULL;
+                cl_iaura3d = DT_NULL;
             }
         }
     }
@@ -458,9 +458,9 @@ cl::Iaura3D* AdrenoCLRuntime::InitCLIaura3D(const Buffer &buffer, cl_mem_flags c
     return cl_iaura3d;
 }
 
-std::string AdrenoCLRuntime::GetCLMaxConstantSizeString(MI_S32 n)
+std::string AdrenoCLRuntime::GetCLMaxConstantSizeString(DT_S32 n)
 {
-    MI_CHAR str[128];
+    DT_CHAR str[128];
     snprintf(str, sizeof(str), "__attribute__((max_constant_size(%d)))", n);
 
     std::string max_constant_size_str(str);

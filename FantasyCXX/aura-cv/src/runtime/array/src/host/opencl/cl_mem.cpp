@@ -7,25 +7,25 @@
 namespace aura
 {
 
-CLMem::CLMem() : m_cl_sync_method(CLMemSyncMethod::INVALID), m_data(MI_NULL)
+CLMem::CLMem() : m_cl_sync_method(CLMemSyncMethod::INVALID), m_data(DT_NULL)
 {
     m_array_type = ArrayType::CL_MEMORY;
 }
 
 CLMem::CLMem(Context *ctx, const CLMemParam &cl_param, ElemType elem_type, const Sizes3 &sizes, const Sizes &strides)
-             : Array(ctx, elem_type, sizes, strides), m_cl_param(cl_param), m_data(MI_NULL)
+             : Array(ctx, elem_type, sizes, strides), m_cl_param(cl_param), m_data(DT_NULL)
 {
     m_array_type = ArrayType::CL_MEMORY;
 
     do
     {
-        if ((MI_NULL == ctx) || (CLMemType::INVALID == m_cl_param.m_type) || (!Array::IsValid()))
+        if ((DT_NULL == ctx) || (CLMemType::INVALID == m_cl_param.m_type) || (!Array::IsValid()))
         {
             Clear();
             break;
         }
 
-        if (ctx->GetCLEngine() == MI_NULL)
+        if (ctx->GetCLEngine() == DT_NULL)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetCLEngine failed");
             Clear();
@@ -33,7 +33,7 @@ CLMem::CLMem(Context *ctx, const CLMemParam &cl_param, ElemType elem_type, const
         }
 
         m_cl_rt = ctx->GetCLEngine()->GetCLRuntime();
-        if (MI_NULL == m_cl_rt)
+        if (DT_NULL == m_cl_rt)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetCLRuntime failed");
             Clear();
@@ -41,7 +41,7 @@ CLMem::CLMem(Context *ctx, const CLMemParam &cl_param, ElemType elem_type, const
         }
 
         m_cl_cmd = m_cl_rt->GetCommandQueue();
-        if (MI_NULL == m_cl_cmd)
+        if (DT_NULL == m_cl_cmd)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetCommandQueue failed");
             Clear();
@@ -67,19 +67,19 @@ CLMem::CLMem(Context *ctx, const CLMemParam &cl_param, ElemType elem_type, const
 }
 
 CLMem::CLMem(Context *ctx, const CLMemParam &cl_param, ElemType elem_type, const Sizes3 &sizes, const Buffer &buffer, const Sizes &strides)
-             : Array(ctx, elem_type, sizes, strides, buffer), m_cl_param(cl_param), m_data(MI_NULL)
+             : Array(ctx, elem_type, sizes, strides, buffer), m_cl_param(cl_param), m_data(DT_NULL)
 {
     m_array_type = ArrayType::CL_MEMORY;
 
     do
     {
-        if ((MI_NULL == ctx) || (CLMemType::INVALID == m_cl_param.m_type) || (!m_buffer.IsValid()) || (!Array::IsValid()))
+        if ((DT_NULL == ctx) || (CLMemType::INVALID == m_cl_param.m_type) || (!m_buffer.IsValid()) || (!Array::IsValid()))
         {
             Clear();
             break;
         }
 
-        if (ctx->GetCLEngine() == MI_NULL)
+        if (ctx->GetCLEngine() == DT_NULL)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetCLEngine failed");
             Clear();
@@ -96,7 +96,7 @@ CLMem::CLMem(Context *ctx, const CLMemParam &cl_param, ElemType elem_type, const
         m_buffer.m_size = m_total_bytes;
 
         m_cl_rt = ctx->GetCLEngine()->GetCLRuntime();
-        if (MI_NULL == m_cl_rt)
+        if (DT_NULL == m_cl_rt)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetCLRuntime failed");
             Clear();
@@ -104,7 +104,7 @@ CLMem::CLMem(Context *ctx, const CLMemParam &cl_param, ElemType elem_type, const
         }
 
         m_cl_cmd = m_cl_rt->GetCommandQueue();
-        if (MI_NULL == m_cl_cmd)
+        if (DT_NULL == m_cl_cmd)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "GetCommandQueue failed");
             Clear();
@@ -170,7 +170,7 @@ CLMem& CLMem::operator=(const CLMem &cl_mem)
     return *this;
 }
 
-AURA_VOID CLMem::Clear()
+DT_VOID CLMem::Clear()
 {
     Array::Clear();
     m_array_type     = ArrayType::INVALID;
@@ -186,7 +186,7 @@ CLMem::~CLMem()
     Release();
 }
 
-AURA_VOID CLMem::Release()
+DT_VOID CLMem::Release()
 {
     if (m_refcount)
     {
@@ -202,7 +202,7 @@ AURA_VOID CLMem::Release()
 
 CLMem CLMem::FromArray(Context *ctx, const Array &array, const CLMemParam &cl_param)
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return CLMem();
     }
@@ -282,12 +282,12 @@ CLMem CLMem::FromArray(Context *ctx, const Array &array, const CLMemParam &cl_pa
     return CLMem();
 }
 
-MI_BOOL CLMem::IsValid() const
+DT_BOOL CLMem::IsValid() const
 {
-    return (Array::IsValid() && m_data != MI_NULL && ArrayType::CL_MEMORY == m_array_type);
+    return (Array::IsValid() && m_data != DT_NULL && ArrayType::CL_MEMORY == m_array_type);
 }
 
-AURA_VOID CLMem::Show() const
+DT_VOID CLMem::Show() const
 {
     if (m_ctx)
     {
@@ -304,7 +304,7 @@ AURA_VOID CLMem::Show() const
     }
 }
 
-AURA_VOID CLMem::Dump(const std::string &fname) const
+DT_VOID CLMem::Dump(const std::string &fname) const
 {
     if (!fname.empty())
     {
@@ -312,15 +312,15 @@ AURA_VOID CLMem::Dump(const std::string &fname) const
         if (fout.is_open())
         {
             cl_int cl_err    = CL_SUCCESS;
-            MI_S32 elem_size = ElemTypeSize(m_elem_type);
+            DT_S32 elem_size = ElemTypeSize(m_elem_type);
 
             switch (m_cl_param.m_type)
             {
                 case CLMemType::BUFFER:
                 {
-                    AURA_VOID *host_ptr = m_cl_cmd->enqueueMapBuffer(GetCLMemRef<cl::Buffer>(), CL_TRUE, CL_MAP_READ,
+                    DT_VOID *host_ptr = m_cl_cmd->enqueueMapBuffer(GetCLMemRef<cl::Buffer>(), CL_TRUE, CL_MAP_READ,
                                                                     0, m_total_bytes, NULL, NULL, &cl_err);
-                    if ((cl_err != CL_SUCCESS) || (MI_NULL == host_ptr))
+                    if ((cl_err != CL_SUCCESS) || (DT_NULL == host_ptr))
                     {
                         if (m_buffer.IsValid())
                         {
@@ -328,14 +328,14 @@ AURA_VOID CLMem::Dump(const std::string &fname) const
                         }
                     }
 
-                    if (MI_NULL == host_ptr)
+                    if (DT_NULL == host_ptr)
                     {
                         return;
                     }
 
-                    for (MI_S32 i = 0; i < m_sizes.m_height; i++)
+                    for (DT_S32 i = 0; i < m_sizes.m_height; i++)
                     {
-                        const MI_CHAR *src = (MI_CHAR *)host_ptr + i * m_strides.m_width;
+                        const DT_CHAR *src = (DT_CHAR *)host_ptr + i * m_strides.m_width;
                         fout.write(src, m_sizes.m_width * m_sizes.m_channel * elem_size);
                     }
                     fout.close();
@@ -368,9 +368,9 @@ AURA_VOID CLMem::Dump(const std::string &fname) const
                     std::array<size_t, 3> origin = {0, 0, 0};
                     std::array<size_t, 3> region = {iaura_width, static_cast<size_t>(m_strides.m_height), 1};
                     size_t row_pitch = 0;
-                    AURA_VOID *host_ptr = m_cl_cmd->enqueueMapIaura(GetCLMemRef<cl::Iaura2D>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, origin, region,
+                    DT_VOID *host_ptr = m_cl_cmd->enqueueMapIaura(GetCLMemRef<cl::Iaura2D>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, origin, region,
                                                                     &row_pitch, 0, NULL, NULL);
-                    if ((cl_err != CL_SUCCESS) || (MI_NULL == host_ptr))
+                    if ((cl_err != CL_SUCCESS) || (DT_NULL == host_ptr))
                     {
                         if (m_buffer.IsValid())
                         {
@@ -379,14 +379,14 @@ AURA_VOID CLMem::Dump(const std::string &fname) const
                         }
                     }
 
-                    if (MI_NULL == host_ptr)
+                    if (DT_NULL == host_ptr)
                     {
                         return;
                     }
 
-                    for (MI_S32 i = 0; i < m_sizes.m_height; i++)
+                    for (DT_S32 i = 0; i < m_sizes.m_height; i++)
                     {
-                        const MI_CHAR *src = (MI_CHAR *)host_ptr + i * row_pitch;
+                        const DT_CHAR *src = (DT_CHAR *)host_ptr + i * row_pitch;
                         fout.write(src, m_sizes.m_width * m_sizes.m_channel * elem_size);
                     }
                     fout.close();
@@ -423,7 +423,7 @@ AURA_VOID CLMem::Dump(const std::string &fname) const
                     size_t row_pitch             = 0;
                     size_t slice_pitch           = 0;
 
-                    AURA_VOID *host_ptr = m_cl_cmd->enqueueMapIaura(GetCLMemRef<cl::Iaura3D>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, origin, region,
+                    DT_VOID *host_ptr = m_cl_cmd->enqueueMapIaura(GetCLMemRef<cl::Iaura3D>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, origin, region,
                                                                   &row_pitch, &slice_pitch, NULL, NULL);
                     if (cl_err != CL_SUCCESS)
                     {
@@ -432,11 +432,11 @@ AURA_VOID CLMem::Dump(const std::string &fname) const
                         return;
                     }
 
-                    for (MI_S32 i = 0; i < static_cast<MI_S32>(depth); i++)
+                    for (DT_S32 i = 0; i < static_cast<DT_S32>(depth); i++)
                     {
-                        for (MI_S32 j = 0; j < static_cast<MI_S32>(iaura_height); j++)
+                        for (DT_S32 j = 0; j < static_cast<DT_S32>(iaura_height); j++)
                         {
-                            const MI_CHAR *src = (MI_CHAR *)host_ptr + i * slice_pitch + j * row_pitch;
+                            const DT_CHAR *src = (DT_CHAR *)host_ptr + i * slice_pitch + j * row_pitch;
                             fout.write(src, m_sizes.m_width * m_sizes.m_channel * elem_size);
                         }
                     }
@@ -501,7 +501,7 @@ Status CLMem::InitCLBuffer()
 {
     cl::Buffer *cl_buffer = m_cl_rt->InitCLBuffer(m_buffer, m_cl_param.m_param.buffer.cl_flags, m_cl_sync_method);
 
-    if (cl_buffer != MI_NULL)
+    if (cl_buffer != DT_NULL)
     {
         m_data = cl_buffer;
         return Status::OK;
@@ -529,7 +529,7 @@ Status CLMem::InitCLIaura2D()
     cl::Iaura2D *cl_iaura2d = m_cl_rt->InitCLIaura2D(m_buffer, m_cl_param.m_param.iaura2d.cl_flags, fmt, iaura_width,
                                                      m_strides.m_height, m_strides.m_width, m_cl_sync_method);
 
-    if (cl_iaura2d != MI_NULL)
+    if (cl_iaura2d != DT_NULL)
     {
         m_data = cl_iaura2d;
         return Status::OK;
@@ -568,7 +568,7 @@ Status CLMem::InitCLIaura3D()
     cl::Iaura3D *cl_iaura3d = m_cl_rt->InitCLIaura3D(m_buffer, m_cl_param.m_param.iaura3d.cl_flags, fmt, iaura_width,
                                                      iaura_height, depth, m_strides.m_width, slice_pitch, m_cl_sync_method);
 
-    if (cl_iaura3d != MI_NULL)
+    if (cl_iaura3d != DT_NULL)
     {
         m_data = cl_iaura3d;
         return Status::OK;
@@ -608,7 +608,7 @@ Status CLMem::CreateCLBuffer()
 {
     cl::Buffer *cl_buffer = m_cl_rt->CreateCLBuffer(m_cl_param.m_param.buffer.cl_flags, m_total_bytes);
 
-    if (cl_buffer != MI_NULL)
+    if (cl_buffer != DT_NULL)
     {
         m_data        = cl_buffer;
         m_cl_sync_method = CLMemSyncMethod::AUTO;
@@ -636,7 +636,7 @@ Status CLMem::CreateCLIaura2D()
 
     cl::Iaura2D *cl_iaura2d = m_cl_rt->CreateCLIaura2D(m_cl_param.m_param.iaura2d.cl_flags, fmt, iaura_width,
                                                        m_strides.m_height);
-    if (cl_iaura2d != MI_NULL)
+    if (cl_iaura2d != DT_NULL)
     {
         m_data        = cl_iaura2d;
         m_cl_sync_method = CLMemSyncMethod::AUTO;
@@ -674,7 +674,7 @@ Status CLMem::CreateCLIaura3D()
 
     cl::Iaura3D *cl_iaura3d = m_cl_rt->CreateCLIaura3D(m_cl_param.m_param.iaura3d.cl_flags, fmt, iaura_width,
                                                        iaura_height, depth);
-    if (cl_iaura3d != MI_NULL)
+    if (cl_iaura3d != DT_NULL)
     {
         m_data        = cl_iaura3d;
         m_cl_sync_method = CLMemSyncMethod::AUTO;
@@ -702,14 +702,14 @@ Status CLMem::EnqueuedData(CLMemSyncType cl_sync_type)
     }
 
     cl_int cl_err    = CL_SUCCESS;
-    MI_U8 *data      = (MI_U8 *)(m_buffer.m_data);
-    MI_S32 elem_size = ElemTypeSize(m_elem_type);
+    DT_U8 *data      = (DT_U8 *)(m_buffer.m_data);
+    DT_S32 elem_size = ElemTypeSize(m_elem_type);
 
     switch (m_cl_param.m_type)
     {
         case CLMemType::BUFFER:
         {
-            AURA_VOID *host_ptr = m_cl_cmd->enqueueMapBuffer(GetCLMemRef<cl::Buffer>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE,
+            DT_VOID *host_ptr = m_cl_cmd->enqueueMapBuffer(GetCLMemRef<cl::Buffer>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE,
                                                             0, m_total_bytes, NULL, NULL, &cl_err);
             if (cl_err != CL_SUCCESS)
             {
@@ -718,10 +718,10 @@ Status CLMem::EnqueuedData(CLMemSyncType cl_sync_type)
                 return Status::ERROR;
             }
 
-            for (MI_S32 i = 0; i < m_sizes.m_height; i++)
+            for (DT_S32 i = 0; i < m_sizes.m_height; i++)
             {
-                MI_U8 *src = (MI_U8 *)host_ptr + i * m_strides.m_width;
-                MI_U8 *dst = data + i * m_strides.m_width;
+                DT_U8 *src = (DT_U8 *)host_ptr + i * m_strides.m_width;
+                DT_U8 *dst = data + i * m_strides.m_width;
 
                 if (CLMemSyncType::WRITE == cl_sync_type)
                 {
@@ -760,7 +760,7 @@ Status CLMem::EnqueuedData(CLMemSyncType cl_sync_type)
             std::array<size_t, 3> region = {iaura_width, static_cast<size_t>(m_strides.m_height), 1};
             size_t row_pitch             = 0;
 
-            AURA_VOID *host_ptr = m_cl_cmd->enqueueMapIaura(GetCLMemRef<cl::Iaura2D>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, origin, region,
+            DT_VOID *host_ptr = m_cl_cmd->enqueueMapIaura(GetCLMemRef<cl::Iaura2D>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, origin, region,
                                                             &row_pitch, 0, NULL, NULL);
             if (cl_err != CL_SUCCESS)
             {
@@ -769,10 +769,10 @@ Status CLMem::EnqueuedData(CLMemSyncType cl_sync_type)
                 return Status::ERROR;
             }
 
-            for (MI_S32 i = 0; i < m_sizes.m_height; i++)
+            for (DT_S32 i = 0; i < m_sizes.m_height; i++)
             {
-                MI_U8 *src = (MI_U8 *)host_ptr + i * row_pitch;
-                MI_U8 *dst = data + i * m_strides.m_width;
+                DT_U8 *src = (DT_U8 *)host_ptr + i * row_pitch;
+                DT_U8 *dst = data + i * m_strides.m_width;
 
                 if (CLMemSyncType::WRITE == cl_sync_type)
                 {
@@ -814,7 +814,7 @@ Status CLMem::EnqueuedData(CLMemSyncType cl_sync_type)
             size_t row_pitch             = 0;
             size_t slice_pitch           = 0;
 
-            AURA_VOID *host_ptr = m_cl_cmd->enqueueMapIaura(GetCLMemRef<cl::Iaura3D>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, origin, region,
+            DT_VOID *host_ptr = m_cl_cmd->enqueueMapIaura(GetCLMemRef<cl::Iaura3D>(), CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, origin, region,
                                                           &row_pitch, &slice_pitch, NULL, NULL);
             if (cl_err != CL_SUCCESS)
             {
@@ -823,13 +823,13 @@ Status CLMem::EnqueuedData(CLMemSyncType cl_sync_type)
                 return Status::ERROR;
             }
 
-            for (MI_S32 i = 0; i < static_cast<MI_S32>(depth); i++)
+            for (DT_S32 i = 0; i < static_cast<DT_S32>(depth); i++)
             {
-                MI_U8 *m_dst = data + i * m_total_bytes / depth;
-                for (MI_S32 j = 0; j < static_cast<MI_S32>(iaura_height); j++)
+                DT_U8 *m_dst = data + i * m_total_bytes / depth;
+                for (DT_S32 j = 0; j < static_cast<DT_S32>(iaura_height); j++)
                 {
-                    MI_U8 *src = (MI_U8 *)host_ptr + i * slice_pitch + j * row_pitch;
-                    MI_U8 *dst = m_dst + j * m_strides.m_width;
+                    DT_U8 *src = (DT_U8 *)host_ptr + i * slice_pitch + j * row_pitch;
+                    DT_U8 *dst = m_dst + j * m_strides.m_width;
 
                     if (CLMemSyncType::WRITE == cl_sync_type)
                     {
@@ -925,13 +925,13 @@ Status CLMem::Load(const std::string &fname)
         return ret;
     }
 
-    MI_S32 row_bytes         = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
-    MI_S32 buffer_valid_size = m_sizes.m_height * row_bytes;
-    MI_BOOL is_alloc_mem     = m_buffer.IsValid();
-    FILE *fp                 = MI_NULL;
-    MI_S32 file_length       = 0;
+    DT_S32 row_bytes         = m_sizes.m_width * m_sizes.m_channel * ElemTypeSize(m_elem_type);
+    DT_S32 buffer_valid_size = m_sizes.m_height * row_bytes;
+    DT_BOOL is_alloc_mem     = m_buffer.IsValid();
+    FILE *fp                 = DT_NULL;
+    DT_S32 file_length       = 0;
 
-    if (MI_FALSE == is_alloc_mem)
+    if (DT_FALSE == is_alloc_mem)
     {
         m_buffer = m_ctx->GetMemPool()->GetBuffer(AURA_ALLOC_PARAM(m_ctx, AURA_MEM_DMA_BUF_HEAP, m_total_bytes, 0));
         if (!m_buffer.IsValid())
@@ -942,7 +942,7 @@ Status CLMem::Load(const std::string &fname)
     }
 
     fp = fopen(fname.c_str(), "rb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open " + fname + " failed";
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -960,9 +960,9 @@ Status CLMem::Load(const std::string &fname)
     }
 
     fseek(fp, 0, SEEK_SET);
-    for (MI_S32 i = 0; i < m_sizes.m_height; i++)
+    for (DT_S32 i = 0; i < m_sizes.m_height; i++)
     {
-        MI_S32 len = fread(static_cast<MI_U8*>(m_buffer.m_data) + i * m_strides.m_width, 1, row_bytes, fp);
+        DT_S32 len = fread(static_cast<DT_U8*>(m_buffer.m_data) + i * m_strides.m_width, 1, row_bytes, fp);
         if (len != row_bytes)
         {
             std::string info = "file fread size(" + std::to_string(len) + "," + std::to_string(row_bytes) + ") not match";
@@ -986,7 +986,7 @@ EXIT:
         fclose(fp);
     }
 
-    if (MI_FALSE == is_alloc_mem)
+    if (DT_FALSE == is_alloc_mem)
     {
         AURA_FREE(m_ctx, m_buffer.m_origin);
         m_buffer.Clear();
@@ -1015,7 +1015,7 @@ Status CLMem::BindBuffer(const Buffer &buffer)
     return Status::OK;
 }
 
-cl_channel_type CLMem::GetCLIauraChannelDataType(ElemType elem_type, MI_BOOL is_norm)
+cl_channel_type CLMem::GetCLIauraChannelDataType(ElemType elem_type, DT_BOOL is_norm)
 {
     cl_channel_type cl_ch_type = 0;
 
@@ -1070,9 +1070,9 @@ cl_channel_type CLMem::GetCLIauraChannelDataType(ElemType elem_type, MI_BOOL is_
     return cl_ch_type;
 }
 
-MI_S32 CLMem::GetCLIauraChannelNum(cl_channel_order cl_ch_order)
+DT_S32 CLMem::GetCLIauraChannelNum(cl_channel_order cl_ch_order)
 {
-    MI_S32 channel_num = 0;
+    DT_S32 channel_num = 0;
 
     switch (cl_ch_order)
     {
@@ -1108,9 +1108,9 @@ MI_S32 CLMem::GetCLIauraChannelNum(cl_channel_order cl_ch_order)
     return channel_num;
 }
 
-size_t CLMem::GetCLIauraWidth(MI_S32 elem_count, cl_channel_order cl_ch_order)
+size_t CLMem::GetCLIauraWidth(DT_S32 elem_count, cl_channel_order cl_ch_order)
 {
-    MI_S32 channel_num = GetCLIauraChannelNum(cl_ch_order);
+    DT_S32 channel_num = GetCLIauraChannelNum(cl_ch_order);
 
     if (0 == channel_num)
     {

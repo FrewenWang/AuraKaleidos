@@ -54,15 +54,15 @@ static std::shared_ptr<LaplacianImpl> CreateLaplacianImpl(Context *ctx, const Op
 Laplacian::Laplacian(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Laplacian::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+Status Laplacian::SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                           BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -101,14 +101,14 @@ Status Laplacian::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateLaplacianImpl(m_ctx, impl_target);
     }
 
     // run initialize
     LaplacianImpl *laplacian_impl = dynamic_cast<LaplacianImpl*>(m_impl.get());
-    if (MI_NULL == laplacian_impl)
+    if (DT_NULL == laplacian_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "LaplacianImpl is null ptr");
         return Status::ERROR;
@@ -119,10 +119,10 @@ Status Laplacian::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Laplacian::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type)
+Status Laplacian::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -144,7 +144,7 @@ Status Laplacian::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel,
     return Status::OK;
 }
 
-AURA_EXPORTS Status ILaplacian(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize,
+AURA_EXPORTS Status ILaplacian(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize,
                                BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Laplacian laplacian(ctx, target);
@@ -154,13 +154,13 @@ AURA_EXPORTS Status ILaplacian(Context *ctx, const Mat &src, Mat &dst, MI_S32 ks
 
 LaplacianImpl::LaplacianImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Laplacian", target),
                                                                      m_ksize(0), m_border_type(BorderType::REFLECT_101),
-                                                                     m_src(MI_NULL), m_dst(MI_NULL)
+                                                                     m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status LaplacianImpl::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+Status LaplacianImpl::SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                               BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -221,7 +221,7 @@ std::string LaplacianImpl::ToString() const
     return str;
 }
 
-AURA_VOID LaplacianImpl::Dump(const std::string &prefix) const
+DT_VOID LaplacianImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

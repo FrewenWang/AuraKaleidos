@@ -46,14 +46,14 @@ static std::shared_ptr<ConvertToImpl> CreateConvertToImpl(Context *ctx, const Op
 ConvertTo::ConvertTo(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status ConvertTo::SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta)
+Status ConvertTo::SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -93,14 +93,14 @@ Status ConvertTo::SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 bet
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateConvertToImpl(m_ctx, impl_target);
     }
 
     // run initialize
     ConvertToImpl *convert_to_impl = dynamic_cast<ConvertToImpl*>(m_impl.get());
-    if (MI_NULL == convert_to_impl)
+    if (DT_NULL == convert_to_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "convert_to_impl is null ptr");
         return Status::ERROR;
@@ -111,16 +111,16 @@ Status ConvertTo::SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 bet
     AURA_RETURN(m_ctx, ret);
 }
 
-Status ConvertTo::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, MI_F32 alpha, MI_F32 beta)
+Status ConvertTo::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType dst_elem_type, DT_F32 alpha, DT_F32 beta)
 {
 
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
-    MI_BOOL scale = (Abs(alpha - 1.0) > DBL_EPSILON) || (Abs(beta) > DBL_EPSILON);
+    DT_BOOL scale = (Abs(alpha - 1.0) > DBL_EPSILON) || (Abs(beta) > DBL_EPSILON);
     std::vector<CLKernel> cl_kernels = ConvertToCL::GetCLKernels(ctx, src_elem_type, dst_elem_type, scale);
 
     if (CheckCLKernels(ctx, cl_kernels) != Status::OK)
@@ -139,7 +139,7 @@ Status ConvertTo::CLPrecompile(Context *ctx, ElemType src_elem_type, ElemType ds
     return Status::OK;
 }
 
-AURA_EXPORTS Status IConvertTo(Context *ctx, const Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta, const OpTarget &target)
+AURA_EXPORTS Status IConvertTo(Context *ctx, const Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta, const OpTarget &target)
 {
     ConvertTo convert_to(ctx, target);
 
@@ -147,13 +147,13 @@ AURA_EXPORTS Status IConvertTo(Context *ctx, const Mat &src, Mat &dst, MI_F32 al
 }
 
 ConvertToImpl::ConvertToImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "ConvertTo", target),
-                                                                     m_src(MI_NULL), m_dst(MI_NULL),
+                                                                     m_src(DT_NULL), m_dst(DT_NULL),
                                                                      m_alpha(1), m_beta(0)
 {}
 
-Status ConvertToImpl::SetArgs(const Array *src, Array *dst, MI_F32 alpha, MI_F32 beta)
+Status ConvertToImpl::SetArgs(const Array *src, Array *dst, DT_F32 alpha, DT_F32 beta)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -200,7 +200,7 @@ std::string ConvertToImpl::ToString() const
     return str;
 }
 
-AURA_VOID ConvertToImpl::Dump(const std::string &prefix) const
+DT_VOID ConvertToImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

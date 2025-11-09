@@ -1,6 +1,6 @@
 #include "sample_runtime.hpp"
 
-MI_S32 main()
+DT_S32 main()
 {
     // create context for sample
     std::shared_ptr<aura::Context> ctx = CreateContext();
@@ -14,7 +14,7 @@ MI_S32 main()
     AURA_LOGI(ctx, SAMPLE_TAG, "=================== aura::MemPool Sample Test Begin ===================\n");
 
     aura::MemPool *mem_pool = ctx->GetMemPool();
-    if (MI_NULL == mem_pool)
+    if (DT_NULL == mem_pool)
     {
         AURA_LOGE(ctx, SAMPLE_TAG, "Context::GetMemPool() failed\n");
         return -1;
@@ -25,7 +25,7 @@ MI_S32 main()
     }
 
     // allocate and free
-    AURA_VOID *ptr = mem_pool->Allocate(AURA_MEM_HEAP, 100, 0, __FILE__, __FUNCTION__, __LINE__);
+    DT_VOID *ptr = mem_pool->Allocate(AURA_MEM_HEAP, 100, 0, __FILE__, __FUNCTION__, __LINE__);
     auto buffer  = mem_pool->GetBuffer(ptr);
     if (buffer.IsValid())
     {

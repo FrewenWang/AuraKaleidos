@@ -36,7 +36,7 @@ public:
      * @param ctx Pointer to the execution context.
      * @param enable_nn Flag indicating whether neural network support is enabled.
      */
-    NNEngine(Context *ctx, MI_BOOL enable_nn);
+    NNEngine(Context *ctx, DT_BOOL enable_nn);
 
     /**
      * @brief Destructor for NNEngine.
@@ -130,7 +130,7 @@ public:
      * Configuration usage
      *     NNConfig config;
      *     config["perf_level"] = "PERF_NORMAL";
-     * @return Shared pointer to the created NNExecutor, or MI_NULL if the creation failed.
+     * @return Shared pointer to the created NNExecutor, or DT_NULL if the creation failed.
      */
     std::shared_ptr<NNExecutor> CreateNNExecutor(const std::string &minn_file,
                                                  const std::string &decrypt_key,
@@ -145,10 +145,10 @@ public:
      * @param config Configuration for the executor.       执行器配置
      * Configuration options: same as above
      * Configuration usage: same as above
-     * @return Shared pointer to the created NNExecutor, or MI_NULL if the creation failed.
+     * @return Shared pointer to the created NNExecutor, or DT_NULL if the creation failed.
      */
-    std::shared_ptr<NNExecutor> CreateNNExecutor(const MI_U8 *minn_data,
-                                                 MI_S64 minn_size,
+    std::shared_ptr<NNExecutor> CreateNNExecutor(const DT_U8 *minn_data,
+                                                 DT_S64 minn_size,
                                                  const std::string &decrypt_key,
                                                  const NNConfig &config = NNConfig());
 
@@ -159,7 +159,7 @@ public:
      * @param minn_name minn name in minb.
      * @param decrypt_key Decryption key for the target minn in minb file.
      * @param config Configuration for the executor
-     * @return Shared pointer to the created NNExecutor, or MI_NULL if the creation failed.
+     * @return Shared pointer to the created NNExecutor, or DT_NULL if the creation failed.
      */
     std::shared_ptr<NNExecutor> CreateNNExecutor(const std::string &minb_file,
                                                  const std::string &minn_name,
@@ -168,7 +168,7 @@ public:
 
 private:
     Context *m_ctx;         /*!< Pointer to the execution context. */
-    MI_BOOL m_enable_nn;    /*!< Flag indicating whether neural network support is enabled. */
+    DT_BOOL m_enable_nn;    /*!< Flag indicating whether neural network support is enabled. */
 };
 
 /**

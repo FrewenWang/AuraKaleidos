@@ -6,7 +6,7 @@
 
 #if (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))
 
-static constexpr MI_S32 graph_rpc_magic_number = 0x12345678;
+static constexpr DT_S32 graph_rpc_magic_number = 0x12345678;
 
 #define AURA_ALGOS_GRAPH_PACKAGE_NAME    "aura.algos.graph"
 #define AURA_ALGOS_GRAPH_MODULE_NAME     "core"

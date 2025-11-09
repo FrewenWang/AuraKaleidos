@@ -14,7 +14,7 @@ void CheckResult(const Tp &val1, const Tp &val2)
     }
 }
 
-template<MI_S32 StrMaxSize = AURA_STRING_DEFAULT_MAX_SIZE>
+template<DT_S32 StrMaxSize = AURA_STRING_DEFAULT_MAX_SIZE>
 void CheckResult(const string_<StrMaxSize> &str1, const string_<StrMaxSize> &str2)
 {
     if (Strcmp(str1.c_str(), str2.c_str()) != 0)
@@ -28,7 +28,7 @@ Status RpcParamTestRpc(TileManager tm, XtensaRpcParam &rpc_param)
     AURA_UNUSED(tm);
 
     string str;
-    map<MI_S32> map_in;
+    map<DT_S32> map_in;
 
     RpcParamInParam in_param(rpc_param);
     Status ret = in_param.Get(str, map_in);
@@ -41,7 +41,7 @@ Status RpcParamTestRpc(TileManager tm, XtensaRpcParam &rpc_param)
     string ref_str = "rpc pram test";
     CheckResult(str, ref_str);
 
-    map<MI_S32> ref_map_in = {{"aaa", 1}, {"bbb", 2}, {"ccc", 3}};
+    map<DT_S32> ref_map_in = {{"aaa", 1}, {"bbb", 2}, {"ccc", 3}};
 
     for (auto it = map_in.begin(); it != map_in.end(); it++)
     {
@@ -52,15 +52,15 @@ Status RpcParamTestRpc(TileManager tm, XtensaRpcParam &rpc_param)
             continue;
         }
 
-        CheckResult<MI_S32>(it->second, ref_it->second);
+        CheckResult<DT_S32>(it->second, ref_it->second);
     }
 
-    MI_S32 value = 999;
-    vector<MI_S32> vec = {1, 2, 3};
-    map<MI_S32> map_out = {{"ddd", 4}, {"eee", 5}, {"fff", 6}};
+    DT_S32 value = 999;
+    vector<DT_S32> vec = {1, 2, 3};
+    map<DT_S32> map_out = {{"ddd", 4}, {"eee", 5}, {"fff", 6}};
 
     RpcParamOutParam out_param(rpc_param);
-    ret = out_param.Set(value, vec, map_out, MI_FALSE);
+    ret = out_param.Set(value, vec, map_out, DT_FALSE);
     if (ret != Status::OK)
     {
         AURA_XTENSA_LOG("Set failed!\n");

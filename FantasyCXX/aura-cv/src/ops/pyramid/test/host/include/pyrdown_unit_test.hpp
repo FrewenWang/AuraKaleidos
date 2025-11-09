@@ -22,7 +22,7 @@ struct PrydownTestParam
     PrydownTestParam()
     {}
 
-    PrydownTestParam(MI_S32 ksize, MI_F32 sigma) : ksize(ksize), sigma(sigma)
+    PrydownTestParam(DT_S32 ksize, DT_F32 sigma) : ksize(ksize), sigma(sigma)
     {}
 
     friend std::ostream& operator<<(std::ostream &os, const PrydownTestParam &pyrdown_test_param)
@@ -38,8 +38,8 @@ struct PrydownTestParam
         return sstream.str();
     }
 
-    MI_S32 ksize;
-    MI_F32 sigma;
+    DT_S32 ksize;
+    DT_F32 sigma;
 };
 
 AURA_TEST_PARAM(PyrDownParam,
@@ -89,7 +89,7 @@ public:
         }
     }
 
-    Status CheckParam(MI_S32 index) override
+    Status CheckParam(DT_S32 index) override
     {
         PyrDownParam run_param(GetParam((index)));
         if (UnitTest::GetInstance()->IsStressMode())
@@ -113,7 +113,7 @@ public:
         return Status::OK;
     }
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // get next param set
         PyrDownParam run_param(GetParam(index));
@@ -130,12 +130,12 @@ public:
         Mat dst = m_factory.GetEmptyMat(elem_type, omat_size.m_sizes, AURA_MEM_DEFAULT, omat_size.m_strides);
         Mat ref = m_factory.GetEmptyMat(elem_type, omat_size.m_sizes, AURA_MEM_DEFAULT, omat_size.m_strides);
 
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         TestTime time_val;
         MatCmpResult cmp_result;
         TestResult result;
-        MI_F32 tolerance = 1.0f;
+        DT_F32 tolerance = 1.0f;
 
         result.param  = BorderTypeToString(run_param.border_type) + " | " + kernel_param.ToString().c_str();
         result.input  = imat_size.ToString() + " " + ElemTypesToString(elem_type);

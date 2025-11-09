@@ -30,10 +30,10 @@ namespace aura
  * @param ksize The size of the Gaussian kernel (must be an odd number).
  * @param sigma The standard deviation of the Gaussian kernel.
  *
- * @return A vector of `MI_F32` type representing the Gaussian kernel.
+ * @return A vector of `DT_F32` type representing the Gaussian kernel.
  *         The kernel is centered at index `ksize / 2`.
  */
-AURA_EXPORTS std::vector<MI_F32> GetGaussianKernel(MI_S32 ksize, MI_F32 sigma);
+AURA_EXPORTS std::vector<DT_F32> GetGaussianKernel(DT_S32 ksize, DT_F32 sigma);
 
 /**
  * @brief The Gaussian filter interface class.
@@ -69,7 +69,7 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma,
                    BorderType border_type = BorderType::REFLECT_101,
                    const Scalar &border_value = Scalar());
 
@@ -81,7 +81,7 @@ public:
      * @param ksize The size of the gaussian kernel.
      * @param border_type The border type for handling border pixels.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type);
 };
 
 /**
@@ -114,7 +114,7 @@ public:
  * @note 1.N is positive integer(ksize is odd positive integer). <br>
  *       2.The above implementations supported all BorderType(CONSTANT/REPLICATE/REFLECT_101).
  */
-AURA_EXPORTS Status IGaussian(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MI_F32 sigma,
+AURA_EXPORTS Status IGaussian(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, DT_F32 sigma,
                               BorderType border_type     = BorderType::REFLECT_101,
                               const Scalar &border_value = Scalar(),
                               const OpTarget &target     = OpTarget::Default());

@@ -33,16 +33,16 @@ Graph::Config::Config(const std::string &root_name)
 }
 #endif // AURA_BUILD_ANDROID
 
-AURA_VOID Graph::Config::SetOutputPath(const std::string &output_dir, const std::string &output_prefix)
+DT_VOID Graph::Config::SetOutputPath(const std::string &output_dir, const std::string &output_prefix)
 {
     m_output_dir = output_dir + "/";
     m_output_prefix = output_prefix;
 }
 
 #if defined AURA_BUILD_ANDROID
-AURA_VOID Graph::Config::GetPropsFromFile(const std::string &config_key, const std::unordered_map<std::string, std::string> &keys_map)
+DT_VOID Graph::Config::GetPropsFromFile(const std::string &config_key, const std::unordered_map<std::string, std::string> &keys_map)
 {
-    MI_CHAR config_path[2048];
+    DT_CHAR config_path[2048];
     memset(config_path, 0, sizeof(config_path));
     __system_property_get(config_key.c_str(), config_path);
 
@@ -83,9 +83,9 @@ AURA_VOID Graph::Config::GetPropsFromFile(const std::string &config_key, const s
     ifs.close();
 }
 
-AURA_VOID Graph::Config::GetPropsFromShell(const std::unordered_map<std::string, std::string> &keys_map)
+DT_VOID Graph::Config::GetPropsFromShell(const std::unordered_map<std::string, std::string> &keys_map)
 {
-    MI_CHAR prop_value[2048];
+    DT_CHAR prop_value[2048];
 
     for (const auto &key_pair : keys_map)
     {
@@ -115,12 +115,12 @@ std::vector<std::string> Graph::Config::ParseProps(const std::string &props)
 
 Node Graph::m_dummy_node;
 
-Graph::Graph(Context *ctx) : m_ctx(ctx), m_is_valid(MI_TRUE)
+Graph::Graph(Context *ctx) : m_ctx(ctx), m_is_valid(DT_TRUE)
 {}
 
 #if defined(AURA_BUILD_HOST)
 Graph::Graph(Context *ctx, const std::unordered_map<std::string, std::vector<std::string>> &props)
-             : m_ctx(ctx), m_is_valid(MI_TRUE)
+             : m_ctx(ctx), m_is_valid(DT_TRUE)
 {
     do
     {
@@ -128,29 +128,29 @@ Graph::Graph(Context *ctx, const std::unordered_map<std::string, std::vector<std
         if (!props.empty())
         {
             m_config = std::make_shared<Config>(props);
-            if (MI_NULL == m_config)
+            if (DT_NULL == m_config)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-                m_is_valid = MI_FALSE;
+                m_is_valid = DT_FALSE;
                 break;
             }
         }
 #  else
         m_config = std::make_shared<Config>(props);
-        if (MI_NULL == m_config)
+        if (DT_NULL == m_config)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-            m_is_valid = MI_FALSE;
+            m_is_valid = DT_FALSE;
             break;
         }
 #  endif
 
         m_profiler = std::make_shared<Profiler>(m_ctx);
         m_timer = std::make_shared<Timer>();
-        if (MI_NULL == m_profiler || MI_NULL == m_timer)
+        if (DT_NULL == m_profiler || DT_NULL == m_timer)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-            m_is_valid = MI_FALSE;
+            m_is_valid = DT_FALSE;
         }
     } while (0);
 }
@@ -159,15 +159,15 @@ Graph::Graph(Context *ctx, const std::unordered_map<std::string, std::vector<std
 #if defined(AURA_BUILD_HEXAGON)
 Graph::Graph(Context *ctx, const std::string &name, const Time &end_time, const Time &host_base_time,
              const std::unordered_map<std::string, std::vector<std::string>> &props)
-             : m_ctx(ctx), m_name(name), m_is_valid(MI_TRUE)
+             : m_ctx(ctx), m_name(name), m_is_valid(DT_TRUE)
 {
     m_config = std::make_shared<Config>(props);
     m_profiler = std::make_shared<Profiler>(m_ctx);
     m_timer = std::make_shared<Timer>(end_time, host_base_time);
-    if (MI_NULL == m_config || MI_NULL == m_profiler || MI_NULL == m_timer)
+    if (DT_NULL == m_config || DT_NULL == m_profiler || DT_NULL == m_timer)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-        m_is_valid = MI_FALSE;
+        m_is_valid = DT_FALSE;
     }
 }
 #endif // AURA_BUILD_HEXAGON
@@ -185,7 +185,7 @@ Graph::~Graph()
     }
 }
 
-AURA_VOID Graph::MakeNodes(Node *node, const std::vector<std::string> &names)
+DT_VOID Graph::MakeNodes(Node *node, const std::vector<std::string> &names)
 {
     if (!m_is_valid)
     {
@@ -193,10 +193,10 @@ AURA_VOID Graph::MakeNodes(Node *node, const std::vector<std::string> &names)
         return;
     }
 
-    if (MI_NULL == node)
+    if (DT_NULL == node)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-        m_is_valid = MI_FALSE;
+        m_is_valid = DT_FALSE;
         return;
     }
 
@@ -205,15 +205,15 @@ AURA_VOID Graph::MakeNodes(Node *node, const std::vector<std::string> &names)
         if (m_nodes.find(name) != m_nodes.end() || name.find('.') != std::string::npos)
         {
             AURA_ADD_ERROR_STRING(m_ctx, ("invalid name " + name).c_str());
-            m_is_valid = MI_FALSE;
+            m_is_valid = DT_FALSE;
             return;
         }
 
         Node *node_copy = Create<Node>(m_ctx, node->GetOp(), node->GetType(), this, name);
-        if (MI_NULL == node_copy)
+        if (DT_NULL == node_copy)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-            m_is_valid = MI_FALSE;
+            m_is_valid = DT_FALSE;
             return;
         }
         m_nodes[name] = node_copy;
@@ -235,7 +235,7 @@ Node& Graph::operator[](const std::string &name)
     }
     else
     {
-        if (m_nodes[name] != MI_NULL)
+        if (m_nodes[name] != DT_NULL)
         {
             return *(m_nodes[name]);
         }
@@ -262,27 +262,27 @@ Status Graph::Finalize()
     }
 
 #if defined(AURA_BUILD_ANDROID)
-    if (MI_NULL == m_config)
+    if (DT_NULL == m_config)
     {
         m_config = std::make_shared<Config>(m_nodes.begin()->first);
-        if (MI_NULL == m_config)
+        if (DT_NULL == m_config)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-            m_is_valid = MI_FALSE;
+            m_is_valid = DT_FALSE;
             return Status::ERROR;
         }
     }
 #endif // AURA_BUILD_ANDROID
 
-    if (MI_NULL == m_profiler)
+    if (DT_NULL == m_profiler)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-        m_is_valid = MI_FALSE;
+        m_is_valid = DT_FALSE;
         return Status::ERROR;
     }
 
     const std::vector<std::string> &perf_props = m_config->m_props["perf"];
-    MI_BOOL enable_perf = (perf_props.size() == 1 && perf_props[0] == "1");
+    DT_BOOL enable_perf = (perf_props.size() == 1 && perf_props[0] == "1");
     m_profiler->Initialize(enable_perf);
 
     Node *node = m_nodes.begin()->second;
@@ -303,7 +303,7 @@ Status Graph::Finalize()
     if (node->GetType() == NodeType::ALGO)
     {
         Graph *graph = dynamic_cast<Algo*>(node->GetOp())->GetGraph();
-        if (MI_NULL == graph)
+        if (DT_NULL == graph)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
             return Status::ERROR;
@@ -326,7 +326,7 @@ Status Graph::Finalize()
 }
 
 #if defined(AURA_BUILD_HOST)
-Status Graph::SetTimeout(MI_S32 timeout_ms)
+Status Graph::SetTimeout(DT_S32 timeout_ms)
 {
     if (!m_is_valid)
     {
@@ -379,7 +379,7 @@ Status Graph::Barrier()
     }
 
     Status ret = Status::OK;
-    MI_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
+    DT_U64 thread_id = std::hash<std::thread::id>()(std::this_thread::get_id());
     for (auto &token : m_tokens[thread_id])
     {
         if (token.valid())
@@ -397,7 +397,7 @@ Profiler* Graph::GetProfiler()
     if (!m_is_valid)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "invalid graph");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return m_profiler.get();
@@ -409,7 +409,7 @@ Context* Graph::GetContext()
     if (!m_is_valid)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "invalid graph");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return m_ctx;
@@ -428,19 +428,19 @@ Status Graph::CallHexagon(const std::string &package, const std::string &module,
     Status ret = Status::OK;
 
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
-    if (MI_NULL == engine)
+    if (DT_NULL == engine)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
         return Status::ERROR;
     }
 
-    if (MI_NULL == op_impl)
+    if (DT_NULL == op_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "op_impl is null");
         return Status::ERROR;
     }
 
-    MI_S32 size = 0;
+    DT_S32 size = 0;
     Buffer buffer;
     if (m_profiler->IsEnablePerf())
     {
@@ -496,7 +496,7 @@ Status Graph::CallHexagon(const std::string &package, const std::string &module,
         if (m_profiler->IsEnablePerf())
         {
             Status ret_status = Status::OK;
-            MI_S32 magic_num = 0;
+            DT_S32 magic_num = 0;
 
             ret_status = graph_rpc_param.Get(magic_num);
             if (ret_status != Status::OK)
@@ -550,12 +550,12 @@ EXIT:
 }
 #endif // AURA_ENABLE_HEXAGON
 
-MI_BOOL Graph::CheckValid()
+DT_BOOL Graph::CheckValid()
 {
     if (!m_is_valid)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "invalid graph");
-        return MI_FALSE;
+        return DT_FALSE;
     }
 
     for (auto &node : m_nodes)
@@ -565,12 +565,12 @@ MI_BOOL Graph::CheckValid()
             Graph *graph = dynamic_cast<Algo*>(node.second->GetOp())->GetGraph();
             if (!graph->CheckValid())
             {
-                return MI_FALSE;
+                return DT_FALSE;
             }
         }
     }
 
-    return MI_TRUE;
+    return DT_TRUE;
 }
 
 Status Graph::UpdateNodes()
@@ -595,7 +595,7 @@ Status Graph::UpdateNodes()
         if (node.second->GetType() == NodeType::ALGO)
         {
             Graph *graph = dynamic_cast<Algo*>(node.second->GetOp())->GetGraph();
-            if (MI_NULL == graph)
+            if (DT_NULL == graph)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
                 return Status::ERROR;
@@ -619,7 +619,7 @@ Status Graph::UpdateNodes()
 }
 
 Mat* Graph::CreateMat(const std::string &name, ElemType elem_type, const Sizes3 &sizes,
-                      MI_S32 mem_type, const Sizes &strides)
+                      DT_S32 mem_type, const Sizes &strides)
 {
     return CreateArrayImpl<Mat>(name, elem_type, sizes, mem_type, strides);
 }
@@ -635,25 +635,25 @@ Mat* Graph::CreateMat(const std::string &name, const Mat *src, const Rect &roi)
     if (!m_is_valid)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "invalid graph");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (m_timer && m_timer->IsTimedOut())
     {
         AURA_ADD_ERROR_STRING(m_ctx, "timed out");
-        return MI_NULL;
+        return DT_NULL;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (name.find('.') != std::string::npos)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "invalid name");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     Time start, end;
@@ -661,16 +661,16 @@ Mat* Graph::CreateMat(const std::string &name, const Mat *src, const Rect &roi)
     {
         start = m_timer->Now();
     }
-    Mat *mat = MI_NULL;
-    AURA_VOID *buffer = AURA_ALLOC_PARAM(m_ctx, AURA_MEM_HEAP, sizeof(Mat), 0);
-    if (buffer != MI_NULL)
+    Mat *mat = DT_NULL;
+    DT_VOID *buffer = AURA_ALLOC_PARAM(m_ctx, AURA_MEM_HEAP, sizeof(Mat), 0);
+    if (buffer != DT_NULL)
     {
         mat = new(buffer) Mat(*src, roi);
     }
-    if (MI_NULL == mat)
+    if (DT_NULL == mat)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
     if (m_timer)
     {
@@ -685,7 +685,7 @@ Mat* Graph::CreateMat(const std::string &name, const Mat *src, const Rect &roi)
         {
             AURA_ADD_ERROR_STRING(m_ctx, "AddCreateArrayProfiling failed");
             Delete<Mat>(m_ctx, &mat);
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 
@@ -697,25 +697,25 @@ Mat* Graph::CloneMat(const std::string &name, const Mat *src, const Rect &roi, c
     if (!m_is_valid)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "invalid graph");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (m_timer && m_timer->IsTimedOut())
     {
         AURA_ADD_ERROR_STRING(m_ctx, "timed out");
-        return MI_NULL;
+        return DT_NULL;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (name.find('.') != std::string::npos)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "invalid name");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     Time start, end;
@@ -723,16 +723,16 @@ Mat* Graph::CloneMat(const std::string &name, const Mat *src, const Rect &roi, c
     {
         start = m_timer->Now();
     }
-    Mat *mat = MI_NULL;
-    AURA_VOID *buffer = AURA_ALLOC_PARAM(m_ctx, AURA_MEM_HEAP, sizeof(Mat), 0);
-    if (buffer != MI_NULL)
+    Mat *mat = DT_NULL;
+    DT_VOID *buffer = AURA_ALLOC_PARAM(m_ctx, AURA_MEM_HEAP, sizeof(Mat), 0);
+    if (buffer != DT_NULL)
     {
         mat = new(buffer) Mat();
     }
-    if (MI_NULL == mat)
+    if (DT_NULL == mat)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
     *mat = src->Clone(roi, strides);
     if (m_timer)
@@ -748,7 +748,7 @@ Mat* Graph::CloneMat(const std::string &name, const Mat *src, const Rect &roi, c
         {
             AURA_ADD_ERROR_STRING(m_ctx, "AddCreateArrayProfiling failed");
             Delete<Mat>(m_ctx, &mat);
-            return MI_NULL;
+            return DT_NULL;
         }
     }
 
@@ -770,17 +770,17 @@ CLMem* Graph::CreateClMem(const std::string &name, const CLMemParam &cl_param, E
 
 CLMem* Graph::CreateClMem(const std::string &name, const CLMemParam &cl_param, const Mat *mat)
 {
-    if (MI_NULL == mat)
+    if (DT_NULL == mat)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return CreateArrayImpl<CLMem>(name, cl_param, mat->GetElemType(), mat->GetSizes(), mat->GetBuffer(), mat->GetStrides());
 }
 #endif // AURA_ENABLE_OPENCL
 
-Buffer Graph::CreateBuffer(const std::string &name, MI_S64 size, MI_S32 type, MI_S32 align)
+Buffer Graph::CreateBuffer(const std::string &name, DT_S64 size, DT_S32 type, DT_S32 align)
 {
     if (!m_is_valid)
     {
@@ -826,7 +826,7 @@ Buffer Graph::CreateBuffer(const std::string &name, MI_S64 size, MI_S32 type, MI
     return buffer;
 }
 
-AURA_VOID Graph::DeleteBuffer(Buffer &buffer)
+DT_VOID Graph::DeleteBuffer(Buffer &buffer)
 {
     if (!m_is_valid)
     {
@@ -852,7 +852,7 @@ AURA_VOID Graph::DeleteBuffer(Buffer &buffer)
     buffer.Clear();
 }
 
-Buffer Graph::AddExternalMem(const std::string &name, MI_S32 type, MI_S64 size, AURA_VOID *data, MI_S32 property)
+Buffer Graph::AddExternalMem(const std::string &name, DT_S32 type, DT_S64 size, DT_VOID *data, DT_S32 property)
 {
     if (!m_is_valid)
     {
@@ -872,7 +872,7 @@ Buffer Graph::AddExternalMem(const std::string &name, MI_S32 type, MI_S64 size, 
         return Buffer();
     }
 
-    if (MI_NULL == data)
+    if (DT_NULL == data)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "null ptr");
         return Buffer();
@@ -917,7 +917,7 @@ Status Graph::AddExternalArray(const std::string &name, const Array *array)
         return Status::ERROR;
     }
 
-    if (MI_NULL == array)
+    if (DT_NULL == array)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "array is null");
         return Status::ERROR;
@@ -930,7 +930,7 @@ Status Graph::AddExternalArray(const std::string &name, const Array *array)
     }
 
     std::string array_name = m_name.empty() ? name : m_name + "." + name;
-    Status ret = m_profiler->AddCreateArrayProfiling(array_name, array, m_timer->Now(), m_timer->Now(), MI_FALSE);
+    Status ret = m_profiler->AddCreateArrayProfiling(array_name, array, m_timer->Now(), m_timer->Now(), DT_FALSE);
 
     if (ret != Status::OK)
     {

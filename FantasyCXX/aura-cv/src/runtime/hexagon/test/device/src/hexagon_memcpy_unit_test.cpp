@@ -5,12 +5,12 @@ NEW_TESTCASE(runtime_hexagon_instructions_memcpy_test)
     Status ret = Status::OK;
     Context *ctx = UnitTest::GetInstance()->GetContext();
 
-    MI_S32 len = 1024 * 1024;
-    MI_U8 *src = static_cast<MI_U8*>(AURA_ALLOC(ctx, len));
-    MI_U8 *dst = static_cast<MI_U8*>(AURA_ALLOC(ctx, len));
-    MI_U8 *ref = static_cast<MI_U8*>(AURA_ALLOC(ctx, len));
+    DT_S32 len = 1024 * 1024;
+    DT_U8 *src = static_cast<DT_U8*>(AURA_ALLOC(ctx, len));
+    DT_U8 *dst = static_cast<DT_U8*>(AURA_ALLOC(ctx, len));
+    DT_U8 *ref = static_cast<DT_U8*>(AURA_ALLOC(ctx, len));
 
-    for (MI_S32 i = 0; i < len; i++)
+    for (DT_S32 i = 0; i < len; i++)
     {
         src[i] = i;
     }

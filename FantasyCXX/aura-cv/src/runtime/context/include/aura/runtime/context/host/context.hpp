@@ -74,7 +74,7 @@ public:
      * 
      * @return True if platform is supported; otherwise, false.
      */
-    static MI_BOOL IsPlatformSupported();
+    static DT_BOOL IsPlatformSupported();
 
     /**
      * @brief Initialize the AURA context.

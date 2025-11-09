@@ -9,11 +9,11 @@
 extern "C" {
 #endif // __cplusplus
 
-AURA_VOID HistogramPernRow(MI_U8 *src, MI_S32 stride, MI_S32 width, MI_S32 height, MI_S32 *hist);
-AURA_VOID HistogramBorderPernRow(MI_U8 *src, MI_S32 stride, MI_S32 width, MI_S32 height, MI_S32 *hist, MI_S32 border);
-AURA_VOID HistogramBorderMaskPernRow(MI_U8 *src, MI_S32 stride, MI_S32 width, MI_S32 height,
-                                   MI_S32 *hist, MI_S32 border, MI_U8 *mask, MI_S32 mask_stride);
-AURA_VOID ClearHistogram(MI_S32 *hist);
+DT_VOID HistogramPernRow(DT_U8 *src, DT_S32 stride, DT_S32 width, DT_S32 height, DT_S32 *hist);
+DT_VOID HistogramBorderPernRow(DT_U8 *src, DT_S32 stride, DT_S32 width, DT_S32 height, DT_S32 *hist, DT_S32 border);
+DT_VOID HistogramBorderMaskPernRow(DT_U8 *src, DT_S32 stride, DT_S32 width, DT_S32 height,
+                                   DT_S32 *hist, DT_S32 border, DT_U8 *mask, DT_S32 mask_stride);
+DT_VOID ClearHistogram(DT_S32 *hist);
 
 #if defined(__cplusplus)
 }
@@ -22,12 +22,12 @@ AURA_VOID ClearHistogram(MI_S32 *hist);
 namespace aura
 {
 
-template <MI_BOOL IS_MASK>
-Status CalcHistU8HvxImpl(Context *ctx, const Mat &src, MI_U32 *dst, const Mat &mask,
-                         const MI_S32 max_size, ThreadBuffer &thread_buffer, std::mutex &mutex,
-                         MI_S32 start_row, MI_S32 end_row)
+template <DT_BOOL IS_MASK>
+Status CalcHistU8HvxImpl(Context *ctx, const Mat &src, DT_U32 *dst, const Mat &mask,
+                         const DT_S32 max_size, ThreadBuffer &thread_buffer, std::mutex &mutex,
+                         DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 *hist = thread_buffer.GetThreadData<MI_S32>();
+    DT_S32 *hist = thread_buffer.GetThreadData<DT_S32>();
 
     if (!hist)
     {
@@ -35,22 +35,22 @@ Status CalcHistU8HvxImpl(Context *ctx, const Mat &src, MI_U32 *dst, const Mat &m
         return Status::ERROR;
     }
 
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 istride = src.GetStrides().m_width;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 istride = src.GetStrides().m_width;
 
-    memset(hist, 0, max_size * sizeof(MI_U32));
+    memset(hist, 0, max_size * sizeof(DT_U32));
 
     ClearHistogram(hist);
 
-    MI_S32 i, k, n;
-    n = Max((MI_S32)(8192 / istride), (MI_S32)1);
+    DT_S32 i, k, n;
+    n = Max((DT_S32)(8192 / istride), (DT_S32)1);
 
     if (IS_MASK)
     {
-        MI_S32 mask_stride = mask.GetStrides().m_width;
+        DT_S32 mask_stride = mask.GetStrides().m_width;
 
-        MI_U64 l2fetch_src_size  = L2PfParam(istride, width, n, 1);
-        MI_U64 l2fetch_mask_size = L2PfParam(mask_stride, width, n, 1);
+        DT_U64 l2fetch_src_size  = L2PfParam(istride, width, n, 1);
+        DT_U64 l2fetch_mask_size = L2PfParam(mask_stride, width, n, 1);
 
         // HVX-optimized implementation
         for (i = start_row; i < end_row; i += n)
@@ -65,18 +65,18 @@ Status CalcHistU8HvxImpl(Context *ctx, const Mat &src, MI_U32 *dst, const Mat &m
                     l2fetch_mask_size = L2PfParam(mask_stride, width, end_row - i - n, 1);
                 }
 
-                L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(i + n)), l2fetch_src_size);
-                L2Fetch(reinterpret_cast<MI_U32>(mask.Ptr<MI_U8>(i + n)), l2fetch_mask_size);
+                L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(i + n)), l2fetch_src_size);
+                L2Fetch(reinterpret_cast<DT_U32>(mask.Ptr<DT_U8>(i + n)), l2fetch_mask_size);
             }
 
-            MI_U8 *src_data = const_cast<MI_U8 *>(src.Ptr<MI_U8>(i));
-            MI_U8 *mask_data = const_cast<MI_U8 *>(mask.Ptr<MI_U8>(i));
+            DT_U8 *src_data = const_cast<DT_U8 *>(src.Ptr<DT_U8>(i));
+            DT_U8 *mask_data = const_cast<DT_U8 *>(mask.Ptr<DT_U8>(i));
             HistogramBorderMaskPernRow(src_data, istride, width, k, hist, 0, mask_data, mask_stride);
         }
     }
     else
     {
-        MI_U64 l2fetch_src_size = L2PfParam(istride, width, n, 1);
+        DT_U64 l2fetch_src_size = L2PfParam(istride, width, n, 1);
         // HVX-optimized implementation
         for (i = start_row; i < end_row; i += n)
         {
@@ -89,16 +89,16 @@ Status CalcHistU8HvxImpl(Context *ctx, const Mat &src, MI_U32 *dst, const Mat &m
                     l2fetch_src_size = L2PfParam(istride, width, end_row - i - n, 1);
                 }
 
-                L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(i + n)), l2fetch_src_size);
+                L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(i + n)), l2fetch_src_size);
             }
 
-            MI_U8 *src_data = const_cast<MI_U8 *>(src.Ptr<MI_U8>(i));
+            DT_U8 *src_data = const_cast<DT_U8 *>(src.Ptr<DT_U8>(i));
             HistogramPernRow(src_data, istride, width, k, hist);
         }
     }
 
     std::lock_guard<std::mutex> guard(mutex);
-    for (MI_S32 i = 0; i < max_size; i++)
+    for (DT_S32 i = 0; i < max_size; i++)
     {
         dst[i] += hist[i];
     }
@@ -106,27 +106,27 @@ Status CalcHistU8HvxImpl(Context *ctx, const Mat &src, MI_U32 *dst, const Mat &m
     return Status::OK;
 }
 
-template <MI_BOOL IS_MASK>
-static Status CalcHistU8HvxHelper(Context *ctx, const Mat &src, MI_U32 *dst, MI_S32 max_size, const Mat &mask)
+template <DT_BOOL IS_MASK>
+static Status CalcHistU8HvxHelper(Context *ctx, const Mat &src, DT_U32 *dst, DT_S32 max_size, const Mat &mask)
 {
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 height = src.GetSizes().m_height;
-    MI_S32 stride = src.GetStrides().m_width;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 height = src.GetSizes().m_height;
+    DT_S32 stride = src.GetStrides().m_width;
 
     Mat src_align, mask_align;
     if (stride % 128)
     {
-        MI_S32 align_width  = width / 128 * 128;
-        MI_S32 align_height = width * height / align_width;
+        DT_S32 align_width  = width / 128 * 128;
+        DT_S32 align_height = width * height / align_width;
         src_align  = Mat(ctx, ElemType::U8, Sizes3(align_height, align_width, 1), src.GetBuffer());
         mask_align = Mat(ctx, ElemType::U8, Sizes3(align_height, align_width, 1), mask.GetBuffer());
     }
@@ -136,29 +136,29 @@ static Status CalcHistU8HvxHelper(Context *ctx, const Mat &src, MI_U32 *dst, MI_
         mask_align = mask;
     }
 
-    ThreadBuffer thread_buffer(ctx, max_size * sizeof(MI_U32));
+    ThreadBuffer thread_buffer(ctx, max_size * sizeof(DT_U32));
     std::mutex mutex;
 
-    ret = wp->ParallelFor((MI_S32)0, src_align.GetSizes().m_height, CalcHistU8HvxImpl<IS_MASK>, ctx, src_align,
+    ret = wp->ParallelFor((DT_S32)0, src_align.GetSizes().m_height, CalcHistU8HvxImpl<IS_MASK>, ctx, src_align,
                           dst, mask_align, max_size, std::ref(thread_buffer), std::ref(mutex));
 
     if (stride % 128)
     {
-        MI_S32 begin    = src_align.GetTotalBytes();
-        MI_S32 end      = src.GetTotalBytes();
-        MI_U8 *src_data = (MI_U8 *)src.GetData();
+        DT_S32 begin    = src_align.GetTotalBytes();
+        DT_S32 end      = src.GetTotalBytes();
+        DT_U8 *src_data = (DT_U8 *)src.GetData();
 
         if (IS_MASK)
         {
-            MI_U8 *mask_data = (MI_U8 *)mask.GetData();
-            for (MI_S32 x = begin; x < end; x++)
+            DT_U8 *mask_data = (DT_U8 *)mask.GetData();
+            for (DT_S32 x = begin; x < end; x++)
             {
                 dst[src_data[x]] = mask_data[x] ? dst[src_data[x]] + 1 : dst[src_data[x]];
             }
         }
         else
         {
-            for (MI_S32 x = begin; x < end; x++)
+            for (DT_S32 x = begin; x < end; x++)
             {
                 dst[src_data[x]]++;
             }
@@ -168,12 +168,12 @@ static Status CalcHistU8HvxHelper(Context *ctx, const Mat &src, MI_U32 *dst, MI_
     AURA_RETURN(ctx, ret);
 }
 
-static Status CalcHistU8Hvx(Context *ctx, const Mat &src, std::vector<MI_U32> &dst, MI_S32 hist_size,
-                            const Scalar &ranges, const Mat &mask, MI_BOOL accumulate)
+static Status CalcHistU8Hvx(Context *ctx, const Mat &src, std::vector<DT_U32> &dst, DT_S32 hist_size,
+                            const Scalar &ranges, const Mat &mask, DT_BOOL accumulate)
 {
     Status ret = Status::ERROR;
 
-    if (dst.size() < (MI_U32)hist_size)
+    if (dst.size() < (DT_U32)hist_size)
     {
         dst.resize(hist_size);
     }
@@ -190,21 +190,21 @@ static Status CalcHistU8Hvx(Context *ctx, const Mat &src, std::vector<MI_U32> &d
         return ret;
     }
 
-    MI_U32 max_size  = 256;
-    MI_S32 hist_low  = ranges.m_val[0];
-    MI_S32 hist_high = ranges.m_val[1];
+    DT_U32 max_size  = 256;
+    DT_S32 hist_low  = ranges.m_val[0];
+    DT_S32 hist_high = ranges.m_val[1];
 
-    MI_U32 *hist_local = static_cast<MI_U32*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, max_size * sizeof(MI_U32), 0));
-    if (MI_NULL == hist_local)
+    DT_U32 *hist_local = static_cast<DT_U32*>(AURA_ALLOC_PARAM(ctx, AURA_MEM_HEAP, max_size * sizeof(DT_U32), 0));
+    if (DT_NULL == hist_local)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM fail");
         return ret;
     }
 
-    memset(hist_local, 0, max_size * sizeof(MI_U32));
+    memset(hist_local, 0, max_size * sizeof(DT_U32));
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         AURA_FREE(ctx, hist_local);
@@ -213,23 +213,23 @@ static Status CalcHistU8Hvx(Context *ctx, const Mat &src, std::vector<MI_U32> &d
 
     if (mask.IsValid())
     {
-        ret = CalcHistU8HvxHelper<MI_TRUE>(ctx, src, hist_local, max_size, mask);
+        ret = CalcHistU8HvxHelper<DT_TRUE>(ctx, src, hist_local, max_size, mask);
     }
     else
     {
-        ret = CalcHistU8HvxHelper<MI_FALSE>(ctx, src, hist_local, max_size, mask);
+        ret = CalcHistU8HvxHelper<DT_FALSE>(ctx, src, hist_local, max_size, mask);
     }
 
-    if (MI_FALSE == accumulate)
+    if (DT_FALSE == accumulate)
     {
         std::fill(dst.begin(), dst.end(), 0);
     }
 
-    MI_F64 scale = (MI_F64)(hist_size) / (hist_high - hist_low);
-    MI_S32 j = 0;
-    for (MI_S32 i = hist_low; i < hist_high; i++)
+    DT_F64 scale = (DT_F64)(hist_size) / (hist_high - hist_low);
+    DT_S32 j = 0;
+    for (DT_S32 i = hist_low; i < hist_high; i++)
     {
-        MI_S32 idx = Floor(j * scale);
+        DT_S32 idx = Floor(j * scale);
         dst[idx] += hist_local[i];
         j++;
     }
@@ -242,8 +242,8 @@ static Status CalcHistU8Hvx(Context *ctx, const Mat &src, std::vector<MI_U32> &d
 CalcHistHvx::CalcHistHvx(Context *ctx, const OpTarget &target) : CalcHistImpl(ctx, target)
 {}
 
-Status CalcHistHvx::SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &hist, MI_S32 hist_size,
-                            const Scalar &ranges, const Array *mask, MI_BOOL accumulate)
+Status CalcHistHvx::SetArgs(const Array *src, DT_S32 channel, std::vector<DT_U32> &hist, DT_S32 hist_size,
+                            const Scalar &ranges, const Array *mask, DT_BOOL accumulate)
 {
     if (CalcHistImpl::SetArgs(src, channel, hist, hist_size, ranges, mask, accumulate) != Status::OK)
     {
@@ -292,7 +292,7 @@ Status CalcHistHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     const Mat *mask = dynamic_cast<const Mat*>(m_mask);
 
-    if ((MI_NULL == src) || (MI_NULL == mask))
+    if ((DT_NULL == src) || (DT_NULL == mask))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or mask is nullptr");
         return Status::ERROR;
@@ -331,11 +331,11 @@ Status CalcHistRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
     Mat src;
     Mat mask;
-    MI_S32 channel;
-    MI_S32 hist_size;
+    DT_S32 channel;
+    DT_S32 hist_size;
     Scalar ranges;
-    std::vector<MI_U32> hist;
-    MI_BOOL accumulate;
+    std::vector<DT_U32> hist;
+    DT_BOOL accumulate;
 
     CalcHistInParam in_param(ctx, rpc_param);
     Status ret = in_param.Get(src, channel, hist, hist_size, ranges, mask, accumulate);

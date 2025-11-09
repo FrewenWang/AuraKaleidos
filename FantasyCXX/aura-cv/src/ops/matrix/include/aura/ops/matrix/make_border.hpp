@@ -53,8 +53,8 @@ public:
      *
      * For more details, please refer to @ref makeborder_details
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 top, MI_S32 bottom,
-                   MI_S32 left, MI_S32 right, BorderType type, const Scalar &border_value = Scalar());
+    Status SetArgs(const Array *src, Array *dst, DT_S32 top, DT_S32 bottom,
+                   DT_S32 left, DT_S32 right, BorderType type, const Scalar &border_value = Scalar());
 };
 
 /**
@@ -86,8 +86,8 @@ public:
  *       2. (top, bottom, left, right) must be greater than or equal to 0; <br>
  *       3. The above implementations support all border types(CONSTANT/REPLICATE/REFLECT_101).
  */
-AURA_EXPORTS Status IMakeBorder(Context *ctx, const Mat &src, Mat &dst, MI_S32 top, MI_S32 bottom,
-                                 MI_S32 left, MI_S32 right, BorderType type, const Scalar &border_value = Scalar(),
+AURA_EXPORTS Status IMakeBorder(Context *ctx, const Mat &src, Mat &dst, DT_S32 top, DT_S32 bottom,
+                                 DT_S32 left, DT_S32 right, BorderType type, const Scalar &border_value = Scalar(),
                                  const OpTarget &target = OpTarget::Default());
 
 /**

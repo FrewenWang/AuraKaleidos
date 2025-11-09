@@ -107,7 +107,7 @@ class OpCodeImpl(OpCodeBase):
 
             {self._decl_func_map["ToString"]}
 
-            AURA_VOID Dump(const std::string &prefix) const override;
+            DT_VOID Dump(const std::string &prefix) const override;
 
         private:
             /* add code here */
@@ -128,7 +128,7 @@ class OpCodeImpl(OpCodeBase):
 
         Status {class_name}::SetArgs(/* add parameters here */)
         {{
-            if (MI_NULL == m_ctx)
+            if (DT_NULL == m_ctx)
             {{
                 return Status::ERROR;
             }}
@@ -145,7 +145,7 @@ class OpCodeImpl(OpCodeBase):
             return str;
         }}
 
-        AURA_VOID {class_name}::Dump(const std::string &prefix) const
+        DT_VOID {class_name}::Dump(const std::string &prefix) const
         {{
             /* add code here */
         }}
@@ -469,7 +469,7 @@ class OpCodeImplHvx(OpCodeImpl):
             HexagonEngine *engine = m_ctx->GetHexagonEngine();
             ret = engine->Run(AURA_OPS_{module.upper()}_PACKAGE_NAME, AURA_OPS_{module.upper()}_{name.upper()}_OP_NAME, rpc_param, &profiling);
 
-            if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+            if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
             {{
                 m_profiling_string = " " + HexagonProfilingToString(profiling);
             }}
@@ -600,7 +600,7 @@ class OpCodeInterface(OpCodeBase):
 
         Status {class_name}::SetArgs(/* add parameters here */)
         {{
-            if (MI_NULL == m_ctx)
+            if (DT_NULL == m_ctx)
             {{
                 return Status::ERROR;
             }}
@@ -612,14 +612,14 @@ class OpCodeInterface(OpCodeBase):
             {check_code}
 
             // set m_impl
-            if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+            if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
             {{
                 m_impl = Create{class_name}Impl(m_ctx, impl_target);
             }}
 
             // run SetArgs
             {class_name}Impl *{class_name.lower()}_impl = dynamic_cast<{class_name}Impl *>(m_impl.get());
-            if (MI_NULL == {class_name.lower()}_impl)
+            if (DT_NULL == {class_name.lower()}_impl)
             {{
                 AURA_ADD_ERROR_STRING(m_ctx, "{class_name.lower()}_impl is null ptr");
                 return Status::ERROR;

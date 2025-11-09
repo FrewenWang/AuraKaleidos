@@ -14,19 +14,19 @@ MnnModel::MnnModel(Context *ctx, const ModelInfo &model_info) : NNModel(ctx, mod
             break;
         }
 
-        m_is_valid = MI_FALSE;
+        m_is_valid = DT_FALSE;
 
         struct
         {
             struct
             {
-                MI_U8 precision = 0;
-                MI_U8 memory    = 0;
-                MI_U8 tuning    = 0;
-                MI_U8 cl_mem    = 0;
+                DT_U8 precision = 0;
+                DT_U8 memory    = 0;
+                DT_U8 tuning    = 0;
+                DT_U8 cl_mem    = 0;
             } gpu_config;
 
-            MI_U8 model_type    = 0;
+            DT_U8 model_type    = 0;
         } mnn_info;
 
         if (std::string::npos == m_framework_version.find("mnn"))
@@ -133,7 +133,7 @@ MnnModel::MnnModel(Context *ctx, const ModelInfo &model_info) : NNModel(ctx, mod
             break;
         }
 
-        m_is_valid = MI_TRUE;
+        m_is_valid = DT_TRUE;
     } while (0);
 }
 

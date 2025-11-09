@@ -54,7 +54,7 @@ public:
      *
      * For more details, please refer to @ref integral_details.
      */
-    Status SetArgs(const Array *src, Array *dst, Array *dst_sq = MI_NULL);
+    Status SetArgs(const Array *src, Array *dst, Array *dst_sq = DT_NULL);
 };
 
 /**

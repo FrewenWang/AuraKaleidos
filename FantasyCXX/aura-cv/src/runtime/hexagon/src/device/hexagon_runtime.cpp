@@ -33,12 +33,12 @@ RpcFuncRegister::RpcFuncRegister(const std::string &name, RpcFunc func)
     }
 }
 
-Status SetPower(Context *ctx, HexagonPowerLevel target_level, MI_BOOL enable_dcvs, MI_U32 client_id)
+Status SetPower(Context *ctx, HexagonPowerLevel target_level, DT_BOOL enable_dcvs, DT_U32 client_id)
 {
-    MI_U32 power_level = HAP_DCVS_VCORNER_DISABLE;
-    MI_U32 min_corner = HAP_DCVS_VCORNER_DISABLE;
+    DT_U32 power_level = HAP_DCVS_VCORNER_DISABLE;
+    DT_U32 min_corner = HAP_DCVS_VCORNER_DISABLE;
 
-    MI_U64 power_client_id = (0 == client_id) ? AURA_CLINET_ID : client_id;
+    DT_U64 power_client_id = (0 == client_id) ? AURA_CLINET_ID : client_id;
 
     switch (target_level)
     {
@@ -56,14 +56,14 @@ Status SetPower(Context *ctx, HexagonPowerLevel target_level, MI_BOOL enable_dcv
         case HexagonPowerLevel::LOW:
         {
             power_level = HAP_DCVS_VCORNER_SVSPLUS;
-            min_corner = ((MI_FALSE == enable_dcvs) ? power_level : HAP_DCVS_VCORNER_SVS2);
+            min_corner = ((DT_FALSE == enable_dcvs) ? power_level : HAP_DCVS_VCORNER_SVS2);
             break;
         }
 
         case HexagonPowerLevel::NORMAL:
         {
             power_level = HAP_DCVS_VCORNER_NOMPLUS;
-            min_corner = ((MI_FALSE == enable_dcvs) ? power_level : HAP_DCVS_VCORNER_SVS2);
+            min_corner = ((DT_FALSE == enable_dcvs) ? power_level : HAP_DCVS_VCORNER_SVS2);
             break;
         }
 
@@ -78,7 +78,7 @@ Status SetPower(Context *ctx, HexagonPowerLevel target_level, MI_BOOL enable_dcv
                 power_level = HAP_DCVS_VCORNER_TURBO;
             }
 
-            min_corner = ((MI_FALSE == enable_dcvs) ? power_level : HAP_DCVS_VCORNER_SVS2);
+            min_corner = ((DT_FALSE == enable_dcvs) ? power_level : HAP_DCVS_VCORNER_SVS2);
             break;
         }
 
@@ -97,7 +97,7 @@ Status SetPower(Context *ctx, HexagonPowerLevel target_level, MI_BOOL enable_dcv
         request.dcvs_v2.dcvs_option = HAP_DCVS_V2_POWER_SAVER_MODE;
         request.dcvs_v2.dcvs_enable = FALSE;
 
-        MI_S32 ret = HAP_power_set((void *)power_client_id, &request);
+        DT_S32 ret = HAP_power_set((void *)power_client_id, &request);
         if (ret != AEE_SUCCESS)
         {
             AURA_ADD_ERROR_STRING(ctx, ("HAP_power_set failed, error(" + std::to_string(ret) + ")").c_str());
@@ -108,14 +108,14 @@ Status SetPower(Context *ctx, HexagonPowerLevel target_level, MI_BOOL enable_dcv
     {
         HAP_power_request_t request;
         qurt_arch_version_t qurt_version;
-        MI_S32 ret = qurt_sysenv_get_arch_version(&qurt_version);
+        DT_S32 ret = qurt_sysenv_get_arch_version(&qurt_version);
         if (ret != QURT_EOK)
         {
             AURA_ADD_ERROR_STRING(ctx, ("qurt_sysenv_get_arch_version failed, error(" + std::to_string(ret) + ")").c_str());
             return Status::ERROR;
         }
 
-        MI_S32 cdsp_version = qurt_version.arch_version & 0xff;
+        DT_S32 cdsp_version = qurt_version.arch_version & 0xff;
         if (cdsp_version < 0x69) // sm8450:0x69  sm8350:0x68 sm8250:0x66
         {
             memset(&request, 0, sizeof(HAP_power_request_t)); //Remove all votes for NULL context 
@@ -123,7 +123,7 @@ Status SetPower(Context *ctx, HexagonPowerLevel target_level, MI_BOOL enable_dcv
             request.dcvs_v2.dcvs_enable = TRUE;
             request.dcvs_v2.dcvs_option = HAP_DCVS_V2_POWER_SAVER_MODE;
             request.dcvs_v2.latency = 100;
-            MI_S32 ret = HAP_power_set(NULL, &request); // here must use null  For SM8450 and later, Passing to NULL context to HAP_power_set() API is no longer allowed
+            DT_S32 ret = HAP_power_set(NULL, &request); // here must use null  For SM8450 and later, Passing to NULL context to HAP_power_set() API is no longer allowed
             if (ret != AEE_SUCCESS)
             {
                 AURA_ADD_ERROR_STRING(ctx, ("HAP_power_set failed, error(" + std::to_string(ret) + ")").c_str());

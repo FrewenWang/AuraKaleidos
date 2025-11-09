@@ -36,7 +36,7 @@ enum class XtensaPowerLevel
 
 class XtensaRpcParam;
 
-using PilRpcFunc = MI_S32 (*)(const MI_CHAR*, MI_U8*, MI_S32);
+using PilRpcFunc = DT_S32 (*)(const DT_CHAR*, DT_U8*, DT_S32);
 
 /**
  * @brief Implementation class for XtensaEngine.
@@ -56,7 +56,7 @@ public:
      * @param enable_xtensa Whether to enable Xtensa acceleration.
      * @param pil_name The pic lib name should be loaded.
      */
-    XtensaEngine(Context *ctx, MI_BOOL enable_xtensa, const std::string &pil_name, XtensaPriorityLevel priority);
+    XtensaEngine(Context *ctx, DT_BOOL enable_xtensa, const std::string &pil_name, XtensaPriorityLevel priority);
 
     /**
      * @brief Destructor for XtensaEngine.
@@ -87,7 +87,7 @@ public:
      * @param fd  data address handle.
      * @return Status::OK if the operation is successful; otherwise, an appropriate error status.
      */
-    Status CacheStart(MI_S32 fd);
+    Status CacheStart(DT_S32 fd);
 
     /**
      * @brief cache cpu data to ddr side
@@ -95,7 +95,7 @@ public:
      * @param fd  data address handle.
      * @return Status::OK if the operation is successful; otherwise, an appropriate error status.
      */
-    Status CacheEnd(MI_S32 fd);
+    Status CacheEnd(DT_S32 fd);
 
     /**
      * @brief Map the input buffer
@@ -116,7 +116,7 @@ public:
      *
      * @return the dsp side virtual address.
      */
-    MI_U32 GetDeviceAddr(const Buffer &buffer);
+    DT_U32 GetDeviceAddr(const Buffer &buffer);
 
     /**
      * @brief Set Xtensa power level

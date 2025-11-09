@@ -21,7 +21,7 @@ public:
      *
      * @param ctx Pointer to the associated context.
      */
-    AnyParams(Context *ctx = MI_NULL);
+    AnyParams(Context *ctx = DT_NULL);
 
     /**
      * @brief Get the value of specified key, you can also use this method
@@ -48,9 +48,9 @@ public:
      *
      * @param key String of specified key.
      *
-     * @return MI_TRUE if the key exists, otherwise MI_FALSE.
+     * @return DT_TRUE if the key exists, otherwise DT_FALSE.
      */
-    MI_BOOL HasKeys(const std::string &key) const;
+    DT_BOOL HasKeys(const std::string &key) const;
 
     /**
      * @brief Query whether the specified key exists.
@@ -58,10 +58,10 @@ public:
      * @param key  String of specified key.
      * @param args Variable parameter list, each parameter is expected to be of type string.
      *
-     * @return MI_TRUE if the key exists, otherwise MI_FALSE.
+     * @return DT_TRUE if the key exists, otherwise DT_FALSE.
      */
     template <typename ...ArgsType>
-    MI_BOOL HasKeys(const std::string &key, const ArgsType &&...args) const
+    DT_BOOL HasKeys(const std::string &key, const ArgsType &&...args) const
     {
         return HasKeys(key) && HasKeys(std::forward<ArgsType>(args)...);
     }
@@ -110,7 +110,7 @@ public:
      *
      * @return The number of stored key-value pairs.
      */
-    MI_S32 Size();
+    DT_S32 Size();
 
     /**
      * @brief Clear stored key-value pair information.

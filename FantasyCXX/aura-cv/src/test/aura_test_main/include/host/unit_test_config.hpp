@@ -203,7 +203,7 @@ public:
 
     ~UnitTestConfig() = default;
 
-    AURA_VOID PrintInfo() const
+    DT_VOID PrintInfo() const
     {
         std::stringstream sstream;
         sstream << "============ Current UnitTest Config ===========" << std::endl;
@@ -290,7 +290,7 @@ public:
         if (json_obj.count("stress_count") > 0)
         {
             this->m_stress_count = json_obj["stress_count"];
-            this->m_stress_count = Max(this->m_stress_count, (MI_S32)0);
+            this->m_stress_count = Max(this->m_stress_count, (DT_S32)0);
         }
 
         if (json_obj.count("data_path") > 0)
@@ -385,10 +385,10 @@ public:
     std::string m_cache_bin_prefix;
     std::string m_report_type;
     std::string m_report_name;
-    MI_S32      m_stress_count;
+    DT_S32      m_stress_count;
     std::string m_data_path;
     std::string m_pil_path;
-    MI_S32      m_enable_mem_profiling;
+    DT_S32      m_enable_mem_profiling;
     std::string m_dump_path;
 };
 

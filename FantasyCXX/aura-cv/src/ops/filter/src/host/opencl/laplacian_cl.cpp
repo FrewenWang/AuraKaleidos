@@ -4,14 +4,14 @@
 namespace aura
 {
 
-static Status GetCLName(Context *ctx,  MI_S32 channel, MI_S32 ksize, std::string program_name[2], std::string kernel_name[2])
+static Status GetCLName(Context *ctx,  DT_S32 channel, DT_S32 ksize, std::string program_name[2], std::string kernel_name[2])
 {
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
-    if (ctx->GetCLEngine() == MI_NULL || ctx->GetCLEngine()->GetCLRuntime() == MI_NULL)
+    if (ctx->GetCLEngine() == DT_NULL || ctx->GetCLEngine()->GetCLRuntime() == DT_NULL)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetCLEngine failed");
         return Status::ERROR;
@@ -84,15 +84,15 @@ static std::string GetCLBuildOptions(Context *ctx, ElemType elem_type, BorderTyp
     return cl_build_opt.ToString(elem_type);
 }
 
-static AURA_VOID GetCLGlobalSize(GpuType gpu_type, MI_S32 ksize, MI_S32 channel, MI_S32 height, MI_S32 width,
-                               cl::NDRange range[2], MI_S32 &main_width)
+static DT_VOID GetCLGlobalSize(GpuType gpu_type, DT_S32 ksize, DT_S32 channel, DT_S32 height, DT_S32 width,
+                               cl::NDRange range[2], DT_S32 &main_width)
 {
     ksize = ((1 == ksize) ? 3 : ksize);
 
-    MI_S32 elem_counts = 0;
-    MI_S32 main_size   = 0;
-    MI_S32 main_rest   = 0;
-    MI_S32 border      = (ksize >> 1) << 1;
+    DT_S32 elem_counts = 0;
+    DT_S32 main_size   = 0;
+    DT_S32 main_rest   = 0;
+    DT_S32 border      = (ksize >> 1) << 1;
 
     if ((GpuType::MALI == gpu_type) && (5 == ksize) && (3 == channel))
     {
@@ -125,7 +125,7 @@ static AURA_VOID GetCLGlobalSize(GpuType gpu_type, MI_S32 ksize, MI_S32 channel,
 LaplacianCL::LaplacianCL(Context *ctx, const OpTarget &target) : LaplacianImpl(ctx, target)
 {}
 
-Status LaplacianCL::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
+Status LaplacianCL::SetArgs(const Array *src, Array *dst, DT_S32 ksize,
                             BorderType border_type, const Scalar &border_value)
 {
     if (LaplacianImpl::SetArgs(src, dst, ksize, border_type, border_value) != Status::OK)
@@ -134,7 +134,7 @@ Status LaplacianCL::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
         return Status::ERROR;
     }
 
-    MI_S32 pattern = AURA_MAKE_PATTERN(src->GetElemType(), dst->GetElemType());
+    DT_S32 pattern = AURA_MAKE_PATTERN(src->GetElemType(), dst->GetElemType());
     if (pattern != AURA_MAKE_PATTERN(ElemType::U8,  ElemType::S16) &&
         pattern != AURA_MAKE_PATTERN(ElemType::U16, ElemType::U16) &&
         pattern != AURA_MAKE_PATTERN(ElemType::S16, ElemType::S16) &&
@@ -151,7 +151,7 @@ Status LaplacianCL::SetArgs(const Array *src, Array *dst, MI_S32 ksize,
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
 
     if (ch != 1 && ch != 2 && ch != 3)
     {
@@ -231,18 +231,18 @@ Status LaplacianCL::DeInitialize()
 
 Status LaplacianCL::Run()
 {
-    MI_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
-    MI_S32 height  = m_dst->GetSizes().m_height;
-    MI_S32 width   = m_dst->GetSizes().m_width;
-    MI_S32 channel = m_dst->GetSizes().m_channel;
+    DT_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 height  = m_dst->GetSizes().m_height;
+    DT_S32 width   = m_dst->GetSizes().m_width;
+    DT_S32 channel = m_dst->GetSizes().m_channel;
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
     CLScalar cl_border_value         = clScalar(m_border_value);
 
     // 1. get center_area and cl_global_size
     cl::NDRange cl_global_size[2];
-    MI_S32 main_width = 0;
+    DT_S32 main_width = 0;
 
     GetCLGlobalSize(cl_rt->GetGpuInfo().m_type, m_ksize, channel, height, width, cl_global_size, main_width);
 
@@ -251,12 +251,12 @@ Status LaplacianCL::Run()
     cl_int cl_ret = CL_SUCCESS;
     Status ret    = Status::ERROR;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, CLScalar>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, CLScalar>(
                                  m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                  m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                  height,
-                                 (MI_S32)(cl_global_size[0].get()[1]),
-                                 (MI_S32)(cl_global_size[0].get()[0]),
+                                 (DT_S32)(cl_global_size[0].get()[1]),
+                                 (DT_S32)(cl_global_size[0].get()[0]),
                                  cl_border_value,
                                  cl_global_size[0], cl_rt->GetCLDefaultLocalSize(m_cl_kernels[0].GetMaxGroupSize(), cl_global_size[0]),
                                  &(cl_event[0]));
@@ -266,12 +266,12 @@ Status LaplacianCL::Run()
         goto EXIT;
     }
 
-    cl_ret |= m_cl_kernels[1].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32, CLScalar>(
+    cl_ret |= m_cl_kernels[1].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32, CLScalar>(
                                   m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                                   m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                                   height, width,
-                                  (MI_S32)(cl_global_size[1].get()[1]),
-                                  (MI_S32)(cl_global_size[1].get()[0]),
+                                  (DT_S32)(cl_global_size[1].get()[1]),
+                                  (DT_S32)(cl_global_size[1].get()[0]),
                                   main_width, cl_border_value,
                                   cl_global_size[1], cl_rt->GetCLDefaultLocalSize(m_cl_kernels[1].GetMaxGroupSize(), cl_global_size[1]),
                                   &(cl_event[1]), {cl_event[0]});
@@ -282,7 +282,7 @@ Status LaplacianCL::Run()
     }
 
     // 3. cl wait
-    if ((MI_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
+    if ((DT_TRUE == m_target.m_data.opencl.profiling) || (m_dst->GetArrayType() != ArrayType::CL_MEMORY))
     {
         cl_ret = cl_event[1].wait();
         if (cl_ret != CL_SUCCESS)
@@ -291,7 +291,7 @@ Status LaplacianCL::Run()
             goto EXIT;
         }
 
-        if (MI_TRUE == m_target.m_data.opencl.profiling)
+        if (DT_TRUE == m_target.m_data.opencl.profiling)
         {
             m_profiling_string = " " + GetCLProfilingInfo(m_cl_kernels[0].GetKernelName(), cl_event[0]) +
                                        GetCLProfilingInfo(m_cl_kernels[1].GetKernelName(), cl_event[1]);
@@ -313,7 +313,7 @@ std::string LaplacianCL::ToString() const
     return LaplacianImpl::ToString() + m_profiling_string;
 }
 
-std::vector<CLKernel> LaplacianCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type)
+std::vector<CLKernel> LaplacianCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type)
 {
     std::vector<CLKernel> cl_kernels;
     std::string build_opt = GetCLBuildOptions(ctx, elem_type, border_type);

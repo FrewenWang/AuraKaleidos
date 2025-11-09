@@ -52,8 +52,8 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, MI_S32 channel, std::vector<MI_U32> &hist,
-                   MI_S32 hist_size, const Scalar &ranges, const Array *mask = NULL, MI_BOOL accumulate = MI_FALSE);
+    Status SetArgs(const Array *src, DT_S32 channel, std::vector<DT_U32> &hist,
+                   DT_S32 hist_size, const Scalar &ranges, const Array *mask = NULL, DT_BOOL accumulate = DT_FALSE);
 };
 
 /**
@@ -69,7 +69,7 @@ public:
  * @param hist_size The number of bins in the histogram.
  * @param ranges The range of values to be measured.
  * @param mask Optional mask. If the array is not empty, only the pixels in it that are non-zero are counted.
- * @param accumulate Flag indicating whether to accumulate the histogram (default is MI_FALSE).
+ * @param accumulate Flag indicating whether to accumulate the histogram (default is DT_FALSE).
  * @param target The platform on which this function runs.
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
@@ -82,9 +82,9 @@ public:
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status ICalcHist(Context *ctx, const Mat &src, MI_S32 channel, std::vector<MI_U32> &hist,
-                              MI_S32 hist_size, const Scalar &ranges, const Mat &mask = Mat(),
-                              MI_BOOL accumulate = MI_FALSE, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status ICalcHist(Context *ctx, const Mat &src, DT_S32 channel, std::vector<DT_U32> &hist,
+                              DT_S32 hist_size, const Scalar &ranges, const Mat &mask = Mat(),
+                              DT_BOOL accumulate = DT_FALSE, const OpTarget &target = OpTarget::Default());
 
 /**
  * @}

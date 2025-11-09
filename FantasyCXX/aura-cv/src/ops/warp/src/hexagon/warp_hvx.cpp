@@ -17,7 +17,7 @@ Status WarpHvx::SetArgs(const Array *src, const Array *matrix, Array *dst, Inter
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1");
@@ -52,7 +52,7 @@ Status WarpHvx::Run()
     const Mat *matrix = dynamic_cast<const Mat*>(m_matrix);
     Mat       *dst    = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == matrix) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == matrix) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or matrix or dst is nullptr");
         return Status::ERROR;

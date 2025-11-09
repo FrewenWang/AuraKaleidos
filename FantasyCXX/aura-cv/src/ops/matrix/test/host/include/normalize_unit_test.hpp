@@ -12,7 +12,7 @@ struct NormalizeTestParam
 {
     NormalizeTestParam()
     {}
-    NormalizeTestParam(MI_F32 a, MI_F32 b, NormType t) : alpha(a), beta(b), type(t)
+    NormalizeTestParam(DT_F32 a, DT_F32 b, NormType t) : alpha(a), beta(b), type(t)
     {}
 
     friend std::ostream& operator << (std::ostream &os, const NormalizeTestParam &param)
@@ -28,8 +28,8 @@ struct NormalizeTestParam
         return sstream.str();
     }
 
-    MI_F32 alpha;
-    MI_F32 beta;
+    DT_F32 alpha;
+    DT_F32 beta;
     NormType type;
 };
 
@@ -40,7 +40,7 @@ AURA_TEST_PARAM(NormalizeParam,
                 OpTarget,           target);
 
 #if !defined(AURA_BUILD_XPLORER)
-AURA_INLINE MI_S32 NormTypeToOpenCV(const NormType &type)
+AURA_INLINE DT_S32 NormTypeToOpenCV(const NormType &type)
 {
     switch (type)
     {
@@ -68,7 +68,7 @@ AURA_INLINE MI_S32 NormTypeToOpenCV(const NormType &type)
 }
 #endif
 
-AURA_INLINE Status CvNormalize(Mat &src, Mat &dst, MI_F32 alpha, MI_F32 beta, NormType type)
+AURA_INLINE Status CvNormalize(Mat &src, Mat &dst, DT_F32 alpha, DT_F32 beta, NormType type)
 {
 #if !defined(AURA_BUILD_XPLORER)
     cv::Mat cv_src = MatToOpencv(src);
@@ -91,13 +91,13 @@ public:
     MatrixNormalizeTest(Context *ctx, NormalizeParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         NormalizeParam run_param(GetParam((index)));
         AURA_LOGI(m_ctx, AURA_TAG, "Run param: %s\n", run_param.ToString().c_str());
         // Create mats
-        MI_S32 mem_type = AURA_MEM_DEFAULT;
+        DT_S32 mem_type = AURA_MEM_DEFAULT;
         Mat src = m_factory.GetRandomMat(-655350, 655350, run_param.elem_type, run_param.mat_size.m_sizes, mem_type, run_param.mat_size.m_strides);
         Mat dst = m_factory.GetEmptyMat(run_param.elem_type, run_param.mat_size.m_sizes, mem_type, run_param.mat_size.m_strides);
         Mat ref = m_factory.GetEmptyMat(run_param.elem_type, run_param.mat_size.m_sizes, mem_type, run_param.mat_size.m_strides);
@@ -110,7 +110,7 @@ public:
         result.output = run_param.mat_size.ToString() + " " + ElemTypesToString(run_param.elem_type);
 
         // run interface
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
         Status status_exec = Executor(loop_count, 2, time_val, INormalize, m_ctx, src, dst, run_param.extra_param.alpha,
                                       run_param.extra_param.beta, run_param.extra_param.type, run_param.target);
 

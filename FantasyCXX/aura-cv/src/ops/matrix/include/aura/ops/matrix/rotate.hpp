@@ -130,7 +130,7 @@ public:
      * @param ochannel The ratate dst array channel.
      * @param type It represents the rotation angle for the matrix.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 ochannel, RotateType type);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 ochannel, RotateType type);
 };
 
 /**

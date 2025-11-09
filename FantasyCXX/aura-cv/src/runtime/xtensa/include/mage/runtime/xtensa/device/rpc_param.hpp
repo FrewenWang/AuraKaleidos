@@ -38,7 +38,7 @@ public:
      * @param rpc_param The RPC parameter buffer.
      * @param rpc_param_len The length of the RPC parameter buffer.
      */
-    XtensaRpcParam(MI_U8 *rpc_param, MI_S32 rpc_param_len)
+    XtensaRpcParam(DT_U8 *rpc_param, DT_S32 rpc_param_len)
     {
         m_rpc_param = Buffer(AURA_XTENSA_MEM_HEAP, rpc_param_len, 0, rpc_param, rpc_param, 0);
     }
@@ -128,7 +128,7 @@ public:
     /**
      * @brief Reset the RPC parameter buffer to its original state.
      */
-    AURA_VOID ResetBuffer()
+    DT_VOID ResetBuffer()
     {
         m_rpc_param.m_data = m_rpc_param.m_origin;
         m_rpc_param.m_size = 0;
@@ -169,7 +169,7 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status Set(const Tp &...params, MI_BOOL reset = MI_TRUE)
+    Status Set(const Tp &...params, DT_BOOL reset = DT_TRUE)
     {
         if (reset)
         {
@@ -189,7 +189,7 @@ public:
      * 
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status Get(Tp &...params, MI_BOOL reset = MI_FALSE)
+    Status Get(Tp &...params, DT_BOOL reset = DT_FALSE)
     {
         if (reset)
         {

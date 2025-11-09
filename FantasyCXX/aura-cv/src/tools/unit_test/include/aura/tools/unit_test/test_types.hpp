@@ -44,9 +44,9 @@ struct AURA_EXPORTS TestTime
     {
         std::stringstream time_sstream;
 
-        MI_CHAR avg_time_buffer[20];
-        MI_CHAR min_time_buffer[20];
-        MI_CHAR max_time_buffer[20];
+        DT_CHAR avg_time_buffer[20];
+        DT_CHAR min_time_buffer[20];
+        DT_CHAR max_time_buffer[20];
 
         std::snprintf(avg_time_buffer, 20, "%.3f", avg_time);
         std::snprintf(min_time_buffer, 20, "%.3f", min_time);
@@ -56,7 +56,7 @@ struct AURA_EXPORTS TestTime
         std::string min_time_str = min_time_buffer;
         std::string max_time_str = max_time_buffer;
 
-        MI_S32 max_str_len = std::max(std::max(avg_time_str.size(), min_time_str.size()), max_time_str.size());
+        DT_S32 max_str_len = std::max(std::max(avg_time_str.size(), min_time_str.size()), max_time_str.size());
         max_str_len = max_str_len > 8 ? max_str_len : 8;
 
         // make sure every time string have the same length
@@ -68,9 +68,9 @@ struct AURA_EXPORTS TestTime
         return time_sstream.str();
     }
 
-    MI_F64 min_time; /*!< Minimum time taken for the test. */
-    MI_F64 max_time; /*!< Maximum time taken for the test. */
-    MI_F64 avg_time; /*!< Average time taken for the test. */
+    DT_F64 min_time; /*!< Minimum time taken for the test. */
+    DT_F64 max_time; /*!< Maximum time taken for the test. */
+    DT_F64 avg_time; /*!< Average time taken for the test. */
 };
 
 /**
@@ -93,12 +93,12 @@ struct AURA_EXPORTS MatSize
      */
     MatSize(const MatSize &mat_size, const Scalar &scale)
     {
-        MI_S32 height = SaturateCast<MI_S32>(mat_size.m_sizes.m_height * scale.m_val[1]);
-        MI_S32 width  = SaturateCast<MI_S32>(mat_size.m_sizes.m_width * scale.m_val[0]);
+        DT_S32 height = SaturateCast<DT_S32>(mat_size.m_sizes.m_height * scale.m_val[1]);
+        DT_S32 width  = SaturateCast<DT_S32>(mat_size.m_sizes.m_width * scale.m_val[0]);
         m_sizes       = Sizes3(height, width, mat_size.m_sizes.m_channel);
 
-        height    = SaturateCast<MI_S32>(mat_size.m_strides.m_height * scale.m_val[1]);
-        width     = SaturateCast<MI_S32>(mat_size.m_strides.m_width * scale.m_val[0]);
+        height    = SaturateCast<DT_S32>(mat_size.m_strides.m_height * scale.m_val[1]);
+        width     = SaturateCast<DT_S32>(mat_size.m_strides.m_width * scale.m_val[0]);
         m_strides = Sizes(height, width);
     }
 
@@ -160,7 +160,7 @@ struct AURA_EXPORTS BorderSize
      *
      * @return The constructed BorderSize.
      */
-    BorderSize(MI_S32 top, MI_S32 bottom, MI_S32 left, MI_S32 right) : top(top), bottom(bottom),
+    BorderSize(DT_S32 top, DT_S32 bottom, DT_S32 left, DT_S32 right) : top(top), bottom(bottom),
                left(left), right(right)
     {}
 
@@ -183,10 +183,10 @@ struct AURA_EXPORTS BorderSize
         return sstream.str();
     }
 
-    MI_S32 top;    /*!< The top size of the border. */
-    MI_S32 bottom; /*!< The bottom size of the border. */
-    MI_S32 left;   /*!< The left size of the border. */
-    MI_S32 right;  /*!< The right size of the border. */
+    DT_S32 top;    /*!< The top size of the border. */
+    DT_S32 bottom; /*!< The bottom size of the border. */
+    DT_S32 left;   /*!< The left size of the border. */
+    DT_S32 right;  /*!< The right size of the border. */
 };
 
 /**

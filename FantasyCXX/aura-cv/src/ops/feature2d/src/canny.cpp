@@ -38,15 +38,15 @@ static std::shared_ptr<CannyImpl> CreateCannyImpl(Context *ctx, const OpTarget &
 Canny::Canny(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Canny::SetArgs(const Array *src, Array *dst, MI_F64 low_thresh, MI_F64 high_thresh,
-                      MI_S32 aperture_size, MI_BOOL l2_gradient)
+Status Canny::SetArgs(const Array *src, Array *dst, DT_F64 low_thresh, DT_F64 high_thresh,
+                      DT_S32 aperture_size, DT_BOOL l2_gradient)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -75,14 +75,14 @@ Status Canny::SetArgs(const Array *src, Array *dst, MI_F64 low_thresh, MI_F64 hi
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateCannyImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     CannyImpl *canny_impl = dynamic_cast<CannyImpl *>(m_impl.get());
-    if (MI_NULL == canny_impl)
+    if (DT_NULL == canny_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "Canny_impl is null ptr");
         return Status::ERROR;
@@ -93,15 +93,15 @@ Status Canny::SetArgs(const Array *src, Array *dst, MI_F64 low_thresh, MI_F64 hi
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Canny::SetArgs(const Array *dx, const Array *dy, Array *dst, MI_F64 low_thresh,
-                      MI_F64 high_thresh, MI_BOOL l2_gradient)
+Status Canny::SetArgs(const Array *dx, const Array *dy, Array *dst, DT_F64 low_thresh,
+                      DT_F64 high_thresh, DT_BOOL l2_gradient)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == dx) || (MI_NULL == dy) || (MI_NULL == dst))
+    if ((DT_NULL == dx) || (DT_NULL == dy) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "dx/dy/dst is null ptr");
         return Status::ERROR;
@@ -130,14 +130,14 @@ Status Canny::SetArgs(const Array *dx, const Array *dy, Array *dst, MI_F64 low_t
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateCannyImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     CannyImpl *canny_impl = dynamic_cast<CannyImpl *>(m_impl.get());
-    if (MI_NULL == canny_impl)
+    if (DT_NULL == canny_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "Canny_impl is null ptr");
         return Status::ERROR;
@@ -148,16 +148,16 @@ Status Canny::SetArgs(const Array *dx, const Array *dy, Array *dst, MI_F64 low_t
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status ICanny(Context *ctx, const Mat &src, Mat &dst, MI_F64 low_thresh, MI_F64 high_thresh,
-                           MI_S32 aperture_size, MI_BOOL l2_gradient, const OpTarget &target)
+AURA_EXPORTS Status ICanny(Context *ctx, const Mat &src, Mat &dst, DT_F64 low_thresh, DT_F64 high_thresh,
+                           DT_S32 aperture_size, DT_BOOL l2_gradient, const OpTarget &target)
 {
     Canny canny(ctx, target);
 
     return OpCall(ctx, canny, &src, &dst, low_thresh, high_thresh, aperture_size, l2_gradient);
 }
 
-AURA_EXPORTS Status ICanny(Context *ctx, const Mat &dx, const Mat &dy, Mat &dst, MI_F64 low_thresh,
-                           MI_F64 high_thresh, MI_BOOL l2_gradient, const OpTarget &target)
+AURA_EXPORTS Status ICanny(Context *ctx, const Mat &dx, const Mat &dy, Mat &dst, DT_F64 low_thresh,
+                           DT_F64 high_thresh, DT_BOOL l2_gradient, const OpTarget &target)
 {
     Canny canny(ctx, target);
 
@@ -166,15 +166,15 @@ AURA_EXPORTS Status ICanny(Context *ctx, const Mat &dx, const Mat &dy, Mat &dst,
 
 CannyImpl::CannyImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "Canny", target),
                                                              m_low_thresh(0.0), m_high_thresh(0.0), m_aperture_size(0),
-                                                             m_l2_gradient(MI_FALSE), m_is_aperture(MI_FALSE),
-                                                             m_src(MI_NULL), m_dx(MI_NULL), m_dy(MI_NULL), m_dst(MI_NULL)
+                                                             m_l2_gradient(DT_FALSE), m_is_aperture(DT_FALSE),
+                                                             m_src(DT_NULL), m_dx(DT_NULL), m_dy(DT_NULL), m_dst(DT_NULL)
 
 {}
 
-Status CannyImpl::SetArgs(const Array *src, Array *dst, MI_F64 low_thresh, MI_F64 high_thresh,
-                          MI_S32 aperture_size, MI_BOOL l2_gradient)
+Status CannyImpl::SetArgs(const Array *src, Array *dst, DT_F64 low_thresh, DT_F64 high_thresh,
+                          DT_S32 aperture_size, DT_BOOL l2_gradient)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -205,22 +205,22 @@ Status CannyImpl::SetArgs(const Array *src, Array *dst, MI_F64 low_thresh, MI_F6
     }
 
     m_src            = src;
-    m_dx             = MI_NULL;
-    m_dy             = MI_NULL;
+    m_dx             = DT_NULL;
+    m_dy             = DT_NULL;
     m_dst            = dst;
     m_low_thresh     = low_thresh;
     m_high_thresh    = high_thresh;
     m_aperture_size  = aperture_size;
     m_l2_gradient    = l2_gradient;
-    m_is_aperture    = MI_TRUE;
+    m_is_aperture    = DT_TRUE;
 
     return Status::OK;
 }
 
-Status CannyImpl::SetArgs(const Array *dx, const Array *dy, Array *dst, MI_F64 low_thresh,
-                          MI_F64 high_thresh, MI_BOOL l2_gradient)
+Status CannyImpl::SetArgs(const Array *dx, const Array *dy, Array *dst, DT_F64 low_thresh,
+                          DT_F64 high_thresh, DT_BOOL l2_gradient)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -254,14 +254,14 @@ Status CannyImpl::SetArgs(const Array *dx, const Array *dy, Array *dst, MI_F64 l
         return Status::ERROR;
     }
 
-    m_src            = MI_NULL;
+    m_src            = DT_NULL;
     m_dx             = dx;
     m_dy             = dy;
     m_dst            = dst;
     m_low_thresh     = low_thresh;
     m_high_thresh    = high_thresh;
     m_l2_gradient    = l2_gradient;
-    m_is_aperture    = MI_FALSE;
+    m_is_aperture    = DT_FALSE;
 
     return Status::OK;
 }
@@ -288,7 +288,7 @@ std::string CannyImpl::ToString() const
 {
     std::string str;
 
-    MI_CHAR low_thresh_str[20], high_thresh_str[20];
+    DT_CHAR low_thresh_str[20], high_thresh_str[20];
     snprintf(low_thresh_str, sizeof(m_low_thresh), "%.2f", m_low_thresh);
     snprintf(high_thresh_str, sizeof(m_high_thresh), "%.2f", m_high_thresh);
 
@@ -300,7 +300,7 @@ std::string CannyImpl::ToString() const
     return str;
 }
 
-AURA_VOID CannyImpl::Dump(const std::string &prefix) const
+DT_VOID CannyImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

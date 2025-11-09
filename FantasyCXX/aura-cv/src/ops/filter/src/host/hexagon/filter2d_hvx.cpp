@@ -35,7 +35,7 @@ Status Filter2dHvx::SetArgs(const Array *src, Array *dst, const Array *kmat,
         return Status::ERROR;
     }
 
-    MI_S32 ch = src->GetSizes().m_channel;
+    DT_S32 ch = src->GetSizes().m_channel;
     if (ch != 1 && ch != 2 && ch != 3)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "channel only support 1/2/3");
@@ -58,7 +58,7 @@ Status Filter2dHvx::Run()
     Mat *dst = dynamic_cast<Mat*>(m_dst);
     const Mat *kmat = dynamic_cast<const Mat*>(m_kmat);
 
-    if ((MI_NULL == src) || (MI_NULL == dst) || (MI_NULL == kmat))
+    if ((DT_NULL == src) || (DT_NULL == dst) || (DT_NULL == kmat))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst/kmat is nullptr");
         return Status::ERROR;
@@ -79,7 +79,7 @@ Status Filter2dHvx::Run()
     HexagonEngine *engine = m_ctx->GetHexagonEngine();
     ret = engine->Run(AURA_OPS_FILTER_PACKAGE_NAME, AURA_OPS_FILTER_FILTER2D_OP_NAME, rpc_param, &profiling);
 
-    if (Status::OK == ret && MI_TRUE == m_target.m_data.hvx.profiling)
+    if (Status::OK == ret && DT_TRUE == m_target.m_data.hvx.profiling)
     {
         m_profiling_string = " " + HexagonProfilingToString(profiling);
     }

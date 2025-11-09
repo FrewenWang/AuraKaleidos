@@ -87,7 +87,7 @@ public:
  *
  * @return Status::OK if successful; otherwise, an appropriate error status.
  */
-Status SetPower(Context *ctx, HexagonPowerLevel target_level, MI_BOOL enable_dcvs, MI_U32 client_id = 0);
+Status SetPower(Context *ctx, HexagonPowerLevel target_level, DT_BOOL enable_dcvs, DT_U32 client_id = 0);
 
 /**
  * @}

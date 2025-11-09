@@ -5,7 +5,7 @@
 namespace aura
 {
 
-static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, MI_S32 channel, std::string &build_opt)
+static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, DT_S32 channel, std::string &build_opt)
 {
     CLBuildOptions cl_build_opt(ctx);
     cl_build_opt.AddOption("Tp", CLTypeString(elem_type));
@@ -16,7 +16,7 @@ static Status GetCLBuildOptions(Context *ctx, ElemType elem_type, MI_S32 channel
     return Status::OK;
 }
 
-static Status GetCLName(MI_S32 channel, std::string &program_name, std::string &kernel_name)
+static Status GetCLName(DT_S32 channel, std::string &program_name, std::string &kernel_name)
 {
     if (channel <= 2)
     {
@@ -32,7 +32,7 @@ static Status GetCLName(MI_S32 channel, std::string &program_name, std::string &
     return Status::OK;
 }
 
-static AURA_VOID GetCLGlobalSize(MI_S32 width, MI_S32 height, MI_S32 channel, cl::NDRange &cl_range)
+static DT_VOID GetCLGlobalSize(DT_S32 width, DT_S32 height, DT_S32 channel, cl::NDRange &cl_range)
 {
     if (channel < 3)
     {
@@ -56,7 +56,7 @@ Status ResizeBnCL::Initialize()
     }
 
     Sizes3 src_sz  = m_src->GetSizes();
-    MI_S32 channel = src_sz.m_channel;
+    DT_S32 channel = src_sz.m_channel;
 
     // 2. init kernel
     m_cl_kernels = GetCLKernels(m_ctx, m_src->GetElemType(), channel);
@@ -85,13 +85,13 @@ Status ResizeBnCL::Run()
     Sizes3 src_sz = m_src->GetSizes();
     Sizes3 dst_sz = m_dst->GetSizes();
 
-    MI_S32 iwidth  = src_sz.m_width;
-    MI_S32 iheight = src_sz.m_height;
-    MI_S32 owidth  = dst_sz.m_width;
-    MI_S32 oheight = dst_sz.m_height;
-    MI_S32 channel = dst_sz.m_channel;
-    MI_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
+    DT_S32 iwidth  = src_sz.m_width;
+    DT_S32 iheight = src_sz.m_height;
+    DT_S32 owidth  = dst_sz.m_width;
+    DT_S32 oheight = dst_sz.m_height;
+    DT_S32 channel = dst_sz.m_channel;
+    DT_S32 istep   = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 ostep   = m_dst->GetRowPitch() / ElemTypeSize(m_dst->GetElemType());
 
     std::shared_ptr<CLRuntime> cl_rt = m_ctx->GetCLEngine()->GetCLRuntime();
 
@@ -105,7 +105,7 @@ Status ResizeBnCL::Run()
     // 2. opencl run
     cl_ret = CL_SUCCESS;
 
-    cl_ret = m_cl_kernels[0].Run<cl::Buffer, MI_S32, cl::Buffer, MI_S32, MI_S32, MI_S32, MI_S32, MI_S32>(
+    cl_ret = m_cl_kernels[0].Run<cl::Buffer, DT_S32, cl::Buffer, DT_S32, DT_S32, DT_S32, DT_S32, DT_S32>(
                          m_cl_src.GetCLMemRef<cl::Buffer>(), istep,
                          m_cl_dst.GetCLMemRef<cl::Buffer>(), ostep,
                          iwidth, iheight, owidth, oheight,
@@ -159,7 +159,7 @@ Status ResizeBnCL::DeInitialize()
     return Status::OK;
 }
 
-std::vector<CLKernel> ResizeBnCL::GetCLKernels(Context *ctx, ElemType elem_type, MI_S32 channel)
+std::vector<CLKernel> ResizeBnCL::GetCLKernels(Context *ctx, ElemType elem_type, DT_S32 channel)
 {
     std::vector<CLKernel> cl_kernels;
 

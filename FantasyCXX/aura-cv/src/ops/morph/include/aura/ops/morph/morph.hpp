@@ -181,7 +181,7 @@ public:
      * row pitch should be aligned to a stride, which is obtained through the `GetCLLengthAlignSize`
      * function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape = MorphShape::RECT, MI_S32 iterations = 1);
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape = MorphShape::RECT, DT_S32 iterations = 1);
 
     /**
      * @brief Generate gaussian opencl precompiled cache.
@@ -191,7 +191,7 @@ public:
      * @param ksize The dilate kernel size.
      * @param shape The morphological shape.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, MorphShape shape);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, MorphShape shape);
 };
 
 /**
@@ -231,7 +231,7 @@ public:
      * row pitch should be aligned to a stride, which is obtained through the `GetCLLengthAlignSize`
      * function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 ksize, MorphShape shape = MorphShape::RECT, MI_S32 iterations = 1);
+    Status SetArgs(const Array *src, Array *dst, DT_S32 ksize, MorphShape shape = MorphShape::RECT, DT_S32 iterations = 1);
 
     /**
      * @brief Generate gaussian opencl precompiled cache.
@@ -241,7 +241,7 @@ public:
      * @param ksize The erode kernel size.
      * @param shape The morphological shape.
      */
-    static Status CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, MorphShape shape);
+    static Status CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, MorphShape shape);
 };
 
 /**
@@ -270,8 +270,8 @@ public:
  *       2.The above implements support all MorphShape(RECT/CROSS/ELLIPSE).
  *
  */
-AURA_EXPORTS Status IDilate(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MorphShape shape = MorphShape::RECT,
-                            MI_S32 iterations = 1, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IDilate(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, MorphShape shape = MorphShape::RECT,
+                            DT_S32 iterations = 1, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Apply an erode operation to the src matrix.
@@ -299,8 +299,8 @@ AURA_EXPORTS Status IDilate(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize
  * @note 1.N is positive integer, K is odd positive integer. <br>
  *       2.The above implements support all MorphShape(RECT/CROSS/ELLIPSE).
  */
-AURA_EXPORTS Status IErode(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MorphShape shape = MorphShape::RECT,
-                           MI_S32 iterations = 1, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IErode(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, MorphShape shape = MorphShape::RECT,
+                           DT_S32 iterations = 1, const OpTarget &target = OpTarget::Default());
 
 /**
  * @brief Apply a morphology operation to the src matrix.
@@ -329,8 +329,8 @@ AURA_EXPORTS Status IErode(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize,
  *       2.The above implements supported all MorphType(ERODE/DILATE/OPEN/CLOSE/GRADIENTTOPHAT/BLACKHAT). <br>
  *       3.The above implements supported all MorphShape(RECT/CROSS/ELLIPSE).
  */
-AURA_EXPORTS Status IMorphologyEx(Context *ctx, const Mat &src, Mat &dst, MorphType type, MI_S32 ksize,
-                                  MorphShape shape = MorphShape::RECT, MI_S32 iterations = 1, const OpTarget &target = OpTarget::Default());
+AURA_EXPORTS Status IMorphologyEx(Context *ctx, const Mat &src, Mat &dst, MorphType type, DT_S32 ksize,
+                                  MorphShape shape = MorphShape::RECT, DT_S32 iterations = 1, const OpTarget &target = OpTarget::Default());
 
 /**
  * @}

@@ -40,10 +40,10 @@ static SumMeanTestParam::TupleTable g_summean_table_hvx
 NEW_TESTCASE(matrix, SumMean, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     SumMeanTest summean_test(UnitTest::GetInstance()->GetContext(), g_summean_table_hvx);
     summean_test.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

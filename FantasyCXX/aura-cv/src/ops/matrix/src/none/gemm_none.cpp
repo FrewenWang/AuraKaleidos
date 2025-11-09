@@ -6,39 +6,39 @@
 namespace aura
 {
 
-AURA_ALWAYS_INLINE AURA_VOID AddDot4x4(MI_S32 k, MI_F32 *a, MI_S32 lda, MI_F32 *b, MI_S32 ldb,
-                                     MI_F32 *c, MI_S32 ldc)
+AURA_ALWAYS_INLINE DT_VOID AddDot4x4(DT_S32 k, DT_F32 *a, DT_S32 lda, DT_F32 *b, DT_S32 ldb,
+                                     DT_F32 *c, DT_S32 ldc)
 {
-    MI_S32 p = 0;
+    DT_S32 p = 0;
     /** hold contributions to
         C( 0, 0 ), C( 0, 1 ), C( 0, 2 ), C( 0, 3 )
         C( 1, 0 ), C( 1, 1 ), C( 1, 2 ), C( 1, 3 )
         C( 2, 0 ), C( 2, 1 ), C( 2, 2 ), C( 2, 3 )
         C( 3, 0 ), C( 3, 1 ), C( 3, 2 ), C( 3, 3 )  
     */
-    MI_F32 c00_reg = 0.0f, c01_reg = 0.0f, c02_reg = 0.0f, c03_reg = 0.0f;
-    MI_F32 c10_reg = 0.0f, c11_reg = 0.0f, c12_reg = 0.0f, c13_reg = 0.0f;
-    MI_F32 c20_reg = 0.0f, c21_reg = 0.0f, c22_reg = 0.0f, c23_reg = 0.0f;
-    MI_F32 c30_reg = 0.0f, c31_reg = 0.0f, c32_reg = 0.0f, c33_reg = 0.0f;
+    DT_F32 c00_reg = 0.0f, c01_reg = 0.0f, c02_reg = 0.0f, c03_reg = 0.0f;
+    DT_F32 c10_reg = 0.0f, c11_reg = 0.0f, c12_reg = 0.0f, c13_reg = 0.0f;
+    DT_F32 c20_reg = 0.0f, c21_reg = 0.0f, c22_reg = 0.0f, c23_reg = 0.0f;
+    DT_F32 c30_reg = 0.0f, c31_reg = 0.0f, c32_reg = 0.0f, c33_reg = 0.0f;
     /** hold
         A( 0, p )
         A( 1, p )
         A( 2, p )
         A( 3, p )
     */
-    MI_F32 a0r_reg = 0.0f;
-    MI_F32 a1r_reg = 0.0f;
-    MI_F32 a2r_reg = 0.0f;
-    MI_F32 a3r_reg = 0.0f;
-    MI_F32 b0c_reg = 0.0f;
-    MI_F32 b1c_reg = 0.0f;
-    MI_F32 b2c_reg = 0.0f;
-    MI_F32 b3c_reg = 0.0f;
+    DT_F32 a0r_reg = 0.0f;
+    DT_F32 a1r_reg = 0.0f;
+    DT_F32 a2r_reg = 0.0f;
+    DT_F32 a3r_reg = 0.0f;
+    DT_F32 b0c_reg = 0.0f;
+    DT_F32 b1c_reg = 0.0f;
+    DT_F32 b2c_reg = 0.0f;
+    DT_F32 b3c_reg = 0.0f;
 
-    MI_F32 *b0_pntr = &b[0];
-    MI_F32 *b1_pntr = &b[1 * ldb];
-    MI_F32 *b2_pntr = &b[2 * ldb];
-    MI_F32 *b3_pntr = &b[3 * ldb];
+    DT_F32 *b0_pntr = &b[0];
+    DT_F32 *b1_pntr = &b[1 * ldb];
+    DT_F32 *b2_pntr = &b[2 * ldb];
+    DT_F32 *b3_pntr = &b[3 * ldb];
 
     for (p = 0; p < k; p++)
     {
@@ -83,32 +83,32 @@ AURA_ALWAYS_INLINE AURA_VOID AddDot4x4(MI_S32 k, MI_F32 *a, MI_S32 lda, MI_F32 *
     c[3 * ldc + 0] = c30_reg;   c[3 * ldc + 1] = c31_reg;   c[3 * ldc + 2] = c32_reg;   c[3 * ldc + 3] = c33_reg;
 }
 
-AURA_ALWAYS_INLINE AURA_VOID AddDot1x4(MI_S32 k, MI_F32 *a, MI_S32 lda, MI_F32 *b, MI_S32 ldb,
-                                     MI_F32 *c, MI_S32 ldc)
+AURA_ALWAYS_INLINE DT_VOID AddDot1x4(DT_S32 k, DT_F32 *a, DT_S32 lda, DT_F32 *b, DT_S32 ldb,
+                                     DT_F32 *c, DT_S32 ldc)
 {
     AURA_UNUSED(lda);
     AURA_UNUSED(ldc);
 
-    MI_S32 p = 0;
+    DT_S32 p = 0;
     /** hold contributions to
         C( 0, 0 ), C( 0, 1 ), C( 0, 2 ), C( 0, 3 )
     */
-    MI_F32 c00_reg = 0.0f;
-    MI_F32 c01_reg = 0.0f;
-    MI_F32 c02_reg = 0.0f;
-    MI_F32 c03_reg = 0.0f;
+    DT_F32 c00_reg = 0.0f;
+    DT_F32 c01_reg = 0.0f;
+    DT_F32 c02_reg = 0.0f;
+    DT_F32 c03_reg = 0.0f;
 
     // hold A( 0, p )
-    MI_F32 a0r_reg = 0.0f;
-    MI_F32 b0c_reg = 0.0f;
-    MI_F32 b1c_reg = 0.0f;
-    MI_F32 b2c_reg = 0.0f;
-    MI_F32 b3c_reg = 0.0f;
+    DT_F32 a0r_reg = 0.0f;
+    DT_F32 b0c_reg = 0.0f;
+    DT_F32 b1c_reg = 0.0f;
+    DT_F32 b2c_reg = 0.0f;
+    DT_F32 b3c_reg = 0.0f;
 
-    MI_F32 *b0_pntr = &b[0];
-    MI_F32 *b1_pntr = &b[1 * ldb];
-    MI_F32 *b2_pntr = &b[2 * ldb];
-    MI_F32 *b3_pntr = &b[3 * ldb];
+    DT_F32 *b0_pntr = &b[0];
+    DT_F32 *b1_pntr = &b[1 * ldb];
+    DT_F32 *b2_pntr = &b[2 * ldb];
+    DT_F32 *b3_pntr = &b[3 * ldb];
 
     for (p = 0; p < k; p++)
     {
@@ -131,19 +131,19 @@ AURA_ALWAYS_INLINE AURA_VOID AddDot1x4(MI_S32 k, MI_F32 *a, MI_S32 lda, MI_F32 *
     c[3] = c03_reg;
 }
 
-AURA_ALWAYS_INLINE AURA_VOID AddDot4x1(MI_S32 k, MI_F32 *a, MI_S32 lda, MI_F32 *b, MI_S32 ldb,
-                                     MI_F32 *c, MI_S32 ldc)
+AURA_ALWAYS_INLINE DT_VOID AddDot4x1(DT_S32 k, DT_F32 *a, DT_S32 lda, DT_F32 *b, DT_S32 ldb,
+                                     DT_F32 *c, DT_S32 ldc)
 {
     AURA_UNUSED(ldb);
 
-    MI_S32 p = 0;
+    DT_S32 p = 0;
     /** hold contributions to
         C( 0, 0 ), C( 1, 0 ), C( 2, 0 ), C( 3, 0 ) 
     */
-    MI_F32 c00_reg = 0.0f;
-    MI_F32 c10_reg = 0.0f;
-    MI_F32 c20_reg = 0.0f;
-    MI_F32 c30_reg = 0.0f;
+    DT_F32 c00_reg = 0.0f;
+    DT_F32 c10_reg = 0.0f;
+    DT_F32 c20_reg = 0.0f;
+    DT_F32 c30_reg = 0.0f;
 
     /** hold
         A( 0, p )
@@ -151,13 +151,13 @@ AURA_ALWAYS_INLINE AURA_VOID AddDot4x1(MI_S32 k, MI_F32 *a, MI_S32 lda, MI_F32 *
         A( 2, p )
         A( 3, p )
     */
-    MI_F32 a0r_reg = 0.0f;
-    MI_F32 a1r_reg = 0.0f;
-    MI_F32 a2r_reg = 0.0f;
-    MI_F32 a3r_reg = 0.0f;
-    MI_F32 b0c_reg = 0.0f;
+    DT_F32 a0r_reg = 0.0f;
+    DT_F32 a1r_reg = 0.0f;
+    DT_F32 a2r_reg = 0.0f;
+    DT_F32 a3r_reg = 0.0f;
+    DT_F32 b0c_reg = 0.0f;
 
-    MI_F32 *b0_pntr = b;
+    DT_F32 *b0_pntr = b;
 
     for (p = 0; p < k; p++)
     {
@@ -180,18 +180,18 @@ AURA_ALWAYS_INLINE AURA_VOID AddDot4x1(MI_S32 k, MI_F32 *a, MI_S32 lda, MI_F32 *
     c[3 * ldc] = c30_reg;
 }
 
-AURA_ALWAYS_INLINE AURA_VOID AddDot1x1(MI_S32 k, MI_F32 *a, MI_S32 lda, MI_F32 *b, MI_S32 ldb,
-                                     MI_F32 *c, MI_S32 ldc)
+AURA_ALWAYS_INLINE DT_VOID AddDot1x1(DT_S32 k, DT_F32 *a, DT_S32 lda, DT_F32 *b, DT_S32 ldb,
+                                     DT_F32 *c, DT_S32 ldc)
 {
     AURA_UNUSED(lda);
     AURA_UNUSED(ldb);
     AURA_UNUSED(ldc);
 
-    MI_S32 p = 0;
-    MI_F32 a_reg = 0.0f;
-    MI_F32 b_reg = 0.0f;
-    MI_F32 c_reg = 0.0f;
-    MI_F32 *b_pntr = b;
+    DT_S32 p = 0;
+    DT_F32 a_reg = 0.0f;
+    DT_F32 b_reg = 0.0f;
+    DT_F32 c_reg = 0.0f;
+    DT_F32 *b_pntr = b;
 
     for (p = 0; p < k; p++)
     {
@@ -208,23 +208,23 @@ Status GemmNoneImpl(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, co
     AURA_UNUSED(ctx);
     AURA_UNUSED(target);
 
-    const MI_S32 m = src0.GetSizes().m_height;
-    const MI_S32 n = src1.GetSizes().m_width;
-    const MI_S32 k = src0.GetSizes().m_width;
+    const DT_S32 m = src0.GetSizes().m_height;
+    const DT_S32 n = src1.GetSizes().m_width;
+    const DT_S32 k = src0.GetSizes().m_width;
 
-    const MI_S32 stride_src0 = src0.GetRowPitch() / sizeof(MI_F32);
-    const MI_S32 stride_src1 = src1.GetRowPitch() / sizeof(MI_F32);
-    const MI_S32 stride_dst  = dst.GetRowPitch() / sizeof(MI_F32);
-    MI_F32 *b_data = (MI_F32 *)src1.GetData();
+    const DT_S32 stride_src0 = src0.GetRowPitch() / sizeof(DT_F32);
+    const DT_S32 stride_src1 = src1.GetRowPitch() / sizeof(DT_F32);
+    const DT_S32 stride_dst  = dst.GetRowPitch() / sizeof(DT_F32);
+    DT_F32 *b_data = (DT_F32 *)src1.GetData();
 
-    MI_F32 *tmp_b = static_cast<MI_F32*>(AURA_ALLOC(ctx, k * 4 * sizeof(MI_F32)));
-    if (MI_NULL == tmp_b)
+    DT_F32 *tmp_b = static_cast<DT_F32*>(AURA_ALLOC(ctx, k * 4 * sizeof(DT_F32)));
+    if (DT_NULL == tmp_b)
     {
         AURA_ADD_ERROR_STRING(ctx, "AURA_ALLOC_PARAM fail");
         return Status::ERROR;
     }
 
-    MI_S32 i, l, j = 0;
+    DT_S32 i, l, j = 0;
     for (; j < n - 3; j += 4)
     {
         for (i = 0; i < k; i++)
@@ -238,13 +238,13 @@ Status GemmNoneImpl(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, co
         i = 0;
         for (; i < m - 3; i += 4)
         {
-            AddDot4x4(k, const_cast<MI_F32*>(src0.Ptr<MI_F32>(i)), stride_src0, tmp_b,
-                      k, &dst.At<MI_F32>(i, j), stride_dst);
+            AddDot4x4(k, const_cast<DT_F32*>(src0.Ptr<DT_F32>(i)), stride_src0, tmp_b,
+                      k, &dst.At<DT_F32>(i, j), stride_dst);
         }
         for (; i < m; i++)
         {
-            AddDot1x4(k, const_cast<MI_F32*>(src0.Ptr<MI_F32>(i)), stride_src0, tmp_b,
-                      k, &dst.At<MI_F32>(i, j), stride_dst);
+            AddDot1x4(k, const_cast<DT_F32*>(src0.Ptr<DT_F32>(i)), stride_src0, tmp_b,
+                      k, &dst.At<DT_F32>(i, j), stride_dst);
         }
     }
 
@@ -258,17 +258,17 @@ Status GemmNoneImpl(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, co
         i = 0;
         for (; i < m - 3; i += 4)
         {
-            AddDot4x1(k, const_cast<MI_F32*>(src0.Ptr<MI_F32>(i)), stride_src0, tmp_b,
-                      k, &dst.At<MI_F32>(i, j), stride_dst);
+            AddDot4x1(k, const_cast<DT_F32*>(src0.Ptr<DT_F32>(i)), stride_src0, tmp_b,
+                      k, &dst.At<DT_F32>(i, j), stride_dst);
         }
         for (; i < m; i++)
         {
-            AddDot1x1(k, const_cast<MI_F32*>(src0.Ptr<MI_F32>(i)), stride_src0, tmp_b,
-                      k, &dst.At<MI_F32>(i, j), stride_dst);
+            AddDot1x1(k, const_cast<DT_F32*>(src0.Ptr<DT_F32>(i)), stride_src0, tmp_b,
+                      k, &dst.At<DT_F32>(i, j), stride_dst);
         }
     }
 
-    if (tmp_b != MI_NULL)
+    if (tmp_b != DT_NULL)
     {
         AURA_FREE(ctx, tmp_b);
     }

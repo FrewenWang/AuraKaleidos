@@ -40,12 +40,12 @@ MeanStdDev::MeanStdDev(Context *ctx, const OpTarget &target) : Op(ctx, target)
 
 Status MeanStdDev::SetArgs(const Array *src, Scalar &mean, Scalar &std_dev)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -74,14 +74,14 @@ Status MeanStdDev::SetArgs(const Array *src, Scalar &mean, Scalar &std_dev)
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateMeanStdDevImpl(m_ctx, impl_target);
     }
 
     // run initialize
     MeanStdDevImpl *mean_std_dev_impl = dynamic_cast<MeanStdDevImpl*>(m_impl.get());
-    if (MI_NULL == mean_std_dev_impl)
+    if (DT_NULL == mean_std_dev_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "mean_std_dev_impl is null ptr");
         return Status::ERROR;
@@ -99,24 +99,24 @@ AURA_EXPORTS Status IMeanStdDev(Context *ctx, const Mat &src, Scalar &mean, Scal
     return OpCall(ctx, mean_std_dev, &src, mean, std_dev);
 }
 
-MeanStdDevImpl::MeanStdDevImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "MeanStdDev", target), m_src(MI_NULL), 
-                                                                       m_mean(MI_NULL), m_std_dev(MI_NULL)
+MeanStdDevImpl::MeanStdDevImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "MeanStdDev", target), m_src(DT_NULL), 
+                                                                       m_mean(DT_NULL), m_std_dev(DT_NULL)
 {}
 
 Status MeanStdDevImpl::SetArgs(const Array *src, Scalar *mean, Scalar *std_dev)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    if (MI_NULL == src)
+    if (DT_NULL == src)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null");
         return Status::ERROR;
     }
 
-    if ((MI_NULL == mean) || (MI_NULL == std_dev))
+    if ((DT_NULL == mean) || (DT_NULL == std_dev))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "mean or std_dev is null");
         return Status::ERROR;
@@ -156,7 +156,7 @@ std::string MeanStdDevImpl::ToString() const
     return str;
 }
 
-AURA_VOID MeanStdDevImpl::Dump(const std::string &prefix) const
+DT_VOID MeanStdDevImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

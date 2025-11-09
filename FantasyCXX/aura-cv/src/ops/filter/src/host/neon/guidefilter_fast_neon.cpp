@@ -27,9 +27,9 @@ Possibilities: (ksize < 256)
 # SqSumRow = SqSumKernel = Promote<SumRow>::Type
 */
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C>
-static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, MI_S32 ksize,
-                                      MI_F32 eps, const Scalar &border_value, const OpTarget &target)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C>
+static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, DT_S32 ksize,
+                                      DT_F32 eps, const Scalar &border_value, const OpTarget &target)
 {
     AURA_UNUSED(target);
 
@@ -37,7 +37,7 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, const Mat &
     using SumKernelType = typename Promote<Tp>::Type;
     using SqSumType     = typename Promote<SumType>::Type;
 
-    const MI_S32 fast_ksize = GetFastKsize(ksize);
+    const DT_S32 fast_ksize = GetFastKsize(ksize);
 
     Sizes3 sub_sizes = {src0.GetSizes().m_height >> 1, src0.GetSizes().m_width >> 1, src0.GetSizes().m_channel};
     Mat    sub_src0  = Mat(ctx, src0.GetElemType(), sub_sizes, AURA_MEM_DEFAULT);
@@ -66,17 +66,17 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, const Mat &
         return Status::ERROR;
     }
 
-    const MI_S32 height = sub_src0.GetSizes().m_height;
+    const DT_S32 height = sub_src0.GetSizes().m_height;
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
     const Sizes3 sz    = sub_src0.GetSizes();
-    MI_S32 width       = sz.m_width;
-    MI_S32 width_align = AURA_ALIGN((width + fast_ksize) * C, 64);
+    DT_S32 width       = sz.m_width;
+    DT_S32 width_align = AURA_ALIGN((width + fast_ksize) * C, 64);
 
     // 0. prepare buffer
     ThreadBuffer row_a_buffer(ctx,  width_align * sizeof(Tp)      * ksize); // to store data with expanded border
@@ -89,7 +89,7 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, const Mat &
     ThreadBuffer sum_aa_buffer(ctx, width_align * sizeof(SqSumType));       // sum of a * a
     ThreadBuffer sum_ab_buffer(ctx, width_align * sizeof(SqSumType));       // sum of a * b
 
-    ThreadBuffer arr_ptr_buffer(ctx, 4 * ksize * sizeof(AURA_VOID*));
+    ThreadBuffer arr_ptr_buffer(ctx, 4 * ksize * sizeof(DT_VOID*));
 
     ret = wp->ParallelFor(0, height, GuideFilterCalcABNeonImpl<Tp, SumType, SqSumType, BORDER_TYPE, C>,
                           std::cref(sub_src0), std::cref(sub_src1), std::ref(sub_a), std::ref(sub_b),
@@ -134,7 +134,7 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, const Mat &
         return Status::ERROR;
     }
 
-    ret = wp->ParallelFor(static_cast<MI_S32>(0), mean_a.GetSizes().m_height, GuideFilterLinearTransNeonImpl<Tp, SumType, SqSumType, C>,
+    ret = wp->ParallelFor(static_cast<DT_S32>(0), mean_a.GetSizes().m_height, GuideFilterLinearTransNeonImpl<Tp, SumType, SqSumType, C>,
                           std::cref(src0), std::cref(mean_a), std::cref(mean_b), std::ref(dst));
     if (ret != Status::OK)
     {
@@ -145,9 +145,9 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, const Mat &
     return Status::OK;
 }
 
-template <typename Tp, BorderType BORDER_TYPE, MI_S32 C>
-static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, Mat &dst, MI_S32 ksize,
-                                      MI_F32 eps, const Scalar &border_value, const OpTarget &target)
+template <typename Tp, BorderType BORDER_TYPE, DT_S32 C>
+static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, Mat &dst, DT_S32 ksize,
+                                      DT_F32 eps, const Scalar &border_value, const OpTarget &target)
 {
     AURA_UNUSED(target);
 
@@ -155,7 +155,7 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, Mat &dst, M
     using SumKernelType = typename Promote<Tp>::Type;
     using SqSumType     = typename Promote<SumType>::Type;
 
-    const MI_S32 fast_ksize = GetFastKsize(ksize);
+    const DT_S32 fast_ksize = GetFastKsize(ksize);
 
     Sizes3 sub_sizes = {src0.GetSizes().m_height >> 1, src0.GetSizes().m_width >> 1, src0.GetSizes().m_channel};
     Mat    sub_src0  = Mat(ctx, src0.GetElemType(), sub_sizes, AURA_MEM_DEFAULT);
@@ -182,17 +182,17 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, Mat &dst, M
         return Status::ERROR;
     }
 
-    const MI_S32 height = sub_src0.GetSizes().m_height;
+    const DT_S32 height = sub_src0.GetSizes().m_height;
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
     }
 
     const Sizes3 sz    = sub_src0.GetSizes();
-    MI_S32 width       = sz.m_width;
-    MI_S32 width_align = AURA_ALIGN((width + fast_ksize) * C, 64);
+    DT_S32 width       = sz.m_width;
+    DT_S32 width_align = AURA_ALIGN((width + fast_ksize) * C, 64);
 
     // 0. prepare buffer
     ThreadBuffer row_a_buffer(ctx,  width_align * sizeof(Tp)      * ksize); // to store data with expanded border
@@ -201,7 +201,7 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, Mat &dst, M
     ThreadBuffer sum_a_buffer(ctx,  width_align * sizeof(SumKernelType));   // sum of a
     ThreadBuffer sum_aa_buffer(ctx, width_align * sizeof(SqSumType));       // sum of a * a
 
-    ThreadBuffer arr_ptr_buffer(ctx, 2 * ksize * sizeof(AURA_VOID*));
+    ThreadBuffer arr_ptr_buffer(ctx, 2 * ksize * sizeof(DT_VOID*));
 
     ret = wp->ParallelFor(0, height, GuideFilterCalcABSameSrcNeonImpl<Tp, SumType, SqSumType, BORDER_TYPE, C>,
                           std::cref(sub_src0), std::ref(sub_a), std::ref(sub_b),
@@ -246,7 +246,7 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, Mat &dst, M
         return Status::ERROR;
     }
 
-    ret = wp->ParallelFor(static_cast<MI_S32>(0), mean_a.GetSizes().m_height, GuideFilterLinearTransNeonImpl<Tp, SumType, SqSumType, C>,
+    ret = wp->ParallelFor(static_cast<DT_S32>(0), mean_a.GetSizes().m_height, GuideFilterLinearTransNeonImpl<Tp, SumType, SqSumType, C>,
                           std::cref(src0), std::cref(mean_a), std::cref(mean_b), std::ref(dst));
     if (ret != Status::OK)
     {
@@ -258,7 +258,7 @@ static Status GuideFilterFastNeonImpl(Context *ctx, const Mat &src0, Mat &dst, M
 }
 
 template <typename Tp, BorderType BORDER_TYPE>
-Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, MI_S32 ksize, MI_F32 eps,
+Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, DT_S32 ksize, DT_F32 eps,
                                  const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
@@ -291,7 +291,7 @@ Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src0, const Mat &src1,
 }
 
 template <typename Tp, BorderType BORDER_TYPE>
-Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MI_F32 eps,
+Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, DT_F32 eps,
                                  const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
@@ -324,7 +324,7 @@ Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 
 }
 
 template <typename Tp>
-Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, MI_S32 ksize, MI_F32 eps,
+Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, DT_S32 ksize, DT_F32 eps,
                                  BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
@@ -357,7 +357,7 @@ Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src0, const Mat &src1,
 }
 
 template <typename Tp>
-Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MI_F32 eps, BorderType border_type,
+Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, DT_F32 eps, BorderType border_type,
                                  const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
@@ -389,7 +389,7 @@ Status GuideFilterFastNeonHelper(Context *ctx, const Mat &src, Mat &dst, MI_S32 
     AURA_RETURN(ctx, ret);
 }
 
-Status GuideFilterFastNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, const MI_S32 &ksize, const MI_F32 &eps,
+Status GuideFilterFastNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &dst, const DT_S32 &ksize, const DT_F32 &eps,
                            BorderType &border_type, const Scalar &border_value, const OpTarget &target)
 {
     Status ret = Status::ERROR;
@@ -399,25 +399,25 @@ Status GuideFilterFastNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &
         {
             case ElemType::U8:
             {
-                ret = GuideFilterFastNeonHelper<MI_U8>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_U8>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 
             case ElemType::S8:
             {
-                ret = GuideFilterFastNeonHelper<MI_S8>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_S8>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 
             case ElemType::U16:
             {
-                ret = GuideFilterFastNeonHelper<MI_U16>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_U16>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 
             case ElemType::S16:
             {
-                ret = GuideFilterFastNeonHelper<MI_S16>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_S16>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 
@@ -431,7 +431,7 @@ Status GuideFilterFastNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &
 
             case ElemType::F32:
             {
-                ret = GuideFilterFastNeonHelper<MI_F32>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_F32>(ctx, src0, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 
@@ -448,25 +448,25 @@ Status GuideFilterFastNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &
         {
             case ElemType::U8:
             {
-                ret = GuideFilterFastNeonHelper<MI_U8>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_U8>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 
             case ElemType::S8:
             {
-                ret = GuideFilterFastNeonHelper<MI_S8>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_S8>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 
             case ElemType::U16:
             {
-                ret = GuideFilterFastNeonHelper<MI_U16>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_U16>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 
             case ElemType::S16:
             {
-                ret = GuideFilterFastNeonHelper<MI_S16>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_S16>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 
@@ -480,7 +480,7 @@ Status GuideFilterFastNeon(Context *ctx, const Mat &src0, const Mat &src1, Mat &
 
             case ElemType::F32:
             {
-                ret = GuideFilterFastNeonHelper<MI_F32>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
+                ret = GuideFilterFastNeonHelper<DT_F32>(ctx, src0, src1, dst, ksize, eps, border_type, border_value, target);
                 break;
             }
 

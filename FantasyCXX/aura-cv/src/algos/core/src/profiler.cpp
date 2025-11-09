@@ -12,15 +12,15 @@
 namespace aura
 {
 
-Profiler::Impl::Impl(Context *ctx) : m_ctx(ctx), m_enable_perf(MI_FALSE)
+Profiler::Impl::Impl(Context *ctx) : m_ctx(ctx), m_enable_perf(DT_FALSE)
 {}
 
-MI_BOOL Profiler::Impl::IsEnablePerf() const
+DT_BOOL Profiler::Impl::IsEnablePerf() const
 {
     return m_enable_perf;
 }
 
-AURA_VOID Profiler::Impl::Initialize(MI_BOOL enable_perf)
+DT_VOID Profiler::Impl::Initialize(DT_BOOL enable_perf)
 {
     m_enable_perf = enable_perf;
 }
@@ -32,7 +32,7 @@ Status Profiler::Impl::AddNewNode(Node *node)
         return Status::OK;
     }
 
-    if (MI_NULL == node)
+    if (DT_NULL == node)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "the node pointer is null");
         return Status::ERROR;
@@ -62,7 +62,7 @@ Status Profiler::Impl::AddNodeProfiling(Node *node, const Time &start, const Tim
         return Status::OK;
     }
 
-    if (MI_NULL == node)
+    if (DT_NULL == node)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "the node pointer is null");
         return Status::ERROR;
@@ -99,12 +99,12 @@ Status Profiler::Impl::AddNodeProfiling(Node *node, const Time &start, const Tim
             std::vector<const Array*> inputs = node->GetOp()->GetInputArrays();
             for (size_t i = 0; i < inputs.size(); i++)
             {
-                if (inputs[i] != MI_NULL)
+                if (inputs[i] != DT_NULL)
                 {
                     if (m_array_map.find(const_cast<Array*>(inputs[i])) == m_array_map.end())
                     {
                         std::string array_name = node->GetName() + "_autogen_input_" + std::to_string(i);
-                        AURA_VOID *origin = inputs[i]->GetBuffer().m_origin;
+                        DT_VOID *origin = inputs[i]->GetBuffer().m_origin;
                         if (m_buffer_map.find(origin) == m_buffer_map.end() && inputs[i]->GetBuffer().IsValid())
                         {
                             std::string buffer_name = array_name + ":buffer";
@@ -122,12 +122,12 @@ Status Profiler::Impl::AddNodeProfiling(Node *node, const Time &start, const Tim
             std::vector<const Array*> outputs = node->GetOp()->GetOutputArrays();
             for (size_t i = 0; i < outputs.size(); i++)
             {
-                if (outputs[i] != MI_NULL)
+                if (outputs[i] != DT_NULL)
                 {
                     if (m_array_map.find(outputs[i]) == m_array_map.end())
                     {
                         std::string array_name = node->GetName() + "_autogen_output_" + std::to_string(i);
-                        AURA_VOID *origin = outputs[i]->GetBuffer().m_origin;
+                        DT_VOID *origin = outputs[i]->GetBuffer().m_origin;
                         if (m_buffer_map.find(origin) == m_buffer_map.end() && outputs[i]->GetBuffer().IsValid())
                         {
                             std::string buffer_name = array_name + ":buffer";
@@ -206,7 +206,7 @@ Status Profiler::Impl::UpdateNodeOutputs(const std::string &node_name, const std
 
     for (const Array *array : outputs)
     {
-        if (array != MI_NULL && m_array_map.find(array) != m_array_map.end())
+        if (array != DT_NULL && m_array_map.find(array) != m_array_map.end())
         {
             node_exec.outputs.push_back(m_array_map[array]);
         }
@@ -215,14 +215,14 @@ Status Profiler::Impl::UpdateNodeOutputs(const std::string &node_name, const std
     return Status::OK;
 }
 
-Status Profiler::Impl::AddCreateArrayProfiling(const std::string &name, const Array *array, const Time &start, const Time &end, MI_BOOL add_buffer)
+Status Profiler::Impl::AddCreateArrayProfiling(const std::string &name, const Array *array, const Time &start, const Time &end, DT_BOOL add_buffer)
 {
     if (!m_enable_perf)
     {
         return Status::OK;
     }
 
-    if (MI_NULL == array)
+    if (DT_NULL == array)
     {
         std::string error_msg = "the array pointer with the name [" + name + "] is null";
         AURA_ADD_ERROR_STRING(m_ctx, error_msg.c_str());
@@ -281,7 +281,7 @@ Status Profiler::Impl::AddCreateArrayProfiling(const std::string &name, const Ar
         case ArrayType::CL_MEMORY:
         {
             const CLMem *clmem = dynamic_cast<const CLMem*>(array);
-            if (MI_NULL == clmem)
+            if (DT_NULL == clmem)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "the clmem pointer is null");
                 return Status::ERROR;
@@ -316,7 +316,7 @@ Status Profiler::Impl::AddExternalMem(const std::string &name, const Buffer &buf
 }
 
 #if defined(AURA_BUILD_HOST)
-static MI_U64 TimeToU64(const Time &time)
+static DT_U64 TimeToU64(const Time &time)
 {
     std::stringstream os;
     os << time.sec << std::setfill('0') << std::setw(3) << time.ms << std::setw(3) << time.us;
@@ -334,7 +334,7 @@ Status Profiler::Impl::Save(const std::string &prefix)
 
     std::string fname = prefix + ".json";
     FILE *fp = fopen(fname.c_str(), "wb");
-    if (MI_NULL == fp)
+    if (DT_NULL == fp)
     {
         std::string info = "open " + fname + " failed";
         AURA_ADD_ERROR_STRING(m_ctx, info.c_str());
@@ -467,7 +467,7 @@ Status Profiler::Impl::AddDeleteArrayProfiling(const Array *array, const Buffer 
         return Status::OK;
     }
 
-    if (MI_NULL == array)
+    if (DT_NULL == array)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "the array pointer is null");
         return Status::ERROR;
@@ -613,21 +613,21 @@ Status Profiler::Impl::AddExternalMemImpl(const std::string &name, const Buffer 
 }
 
 #if defined(AURA_BUILD_HEXAGON) || defined(AURA_ENABLE_HEXAGON)
-template <typename Tp, typename std::enable_if<std::is_same<Tp, ExecInfo>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, ExecInfo>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &exec_info)
 {
     Status ret = rpc_param->Set(exec_info.start, exec_info.end, exec_info.status, exec_info.thread_id);
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, ExecInfo>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, ExecInfo>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &exec_info)
 {
     Status ret = rpc_param->Get(exec_info.start, exec_info.end, exec_info.status, exec_info.thread_id);
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, OpTarget>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, OpTarget>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &target)
 {
     Status ret = rpc_param->Set(target.m_type);
@@ -665,7 +665,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &target)
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, OpTarget>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, OpTarget>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &target)
 {
     Status ret = rpc_param->Get(target.m_type);
@@ -703,7 +703,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &target)
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, NodeExec>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, NodeExec>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &node_exec)
 {
     Status ret = rpc_param->Set(node_exec.op_target, node_exec.op_info, node_exec.inputs, node_exec.outputs,
@@ -711,7 +711,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &node_exec)
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, NodeExec>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, NodeExec>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &node_exec)
 {
     Status ret = rpc_param->Get(node_exec.op_target, node_exec.op_info, node_exec.inputs, node_exec.outputs,
@@ -719,21 +719,21 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &node_exec)
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, NodeProfiling>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, NodeProfiling>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &node_profiling)
 {
     Status ret = rpc_param->Set(node_profiling.type, node_profiling.op_name, node_profiling.node_exec);
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, NodeProfiling>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, NodeProfiling>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &node_profiling)
 {
     Status ret = rpc_param->Get(node_profiling.type, node_profiling.op_name, node_profiling.node_exec);
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, ArrayProfiling>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, ArrayProfiling>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &array_profiling)
 {
     Status ret = rpc_param->Set(array_profiling.elem_type, array_profiling.array_type, array_profiling.sizes,
@@ -742,7 +742,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &array_profi
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, ArrayProfiling>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, ArrayProfiling>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &array_profiling)
 {
     Status ret = rpc_param->Get(array_profiling.elem_type, array_profiling.array_type, array_profiling.sizes,
@@ -751,7 +751,7 @@ Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &array_profiling
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, BufferProfiling>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, BufferProfiling>::value>::type* = DT_NULL>
 Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &buffer_profiling)
 {
     Status ret = rpc_param->Set(buffer_profiling.type, buffer_profiling.capacity, buffer_profiling.property,
@@ -759,7 +759,7 @@ Status Serialize(Context *ctx, HexagonRpcParam *rpc_param, const Tp &buffer_prof
     AURA_RETURN(ctx, ret);
 }
 
-template <typename Tp, typename std::enable_if<std::is_same<Tp, BufferProfiling>::value>::type* = MI_NULL>
+template <typename Tp, typename std::enable_if<std::is_same<Tp, BufferProfiling>::value>::type* = DT_NULL>
 Status Deserialize(Context *ctx, HexagonRpcParam *rpc_param, Tp &buffer_profiling)
 {
     Status ret = rpc_param->Get(buffer_profiling.type, buffer_profiling.capacity, buffer_profiling.property,
@@ -780,7 +780,7 @@ Status Profiler::Impl::Serialize(HexagonRpcParam &rpc_param)
     if (ret != Status::OK)
     {
         rpc_param.ResetBuffer();
-        rpc_param.Set((MI_S32)0);
+        rpc_param.Set((DT_S32)0);
         AURA_ADD_ERROR_STRING(m_ctx, "Set failed");
     }
 
@@ -839,10 +839,10 @@ Status Profiler::Impl::Deserialize(const std::string &node_full_name, HexagonRpc
         buffer_name_map[hexagon_array_profiling_map[hexagon_outputs[i]].buffer_name] = m_array_profiling[host_outputs[i]].buffer_name;
     }
 
-    std::unordered_map<MI_S32, std::string> fds;
+    std::unordered_map<DT_S32, std::string> fds;
     for (auto &buffer_profiling : m_buffer_profiling)
     {
-        MI_S32 fd = buffer_profiling.second.property;
+        DT_S32 fd = buffer_profiling.second.property;
         if (fd != 0)
         {
             if (fds.find(fd) != fds.end())
@@ -924,16 +924,16 @@ Status Profiler::Impl::Deserialize(const std::string &node_full_name, HexagonRpc
 Profiler::Profiler(Context *ctx) : m_impl(new Profiler::Impl(ctx))
 {}
 
-MI_BOOL Profiler::IsEnablePerf() const
+DT_BOOL Profiler::IsEnablePerf() const
 {
     if (m_impl)
     {
         return m_impl->IsEnablePerf();
     }
-    return MI_FALSE;
+    return DT_FALSE;
 }
 
-AURA_VOID Profiler::Initialize(MI_BOOL enable_perf)
+DT_VOID Profiler::Initialize(DT_BOOL enable_perf)
 {
     if (m_impl)
     {
@@ -969,7 +969,7 @@ Status Profiler::UpdateNodeOutputs(const std::string &node_name, const std::vect
     return Status::ERROR;
 }
 
-Status Profiler::AddCreateArrayProfiling(const std::string &name, const Array *array, const Time &start, const Time &end, MI_BOOL add_buffer)
+Status Profiler::AddCreateArrayProfiling(const std::string &name, const Array *array, const Time &start, const Time &end, DT_BOOL add_buffer)
 {
     if (m_impl)
     {

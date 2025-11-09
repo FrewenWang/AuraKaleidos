@@ -22,7 +22,7 @@ AURA_INLINE HVX_Vector Q6_Vub_vdiv_VubVub(HVX_Vector vu8_u, HVX_Vector vu8_v)
     HVX_Vector vd16_div_bit = Q6_V_vsplat_R(0x00800080);
     HVX_VectorPred q_0, q_1;
 
-    for (MI_S32 k = 0; k < 8; k++)
+    for (DT_S32 k = 0; k < 8; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VuhVuh(vu16_divisor_02, vu16_dividend_02);
         q_1 = Q6_Q_vcmp_gt_VuhVuh(vu16_divisor_13, vu16_dividend_13);
@@ -60,7 +60,7 @@ AURA_INLINE HVX_Vector Q6_Vb_vdiv_VbVb(HVX_Vector vs8_u, HVX_Vector vs8_v)
     HVX_Vector vd16_div_bit = Q6_V_vsplat_R(0x00800080);
     HVX_VectorPred q_0, q_1;
 
-    for (MI_S32 k = 0; k < 8; k++)
+    for (DT_S32 k = 0; k < 8; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VuhVuh(vd16_divisor_02, vd16_dividend_02);
         q_1 = Q6_Q_vcmp_gt_VuhVuh(vd16_divisor_13, vd16_dividend_13);
@@ -95,7 +95,7 @@ AURA_INLINE HVX_Vector Q6_Vuh_vdiv8_VuhVuh(HVX_Vector vu16_u, HVX_Vector vu16_v)
     HVX_Vector wd32_div_bit = Q6_V_vsplat_R(0x00000080);
     HVX_VectorPred q_0, q_1;
 
-    for (MI_S32 k = 0; k < 8; k++)
+    for (DT_S32 k = 0; k < 8; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VuwVuw(wu32_divisor_02, wu32_dividend_02);
         q_1 = Q6_Q_vcmp_gt_VuwVuw(wu32_divisor_13, wu32_dividend_13);
@@ -133,7 +133,7 @@ AURA_INLINE HVX_Vector Q6_Vh_vdiv8_VhVh(HVX_Vector vs16_u, HVX_Vector vs16_v)
     HVX_Vector vd32_div_bit = Q6_V_vsplat_R(0x00000080);
     HVX_VectorPred q_0, q_1;
 
-    for (MI_S32 k = 0; k < 8; k++)
+    for (DT_S32 k = 0; k < 8; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vd32_divisor_02, vd32_dividend_02);
         q_1 = Q6_Q_vcmp_gt_VuwVuw(vd32_divisor_13, vd32_dividend_13);
@@ -168,7 +168,7 @@ AURA_INLINE HVX_Vector Q6_Vuh_vdiv_VuhVuh(HVX_Vector vu16_u, HVX_Vector vu16_v)
     HVX_Vector vu32_div_bit = Q6_V_vsplat_R(0x00008000);
     HVX_VectorPred q_0, q_1;
 
-    for (MI_S32 k = 0; k < 16; k++)
+    for (DT_S32 k = 0; k < 16; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vu32_divisor_02, vu32_dividend_02);
         q_1 = Q6_Q_vcmp_gt_VuwVuw(vu32_divisor_13, vu32_dividend_13);
@@ -206,7 +206,7 @@ AURA_INLINE HVX_Vector Q6_Vh_vdiv_VhVh(HVX_Vector vs16_u, HVX_Vector vs16_v)
     HVX_Vector vd32_div_bit = Q6_V_vsplat_R(0x00008000);
     HVX_VectorPred q_0, q_1;
 
-    for (MI_S32 k = 0; k < 16; k++)
+    for (DT_S32 k = 0; k < 16; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vd32_divisor_02, vd32_dividend_02);
         q_1 = Q6_Q_vcmp_gt_VuwVuw(vd32_divisor_13, vd32_dividend_13);
@@ -254,7 +254,7 @@ AURA_INLINE HVX_Vector Q6_Vuh_vdiv8_WuwVuh(HVX_VectorPair wu32_u, HVX_Vector vu1
 
     vu32_div_bit = Q6_V_vsplat_R(0x00800080);
 
-    for (MI_S32 k = 0; k < 8; k++)
+    for (DT_S32 k = 0; k < 8; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VwVw(vu32_denom_04, vu32_pixel_sum_04);
         q_1 = Q6_Q_vcmp_gt_VwVw(vu32_denom_26, vu32_pixel_sum_26);
@@ -307,7 +307,7 @@ AURA_INLINE HVX_Vector Q6_Vh_vdiv8_WwVh(HVX_VectorPair ws32_u, HVX_Vector vs16_v
 
     vd32_div_bit = Q6_V_vsplat_R(0x00000080);
 
-    for (MI_S32 k = 0; k < 8; k++)
+    for (DT_S32 k = 0; k < 8; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VwVw(vd32_denom_04, vd32_pixel_sum_04);
         q_1 = Q6_Q_vcmp_gt_VwVw(vd32_denom_26, vd32_pixel_sum_26);
@@ -354,7 +354,7 @@ AURA_INLINE HVX_Vector Q6_Vuh_vdiv_WuwVuh(HVX_VectorPair wu32_u, HVX_Vector vu16
 
     vu32_div_bit = Q6_V_vsplat_R(0x00008000);
 
-    for (MI_S32 k = 0; k < 16; k++)
+    for (DT_S32 k = 0; k < 16; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vu32_denom_02, vu32_pixel_sum_02);
         q_1 = Q6_Q_vcmp_gt_VuwVuw(vu32_denom_13, vu32_pixel_sum_13);
@@ -404,7 +404,7 @@ AURA_INLINE HVX_Vector Q6_Vh_vdiv_WwVh(HVX_VectorPair ws32_u, HVX_Vector vs16_v)
     vd32_result_13 = Q6_V_vzero();
     vd32_div_bit = Q6_V_vsplat_R(0x80008000);
 
-    for (MI_S32 k = 0; k < 16; k++)
+    for (DT_S32 k = 0; k < 16; k++)
     {
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vd32_denom_02, vd32_pixel_sum_02);
         q_1 = Q6_Q_vcmp_gt_VuwVuw(vd32_denom_13, vd32_pixel_sum_13);
@@ -432,7 +432,7 @@ AURA_INLINE HVX_Vector Q6_Vuw_vdiv8_VuwVuw(HVX_Vector vu32_u, HVX_Vector vu32_v)
     HVX_Vector vd32_result;
     HVX_Vector vd32_div_bit;
     HVX_VectorPred q_0;
-    MI_S32 shift_val = 7;
+    DT_S32 shift_val = 7;
 
     HVX_Vector vd32_dividend_tmp = Q6_Vuw_vlsr_VuwR(vu32_u, 7);
     HVX_Vector vd32_divisor_shift = Q6_Vw_vasl_VwR(vu32_v, shift_val);
@@ -440,7 +440,7 @@ AURA_INLINE HVX_Vector Q6_Vuw_vdiv8_VuwVuw(HVX_Vector vu32_u, HVX_Vector vu32_v)
     vd32_result = Q6_V_vzero();
     vd32_div_bit = Q6_V_vsplat_R(0x00000080);
 
-    for (MI_S32 k = 0; k < 7; k++)
+    for (DT_S32 k = 0; k < 7; k++)
     {
         shift_val--;
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vu32_v, vd32_dividend_tmp);
@@ -464,7 +464,7 @@ AURA_INLINE HVX_Vector Q6_Vw_vdiv8_VwVw(HVX_Vector vs32_u, HVX_Vector vs32_v)
     HVX_Vector vd32_result;
     HVX_Vector vd32_div_bit;
     HVX_VectorPred q_0;
-    MI_S32 shift_val = 7;
+    DT_S32 shift_val = 7;
 
     HVX_VectorPred q_sign = Q6_Q_vcmp_gt_VwVw(Q6_V_vzero(), vs32_u);
     q_sign = Q6_Q_vcmp_gtxacc_QVwVw(q_sign, Q6_V_vzero(), vs32_v);
@@ -478,7 +478,7 @@ AURA_INLINE HVX_Vector Q6_Vw_vdiv8_VwVw(HVX_Vector vs32_u, HVX_Vector vs32_v)
     vd32_result = Q6_V_vzero();
     vd32_div_bit = Q6_V_vsplat_R(0x00000080);
 
-    for (MI_S32 k = 0; k < 7; k++)
+    for (DT_S32 k = 0; k < 7; k++)
     {
         shift_val--;
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vs32_v, vd32_dividend_tmp);
@@ -504,7 +504,7 @@ AURA_INLINE HVX_Vector Q6_Vuw_vdiv16_VuwVuw(HVX_Vector vu32_u, HVX_Vector vu32_v
     HVX_Vector vd32_result;
     HVX_Vector vd32_div_bit;
     HVX_VectorPred q_0;
-    MI_S32 shift_val = 15;
+    DT_S32 shift_val = 15;
 
     HVX_Vector vd32_dividend_tmp = Q6_Vuw_vlsr_VuwR(vu32_u, 15);
     HVX_Vector vd32_divisor_shift = Q6_Vw_vasl_VwR(vu32_v, shift_val);
@@ -512,7 +512,7 @@ AURA_INLINE HVX_Vector Q6_Vuw_vdiv16_VuwVuw(HVX_Vector vu32_u, HVX_Vector vu32_v
     vd32_result = Q6_V_vzero();
     vd32_div_bit = Q6_V_vsplat_R(0x00008000);
 
-    for (MI_S32 k = 0; k < 15; k++)
+    for (DT_S32 k = 0; k < 15; k++)
     {
         shift_val--;
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vu32_v, vd32_dividend_tmp);
@@ -535,7 +535,7 @@ AURA_INLINE HVX_Vector Q6_Vw_vdiv16_VwVw(HVX_Vector vs32_u, HVX_Vector vs32_v)
     HVX_Vector vd32_result;
     HVX_Vector vd32_div_bit;
     HVX_VectorPred q_0;
-    MI_S32 shift_val = 15;
+    DT_S32 shift_val = 15;
 
     HVX_VectorPred q_sign = Q6_Q_vcmp_gt_VwVw(Q6_V_vzero(), vs32_u);
     q_sign = Q6_Q_vcmp_gtxacc_QVwVw(q_sign, Q6_V_vzero(), vs32_v);
@@ -549,7 +549,7 @@ AURA_INLINE HVX_Vector Q6_Vw_vdiv16_VwVw(HVX_Vector vs32_u, HVX_Vector vs32_v)
     vd32_result = Q6_V_vzero();
     vd32_div_bit = Q6_V_vsplat_R(0x00008000);
 
-    for (MI_S32 k = 0; k < 15; k++)
+    for (DT_S32 k = 0; k < 15; k++)
     {
         shift_val--;
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vs32_v, vd32_dividend_tmp);
@@ -575,7 +575,7 @@ AURA_INLINE HVX_Vector Q6_Vuw_vdiv_VuwVuw(HVX_Vector vu32_u, HVX_Vector vu32_v)
     HVX_Vector vd32_result;
     HVX_Vector vd32_div_bit;
     HVX_VectorPred q_0;
-    MI_S32 shift_val = 31;
+    DT_S32 shift_val = 31;
 
     HVX_Vector vd32_dividend_tmp = Q6_Vuw_vlsr_VuwR(vu32_u, 31);
     HVX_Vector vd32_divisor_shift = Q6_Vw_vasl_VwR(vu32_v, shift_val);
@@ -583,7 +583,7 @@ AURA_INLINE HVX_Vector Q6_Vuw_vdiv_VuwVuw(HVX_Vector vu32_u, HVX_Vector vu32_v)
     vd32_result = Q6_V_vzero();
     vd32_div_bit = Q6_V_vsplat_R(0x80000000);
 
-    for (MI_S32 k = 0; k < 31; k++)
+    for (DT_S32 k = 0; k < 31; k++)
     {
         shift_val--;
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vu32_v, vd32_dividend_tmp);
@@ -606,7 +606,7 @@ AURA_INLINE HVX_Vector Q6_Vw_vdiv_VwVw(HVX_Vector vs32_u, HVX_Vector vs32_v)
     HVX_Vector vd32_result;
     HVX_Vector vd32_div_bit;
     HVX_VectorPred q_0;
-    MI_S32 shift_val = 31;
+    DT_S32 shift_val = 31;
 
     HVX_VectorPred q_sign = Q6_Q_vcmp_gt_VwVw(Q6_V_vzero(), vs32_u);
     q_sign = Q6_Q_vcmp_gtxacc_QVwVw(q_sign, Q6_V_vzero(), vs32_v);
@@ -620,7 +620,7 @@ AURA_INLINE HVX_Vector Q6_Vw_vdiv_VwVw(HVX_Vector vs32_u, HVX_Vector vs32_v)
     vd32_result = Q6_V_vzero();
     vd32_div_bit = Q6_V_vsplat_R(0x80000000);
 
-    for (MI_S32 k = 0; k < 31; k++)
+    for (DT_S32 k = 0; k < 31; k++)
     {
         shift_val--;
         q_0 = Q6_Q_vcmp_gt_VuwVuw(vs32_v, vd32_dividend_tmp);

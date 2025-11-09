@@ -27,8 +27,8 @@ aura::Status FastSampleTest(aura::Context *ctx, aura::TargetType type)
     std::vector<aura::KeyPoint> key_points;
 
     // set interface parameters
-    MI_S32 thresh = 40;
-    MI_S32 max_num_corners = 3000;
+    DT_S32 thresh = 40;
+    DT_S32 max_num_corners = 3000;
     aura::FastDetectorType detect_type = aura::FastDetectorType::FAST_9_16;
 
     // ---------------------
@@ -42,7 +42,7 @@ aura::Status FastSampleTest(aura::Context *ctx, aura::TargetType type)
 
     // run and time
     aura::Time start_time = aura::Time::Now();
-    status = IFast(ctx, src, key_points, thresh, MI_TRUE, detect_type, max_num_corners, aura::OpTarget(type));
+    status = IFast(ctx, src, key_points, thresh, DT_TRUE, detect_type, max_num_corners, aura::OpTarget(type));
     aura::Time end_time = aura::Time::Now();
 
     // ---------------------

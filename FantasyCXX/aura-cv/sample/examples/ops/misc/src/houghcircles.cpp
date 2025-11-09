@@ -27,12 +27,12 @@ aura::Status HoughCirclesSampleTest(aura::Context *ctx, aura::TargetType type)
     std::vector<aura::Scalar> dst;
 
     // set interface parameters
-    MI_F64 dp           = 2;
-    MI_F64 min_dist     = 115;
-    MI_F64 canny_thresh = 100;
-    MI_F64 acc_thresh   = 30;
-    MI_S32 min_radius   = 1;
-    MI_S32 max_radius   = 130;
+    DT_F64 dp           = 2;
+    DT_F64 min_dist     = 115;
+    DT_F64 canny_thresh = 100;
+    DT_F64 acc_thresh   = 30;
+    DT_S32 min_radius   = 1;
+    DT_S32 max_radius   = 130;
     auto method         = aura::HoughCirclesMethod::HOUGH_GRADIENT;
 
     // ---------------------

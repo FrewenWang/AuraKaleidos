@@ -7,7 +7,7 @@
 namespace aura
 {
 
-static const MI_U8 ctrl_perm_u8[] __attribute__((aligned(128))) =
+static const DT_U8 ctrl_perm_u8[] __attribute__((aligned(128))) =
 {
     0x00,0x00,0x00,0x00,0x01,0x02,0x01,0x09,0x02,0x03,0x04,0x06,0x02,0x10,0x13,0x16,
     0x05,0x05,0x06,0x05,0x08,0x0C,0x0C,0x0C,0x05,0x06,0x21,0x21,0x26,0x2F,0x2C,0x2A,
@@ -65,7 +65,7 @@ static const MI_U8 ctrl_perm_u8[] __attribute__((aligned(128))) =
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 };
 
-static const MI_U8 ctrl_perm_u16[] __attribute__((aligned(128))) =
+static const DT_U8 ctrl_perm_u16[] __attribute__((aligned(128))) =
 {
     0x00,0x00,0x00,0x00,0x01,0x02,0x01,0x09,0x02,0x03,0x04,0x06,0x02,0x10,0x13,0x16,
     0x05,0x05,0x06,0x05,0x08,0x0C,0x0C,0x0C,0x05,0x06,0x21,0x21,0x26,0x2F,0x2C,0x2A,
@@ -168,7 +168,7 @@ static const MI_U8 ctrl_perm_u16[] __attribute__((aligned(128))) =
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 };
 
-AURA_ALWAYS_INLINE AURA_VOID MipiUnpackRowCoreU8(HVX_Vector &vu8_src0, HVX_Vector &vu8_src1, HVX_Vector &vu8_src2, HVX_Vector &vu8_src3, HVX_Vector &vu8_src4,
+AURA_ALWAYS_INLINE DT_VOID MipiUnpackRowCoreU8(HVX_Vector &vu8_src0, HVX_Vector &vu8_src1, HVX_Vector &vu8_src2, HVX_Vector &vu8_src3, HVX_Vector &vu8_src4,
                                                HVX_Vector &vu8_dst0, HVX_Vector &vu8_dst1, HVX_Vector &vu8_dst2, HVX_Vector &vu8_dst3)
 {
     HVX_Vector *ctrl_data      = (HVX_Vector *)ctrl_perm_u8;
@@ -179,13 +179,13 @@ AURA_ALWAYS_INLINE AURA_VOID MipiUnpackRowCoreU8(HVX_Vector &vu8_src0, HVX_Vecto
     HVX_Vector vu8_ctrl_msb_e  = ctrl_data[4];
     HVX_Vector qu8_pred        = ctrl_data[5];
 
-    MI_S32 pos0 = 0x1010101;
-    MI_S32 pos1 = pos0 + pos0;
-    MI_S32 pos2 = pos1 + pos1;
-    MI_S32 pos3 = pos2 + pos2;
-    MI_S32 pos4 = pos3 + pos3;
-    MI_S32 pos5 = pos4 + pos4;
-    MI_S32 pos6 = pos5 + pos5;
+    DT_S32 pos0 = 0x1010101;
+    DT_S32 pos1 = pos0 + pos0;
+    DT_S32 pos2 = pos1 + pos1;
+    DT_S32 pos3 = pos2 + pos2;
+    DT_S32 pos4 = pos3 + pos3;
+    DT_S32 pos5 = pos4 + pos4;
+    DT_S32 pos6 = pos5 + pos5;
 
     HVX_Vector vu8_perm_msb0, vu8_perm_msb1, vu8_perm_msb2, vu8_perm_msb3, vu8_perm_msb4;
     HVX_VectorPred qu8_pred0, qu8_pred2, qu8_pred4, qu8_pred6;
@@ -207,15 +207,15 @@ AURA_ALWAYS_INLINE AURA_VOID MipiUnpackRowCoreU8(HVX_Vector &vu8_src0, HVX_Vecto
     vu8_dst3 = Q6_V_vmux_QVV(qu8_pred6, vu8_perm_msb3, vu8_perm_msb4);
 }
 
-template <typename Dt, typename std::enable_if<std::is_same<Dt, MI_U8>::value>::type* = MI_NULL>
-static AURA_VOID MipiUnPackRow(const MI_U8 *src, Dt *dst, MI_S32 width)
+template <typename Dt, typename std::enable_if<std::is_same<Dt, DT_U8>::value>::type* = DT_NULL>
+static DT_VOID MipiUnPackRow(const DT_U8 *src, Dt *dst, DT_S32 width)
 {
-    MI_S32 width_algin = width & (-4 * AURA_HVLEN);
+    DT_S32 width_algin = width & (-4 * AURA_HVLEN);
 
     HVX_Vector vu8_src0, vu8_src1, vu8_src2, vu8_src3, vu8_src4;
     HVX_Vector vu8_dst0, vu8_dst1, vu8_dst2, vu8_dst3;
     
-    for (MI_S32 x = 0; x < width_algin; x += 4 * AURA_HVLEN)
+    for (DT_S32 x = 0; x < width_algin; x += 4 * AURA_HVLEN)
     {
         vload(src, vu8_src0);
         vload(src + AURA_HVLEN, vu8_src1);
@@ -236,7 +236,7 @@ static AURA_VOID MipiUnPackRow(const MI_U8 *src, Dt *dst, MI_S32 width)
     // tail
     if (width - width_algin)
     {
-        MI_S32 length = ((width - width_algin) >> 2) * 5;
+        DT_S32 length = ((width - width_algin) >> 2) * 5;
         dst = dst + (width - width_algin) - (AURA_HVLEN << 2);
 
         vload(src + length - AURA_HVLEN * 5, vu8_src0);
@@ -254,7 +254,7 @@ static AURA_VOID MipiUnPackRow(const MI_U8 *src, Dt *dst, MI_S32 width)
     }
 }
 
-AURA_ALWAYS_INLINE AURA_VOID MipiUnPackRowCoreU16(HVX_Vector &vu8_src0, HVX_Vector &vu8_src1, HVX_Vector &vu8_src2, HVX_Vector &vu8_src3, HVX_Vector &vu8_src4,
+AURA_ALWAYS_INLINE DT_VOID MipiUnPackRowCoreU16(HVX_Vector &vu8_src0, HVX_Vector &vu8_src1, HVX_Vector &vu8_src2, HVX_Vector &vu8_src3, HVX_Vector &vu8_src4,
                                                 HVX_VectorPair &wu16_dst0, HVX_VectorPair &wu16_dst1, HVX_VectorPair &wu16_dst2, HVX_VectorPair &wu16_dst3)
 {
     HVX_Vector *ctrl_data = (HVX_Vector *)ctrl_perm_u16;
@@ -271,7 +271,7 @@ AURA_ALWAYS_INLINE AURA_VOID MipiUnPackRowCoreU16(HVX_Vector &vu8_src0, HVX_Vect
     HVX_Vector vu8_ctrl_lsb_e  = ctrl_data[9];
     HVX_Vector qu8_pred        = ctrl_data[10];
 
-    MI_S32 const0401 = 0x04010401;
+    DT_S32 const0401 = 0x04010401;
 
     HVX_Vector vu8_const_3 = Q6_V_vsplat_R(0x03030303);
     HVX_Vector vu8_shift   = Q6_V_vsplat_R(0x40000);
@@ -279,14 +279,14 @@ AURA_ALWAYS_INLINE AURA_VOID MipiUnPackRowCoreU16(HVX_Vector &vu8_src0, HVX_Vect
 
     HVX_VectorPred qu8_oddeven = Q6_Q_vcmp_eq_VbVb(vu8_oddeven, vu8_const_3);
 
-    MI_S32 pos0 = 0x1010101;
-    MI_S32 pos1 = pos0 + pos0;
-    MI_S32 pos2 = pos1 + pos1;
-    MI_S32 pos3 = pos2 + pos2;
-    MI_S32 pos4 = pos3 + pos3;
-    MI_S32 pos5 = pos4 + pos4;
-    MI_S32 pos6 = pos5 + pos5;
-    MI_S32 pos7 = pos6 + pos6;
+    DT_S32 pos0 = 0x1010101;
+    DT_S32 pos1 = pos0 + pos0;
+    DT_S32 pos2 = pos1 + pos1;
+    DT_S32 pos3 = pos2 + pos2;
+    DT_S32 pos4 = pos3 + pos3;
+    DT_S32 pos5 = pos4 + pos4;
+    DT_S32 pos6 = pos5 + pos5;
+    DT_S32 pos7 = pos6 + pos6;
 
     HVX_Vector vu8_shift04, vu8_shift26;
     HVX_VectorPair wu16_out_perm0, wu16_out_perm1, wu16_out_perm2, wu16_out_perm3;
@@ -351,16 +351,16 @@ AURA_ALWAYS_INLINE AURA_VOID MipiUnPackRowCoreU16(HVX_Vector &vu8_src0, HVX_Vect
     wu16_dst3 = Q6_W_vshuff_VVR(Q6_V_hi_W(wu16_out_perm3), Q6_V_lo_W(wu16_out_perm3), -2);
 }
 
-template <typename Dt, typename std::enable_if<std::is_same<Dt, MI_U16>::value>::type* = MI_NULL>
-static AURA_VOID MipiUnPackRow(const MI_U8 *src, Dt *dst, MI_S32 width)
+template <typename Dt, typename std::enable_if<std::is_same<Dt, DT_U16>::value>::type* = DT_NULL>
+static DT_VOID MipiUnPackRow(const DT_U8 *src, Dt *dst, DT_S32 width)
 {
-    MI_U8 *dst_data    = (MI_U8 *)dst;
-    MI_S32 width_algin = width & (-4 * AURA_HVLEN);
+    DT_U8 *dst_data    = (DT_U8 *)dst;
+    DT_S32 width_algin = width & (-4 * AURA_HVLEN);
 
     HVX_Vector vu8_src0, vu8_src1, vu8_src2, vu8_src3, vu8_src4;
     HVX_VectorPair wu16_dst0, wu16_dst1, wu16_dst2, wu16_dst3;
 
-    for (MI_S32 x = 0; x < width_algin; x += 4 * AURA_HVLEN)
+    for (DT_S32 x = 0; x < width_algin; x += 4 * AURA_HVLEN)
     {
         vload(src, vu8_src0);
         vload(src + AURA_HVLEN, vu8_src1);
@@ -395,7 +395,7 @@ static AURA_VOID MipiUnPackRow(const MI_U8 *src, Dt *dst, MI_S32 width)
     // remain
     if (width - width_algin)
     {
-        MI_S32 length = ((width - width_algin) >> 2) * 5;
+        DT_S32 length = ((width - width_algin) >> 2) * 5;
         dst_data = dst_data + ((width - width_algin) << 1) - (AURA_HVLEN << 3);
 
         vload(src + length - AURA_HVLEN * 5, vu8_src0);
@@ -428,22 +428,22 @@ static AURA_VOID MipiUnPackRow(const MI_U8 *src, Dt *dst, MI_S32 width)
 }
 
 template<typename Dt>
-static Status MipiUnPackHvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status MipiUnPackHvxImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 iwidth = src.GetSizes().m_width;
-    MI_S32 height = src.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
-    MI_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 iwidth = src.GetSizes().m_width;
+    DT_S32 height = src.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
+    DT_S32 owidth = dst.GetSizes().m_width;
 
-    MI_U64 L2fetch_param = L2PfParam(istride, iwidth * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 L2fetch_param = L2PfParam(istride, iwidth * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 1 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U8>(y + 1)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U8>(y + 1)), L2fetch_param);
         }
 
-        const MI_U8 *src_row = src.Ptr<MI_U8>(y);
+        const DT_U8 *src_row = src.Ptr<DT_U8>(y);
         Dt *dst_row = dst.Ptr<Dt>(y);
         MipiUnPackRow<Dt>(src_row, dst_row, owidth);
     }
@@ -480,39 +480,39 @@ Status MipiUnPackHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return ret;
     }
 
     WorkerPool *wp = m_ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height = src->GetSizes().m_height;
+    DT_S32 height = src->GetSizes().m_height;
 
     switch (dst->GetElemType())
     {
         case ElemType::U8:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, MipiUnPackHvxImpl<MI_U8>, std::cref(*src), std::ref(*dst));
+            ret = wp->ParallelFor((DT_S32)0, height, MipiUnPackHvxImpl<DT_U8>, std::cref(*src), std::ref(*dst));
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MipiUnPackHvxImpl<MI_U8> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "MipiUnPackHvxImpl<DT_U8> failed");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, MipiUnPackHvxImpl<MI_U16>, std::cref(*src), std::ref(*dst));
+            ret = wp->ParallelFor((DT_S32)0, height, MipiUnPackHvxImpl<DT_U16>, std::cref(*src), std::ref(*dst));
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "MipiUnPackHvxImpl<MI_U16> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "MipiUnPackHvxImpl<DT_U16> failed");
             }
             break;
         }

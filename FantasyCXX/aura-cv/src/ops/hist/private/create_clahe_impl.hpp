@@ -20,7 +20,7 @@ class CreateClAHEImpl : public OpImpl
 public:
     CreateClAHEImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_F64 clip_limit = 40.0, const Sizes &tile_grid_size = Sizes(8, 8));
+    virtual Status SetArgs(const Array *src, Array *dst, DT_F64 clip_limit = 40.0, const Sizes &tile_grid_size = Sizes(8, 8));
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -28,10 +28,10 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    MI_F64 m_clip_limit;
+    DT_F64 m_clip_limit;
     Sizes  m_tile_grid_size;
 
     const Array *m_src;
@@ -43,7 +43,7 @@ class CreateClAHENone : public CreateClAHEImpl
 public:
     CreateClAHENone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F64 clip_limit = 40.0, const Sizes &tile_grid_size = Sizes(8, 8)) override;
+    Status SetArgs(const Array *src, Array *dst, DT_F64 clip_limit = 40.0, const Sizes &tile_grid_size = Sizes(8, 8)) override;
 
     Status Run() override;
 };

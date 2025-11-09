@@ -6,26 +6,26 @@
 namespace aura
 {
 
-// Tp = MI_U8, MI_S8
+// Tp = DT_U8, DT_S8
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, Status>::type
-ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, Status>::type
+ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 owidth       = dst.GetSizes().m_width;
-    MI_S32 width_align8 = owidth & (-8);
+    DT_S32 owidth       = dst.GetSizes().m_width;
+    DT_S32 width_align8 = owidth & (-8);
     using MVType        = typename neon::MDVector<Tp, 2>::MVType;
 
-    for (MI_S32 dy = start_row; dy < end_row; dy++)
+    for (DT_S32 dy = start_row; dy < end_row; dy++)
     {
         // hresize two row
-        MI_S32 sy        = dy << 2;
+        DT_S32 sy        = dy << 2;
         const Tp *src_c  = src.Ptr<Tp>(sy);
         const Tp *src_n0 = src.Ptr<Tp>(sy + 1);
         const Tp *src_n1 = src.Ptr<Tp>(sy + 2);
         const Tp *src_n2 = src.Ptr<Tp>(sy + 3);
         Tp *dst_row      = dst.Ptr<Tp>(dy);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align8; x += 8)
         {
             auto v2q8_cx0  = neon::vload2q(src_c);
@@ -71,22 +71,22 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             int16x8_t vqs16_n2_c1_12 = neon::vaddl(neon::vgethigh(v2q8_n2_3.val[0]), neon::vgetlow(v2q8_n2_3.val[1]));
             int16x8_t vqs16_n2_c1_03 = neon::vaddl(neon::vgetlow(v2q8_n2_3.val[0]), neon::vgethigh(v2q8_n2_3.val[1]));
 
-            int16x8_t vqs16_c_c0_x19     = neon::vmul(vqs16_c_c0_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_c_c0_result  = neon::vmls(vqs16_c_c0_x19, vqs16_c_c0_03, static_cast<MI_S16>(3));
-            int16x8_t vqs16_c_c1_x19     = neon::vmul(vqs16_c_c1_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_c_c1_result  = neon::vmls(vqs16_c_c1_x19, vqs16_c_c1_03, static_cast<MI_S16>(3));
-            int16x8_t vqs16_n0_c0_x19    = neon::vmul(vqs16_n0_c0_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_n0_c0_result = neon::vmls(vqs16_n0_c0_x19, vqs16_n0_c0_03, static_cast<MI_S16>(3));
-            int16x8_t vqs16_n0_c1_x19    = neon::vmul(vqs16_n0_c1_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_n0_c1_result = neon::vmls(vqs16_n0_c1_x19, vqs16_n0_c1_03, static_cast<MI_S16>(3));
-            int16x8_t vqs16_n1_c0_x19    = neon::vmul(vqs16_n1_c0_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_n1_c0_result = neon::vmls(vqs16_n1_c0_x19, vqs16_n1_c0_03, static_cast<MI_S16>(3));
-            int16x8_t vqs16_n1_c1_x19    = neon::vmul(vqs16_n1_c1_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_n1_c1_result = neon::vmls(vqs16_n1_c1_x19, vqs16_n1_c1_03, static_cast<MI_S16>(3));
-            int16x8_t vqs16_n2_c0_x19    = neon::vmul(vqs16_n2_c0_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_n2_c0_result = neon::vmls(vqs16_n2_c0_x19, vqs16_n2_c0_03, static_cast<MI_S16>(3));
-            int16x8_t vqs16_n2_c1_x19    = neon::vmul(vqs16_n2_c1_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_n2_c1_result = neon::vmls(vqs16_n2_c1_x19, vqs16_n2_c1_03, static_cast<MI_S16>(3));
+            int16x8_t vqs16_c_c0_x19     = neon::vmul(vqs16_c_c0_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_c_c0_result  = neon::vmls(vqs16_c_c0_x19, vqs16_c_c0_03, static_cast<DT_S16>(3));
+            int16x8_t vqs16_c_c1_x19     = neon::vmul(vqs16_c_c1_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_c_c1_result  = neon::vmls(vqs16_c_c1_x19, vqs16_c_c1_03, static_cast<DT_S16>(3));
+            int16x8_t vqs16_n0_c0_x19    = neon::vmul(vqs16_n0_c0_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_n0_c0_result = neon::vmls(vqs16_n0_c0_x19, vqs16_n0_c0_03, static_cast<DT_S16>(3));
+            int16x8_t vqs16_n0_c1_x19    = neon::vmul(vqs16_n0_c1_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_n0_c1_result = neon::vmls(vqs16_n0_c1_x19, vqs16_n0_c1_03, static_cast<DT_S16>(3));
+            int16x8_t vqs16_n1_c0_x19    = neon::vmul(vqs16_n1_c0_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_n1_c0_result = neon::vmls(vqs16_n1_c0_x19, vqs16_n1_c0_03, static_cast<DT_S16>(3));
+            int16x8_t vqs16_n1_c1_x19    = neon::vmul(vqs16_n1_c1_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_n1_c1_result = neon::vmls(vqs16_n1_c1_x19, vqs16_n1_c1_03, static_cast<DT_S16>(3));
+            int16x8_t vqs16_n2_c0_x19    = neon::vmul(vqs16_n2_c0_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_n2_c0_result = neon::vmls(vqs16_n2_c0_x19, vqs16_n2_c0_03, static_cast<DT_S16>(3));
+            int16x8_t vqs16_n2_c1_x19    = neon::vmul(vqs16_n2_c1_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_n2_c1_result = neon::vmls(vqs16_n2_c1_x19, vqs16_n2_c1_03, static_cast<DT_S16>(3));
 
             int32x4_t vqs32_c0_result_lo12 = neon::vaddl(neon::vgetlow(vqs16_n0_c0_result), neon::vgetlow(vqs16_n1_c0_result));
             int32x4_t vqs32_c0_result_hi12 = neon::vaddl(neon::vgethigh(vqs16_n0_c0_result), neon::vgethigh(vqs16_n1_c0_result));
@@ -97,14 +97,14 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             int32x4_t vqs32_c1_result_lo03 = neon::vaddl(neon::vgetlow(vqs16_c_c1_result), neon::vgetlow(vqs16_n2_c1_result));
             int32x4_t vqs32_c1_result_hi03 = neon::vaddl(neon::vgethigh(vqs16_c_c1_result), neon::vgethigh(vqs16_n2_c1_result));
 
-            int32x4_t vqs32_c0_x19_lo    = neon::vmul(vqs32_c0_result_lo12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c0_result_lo = neon::vmls(vqs32_c0_x19_lo, vqs32_c0_result_lo03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c0_x19_hi    = neon::vmul(vqs32_c0_result_hi12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c0_result_hi = neon::vmls(vqs32_c0_x19_hi, vqs32_c0_result_hi03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c1_x19_lo    = neon::vmul(vqs32_c1_result_lo12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c1_result_lo = neon::vmls(vqs32_c1_x19_lo, vqs32_c1_result_lo03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c1_x19_hi    = neon::vmul(vqs32_c1_result_hi12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c1_result_hi = neon::vmls(vqs32_c1_x19_hi, vqs32_c1_result_hi03, static_cast<MI_S32>(3));
+            int32x4_t vqs32_c0_x19_lo    = neon::vmul(vqs32_c0_result_lo12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c0_result_lo = neon::vmls(vqs32_c0_x19_lo, vqs32_c0_result_lo03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c0_x19_hi    = neon::vmul(vqs32_c0_result_hi12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c0_result_hi = neon::vmls(vqs32_c0_x19_hi, vqs32_c0_result_hi03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c1_x19_lo    = neon::vmul(vqs32_c1_result_lo12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c1_result_lo = neon::vmls(vqs32_c1_x19_lo, vqs32_c1_result_lo03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c1_x19_hi    = neon::vmul(vqs32_c1_result_hi12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c1_result_hi = neon::vmls(vqs32_c1_x19_hi, vqs32_c1_result_hi03, static_cast<DT_S32>(3));
 
             int16x4_t vds16_c0_des_lo = neon::vrshrn_n<10>(vqs32_c0_result_lo);
             int16x4_t vds16_c0_des_hi = neon::vrshrn_n<10>(vqs32_c0_result_hi);
@@ -112,12 +112,12 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             int16x4_t vds16_c1_des_hi = neon::vrshrn_n<10>(vqs32_c1_result_hi);
 
             MVType mvd8_result;
-            if (std::is_same<Tp, MI_U8>::value)
+            if (std::is_same<Tp, DT_U8>::value)
             {
                 int16x8_t vqs16_zero;
-                neon::vdup(vqs16_zero, static_cast<MI_S16>(0));
+                neon::vdup(vqs16_zero, static_cast<DT_S16>(0));
                 int16x8_t vqs16_255;
-                neon::vdup(vqs16_255, static_cast<MI_S16>(255));
+                neon::vdup(vqs16_255, static_cast<DT_S16>(255));
 
                 int16x8_t vqs16_c0_des  = neon::vcombine(vds16_c0_des_lo, vds16_c0_des_hi);
                 int16x8_t vqs16_c1_des  = neon::vcombine(vds16_c1_des_lo, vds16_c1_des_hi);
@@ -134,9 +134,9 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             else
             {
                 int16x8_t vqs16_n128;
-                neon::vdup(vqs16_n128, static_cast<MI_S16>(-128));
+                neon::vdup(vqs16_n128, static_cast<DT_S16>(-128));
                 int16x8_t vqs16_p127;
-                neon::vdup(vqs16_p127, static_cast<MI_S16>(127));
+                neon::vdup(vqs16_p127, static_cast<DT_S16>(127));
 
                 int16x8_t vqs16_c0_des = neon::vcombine(vds16_c0_des_lo, vds16_c0_des_hi);
                 int16x8_t vqs16_c1_des = neon::vcombine(vds16_c1_des_lo, vds16_c1_des_hi);
@@ -158,18 +158,18 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
 
         for (; x < owidth; x++)
         {
-            MI_S32 y00   = (src_c[2] + src_c[4]) * 19 - (src_c[0] + src_c[6]) * 3;
-            MI_S32 y10   = (src_n0[2] + src_n0[4]) * 19 - (src_n0[0] + src_n0[6]) * 3;
-            MI_S32 y20   = (src_n1[2] + src_n1[4]) * 19 - (src_n1[0] + src_n1[6]) * 3;
-            MI_S32 y30   = (src_n2[2] + src_n2[4]) * 19 - (src_n2[0] + src_n2[6]) * 3;
-            MI_S32 temp0 = (y10 * 19 - y00 * 3 + y20 * 19 - y30 * 3 + 512) >> 10;
+            DT_S32 y00   = (src_c[2] + src_c[4]) * 19 - (src_c[0] + src_c[6]) * 3;
+            DT_S32 y10   = (src_n0[2] + src_n0[4]) * 19 - (src_n0[0] + src_n0[6]) * 3;
+            DT_S32 y20   = (src_n1[2] + src_n1[4]) * 19 - (src_n1[0] + src_n1[6]) * 3;
+            DT_S32 y30   = (src_n2[2] + src_n2[4]) * 19 - (src_n2[0] + src_n2[6]) * 3;
+            DT_S32 temp0 = (y10 * 19 - y00 * 3 + y20 * 19 - y30 * 3 + 512) >> 10;
             *dst_row     = SaturateCast<Tp>(temp0);
 
-            MI_S32 y01     = (src_c[3] + src_c[5]) * 19 - (src_c[1] + src_c[7]) * 3;
-            MI_S32 y11     = (src_n0[3] + src_n0[5]) * 19 - (src_n0[1] + src_n0[7]) * 3;
-            MI_S32 y21     = (src_n1[3] + src_n1[5]) * 19 - (src_n1[1] + src_n1[7]) * 3;
-            MI_S32 y31     = (src_n2[3] + src_n2[5]) * 19 - (src_n2[1] + src_n2[7]) * 3;
-            MI_S32 temp1   = (y11 * 19 - y01 * 3 + y21 * 19 - y31 * 3 + 512) >> 10;
+            DT_S32 y01     = (src_c[3] + src_c[5]) * 19 - (src_c[1] + src_c[7]) * 3;
+            DT_S32 y11     = (src_n0[3] + src_n0[5]) * 19 - (src_n0[1] + src_n0[7]) * 3;
+            DT_S32 y21     = (src_n1[3] + src_n1[5]) * 19 - (src_n1[1] + src_n1[7]) * 3;
+            DT_S32 y31     = (src_n2[3] + src_n2[5]) * 19 - (src_n2[1] + src_n2[7]) * 3;
+            DT_S32 temp1   = (y11 * 19 - y01 * 3 + y21 * 19 - y31 * 3 + 512) >> 10;
             *(dst_row + 1) = SaturateCast<Tp>(temp1);
 
             dst_row += 2;
@@ -183,26 +183,26 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
     return Status::OK;
 }
 
-// Tp = MI_U16, MI_S16
+// Tp = DT_U16, DT_S16
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, Status>::type
-ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, Status>::type
+ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 owidth       = dst.GetSizes().m_width;
-    MI_S32 width_align4 = owidth & (-4);
+    DT_S32 owidth       = dst.GetSizes().m_width;
+    DT_S32 width_align4 = owidth & (-4);
     using MVType        = typename neon::MDVector<Tp, 2>::MVType;
 
-    for (MI_S32 dy = start_row; dy < end_row; dy++)
+    for (DT_S32 dy = start_row; dy < end_row; dy++)
     {
         // hresize two row
-        MI_S32 sy        = dy << 2;
+        DT_S32 sy        = dy << 2;
         const Tp *src_c  = src.Ptr<Tp>(sy);
         const Tp *src_n0 = src.Ptr<Tp>(sy + 1);
         const Tp *src_n1 = src.Ptr<Tp>(sy + 2);
         const Tp *src_n2 = src.Ptr<Tp>(sy + 3);
         Tp *dst_row      = dst.Ptr<Tp>(dy);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align4; x += 4)
         {
             auto v2q16_cx0  = neon::vload2q(src_c);
@@ -248,42 +248,42 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             int32x4_t vqs32_n2_c1_12 = neon::vaddl(neon::vgethigh(v2q16_n2_3.val[0]), neon::vgetlow(v2q16_n2_3.val[1]));
             int32x4_t vqs32_n2_c1_03 = neon::vaddl(neon::vgetlow(v2q16_n2_3.val[0]), neon::vgethigh(v2q16_n2_3.val[1]));
 
-            int32x4_t vqs32_c_c0_x19     = neon::vmul(vqs32_c_c0_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c_c0_result  = neon::vmls(vqs32_c_c0_x19, vqs32_c_c0_03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c_c1_x19     = neon::vmul(vqs32_c_c1_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c_c1_result  = neon::vmls(vqs32_c_c1_x19, vqs32_c_c1_03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_n0_c0_x19    = neon::vmul(vqs32_n0_c0_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_n0_c0_result = neon::vmls(vqs32_n0_c0_x19, vqs32_n0_c0_03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_n0_c1_x19    = neon::vmul(vqs32_n0_c1_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_n0_c1_result = neon::vmls(vqs32_n0_c1_x19, vqs32_n0_c1_03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_n1_c0_x19    = neon::vmul(vqs32_n1_c0_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_n1_c0_result = neon::vmls(vqs32_n1_c0_x19, vqs32_n1_c0_03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_n1_c1_x19    = neon::vmul(vqs32_n1_c1_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_n1_c1_result = neon::vmls(vqs32_n1_c1_x19, vqs32_n1_c1_03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_n2_c0_x19    = neon::vmul(vqs32_n2_c0_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_n2_c0_result = neon::vmls(vqs32_n2_c0_x19, vqs32_n2_c0_03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_n2_c1_x19    = neon::vmul(vqs32_n2_c1_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_n2_c1_result = neon::vmls(vqs32_n2_c1_x19, vqs32_n2_c1_03, static_cast<MI_S32>(3));
+            int32x4_t vqs32_c_c0_x19     = neon::vmul(vqs32_c_c0_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c_c0_result  = neon::vmls(vqs32_c_c0_x19, vqs32_c_c0_03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c_c1_x19     = neon::vmul(vqs32_c_c1_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c_c1_result  = neon::vmls(vqs32_c_c1_x19, vqs32_c_c1_03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_n0_c0_x19    = neon::vmul(vqs32_n0_c0_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_n0_c0_result = neon::vmls(vqs32_n0_c0_x19, vqs32_n0_c0_03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_n0_c1_x19    = neon::vmul(vqs32_n0_c1_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_n0_c1_result = neon::vmls(vqs32_n0_c1_x19, vqs32_n0_c1_03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_n1_c0_x19    = neon::vmul(vqs32_n1_c0_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_n1_c0_result = neon::vmls(vqs32_n1_c0_x19, vqs32_n1_c0_03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_n1_c1_x19    = neon::vmul(vqs32_n1_c1_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_n1_c1_result = neon::vmls(vqs32_n1_c1_x19, vqs32_n1_c1_03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_n2_c0_x19    = neon::vmul(vqs32_n2_c0_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_n2_c0_result = neon::vmls(vqs32_n2_c0_x19, vqs32_n2_c0_03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_n2_c1_x19    = neon::vmul(vqs32_n2_c1_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_n2_c1_result = neon::vmls(vqs32_n2_c1_x19, vqs32_n2_c1_03, static_cast<DT_S32>(3));
 
             int32x4_t vqs32_c0_result_12 = neon::vadd(vqs32_n0_c0_result, vqs32_n1_c0_result);
             int32x4_t vqs32_c0_result_03 = neon::vadd(vqs32_c_c0_result, vqs32_n2_c0_result);
             int32x4_t vqs32_c1_result_12 = neon::vadd(vqs32_n0_c1_result, vqs32_n1_c1_result);
             int32x4_t vqs32_c1_result_03 = neon::vadd(vqs32_c_c1_result, vqs32_n2_c1_result);
 
-            int32x4_t vqs32_c0_x19    = neon::vmul(vqs32_c0_result_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c0_result = neon::vmls(vqs32_c0_x19, vqs32_c0_result_03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c1_x19    = neon::vmul(vqs32_c1_result_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c1_result = neon::vmls(vqs32_c1_x19, vqs32_c1_result_03, static_cast<MI_S32>(3));
+            int32x4_t vqs32_c0_x19    = neon::vmul(vqs32_c0_result_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c0_result = neon::vmls(vqs32_c0_x19, vqs32_c0_result_03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c1_x19    = neon::vmul(vqs32_c1_result_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c1_result = neon::vmls(vqs32_c1_x19, vqs32_c1_result_03, static_cast<DT_S32>(3));
             int32x4_t vqs32_c0_des    = neon::vrshr_n<10>(vqs32_c0_result);
             int32x4_t vqs32_c1_des    = neon::vrshr_n<10>(vqs32_c1_result);
 
             MVType mvd16_result;
-            if (std::is_same<Tp, MI_U16>::value)
+            if (std::is_same<Tp, DT_U16>::value)
             {
                 int32x4_t vqs32_zero;
-                neon::vdup(vqs32_zero, static_cast<MI_S32>(0));
+                neon::vdup(vqs32_zero, static_cast<DT_S32>(0));
                 int32x4_t vqs32_65535;
-                neon::vdup(vqs32_65535, static_cast<MI_S32>(65535));
+                neon::vdup(vqs32_65535, static_cast<DT_S32>(65535));
 
                 vqs32_c0_des = neon::vmax(vqs32_c0_des, vqs32_zero);
                 vqs32_c0_des = neon::vmin(vqs32_c0_des, vqs32_65535);
@@ -299,9 +299,9 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             else
             {
                 int32x4_t vqs32_n32768;
-                neon::vdup(vqs32_n32768, static_cast<MI_S32>(-32768));
+                neon::vdup(vqs32_n32768, static_cast<DT_S32>(-32768));
                 int32x4_t vqs32_p32767;
-                neon::vdup(vqs32_p32767, static_cast<MI_S32>(32767));
+                neon::vdup(vqs32_p32767, static_cast<DT_S32>(32767));
 
                 vqs32_c0_des = neon::vmax(vqs32_c0_des, vqs32_n32768);
                 vqs32_c0_des = neon::vmin(vqs32_c0_des, vqs32_p32767);
@@ -321,18 +321,18 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
 
         for (; x < owidth; x++)
         {
-            MI_S32 y00   = (src_c[2] + src_c[4]) * 19 - (src_c[0] + src_c[6]) * 3;
-            MI_S32 y10   = (src_n0[2] + src_n0[4]) * 19 - (src_n0[0] + src_n0[6]) * 3;
-            MI_S32 y20   = (src_n1[2] + src_n1[4]) * 19 - (src_n1[0] + src_n1[6]) * 3;
-            MI_S32 y30   = (src_n2[2] + src_n2[4]) * 19 - (src_n2[0] + src_n2[6]) * 3;
-            MI_S32 temp0 = (y10 * 19 - y00 * 3 + y20 * 19 - y30 * 3 + 512) >> 10;
+            DT_S32 y00   = (src_c[2] + src_c[4]) * 19 - (src_c[0] + src_c[6]) * 3;
+            DT_S32 y10   = (src_n0[2] + src_n0[4]) * 19 - (src_n0[0] + src_n0[6]) * 3;
+            DT_S32 y20   = (src_n1[2] + src_n1[4]) * 19 - (src_n1[0] + src_n1[6]) * 3;
+            DT_S32 y30   = (src_n2[2] + src_n2[4]) * 19 - (src_n2[0] + src_n2[6]) * 3;
+            DT_S32 temp0 = (y10 * 19 - y00 * 3 + y20 * 19 - y30 * 3 + 512) >> 10;
             *dst_row     = SaturateCast<Tp>(temp0);
 
-            MI_S32 y01     = (src_c[3] + src_c[5]) * 19 - (src_c[1] + src_c[7]) * 3;
-            MI_S32 y11     = (src_n0[3] + src_n0[5]) * 19 - (src_n0[1] + src_n0[7]) * 3;
-            MI_S32 y21     = (src_n1[3] + src_n1[5]) * 19 - (src_n1[1] + src_n1[7]) * 3;
-            MI_S32 y31     = (src_n2[3] + src_n2[5]) * 19 - (src_n2[1] + src_n2[7]) * 3;
-            MI_S32 temp1   = (y11 * 19 - y01 * 3 + y21 * 19 - y31 * 3 + 512) >> 10;
+            DT_S32 y01     = (src_c[3] + src_c[5]) * 19 - (src_c[1] + src_c[7]) * 3;
+            DT_S32 y11     = (src_n0[3] + src_n0[5]) * 19 - (src_n0[1] + src_n0[7]) * 3;
+            DT_S32 y21     = (src_n1[3] + src_n1[5]) * 19 - (src_n1[1] + src_n1[7]) * 3;
+            DT_S32 y31     = (src_n2[3] + src_n2[5]) * 19 - (src_n2[1] + src_n2[7]) * 3;
+            DT_S32 temp1   = (y11 * 19 - y01 * 3 + y21 * 19 - y31 * 3 + 512) >> 10;
             *(dst_row + 1) = SaturateCast<Tp>(temp1);
 
             dst_row += 2;
@@ -350,22 +350,22 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
 #if defined(AURA_ENABLE_NEON_FP16)
 template <typename Tp>
 static typename std::enable_if<std::is_same<MI_F16, Tp>::value, Status>::type
-ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 owidth       = dst.GetSizes().m_width;
-    MI_S32 width_align4 = owidth & (-4);
+    DT_S32 owidth       = dst.GetSizes().m_width;
+    DT_S32 width_align4 = owidth & (-4);
 
-    for (MI_S32 dy = start_row; dy < end_row; dy++)
+    for (DT_S32 dy = start_row; dy < end_row; dy++)
     {
         // hresize two row
-        MI_S32 sy        = dy << 2;
+        DT_S32 sy        = dy << 2;
         const Tp *src_c  = src.Ptr<Tp>(sy);
         const Tp *src_n0 = src.Ptr<Tp>(sy + 1);
         const Tp *src_n1 = src.Ptr<Tp>(sy + 2);
         const Tp *src_n2 = src.Ptr<Tp>(sy + 3);
         Tp *dst_row      = dst.Ptr<Tp>(dy);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align4; x += 4)
         {
             float16x8x2_t v2qf16_cx0  = neon::vload2q(src_c);
@@ -394,53 +394,53 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             float16x8x2_t v2qf16_n2_2 = neon::vuzp(v2qf16_n2x0.val[1], v2qf16_n2x1.val[1]);
             float16x8x2_t v2qf16_n2_3 = neon::vuzp(v2qf16_n2_2.val[0], v2qf16_n2_2.val[1]);
 
-            float32x4_t vqf32_c_c0_12  = neon::vadd(neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_c_1.val[0])),  neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_c_1.val[1])));
-            float32x4_t vqf32_c_c0_03  = neon::vadd(neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_c_1.val[0])),   neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_c_1.val[1])));
-            float32x4_t vqf32_c_c1_12  = neon::vadd(neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_c_3.val[0])),  neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_c_3.val[1])));
-            float32x4_t vqf32_c_c1_03  = neon::vadd(neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_c_3.val[0])),   neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_c_3.val[1])));
-            float32x4_t vqf32_n0_c0_12 = neon::vadd(neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n0_1.val[0])), neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n0_1.val[1])));
-            float32x4_t vqf32_n0_c0_03 = neon::vadd(neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n0_1.val[0])),  neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n0_1.val[1])));
-            float32x4_t vqf32_n0_c1_12 = neon::vadd(neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n0_3.val[0])), neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n0_3.val[1])));
-            float32x4_t vqf32_n0_c1_03 = neon::vadd(neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n0_3.val[0])),  neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n0_3.val[1])));
-            float32x4_t vqf32_n1_c0_12 = neon::vadd(neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n1_1.val[0])), neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n1_1.val[1])));
-            float32x4_t vqf32_n1_c0_03 = neon::vadd(neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n1_1.val[0])),  neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n1_1.val[1])));
-            float32x4_t vqf32_n1_c1_12 = neon::vadd(neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n1_3.val[0])), neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n1_3.val[1])));
-            float32x4_t vqf32_n1_c1_03 = neon::vadd(neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n1_3.val[0])),  neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n1_3.val[1])));
-            float32x4_t vqf32_n2_c0_12 = neon::vadd(neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n2_1.val[0])), neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n2_1.val[1])));
-            float32x4_t vqf32_n2_c0_03 = neon::vadd(neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n2_1.val[0])),  neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n2_1.val[1])));
-            float32x4_t vqf32_n2_c1_12 = neon::vadd(neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n2_3.val[0])), neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n2_3.val[1])));
-            float32x4_t vqf32_n2_c1_03 = neon::vadd(neon::vcvt<MI_F32>(neon::vgetlow(v2qf16_n2_3.val[0])),  neon::vcvt<MI_F32>(neon::vgethigh(v2qf16_n2_3.val[1])));
+            float32x4_t vqf32_c_c0_12  = neon::vadd(neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_c_1.val[0])),  neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_c_1.val[1])));
+            float32x4_t vqf32_c_c0_03  = neon::vadd(neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_c_1.val[0])),   neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_c_1.val[1])));
+            float32x4_t vqf32_c_c1_12  = neon::vadd(neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_c_3.val[0])),  neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_c_3.val[1])));
+            float32x4_t vqf32_c_c1_03  = neon::vadd(neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_c_3.val[0])),   neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_c_3.val[1])));
+            float32x4_t vqf32_n0_c0_12 = neon::vadd(neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n0_1.val[0])), neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n0_1.val[1])));
+            float32x4_t vqf32_n0_c0_03 = neon::vadd(neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n0_1.val[0])),  neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n0_1.val[1])));
+            float32x4_t vqf32_n0_c1_12 = neon::vadd(neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n0_3.val[0])), neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n0_3.val[1])));
+            float32x4_t vqf32_n0_c1_03 = neon::vadd(neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n0_3.val[0])),  neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n0_3.val[1])));
+            float32x4_t vqf32_n1_c0_12 = neon::vadd(neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n1_1.val[0])), neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n1_1.val[1])));
+            float32x4_t vqf32_n1_c0_03 = neon::vadd(neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n1_1.val[0])),  neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n1_1.val[1])));
+            float32x4_t vqf32_n1_c1_12 = neon::vadd(neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n1_3.val[0])), neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n1_3.val[1])));
+            float32x4_t vqf32_n1_c1_03 = neon::vadd(neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n1_3.val[0])),  neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n1_3.val[1])));
+            float32x4_t vqf32_n2_c0_12 = neon::vadd(neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n2_1.val[0])), neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n2_1.val[1])));
+            float32x4_t vqf32_n2_c0_03 = neon::vadd(neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n2_1.val[0])),  neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n2_1.val[1])));
+            float32x4_t vqf32_n2_c1_12 = neon::vadd(neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n2_3.val[0])), neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n2_3.val[1])));
+            float32x4_t vqf32_n2_c1_03 = neon::vadd(neon::vcvt<DT_F32>(neon::vgetlow(v2qf16_n2_3.val[0])),  neon::vcvt<DT_F32>(neon::vgethigh(v2qf16_n2_3.val[1])));
 
-            float32x4_t vqf32_c_c0_x19    = neon::vmul(vqf32_c_c0_12, static_cast<MI_F32>(0.59375));
-            float32x4_t vqf32_c_c0_x3     = neon::vmul(vqf32_c_c0_03, static_cast<MI_F32>(-0.09375));
+            float32x4_t vqf32_c_c0_x19    = neon::vmul(vqf32_c_c0_12, static_cast<DT_F32>(0.59375));
+            float32x4_t vqf32_c_c0_x3     = neon::vmul(vqf32_c_c0_03, static_cast<DT_F32>(-0.09375));
             float32x4_t vqf32_c_c0_result = neon::vadd(vqf32_c_c0_x19, vqf32_c_c0_x3);
 
-            float32x4_t vqf32_c_c1_x19    = neon::vmul(vqf32_c_c1_12, static_cast<MI_F32>(0.59375));
-            float32x4_t vqf32_c_c1_x3     = neon::vmul(vqf32_c_c1_03, static_cast<MI_F32>(-0.09375));
+            float32x4_t vqf32_c_c1_x19    = neon::vmul(vqf32_c_c1_12, static_cast<DT_F32>(0.59375));
+            float32x4_t vqf32_c_c1_x3     = neon::vmul(vqf32_c_c1_03, static_cast<DT_F32>(-0.09375));
             float32x4_t vqf32_c_c1_result = neon::vadd(vqf32_c_c1_x19, vqf32_c_c1_x3);
 
-            float32x4_t vqf32_n0_c0_x19    = neon::vmul(vqf32_n0_c0_12, static_cast<MI_F32>(0.59375));
-            float32x4_t vqf32_n0_c0_x3     = neon::vmul(vqf32_n0_c0_03, static_cast<MI_F32>(-0.09375));
+            float32x4_t vqf32_n0_c0_x19    = neon::vmul(vqf32_n0_c0_12, static_cast<DT_F32>(0.59375));
+            float32x4_t vqf32_n0_c0_x3     = neon::vmul(vqf32_n0_c0_03, static_cast<DT_F32>(-0.09375));
             float32x4_t vqf32_n0_c0_result = neon::vadd(vqf32_n0_c0_x19, vqf32_n0_c0_x3);
 
-            float32x4_t vqf32_n0_c1_x19    = neon::vmul(vqf32_n0_c1_12, static_cast<MI_F32>(0.59375));
-            float32x4_t vqf32_n0_c1_x3     = neon::vmul(vqf32_n0_c1_03, static_cast<MI_F32>(-0.09375));
+            float32x4_t vqf32_n0_c1_x19    = neon::vmul(vqf32_n0_c1_12, static_cast<DT_F32>(0.59375));
+            float32x4_t vqf32_n0_c1_x3     = neon::vmul(vqf32_n0_c1_03, static_cast<DT_F32>(-0.09375));
             float32x4_t vqf32_n0_c1_result = neon::vadd(vqf32_n0_c1_x19, vqf32_n0_c1_x3);
 
-            float32x4_t vqf32_n1_c0_x19    = neon::vmul(vqf32_n1_c0_12, static_cast<MI_F32>(0.59375));
-            float32x4_t vqf32_n1_c0_x3     = neon::vmul(vqf32_n1_c0_03, static_cast<MI_F32>(-0.09375));
+            float32x4_t vqf32_n1_c0_x19    = neon::vmul(vqf32_n1_c0_12, static_cast<DT_F32>(0.59375));
+            float32x4_t vqf32_n1_c0_x3     = neon::vmul(vqf32_n1_c0_03, static_cast<DT_F32>(-0.09375));
             float32x4_t vqf32_n1_c0_result = neon::vadd(vqf32_n1_c0_x19, vqf32_n1_c0_x3);
 
-            float32x4_t vqf32_n1_c1_x19    = neon::vmul(vqf32_n1_c1_12, static_cast<MI_F32>(0.59375));
-            float32x4_t vqf32_n1_c1_x3     = neon::vmul(vqf32_n1_c1_03, static_cast<MI_F32>(-0.09375));
+            float32x4_t vqf32_n1_c1_x19    = neon::vmul(vqf32_n1_c1_12, static_cast<DT_F32>(0.59375));
+            float32x4_t vqf32_n1_c1_x3     = neon::vmul(vqf32_n1_c1_03, static_cast<DT_F32>(-0.09375));
             float32x4_t vqf32_n1_c1_result = neon::vadd(vqf32_n1_c1_x19, vqf32_n1_c1_x3);
 
-            float32x4_t vqf32_n2_c0_x19    = neon::vmul(vqf32_n2_c0_12, static_cast<MI_F32>(0.59375));
-            float32x4_t vqf32_n2_c0_x3     = neon::vmul(vqf32_n2_c0_03, static_cast<MI_F32>(-0.09375));
+            float32x4_t vqf32_n2_c0_x19    = neon::vmul(vqf32_n2_c0_12, static_cast<DT_F32>(0.59375));
+            float32x4_t vqf32_n2_c0_x3     = neon::vmul(vqf32_n2_c0_03, static_cast<DT_F32>(-0.09375));
             float32x4_t vqf32_n2_c0_result = neon::vadd(vqf32_n2_c0_x19, vqf32_n2_c0_x3);
 
-            float32x4_t vqf32_n2_c1_x19    = neon::vmul(vqf32_n2_c1_12, static_cast<MI_F32>(0.59375));
-            float32x4_t vqf32_n2_c1_x3     = neon::vmul(vqf32_n2_c1_03, static_cast<MI_F32>(-0.09375));
+            float32x4_t vqf32_n2_c1_x19    = neon::vmul(vqf32_n2_c1_12, static_cast<DT_F32>(0.59375));
+            float32x4_t vqf32_n2_c1_x3     = neon::vmul(vqf32_n2_c1_03, static_cast<DT_F32>(-0.09375));
             float32x4_t vqf32_n2_c1_result = neon::vadd(vqf32_n2_c1_x19, vqf32_n2_c1_x3);
 
             float32x4_t vqf32_c0_result_12 = neon::vadd(vqf32_n0_c0_result, vqf32_n1_c0_result);
@@ -449,10 +449,10 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             float32x4_t vqf32_c1_result_03 = neon::vadd(vqf32_c_c1_result, vqf32_n2_c1_result);
 
             float16x4x2_t v2df16_result;
-            float32x4_t vqf32_c0_x19 = neon::vmul(vqf32_c0_result_12, static_cast<MI_F32>(0.59375));
-            v2df16_result.val[0]     = neon::vcvt<MI_F16>(neon::vadd(vqf32_c0_x19, neon::vmul(vqf32_c0_result_03, static_cast<MI_F32>(-0.09375))));
-            float32x4_t vqf32_c1_x19 = neon::vmul(vqf32_c1_result_12, static_cast<MI_F32>(0.59375));
-            v2df16_result.val[1]     = neon::vcvt<MI_F16>(neon::vadd(vqf32_c1_x19, neon::vmul(vqf32_c1_result_03, static_cast<MI_F32>(-0.09375))));
+            float32x4_t vqf32_c0_x19 = neon::vmul(vqf32_c0_result_12, static_cast<DT_F32>(0.59375));
+            v2df16_result.val[0]     = neon::vcvt<MI_F16>(neon::vadd(vqf32_c0_x19, neon::vmul(vqf32_c0_result_03, static_cast<DT_F32>(-0.09375))));
+            float32x4_t vqf32_c1_x19 = neon::vmul(vqf32_c1_result_12, static_cast<DT_F32>(0.59375));
+            v2df16_result.val[1]     = neon::vcvt<MI_F16>(neon::vadd(vqf32_c1_x19, neon::vmul(vqf32_c1_result_03, static_cast<DT_F32>(-0.09375))));
             neon::vstore(dst_row, v2df16_result);
 
             dst_row += 8;
@@ -464,16 +464,16 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
 
         for (; x < owidth; x++)
         {
-            MI_F32 y00 = (src_c[2] + src_c[4]) * 0.59375f - (src_c[0] + src_c[6]) * 0.09375f;
-            MI_F32 y10 = (src_n0[2] + src_n0[4]) * 0.59375f - (src_n0[0] + src_n0[6]) * 0.09375f;
-            MI_F32 y20 = (src_n1[2] + src_n1[4]) * 0.59375f - (src_n1[0] + src_n1[6]) * 0.09375f;
-            MI_F32 y30 = (src_n2[2] + src_n2[4]) * 0.59375f - (src_n2[0] + src_n2[6]) * 0.09375f;
+            DT_F32 y00 = (src_c[2] + src_c[4]) * 0.59375f - (src_c[0] + src_c[6]) * 0.09375f;
+            DT_F32 y10 = (src_n0[2] + src_n0[4]) * 0.59375f - (src_n0[0] + src_n0[6]) * 0.09375f;
+            DT_F32 y20 = (src_n1[2] + src_n1[4]) * 0.59375f - (src_n1[0] + src_n1[6]) * 0.09375f;
+            DT_F32 y30 = (src_n2[2] + src_n2[4]) * 0.59375f - (src_n2[0] + src_n2[6]) * 0.09375f;
             *dst_row   = SaturateCast<Tp>((y10 + y20) * 0.59375f - (y00 + y30) * 0.09375f);
 
-            MI_F32 y01     = (src_c[3] + src_c[5]) * 0.59375f - (src_c[1] + src_c[7]) * 0.09375f;
-            MI_F32 y11     = (src_n0[3] + src_n0[5]) * 0.59375f - (src_n0[1] + src_n0[7]) * 0.09375f;
-            MI_F32 y21     = (src_n1[3] + src_n1[5]) * 0.59375f - (src_n1[1] + src_n1[7]) * 0.09375f;
-            MI_F32 y31     = (src_n2[3] + src_n2[5]) * 0.59375f - (src_n2[1] + src_n2[7]) * 0.09375f;
+            DT_F32 y01     = (src_c[3] + src_c[5]) * 0.59375f - (src_c[1] + src_c[7]) * 0.09375f;
+            DT_F32 y11     = (src_n0[3] + src_n0[5]) * 0.59375f - (src_n0[1] + src_n0[7]) * 0.09375f;
+            DT_F32 y21     = (src_n1[3] + src_n1[5]) * 0.59375f - (src_n1[1] + src_n1[7]) * 0.09375f;
+            DT_F32 y31     = (src_n2[3] + src_n2[5]) * 0.59375f - (src_n2[1] + src_n2[7]) * 0.09375f;
             *(dst_row + 1) = SaturateCast<Tp>((y11 + y21) * 0.59375f - (y01 + y31) * 0.09375f);
 
             dst_row += 2;
@@ -488,25 +488,25 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
 }
 #endif
 
-// Tp = MI_F32
+// Tp = DT_F32
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_F32, Tp>::value, Status>::type
-ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_F32, Tp>::value, Status>::type
+ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 owidth       = dst.GetSizes().m_width;
-    MI_S32 width_align2 = owidth & (-2);
+    DT_S32 owidth       = dst.GetSizes().m_width;
+    DT_S32 width_align2 = owidth & (-2);
 
-    for (MI_S32 dy = start_row; dy < end_row; dy++)
+    for (DT_S32 dy = start_row; dy < end_row; dy++)
     {
         // hresize two row
-        MI_S32 sy        = dy << 2;
+        DT_S32 sy        = dy << 2;
         const Tp *src_c  = src.Ptr<Tp>(sy);
         const Tp *src_n0 = src.Ptr<Tp>(sy + 1);
         const Tp *src_n1 = src.Ptr<Tp>(sy + 2);
         const Tp *src_n2 = src.Ptr<Tp>(sy + 3);
         Tp *dst_row      = dst.Ptr<Tp>(dy);
 
-        MI_S32 x = 0;
+        DT_S32 x = 0;
         for (; x < width_align2; x += 2)
         {
             float32x4x2_t v2qf32_cx0  = neon::vload2q(src_c);
@@ -552,22 +552,22 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             float32x2_t vdf32_n2_c1_12 = neon::vadd(neon::vgethigh(v2qf32_n2_3.val[0]), neon::vgetlow(v2qf32_n2_3.val[1]));
             float32x2_t vdf32_n2_c1_03 = neon::vadd(neon::vgetlow(v2qf32_n2_3.val[0]), neon::vgethigh(v2qf32_n2_3.val[1]));
 
-            float32x2_t vdf32_c_c0_x19     = neon::vmul(vdf32_c_c0_12, static_cast<MI_F32>(0.59375));
-            float32x2_t vdf32_c_c0_result  = neon::vmls(vdf32_c_c0_x19, vdf32_c_c0_03, static_cast<MI_F32>(0.09375));
-            float32x2_t vdf32_c_c1_x19     = neon::vmul(vdf32_c_c1_12, static_cast<MI_F32>(0.59375));
-            float32x2_t vdf32_c_c1_result  = neon::vmls(vdf32_c_c1_x19, vdf32_c_c1_03, static_cast<MI_F32>(0.09375));
-            float32x2_t vdf32_n0_c0_x19    = neon::vmul(vdf32_n0_c0_12, static_cast<MI_F32>(0.59375));
-            float32x2_t vdf32_n0_c0_result = neon::vmls(vdf32_n0_c0_x19, vdf32_n0_c0_03, static_cast<MI_F32>(0.09375));
-            float32x2_t vdf32_n0_c1_x19    = neon::vmul(vdf32_n0_c1_12, static_cast<MI_F32>(0.59375));
-            float32x2_t vdf32_n0_c1_result = neon::vmls(vdf32_n0_c1_x19, vdf32_n0_c1_03, static_cast<MI_F32>(0.09375));
-            float32x2_t vdf32_n1_c0_x19    = neon::vmul(vdf32_n1_c0_12, static_cast<MI_F32>(0.59375));
-            float32x2_t vdf32_n1_c0_result = neon::vmls(vdf32_n1_c0_x19, vdf32_n1_c0_03, static_cast<MI_F32>(0.09375));
-            float32x2_t vdf32_n1_c1_x19    = neon::vmul(vdf32_n1_c1_12, static_cast<MI_F32>(0.59375));
-            float32x2_t vdf32_n1_c1_result = neon::vmls(vdf32_n1_c1_x19, vdf32_n1_c1_03, static_cast<MI_F32>(0.09375));
-            float32x2_t vdf32_n2_c0_x19    = neon::vmul(vdf32_n2_c0_12, static_cast<MI_F32>(0.59375));
-            float32x2_t vdf32_n2_c0_result = neon::vmls(vdf32_n2_c0_x19, vdf32_n2_c0_03, static_cast<MI_F32>(0.09375));
-            float32x2_t vdf32_n2_c1_x19    = neon::vmul(vdf32_n2_c1_12, static_cast<MI_F32>(0.59375));
-            float32x2_t vdf32_n2_c1_result = neon::vmls(vdf32_n2_c1_x19, vdf32_n2_c1_03, static_cast<MI_F32>(0.09375));
+            float32x2_t vdf32_c_c0_x19     = neon::vmul(vdf32_c_c0_12, static_cast<DT_F32>(0.59375));
+            float32x2_t vdf32_c_c0_result  = neon::vmls(vdf32_c_c0_x19, vdf32_c_c0_03, static_cast<DT_F32>(0.09375));
+            float32x2_t vdf32_c_c1_x19     = neon::vmul(vdf32_c_c1_12, static_cast<DT_F32>(0.59375));
+            float32x2_t vdf32_c_c1_result  = neon::vmls(vdf32_c_c1_x19, vdf32_c_c1_03, static_cast<DT_F32>(0.09375));
+            float32x2_t vdf32_n0_c0_x19    = neon::vmul(vdf32_n0_c0_12, static_cast<DT_F32>(0.59375));
+            float32x2_t vdf32_n0_c0_result = neon::vmls(vdf32_n0_c0_x19, vdf32_n0_c0_03, static_cast<DT_F32>(0.09375));
+            float32x2_t vdf32_n0_c1_x19    = neon::vmul(vdf32_n0_c1_12, static_cast<DT_F32>(0.59375));
+            float32x2_t vdf32_n0_c1_result = neon::vmls(vdf32_n0_c1_x19, vdf32_n0_c1_03, static_cast<DT_F32>(0.09375));
+            float32x2_t vdf32_n1_c0_x19    = neon::vmul(vdf32_n1_c0_12, static_cast<DT_F32>(0.59375));
+            float32x2_t vdf32_n1_c0_result = neon::vmls(vdf32_n1_c0_x19, vdf32_n1_c0_03, static_cast<DT_F32>(0.09375));
+            float32x2_t vdf32_n1_c1_x19    = neon::vmul(vdf32_n1_c1_12, static_cast<DT_F32>(0.59375));
+            float32x2_t vdf32_n1_c1_result = neon::vmls(vdf32_n1_c1_x19, vdf32_n1_c1_03, static_cast<DT_F32>(0.09375));
+            float32x2_t vdf32_n2_c0_x19    = neon::vmul(vdf32_n2_c0_12, static_cast<DT_F32>(0.59375));
+            float32x2_t vdf32_n2_c0_result = neon::vmls(vdf32_n2_c0_x19, vdf32_n2_c0_03, static_cast<DT_F32>(0.09375));
+            float32x2_t vdf32_n2_c1_x19    = neon::vmul(vdf32_n2_c1_12, static_cast<DT_F32>(0.59375));
+            float32x2_t vdf32_n2_c1_result = neon::vmls(vdf32_n2_c1_x19, vdf32_n2_c1_03, static_cast<DT_F32>(0.09375));
 
             float32x2_t vdf32_c0_result_12 = neon::vadd(vdf32_n0_c0_result, vdf32_n1_c0_result);
             float32x2_t vdf32_c0_result_03 = neon::vadd(vdf32_c_c0_result, vdf32_n2_c0_result);
@@ -575,10 +575,10 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
             float32x2_t vdf32_c1_result_03 = neon::vadd(vdf32_c_c1_result, vdf32_n2_c1_result);
 
             float32x2x2_t v2df32_result;
-            float32x2_t vdf32_c0_x19 = neon::vmul(vdf32_c0_result_12, static_cast<MI_F32>(0.59375));
-            v2df32_result.val[0]     = neon::vmls(vdf32_c0_x19, vdf32_c0_result_03, static_cast<MI_F32>(0.09375));
-            float32x2_t vdf32_c1_x19 = neon::vmul(vdf32_c1_result_12, static_cast<MI_F32>(0.59375));
-            v2df32_result.val[1]     = neon::vmls(vdf32_c1_x19, vdf32_c1_result_03, static_cast<MI_F32>(0.09375));
+            float32x2_t vdf32_c0_x19 = neon::vmul(vdf32_c0_result_12, static_cast<DT_F32>(0.59375));
+            v2df32_result.val[0]     = neon::vmls(vdf32_c0_x19, vdf32_c0_result_03, static_cast<DT_F32>(0.09375));
+            float32x2_t vdf32_c1_x19 = neon::vmul(vdf32_c1_result_12, static_cast<DT_F32>(0.59375));
+            v2df32_result.val[1]     = neon::vmls(vdf32_c1_x19, vdf32_c1_result_03, static_cast<DT_F32>(0.09375));
             neon::vstore(dst_row, v2df32_result);
 
             dst_row += 4;
@@ -590,16 +590,16 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
 
         for (; x < owidth; x++)
         {
-            MI_F32 y00 = (src_c[2] + src_c[4]) * 0.59375f - (src_c[0] + src_c[6]) * 0.09375f;
-            MI_F32 y10 = (src_n0[2] + src_n0[4]) * 0.59375f - (src_n0[0] + src_n0[6]) * 0.09375f;
-            MI_F32 y20 = (src_n1[2] + src_n1[4]) * 0.59375f - (src_n1[0] + src_n1[6]) * 0.09375f;
-            MI_F32 y30 = (src_n2[2] + src_n2[4]) * 0.59375f - (src_n2[0] + src_n2[6]) * 0.09375f;
+            DT_F32 y00 = (src_c[2] + src_c[4]) * 0.59375f - (src_c[0] + src_c[6]) * 0.09375f;
+            DT_F32 y10 = (src_n0[2] + src_n0[4]) * 0.59375f - (src_n0[0] + src_n0[6]) * 0.09375f;
+            DT_F32 y20 = (src_n1[2] + src_n1[4]) * 0.59375f - (src_n1[0] + src_n1[6]) * 0.09375f;
+            DT_F32 y30 = (src_n2[2] + src_n2[4]) * 0.59375f - (src_n2[0] + src_n2[6]) * 0.09375f;
             *dst_row   = (y10 + y20) * 0.59375f - (y00 + y30) * 0.09375f;
 
-            MI_F32 y01     = (src_c[3] + src_c[5]) * 0.59375f - (src_c[1] + src_c[7]) * 0.09375f;
-            MI_F32 y11     = (src_n0[3] + src_n0[5]) * 0.59375f - (src_n0[1] + src_n0[7]) * 0.09375f;
-            MI_F32 y21     = (src_n1[3] + src_n1[5]) * 0.59375f - (src_n1[1] + src_n1[7]) * 0.09375f;
-            MI_F32 y31     = (src_n2[3] + src_n2[5]) * 0.59375f - (src_n2[1] + src_n2[7]) * 0.09375f;
+            DT_F32 y01     = (src_c[3] + src_c[5]) * 0.59375f - (src_c[1] + src_c[7]) * 0.09375f;
+            DT_F32 y11     = (src_n0[3] + src_n0[5]) * 0.59375f - (src_n0[1] + src_n0[7]) * 0.09375f;
+            DT_F32 y21     = (src_n1[3] + src_n1[5]) * 0.59375f - (src_n1[1] + src_n1[7]) * 0.09375f;
+            DT_F32 y31     = (src_n2[3] + src_n2[5]) * 0.59375f - (src_n2[1] + src_n2[7]) * 0.09375f;
             *(dst_row + 1) = (y11 + y21) * 0.59375f - (y01 + y31) * 0.09375f;
 
             dst_row += 2;
@@ -613,18 +613,18 @@ ResizeCuC2DownX4NeonImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_
     return Status::OK;
 }
 
-// Tp = MI_U8, MI_S8
+// Tp = DT_U8, DT_S8
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U8, Tp>::value || std::is_same<MI_S8, Tp>::value, Status>::type
-ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U8, Tp>::value || std::is_same<DT_S8, Tp>::value, Status>::type
+ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     using WMVType  = typename neon::MQVector<Tp, 2>::MVType;
     using MVType   = typename neon::MDVector<Tp, 2>::MVType;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
-    MI_S16 *rows = thread_buffer.GetThreadData<MI_S16>();
+    DT_S16 *rows = thread_buffer.GetThreadData<DT_S16>();
 
     if (!rows)
     {
@@ -632,10 +632,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         return Status::ERROR;
     }
 
-    MI_S16 *rows0 = rows;
-    MI_S16 *rows1 = rows0 + owidth * channel;
-    MI_S16 *rows2 = rows1 + owidth * channel;
-    MI_S16 *rows3 = rows2 + owidth * channel;
+    DT_S16 *rows0 = rows;
+    DT_S16 *rows1 = rows0 + owidth * channel;
+    DT_S16 *rows2 = rows1 + owidth * channel;
+    DT_S16 *rows3 = rows2 + owidth * channel;
 
     start_row = start_row << 1;
     end_row   = Min(end_row << 1, oheight);
@@ -644,10 +644,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     const Tp *src_n0 = src.Ptr<Tp>(start_row << 1);
     const Tp *src_n1 = src.Ptr<Tp>((start_row << 1) + 1);
     const Tp *src_n2 = src.Ptr<Tp>((start_row << 1) + 2);
-    MI_S16 *rows0_x = rows0;
-    MI_S16 *rows1_x = rows1;
-    MI_S16 *rows2_x = rows2;
-    MI_S16 *rows3_x = rows3;
+    DT_S16 *rows0_x = rows0;
+    DT_S16 *rows1_x = rows1;
+    DT_S16 *rows2_x = rows2;
+    DT_S16 *rows3_x = rows3;
 
     // Line 0
     if (0 == start_row)
@@ -677,8 +677,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     rows2_x += channel;
     rows3_x += channel;
 
-    MI_S32 owidth_align8 = (owidth - 2) & (-8);
-    MI_S32 dx = 0;
+    DT_S32 owidth_align8 = (owidth - 2) & (-8);
+    DT_S32 dx = 0;
     for (; dx < owidth_align8; dx += 8)
     {
         WMVType wmvq8_cx0  = neon::vload2q(src_c); //val[0]:channel 0; val[1]:channel 1;
@@ -726,24 +726,24 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         int16x8_t vqs16_n2_c1_12 = neon::vaddl(neon::vgetlow(v2q8_n2x0_c1.val[1]), neon::vgetlow(v2q8_n2x1_c1.val[0]));
         int16x8_t vqs16_n2_c1_03 = neon::vaddl(neon::vgetlow(v2q8_n2x0_c1.val[0]), neon::vgetlow(v2q8_n2x1_c1.val[1]));
 
-        int16x8_t vqs16_c_c0_x19  = neon::vmul(vqs16_c_c0_12, static_cast<MI_S16>(19));
-        int16x8_t vqs16_n0_c0_x19 = neon::vmul(vqs16_n0_c0_12, static_cast<MI_S16>(19));
-        int16x8_t vqs16_n1_c0_x19 = neon::vmul(vqs16_n1_c0_12, static_cast<MI_S16>(19));
-        int16x8_t vqs16_n2_c0_x19 = neon::vmul(vqs16_n2_c0_12, static_cast<MI_S16>(19));
-        int16x8_t vqs16_c_c1_x19  = neon::vmul(vqs16_c_c1_12, static_cast<MI_S16>(19));
-        int16x8_t vqs16_n0_c1_x19 = neon::vmul(vqs16_n0_c1_12, static_cast<MI_S16>(19));
-        int16x8_t vqs16_n1_c1_x19 = neon::vmul(vqs16_n1_c1_12, static_cast<MI_S16>(19));
-        int16x8_t vqs16_n2_c1_x19 = neon::vmul(vqs16_n2_c1_12, static_cast<MI_S16>(19));
+        int16x8_t vqs16_c_c0_x19  = neon::vmul(vqs16_c_c0_12, static_cast<DT_S16>(19));
+        int16x8_t vqs16_n0_c0_x19 = neon::vmul(vqs16_n0_c0_12, static_cast<DT_S16>(19));
+        int16x8_t vqs16_n1_c0_x19 = neon::vmul(vqs16_n1_c0_12, static_cast<DT_S16>(19));
+        int16x8_t vqs16_n2_c0_x19 = neon::vmul(vqs16_n2_c0_12, static_cast<DT_S16>(19));
+        int16x8_t vqs16_c_c1_x19  = neon::vmul(vqs16_c_c1_12, static_cast<DT_S16>(19));
+        int16x8_t vqs16_n0_c1_x19 = neon::vmul(vqs16_n0_c1_12, static_cast<DT_S16>(19));
+        int16x8_t vqs16_n1_c1_x19 = neon::vmul(vqs16_n1_c1_12, static_cast<DT_S16>(19));
+        int16x8_t vqs16_n2_c1_x19 = neon::vmul(vqs16_n2_c1_12, static_cast<DT_S16>(19));
 
         int16x8x2_t v2qs16_c_result, v2qs16_n0_result, v2qs16_n1_result, v2qs16_n2_result;
-        v2qs16_c_result.val[0]  = neon::vmls(vqs16_c_c0_x19, vqs16_c_c0_03, static_cast<MI_S16>(3));
-        v2qs16_n0_result.val[0] = neon::vmls(vqs16_n0_c0_x19, vqs16_n0_c0_03, static_cast<MI_S16>(3));
-        v2qs16_n1_result.val[0] = neon::vmls(vqs16_n1_c0_x19, vqs16_n1_c0_03, static_cast<MI_S16>(3));
-        v2qs16_n2_result.val[0] = neon::vmls(vqs16_n2_c0_x19, vqs16_n2_c0_03, static_cast<MI_S16>(3));
-        v2qs16_c_result.val[1]  = neon::vmls(vqs16_c_c1_x19, vqs16_c_c1_03, static_cast<MI_S16>(3));
-        v2qs16_n0_result.val[1] = neon::vmls(vqs16_n0_c1_x19, vqs16_n0_c1_03, static_cast<MI_S16>(3));
-        v2qs16_n1_result.val[1] = neon::vmls(vqs16_n1_c1_x19, vqs16_n1_c1_03, static_cast<MI_S16>(3));
-        v2qs16_n2_result.val[1] = neon::vmls(vqs16_n2_c1_x19, vqs16_n2_c1_03, static_cast<MI_S16>(3));
+        v2qs16_c_result.val[0]  = neon::vmls(vqs16_c_c0_x19, vqs16_c_c0_03, static_cast<DT_S16>(3));
+        v2qs16_n0_result.val[0] = neon::vmls(vqs16_n0_c0_x19, vqs16_n0_c0_03, static_cast<DT_S16>(3));
+        v2qs16_n1_result.val[0] = neon::vmls(vqs16_n1_c0_x19, vqs16_n1_c0_03, static_cast<DT_S16>(3));
+        v2qs16_n2_result.val[0] = neon::vmls(vqs16_n2_c0_x19, vqs16_n2_c0_03, static_cast<DT_S16>(3));
+        v2qs16_c_result.val[1]  = neon::vmls(vqs16_c_c1_x19, vqs16_c_c1_03, static_cast<DT_S16>(3));
+        v2qs16_n0_result.val[1] = neon::vmls(vqs16_n0_c1_x19, vqs16_n0_c1_03, static_cast<DT_S16>(3));
+        v2qs16_n1_result.val[1] = neon::vmls(vqs16_n1_c1_x19, vqs16_n1_c1_03, static_cast<DT_S16>(3));
+        v2qs16_n2_result.val[1] = neon::vmls(vqs16_n2_c1_x19, vqs16_n2_c1_03, static_cast<DT_S16>(3));
 
         neon::vstore(rows0_x, v2qs16_c_result);
         neon::vstore(rows1_x, v2qs16_n0_result);
@@ -792,17 +792,17 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     rows3_x[1] = src_n2[3] * 19 - src_n2[1] * 3 + src_n2[5] * 16;
 
     // vresize
-    MI_S16 *rows0_y = rows0;
-    MI_S16 *rows1_y = rows1;
-    MI_S16 *rows2_y = rows2;
-    MI_S16 *rows3_y = rows3;
+    DT_S16 *rows0_y = rows0;
+    DT_S16 *rows1_y = rows1;
+    DT_S16 *rows2_y = rows2;
+    DT_S16 *rows3_y = rows3;
 
     Tp *dst_row = dst.Ptr<Tp>(start_row);
 
     int16x8_t vqs16_zero;
-    neon::vdup(vqs16_zero, static_cast<MI_S16>(0));
+    neon::vdup(vqs16_zero, static_cast<DT_S16>(0));
     int16x8_t vqs16_255;
-    neon::vdup(vqs16_255, static_cast<MI_S16>(255));
+    neon::vdup(vqs16_255, static_cast<DT_S16>(255));
 
     owidth_align8 = owidth & (-8);
     dx = 0;
@@ -822,14 +822,14 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         int32x4_t vqs32_c1_hi12 = neon::vaddl(neon::vgethigh(v2qs16_n0x0.val[1]), neon::vgethigh(v2qs16_n1x0.val[1]));
         int32x4_t vqs32_c1_hi03 = neon::vaddl(neon::vgethigh(v2qs16_cx0.val[1]), neon::vgethigh(v2qs16_n2x0.val[1]));
 
-        int32x4_t vqs32_c0_lo_x19 = neon::vmul(vqs32_c0_lo12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_c0_hi_x19 = neon::vmul(vqs32_c0_hi12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_c1_lo_x19 = neon::vmul(vqs32_c1_lo12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_c1_hi_x19 = neon::vmul(vqs32_c1_hi12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_c0_des_lo = neon::vmls(vqs32_c0_lo_x19, vqs32_c0_lo03, static_cast<MI_S32>(3));
-        int32x4_t vqs32_c0_des_hi = neon::vmls(vqs32_c0_hi_x19, vqs32_c0_hi03, static_cast<MI_S32>(3));
-        int32x4_t vqs32_c1_des_lo = neon::vmls(vqs32_c1_lo_x19, vqs32_c1_lo03, static_cast<MI_S32>(3));
-        int32x4_t vqs32_c1_des_hi = neon::vmls(vqs32_c1_hi_x19, vqs32_c1_hi03, static_cast<MI_S32>(3));
+        int32x4_t vqs32_c0_lo_x19 = neon::vmul(vqs32_c0_lo12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_c0_hi_x19 = neon::vmul(vqs32_c0_hi12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_c1_lo_x19 = neon::vmul(vqs32_c1_lo12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_c1_hi_x19 = neon::vmul(vqs32_c1_hi12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_c0_des_lo = neon::vmls(vqs32_c0_lo_x19, vqs32_c0_lo03, static_cast<DT_S32>(3));
+        int32x4_t vqs32_c0_des_hi = neon::vmls(vqs32_c0_hi_x19, vqs32_c0_hi03, static_cast<DT_S32>(3));
+        int32x4_t vqs32_c1_des_lo = neon::vmls(vqs32_c1_lo_x19, vqs32_c1_lo03, static_cast<DT_S32>(3));
+        int32x4_t vqs32_c1_des_hi = neon::vmls(vqs32_c1_hi_x19, vqs32_c1_hi03, static_cast<DT_S32>(3));
 
         int16x4_t vds16_c0_des_lo = neon::vrshrn_n<10>(vqs32_c0_des_lo);
         int16x4_t vds16_c0_des_hi = neon::vrshrn_n<10>(vqs32_c0_des_hi);
@@ -837,7 +837,7 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         int16x4_t vds16_c1_des_hi = neon::vrshrn_n<10>(vqs32_c1_des_hi);
 
         MVType mvd8_result;
-        if (std::is_same<Tp, MI_U8>::value)
+        if (std::is_same<Tp, DT_U8>::value)
         {
             int16x8_t vqs16_c0_des = neon::vcombine(vds16_c0_des_lo, vds16_c0_des_hi);
             int16x8_t vqs16_c1_des = neon::vcombine(vds16_c1_des_lo, vds16_c1_des_hi);
@@ -872,7 +872,7 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 
     for (; dx < owidth; dx++)
     {
-        MI_S32 result = (rows1_y[0] * 19 - rows0_y[0] * 3 + rows2_y[0] * 19 - rows3_y[0] * 3 + 512) >> 10;
+        DT_S32 result = (rows1_y[0] * 19 - rows0_y[0] * 3 + rows2_y[0] * 19 - rows3_y[0] * 3 + 512) >> 10;
         dst_row[0]    = SaturateCast<Tp>(result);
         result        = (rows1_y[1] * 19 - rows0_y[1] * 3 + rows2_y[1] * 19 - rows3_y[1] * 3 + 512) >> 10;
         dst_row[1]    = SaturateCast<Tp>(result);
@@ -885,13 +885,13 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     }
 
     // Line 1 ~ h-1
-    for (MI_S32 dy = (start_row + 1); dy < end_row; dy++)
+    for (DT_S32 dy = (start_row + 1); dy < end_row; dy++)
     {
-        MI_S32 sy = (dy << 1) - 1;
+        DT_S32 sy = (dy << 1) - 1;
 
         // hresize two row
-        MI_S16 *rows0_tmp = rows0;
-        MI_S16 *rows1_tmp = rows1;
+        DT_S16 *rows0_tmp = rows0;
+        DT_S16 *rows1_tmp = rows1;
         rows0             = rows2;
         rows1             = rows3;
         rows2             = rows0_tmp;
@@ -899,8 +899,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 
         const Tp *src_n1 = src.Ptr<Tp>(sy + 2);
         const Tp *src_n2 = src.Ptr<Tp>(sy + 3);
-        MI_S16 *rows2_x  = rows2;
-        MI_S16 *rows3_x  = rows3;
+        DT_S16 *rows2_x  = rows2;
+        DT_S16 *rows3_x  = rows3;
 
         if (end_row == oheight && dy == (end_row - 1))
         {
@@ -917,8 +917,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         rows2_x += channel;
         rows3_x += channel;
 
-        MI_S32 owidth_align8 = (owidth - 2) & (-8);
-        MI_S32 dx = 0;
+        DT_S32 owidth_align8 = (owidth - 2) & (-8);
+        DT_S32 dx = 0;
         for (; dx < owidth_align8; dx += 8)
         {
             WMVType wmvq8_n1x0 = neon::vload2q(src_n1);
@@ -944,16 +944,16 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
             int16x8_t vqs16_n2_c1_12 = neon::vaddl(neon::vgetlow(v2q8_n2x0_c1.val[1]), neon::vgetlow(v2q8_n2x1_c1.val[0]));
             int16x8_t vqs16_n2_c1_03 = neon::vaddl(neon::vgetlow(v2q8_n2x0_c1.val[0]), neon::vgetlow(v2q8_n2x1_c1.val[1]));
 
-            int16x8_t vqs16_n1_c0_x19 = neon::vmul(vqs16_n1_c0_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_n2_c0_x19 = neon::vmul(vqs16_n2_c0_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_n1_c1_x19 = neon::vmul(vqs16_n1_c1_12, static_cast<MI_S16>(19));
-            int16x8_t vqs16_n2_c1_x19 = neon::vmul(vqs16_n2_c1_12, static_cast<MI_S16>(19));
+            int16x8_t vqs16_n1_c0_x19 = neon::vmul(vqs16_n1_c0_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_n2_c0_x19 = neon::vmul(vqs16_n2_c0_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_n1_c1_x19 = neon::vmul(vqs16_n1_c1_12, static_cast<DT_S16>(19));
+            int16x8_t vqs16_n2_c1_x19 = neon::vmul(vqs16_n2_c1_12, static_cast<DT_S16>(19));
 
             int16x8x2_t v2qs16_n1_result, v2qs16_n2_result;
-            v2qs16_n1_result.val[0] = neon::vmls(vqs16_n1_c0_x19, vqs16_n1_c0_03, static_cast<MI_S16>(3));
-            v2qs16_n2_result.val[0] = neon::vmls(vqs16_n2_c0_x19, vqs16_n2_c0_03, static_cast<MI_S16>(3));
-            v2qs16_n1_result.val[1] = neon::vmls(vqs16_n1_c1_x19, vqs16_n1_c1_03, static_cast<MI_S16>(3));
-            v2qs16_n2_result.val[1] = neon::vmls(vqs16_n2_c1_x19, vqs16_n2_c1_03, static_cast<MI_S16>(3));
+            v2qs16_n1_result.val[0] = neon::vmls(vqs16_n1_c0_x19, vqs16_n1_c0_03, static_cast<DT_S16>(3));
+            v2qs16_n2_result.val[0] = neon::vmls(vqs16_n2_c0_x19, vqs16_n2_c0_03, static_cast<DT_S16>(3));
+            v2qs16_n1_result.val[1] = neon::vmls(vqs16_n1_c1_x19, vqs16_n1_c1_03, static_cast<DT_S16>(3));
+            v2qs16_n2_result.val[1] = neon::vmls(vqs16_n2_c1_x19, vqs16_n2_c1_03, static_cast<DT_S16>(3));
 
             neon::vstore(rows2_x, v2qs16_n1_result);
             neon::vstore(rows3_x, v2qs16_n2_result);
@@ -983,10 +983,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         rows3_x[1] = src_n2[3] * 19 - src_n2[1] * 3 + src_n2[5] * 16;
 
         // vresize
-        MI_S16 *rows0_y = rows0;
-        MI_S16 *rows1_y = rows1;
-        MI_S16 *rows2_y = rows2;
-        MI_S16 *rows3_y = rows3;
+        DT_S16 *rows0_y = rows0;
+        DT_S16 *rows1_y = rows1;
+        DT_S16 *rows2_y = rows2;
+        DT_S16 *rows3_y = rows3;
 
         Tp *dst_row = dst.Ptr<Tp>(dy);
 
@@ -1008,14 +1008,14 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
             int32x4_t vqs32_c1_hi12 = neon::vaddl(neon::vgethigh(v2qs16_n0.val[1]), neon::vgethigh(v2qs16_n1.val[1]));
             int32x4_t vqs32_c1_hi03 = neon::vaddl(neon::vgethigh(v2qs16_c.val[1]), neon::vgethigh(v2qs16_n2.val[1]));
 
-            int32x4_t vqs32_c0_lo_x19 = neon::vmul(vqs32_c0_lo12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c0_hi_x19 = neon::vmul(vqs32_c0_hi12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c1_lo_x19 = neon::vmul(vqs32_c1_lo12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c1_hi_x19 = neon::vmul(vqs32_c1_hi12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c0_des_lo = neon::vmls(vqs32_c0_lo_x19, vqs32_c0_lo03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c0_des_hi = neon::vmls(vqs32_c0_hi_x19, vqs32_c0_hi03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c1_des_lo = neon::vmls(vqs32_c1_lo_x19, vqs32_c1_lo03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c1_des_hi = neon::vmls(vqs32_c1_hi_x19, vqs32_c1_hi03, static_cast<MI_S32>(3));
+            int32x4_t vqs32_c0_lo_x19 = neon::vmul(vqs32_c0_lo12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c0_hi_x19 = neon::vmul(vqs32_c0_hi12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c1_lo_x19 = neon::vmul(vqs32_c1_lo12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c1_hi_x19 = neon::vmul(vqs32_c1_hi12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c0_des_lo = neon::vmls(vqs32_c0_lo_x19, vqs32_c0_lo03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c0_des_hi = neon::vmls(vqs32_c0_hi_x19, vqs32_c0_hi03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c1_des_lo = neon::vmls(vqs32_c1_lo_x19, vqs32_c1_lo03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c1_des_hi = neon::vmls(vqs32_c1_hi_x19, vqs32_c1_hi03, static_cast<DT_S32>(3));
 
             int16x4_t vds16_c0_des_lo = neon::vrshrn_n<10>(vqs32_c0_des_lo);
             int16x4_t vds16_c0_des_hi = neon::vrshrn_n<10>(vqs32_c0_des_hi);
@@ -1023,7 +1023,7 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
             int16x4_t vds16_c1_des_hi = neon::vrshrn_n<10>(vqs32_c1_des_hi);
 
             MVType mvd8_result;
-            if (std::is_same<Tp, MI_U8>::value)
+            if (std::is_same<Tp, DT_U8>::value)
             {
                 int16x8_t vqs16_c0_des = neon::vcombine(vds16_c0_des_lo, vds16_c0_des_hi);
                 int16x8_t vqs16_c1_des = neon::vcombine(vds16_c1_des_lo, vds16_c1_des_hi);
@@ -1058,7 +1058,7 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 
         for (; dx < owidth; dx++)
         {
-            MI_S32 result = (rows1_y[0] * 19 - rows0_y[0] * 3 + rows2_y[0] * 19 - rows3_y[0] * 3 + 512) >> 10;
+            DT_S32 result = (rows1_y[0] * 19 - rows0_y[0] * 3 + rows2_y[0] * 19 - rows3_y[0] * 3 + 512) >> 10;
             dst_row[0]    = SaturateCast<Tp>(result);
             result        = (rows1_y[1] * 19 - rows0_y[1] * 3 + rows2_y[1] * 19 - rows3_y[1] * 3 + 512) >> 10;
             dst_row[1]    = SaturateCast<Tp>(result);
@@ -1074,17 +1074,17 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     return Status::OK;
 }
 
-// Tp = MI_U16, MI_S16
+// Tp = DT_U16, DT_S16
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_U16, Tp>::value || std::is_same<MI_S16, Tp>::value, Status>::type
-ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_U16, Tp>::value || std::is_same<DT_S16, Tp>::value, Status>::type
+ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     using MVType   = typename neon::MQVector<Tp, 2>::MVType;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
-    MI_S32 *rows = thread_buffer.GetThreadData<MI_S32>();
+    DT_S32 *rows = thread_buffer.GetThreadData<DT_S32>();
 
     if (!rows)
     {
@@ -1092,10 +1092,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         return Status::ERROR;
     }
 
-    MI_S32 *rows0 = rows;
-    MI_S32 *rows1 = rows0 + owidth * channel;
-    MI_S32 *rows2 = rows1 + owidth * channel;
-    MI_S32 *rows3 = rows2 + owidth * channel;
+    DT_S32 *rows0 = rows;
+    DT_S32 *rows1 = rows0 + owidth * channel;
+    DT_S32 *rows2 = rows1 + owidth * channel;
+    DT_S32 *rows3 = rows2 + owidth * channel;
 
     start_row = start_row << 1;
     end_row   = Min(end_row << 1, oheight);
@@ -1104,10 +1104,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     const Tp *src_n0 = src.Ptr<Tp>(start_row << 1);
     const Tp *src_n1 = src.Ptr<Tp>((start_row << 1) + 1);
     const Tp *src_n2 = src.Ptr<Tp>((start_row << 1) + 2);
-    MI_S32 *rows0_x = rows0;
-    MI_S32 *rows1_x = rows1;
-    MI_S32 *rows2_x = rows2;
-    MI_S32 *rows3_x = rows3;
+    DT_S32 *rows0_x = rows0;
+    DT_S32 *rows1_x = rows1;
+    DT_S32 *rows2_x = rows2;
+    DT_S32 *rows3_x = rows3;
 
     // Line 0
     if (0 == start_row)
@@ -1137,8 +1137,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     rows2_x += channel;
     rows3_x += channel;
 
-    MI_S32 owidth_align4 = (owidth - 2) & (-4);
-    MI_S32 dx = 0;
+    DT_S32 owidth_align4 = (owidth - 2) & (-4);
+    DT_S32 dx = 0;
     for (; dx < owidth_align4; dx += 4)
     {
         MVType mvq16_cx0  = neon::vload2q(src_c);
@@ -1186,24 +1186,24 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         int32x4_t vqs32_n2_c1_12 = neon::vaddl(neon::vgetlow(v2q16_n2x0_c1.val[1]), neon::vgetlow(v2q16_n2x1_c1.val[0]));
         int32x4_t vqs32_n2_c1_03 = neon::vaddl(neon::vgetlow(v2q16_n2x0_c1.val[0]), neon::vgetlow(v2q16_n2x1_c1.val[1]));
 
-        int32x4_t vqs32_c_c0_x19  = neon::vmul(vqs32_c_c0_12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_n0_c0_x19 = neon::vmul(vqs32_n0_c0_12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_n1_c0_x19 = neon::vmul(vqs32_n1_c0_12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_n2_c0_x19 = neon::vmul(vqs32_n2_c0_12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_c_c1_x19  = neon::vmul(vqs32_c_c1_12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_n0_c1_x19 = neon::vmul(vqs32_n0_c1_12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_n1_c1_x19 = neon::vmul(vqs32_n1_c1_12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_n2_c1_x19 = neon::vmul(vqs32_n2_c1_12, static_cast<MI_S32>(19));
+        int32x4_t vqs32_c_c0_x19  = neon::vmul(vqs32_c_c0_12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_n0_c0_x19 = neon::vmul(vqs32_n0_c0_12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_n1_c0_x19 = neon::vmul(vqs32_n1_c0_12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_n2_c0_x19 = neon::vmul(vqs32_n2_c0_12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_c_c1_x19  = neon::vmul(vqs32_c_c1_12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_n0_c1_x19 = neon::vmul(vqs32_n0_c1_12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_n1_c1_x19 = neon::vmul(vqs32_n1_c1_12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_n2_c1_x19 = neon::vmul(vqs32_n2_c1_12, static_cast<DT_S32>(19));
 
         int32x4x2_t v2qs32_c_result, v2qs32_n0_result, v2qs32_n1_result, v2qs32_n2_result;
-        v2qs32_c_result.val[0]  = neon::vmls(vqs32_c_c0_x19, vqs32_c_c0_03, static_cast<MI_S32>(3));
-        v2qs32_n0_result.val[0] = neon::vmls(vqs32_n0_c0_x19, vqs32_n0_c0_03, static_cast<MI_S32>(3));
-        v2qs32_n1_result.val[0] = neon::vmls(vqs32_n1_c0_x19, vqs32_n1_c0_03, static_cast<MI_S32>(3));
-        v2qs32_n2_result.val[0] = neon::vmls(vqs32_n2_c0_x19, vqs32_n2_c0_03, static_cast<MI_S32>(3));
-        v2qs32_c_result.val[1]  = neon::vmls(vqs32_c_c1_x19, vqs32_c_c1_03, static_cast<MI_S32>(3));
-        v2qs32_n0_result.val[1] = neon::vmls(vqs32_n0_c1_x19, vqs32_n0_c1_03, static_cast<MI_S32>(3));
-        v2qs32_n1_result.val[1] = neon::vmls(vqs32_n1_c1_x19, vqs32_n1_c1_03, static_cast<MI_S32>(3));
-        v2qs32_n2_result.val[1] = neon::vmls(vqs32_n2_c1_x19, vqs32_n2_c1_03, static_cast<MI_S32>(3));
+        v2qs32_c_result.val[0]  = neon::vmls(vqs32_c_c0_x19, vqs32_c_c0_03, static_cast<DT_S32>(3));
+        v2qs32_n0_result.val[0] = neon::vmls(vqs32_n0_c0_x19, vqs32_n0_c0_03, static_cast<DT_S32>(3));
+        v2qs32_n1_result.val[0] = neon::vmls(vqs32_n1_c0_x19, vqs32_n1_c0_03, static_cast<DT_S32>(3));
+        v2qs32_n2_result.val[0] = neon::vmls(vqs32_n2_c0_x19, vqs32_n2_c0_03, static_cast<DT_S32>(3));
+        v2qs32_c_result.val[1]  = neon::vmls(vqs32_c_c1_x19, vqs32_c_c1_03, static_cast<DT_S32>(3));
+        v2qs32_n0_result.val[1] = neon::vmls(vqs32_n0_c1_x19, vqs32_n0_c1_03, static_cast<DT_S32>(3));
+        v2qs32_n1_result.val[1] = neon::vmls(vqs32_n1_c1_x19, vqs32_n1_c1_03, static_cast<DT_S32>(3));
+        v2qs32_n2_result.val[1] = neon::vmls(vqs32_n2_c1_x19, vqs32_n2_c1_03, static_cast<DT_S32>(3));
 
         neon::vstore(rows0_x, v2qs32_c_result);
         neon::vstore(rows1_x, v2qs32_n0_result);
@@ -1252,14 +1252,14 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     rows3_x[1] = src_n2[3] * 19 - src_n2[1] * 3 + src_n2[5] * 16;
 
     // vresize
-    MI_S32 *rows0_y = rows0;
-    MI_S32 *rows1_y = rows1;
-    MI_S32 *rows2_y = rows2;
-    MI_S32 *rows3_y = rows3;
+    DT_S32 *rows0_y = rows0;
+    DT_S32 *rows1_y = rows1;
+    DT_S32 *rows2_y = rows2;
+    DT_S32 *rows3_y = rows3;
 
     Tp *dst_row = dst.Ptr<Tp>(start_row);
 
-    MI_S32 owidth_align8 = owidth & (-8);
+    DT_S32 owidth_align8 = owidth & (-8);
     dx = 0;
     for (; dx < owidth_align8; dx += 8)
     {
@@ -1281,20 +1281,20 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         int32x4_t vqs32_c1_hi12 = neon::vadd(v2qs32_n0x1_hi.val[1], v2qs32_n1x1_hi.val[1]);
         int32x4_t vqs32_c1_hi03 = neon::vadd(v2qs32_cx1_hi.val[1], v2qs32_n2x1_hi.val[1]);
 
-        int32x4_t vqs32_c0_lo_x19 = neon::vmul(vqs32_c0_lo12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_c0_hi_x19 = neon::vmul(vqs32_c0_hi12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_c1_lo_x19 = neon::vmul(vqs32_c1_lo12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_c1_hi_x19 = neon::vmul(vqs32_c1_hi12, static_cast<MI_S32>(19));
-        int32x4_t vqs32_c0_des_lo = neon::vmls(vqs32_c0_lo_x19, vqs32_c0_lo03, static_cast<MI_S32>(3));
-        int32x4_t vqs32_c0_des_hi = neon::vmls(vqs32_c0_hi_x19, vqs32_c0_hi03, static_cast<MI_S32>(3));
-        int32x4_t vqs32_c1_des_lo = neon::vmls(vqs32_c1_lo_x19, vqs32_c1_lo03, static_cast<MI_S32>(3));
-        int32x4_t vqs32_c1_des_hi = neon::vmls(vqs32_c1_hi_x19, vqs32_c1_hi03, static_cast<MI_S32>(3));
+        int32x4_t vqs32_c0_lo_x19 = neon::vmul(vqs32_c0_lo12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_c0_hi_x19 = neon::vmul(vqs32_c0_hi12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_c1_lo_x19 = neon::vmul(vqs32_c1_lo12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_c1_hi_x19 = neon::vmul(vqs32_c1_hi12, static_cast<DT_S32>(19));
+        int32x4_t vqs32_c0_des_lo = neon::vmls(vqs32_c0_lo_x19, vqs32_c0_lo03, static_cast<DT_S32>(3));
+        int32x4_t vqs32_c0_des_hi = neon::vmls(vqs32_c0_hi_x19, vqs32_c0_hi03, static_cast<DT_S32>(3));
+        int32x4_t vqs32_c1_des_lo = neon::vmls(vqs32_c1_lo_x19, vqs32_c1_lo03, static_cast<DT_S32>(3));
+        int32x4_t vqs32_c1_des_hi = neon::vmls(vqs32_c1_hi_x19, vqs32_c1_hi03, static_cast<DT_S32>(3));
 
         MVType mvq16_result;
-        if (std::is_same<Tp, MI_U16>::value)
+        if (std::is_same<Tp, DT_U16>::value)
         {
             int32x4_t vqs32_zero;
-            neon::vdup(vqs32_zero, static_cast<MI_S32>(0));
+            neon::vdup(vqs32_zero, static_cast<DT_S32>(0));
 
             vqs32_c0_des_lo = neon::vmax(vqs32_c0_des_lo, vqs32_zero);
             vqs32_c0_des_hi = neon::vmax(vqs32_c0_des_hi, vqs32_zero);
@@ -1336,7 +1336,7 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 
     for (; dx < owidth; dx++)
     {
-        MI_S32 result = (rows1_y[0] * 19 - rows0_y[0] * 3 + rows2_y[0] * 19 - rows3_y[0] * 3 + 512) >> 10;
+        DT_S32 result = (rows1_y[0] * 19 - rows0_y[0] * 3 + rows2_y[0] * 19 - rows3_y[0] * 3 + 512) >> 10;
         dst_row[0]    = SaturateCast<Tp>(result);
         result        = (rows1_y[1] * 19 - rows0_y[1] * 3 + rows2_y[1] * 19 - rows3_y[1] * 3 + 512) >> 10;
         dst_row[1]    = SaturateCast<Tp>(result);
@@ -1349,13 +1349,13 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     }
 
     // Line 1 ~ h-1
-    for (MI_S32 dy = (start_row + 1); dy < end_row; dy++)
+    for (DT_S32 dy = (start_row + 1); dy < end_row; dy++)
     {
-        MI_S32 sy = (dy << 1) - 1;
+        DT_S32 sy = (dy << 1) - 1;
 
         // hresize two row
-        MI_S32 *rows0_tmp = rows0;
-        MI_S32 *rows1_tmp = rows1;
+        DT_S32 *rows0_tmp = rows0;
+        DT_S32 *rows1_tmp = rows1;
         rows0             = rows2;
         rows1             = rows3;
         rows2             = rows0_tmp;
@@ -1363,8 +1363,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 
         const Tp *src_n1 = src.Ptr<Tp>(sy + 2);
         const Tp *src_n2 = src.Ptr<Tp>(sy + 3);
-        MI_S32 *rows2_x  = rows2;
-        MI_S32 *rows3_x  = rows3;
+        DT_S32 *rows2_x  = rows2;
+        DT_S32 *rows3_x  = rows3;
 
         if (end_row == oheight && dy == (end_row - 1))
         {
@@ -1381,8 +1381,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         rows2_x += channel;
         rows3_x += channel;
 
-        MI_S32 owidth_align4 = (owidth - 2) & (-4);
-        MI_S32 dx = 0;
+        DT_S32 owidth_align4 = (owidth - 2) & (-4);
+        DT_S32 dx = 0;
         for (; dx < owidth_align4; dx += 4)
         {
             MVType mvq16_n1x0 = neon::vload2q(src_n1);
@@ -1408,18 +1408,18 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
             int32x4_t vqs32_n2_c1_12 = neon::vaddl(neon::vgetlow(v2q16_n2x0_c1.val[1]), neon::vgetlow(v2q16_n2x1_c1.val[0]));
             int32x4_t vqs32_n2_c1_03 = neon::vaddl(neon::vgetlow(v2q16_n2x0_c1.val[0]), neon::vgetlow(v2q16_n2x1_c1.val[1]));
 
-            int32x4_t vqs32_n1_c0_x19 = neon::vmul(vqs32_n1_c0_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_n2_c0_x19 = neon::vmul(vqs32_n2_c0_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_n1_c1_x19 = neon::vmul(vqs32_n1_c1_12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_n2_c1_x19 = neon::vmul(vqs32_n2_c1_12, static_cast<MI_S32>(19));
+            int32x4_t vqs32_n1_c0_x19 = neon::vmul(vqs32_n1_c0_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_n2_c0_x19 = neon::vmul(vqs32_n2_c0_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_n1_c1_x19 = neon::vmul(vqs32_n1_c1_12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_n2_c1_x19 = neon::vmul(vqs32_n2_c1_12, static_cast<DT_S32>(19));
 
             int32x4x2_t v2qs32_n1_result, v2qs32_n2_result;
-            v2qs32_n1_result.val[0] = neon::vmls(vqs32_n1_c0_x19, vqs32_n1_c0_03, static_cast<MI_S32>(3));
-            v2qs32_n2_result.val[0] = neon::vmls(vqs32_n2_c0_x19, vqs32_n2_c0_03, static_cast<MI_S32>(3));
-            v2qs32_n1_result.val[1] = neon::vmls(vqs32_n1_c1_x19, vqs32_n1_c1_03, static_cast<MI_S32>(3));
-            v2qs32_n2_result.val[1] = neon::vmls(vqs32_n2_c1_x19, vqs32_n2_c1_03, static_cast<MI_S32>(3));
+            v2qs32_n1_result.val[0] = neon::vmls(vqs32_n1_c0_x19, vqs32_n1_c0_03, static_cast<DT_S32>(3));
+            v2qs32_n2_result.val[0] = neon::vmls(vqs32_n2_c0_x19, vqs32_n2_c0_03, static_cast<DT_S32>(3));
+            v2qs32_n1_result.val[1] = neon::vmls(vqs32_n1_c1_x19, vqs32_n1_c1_03, static_cast<DT_S32>(3));
+            v2qs32_n2_result.val[1] = neon::vmls(vqs32_n2_c1_x19, vqs32_n2_c1_03, static_cast<DT_S32>(3));
 
-            // vst MI_S32
+            // vst DT_S32
             neon::vstore(rows2_x, v2qs32_n1_result);
             neon::vstore(rows3_x, v2qs32_n2_result);
 
@@ -1448,14 +1448,14 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         rows3_x[1] = src_n2[3] * 19 - src_n2[1] * 3 + src_n2[5] * 16;
 
         // vresize
-        MI_S32 *rows0_y = rows0;
-        MI_S32 *rows1_y = rows1;
-        MI_S32 *rows2_y = rows2;
-        MI_S32 *rows3_y = rows3;
+        DT_S32 *rows0_y = rows0;
+        DT_S32 *rows1_y = rows1;
+        DT_S32 *rows2_y = rows2;
+        DT_S32 *rows3_y = rows3;
 
         Tp *dst_row = dst.Ptr<Tp>(dy);
 
-        MI_S32 owidth_align8 = owidth & (-8);
+        DT_S32 owidth_align8 = owidth & (-8);
         dx = 0;
         for (; dx < owidth_align8; dx += 8)
         {
@@ -1479,20 +1479,20 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
             int32x4_t vqs32_c1_hi03 = neon::vadd(v2qs32_cx1_hi.val[1], v2qs32_n2x1_hi.val[1]);
 
 
-            int32x4_t vqs32_c0_lo_x19 = neon::vmul(vqs32_c0_lo12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c0_hi_x19 = neon::vmul(vqs32_c0_hi12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c1_lo_x19 = neon::vmul(vqs32_c1_lo12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c1_hi_x19 = neon::vmul(vqs32_c1_hi12, static_cast<MI_S32>(19));
-            int32x4_t vqs32_c0_des_lo = neon::vmls(vqs32_c0_lo_x19, vqs32_c0_lo03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c0_des_hi = neon::vmls(vqs32_c0_hi_x19, vqs32_c0_hi03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c1_des_lo = neon::vmls(vqs32_c1_lo_x19, vqs32_c1_lo03, static_cast<MI_S32>(3));
-            int32x4_t vqs32_c1_des_hi = neon::vmls(vqs32_c1_hi_x19, vqs32_c1_hi03, static_cast<MI_S32>(3));
+            int32x4_t vqs32_c0_lo_x19 = neon::vmul(vqs32_c0_lo12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c0_hi_x19 = neon::vmul(vqs32_c0_hi12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c1_lo_x19 = neon::vmul(vqs32_c1_lo12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c1_hi_x19 = neon::vmul(vqs32_c1_hi12, static_cast<DT_S32>(19));
+            int32x4_t vqs32_c0_des_lo = neon::vmls(vqs32_c0_lo_x19, vqs32_c0_lo03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c0_des_hi = neon::vmls(vqs32_c0_hi_x19, vqs32_c0_hi03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c1_des_lo = neon::vmls(vqs32_c1_lo_x19, vqs32_c1_lo03, static_cast<DT_S32>(3));
+            int32x4_t vqs32_c1_des_hi = neon::vmls(vqs32_c1_hi_x19, vqs32_c1_hi03, static_cast<DT_S32>(3));
 
             MVType mvq16_result;
-            if (std::is_same<Tp, MI_U16>::value)
+            if (std::is_same<Tp, DT_U16>::value)
             {
                 int32x4_t vqs32_zero;
-                neon::vdup(vqs32_zero, static_cast<MI_S32>(0));
+                neon::vdup(vqs32_zero, static_cast<DT_S32>(0));
 
                 vqs32_c0_des_lo = neon::vmax(vqs32_c0_des_lo, vqs32_zero);
                 vqs32_c0_des_hi = neon::vmax(vqs32_c0_des_hi, vqs32_zero);
@@ -1534,7 +1534,7 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 
         for (; dx < owidth; dx++)
         {
-            MI_S32 result = (rows1_y[0] * 19 - rows0_y[0] * 3 + rows2_y[0] * 19 - rows3_y[0] * 3 + 512) >> 10;
+            DT_S32 result = (rows1_y[0] * 19 - rows0_y[0] * 3 + rows2_y[0] * 19 - rows3_y[0] * 3 + 512) >> 10;
             dst_row[0]    = SaturateCast<Tp>(result);
             result        = (rows1_y[1] * 19 - rows0_y[1] * 3 + rows2_y[1] * 19 - rows3_y[1] * 3 + 512) >> 10;
             dst_row[1]    = SaturateCast<Tp>(result);
@@ -1554,16 +1554,16 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 #if defined(AURA_ENABLE_NEON_FP16)
 template <typename Tp>
 static typename std::enable_if<std::is_same<MI_F16, Tp>::value, Status>::type
-ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     using MVType   = typename neon::MDVector<Tp, 4>::MVType;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
-    MI_F32 coef0   = -0.093750; // GetCuCoef(1.5f);
-    MI_F32 coef1   = 0.593750; // GetCuCoef(0.5f);
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
+    DT_F32 coef0   = -0.093750; // GetCuCoef(1.5f);
+    DT_F32 coef1   = 0.593750; // GetCuCoef(0.5f);
 
-    MI_F32 *rows = thread_buffer.GetThreadData<MI_F32>();
+    DT_F32 *rows = thread_buffer.GetThreadData<DT_F32>();
 
     if (!rows)
     {
@@ -1571,10 +1571,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         return Status::ERROR;
     }
 
-    MI_F32 *rows0 = rows;
-    MI_F32 *rows1 = rows0 + owidth * channel;
-    MI_F32 *rows2 = rows1 + owidth * channel;
-    MI_F32 *rows3 = rows2 + owidth * channel;
+    DT_F32 *rows0 = rows;
+    DT_F32 *rows1 = rows0 + owidth * channel;
+    DT_F32 *rows2 = rows1 + owidth * channel;
+    DT_F32 *rows3 = rows2 + owidth * channel;
 
     start_row = start_row << 1;
     end_row   = Min(end_row << 1, oheight);
@@ -1583,10 +1583,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     const Tp *src_n0 = src.Ptr<Tp>(start_row << 1);
     const Tp *src_n1 = src.Ptr<Tp>((start_row << 1) + 1);
     const Tp *src_n2 = src.Ptr<Tp>((start_row << 1) + 2);
-    MI_F32 *rows0_x = rows0;
-    MI_F32 *rows1_x = rows1;
-    MI_F32 *rows2_x = rows2;
-    MI_F32 *rows3_x = rows3;
+    DT_F32 *rows0_x = rows0;
+    DT_F32 *rows1_x = rows1;
+    DT_F32 *rows2_x = rows2;
+    DT_F32 *rows3_x = rows3;
 
     // Line 0
     if (0 == start_row)
@@ -1616,8 +1616,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     rows2_x += channel;
     rows3_x += channel;
 
-    MI_S32 owidth_align4 = (owidth - 2) & (-4);
-    MI_S32 dx = 0;
+    DT_S32 owidth_align4 = (owidth - 2) & (-4);
+    DT_S32 dx = 0;
     for (; dx < owidth_align4; dx += 4)
     {
         MVType mvdf16_cx0  = neon::vload4(src_c);
@@ -1629,23 +1629,23 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         MVType mvdf16_n1x1 = neon::vload4(src_n1 + 2 * channel);
         MVType mvdf16_n2x1 = neon::vload4(src_n2 + 2 * channel);
 
-        float32x4_t vqf32_c_c0_12  = neon::vadd(neon::vcvt<MI_F32>(mvdf16_cx0.val[2]),  neon::vcvt<MI_F32>(mvdf16_cx1.val[0]));
-        float32x4_t vqf32_c_c0_03  = neon::vadd(neon::vcvt<MI_F32>(mvdf16_cx0.val[0]),  neon::vcvt<MI_F32>(mvdf16_cx1.val[2]));
-        float32x4_t vqf32_n0_c0_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n0x0.val[2]), neon::vcvt<MI_F32>(mvdf16_n0x1.val[0]));
-        float32x4_t vqf32_n0_c0_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n0x0.val[0]), neon::vcvt<MI_F32>(mvdf16_n0x1.val[2]));
-        float32x4_t vqf32_n1_c0_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n1x0.val[2]), neon::vcvt<MI_F32>(mvdf16_n1x1.val[0]));
-        float32x4_t vqf32_n1_c0_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n1x0.val[0]), neon::vcvt<MI_F32>(mvdf16_n1x1.val[2]));
-        float32x4_t vqf32_n2_c0_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n2x0.val[2]), neon::vcvt<MI_F32>(mvdf16_n2x1.val[0]));
-        float32x4_t vqf32_n2_c0_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n2x0.val[0]), neon::vcvt<MI_F32>(mvdf16_n2x1.val[2]));
+        float32x4_t vqf32_c_c0_12  = neon::vadd(neon::vcvt<DT_F32>(mvdf16_cx0.val[2]),  neon::vcvt<DT_F32>(mvdf16_cx1.val[0]));
+        float32x4_t vqf32_c_c0_03  = neon::vadd(neon::vcvt<DT_F32>(mvdf16_cx0.val[0]),  neon::vcvt<DT_F32>(mvdf16_cx1.val[2]));
+        float32x4_t vqf32_n0_c0_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n0x0.val[2]), neon::vcvt<DT_F32>(mvdf16_n0x1.val[0]));
+        float32x4_t vqf32_n0_c0_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n0x0.val[0]), neon::vcvt<DT_F32>(mvdf16_n0x1.val[2]));
+        float32x4_t vqf32_n1_c0_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n1x0.val[2]), neon::vcvt<DT_F32>(mvdf16_n1x1.val[0]));
+        float32x4_t vqf32_n1_c0_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n1x0.val[0]), neon::vcvt<DT_F32>(mvdf16_n1x1.val[2]));
+        float32x4_t vqf32_n2_c0_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n2x0.val[2]), neon::vcvt<DT_F32>(mvdf16_n2x1.val[0]));
+        float32x4_t vqf32_n2_c0_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n2x0.val[0]), neon::vcvt<DT_F32>(mvdf16_n2x1.val[2]));
 
-        float32x4_t vqf32_c_c1_12  = neon::vadd(neon::vcvt<MI_F32>(mvdf16_cx0.val[3]),  neon::vcvt<MI_F32>(mvdf16_cx1.val[1]));
-        float32x4_t vqf32_c_c1_03  = neon::vadd(neon::vcvt<MI_F32>(mvdf16_cx0.val[1]),  neon::vcvt<MI_F32>(mvdf16_cx1.val[3]));
-        float32x4_t vqf32_n0_c1_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n0x0.val[3]), neon::vcvt<MI_F32>(mvdf16_n0x1.val[1]));
-        float32x4_t vqf32_n0_c1_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n0x0.val[1]), neon::vcvt<MI_F32>(mvdf16_n0x1.val[3]));
-        float32x4_t vqf32_n1_c1_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n1x0.val[3]), neon::vcvt<MI_F32>(mvdf16_n1x1.val[1]));
-        float32x4_t vqf32_n1_c1_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n1x0.val[1]), neon::vcvt<MI_F32>(mvdf16_n1x1.val[3]));
-        float32x4_t vqf32_n2_c1_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n2x0.val[3]), neon::vcvt<MI_F32>(mvdf16_n2x1.val[1]));
-        float32x4_t vqf32_n2_c1_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n2x0.val[1]), neon::vcvt<MI_F32>(mvdf16_n2x1.val[3]));
+        float32x4_t vqf32_c_c1_12  = neon::vadd(neon::vcvt<DT_F32>(mvdf16_cx0.val[3]),  neon::vcvt<DT_F32>(mvdf16_cx1.val[1]));
+        float32x4_t vqf32_c_c1_03  = neon::vadd(neon::vcvt<DT_F32>(mvdf16_cx0.val[1]),  neon::vcvt<DT_F32>(mvdf16_cx1.val[3]));
+        float32x4_t vqf32_n0_c1_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n0x0.val[3]), neon::vcvt<DT_F32>(mvdf16_n0x1.val[1]));
+        float32x4_t vqf32_n0_c1_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n0x0.val[1]), neon::vcvt<DT_F32>(mvdf16_n0x1.val[3]));
+        float32x4_t vqf32_n1_c1_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n1x0.val[3]), neon::vcvt<DT_F32>(mvdf16_n1x1.val[1]));
+        float32x4_t vqf32_n1_c1_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n1x0.val[1]), neon::vcvt<DT_F32>(mvdf16_n1x1.val[3]));
+        float32x4_t vqf32_n2_c1_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n2x0.val[3]), neon::vcvt<DT_F32>(mvdf16_n2x1.val[1]));
+        float32x4_t vqf32_n2_c1_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n2x0.val[1]), neon::vcvt<DT_F32>(mvdf16_n2x1.val[3]));
 
         float32x4_t vqf32_c_c0_x19  = neon::vmul(vqf32_c_c0_12, coef1);
         float32x4_t vqf32_n0_c0_x19 = neon::vmul(vqf32_n0_c0_12, coef1);
@@ -1723,10 +1723,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     rows3_x[1] = src_n2[3] * coef1 + src_n2[1] * coef0 + src_n2[5] * 0.5f;
 
     // vresize
-    MI_F32 *rows0_y = rows0;
-    MI_F32 *rows1_y = rows1;
-    MI_F32 *rows2_y = rows2;
-    MI_F32 *rows3_y = rows3;
+    DT_F32 *rows0_y = rows0;
+    DT_F32 *rows1_y = rows1;
+    DT_F32 *rows2_y = rows2;
+    DT_F32 *rows3_y = rows3;
 
     Tp *dst_row = dst.Ptr<Tp>(start_row);
 
@@ -1775,13 +1775,13 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     }
 
     // Line 1 ~ h-1
-    for (MI_S32 dy = (start_row + 1); dy < end_row; dy++)
+    for (DT_S32 dy = (start_row + 1); dy < end_row; dy++)
     {
-        MI_S32 sy = (dy << 1) - 1;
+        DT_S32 sy = (dy << 1) - 1;
 
         // hresize two row
-        MI_F32 *rows0_tmp = rows0;
-        MI_F32 *rows1_tmp = rows1;
+        DT_F32 *rows0_tmp = rows0;
+        DT_F32 *rows1_tmp = rows1;
         rows0             = rows2;
         rows1             = rows3;
         rows2             = rows0_tmp;
@@ -1789,8 +1789,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 
         const Tp *src_n1 = src.Ptr<Tp>(sy + 2);
         const Tp *src_n2 = src.Ptr<Tp>(sy + 3);
-        MI_F32 *rows2_x  = rows2;
-        MI_F32 *rows3_x  = rows3;
+        DT_F32 *rows2_x  = rows2;
+        DT_F32 *rows3_x  = rows3;
 
         if (end_row == oheight && dy == (end_row - 1))
         {
@@ -1807,8 +1807,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         rows2_x += channel;
         rows3_x += channel;
 
-        MI_S32 owidth_align4 = (owidth - 2) & (-4);
-        MI_S32 dx = 0;
+        DT_S32 owidth_align4 = (owidth - 2) & (-4);
+        DT_S32 dx = 0;
         for (; dx < owidth_align4; dx += 4)
         {
             MVType mvdf16_n1x0 = neon::vload4(src_n1);
@@ -1816,14 +1816,14 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
             MVType mvdf16_n1x1 = neon::vload4(src_n1 + 2 * channel);
             MVType mvdf16_n2x1 = neon::vload4(src_n2 + 2 * channel);
 
-            float32x4_t vqf32_n1_c0_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n1x0.val[2]), neon::vcvt<MI_F32>(mvdf16_n1x1.val[0]));
-            float32x4_t vqf32_n1_c0_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n1x0.val[0]), neon::vcvt<MI_F32>(mvdf16_n1x1.val[2]));
-            float32x4_t vqf32_n2_c0_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n2x0.val[2]), neon::vcvt<MI_F32>(mvdf16_n2x1.val[0]));
-            float32x4_t vqf32_n2_c0_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n2x0.val[0]), neon::vcvt<MI_F32>(mvdf16_n2x1.val[2]));
-            float32x4_t vqf32_n1_c1_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n1x0.val[3]), neon::vcvt<MI_F32>(mvdf16_n1x1.val[1]));
-            float32x4_t vqf32_n1_c1_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n1x0.val[1]), neon::vcvt<MI_F32>(mvdf16_n1x1.val[3]));
-            float32x4_t vqf32_n2_c1_12 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n2x0.val[3]), neon::vcvt<MI_F32>(mvdf16_n2x1.val[1]));
-            float32x4_t vqf32_n2_c1_03 = neon::vadd(neon::vcvt<MI_F32>(mvdf16_n2x0.val[1]), neon::vcvt<MI_F32>(mvdf16_n2x1.val[3]));
+            float32x4_t vqf32_n1_c0_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n1x0.val[2]), neon::vcvt<DT_F32>(mvdf16_n1x1.val[0]));
+            float32x4_t vqf32_n1_c0_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n1x0.val[0]), neon::vcvt<DT_F32>(mvdf16_n1x1.val[2]));
+            float32x4_t vqf32_n2_c0_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n2x0.val[2]), neon::vcvt<DT_F32>(mvdf16_n2x1.val[0]));
+            float32x4_t vqf32_n2_c0_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n2x0.val[0]), neon::vcvt<DT_F32>(mvdf16_n2x1.val[2]));
+            float32x4_t vqf32_n1_c1_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n1x0.val[3]), neon::vcvt<DT_F32>(mvdf16_n1x1.val[1]));
+            float32x4_t vqf32_n1_c1_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n1x0.val[1]), neon::vcvt<DT_F32>(mvdf16_n1x1.val[3]));
+            float32x4_t vqf32_n2_c1_12 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n2x0.val[3]), neon::vcvt<DT_F32>(mvdf16_n2x1.val[1]));
+            float32x4_t vqf32_n2_c1_03 = neon::vadd(neon::vcvt<DT_F32>(mvdf16_n2x0.val[1]), neon::vcvt<DT_F32>(mvdf16_n2x1.val[3]));
 
             float32x4_t vqf32_n1_c0_x19 = neon::vmul(vqf32_n1_c0_12, coef1);
             float32x4_t vqf32_n2_c0_x19 = neon::vmul(vqf32_n2_c0_12, coef1);
@@ -1869,10 +1869,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         rows3_x[1] = src_n2[3] * coef1 + src_n2[1] * coef0 + src_n2[5] * 0.5f;
 
         // vresize
-        MI_F32 *rows0_y = rows0;
-        MI_F32 *rows1_y = rows1;
-        MI_F32 *rows2_y = rows2;
-        MI_F32 *rows3_y = rows3;
+        DT_F32 *rows0_y = rows0;
+        DT_F32 *rows1_y = rows1;
+        DT_F32 *rows2_y = rows2;
+        DT_F32 *rows3_y = rows3;
 
         Tp *dst_row = dst.Ptr<Tp>(dy);
 
@@ -1925,19 +1925,19 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 }
 #endif
 
-// Tp = MI_F32
+// Tp = DT_F32
 template <typename Tp>
-static typename std::enable_if<std::is_same<MI_F32, Tp>::value, Status>::type
-ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, MI_S32 start_row, MI_S32 end_row)
+static typename std::enable_if<std::is_same<DT_F32, Tp>::value, Status>::type
+ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &thread_buffer, DT_S32 start_row, DT_S32 end_row)
 {
     using MVType   = typename neon::MQVector<Tp, 4>::MVType;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
-    MI_S32 channel = dst.GetSizes().m_channel;
-    MI_F32 coef0   = 0.093750;//GetCuCoef(1.5f);
-    MI_F32 coef1   = 0.593750;//GetCuCoef(0.5f);
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 channel = dst.GetSizes().m_channel;
+    DT_F32 coef0   = 0.093750;//GetCuCoef(1.5f);
+    DT_F32 coef1   = 0.593750;//GetCuCoef(0.5f);
 
-    MI_F32 *rows = thread_buffer.GetThreadData<MI_F32>();
+    DT_F32 *rows = thread_buffer.GetThreadData<DT_F32>();
 
     if (!rows)
     {
@@ -1945,10 +1945,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         return Status::ERROR;
     }
 
-    MI_F32 *rows0 = rows;
-    MI_F32 *rows1 = rows0 + owidth * channel;
-    MI_F32 *rows2 = rows1 + owidth * channel;
-    MI_F32 *rows3 = rows2 + owidth * channel;
+    DT_F32 *rows0 = rows;
+    DT_F32 *rows1 = rows0 + owidth * channel;
+    DT_F32 *rows2 = rows1 + owidth * channel;
+    DT_F32 *rows3 = rows2 + owidth * channel;
 
     start_row = start_row << 1;
     end_row   = Min(end_row << 1, oheight);
@@ -1957,10 +1957,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     const Tp *src_n0 = src.Ptr<Tp>(start_row << 1);
     const Tp *src_n1 = src.Ptr<Tp>((start_row << 1) + 1);
     const Tp *src_n2 = src.Ptr<Tp>((start_row << 1) + 2);
-    MI_F32 *rows0_x = rows0;
-    MI_F32 *rows1_x = rows1;
-    MI_F32 *rows2_x = rows2;
-    MI_F32 *rows3_x = rows3;
+    DT_F32 *rows0_x = rows0;
+    DT_F32 *rows1_x = rows1;
+    DT_F32 *rows2_x = rows2;
+    DT_F32 *rows3_x = rows3;
 
     // Line 0
     if (0 == start_row)
@@ -1990,8 +1990,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     rows2_x += channel;
     rows3_x += channel;
 
-    MI_S32 owidth_align4 = (owidth - 2) & (-4);
-    MI_S32 dx = 0;
+    DT_S32 owidth_align4 = (owidth - 2) & (-4);
+    DT_S32 dx = 0;
     for (; dx < owidth_align4; dx += 4)
     {
         MVType mvqf32_cx0  = neon::vload4q(src_c);
@@ -2088,10 +2088,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     rows3_x[1] = src_n2[3] * coef1 - src_n2[1] * coef0 + src_n2[5] * 0.5f;
 
     // vresize
-    MI_F32 *rows0_y = rows0;
-    MI_F32 *rows1_y = rows1;
-    MI_F32 *rows2_y = rows2;
-    MI_F32 *rows3_y = rows3;
+    DT_F32 *rows0_y = rows0;
+    DT_F32 *rows1_y = rows1;
+    DT_F32 *rows2_y = rows2;
+    DT_F32 *rows3_y = rows3;
 
     Tp *dst_row = dst.Ptr<Tp>(start_row);
 
@@ -2138,13 +2138,13 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
     }
 
     // Line 1 ~ h-1
-    for (MI_S32 dy = (start_row + 1); dy < end_row; dy++)
+    for (DT_S32 dy = (start_row + 1); dy < end_row; dy++)
     {
-        MI_S32 sy = (dy << 1) - 1;
+        DT_S32 sy = (dy << 1) - 1;
 
         // hresize two row
-        MI_F32 *rows0_tmp = rows0;
-        MI_F32 *rows1_tmp = rows1;
+        DT_F32 *rows0_tmp = rows0;
+        DT_F32 *rows1_tmp = rows1;
         rows0             = rows2;
         rows1             = rows3;
         rows2             = rows0_tmp;
@@ -2152,8 +2152,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
 
         const Tp *src_n1 = src.Ptr<Tp>(sy + 2);
         const Tp *src_n2 = src.Ptr<Tp>(sy + 3);
-        MI_F32 *rows2_x  = rows2;
-        MI_F32 *rows3_x  = rows3;
+        DT_F32 *rows2_x  = rows2;
+        DT_F32 *rows3_x  = rows3;
 
         if (end_row == oheight && dy == (end_row - 1))
         {
@@ -2170,8 +2170,8 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         rows2_x += channel;
         rows3_x += channel;
 
-        MI_S32 owidth_align4 = (owidth - 2) & (-4);
-        MI_S32 dx = 0;
+        DT_S32 owidth_align4 = (owidth - 2) & (-4);
+        DT_S32 dx = 0;
         for (; dx < owidth_align4; dx += 4)
         {
             MVType mvqf32_n1x0 = neon::vload4q(src_n1);
@@ -2227,10 +2227,10 @@ ResizeCuC2DownX2NeonImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &t
         rows3_x[1] = src_n2[3] * coef1 - src_n2[1] * coef0 + src_n2[5] * 0.5f;
 
         // vresize
-        MI_F32 *rows0_y = rows0;
-        MI_F32 *rows1_y = rows1;
-        MI_F32 *rows2_y = rows2;
-        MI_F32 *rows3_y = rows3;
+        DT_F32 *rows0_y = rows0;
+        DT_F32 *rows1_y = rows1;
+        DT_F32 *rows2_y = rows2;
+        DT_F32 *rows3_y = rows3;
 
         Tp *dst_row = dst.Ptr<Tp>(dy);
 
@@ -2285,16 +2285,16 @@ static Status ResizeCuFastC2NeonHelper(Context *ctx, const Mat &src, Mat &dst, c
 {
     AURA_UNUSED(target);
     using BufType  = typename ResizeBnCuTraits<Tp>::BufType;
-    MI_S32 iwidth  = src.GetSizes().m_width;
-    MI_S32 iheight = src.GetSizes().m_height;
-    MI_S32 owidth  = dst.GetSizes().m_width;
-    MI_S32 oheight = dst.GetSizes().m_height;
+    DT_S32 iwidth  = src.GetSizes().m_width;
+    DT_S32 iheight = src.GetSizes().m_height;
+    DT_S32 owidth  = dst.GetSizes().m_width;
+    DT_S32 oheight = dst.GetSizes().m_height;
 
-    MI_F32 scale_x = static_cast<MI_F64>(iwidth) / owidth;
-    MI_F32 scale_y = static_cast<MI_F64>(iheight) / oheight;
+    DT_F32 scale_x = static_cast<DT_F64>(iwidth) / owidth;
+    DT_F32 scale_y = static_cast<DT_F64>(iheight) / oheight;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerPool failed");
         return Status::ERROR;
@@ -2336,40 +2336,40 @@ Status ResizeCuFastC2Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget
     {
         case ElemType::U8:
         {
-            ret = ResizeCuFastC2NeonHelper<MI_U8>(ctx, src, dst, target);
+            ret = ResizeCuFastC2NeonHelper<DT_U8>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: MI_U8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: DT_U8");
             }
             break;
         }
 
         case ElemType::S8:
         {
-            ret = ResizeCuFastC2NeonHelper<MI_S8>(ctx, src, dst, target);
+            ret = ResizeCuFastC2NeonHelper<DT_S8>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: MI_S8");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: DT_S8");
             }
             break;
         }
 
         case ElemType::U16:
         {
-            ret = ResizeCuFastC2NeonHelper<MI_U16>(ctx, src, dst, target);
+            ret = ResizeCuFastC2NeonHelper<DT_U16>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: MI_U16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: DT_U16");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            ret = ResizeCuFastC2NeonHelper<MI_S16>(ctx, src, dst, target);
+            ret = ResizeCuFastC2NeonHelper<DT_S16>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: MI_S16");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: DT_S16");
             }
             break;
         }
@@ -2388,10 +2388,10 @@ Status ResizeCuFastC2Neon(Context *ctx, const Mat &src, Mat &dst, const OpTarget
 
         case ElemType::F32:
         {
-            ret = ResizeCuFastC2NeonHelper<MI_F32>(ctx, src, dst, target);
+            ret = ResizeCuFastC2NeonHelper<DT_F32>(ctx, src, dst, target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: MI_F32");
+                AURA_ADD_ERROR_STRING(ctx, "ResizeCuFastC2NeonHelper run failed, type: DT_F32");
             }
             break;
         }

@@ -77,7 +77,7 @@ static MiscThresholdParam::TupleTable g_combine_threshold_table_hvx
 NEW_TESTCASE(misc, Threshold, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(aura::HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::TURBO, DT_FALSE);
 
     ThresholdTest test_threshold(aura::UnitTest::GetInstance()->GetContext(), g_threshold_table_hvx);
     test_threshold.RunTest(this, UnitTest::GetInstance()->GetStressCount());
@@ -85,5 +85,5 @@ NEW_TESTCASE(misc, Threshold, hvx)
     ThresholdTest test_combine_threshold(aura::UnitTest::GetInstance()->GetContext(), g_combine_threshold_table_hvx);
     test_combine_threshold.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(aura::HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(aura::HexagonPowerLevel::STANDBY, DT_FALSE);
 }

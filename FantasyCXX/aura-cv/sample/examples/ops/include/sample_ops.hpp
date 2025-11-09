@@ -6,7 +6,7 @@
 
 using SampleOpsFunc = std::function<aura::Status(aura::Context*, aura::TargetType)>;
 
-AURA_INLINE aura::Status InputParser(MI_S32 argc, MI_CHAR *argv[], std::string &help_info,
+AURA_INLINE aura::Status InputParser(DT_S32 argc, DT_CHAR *argv[], std::string &help_info,
                                      const std::map<std::string, SampleOpsFunc> &func_map,
                                      SampleOpsFunc &func, aura::TargetType &type)
 {

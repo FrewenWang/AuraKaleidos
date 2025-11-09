@@ -7,7 +7,7 @@
 namespace aura
 {
 
-static const MI_U8 ctrl_perm_2mipi[] __attribute__((aligned(128))) = 
+static const DT_U8 ctrl_perm_2mipi[] __attribute__((aligned(128))) = 
 {
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -28,7 +28,7 @@ static const MI_U8 ctrl_perm_2mipi[] __attribute__((aligned(128))) =
     0x00,0x00,0x00,0x00,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,
 };
 
-AURA_ALWAYS_INLINE AURA_VOID ProcessRawFrames(HVX_Vector &vu16_src, HVX_Vector &vu8_dst)
+AURA_ALWAYS_INLINE DT_VOID ProcessRawFrames(HVX_Vector &vu16_src, HVX_Vector &vu8_dst)
 {
     HVX_Vector vu16_zero  = Q6_V_vsplat_R(0x0);
     HVX_Vector vu16_const = Q6_V_vsplat_R(0x30003);
@@ -51,7 +51,7 @@ AURA_ALWAYS_INLINE AURA_VOID ProcessRawFrames(HVX_Vector &vu16_src, HVX_Vector &
     vu8_dst  = Q6_V_vdelta_VV(vu8_res1, vu8_ctrl1);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID PackData(HVX_Vector &vu8_src0, HVX_Vector &vu8_src1, HVX_Vector &vu8_src2, HVX_Vector &vu8_src3,
+AURA_ALWAYS_INLINE DT_VOID PackData(HVX_Vector &vu8_src0, HVX_Vector &vu8_src1, HVX_Vector &vu8_src2, HVX_Vector &vu8_src3,
                                     HVX_Vector &vu8_src4, HVX_Vector &vu8_src5, HVX_Vector &vu8_src6, HVX_Vector &vu8_src7,
                                     HVX_Vector &vu8_dst0, HVX_Vector &vu8_dst1, HVX_Vector &vu8_dst2,
                                     HVX_Vector &vu8_dst3, HVX_Vector &vu8_dst4)
@@ -88,7 +88,7 @@ AURA_ALWAYS_INLINE AURA_VOID PackData(HVX_Vector &vu8_src0, HVX_Vector &vu8_src1
     vu8_dst4 = Q6_V_vor_VV(vu8_res3, vu8_res2);
 }
 
-AURA_ALWAYS_INLINE AURA_VOID MipiPackRowCore(MI_U8 *src, MI_U8 *dst)
+AURA_ALWAYS_INLINE DT_VOID MipiPackRowCore(DT_U8 *src, DT_U8 *dst)
 {
     HVX_Vector vu16_src0, vu16_src1, vu16_src2, vu16_src3;
     HVX_Vector vu16_src4, vu16_src5, vu16_src6, vu16_src7;
@@ -126,15 +126,15 @@ AURA_ALWAYS_INLINE AURA_VOID MipiPackRowCore(MI_U8 *src, MI_U8 *dst)
     vstore(dst + AURA_HVLEN * 4, vu8_dst4);
 }
 
-static AURA_VOID MipiPackRow(const MI_U16 *src, MI_U8 *dst, MI_S32 iwidth, MI_S32 owidth)
+static DT_VOID MipiPackRow(const DT_U16 *src, DT_U8 *dst, DT_S32 iwidth, DT_S32 owidth)
 {
-    MI_U8 *src_u8 = reinterpret_cast<MI_U8 *>(const_cast<MI_U16 *>(src));
-    MI_U8 *dst_u8 = (MI_U8 *)dst;
+    DT_U8 *src_u8 = reinterpret_cast<DT_U8 *>(const_cast<DT_U16 *>(src));
+    DT_U8 *dst_u8 = (DT_U8 *)dst;
 
-    MI_S32 loop = iwidth / (AURA_HALF_HVLEN * 8);
-    MI_S32 tail = iwidth % (AURA_HALF_HVLEN * 8);
+    DT_S32 loop = iwidth / (AURA_HALF_HVLEN * 8);
+    DT_S32 tail = iwidth % (AURA_HALF_HVLEN * 8);
 
-    for (MI_S32 index_loop = 0; index_loop < loop; index_loop++)
+    for (DT_S32 index_loop = 0; index_loop < loop; index_loop++)
     {
         MipiPackRowCore(src_u8, dst_u8);
 
@@ -144,30 +144,30 @@ static AURA_VOID MipiPackRow(const MI_U16 *src, MI_U8 *dst, MI_S32 iwidth, MI_S3
     // remain
     if (tail)
     {
-        src_u8 = reinterpret_cast<MI_U8 *>(const_cast<MI_U16 *>(src + iwidth - AURA_HVLEN * 4));
+        src_u8 = reinterpret_cast<DT_U8 *>(const_cast<DT_U16 *>(src + iwidth - AURA_HVLEN * 4));
         dst_u8 = dst + owidth - AURA_HVLEN * 5;
 
         MipiPackRowCore(src_u8, dst_u8);
     }
 }
 
-static Status MipiPackHvxImpl(const Mat &src, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status MipiPackHvxImpl(const Mat &src, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 iwidth = src.GetSizes().m_width;
-    MI_S32 height = src.GetSizes().m_height;
-    MI_S32 istride = src.GetStrides().m_width;
-    MI_S32 owidth = dst.GetSizes().m_width;
+    DT_S32 iwidth = src.GetSizes().m_width;
+    DT_S32 height = src.GetSizes().m_height;
+    DT_S32 istride = src.GetStrides().m_width;
+    DT_S32 owidth = dst.GetSizes().m_width;
 
-    MI_U64 L2fetch_param = L2PfParam(istride, iwidth * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 L2fetch_param = L2PfParam(istride, iwidth * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 1 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<MI_U16>(y + 1)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<DT_U16>(y + 1)), L2fetch_param);
         }
 
-        const MI_U16 *src_row = src.Ptr<MI_U16>(y);
-        MI_U8 *dst_row = dst.Ptr<MI_U8>(y);
+        const DT_U16 *src_row = src.Ptr<DT_U16>(y);
+        DT_U8 *dst_row = dst.Ptr<DT_U8>(y);
         MipiPackRow(src_row, dst_row, iwidth, owidth);
     }
 
@@ -203,7 +203,7 @@ Status MipiPackHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return ret;
@@ -213,16 +213,16 @@ Status MipiPackHvx::Run()
     {
         case ElemType::U16:
         {
-            MI_S32 height = src->GetSizes().m_height;
+            DT_S32 height = src->GetSizes().m_height;
 
             WorkerPool *wp = m_ctx->GetWorkerPool();
-            if (MI_NULL == wp)
+            if (DT_NULL == wp)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "GetWorkpool failed");
                 break;
             }
 
-            ret = wp->ParallelFor((MI_S32)0, height, MipiPackHvxImpl, std::cref(*src), std::ref(*dst));
+            ret = wp->ParallelFor((DT_S32)0, height, MipiPackHvxImpl, std::cref(*src), std::ref(*dst));
             if (ret != Status::OK)
             {
                 AURA_ADD_ERROR_STRING(m_ctx, "MipiPackHvxImpl failed");

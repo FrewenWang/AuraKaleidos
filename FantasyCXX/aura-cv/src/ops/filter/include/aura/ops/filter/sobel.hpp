@@ -54,7 +54,7 @@ public:
      * @note If the type of src or dst is `CLMem` and is an iaura2D memory object, the row pitch should be aligned to a stride,
      * which is obtained through the `GetCLLengthAlignSize` function and is platform-dependent.
      */
-    Status SetArgs(const Array *src, Array *dst, MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_F32 scale = 1.f,
+    Status SetArgs(const Array *src, Array *dst, DT_S32 dx, DT_S32 dy, DT_S32 ksize, DT_F32 scale = 1.f,
                    BorderType border_type = BorderType::REFLECT_101, const Scalar &border_value = Scalar());
 
     /**
@@ -69,8 +69,8 @@ public:
      * @param src_elem_type The element type of the src array.
      * @param dst_elem_type The element type of the dst array.
      */
-    static Status CLPrecompile(Context *ctx, MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_F32 scale, BorderType border_type,
-                               MI_S32 channel, ElemType src_elem_type, ElemType dst_elem_type);
+    static Status CLPrecompile(Context *ctx, DT_S32 dx, DT_S32 dy, DT_S32 ksize, DT_F32 scale, BorderType border_type,
+                               DT_S32 channel, ElemType src_elem_type, ElemType dst_elem_type);
 };
 
 /**
@@ -104,7 +104,7 @@ public:
  * @note 1.N is positive integer(ksize is odd positive integer). <br>
  *       2.The above implementations supported all BorderType(CONSTANT/REPLICATE/REFLECT_101).
  */
-AURA_EXPORTS Status ISobel(Context *ctx, const Mat &src, Mat &dst, MI_S32 dx, MI_S32 dy, MI_S32 ksize, MI_F32 scale = 1.f,
+AURA_EXPORTS Status ISobel(Context *ctx, const Mat &src, Mat &dst, DT_S32 dx, DT_S32 dy, DT_S32 ksize, DT_F32 scale = 1.f,
                            BorderType border_type = BorderType::REFLECT_101, const Scalar &border_value = Scalar(),
                            const OpTarget &target = OpTarget::Default());
 /**

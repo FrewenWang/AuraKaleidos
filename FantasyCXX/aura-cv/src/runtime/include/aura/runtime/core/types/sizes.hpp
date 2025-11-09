@@ -142,7 +142,7 @@ public:
      *
      * @return True if the size is empty, false otherwise.
      */
-    MI_BOOL Empty() const
+    DT_BOOL Empty() const
     {
         return m_width <= 0 || m_height <= 0;
     }
@@ -188,7 +188,7 @@ public:
      *
      * @return True if the sizes are equal, false otherwise.
      */
-    MI_BOOL operator==(const Sizes2_ &sz) const
+    DT_BOOL operator==(const Sizes2_ &sz) const
     {
         return m_width == sz.m_width && m_height == sz.m_height;
     }
@@ -200,7 +200,7 @@ public:
      *
      * @return True if the sizes are not equal, false if they are equal.
      */
-    MI_BOOL operator!=(const Sizes2_ &sz) const
+    DT_BOOL operator!=(const Sizes2_ &sz) const
     {
         return m_width != sz.m_width || m_height != sz.m_height;
     }
@@ -416,10 +416,10 @@ public:
     Tp0 m_width;    /*!< Width value of the size. */
 };
 
-typedef Sizes2_<MI_S32> Sizes;
-typedef Sizes2_<MI_S64> Sizesl;
-typedef Sizes2_<MI_F32> Sizesf;
-typedef Sizes2_<MI_F64> Sizesd;
+typedef Sizes2_<DT_S32> Sizes;
+typedef Sizes2_<DT_S64> Sizesl;
+typedef Sizes2_<DT_F32> Sizesf;
+typedef Sizes2_<DT_F64> Sizesd;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -550,7 +550,7 @@ public:
      *
      * @return True if the size is empty, false otherwise.
      */
-    MI_BOOL Empty() const
+    DT_BOOL Empty() const
     {
         return m_width <= 0 || m_height <= 0;
     }
@@ -598,7 +598,7 @@ public:
      *
      * @return True if the sizes are equal, false otherwise.
      */
-    MI_BOOL operator==(const Sizes3_ &sz) const
+    DT_BOOL operator==(const Sizes3_ &sz) const
     {
         return m_height == sz.m_height && m_width == sz.m_width && m_channel == sz.m_channel;
     }
@@ -610,7 +610,7 @@ public:
      *
      * @return True if the sizes are not equal, false if they are equal.
      */
-    MI_BOOL operator!=(const Sizes3_ &sz) const
+    DT_BOOL operator!=(const Sizes3_ &sz) const
     {
         return m_height != sz.m_height || m_width != sz.m_width || m_channel != sz.m_channel;
     }
@@ -820,10 +820,10 @@ public:
     Tp0 m_channel;  /*!< Channel value of the size. */
 };
 
-typedef Sizes3_<MI_S32> Sizes3;
-typedef Sizes3_<MI_S64> Sizes3l;
-typedef Sizes3_<MI_F32> Sizes3f;
-typedef Sizes3_<MI_F64> Sizes3d;
+typedef Sizes3_<DT_S32> Sizes3;
+typedef Sizes3_<DT_S64> Sizes3l;
+typedef Sizes3_<DT_F32> Sizes3f;
+typedef Sizes3_<DT_F64> Sizes3d;
 
 /**
  * @}

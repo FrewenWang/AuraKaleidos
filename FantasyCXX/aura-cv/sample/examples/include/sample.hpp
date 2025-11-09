@@ -8,14 +8,14 @@
 #define SAMPLE_TAG                                "aura_sample"
 #define SPLIT_WIDTH                               (86)
 
-AURA_INLINE AURA_VOID PrintHeading(const std::string &heading)
+AURA_INLINE DT_VOID PrintHeading(const std::string &heading)
 {
     std::cout << std::endl << std::string(SPLIT_WIDTH, '=') << std::endl;
     std::cout << heading << std::endl;
     std::cout << std::string(SPLIT_WIDTH, '=') << std::endl;
 }
 
-AURA_INLINE AURA_VOID PrintHelpInfo(const std::string &help_info)
+AURA_INLINE DT_VOID PrintHelpInfo(const std::string &help_info)
 {
     PrintHeading("Aura Sample Run Help Info");
     std::cout << help_info <<std::endl;
@@ -29,27 +29,27 @@ AURA_INLINE std::shared_ptr<aura::Context> CreateContext()
     config.SetWorkerPool("AuraSample", aura::CpuAffinity::BIG, aura::CpuAffinity::LITTLE);
 
 #if defined(AURA_ENABLE_OPENCL)
-    config.SetCLConf(MI_TRUE, "/data/local/tmp", "aura_unit_test");
+    config.SetCLConf(DT_TRUE, "/data/local/tmp", "aura_unit_test");
 #endif
 
 #if defined(AURA_ENABLE_HEXAGON)
-    config.SetHexagonConf(MI_TRUE, MI_TRUE, "aura_hexagon");
+    config.SetHexagonConf(DT_TRUE, DT_TRUE, "aura_hexagon");
 #endif
 
 #if defined(AURA_ENABLE_XTENSA)
-    config.SetXtensaConf(MI_TRUE, "aura_xtensa_pil.so", XtensaPriorityLevel::PRIORITY_HIGH);
+    config.SetXtensaConf(DT_TRUE, "aura_xtensa_pil.so", XtensaPriorityLevel::PRIORITY_HIGH);
 #endif
 
     std::shared_ptr<aura::Context> ctx = std::make_shared<aura::Context>(config);
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
-        return MI_NULL;
+        return DT_NULL;
     }
 
     if (ctx->Initialize() != aura::Status::OK)
     {
         AURA_LOGE(ctx, SAMPLE_TAG, "aura::Context::Initialize() failed\n");
-        return MI_NULL;
+        return DT_NULL;
     }
 
     return ctx;

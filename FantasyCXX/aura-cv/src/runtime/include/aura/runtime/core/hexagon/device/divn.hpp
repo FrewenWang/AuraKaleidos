@@ -10,7 +10,7 @@ namespace aura
 
 /************************************ u8 vdvin ************************************/
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U8>::value && DENOM == 3>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U8>::value && DENOM == 3>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 {
     HVX_VectorPair wu16_mul   = Q6_Wuh_vmpy_VubRub(vu8_src, 0xABABABAB);
@@ -21,7 +21,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U8>::value && DENOM == 5>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U8>::value && DENOM == 5>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 {
     HVX_VectorPair wu16_mul   = Q6_Wuh_vmpy_VubRub(vu8_src,  0xCDCDCDCD);
@@ -32,7 +32,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U8>::value && DENOM == 7>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U8>::value && DENOM == 7>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 {
     HVX_VectorPair wu16_mul   = Q6_Wuh_vmpy_VubRub(vu8_src,  0x25252525);
@@ -43,7 +43,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U8>::value && DENOM == 9>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U8>::value && DENOM == 9>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 {
     HVX_VectorPair wu16_mul   = Q6_Wuh_vmpy_VubRub(vu8_src, 0x39393939);
@@ -54,7 +54,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U8>::value && DENOM == 25>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U8>::value && DENOM == 25>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 {
     HVX_VectorPair wu16_mul   = Q6_Wuh_vmpy_VubRub(vu8_src, 0x29292929);
@@ -65,7 +65,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U8>::value && DENOM == 49>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U8>::value && DENOM == 49>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 {
     HVX_VectorPair wu16_mul   = Q6_Wuh_vmpy_VubRub(vu8_src,  0x4F4F4F4F);
@@ -76,15 +76,15 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U8>::value &&
+          typename std::enable_if<std::is_same<Tp, DT_U8>::value &&
                                   (DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                  (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+                                  (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 {
-    constexpr MI_U8 LENGTH = 32 - __builtin_clz(DENOM - 1);
-    constexpr MI_U8 MUL    = (0 == DENOM) ? 0 : (((MI_U16)256) * ((1 << LENGTH) - DENOM)) / DENOM + 1;
-    constexpr MI_U8 SHIFT0 = (LENGTH > 1) ? 1 : LENGTH;
-    constexpr MI_U8 SHIFT1 = (0 == DENOM) ? 7 : ((MI_S32)LENGTH > 1) ? (MI_S8)(LENGTH - 1) : 0;
+    constexpr DT_U8 LENGTH = 32 - __builtin_clz(DENOM - 1);
+    constexpr DT_U8 MUL    = (0 == DENOM) ? 0 : (((DT_U16)256) * ((1 << LENGTH) - DENOM)) / DENOM + 1;
+    constexpr DT_U8 SHIFT0 = (LENGTH > 1) ? 1 : LENGTH;
+    constexpr DT_U8 SHIFT1 = (0 == DENOM) ? 7 : ((DT_S32)LENGTH > 1) ? (DT_S8)(LENGTH - 1) : 0;
 
     const static HVX_Vector vu8_mul = Q6_Vb_vsplat_R(MUL);
 
@@ -104,7 +104,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu8_src)
 
 /************************************ s8 vdvin ************************************/
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S8>::value && DENOM == 3>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S8>::value && DENOM == 3>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 {
     HVX_VectorPair ws16_mul     = Q6_Wh_vmpy_VubVb(Q6_Vb_vsplat_R(171), vs8_src);
@@ -118,7 +118,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S8>::value && DENOM == 5>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S8>::value && DENOM == 5>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 {
     HVX_VectorPair ws16_mul     = Q6_Wh_vmpy_VubVb(Q6_Vb_vsplat_R(205), vs8_src);
@@ -132,7 +132,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S8>::value && DENOM == 7>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S8>::value && DENOM == 7>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 {
     HVX_VectorPair ws16_mul     = Q6_Wh_vmpy_VubVb(Q6_Vb_vsplat_R(147), vs8_src);
@@ -146,7 +146,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S8>::value && DENOM == 9>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S8>::value && DENOM == 9>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 {
     HVX_VectorPair ws16_mul     = Q6_Wh_vmpy_VubVb(Q6_Vb_vsplat_R(57), vs8_src);
@@ -160,7 +160,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S8>::value && DENOM == 25>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S8>::value && DENOM == 25>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 {
     HVX_VectorPair ws16_mul     = Q6_Wh_vmpy_VubVb(Q6_Vb_vsplat_R(41), vs8_src);
@@ -174,7 +174,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S8>::value && DENOM == 49>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S8>::value && DENOM == 49>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 {
     HVX_VectorPair ws16_mul     = Q6_Wh_vmpy_VubVb(Q6_Vb_vsplat_R(42), vs8_src);
@@ -188,16 +188,16 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S8>::value &&
+          typename std::enable_if<std::is_same<Tp, DT_S8>::value &&
                                   (DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                  (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+                                  (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 {
-    constexpr MI_U8  ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
-    constexpr MI_S8  BITS   = static_cast<MI_S8>(32 - __builtin_clz(ABS_D - 1));
-    constexpr MI_S8  LENGTH = (BITS > 1) ? BITS : 1;
-    constexpr MI_S16 MUL    = (0 == DENOM) ? 0 : 1 + ((MI_U16(1)) << (8 + LENGTH - 1)) / ABS_D - ((MI_U16)256);
-    constexpr MI_S8  SHIFT  = (0 == DENOM) ? 7 : LENGTH - 1;
+    constexpr DT_U8  ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
+    constexpr DT_S8  BITS   = static_cast<DT_S8>(32 - __builtin_clz(ABS_D - 1));
+    constexpr DT_S8  LENGTH = (BITS > 1) ? BITS : 1;
+    constexpr DT_S16 MUL    = (0 == DENOM) ? 0 : 1 + ((DT_U16(1)) << (8 + LENGTH - 1)) / ABS_D - ((DT_U16)256);
+    constexpr DT_S8  SHIFT  = (0 == DENOM) ? 7 : LENGTH - 1;
 
     const static HVX_Vector vs8_mul  = Q6_Vb_vsplat_R(MUL);
     const static HVX_Vector vs8_sign = Q6_Vb_vsplat_R(DENOM >> (7));
@@ -220,7 +220,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs8_src)
 
 /************************************ u16 vdvin ************************************/
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U16>::value && DENOM == 3>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U16>::value && DENOM == 3>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 {
     HVX_VectorPair wu32_mul    = Q6_Wuw_vmpy_VuhRuh(vu16_src, 0xAAABAAAB);
@@ -231,7 +231,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U16>::value && DENOM == 5>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U16>::value && DENOM == 5>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 {
     HVX_VectorPair wu32_mul    = Q6_Wuw_vmpy_VuhRuh(vu16_src, 0xCCCDCCCD);
@@ -242,7 +242,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U16>::value && DENOM == 7>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U16>::value && DENOM == 7>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 {
     HVX_VectorPair wu32_mul    = Q6_Wuw_vmpy_VuhRuh(vu16_src, 0x24932493);
@@ -253,7 +253,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U16>::value && DENOM == 9>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U16>::value && DENOM == 9>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 {
     HVX_VectorPair wu32_mul    = Q6_Wuw_vmpy_VuhRuh(vu16_src, 0xE38FE38F);
@@ -264,7 +264,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U16>::value && DENOM == 25>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U16>::value && DENOM == 25>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 {
     HVX_VectorPair wu32_mul    = Q6_Wuw_vmpy_VuhRuh(vu16_src, 0x47AF47AF);
@@ -275,7 +275,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U16>::value && DENOM == 49>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U16>::value && DENOM == 49>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 {
     HVX_VectorPair wu32_mul    = Q6_Wuw_vmpy_VuhRuh(vu16_src, 0x4E5F4E5F);
@@ -286,15 +286,15 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U16>::value &&
+          typename std::enable_if<std::is_same<Tp, DT_U16>::value &&
                                   (DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                  (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+                                  (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 {
-    constexpr MI_U16 LENGTH = 32 - __builtin_clz(DENOM - 1);
-    constexpr MI_U16 MUL    = (0 == DENOM) ? 0 : ((65536) * ((1 << LENGTH) - DENOM)) / DENOM + 1;
-    constexpr MI_U16 SHIFT0 = (LENGTH > 1) ? 1 : LENGTH;
-    constexpr MI_U16 SHIFT1 = (0 == DENOM) ? 15 : (((MI_S32)LENGTH > 1) ? LENGTH - 1 : 0);
+    constexpr DT_U16 LENGTH = 32 - __builtin_clz(DENOM - 1);
+    constexpr DT_U16 MUL    = (0 == DENOM) ? 0 : ((65536) * ((1 << LENGTH) - DENOM)) / DENOM + 1;
+    constexpr DT_U16 SHIFT0 = (LENGTH > 1) ? 1 : LENGTH;
+    constexpr DT_U16 SHIFT1 = (0 == DENOM) ? 15 : (((DT_S32)LENGTH > 1) ? LENGTH - 1 : 0);
 
     const static HVX_Vector vu16_mul = Q6_Vh_vsplat_R(MUL);
 
@@ -313,7 +313,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu16_src)
 
 /************************************ s16 vdvin ************************************/
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S16>::value && DENOM == 3>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S16>::value && DENOM == 3>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 {
     HVX_VectorPair ws32_mul     = Q6_Ww_vmpy_VhVuh(vs16_src, Q6_Vh_vsplat_R(43691));
@@ -327,7 +327,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S16>::value && DENOM == 5>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S16>::value && DENOM == 5>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 {
     HVX_VectorPair ws32_mul     = Q6_Ww_vmpy_VhVuh(vs16_src, Q6_Vh_vsplat_R(52429));
@@ -341,7 +341,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S16>::value && DENOM == 7>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S16>::value && DENOM == 7>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 {
     HVX_VectorPair ws32_mul     = Q6_Ww_vmpy_VhVuh(vs16_src, Q6_Vh_vsplat_R(18725));
@@ -355,7 +355,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S16>::value && DENOM == 9>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S16>::value && DENOM == 9>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 {
     HVX_VectorPair ws32_mul     = Q6_Ww_vmpy_VhVuh(vs16_src, Q6_Vh_vsplat_R(58255));
@@ -369,7 +369,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S16>::value && DENOM == 25>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S16>::value && DENOM == 25>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 {
     HVX_VectorPair ws32_mul     = Q6_Ww_vmpy_VhVuh(vs16_src, Q6_Vh_vsplat_R(20972));
@@ -383,7 +383,7 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S16>::value && DENOM == 49>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S16>::value && DENOM == 49>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 {
     HVX_VectorPair ws32_mul     = Q6_Ww_vmpy_VhVuh(vs16_src, Q6_Vh_vsplat_R(2675));
@@ -397,16 +397,16 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 }
 
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S16>::value &&
+          typename std::enable_if<std::is_same<Tp, DT_S16>::value &&
                                   (DENOM != 3) && (DENOM != 5)  && (DENOM != 7) &&
-                                  (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = MI_NULL>
+                                  (DENOM != 9) && (DENOM != 25) && (DENOM != 49)>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 {
-    constexpr MI_U16 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
-    constexpr MI_S16 BITS   = static_cast<MI_S16>(32 - __builtin_clz(ABS_D - 1));
-    constexpr MI_S16 LENGTH = (BITS > 1) ? BITS : 1;
-    constexpr MI_S32 MUL    = (0 == DENOM) ? 0 : 1 + ((MI_U32(1)) << (16 + LENGTH - 1)) / ABS_D - (65536);
-    constexpr MI_S16 SHIFT  = (0 == DENOM) ? 15 : (LENGTH - 1);
+    constexpr DT_U16 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
+    constexpr DT_S16 BITS   = static_cast<DT_S16>(32 - __builtin_clz(ABS_D - 1));
+    constexpr DT_S16 LENGTH = (BITS > 1) ? BITS : 1;
+    constexpr DT_S32 MUL    = (0 == DENOM) ? 0 : 1 + ((DT_U32(1)) << (16 + LENGTH - 1)) / ABS_D - (65536);
+    constexpr DT_S16 SHIFT  = (0 == DENOM) ? 15 : (LENGTH - 1);
 
     const static HVX_Vector vs16_mul  = Q6_Vh_vsplat_R(MUL);
     const static HVX_Vector vs16_sign = Q6_Vh_vsplat_R(DENOM >> 15);
@@ -427,14 +427,14 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vs16_src)
 
 /************************************ u32 vdvin ************************************/
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_U32>::value>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_U32>::value>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vu32_src)
 {
-    constexpr MI_U32 LENGTH = 32 - __builtin_clz(DENOM - 1);
-    constexpr MI_U32 MUL    = (0 == DENOM) ? 0 : ((MI_U64)(4294967296) * (((MI_U64)1 << LENGTH) - (MI_U64)DENOM) / DENOM + 1);
-    constexpr MI_U32 MUL_R  = (MUL << 16) | (MUL >> 16);
-    constexpr MI_U32 SHIFT0 = (LENGTH > 1) ? 1 : LENGTH;
-    constexpr MI_U32 SHIFT1 = (0 == DENOM) ? 31 : (((MI_S32)LENGTH > 1) ? ((MI_S32)LENGTH - 1) : 0);
+    constexpr DT_U32 LENGTH = 32 - __builtin_clz(DENOM - 1);
+    constexpr DT_U32 MUL    = (0 == DENOM) ? 0 : ((DT_U64)(4294967296) * (((DT_U64)1 << LENGTH) - (DT_U64)DENOM) / DENOM + 1);
+    constexpr DT_U32 MUL_R  = (MUL << 16) | (MUL >> 16);
+    constexpr DT_U32 SHIFT0 = (LENGTH > 1) ? 1 : LENGTH;
+    constexpr DT_U32 SHIFT1 = (0 == DENOM) ? 31 : (((DT_S32)LENGTH > 1) ? ((DT_S32)LENGTH - 1) : 0);
 
     HVX_Vector vu32_result;
     HVX_VectorPair vu32_albh_ahbl, vu32_albl_ahbh;
@@ -459,14 +459,14 @@ inline HVX_Vector vdiv_n(const HVX_Vector &vu32_src)
 
 /************************************ s32 vdvin ************************************/
 template <typename Tp, Tp DENOM,
-          typename std::enable_if<std::is_same<Tp, MI_S32>::value>::type* = MI_NULL>
+          typename std::enable_if<std::is_same<Tp, DT_S32>::value>::type* = DT_NULL>
 inline HVX_Vector vdiv_n(const HVX_Vector &vs32_src)
 {
-    constexpr MI_U32 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
-    constexpr MI_S32 BITS   = 32 - __builtin_clz(ABS_D - 1);
-    constexpr MI_S32 LENGTH = (BITS > 1) ? BITS : 1;
-    constexpr MI_S64 MUL    = (0 == ABS_D) ? 0 : ((1 + ((MI_U64(1)) << (32 + LENGTH - 1)) / ABS_D) - (4294967296));
-    constexpr MI_S32 SHIFT  = (0 == DENOM) ? 31 : (LENGTH - 1);
+    constexpr DT_U32 ABS_D  = (DENOM >= 0) ? DENOM : -DENOM;
+    constexpr DT_S32 BITS   = 32 - __builtin_clz(ABS_D - 1);
+    constexpr DT_S32 LENGTH = (BITS > 1) ? BITS : 1;
+    constexpr DT_S64 MUL    = (0 == ABS_D) ? 0 : ((1 + ((DT_U64(1)) << (32 + LENGTH - 1)) / ABS_D) - (4294967296));
+    constexpr DT_S32 SHIFT  = (0 == DENOM) ? 31 : (LENGTH - 1);
 
     const static HVX_Vector vs32_mul   = Q6_V_vsplat_R(MUL);
     const static HVX_Vector vs32_sign  = Q6_V_vsplat_R(DENOM >> (31));
@@ -504,16 +504,16 @@ static HVX_VectorPair vdiv_n(const HVX_VectorPair &w_src)
 template <typename Tp> class HvxVdivnHelper;
 
 template <>
-class HvxVdivnHelper<MI_U8>
+class HvxVdivnHelper<DT_U8>
 {
 public:
-    explicit HvxVdivnHelper(MI_U8 denom) : m_denom(denom)
+    explicit HvxVdivnHelper(DT_U8 denom) : m_denom(denom)
     {
-        MI_U8 length = 32 - __builtin_clz(m_denom - 1);
-        MI_U8 mul    = (0 == m_denom) ? 0 : (((MI_U16)256) * ((1 << length) - m_denom)) / m_denom + 1;
+        DT_U8 length = 32 - __builtin_clz(m_denom - 1);
+        DT_U8 mul    = (0 == m_denom) ? 0 : (((DT_U16)256) * ((1 << length) - m_denom)) / m_denom + 1;
         m_vu8_mul    = Q6_Vb_vsplat_R(mul);
-        m_shift0     = Min<MI_U8>(length, (MI_U8)1);
-        m_shift1     = Max<MI_S8>((MI_S8)length - 1, (MI_S8)0);
+        m_shift0     = Min<DT_U8>(length, (DT_U8)1);
+        m_shift1     = Max<DT_S8>((DT_S8)length - 1, (DT_S8)0);
         m_shift1     = (0 == m_denom) ? 7 : m_shift1;
     }
 
@@ -536,23 +536,23 @@ public:
     W_VDIVN_COMM;
 
 private:
-    MI_U8      m_denom;
-    MI_U8      m_shift0;
-    MI_U8      m_shift1;
+    DT_U8      m_denom;
+    DT_U8      m_shift0;
+    DT_U8      m_shift1;
     HVX_Vector m_vu8_mul;
 };
 
 template <>
-class HvxVdivnHelper<MI_S8>
+class HvxVdivnHelper<DT_S8>
 {
 public:
-    explicit HvxVdivnHelper(MI_S8 denom) : m_denom(denom)
+    explicit HvxVdivnHelper(DT_S8 denom) : m_denom(denom)
     {
-        MI_U8 abs_d  = Abs(m_denom);
-        MI_S8 length = 32 - __builtin_clz(abs_d - 1);
-              length = Max<MI_U8>(length, (MI_S8)1);
+        DT_U8 abs_d  = Abs(m_denom);
+        DT_S8 length = 32 - __builtin_clz(abs_d - 1);
+              length = Max<DT_U8>(length, (DT_S8)1);
 
-        MI_S16 mul = (0 == m_denom) ? 0 : (1 + ((MI_U16(1)) << (8 + length - 1)) / abs_d) - (256);
+        DT_S16 mul = (0 == m_denom) ? 0 : (1 + ((DT_U16(1)) << (8 + length - 1)) / abs_d) - (256);
         m_vs8_mul  = Q6_Vb_vsplat_R(mul);
         m_vs8_sign = Q6_Vb_vsplat_R(m_denom >> (7));
         m_shift    = (0 == m_denom) ? 7 : length - 1;
@@ -579,23 +579,23 @@ public:
     W_VDIVN_COMM;
 
 private:
-    MI_S8      m_denom;
-    MI_S8      m_shift;
+    DT_S8      m_denom;
+    DT_S8      m_shift;
     HVX_Vector m_vs8_mul;
     HVX_Vector m_vs8_sign;
 };
 
 template <>
-class HvxVdivnHelper<MI_U16>
+class HvxVdivnHelper<DT_U16>
 {
 public:
-    explicit HvxVdivnHelper(MI_U16 denom) : m_denom(denom)
+    explicit HvxVdivnHelper(DT_U16 denom) : m_denom(denom)
     {
-        MI_U16 length = 32 - __builtin_clz(m_denom - 1);
-        MI_U16 mul    = (0 == m_denom) ? 0 : ((65536) * ((1 << length) - m_denom)) / m_denom + 1;
+        DT_U16 length = 32 - __builtin_clz(m_denom - 1);
+        DT_U16 mul    = (0 == m_denom) ? 0 : ((65536) * ((1 << length) - m_denom)) / m_denom + 1;
         m_vu16_mul    = Q6_Vh_vsplat_R(mul);
-        m_shift0      = Min<MI_U16>(length, (MI_U16)1);
-        m_shift1      = Max<MI_S16>((MI_S16)length - 1, (MI_S16)0);
+        m_shift0      = Min<DT_U16>(length, (DT_U16)1);
+        m_shift1      = Max<DT_S16>((DT_S16)length - 1, (DT_S16)0);
         m_shift1      = (0 == m_denom) ? 15 : m_shift1;
     }
 
@@ -617,24 +617,24 @@ public:
     W_VDIVN_COMM;
 
 private:
-    MI_U16     m_denom;
-    MI_U16     m_shift0;
-    MI_U16     m_shift1;
+    DT_U16     m_denom;
+    DT_U16     m_shift0;
+    DT_U16     m_shift1;
     HVX_Vector m_vu16_mul;
 };
 
 template <>
-class HvxVdivnHelper<MI_S16>
+class HvxVdivnHelper<DT_S16>
 {
 public:
-    explicit HvxVdivnHelper(MI_S16 denom) : m_denom(denom)
+    explicit HvxVdivnHelper(DT_S16 denom) : m_denom(denom)
     {
-        MI_U16 abs_d  = Abs(m_denom);
-        MI_S16 length = 32 - __builtin_clz(abs_d - 1);
-               length = Max<MI_U16>(length, (MI_S16)1);
+        DT_U16 abs_d  = Abs(m_denom);
+        DT_S16 length = 32 - __builtin_clz(abs_d - 1);
+               length = Max<DT_U16>(length, (DT_S16)1);
 
-        MI_S32 MUL   = (0 == m_denom) ? 0 : (1 + ((MI_U32(1)) << (16 + length - 1)) / abs_d) - (65536);
-        MI_S16 SHIFT = (0 == m_denom) ? 15 : (length - 1);
+        DT_S32 MUL   = (0 == m_denom) ? 0 : (1 + ((DT_U32(1)) << (16 + length - 1)) / abs_d) - (65536);
+        DT_S16 SHIFT = (0 == m_denom) ? 15 : (length - 1);
         m_vs16_mul   = Q6_Vh_vsplat_R(MUL);
         m_vs16_sign  = Q6_Vh_vsplat_R(m_denom >> (15));
         m_shift      = Q6_Vh_vsplat_R(SHIFT);
@@ -658,24 +658,24 @@ public:
     W_VDIVN_COMM;
 
 private:
-    MI_S16     m_denom;
+    DT_S16     m_denom;
     HVX_Vector m_vs16_mul;
     HVX_Vector m_vs16_sign;
     HVX_Vector m_shift;
 };
 
 template <>
-class HvxVdivnHelper<MI_U32>
+class HvxVdivnHelper<DT_U32>
 {
 public:
-    explicit HvxVdivnHelper(MI_U32 denom) : m_denom(denom)
+    explicit HvxVdivnHelper(DT_U32 denom) : m_denom(denom)
     {
-        MI_U32 length = 32 - __builtin_clz(m_denom - 1);
-        m_mul = (0 == m_denom) ? 0 : ((MI_U64)(4294967296) * (((MI_U64)1 << length) - (MI_U64)m_denom) / m_denom + 1);
+        DT_U32 length = 32 - __builtin_clz(m_denom - 1);
+        m_mul = (0 == m_denom) ? 0 : ((DT_U64)(4294967296) * (((DT_U64)1 << length) - (DT_U64)m_denom) / m_denom + 1);
 
         m_mul_r  = (m_mul << 16) | (m_mul >> 16);
-        m_shift0 = Min<MI_U32>(length, (MI_U32)1);
-        m_shift1 = (0 == m_denom) ? 31 : (Max<MI_S32>((MI_S32)length - 1, (MI_S32)0));
+        m_shift0 = Min<DT_U32>(length, (DT_U32)1);
+        m_shift1 = (0 == m_denom) ? 31 : (Max<DT_S32>((DT_S32)length - 1, (DT_S32)0));
     }
 
     HVX_Vector operator()(const HVX_Vector &vu32_src)
@@ -703,23 +703,23 @@ public:
     W_VDIVN_COMM;
 
 private:
-    MI_U32 m_mul;
-    MI_U32 m_mul_r;
-    MI_U32 m_shift0;
-    MI_U32 m_shift1;
-    MI_U32 m_denom;
+    DT_U32 m_mul;
+    DT_U32 m_mul_r;
+    DT_U32 m_shift0;
+    DT_U32 m_shift1;
+    DT_U32 m_denom;
 };
 
 template <>
-class HvxVdivnHelper<MI_S32>
+class HvxVdivnHelper<DT_S32>
 {
 public:
-    explicit HvxVdivnHelper(MI_S32 denom) : m_denom(denom)
+    explicit HvxVdivnHelper(DT_S32 denom) : m_denom(denom)
     {
-        MI_U32 abs_d  = Abs(m_denom);
-        MI_S32 length = 32 - __builtin_clz(abs_d - 1);
-               length = Max<MI_U32>(length, (MI_S32)1);
-        MI_S64 mul    = (0 == abs_d) ? 0 : (1 + ((MI_U64(1)) << (32 + length - 1)) / abs_d) - (4294967296);
+        DT_U32 abs_d  = Abs(m_denom);
+        DT_S32 length = 32 - __builtin_clz(abs_d - 1);
+               length = Max<DT_U32>(length, (DT_S32)1);
+        DT_S64 mul    = (0 == abs_d) ? 0 : (1 + ((DT_U64(1)) << (32 + length - 1)) / abs_d) - (4294967296);
 
         m_vs32_mul  = Q6_V_vsplat_R(mul);
         m_vs32_sign = Q6_V_vsplat_R(m_denom >> (31));
@@ -744,7 +744,7 @@ public:
     W_VDIVN_COMM;
 
 private:
-    MI_S32     m_denom;
+    DT_S32     m_denom;
     HVX_Vector m_vs32_mul;
     HVX_Vector m_vs32_sign;
     HVX_Vector m_shift;

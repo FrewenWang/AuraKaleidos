@@ -8,7 +8,7 @@ extern "C"
 {
 #endif // __cplusplus
 
-AURA_VOID AuraMemCopy(AURA_VOID *dst, const AURA_VOID *src, MI_S32 len);
+DT_VOID AuraMemCopy(DT_VOID *dst, const DT_VOID *src, DT_S32 len);
 
 #if defined(__cplusplus)
 }

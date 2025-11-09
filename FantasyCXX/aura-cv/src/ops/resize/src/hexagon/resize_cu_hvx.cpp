@@ -8,10 +8,10 @@ namespace aura
 Status ResizeCuHvx(Context *ctx, const Mat &src, Mat &dst)
 {
     Status ret = Status::ERROR;
-    const MI_S32 iwidth  = src.GetSizes().m_width;
-    const MI_S32 owidth  = dst.GetSizes().m_width;
-    const MI_S32 iheight = src.GetSizes().m_height;
-    const MI_S32 oheight = dst.GetSizes().m_height;
+    const DT_S32 iwidth  = src.GetSizes().m_width;
+    const DT_S32 owidth  = dst.GetSizes().m_width;
+    const DT_S32 iheight = src.GetSizes().m_height;
+    const DT_S32 oheight = dst.GetSizes().m_height;
 
     if (((iwidth == 2 * owidth) && (iheight == 2 * oheight)) ||
         ((iwidth == 4 * owidth) && (iheight == 4 * oheight)))

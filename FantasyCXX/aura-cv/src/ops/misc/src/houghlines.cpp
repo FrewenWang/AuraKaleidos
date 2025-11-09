@@ -29,15 +29,15 @@ static std::shared_ptr<HoughLinesImpl> CreateHoughLinesImpl(Context *ctx, const 
 HoughLines::HoughLines(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status HoughLines::SetArgs(const Array *src, std::vector<Scalar> &lines, LinesType line_type, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                           MI_F64 srn, MI_F64 stn, MI_F64 min_theta, MI_F64 max_theta)
+Status HoughLines::SetArgs(const Array *src, std::vector<Scalar> &lines, LinesType line_type, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                           DT_F64 srn, DT_F64 stn, DT_F64 min_theta, DT_F64 max_theta)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src))
+    if ((DT_NULL == src))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -46,14 +46,14 @@ Status HoughLines::SetArgs(const Array *src, std::vector<Scalar> &lines, LinesTy
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateHoughLinesImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     HoughLinesImpl *hough_lines_impl = dynamic_cast<HoughLinesImpl *>(m_impl.get());
-    if (MI_NULL == hough_lines_impl)
+    if (DT_NULL == hough_lines_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "hough_lines_impl is null ptr");
         return Status::ERROR;
@@ -64,8 +64,8 @@ Status HoughLines::SetArgs(const Array *src, std::vector<Scalar> &lines, LinesTy
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status IHoughLines(Context *ctx, const Mat &mat, std::vector<Scalar> &lines, LinesType line_type, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                                MI_F64 srn, MI_F64 stn, MI_F64 min_theta, MI_F64 max_theta, const OpTarget &target)
+AURA_EXPORTS Status IHoughLines(Context *ctx, const Mat &mat, std::vector<Scalar> &lines, LinesType line_type, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                                DT_F64 srn, DT_F64 stn, DT_F64 min_theta, DT_F64 max_theta, const OpTarget &target)
 {
     HoughLines hough_lines(ctx, target);
 
@@ -76,13 +76,13 @@ HoughLinesImpl::HoughLinesImpl(Context *ctx, const OpTarget &target) : OpImpl(ct
                                                                        m_line_type(LinesType::VEC2F),
                                                                        m_rho(0.0), m_theta(0.0), m_threshold(0),
                                                                        m_srn(0.0), m_stn(0.0),   m_min_theta(0.0),
-                                                                       m_max_theta(AURA_PI), m_src(MI_NULL)
+                                                                       m_max_theta(AURA_PI), m_src(DT_NULL)
 {}
 
-Status HoughLinesImpl::SetArgs(const Array *mat, std::vector<Scalar> &lines, LinesType line_type, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                               MI_F64 srn, MI_F64 stn, MI_F64 min_theta, MI_F64 max_theta)
+Status HoughLinesImpl::SetArgs(const Array *mat, std::vector<Scalar> &lines, LinesType line_type, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                               DT_F64 srn, DT_F64 stn, DT_F64 min_theta, DT_F64 max_theta)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -144,7 +144,7 @@ std::string HoughLinesImpl::ToString() const
     return str;
 }
 
-AURA_VOID HoughLinesImpl::Dump(const std::string &prefix) const
+DT_VOID HoughLinesImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -182,15 +182,15 @@ static std::shared_ptr<HoughLinesPImpl> CreateHoughLinesPImpl(Context *ctx, cons
 HoughLinesP::HoughLinesP(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status HoughLinesP::SetArgs(const Array *src, std::vector<Scalari> &lines, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                            MI_F64 min_line_length, MI_F64 max_gap)
+Status HoughLinesP::SetArgs(const Array *src, std::vector<Scalari> &lines, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                            DT_F64 min_line_length, DT_F64 max_gap)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src))
+    if ((DT_NULL == src))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src is null ptr");
         return Status::ERROR;
@@ -199,14 +199,14 @@ Status HoughLinesP::SetArgs(const Array *src, std::vector<Scalari> &lines, MI_F6
     OpTarget impl_target = m_target;
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateHoughLinesPImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     HoughLinesPImpl *hough_linesp_impl = dynamic_cast<HoughLinesPImpl *>(m_impl.get());
-    if (MI_NULL == hough_linesp_impl)
+    if (DT_NULL == hough_linesp_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "hough_linesp_impl is null ptr");
         return Status::ERROR;
@@ -217,8 +217,8 @@ Status HoughLinesP::SetArgs(const Array *src, std::vector<Scalari> &lines, MI_F6
     AURA_RETURN(m_ctx, ret);
 }
 
-AURA_EXPORTS Status IHoughLinesP(Context *ctx, const Mat &mat, std::vector<Scalari> &lines, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                                 MI_F64 min_line_length, MI_F64 max_gap, const OpTarget &target)
+AURA_EXPORTS Status IHoughLinesP(Context *ctx, const Mat &mat, std::vector<Scalari> &lines, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                                 DT_F64 min_line_length, DT_F64 max_gap, const OpTarget &target)
 {
     HoughLinesP hough_linesp(ctx, target);
 
@@ -227,13 +227,13 @@ AURA_EXPORTS Status IHoughLinesP(Context *ctx, const Mat &mat, std::vector<Scala
 
 HoughLinesPImpl::HoughLinesPImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "HoughLinesP", target),
                                                                          m_rho(0.0), m_theta(0.0), m_threshold(0),
-                                                                         m_min_line_length(0.0), m_max_gap(0.0), m_src(MI_NULL)
+                                                                         m_min_line_length(0.0), m_max_gap(0.0), m_src(DT_NULL)
 {}
 
-Status HoughLinesPImpl::SetArgs(const Array *mat, std::vector<Scalari> &lines, MI_F64 rho, MI_F64 theta, MI_S32 threshold,
-                                MI_F64 min_line_length, MI_F64 max_gap)
+Status HoughLinesPImpl::SetArgs(const Array *mat, std::vector<Scalari> &lines, DT_F64 rho, DT_F64 theta, DT_S32 threshold,
+                                DT_F64 min_line_length, DT_F64 max_gap)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -287,7 +287,7 @@ std::string HoughLinesPImpl::ToString() const
     return str;
 }
 
-AURA_VOID HoughLinesPImpl::Dump(const std::string &prefix) const
+DT_VOID HoughLinesPImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 

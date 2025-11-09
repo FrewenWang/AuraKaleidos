@@ -24,7 +24,7 @@ class ThresholdImpl : public OpImpl
 public:
     ThresholdImpl(Context *ctx, const OpTarget &target);
 
-    virtual Status SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type);
+    virtual Status SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type);
 
     std::vector<const Array*> GetInputArrays() const override;
 
@@ -32,15 +32,15 @@ public:
 
     std::string ToString() const override;
 
-    AURA_VOID Dump(const std::string &prefix) const override;
+    DT_VOID Dump(const std::string &prefix) const override;
 
 protected:
-    Status ReCalcThresh(MI_S32 &thresh);
+    Status ReCalcThresh(DT_S32 &thresh);
 
 protected:
-    MI_F32       m_thresh;
-    MI_F32       m_max_val;
-    MI_S32       m_type;
+    DT_F32       m_thresh;
+    DT_F32       m_max_val;
+    DT_S32       m_type;
 
     const Array *m_src;
     Array       *m_dst;
@@ -51,7 +51,7 @@ class ThresholdNone : public ThresholdImpl
 public:
     ThresholdNone(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type) override;
+    Status SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type) override;
 
     Status Run() override;
 };
@@ -62,7 +62,7 @@ class ThresholdNeon : public ThresholdImpl
 public:
     ThresholdNeon(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type) override;
+    Status SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type) override;
 
     Status Run() override;
 };
@@ -74,7 +74,7 @@ class ThresholdHvx : public ThresholdImpl
 public:
     ThresholdHvx(Context *ctx, const OpTarget &target);
 
-    Status SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type) override;
+    Status SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type) override;
 
     Status Run() override;
 
@@ -84,7 +84,7 @@ private:
     std::string m_profiling_string;
 };
 
-using ThresholdInParam = HexagonRpcParamType<Mat, Mat, MI_F32, MI_F32, MI_S32>;
+using ThresholdInParam = HexagonRpcParamType<Mat, Mat, DT_F32, DT_F32, DT_S32>;
 #  define AURA_OPS_MISC_THRESHOLD_OP_NAME          "Threshold"
 
 #endif // (defined(AURA_ENABLE_HEXAGON) || defined(AURA_BUILD_HEXAGON))

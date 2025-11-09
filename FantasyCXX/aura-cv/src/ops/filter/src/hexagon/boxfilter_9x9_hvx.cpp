@@ -6,15 +6,15 @@
 namespace aura
 {
 
-// using Tp = MI_U8
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9VCore(const HVX_Vector &vu8_src_p0, const HVX_Vector &vu8_src_n0, HVX_VectorPair &ws16_result)
+// using Tp = DT_U8
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9VCore(const HVX_Vector &vu8_src_p0, const HVX_Vector &vu8_src_n0, HVX_VectorPair &ws16_result)
 {
     ws16_result = Q6_Wh_vsub_VubVub(vu8_src_n0, vu8_src_p0);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9VCore(const HVX_Vector &vu8_src_p0, const HVX_Vector &vu8_src_n0,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9VCore(const HVX_Vector &vu8_src_p0, const HVX_Vector &vu8_src_n0,
                                              const HVX_Vector &vu8_src_p1, const HVX_Vector &vu8_src_n1,
                                              HVX_VectorPair &ws16_diff0,  HVX_VectorPair &ws16_diff1,
                                              HVX_Vector &vs16_sum1, HVX_Vector &vs16_common0)
@@ -29,10 +29,10 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9VCore(const HVX_Vector &vu8_src_p0, con
     vs16_common0 = Q6_Vh_vadd_VhVh(vs16_sum1, Q6_V_vlalign_VVI(vs16_sum1, vs16_sum0, 2));
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws16_diff0, HVX_VectorPair &ws16_diff1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9HCore(HVX_VectorPair &ws16_diff0, HVX_VectorPair &ws16_diff1,
                                              HVX_VectorPair &ws16_diff2, HVX_Vector &vs16_sum1, HVX_Vector &vs16_com0,
-                                             HVX_Vector &vu8_result, const SumType *row_sum, MI_S32 row_sum_step)
+                                             HVX_Vector &vu8_result, const SumType *row_sum, DT_S32 row_sum_step)
 {
     HVX_Vector vs16_sum1_p = vs16_sum1;
     HVX_Vector vs16_sum0_p = vs16_com0;
@@ -59,17 +59,17 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws16_diff0, HVX_V
     vstore(row_sum_data_out,   vs16_sum_even);
     vstore(++row_sum_data_out, vs16_sum_odd);
 
-    HVX_Vector vu16_dst_odd  = vdiv_n<MI_U16, 81>(vs16_sum_odd);
-    HVX_Vector vu16_dst_even = vdiv_n<MI_U16, 81>(vs16_sum_even);
+    HVX_Vector vu16_dst_odd  = vdiv_n<DT_U16, 81>(vs16_sum_odd);
+    HVX_Vector vu16_dst_even = vdiv_n<DT_U16, 81>(vs16_sum_even);
 
     vu8_result = Q6_Vub_vsat_VhVh(vu16_dst_odd, vu16_dst_even);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws16_diff_x0, HVX_VectorPair &ws16_diff_x1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9HCore(HVX_VectorPair &ws16_diff_x0, HVX_VectorPair &ws16_diff_x1,
                                              HVX_VectorPair &ws16_diff_x2, HVX_VectorPair &ws16_diff_x3,
                                              HVX_Vector &vu8_result_x0, HVX_Vector &vu8_result_x1,
-                                             SumType *row_sum, MI_S32 row_sum_step, MI_S32 rest)
+                                             SumType *row_sum, DT_S32 row_sum_step, DT_S32 rest)
 {
     HVX_Vector vs16_diff_x0_lo = Q6_V_lo_W(ws16_diff_x0);
     HVX_Vector vs16_diff_x0_hi = Q6_V_hi_W(ws16_diff_x0);
@@ -83,8 +83,8 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws16_diff_x0, HVX
     HVX_Vector vs16_diff_l0_lo, vs16_diff_l0_hi, vs16_diff_r0_lo, vs16_diff_r0_hi;
     if (rest & 1)
     {
-        MI_S32 align_size0 = (rest / 2) * sizeof(SumType);
-        MI_S32 align_size1 = align_size0 + sizeof(SumType);
+        DT_S32 align_size0 = (rest / 2) * sizeof(SumType);
+        DT_S32 align_size1 = align_size0 + sizeof(SumType);
         vs16_diff_r0_lo = Q6_V_vlalign_safe_VVR(vs16_diff_x3_lo, vs16_diff_x2_hi, align_size1);
         vs16_diff_r0_hi = Q6_V_vlalign_safe_VVR(vs16_diff_x3_lo, vs16_diff_x2_lo, align_size0);
         vs16_diff_l0_lo = Q6_V_valign_safe_VVR(vs16_diff_x1_hi, vs16_diff_x0_hi, align_size0);
@@ -92,7 +92,7 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws16_diff_x0, HVX
     }
     else
     {
-        MI_S32 align_size = (rest / 2) * sizeof(SumType);
+        DT_S32 align_size = (rest / 2) * sizeof(SumType);
         vs16_diff_r0_lo = Q6_V_vlalign_safe_VVR(vs16_diff_x3_lo, vs16_diff_x2_lo, align_size);
         vs16_diff_r0_hi = Q6_V_vlalign_safe_VVR(vs16_diff_x3_hi, vs16_diff_x2_hi, align_size);
         vs16_diff_l0_lo = Q6_V_valign_safe_VVR(vs16_diff_x1_lo, vs16_diff_x0_lo, align_size);
@@ -115,8 +115,8 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws16_diff_x0, HVX
     BoxFilter9x9HCore<Tp, SumType>(ws16_sum_l0, ws16_diff_x2, ws16_diff_x3, vs16_sum1, vs16_com0, vu8_result_x1, row_sum, row_sum_step + 128);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu8_src_p3r0, const HVX_Vector &vu8_src_p2r0, const HVX_Vector &vu8_src_p1r0,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu8_src_p3r0, const HVX_Vector &vu8_src_p2r0, const HVX_Vector &vu8_src_p1r0,
                                                      const HVX_Vector &vu8_src_p0r0, const HVX_Vector &vu8_src_cr0,  const HVX_Vector &vu8_src_n0r0,
                                                      const HVX_Vector &vu8_src_n1r0, const HVX_Vector &vu8_src_n2r0, const HVX_Vector &vu8_src_n3r0,
                                                      HVX_VectorPair &ws16_result)
@@ -132,8 +132,8 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu8_src
     ws16_result  = Q6_Wh_vmpyacc_WhVubRb(ws16_result, vu8_src_cr0, 0x01010101);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu8_src_p3l0, const HVX_Vector &vu8_src_p2l0, const HVX_Vector &vu8_src_p1l0,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu8_src_p3l0, const HVX_Vector &vu8_src_p2l0, const HVX_Vector &vu8_src_p1l0,
                                                      const HVX_Vector &vu8_src_p0l0, const HVX_Vector &vu8_src_cl0,  const HVX_Vector &vu8_src_n0l0,
                                                      const HVX_Vector &vu8_src_n1l0, const HVX_Vector &vu8_src_n2l0, const HVX_Vector &vu8_src_n3l0,
                                                      const HVX_Vector &vu8_src_p3c,  const HVX_Vector &vu8_src_p2c,  const HVX_Vector &vu8_src_p1c,
@@ -166,10 +166,10 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu8_src
     vs16_com0 = Q6_Vh_vadd_VhVh(vs16_sum1, Q6_V_vlalign_VVI(vs16_sum1, vs16_sum0, 2));
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &ws16_sum0, HVX_VectorPair &ws16_sum1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &ws16_sum0, HVX_VectorPair &ws16_sum1,
                                                      HVX_VectorPair &ws16_sum2, HVX_Vector &vs16_sum1, HVX_Vector &vs16_com0,
-                                                     HVX_Vector &vu8_result, const SumType *row_sum, MI_S32 row_sum_step)
+                                                     HVX_Vector &vu8_result, const SumType *row_sum, DT_S32 row_sum_step)
 {
     HVX_Vector vs16_sum1_p = vs16_sum1;
     HVX_Vector vs16_sum0_p = vs16_com0;
@@ -191,17 +191,17 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &ws16_sum0
     vstore(row_sum_data_out,   vs16_sum_even);
     vstore(++row_sum_data_out, vs16_sum_odd);
 
-    HVX_Vector vu16_dst_odd  = vdiv_n<MI_U16, 81>(vs16_sum_odd);
-    HVX_Vector vu16_dst_even = vdiv_n<MI_U16, 81>(vs16_sum_even);
+    HVX_Vector vu16_dst_odd  = vdiv_n<DT_U16, 81>(vs16_sum_odd);
+    HVX_Vector vu16_dst_even = vdiv_n<DT_U16, 81>(vs16_sum_even);
 
     vu8_result = Q6_Vub_vsat_VhVh(vu16_dst_odd, vu16_dst_even);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wu16_sum_x0, HVX_VectorPair &wu16_sum_x1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wu16_sum_x0, HVX_VectorPair &wu16_sum_x1,
                                                      HVX_VectorPair &wu16_sum_x2, HVX_VectorPair &wu16_sum_x3,
                                                      HVX_Vector &vu8_result_x0, HVX_Vector &vu8_result_x1,
-                                                     SumType *row_sum, MI_S32 row_sum_step, MI_S32 rest)
+                                                     SumType *row_sum, DT_S32 row_sum_step, DT_S32 rest)
 {
     HVX_Vector vu16_sum_x0_lo = Q6_V_lo_W(wu16_sum_x0);
     HVX_Vector vu16_sum_x0_hi = Q6_V_hi_W(wu16_sum_x0);
@@ -215,8 +215,8 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wu16_sum_
     HVX_Vector vu16_sum_l0_lo, vu16_sum_l0_hi, vu16_sum_r0_lo, vu16_sum_r0_hi;
     if (rest & 1)
     {
-        MI_S32 align_size0 = (rest / 2) * sizeof(SumType);
-        MI_S32 align_size1 = align_size0 + sizeof(SumType);
+        DT_S32 align_size0 = (rest / 2) * sizeof(SumType);
+        DT_S32 align_size1 = align_size0 + sizeof(SumType);
         vu16_sum_r0_lo = Q6_V_vlalign_safe_VVR(vu16_sum_x3_hi, vu16_sum_x2_hi, align_size1);
         vu16_sum_r0_hi = Q6_V_vlalign_safe_VVR(vu16_sum_x3_lo, vu16_sum_x2_lo, align_size0);
         vu16_sum_l0_lo = Q6_V_valign_safe_VVR(vu16_sum_x1_hi, vu16_sum_x0_hi, align_size0);
@@ -224,7 +224,7 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wu16_sum_
     }
     else
     {
-        MI_S32 align_size = (rest / 2) * sizeof(SumType);
+        DT_S32 align_size = (rest / 2) * sizeof(SumType);
         vu16_sum_r0_lo = Q6_V_vlalign_safe_VVR(vu16_sum_x3_lo, vu16_sum_x2_lo, align_size);
         vu16_sum_r0_hi = Q6_V_vlalign_safe_VVR(vu16_sum_x3_hi, vu16_sum_x2_hi, align_size);
         vu16_sum_l0_lo = Q6_V_valign_safe_VVR(vu16_sum_x1_lo, vu16_sum_x0_lo, align_size);
@@ -247,15 +247,15 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wu16_sum_
     BoxFilter9x9FirstRowHCore<Tp, SumType>(wu16_sum_l0, wu16_sum_x2, wu16_sum_x3, vs16_sum1, vs16_com0, vu8_result_x1, row_sum, row_sum_step + 128);
 }
 
-// using Tp = MI_U16
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9VCore(const HVX_Vector &vu16_src_p0, const HVX_Vector &vu16_src_n0, HVX_VectorPair &vs32_result)
+// using Tp = DT_U16
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9VCore(const HVX_Vector &vu16_src_p0, const HVX_Vector &vu16_src_n0, HVX_VectorPair &vs32_result)
 {
     vs32_result = Q6_Ww_vsub_VuhVuh(vu16_src_n0, vu16_src_p0);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9VCore(const HVX_Vector &vu16_src_p0, const HVX_Vector &vu16_src_n0,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9VCore(const HVX_Vector &vu16_src_p0, const HVX_Vector &vu16_src_n0,
                                              const HVX_Vector &vu16_src_p1, const HVX_Vector &vu16_src_n1,
                                              HVX_VectorPair &ws32_diff0,  HVX_VectorPair &ws32_diff1,
                                              HVX_Vector &vs32_sum1, HVX_Vector &vs32_com0)
@@ -270,10 +270,10 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9VCore(const HVX_Vector &vu16_src_p0, co
     vs32_com0 = Q6_Vw_vadd_VwVw(vs32_sum1, Q6_V_vlalign_VVI(vs32_sum1, vs32_sum0, 4));
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff0, HVX_VectorPair &ws32_diff1, HVX_VectorPair &ws32_diff2,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff0, HVX_VectorPair &ws32_diff1, HVX_VectorPair &ws32_diff2,
                                              HVX_Vector &vs32_sum1, HVX_Vector &vs32_com0, HVX_Vector &vu16_result,
-                                             const SumType *row_sum, MI_S32 row_sum_step)
+                                             const SumType *row_sum, DT_S32 row_sum_step)
 {
     HVX_VectorPred vq_mask0 = Q6_Q_vsetq_R(8);
     HVX_VectorPred vq_mask1 = Q6_Q_vsetq_R(120);
@@ -305,14 +305,14 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff0, HVX_V
     vstore(row_sum_data_out,   vs32_sum_even);
     vstore(++row_sum_data_out, vs32_sum_odd);
 
-    HVX_Vector vu32_dst_odd  = vdiv_n<MI_U32, 81>(vs32_sum_odd);
-    HVX_Vector vu32_dst_even = vdiv_n<MI_U32, 81>(vs32_sum_even);
+    HVX_Vector vu32_dst_odd  = vdiv_n<DT_U32, 81>(vs32_sum_odd);
+    HVX_Vector vu32_dst_even = vdiv_n<DT_U32, 81>(vs32_sum_even);
 
     vu16_result = Q6_Vuh_vsat_VuwVuw(vu32_dst_odd, vu32_dst_even);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu16_src_p3, const HVX_Vector &vu16_src_p2, const HVX_Vector &vu16_src_p1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu16_src_p3, const HVX_Vector &vu16_src_p2, const HVX_Vector &vu16_src_p1,
                                                      const HVX_Vector &vu16_src_p0, const HVX_Vector &vu16_src_c,  const HVX_Vector &vu16_src_n0,
                                                      const HVX_Vector &vu16_src_n1, const HVX_Vector &vu16_src_n2, const HVX_Vector &vu16_src_n3,
                                                      HVX_VectorPair &ws32_result)
@@ -328,8 +328,8 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu16_sr
     ws32_result  = Q6_Wuw_vmpyacc_WuwVuhRuh(ws32_result, vu16_src_c, 0x00010001);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu16_src_p3l0, const HVX_Vector &vu16_src_p2l0, const HVX_Vector &vu16_src_p1l0,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu16_src_p3l0, const HVX_Vector &vu16_src_p2l0, const HVX_Vector &vu16_src_p1l0,
                                                      const HVX_Vector &vu16_src_p0l0, const HVX_Vector &vu16_src_cl0,  const HVX_Vector &vu16_src_n0l0,
                                                      const HVX_Vector &vu16_src_n1l0, const HVX_Vector &vu16_src_n2l0, const HVX_Vector &vu16_src_n3l0,
                                                      const HVX_Vector &vu16_src_p3c,  const HVX_Vector &vu16_src_p2c,  const HVX_Vector &vu16_src_p1c,
@@ -364,10 +364,10 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vu16_sr
     vs32_com0 = Q6_Vw_vadd_VwVw(vs32_sum1, Q6_V_vlalign_VVI(vs32_sum1, vs32_sum0, 4));
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &ws32_sum0, HVX_VectorPair &ws32_sum1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &ws32_sum0, HVX_VectorPair &ws32_sum1,
                                                      HVX_VectorPair &ws32_sum2, HVX_Vector &vs32_sum1, HVX_Vector &vs32_com0,
-                                                     HVX_Vector &vu16_result, const SumType *row_sum, MI_S32 row_sum_step)
+                                                     HVX_Vector &vu16_result, const SumType *row_sum, DT_S32 row_sum_step)
 {
     HVX_VectorPred vq_mask0 = Q6_Q_vsetq_R(8);
     HVX_VectorPred vq_mask1 = Q6_Q_vsetq_R(120);
@@ -394,21 +394,21 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &ws32_sum0
     vstore(row_sum_data_out,   vs32_sum_even);
     vstore(++row_sum_data_out, vs32_sum_odd);
 
-    HVX_Vector vu32_dst_odd  = vdiv_n<MI_U32, 81>(vs32_sum_odd);
-    HVX_Vector vu32_dst_even = vdiv_n<MI_U32, 81>(vs32_sum_even);
+    HVX_Vector vu32_dst_odd  = vdiv_n<DT_U32, 81>(vs32_sum_odd);
+    HVX_Vector vu32_dst_even = vdiv_n<DT_U32, 81>(vs32_sum_even);
 
     vu16_result = Q6_Vuh_vsat_VuwVuw(vu32_dst_odd, vu32_dst_even);
 }
 
-// using Tp = MI_S16
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9VCore(const HVX_Vector &vs16_src_p1, const HVX_Vector &vs16_src_n1, HVX_VectorPair &vs32_result)
+// using Tp = DT_S16
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9VCore(const HVX_Vector &vs16_src_p1, const HVX_Vector &vs16_src_n1, HVX_VectorPair &vs32_result)
 {
     vs32_result = Q6_Ww_vsub_VhVh(vs16_src_n1, vs16_src_p1);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9VCore(const HVX_Vector &vs16_src_p0, const HVX_Vector &vs16_src_n0,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9VCore(const HVX_Vector &vs16_src_p0, const HVX_Vector &vs16_src_n0,
                                              const HVX_Vector &vs16_src_p1, const HVX_Vector &vs16_src_n1,
                                              HVX_VectorPair &ws32_diff0,  HVX_VectorPair &ws32_diff1,
                                              HVX_Vector &vs32_sum1, HVX_Vector &vs32_com0)
@@ -423,11 +423,11 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9VCore(const HVX_Vector &vs16_src_p0, co
     vs32_com0= Q6_Vw_vadd_VwVw(vs32_sum1, Q6_V_vlalign_VVI(vs32_sum1, vs32_sum0, 4));
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff0, HVX_VectorPair &ws32_diff1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff0, HVX_VectorPair &ws32_diff1,
                                              HVX_VectorPair &ws32_diff2, HVX_Vector &vs32_sum1, HVX_Vector &vs32_com0,
                                              HVX_Vector &vs16_result,
-                                             const SumType *row_sum, MI_S32 row_sum_step)
+                                             const SumType *row_sum, DT_S32 row_sum_step)
 {
     HVX_VectorPred vq_mask0 = Q6_Q_vsetq_R(8);
     HVX_VectorPred vq_mask1 = Q6_Q_vsetq_R(120);
@@ -459,14 +459,14 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff0, HVX_V
     vstore(row_sum_data_out,   vs32_sum_even);
     vstore(++row_sum_data_out, vs32_sum_odd);
 
-    HVX_Vector vs32_dst_odd  = vdiv_n<MI_S32, 81>(vs32_sum_odd);
-    HVX_Vector vs32_dst_even = vdiv_n<MI_S32, 81>(vs32_sum_even);
+    HVX_Vector vs32_dst_odd  = vdiv_n<DT_S32, 81>(vs32_sum_odd);
+    HVX_Vector vs32_dst_even = vdiv_n<DT_S32, 81>(vs32_sum_even);
 
     vs16_result = Q6_Vh_vsat_VwVw(vs32_dst_odd, vs32_dst_even);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vs16_src_p3, const HVX_Vector &vs16_src_p2, const HVX_Vector &vs16_src_p1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vs16_src_p3, const HVX_Vector &vs16_src_p2, const HVX_Vector &vs16_src_p1,
                                                      const HVX_Vector &vs16_src_p0, const HVX_Vector &vs16_src_c,  const HVX_Vector &vs16_src_n0,
                                                      const HVX_Vector &vs16_src_n1, const HVX_Vector &vs16_src_n2, const HVX_Vector &vs16_src_n3,
                                                      HVX_VectorPair &ws32_result)
@@ -482,8 +482,8 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vs16_sr
     ws32_result = Q6_Ww_vmpyacc_WwVhRh(ws32_result, vs16_src_c, 0x00010001);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vs16_src_p3l0, const HVX_Vector &vs16_src_p2l0, const HVX_Vector &vs16_src_p1l0,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vs16_src_p3l0, const HVX_Vector &vs16_src_p2l0, const HVX_Vector &vs16_src_p1l0,
                                                      const HVX_Vector &vs16_src_p0l0, const HVX_Vector &vs16_src_cl0,  const HVX_Vector &vs16_src_n0l0,
                                                      const HVX_Vector &vs16_src_n1l0, const HVX_Vector &vs16_src_n2l0, const HVX_Vector &vs16_src_n3l0,
                                                      const HVX_Vector &vs16_src_p3c,  const HVX_Vector &vs16_src_p2c,  const HVX_Vector &vs16_src_p1c,
@@ -517,11 +517,11 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowVCore(const HVX_Vector &vs16_sr
     vs32_com0= Q6_Vw_vadd_VwVw(vs32_sum1, Q6_V_vlalign_VVI(vs32_sum1, vs32_sum0, 4));
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &ws32_sum0, HVX_VectorPair &ws32_sum1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &ws32_sum0, HVX_VectorPair &ws32_sum1,
                                                      HVX_VectorPair &ws32_sum2, HVX_Vector &vs32_sum1, HVX_Vector &vs32_com0,
                                                      HVX_Vector &vs16_result,
-                                                     const SumType *row_sum, MI_S32 row_sum_step)
+                                                     const SumType *row_sum, DT_S32 row_sum_step)
 {
     HVX_VectorPred vq_mask0 = Q6_Q_vsetq_R(8);
     HVX_VectorPred vq_mask1 = Q6_Q_vsetq_R(120);
@@ -548,17 +548,17 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &ws32_sum0
     vstore(row_sum_data_out,   vs32_sum_even);
     vstore(++row_sum_data_out, vs32_sum_odd);
 
-    HVX_Vector vs32_dst_odd  = vdiv_n<MI_S32, 81>(vs32_sum_odd);
-    HVX_Vector vs32_dst_even = vdiv_n<MI_S32, 81>(vs32_sum_even);
+    HVX_Vector vs32_dst_odd  = vdiv_n<DT_S32, 81>(vs32_sum_odd);
+    HVX_Vector vs32_dst_even = vdiv_n<DT_S32, 81>(vs32_sum_even);
 
     vs16_result = Q6_Vh_vsat_VwVw(vs32_dst_odd, vs32_dst_even);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_S16>::value || std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff_x0, HVX_VectorPair &ws32_diff_x1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_S16>::value || std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff_x0, HVX_VectorPair &ws32_diff_x1,
                                              HVX_VectorPair &ws32_diff_x2, HVX_VectorPair &ws32_diff_x3,
                                              HVX_Vector &vd16_result_x0, HVX_Vector &vd16_result_x1,
-                                             SumType *row_sum, MI_S32 row_sum_step, MI_S32 rest)
+                                             SumType *row_sum, DT_S32 row_sum_step, DT_S32 rest)
 {
     HVX_Vector vs32_diff_x0_lo = Q6_V_lo_W(ws32_diff_x0);
     HVX_Vector vs32_diff_x0_hi = Q6_V_hi_W(ws32_diff_x0);
@@ -572,8 +572,8 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff_x0, HVX
     HVX_Vector vs32_diff_l0_lo, vs32_diff_l0_hi, vs32_diff_r0_lo, vs32_diff_r0_hi;
     if (rest & 1)
     {
-        MI_S32 align_size0 = (rest / 2) * sizeof(SumType);
-        MI_S32 align_size1 = align_size0 + sizeof(SumType);
+        DT_S32 align_size0 = (rest / 2) * sizeof(SumType);
+        DT_S32 align_size1 = align_size0 + sizeof(SumType);
         vs32_diff_r0_lo = Q6_V_vlalign_safe_VVR(vs32_diff_x3_hi, vs32_diff_x2_hi, align_size1);
         vs32_diff_r0_hi = Q6_V_vlalign_safe_VVR(vs32_diff_x3_lo, vs32_diff_x2_lo, align_size0);
         vs32_diff_l0_lo = Q6_V_valign_safe_VVR(vs32_diff_x1_hi, vs32_diff_x0_hi, align_size0);
@@ -581,7 +581,7 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff_x0, HVX
     }
     else
     {
-        MI_S32 align_size = (rest / 2) * sizeof(SumType);
+        DT_S32 align_size = (rest / 2) * sizeof(SumType);
         vs32_diff_r0_lo = Q6_V_vlalign_safe_VVR(vs32_diff_x3_lo, vs32_diff_x2_lo, align_size);
         vs32_diff_r0_hi = Q6_V_vlalign_safe_VVR(vs32_diff_x3_hi, vs32_diff_x2_hi, align_size);
         vs32_diff_l0_lo = Q6_V_valign_safe_VVR(vs32_diff_x1_lo, vs32_diff_x0_lo, align_size);
@@ -606,11 +606,11 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9HCore(HVX_VectorPair &ws32_diff_x0, HVX
     BoxFilter9x9HCore<Tp, SumType>(ws32_diff_l0, ws32_diff_x2, ws32_diff_x3, vs32_sum1, vs32_com0, vd16_result_x1, row_sum, row_sum_step + 128);
 }
 
-template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, MI_S16>::value || std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wd32_sum_x0, HVX_VectorPair &wd32_sum_x1,
+template <typename Tp, typename SumType, typename std::enable_if<std::is_same<Tp, DT_S16>::value || std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+AURA_ALWAYS_INLINE DT_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wd32_sum_x0, HVX_VectorPair &wd32_sum_x1,
                                                      HVX_VectorPair &wd32_sum_x2, HVX_VectorPair &wd32_sum_x3,
                                                      HVX_Vector &vd16_result_x0, HVX_Vector &vd16_result_x1,
-                                                     SumType *row_sum, MI_S32 row_sum_step, MI_S32 rest)
+                                                     SumType *row_sum, DT_S32 row_sum_step, DT_S32 rest)
 {
     HVX_Vector vd32_sum_x0_lo = Q6_V_lo_W(wd32_sum_x0);
     HVX_Vector vd32_sum_x0_hi = Q6_V_hi_W(wd32_sum_x0);
@@ -624,8 +624,8 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wd32_sum_
     HVX_Vector vd32_sum_l0_lo, vd32_sum_l0_hi, vd32_sum_r0_lo, vd32_sum_r0_hi;
     if (rest & 1)
     {
-        MI_S32 align_size0 = (rest / 2) * sizeof(SumType);
-        MI_S32 align_size1 = align_size0 + sizeof(SumType);
+        DT_S32 align_size0 = (rest / 2) * sizeof(SumType);
+        DT_S32 align_size1 = align_size0 + sizeof(SumType);
         vd32_sum_r0_lo = Q6_V_vlalign_safe_VVR(vd32_sum_x3_hi, vd32_sum_x2_hi, align_size1);
         vd32_sum_r0_hi = Q6_V_vlalign_safe_VVR(vd32_sum_x3_lo, vd32_sum_x2_lo, align_size0);
         vd32_sum_l0_lo = Q6_V_valign_safe_VVR(vd32_sum_x1_hi, vd32_sum_x0_hi, align_size0);
@@ -633,7 +633,7 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wd32_sum_
     }
     else
     {
-        MI_S32 align_size = (rest / 2) * sizeof(SumType);
+        DT_S32 align_size = (rest / 2) * sizeof(SumType);
         vd32_sum_r0_lo = Q6_V_vlalign_safe_VVR(vd32_sum_x3_lo, vd32_sum_x2_lo, align_size);
         vd32_sum_r0_hi = Q6_V_vlalign_safe_VVR(vd32_sum_x3_hi, vd32_sum_x2_hi, align_size);
         vd32_sum_l0_lo = Q6_V_valign_safe_VVR(vd32_sum_x1_lo, vd32_sum_x0_lo, align_size);
@@ -658,16 +658,16 @@ AURA_ALWAYS_INLINE AURA_VOID BoxFilter9x9FirstRowHCore(HVX_VectorPair &wd32_sum_
     BoxFilter9x9FirstRowHCore<Tp, SumType>(vd32_sum_l0, wd32_sum_x2, wd32_sum_x3, vs32_sum1, vs32_com0, vd16_result_x1, row_sum, row_sum_step + 128);
 }
 
-template <typename Tp, typename SumType, BorderType BORDER_TYPE, MI_S32 C>
-static AURA_VOID BoxFilter9x9Row(const Tp *src_p0, const Tp *src_n0, Tp *dst, MI_S32 width, SumType *row_sum, MI_S32 row_sum_step,
+template <typename Tp, typename SumType, BorderType BORDER_TYPE, DT_S32 C>
+static DT_VOID BoxFilter9x9Row(const Tp *src_p0, const Tp *src_n0, Tp *dst, DT_S32 width, SumType *row_sum, DT_S32 row_sum_step,
                                const std::vector<Tp> &border_value)
 {
     using MVType = typename MVHvxVector<C>::Type;
     using MWType = typename MWHvxVector<C>::Type;
 
-    MI_S32 shift = 0;
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
-    MI_S32 back_offset = width - ELEM_COUNTS;
+    DT_S32 shift = 0;
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
+    DT_S32 back_offset = width - ELEM_COUNTS;
 
     MVType mv_src_p0, mv_src_n0;
     MWType mw_diff0, mw_diff1, mw_diff2;
@@ -680,7 +680,7 @@ static AURA_VOID BoxFilter9x9Row(const Tp *src_p0, const Tp *src_n0, Tp *dst, MI
         vload(src_n0, mv_src_n0);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p1 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_p0.val[ch], src_p0[ch], border_value[ch]);
             HVX_Vector v_border_n1 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_n0.val[ch], src_n0[ch], border_value[ch]);
@@ -692,13 +692,13 @@ static AURA_VOID BoxFilter9x9Row(const Tp *src_p0, const Tp *src_n0, Tp *dst, MI
 
     // main(0 ~ n-2)
     {
-        for (MI_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS, shift += ELEM_COUNTS)
+        for (DT_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS, shift += ELEM_COUNTS)
         {
             vload(src_p0 + C * x, mv_src_p0);
             vload(src_n0 + C * x, mv_src_n0);
 
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 BoxFilter9x9VCore<Tp, SumType>(mv_src_p0.val[ch], mv_src_n0.val[ch], mw_diff2.val[ch]);
                 BoxFilter9x9HCore<Tp, SumType>(mw_diff0.val[ch], mw_diff1.val[ch], mw_diff2.val[ch],
@@ -714,15 +714,15 @@ static AURA_VOID BoxFilter9x9Row(const Tp *src_p0, const Tp *src_n0, Tp *dst, MI
 
     // remain
     {
-        MI_S32 last = C * (width - 1);
-        MI_S32 rest = width % ELEM_COUNTS;
+        DT_S32 last = C * (width - 1);
+        DT_S32 rest = width % ELEM_COUNTS;
         MVType mv_last;
 
         vload(src_p0 + C * back_offset, mv_src_p0);
         vload(src_n0 + C * back_offset, mv_src_n0);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p1 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_p0.val[ch], src_p0[last + ch], border_value[ch]);
             HVX_Vector v_border_n1 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_n0.val[ch], src_n0[last + ch], border_value[ch]);
@@ -740,17 +740,17 @@ static AURA_VOID BoxFilter9x9Row(const Tp *src_p0, const Tp *src_n0, Tp *dst, MI
     }
 }
 
-template <typename Tp, typename SumType, BorderType BORDER_TYPE, MI_S32 C>
-static AURA_VOID BoxFilter9x9FirstRow(const Tp *src_p3, const Tp *src_p2, const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0,
-                                    const Tp *src_n1, const Tp *src_n2, const Tp *src_n3, Tp *dst, MI_S32 width, SumType *row_sum, MI_S32 row_sum_step,
+template <typename Tp, typename SumType, BorderType BORDER_TYPE, DT_S32 C>
+static DT_VOID BoxFilter9x9FirstRow(const Tp *src_p3, const Tp *src_p2, const Tp *src_p1, const Tp *src_p0, const Tp *src_c, const Tp *src_n0,
+                                    const Tp *src_n1, const Tp *src_n2, const Tp *src_n3, Tp *dst, DT_S32 width, SumType *row_sum, DT_S32 row_sum_step,
                                     const std::vector<Tp> &border_value)
 {
     using MVType = typename MVHvxVector<C>::Type;
     using MWType = typename MWHvxVector<C>::Type;
 
-    MI_S32 shift = 0;
-    MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
-    MI_S32 back_offset = width - ELEM_COUNTS;
+    DT_S32 shift = 0;
+    DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
+    DT_S32 back_offset = width - ELEM_COUNTS;
 
     MVType mv_src_p3, mv_src_p2, mv_src_p1, mv_src_p0, mv_src_c, mv_src_n0, mv_src_n1, mv_src_n2, mv_src_n3;
     MWType mw_sum0, mw_sum1, mw_sum2;
@@ -770,7 +770,7 @@ static AURA_VOID BoxFilter9x9FirstRow(const Tp *src_p3, const Tp *src_p2, const 
         vload(src_n3, mv_src_n3);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p3 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_p3.val[ch], src_p3[ch], border_value[ch]);
             HVX_Vector v_border_p2 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::LEFT>(mv_src_p2.val[ch], src_p2[ch], border_value[ch]);
@@ -791,7 +791,7 @@ static AURA_VOID BoxFilter9x9FirstRow(const Tp *src_p3, const Tp *src_p2, const 
 
     // main(0 ~ n-2)
     {
-        for (MI_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS, shift += ELEM_COUNTS)
+        for (DT_S32 x = ELEM_COUNTS; x <= back_offset; x += ELEM_COUNTS, shift += ELEM_COUNTS)
         {
             vload(src_p3 + C * x, mv_src_p3);
             vload(src_p2 + C * x, mv_src_p2);
@@ -804,7 +804,7 @@ static AURA_VOID BoxFilter9x9FirstRow(const Tp *src_p3, const Tp *src_p2, const 
             vload(src_n3 + C * x, mv_src_n3);
 
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 BoxFilter9x9FirstRowVCore<Tp, SumType>(mv_src_p3.val[ch], mv_src_p2.val[ch], mv_src_p1.val[ch], mv_src_p0.val[ch],
                                                        mv_src_c.val[ch], mv_src_n0.val[ch], mv_src_n1.val[ch], mv_src_n2.val[ch], mv_src_n3.val[ch],
@@ -822,8 +822,8 @@ static AURA_VOID BoxFilter9x9FirstRow(const Tp *src_p3, const Tp *src_p2, const 
 
     // remain
     {
-        MI_S32 last = C * (width - 1);
-        MI_S32 rest = width % ELEM_COUNTS;
+        DT_S32 last = C * (width - 1);
+        DT_S32 rest = width % ELEM_COUNTS;
         MVType mv_last;
 
         vload(src_p3 + C * back_offset, mv_src_p3);
@@ -837,7 +837,7 @@ static AURA_VOID BoxFilter9x9FirstRow(const Tp *src_p3, const Tp *src_p2, const 
         vload(src_n3 + C * back_offset, mv_src_n3);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             HVX_Vector v_border_p3 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_p3.val[ch], src_p3[last + ch], border_value[ch]);
             HVX_Vector v_border_p2 = GetBorderVector<Tp, BORDER_TYPE, BorderArea::RIGHT>(mv_src_p2.val[ch], src_p2[last + ch], border_value[ch]);
@@ -865,15 +865,15 @@ static AURA_VOID BoxFilter9x9FirstRow(const Tp *src_p3, const Tp *src_p2, const 
     }
 }
 
-template <typename Tp, typename SumType, BorderType BORDER_TYPE, MI_S32 C>
+template <typename Tp, typename SumType, BorderType BORDER_TYPE, DT_S32 C>
 static Status BoxFilter9x9HvxImpl(Context *ctx, const Mat &src, Mat &dst, ThreadBuffer &row_sum_buffer, const std::vector<Tp> &border_value,
-                                  const Tp *border_buffer, MI_S32 start_row, MI_S32 end_row)
+                                  const Tp *border_buffer, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 height = src.GetSizes().m_height;
-    MI_S32 stride = src.GetStrides().m_width;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 height = src.GetSizes().m_height;
+    DT_S32 stride = src.GetStrides().m_width;
 
-    MI_S32 sum_size  = AURA_ALIGN(width, 128) + AURA_HVLEN;
+    DT_S32 sum_size  = AURA_ALIGN(width, 128) + AURA_HVLEN;
     SumType *row_sum = row_sum_buffer.GetThreadData<SumType>();
     if (NULL == row_sum)
     {
@@ -906,12 +906,12 @@ static Status BoxFilter9x9HvxImpl(Context *ctx, const Mat &src, Mat &dst, Thread
     src_n1 = src_n2;
     src_n2 = src_n3;
     src_n3 = src.Ptr<Tp, BORDER_TYPE>(start_row + 5, border_buffer);
-    MI_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row + 1; y < end_row; y++)
+    DT_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row + 1; y < end_row; y++)
     {
         if (y + 5 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 5)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 5)), L2fetch_param);
         }
 
         Tp *dst_row = dst.Ptr<Tp>(y);
@@ -938,16 +938,16 @@ static Status BoxFilter9x9HvxHelper(Context *ctx, const Mat &src, Mat &dst, cons
     Status ret = Status::ERROR;
 
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return ret;
     }
 
-    MI_S32 height   = src.GetSizes().m_height;
-    MI_S32 width    = src.GetSizes().m_width;
-    MI_S32 channel  = src.GetSizes().m_channel;
-    MI_S32 sum_size = AURA_ALIGN(width, 128) + AURA_HVLEN;
+    DT_S32 height   = src.GetSizes().m_height;
+    DT_S32 width    = src.GetSizes().m_width;
+    DT_S32 channel  = src.GetSizes().m_channel;
+    DT_S32 sum_size = AURA_ALIGN(width, 128) + AURA_HVLEN;
 
     ThreadBuffer row_sum_buffer(ctx, sum_size * sizeof(SumType) * channel);
 
@@ -955,21 +955,21 @@ static Status BoxFilter9x9HvxHelper(Context *ctx, const Mat &src, Mat &dst, cons
     {
         case 1:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, BoxFilter9x9HvxImpl<Tp, SumType, BORDER_TYPE, 1>,
+            ret = wp->ParallelFor((DT_S32)0, height, BoxFilter9x9HvxImpl<Tp, SumType, BORDER_TYPE, 1>,
                                   ctx, std::cref(src), std::ref(dst), std::ref(row_sum_buffer), std::cref(border_value), border_buffer);
             break;
         }
 
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, BoxFilter9x9HvxImpl<Tp, SumType, BORDER_TYPE, 2>,
+            ret = wp->ParallelFor((DT_S32)0, height, BoxFilter9x9HvxImpl<Tp, SumType, BORDER_TYPE, 2>,
                                   ctx, std::cref(src), std::ref(dst), std::ref(row_sum_buffer), std::cref(border_value), border_buffer);
             break;
         }
 
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, BoxFilter9x9HvxImpl<Tp, SumType, BORDER_TYPE, 3>,
+            ret = wp->ParallelFor((DT_S32)0, height, BoxFilter9x9HvxImpl<Tp, SumType, BORDER_TYPE, 3>,
                                   ctx, std::cref(src), std::ref(dst), std::ref(row_sum_buffer), std::cref(border_value), border_buffer);
             break;
         }
@@ -987,11 +987,11 @@ static Status BoxFilter9x9HvxHelper(Context *ctx, const Mat &src, Mat &dst, cons
 template <typename Tp, typename SumType>
 static Status BoxFilter9x9HvxHelper(Context *ctx, const Mat &src, Mat &dst, BorderType &border_type, const Scalar &border_value)
 {
-    Tp *border_buffer = MI_NULL;
+    Tp *border_buffer = DT_NULL;
     std::vector<Tp> vec_border_value = border_value.ToVector<Tp>();
 
-    MI_S32 width   = dst.GetSizes().m_width;
-    MI_S32 channel = dst.GetSizes().m_channel;
+    DT_S32 width   = dst.GetSizes().m_width;
+    DT_S32 channel = dst.GetSizes().m_channel;
 
     Status ret = Status::ERROR;
 
@@ -1000,7 +1000,7 @@ static Status BoxFilter9x9HvxHelper(Context *ctx, const Mat &src, Mat &dst, Bord
         case BorderType::CONSTANT:
         {
             border_buffer = CreateBorderBuffer(ctx, width, channel, vec_border_value);
-            if (MI_NULL == border_buffer)
+            if (DT_NULL == border_buffer)
             {
                 AURA_ADD_ERROR_STRING(ctx, "CreateBorderBuffer failed");
                 return Status::ERROR;
@@ -1042,19 +1042,19 @@ Status BoxFilter9x9Hvx(Context *ctx, const Mat &src, Mat &dst, BorderType border
     {
         case ElemType::U8:
         {
-            ret = BoxFilter9x9HvxHelper<MI_U8, MI_S16>(ctx, src, dst, border_type, border_value);
+            ret = BoxFilter9x9HvxHelper<DT_U8, DT_S16>(ctx, src, dst, border_type, border_value);
             break;
         }
 
         case ElemType::U16:
         {
-            ret = BoxFilter9x9HvxHelper<MI_U16, MI_S32>(ctx, src, dst, border_type, border_value);
+            ret = BoxFilter9x9HvxHelper<DT_U16, DT_S32>(ctx, src, dst, border_type, border_value);
             break;
         }
 
         case ElemType::S16:
         {
-            ret = BoxFilter9x9HvxHelper<MI_S16, MI_S32>(ctx, src, dst, border_type, border_value);
+            ret = BoxFilter9x9HvxHelper<DT_S16, DT_S32>(ctx, src, dst, border_type, border_value);
             break;
         }
 

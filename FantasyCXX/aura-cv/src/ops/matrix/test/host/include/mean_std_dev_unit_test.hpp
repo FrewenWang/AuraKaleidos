@@ -23,7 +23,7 @@ AURA_INLINE Status CvMeanStdDev(Mat &mat, Scalar &means, Scalar &std_devs)
 
     cv::meanStdDev(cv_src, cv_mean, cv_std_dev);
 
-    for (MI_S32 i = 0; i < 4; ++i)
+    for (DT_S32 i = 0; i < 4; ++i)
     {
         means.m_val[i] = cv_mean[i];
         std_devs.m_val[i] = cv_std_dev[i];
@@ -43,7 +43,7 @@ public:
     MeanStdDevTest(Context *ctx, MeanStdDevParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         MeanStdDevParam run_param(GetParam((index)));
@@ -54,13 +54,13 @@ public:
         AURA_LOGI(m_ctx, AURA_TAG, "\n\n######################### MeanStdDev param: %s\n", run_param.ToString().c_str());
 
         // Create src mats
-        MI_S32 mem_type = AURA_MEM_DEFAULT;
+        DT_S32 mem_type = AURA_MEM_DEFAULT;
         Mat src_mat = m_factory.GetRandomMat(-655350, 655350, elem_type, mat_size.m_sizes, mem_type, mat_size.m_strides);
 
         TestTime time_val;
         TestResult result;
         result.input  = mat_size.ToString() + " " + ElemTypesToString(elem_type);
-        result.output = "MI_F64, MI_F64";
+        result.output = "DT_F64, DT_F64";
 
         // Execute result variables
         Scalar res_means    = Scalar::All(0.0);
@@ -75,7 +75,7 @@ public:
         ScalarCmpResult cmp_result;
 
         // Run interface
-        MI_S32 loop_count  = stress_count ? stress_count : 10;
+        DT_S32 loop_count  = stress_count ? stress_count : 10;
         Status status_exec = Executor(loop_count, 2, time_val, IMeanStdDev, m_ctx, src_mat, res_means, res_std_devs, run_param.target);
 
         if (Status::OK == status_exec)

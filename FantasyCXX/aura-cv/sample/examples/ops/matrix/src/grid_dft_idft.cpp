@@ -27,7 +27,7 @@ aura::Status GridDftIDftSampleTest(aura::Context *ctx, aura::TargetType type)
         return status;
     }
 
-    MI_S32 grid_len = 8;
+    DT_S32 grid_len = 8;
 
     // ---------------------
     //     run interface
@@ -61,7 +61,7 @@ aura::Status GridDftIDftSampleTest(aura::Context *ctx, aura::TargetType type)
 
     // run and time
     start_time = aura::Time::Now();
-    status = IGridIDft(ctx, dst0, dst1, grid_len, MI_TRUE, aura::OpTarget(type));
+    status = IGridIDft(ctx, dst0, dst1, grid_len, DT_TRUE, aura::OpTarget(type));
     end_time = aura::Time::Now();
     
     // ---------------------

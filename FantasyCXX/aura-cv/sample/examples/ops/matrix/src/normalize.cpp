@@ -25,8 +25,8 @@ aura::Status NormalizeSampleTest(aura::Context *ctx, aura::TargetType type)
         return status;
     }
 
-    MI_F32 alpha = 3.2f;
-    MI_F32 beta  = 1.0f;
+    DT_F32 alpha = 3.2f;
+    DT_F32 beta  = 1.0f;
 
     // ---------------------
     //     run interface

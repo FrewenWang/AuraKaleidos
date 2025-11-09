@@ -42,7 +42,7 @@ namespace aura
  * @param token The token to wait for.
  */
 template<typename Tp>
-AURA_VOID WaitTokens(Tp &&token)
+DT_VOID WaitTokens(Tp &&token)
 {
     token.wait();
 }
@@ -59,7 +59,7 @@ AURA_VOID WaitTokens(Tp &&token)
  * @param tokens The rest of the tokens.
  */
 template<typename Tp0, typename ...Tp1>
-AURA_VOID WaitTokens(Tp0 &&token, Tp1 &&...tokens)
+DT_VOID WaitTokens(Tp0 &&token, Tp1 &&...tokens)
 {
     WaitTokens(token);
     WaitTokens(tokens...);
@@ -72,7 +72,7 @@ AURA_VOID WaitTokens(Tp0 &&token, Tp1 &&...tokens)
  * @param tokens The vector of tokens to wait for.
  */
 template<typename Tp>
-AURA_VOID WaitTokens(std::vector<Tp> &tokens)
+DT_VOID WaitTokens(std::vector<Tp> &tokens)
 {
     for (auto &token : tokens)
     {
@@ -85,7 +85,7 @@ AURA_VOID WaitTokens(std::vector<Tp> &tokens)
  *
  * @param instance A pointer to the WorkerPool instance.
  */
-AURA_VOID ThreadRun(AURA_VOID *instance);
+DT_VOID ThreadRun(DT_VOID *instance);
 
 /**
  * @brief Class for managing a pool of worker threads on Qualcomm CDSP platform.
@@ -103,7 +103,7 @@ public:
      * @param stack_sz Size of the thread stack.
      * @param tag The tag for identifying the worker pool.
      */
-    WorkerPool(Context *ctx, MI_S32 stack_sz = AURA_DEFAULT_THREAD_STACK_SZ, const std::string &tag = AURA_TAG);
+    WorkerPool(Context *ctx, DT_S32 stack_sz = AURA_DEFAULT_THREAD_STACK_SZ, const std::string &tag = AURA_TAG);
 
     /**
      * @brief Destructor for WorkerPool to terminates all threads and stops the worker pool.
@@ -174,19 +174,19 @@ public:
      *
      * @return The number of threads.
      */
-    MI_S32 GetComputeThreadNum() {return m_threads.size();}
+    DT_S32 GetComputeThreadNum() {return m_threads.size();}
 
     /**
      * @brief Send a stop signal to awaken all threads in preparation for exiting the thread callback function.
      */
-    AURA_VOID Stop();
+    DT_VOID Stop();
 
     /**
      * @brief Gets the index of the current thread within the worker pool.
      *
      * @return The index of the current thread. (Return -1 if the thread is not in the thread pool.)
      */
-    MI_S32 GetComputeThreadIdx()
+    DT_S32 GetComputeThreadIdx()
     {
         auto search = m_tid_map.find(qurt_thread_get_id());
         if (search != m_tid_map.end())
@@ -223,7 +223,7 @@ public:
      *
      * @param instance A pointer to the WorkerPool instance.
      */
-    friend AURA_VOID ThreadRun(AURA_VOID *instance);
+    friend DT_VOID ThreadRun(DT_VOID *instance);
 
 private:
     template <typename FuncType, typename ...ArgsType>
@@ -236,36 +236,36 @@ private:
     std::condition_variable m_wait_cv;                  /*!< Condition variable for thread synchronization. */
     std::string m_tag;                                  /*!< The tag to identify the threads of the worker pool. */
     std::vector<qurt_thread_t> m_threads;               /*!< Vector of compute threads. */
-    MI_U8 *m_stack;                                     /*!< Pointer to the thread stack memory. */
-    std::queue<std::function<AURA_VOID()>> m_task_queue;  /*!< Queue for tasks. */
-    std::map<qurt_thread_t, MI_S32> m_tid_map;          /*!< Map to store thread IDs and their corresponding thread indices. */
+    DT_U8 *m_stack;                                     /*!< Pointer to the thread stack memory. */
+    std::queue<std::function<DT_VOID()>> m_task_queue;  /*!< Queue for tasks. */
+    std::map<qurt_thread_t, DT_S32> m_tid_map;          /*!< Map to store thread IDs and their corresponding thread indices. */
 };
 
 template <typename FuncType, typename ...ArgsType>
 class WorkerPool::WaveFrontHelper
 {
 public:
-    WaveFrontHelper(FuncType &&f, MI_S32 h, MI_S32 w): m_f(std::forward<FuncType>(f)), m_h(h), m_w(w)
+    WaveFrontHelper(FuncType &&f, DT_S32 h, DT_S32 w): m_f(std::forward<FuncType>(f)), m_h(h), m_w(w)
     {
         if ((w > 0) && (h > 0))
         {
             m_counters.resize(h * w);
-            for (MI_S32 row = 0; row < h; row++)
+            for (DT_S32 row = 0; row < h; row++)
             {
-                for (MI_S32 col = 0; col < w; col++)
+                for (DT_S32 col = 0; col < w; col++)
                 {
-                    m_counters[row * w + col] = static_cast<MI_U8>(row > 0) +
-                                                static_cast<MI_U8>(col > 0);
+                    m_counters[row * w + col] = static_cast<DT_U8>(row > 0) +
+                                                static_cast<DT_U8>(col > 0);
                 }
             }
         }
 
-        m_task_finished = MI_FALSE;
-        m_task_failed   = MI_FALSE;
+        m_task_finished = DT_FALSE;
+        m_task_failed   = DT_FALSE;
     }
 
     Status operator()(WorkerPool *wp, std::vector<std::shared_future<Status>> &tokens,
-                      MI_S32 row, MI_S32 col, ArgsType &&...args)
+                      DT_S32 row, DT_S32 col, ArgsType &&...args)
     {
         if ((m_task_failed) || (row > m_h - 1) || (col > m_w - 1))
         {
@@ -275,14 +275,14 @@ public:
         Status ret = m_f(std::forward<ArgsType>(args)..., row, col);
         if (ret != Status::OK)
         {
-            m_task_failed = MI_TRUE;
+            m_task_failed = DT_TRUE;
             return ret;
         }
 
-        while (MI_TRUE)
+        while (DT_TRUE)
         {
-            MI_BOOL to_east  = MI_FALSE;
-            MI_BOOL to_south = MI_FALSE;
+            DT_BOOL to_east  = DT_FALSE;
+            DT_BOOL to_south = DT_FALSE;
 
             {
                 std::unique_lock<std::mutex> lock(m_mutex);
@@ -296,7 +296,7 @@ public:
                 ret = m_f(std::forward<ArgsType>(args)..., row, col + 1);
                 if (ret != Status::OK)
                 {
-                    m_task_failed = MI_TRUE;
+                    m_task_failed = DT_TRUE;
                     return ret;
                 }
 
@@ -307,7 +307,7 @@ public:
                 ret = m_f(std::forward<ArgsType>(args)..., row + 1, col);
                 if (ret != Status::OK)
                 {
-                    m_task_failed = MI_TRUE;
+                    m_task_failed = DT_TRUE;
                     return ret;
                 }
 
@@ -318,7 +318,7 @@ public:
                 ret = m_f(std::forward<ArgsType>(args)..., row, col + 1);
                 if (ret != Status::OK)
                 {
-                    m_task_failed = MI_TRUE;
+                    m_task_failed = DT_TRUE;
                     return ret;
                 }
 
@@ -333,21 +333,21 @@ public:
         // last task done
         if ((row == (m_h - 1)) && (col == (m_w - 1)))
         {
-            m_task_finished = MI_TRUE;
+            m_task_finished = DT_TRUE;
         }
 
         return ret;
     }
 
 public:
-    MI_BOOL m_task_finished;
-    MI_BOOL m_task_failed;
+    DT_BOOL m_task_finished;
+    DT_BOOL m_task_failed;
 
 private:
     FuncType           m_f;
-    MI_S32             m_h;
-    MI_S32             m_w;
-    std::vector<MI_U8> m_counters;
+    DT_S32             m_h;
+    DT_S32             m_w;
+    std::vector<DT_U8> m_counters;
     std::mutex         m_mutex;
 };
 
@@ -380,12 +380,12 @@ Status WorkerPool::ParallelFor(RangeType start, RangeType end, FuncType &&f, Arg
     }
 
     std::vector<std::future<RetType>> tokens;
-    std::atomic_bool task_finished(MI_FALSE);
-    std::atomic_bool task_failed(MI_FALSE);
+    std::atomic_bool task_finished(DT_FALSE);
+    std::atomic_bool task_failed(DT_FALSE);
 
     auto functor = std::bind(std::forward<FuncType>(f), std::forward<ArgsType>(args)..., std::placeholders::_1, std::placeholders::_2);
 
-    auto task_func = [&functor, &task_failed](MI_S32 idx_start, MI_S32 idx_end) -> Status
+    auto task_func = [&functor, &task_failed](DT_S32 idx_start, DT_S32 idx_end) -> Status
     {
         if (task_failed)
         {
@@ -394,14 +394,14 @@ Status WorkerPool::ParallelFor(RangeType start, RangeType end, FuncType &&f, Arg
 
         if (functor(idx_start, idx_end) != Status::OK)
         {
-            task_failed = MI_TRUE;
+            task_failed = DT_TRUE;
             return Status::ERROR;
         }
 
         return Status::OK;
     };
 
-    auto last_task_func = [&functor, &task_failed, &task_finished](MI_S32 idx_start, MI_S32 idx_end) -> Status
+    auto last_task_func = [&functor, &task_failed, &task_finished](DT_S32 idx_start, DT_S32 idx_end) -> Status
     {
         if (task_failed)
         {
@@ -410,11 +410,11 @@ Status WorkerPool::ParallelFor(RangeType start, RangeType end, FuncType &&f, Arg
 
         if (functor(idx_start, idx_end) != Status::OK)
         {
-            task_failed = MI_TRUE;
+            task_failed = DT_TRUE;
             return Status::ERROR;
         }
 
-        task_finished = MI_TRUE;
+        task_finished = DT_TRUE;
         return Status::OK;
     };
 
@@ -458,9 +458,9 @@ Status WorkerPool::WaveFront(RangeType h, RangeType w, FuncType &&f, ArgsType &&
     tokens.emplace_back(this->AddTask(std::ref(task_helper),
                         this, tokens, 0, 0, std::forward<ArgsType>(args)...));
 
-    while (MI_TRUE)
+    while (DT_TRUE)
     {
-        std::function<AURA_VOID()> task;
+        std::function<DT_VOID()> task;
 
         {
             std::unique_lock<std::mutex> lock(m_mutex);

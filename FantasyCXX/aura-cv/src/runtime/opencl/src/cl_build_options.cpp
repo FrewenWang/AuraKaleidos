@@ -57,16 +57,16 @@ std::string CLBuildOptions::ToString(ElemType type)
         return ret;
     };
 
-    auto IsEmpty = [](const std::string &str) -> MI_BOOL
+    auto IsEmpty = [](const std::string &str) -> DT_BOOL
     {
         for (auto it = str.begin(); it != str.end(); ++it)
         {
             if (*it != ' ')
             {
-                return MI_FALSE;
+                return DT_FALSE;
             }
         }
-        return MI_TRUE;
+        return DT_TRUE;
     };
 
     auto Split = [&](const std::string &str) -> std::vector<std::string>

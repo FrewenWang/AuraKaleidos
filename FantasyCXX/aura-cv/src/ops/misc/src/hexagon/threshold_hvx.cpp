@@ -8,63 +8,63 @@ namespace aura
 {
 
 // AURA_THRESH_BINARY, U8
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY == THRESH_TYPE &&
-          std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY == THRESH_TYPE &&
+          std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
 {
     HVX_VectorPred qu8_sign = Q6_Q_vcmp_gt_VubVub(vu8_src, Q6_Vb_vsplat_R(thresh));
     vu8_result = Q6_V_vmux_QVV(qu8_sign, Q6_Vb_vsplat_R(max_val), Q6_V_vzero());
 }
 
 // AURA_THRESH_BINARY, U16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY == THRESH_TYPE &&
-          std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY == THRESH_TYPE &&
+          std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
 {
     HVX_VectorPred qu16_sign = Q6_Q_vcmp_gt_VuhVuh(vu16_src, Q6_Vh_vsplat_R(thresh));
     vu16_result = Q6_V_vmux_QVV(qu16_sign, Q6_Vh_vsplat_R(max_val), Q6_V_vzero());
 }
 
 // AURA_THRESH_BINARY, S16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY == THRESH_TYPE &&
-          std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY == THRESH_TYPE &&
+          std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
 {
     HVX_VectorPred qs16_sign = Q6_Q_vcmp_gt_VhVh(vs16_src, Q6_Vh_vsplat_R(thresh));
     vs16_result = Q6_V_vmux_QVV(qs16_sign, Q6_Vh_vsplat_R(max_val), Q6_V_vzero());
 }
 
 // AURA_THRESH_BINARY_INV, U8
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY_INV == THRESH_TYPE &&
-          std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY_INV == THRESH_TYPE &&
+          std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
 {
     HVX_VectorPred qu8_sign = Q6_Q_vcmp_gt_VubVub(vu8_src, Q6_Vb_vsplat_R(thresh));
     vu8_result = Q6_V_vmux_QVV(qu8_sign, Q6_V_vzero(), Q6_Vb_vsplat_R(max_val));
 }
 
 // AURA_THRESH_BINARY_INV, U16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY_INV == THRESH_TYPE &&
-          std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY_INV == THRESH_TYPE &&
+          std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
 {
     HVX_VectorPred qu16_sign = Q6_Q_vcmp_gt_VuhVuh(vu16_src, Q6_Vh_vsplat_R(thresh));
     vu16_result = Q6_V_vmux_QVV(qu16_sign, Q6_V_vzero(), Q6_Vh_vsplat_R(max_val));
 }
 
 // AURA_THRESH_BINARY_INV, S16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY_INV == THRESH_TYPE &&
-          std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_BINARY_INV == THRESH_TYPE &&
+          std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
 {
     HVX_VectorPred qs16_sign = Q6_Q_vcmp_gt_VhVh(vs16_src, Q6_Vh_vsplat_R(thresh));
     vs16_result = Q6_V_vmux_QVV(qs16_sign, Q6_V_vzero(), Q6_Vh_vsplat_R(max_val));
 }
 
 // AURA_THRESH_TRUNC, U8
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TRUNC == THRESH_TYPE &&
-          std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TRUNC == THRESH_TYPE &&
+          std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
 {
     AURA_UNUSED(max_val);
     HVX_VectorPred qu8_sign = Q6_Q_vcmp_gt_VubVub(vu8_src, Q6_Vb_vsplat_R(thresh));
@@ -72,9 +72,9 @@ static AURA_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HV
 }
 
 // AURA_THRESH_TRUNC, U16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TRUNC == THRESH_TYPE &&
-          std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TRUNC == THRESH_TYPE &&
+          std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
 {
     AURA_UNUSED(max_val);
     HVX_VectorPred qu16_sign = Q6_Q_vcmp_gt_VuhVuh(vu16_src, Q6_Vh_vsplat_R(thresh));
@@ -82,9 +82,9 @@ static AURA_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, H
 }
 
 // AURA_THRESH_TRUNC, S16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TRUNC == THRESH_TYPE &&
-          std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TRUNC == THRESH_TYPE &&
+          std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
 {
     AURA_UNUSED(max_val);
     HVX_VectorPred qs16_sign = Q6_Q_vcmp_gt_VhVh(vs16_src, Q6_Vh_vsplat_R(thresh));
@@ -92,9 +92,9 @@ static AURA_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, H
 }
 
 // AURA_THRESH_TOZERO, U8
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO == THRESH_TYPE &&
-          std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO == THRESH_TYPE &&
+          std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
 {
     AURA_UNUSED(max_val);
     HVX_VectorPred qu8_sign = Q6_Q_vcmp_gt_VubVub(vu8_src, Q6_Vb_vsplat_R(thresh));
@@ -102,9 +102,9 @@ static AURA_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HV
 }
 
 // AURA_THRESH_TOZERO, U16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO == THRESH_TYPE &&
-          std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO == THRESH_TYPE &&
+          std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
 {
     AURA_UNUSED(max_val);
     HVX_VectorPred qu16_sign = Q6_Q_vcmp_gt_VuhVuh(vu16_src, Q6_Vh_vsplat_R(thresh));
@@ -112,9 +112,9 @@ static AURA_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, H
 }
 
 // AURA_THRESH_TOZERO, S16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO == THRESH_TYPE &&
-          std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO == THRESH_TYPE &&
+          std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
 {
     AURA_UNUSED(max_val);
     HVX_VectorPred qs16_sign = Q6_Q_vcmp_gt_VhVh(vs16_src, Q6_Vh_vsplat_R(thresh));
@@ -122,9 +122,9 @@ static AURA_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, H
 }
 
 // AURA_THRESH_TOZERO_INV, U8
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO_INV == THRESH_TYPE &&
-          std::is_same<Tp, MI_U8>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO_INV == THRESH_TYPE &&
+          std::is_same<Tp, DT_U8>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HVX_Vector &vu8_result)
 {
     AURA_UNUSED(max_val);
     HVX_VectorPred qu8_sign = Q6_Q_vcmp_gt_VubVub(vu8_src, Q6_Vb_vsplat_R(thresh));
@@ -132,9 +132,9 @@ static AURA_VOID ThresholdRowCore(HVX_Vector &vu8_src, Tp thresh, Tp max_val, HV
 }
 
 // AURA_THRESH_TOZERO_INV, U16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO_INV == THRESH_TYPE &&
-          std::is_same<Tp, MI_U16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO_INV == THRESH_TYPE &&
+          std::is_same<Tp, DT_U16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, HVX_Vector &vu16_result)
 {
     AURA_UNUSED(max_val);
     HVX_VectorPred qu16_sign = Q6_Q_vcmp_gt_VuhVuh(vu16_src, Q6_Vh_vsplat_R(thresh));
@@ -142,32 +142,32 @@ static AURA_VOID ThresholdRowCore(HVX_Vector &vu16_src, Tp thresh, Tp max_val, H
 }
 
 // AURA_THRESH_TOZERO_INV, S16
-template <typename Tp, MI_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO_INV == THRESH_TYPE &&
-          std::is_same<Tp, MI_S16>::value>::type* = MI_NULL>
-static AURA_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
+template <typename Tp, DT_S32 THRESH_TYPE, typename std::enable_if<AURA_THRESH_TOZERO_INV == THRESH_TYPE &&
+          std::is_same<Tp, DT_S16>::value>::type* = DT_NULL>
+static DT_VOID ThresholdRowCore(HVX_Vector &vs16_src, Tp thresh, Tp max_val, HVX_Vector &vs16_result)
 {
     AURA_UNUSED(max_val);
     HVX_VectorPred qs16_sign = Q6_Q_vcmp_gt_VhVh(vs16_src, Q6_Vh_vsplat_R(thresh));
     vs16_result = Q6_V_vmux_QVV(qs16_sign, Q6_V_vzero(), vs16_src);
 }
 
-template <typename Tp, MI_S32 C, MI_S32 THRESH_TYPE>
-static AURA_VOID ThresholdRow(const Tp *src, Tp *dst, Tp thresh, Tp max_val, MI_S32 width)
+template <typename Tp, DT_S32 C, DT_S32 THRESH_TYPE>
+static DT_VOID ThresholdRow(const Tp *src, Tp *dst, Tp thresh, Tp max_val, DT_S32 width)
 {
     using MVType = typename MVHvxVector<C>::Type;
 
-    constexpr MI_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
+    constexpr DT_S32 ELEM_COUNTS = AURA_HVLEN / sizeof(Tp);
 
     MVType mv_src, mv_result;
 
     // main
     {
-        for (MI_S32 x = 0; x <= (width - ELEM_COUNTS); x += ELEM_COUNTS)
+        for (DT_S32 x = 0; x <= (width - ELEM_COUNTS); x += ELEM_COUNTS)
         {
             vload(src + C * x, mv_src);
 
             #pragma unroll(C)
-            for (MI_S32 ch = 0; ch < C; ch++)
+            for (DT_S32 ch = 0; ch < C; ch++)
             {
                 ThresholdRowCore<Tp, THRESH_TYPE>(mv_src.val[ch], thresh, max_val, mv_result.val[ch]);
             }
@@ -184,7 +184,7 @@ static AURA_VOID ThresholdRow(const Tp *src, Tp *dst, Tp thresh, Tp max_val, MI_
         vload(src_data, mv_src);
 
         #pragma unroll(C)
-        for (MI_S32 ch = 0; ch < C; ch++)
+        for (DT_S32 ch = 0; ch < C; ch++)
         {
             ThresholdRowCore<Tp, THRESH_TYPE>(mv_src.val[ch], thresh, max_val, mv_result.val[ch]);
         }
@@ -193,19 +193,19 @@ static AURA_VOID ThresholdRow(const Tp *src, Tp *dst, Tp thresh, Tp max_val, MI_
     }
 }
 
-template <typename Tp, MI_S32 C, MI_S32 THRESH_TYPE>
-static Status ThresholdHvxImpl(const Mat &src, Mat &dst, Tp thresh, Tp max_val, MI_S32 start_row, MI_S32 end_row)
+template <typename Tp, DT_S32 C, DT_S32 THRESH_TYPE>
+static Status ThresholdHvxImpl(const Mat &src, Mat &dst, Tp thresh, Tp max_val, DT_S32 start_row, DT_S32 end_row)
 {
-    MI_S32 width  = src.GetSizes().m_width;
-    MI_S32 height = src.GetSizes().m_height;
-    MI_S32 stride = src.GetStrides().m_width;
+    DT_S32 width  = src.GetSizes().m_width;
+    DT_S32 height = src.GetSizes().m_height;
+    DT_S32 stride = src.GetStrides().m_width;
 
-    MI_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
-    for (MI_S32 y = start_row; y < end_row; y++)
+    DT_U64 L2fetch_param = L2PfParam(stride, width * C * ElemTypeSize(src.GetElemType()), 1, 0);
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         if (y + 1 < height)
         {
-            L2Fetch(reinterpret_cast<MI_U32>(src.Ptr<Tp>(y + 1)), L2fetch_param);
+            L2Fetch(reinterpret_cast<DT_U32>(src.Ptr<Tp>(y + 1)), L2fetch_param);
         }
 
         const Tp *src_row  = src.Ptr<Tp>(y);
@@ -216,11 +216,11 @@ static Status ThresholdHvxImpl(const Mat &src, Mat &dst, Tp thresh, Tp max_val, 
     return Status::OK;
 }
 
-template<typename Tp, MI_S32 THRESH_TYPE>
+template<typename Tp, DT_S32 THRESH_TYPE>
 static Status ThresholdHvxHelper(Context *ctx, const Mat &src, Mat &dst, Tp thresh, Tp max_val)
 {
     WorkerPool *wp = ctx->GetWorkerPool();
-    if (MI_NULL == wp)
+    if (DT_NULL == wp)
     {
         AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");
         return Status::ERROR;
@@ -228,26 +228,26 @@ static Status ThresholdHvxHelper(Context *ctx, const Mat &src, Mat &dst, Tp thre
 
     Status ret = Status::ERROR;
 
-    MI_S32 height  = src.GetSizes().m_height;
-    MI_S32 channel = src.GetSizes().m_channel;
+    DT_S32 height  = src.GetSizes().m_height;
+    DT_S32 channel = src.GetSizes().m_channel;
 
     switch (channel)
     {
         case 1:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, ThresholdHvxImpl<Tp, 1, THRESH_TYPE>, std::cref(src), std::ref(dst), thresh, max_val);
+            ret = wp->ParallelFor((DT_S32)0, height, ThresholdHvxImpl<Tp, 1, THRESH_TYPE>, std::cref(src), std::ref(dst), thresh, max_val);
             break;
         }
 
         case 2:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, ThresholdHvxImpl<Tp, 2, THRESH_TYPE >, std::cref(src), std::ref(dst), thresh, max_val);
+            ret = wp->ParallelFor((DT_S32)0, height, ThresholdHvxImpl<Tp, 2, THRESH_TYPE >, std::cref(src), std::ref(dst), thresh, max_val);
             break;
         }
 
         case 3:
         {
-            ret = wp->ParallelFor((MI_S32)0, height, ThresholdHvxImpl<Tp, 3, THRESH_TYPE>, std::cref(src), std::ref(dst), thresh, max_val);
+            ret = wp->ParallelFor((DT_S32)0, height, ThresholdHvxImpl<Tp, 3, THRESH_TYPE>, std::cref(src), std::ref(dst), thresh, max_val);
             break;
         }
 
@@ -262,7 +262,7 @@ static Status ThresholdHvxHelper(Context *ctx, const Mat &src, Mat &dst, Tp thre
 }
 
 template <typename Tp>
-static Status ThresholdHvxHelper(Context *ctx, const Mat &src, Mat &dst, Tp thresh, Tp max_val, MI_S32 type)
+static Status ThresholdHvxHelper(Context *ctx, const Mat &src, Mat &dst, Tp thresh, Tp max_val, DT_S32 type)
 {
     Status ret = Status::ERROR;
 
@@ -331,7 +331,7 @@ static Status ThresholdHvxHelper(Context *ctx, const Mat &src, Mat &dst, Tp thre
 ThresholdHvx::ThresholdHvx(Context *ctx, const OpTarget &target) : ThresholdImpl(ctx, target)
 {}
 
-Status ThresholdHvx::SetArgs(const Array *src, Array *dst, MI_F32 thresh, MI_F32 max_val, MI_S32 type)
+Status ThresholdHvx::SetArgs(const Array *src, Array *dst, DT_F32 thresh, DT_F32 max_val, DT_S32 type)
 {
     if (ThresholdImpl::SetArgs(src, dst, thresh, max_val, type) != Status::OK)
     {
@@ -360,7 +360,7 @@ Status ThresholdHvx::Run()
     const Mat *src = dynamic_cast<const Mat*>(m_src);
     Mat *dst       = dynamic_cast<Mat*>(m_dst);
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src or dst is null");
         return Status::ERROR;
@@ -372,39 +372,39 @@ Status ThresholdHvx::Run()
     {
         case ElemType::U8:
         {
-            MI_U8 max_val = SaturateCast<MI_U8>(m_max_val);
-            MI_U8 thresh  = SaturateCast<MI_U8>(Floor(m_thresh));
+            DT_U8 max_val = SaturateCast<DT_U8>(m_max_val);
+            DT_U8 thresh  = SaturateCast<DT_U8>(Floor(m_thresh));
 
-            ret = ThresholdHvxHelper<MI_U8>(m_ctx, *src, *dst, thresh, max_val, m_type);
+            ret = ThresholdHvxHelper<DT_U8>(m_ctx, *src, *dst, thresh, max_val, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdHvxHelper<MI_U8> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdHvxHelper<DT_U8> failed");
             }
             break;
         }
         
         case ElemType::U16:
         {
-            MI_U16 max_val = SaturateCast<MI_U16>(m_max_val);
-            MI_U16 thresh  = SaturateCast<MI_U16>(Floor(m_thresh));
+            DT_U16 max_val = SaturateCast<DT_U16>(m_max_val);
+            DT_U16 thresh  = SaturateCast<DT_U16>(Floor(m_thresh));
 
-            ret = ThresholdHvxHelper<MI_U16>(m_ctx, *src, *dst, thresh, max_val, m_type);
+            ret = ThresholdHvxHelper<DT_U16>(m_ctx, *src, *dst, thresh, max_val, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdHvxHelper<MI_U16> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdHvxHelper<DT_U16> failed");
             }
             break;
         }
 
         case ElemType::S16:
         {
-            MI_S16 max_val = SaturateCast<MI_S16>(m_max_val);
-            MI_S16 thresh  = SaturateCast<MI_S16>(Floor(m_thresh));
+            DT_S16 max_val = SaturateCast<DT_S16>(m_max_val);
+            DT_S16 thresh  = SaturateCast<DT_S16>(Floor(m_thresh));
 
-            ret = ThresholdHvxHelper<MI_S16>(m_ctx, *src, *dst, thresh, max_val, m_type);
+            ret = ThresholdHvxHelper<DT_S16>(m_ctx, *src, *dst, thresh, max_val, m_type);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdHvxHelper<MI_S16> failed");
+                AURA_ADD_ERROR_STRING(m_ctx, "ThresholdHvxHelper<DT_S16> failed");
             }
             break;
         }
@@ -428,9 +428,9 @@ Status ThresholdRpc(Context *ctx, HexagonRpcParam &rpc_param)
 {
     Mat src;
     Mat dst;
-    MI_F32 thresh;
-    MI_F32 max_val;
-    MI_S32 type;
+    DT_F32 thresh;
+    DT_F32 max_val;
+    DT_S32 type;
 
     ThresholdInParam in_param(ctx, rpc_param);
     Status ret = in_param.Get(src, dst, thresh, max_val, type);

@@ -12,7 +12,7 @@ namespace aura
 {
 
 MemPool::Impl::Impl(Context *ctx) : m_ctx(ctx), m_lock(),
-                    m_mtrace_enable(MI_FALSE), m_peak_mem_size(0),
+                    m_mtrace_enable(DT_FALSE), m_peak_mem_size(0),
                     m_total_mem_size(0), m_mblk_map(), m_allocators()
 {
     std::lock_guard<std::mutex> guard(m_lock);
@@ -52,15 +52,15 @@ MemPool::Impl::~Impl()
         AURA_LOGD(m_ctx, AURA_TAG, "****************** Mem Leak *******************\n");
         AURA_LOGD(m_ctx, AURA_TAG, "****************** Blk info *******************\n");
 
-        MI_S32 counter = 0;
-        MI_S32 leak_mem_size = 0;
+        DT_S32 counter = 0;
+        DT_S32 leak_mem_size = 0;
 
         for (auto iter = m_mblk_map.begin(); iter != m_mblk_map.end(); ++iter)
         {
-            MI_S32 type = iter->second.buffer.m_type;
-            MI_S64 size = iter->second.buffer.m_size;
+            DT_S32 type = iter->second.buffer.m_type;
+            DT_S64 size = iter->second.buffer.m_size;
 
-            AURA_LOGD(m_ctx, AURA_TAG, "* blk [%zu] - %p\n", counter, reinterpret_cast<AURA_VOID*>(iter->first));
+            AURA_LOGD(m_ctx, AURA_TAG, "* blk [%zu] - %p\n", counter, reinterpret_cast<DT_VOID*>(iter->first));
             AURA_LOGD(m_ctx, AURA_TAG, "*   type: %s\n", m_allocators[type]->GetName().c_str());
             AURA_LOGD(m_ctx, AURA_TAG, "*   size: %zu byte\n", size);
             AURA_LOGD(m_ctx, AURA_TAG, "*   file: %s\n",  iter->second.file.c_str());
@@ -91,7 +91,7 @@ MemPool::Impl::~Impl()
             if (iter->second)
             {
                 delete iter->second;
-                iter->second = MI_NULL;
+                iter->second = DT_NULL;
             }
         }
 
@@ -99,8 +99,8 @@ MemPool::Impl::~Impl()
     }
 }
 
-AURA_VOID* MemPool::Impl::Allocate(MI_S32 type, MI_S64 size, MI_S32 align,
-                                 const MI_CHAR *file, const MI_CHAR *func, MI_S32 line)
+DT_VOID* MemPool::Impl::Allocate(DT_S32 type, DT_S64 size, DT_S32 align,
+                                 const DT_CHAR *file, const DT_CHAR *func, DT_S32 line)
 {
     std::lock_guard<std::mutex> guard(m_lock);
     /// 我们进行内存分配的时候，会进行判断对应类型的内存分配器是否已经初始化完成，如果没有则直接返回NULL
@@ -114,7 +114,7 @@ AURA_VOID* MemPool::Impl::Allocate(MI_S32 type, MI_S64 size, MI_S32 align,
             buffer.m_type = type;
             m_total_mem_size += buffer.m_size;
             m_peak_mem_size  = Max(m_peak_mem_size, m_total_mem_size);
-            m_mblk_map.emplace(reinterpret_cast<MI_UPTR_T>(buffer.m_origin), MemBlkData(file, func, line, buffer, MI_TRUE));
+            m_mblk_map.emplace(reinterpret_cast<DT_UPTR_T>(buffer.m_origin), MemBlkData(file, func, line, buffer, DT_TRUE));
 
             if (m_mtrace_enable && m_mtrace_match)
             {
@@ -136,17 +136,17 @@ AURA_VOID* MemPool::Impl::Allocate(MI_S32 type, MI_S64 size, MI_S32 align,
     }
     else
     {
-        return MI_NULL;
+        return DT_NULL;
     }
 }
 
-Status MemPool::Impl::Free(AURA_VOID *ptr)
+Status MemPool::Impl::Free(DT_VOID *ptr)
 {
     std::lock_guard<std::mutex> guard(m_lock);
 
     Status status = Status::OK;
 
-    MI_UPTR_T addr = reinterpret_cast<MI_UPTR_T>(ptr);
+    DT_UPTR_T addr = reinterpret_cast<DT_UPTR_T>(ptr);
 
     if (m_mblk_map.count(addr))
     {
@@ -199,12 +199,12 @@ Status MemPool::Impl::Map(const Buffer& buffer)
     Status status = Status::OK;
     if (m_allocators.count(buffer.m_type))
     {
-        MI_UPTR_T addr = reinterpret_cast<MI_UPTR_T>(buffer.m_origin);
+        DT_UPTR_T addr = reinterpret_cast<DT_UPTR_T>(buffer.m_origin);
 
         if (m_mblk_map.count(addr))
         {
             m_allocators[buffer.m_type]->Map(buffer);
-            m_mblk_map.at(addr).is_mapped = MI_TRUE;
+            m_mblk_map.at(addr).is_mapped = DT_TRUE;
         }
         else
         {
@@ -229,12 +229,12 @@ Status MemPool::Impl::Unmap(const Buffer& buffer)
 
     if (m_allocators.count(buffer.m_type))
     {
-        MI_UPTR_T addr = reinterpret_cast<MI_UPTR_T>(buffer.m_origin);
+        DT_UPTR_T addr = reinterpret_cast<DT_UPTR_T>(buffer.m_origin);
 
         if (m_mblk_map.count(addr))
         {
             m_allocators[buffer.m_type]->Unmap(buffer);
-            m_mblk_map.at(addr).is_mapped = MI_FALSE;
+            m_mblk_map.at(addr).is_mapped = DT_FALSE;
         }
         else
         {
@@ -251,13 +251,13 @@ Status MemPool::Impl::Unmap(const Buffer& buffer)
     return status;
 }
 
-Buffer MemPool::Impl::GetBuffer(AURA_VOID *ptr)
+Buffer MemPool::Impl::GetBuffer(DT_VOID *ptr)
 {
     std::lock_guard<std::mutex> guard(m_lock);
 
     if (ptr)
     {
-        MI_UPTR_T addr = reinterpret_cast<MI_UPTR_T>(ptr);
+        DT_UPTR_T addr = reinterpret_cast<DT_UPTR_T>(ptr);
         if (m_mblk_map.count(addr))
         {
             Buffer &buffer = m_mblk_map.at(addr).buffer;
@@ -274,10 +274,10 @@ Buffer MemPool::Impl::GetBuffer(AURA_VOID *ptr)
     }
 }
 
-Status MemPool::Impl::RegisterAllocator(MI_S32 type, Allocator *allocator)
+Status MemPool::Impl::RegisterAllocator(DT_S32 type, Allocator *allocator)
 {
     Status status = Status::ERROR;
-    if (MI_NULL == allocator)
+    if (DT_NULL == allocator)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "Allocator create failed");
         return status;
@@ -298,7 +298,7 @@ Status MemPool::Impl::RegisterAllocator(MI_S32 type, Allocator *allocator)
     return status;
 }
 
-Status MemPool::Impl::UnregisterAllocator(MI_S32 type)
+Status MemPool::Impl::UnregisterAllocator(DT_S32 type)
 {
     std::lock_guard<std::mutex> guard(m_lock);
 
@@ -323,7 +323,7 @@ Status MemPool::Impl::UnregisterAllocator(MI_S32 type)
     return status;
 }
 
-Allocator* MemPool::Impl::GetAllocator(MI_S32 type)
+Allocator* MemPool::Impl::GetAllocator(DT_S32 type)
 {
     std::lock_guard<std::mutex> guard(m_lock);
 
@@ -341,10 +341,10 @@ Allocator* MemPool::Impl::GetAllocator(MI_S32 type)
         AURA_ADD_ERROR_STRING(m_ctx, "Allocator type not exists");
     }
 
-    return MI_NULL;
+    return DT_NULL;
 }
 
-AURA_VOID MemPool::Impl::MemTraceSet(MI_BOOL flag)
+DT_VOID MemPool::Impl::MemTraceSet(DT_BOOL flag)
 {
     if (m_mtrace_enable == flag)
     {
@@ -355,17 +355,17 @@ AURA_VOID MemPool::Impl::MemTraceSet(MI_BOOL flag)
     m_mtrace_enable = flag;     // set enable flag
 }
 
-AURA_VOID MemPool::Impl::MemTraceClear()
+DT_VOID MemPool::Impl::MemTraceClear()
 {
     std::lock_guard<std::mutex> guard(m_mtrace_lock);
 
     std::deque<std::pair<std::string, MemTraceData>>().swap(m_mtrace_running);   // empty running   data
     std::deque<std::pair<std::string, MemTraceData>>().swap(m_mtrace_completed); // empty completed data
     m_mtrace_dismatch_string.clear(); // clear dismatch info
-    m_mtrace_match  = MI_TRUE; // reset match flag
+    m_mtrace_match  = DT_TRUE; // reset match flag
 }
 
-AURA_VOID MemPool::Impl::MemTraceBegin(const std::string &tag)
+DT_VOID MemPool::Impl::MemTraceBegin(const std::string &tag)
 {
     if (m_mtrace_enable && m_mtrace_match)
     {
@@ -376,7 +376,7 @@ AURA_VOID MemPool::Impl::MemTraceBegin(const std::string &tag)
     }
 }
 
-AURA_VOID MemPool::Impl::MemTraceEnd(const std::string &tag)
+DT_VOID MemPool::Impl::MemTraceEnd(const std::string &tag)
 {
     if (m_mtrace_enable && m_mtrace_match)
     {
@@ -386,7 +386,7 @@ AURA_VOID MemPool::Impl::MemTraceEnd(const std::string &tag)
         if (m_mtrace_running.empty())
         {
             m_mtrace_dismatch_string = "begin tag miss: " + tag;
-            m_mtrace_match = MI_FALSE;
+            m_mtrace_match = DT_FALSE;
             return;
         }
 
@@ -394,7 +394,7 @@ AURA_VOID MemPool::Impl::MemTraceEnd(const std::string &tag)
         if (m_mtrace_running.back().first != tag)
         {
             m_mtrace_dismatch_string = "tag dismatch: begin tag: " + m_mtrace_running.back().first + ", end tag: " + tag;
-            m_mtrace_match = MI_FALSE;
+            m_mtrace_match = DT_FALSE;
             return;
         }
 
@@ -447,8 +447,8 @@ std::string MemPool::Impl::MemTraceReport()
         std::string  &tag  = it->first;
         MemTraceData &data = it->second;
 
-        MI_CHAR tag_buffer[256]     = {0};
-        MI_CHAR mem_str_buffer[512] = {0};
+        DT_CHAR tag_buffer[256]     = {0};
+        DT_CHAR mem_str_buffer[512] = {0};
         sprintf(tag_buffer, "%s[%s]", std::string(data.level * 4, ' ').c_str(), tag.c_str());
         sprintf(mem_str_buffer, "%-50s count: %-3zu peak: %.2f KB(%.4f MB)", tag_buffer, data.alloc_cnt,
                                                                              data.max_size / 1024.0f,
@@ -469,18 +469,18 @@ MemPool::~MemPool()
     if (m_impl)
     {
         delete m_impl;
-        m_impl = MI_NULL;
+        m_impl = DT_NULL;
     }
 }
 
-AURA_VOID* MemPool::Allocate(MI_S32 type, MI_S64 size, MI_S32 align,
-                           const MI_CHAR *file, const MI_CHAR *func, MI_S32 line)
+DT_VOID* MemPool::Allocate(DT_S32 type, DT_S64 size, DT_S32 align,
+                           const DT_CHAR *file, const DT_CHAR *func, DT_S32 line)
 {
     /// 根据对应类型。来进行内存分配。
     return m_impl->Allocate(type, size, align, file, func, line);
 }
 
-Status MemPool::Free(AURA_VOID *ptr)
+Status MemPool::Free(DT_VOID *ptr)
 {
     return m_impl->Free(ptr);
 }
@@ -495,42 +495,42 @@ Status MemPool::Unmap(const Buffer& buffer)
     return m_impl->Unmap(buffer);
 }
 
-Buffer MemPool::GetBuffer(AURA_VOID *ptr)
+Buffer MemPool::GetBuffer(DT_VOID *ptr)
 {
     return m_impl->GetBuffer(ptr);
 }
 
-Status MemPool::RegisterAllocator(MI_S32 type, Allocator *allocator)
+Status MemPool::RegisterAllocator(DT_S32 type, Allocator *allocator)
 {
     return m_impl->RegisterAllocator(type, allocator);
 }
 
-Status MemPool::UnregisterAllocator(MI_S32 type)
+Status MemPool::UnregisterAllocator(DT_S32 type)
 {
     return m_impl->UnregisterAllocator(type);
 }
 
-Allocator* MemPool::GetAllocator(MI_S32 type)
+Allocator* MemPool::GetAllocator(DT_S32 type)
 {
     return m_impl->GetAllocator(type);
 }
 
-AURA_VOID MemPool::MemTraceSet(MI_BOOL enable)
+DT_VOID MemPool::MemTraceSet(DT_BOOL enable)
 {
     m_impl->MemTraceSet(enable);
 }
 
-AURA_VOID MemPool::MemTraceBegin(const std::string &tag)
+DT_VOID MemPool::MemTraceBegin(const std::string &tag)
 {
     m_impl->MemTraceBegin(tag);
 }
 
-AURA_VOID MemPool::MemTraceEnd(const std::string &tag)
+DT_VOID MemPool::MemTraceEnd(const std::string &tag)
 {
     m_impl->MemTraceEnd(tag);
 }
 
-AURA_VOID MemPool::MemTraceClear()
+DT_VOID MemPool::MemTraceClear()
 {
     m_impl->MemTraceClear();
 }

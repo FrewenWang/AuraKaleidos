@@ -25,9 +25,9 @@ namespace aura
  */
 struct AURA_EXPORTS HexagonProfiling
 {
-    MI_U64 rpc_time;  /*!< Time taken by the Remote Procedure Call (RPC). */
-    MI_U64 skel_time; /*!< Skeleton execution time. */
-    MI_U64 clk_mhz;   /*!< Clock speed in megahertz (MHz). */
+    DT_U64 rpc_time;  /*!< Time taken by the Remote Procedure Call (RPC). */
+    DT_U64 skel_time; /*!< Skeleton execution time. */
+    DT_U64 clk_mhz;   /*!< Clock speed in megahertz (MHz). */
 };
 
 AURA_INLINE std::ostream& operator<<(std::ostream &os, HexagonProfiling profiling)
@@ -96,10 +96,10 @@ AURA_INLINE std::string RTQueryTypeToString(const HexagonRTQueryType &type)
  */
 struct AURA_EXPORTS VtcmLayout
 {
-    MI_S32 total_vtcm_size; /*!< Total VTCM size. */
-    MI_S32 page_list_count; /*!< Count of VTCM page lists. */
-    MI_S32 page_sizes[16];  /*!< VTCM page sizes (in KB). */
-    MI_S32 page_count[16];  /*!< VTCM page counts. */
+    DT_S32 total_vtcm_size; /*!< Total VTCM size. */
+    DT_S32 page_list_count; /*!< Count of VTCM page lists. */
+    DT_S32 page_sizes[16];  /*!< VTCM page sizes (in KB). */
+    DT_S32 page_count[16];  /*!< VTCM page counts. */
 };
 
 AURA_INLINE std::ostream& operator<<(std::ostream &os, const VtcmLayout &layout)
@@ -107,7 +107,7 @@ AURA_INLINE std::ostream& operator<<(std::ostream &os, const VtcmLayout &layout)
     os << "VtcmLayout: " << " ";
 
     os << "[ ";
-    for (MI_S32 i = 0; i < layout.page_list_count; ++i)
+    for (DT_S32 i = 0; i < layout.page_list_count; ++i)
     {
         os << layout.page_sizes[i] << "KBx" << layout.page_count[i] << " ";
     }
@@ -128,8 +128,8 @@ AURA_INLINE std::string VtcmLayoutToString(const VtcmLayout &layout)
  */
 struct AURA_EXPORTS HardwareInfo
 {
-    MI_S32 arch_version;    /*!< Hexagon architecture version. */
-    MI_S32 num_hvx_units;   /*!< Number of HVX (Hexagon Vector eXtension) units. */
+    DT_S32 arch_version;    /*!< Hexagon architecture version. */
+    DT_S32 num_hvx_units;   /*!< Number of HVX (Hexagon Vector eXtension) units. */
     VtcmLayout vtcm_layout; /*!< Layout information for VTCM. */
 };
 
@@ -138,7 +138,7 @@ struct AURA_EXPORTS HardwareInfo
  */
 union RealTimeInfo
 {
-    MI_F32 cur_freq;        /*!< Current frequency in MHz. */
+    DT_F32 cur_freq;        /*!< Current frequency in MHz. */
     VtcmLayout vtcm_layout; /*!< VTCM layout information. */
     // remote_rpc_status_flags_t user_pd_status; // Current unused
 };
@@ -166,10 +166,10 @@ public:
      * @param file The log file path.
      */
     HexagonEngine(Context *ctx,
-                  MI_BOOL enable_hexagon,
-                  MI_BOOL unsigned_pd,
+                  DT_BOOL enable_hexagon,
+                  DT_BOOL unsigned_pd,
                   const std::string &lib_prefix,
-                  MI_BOOL async_call,
+                  DT_BOOL async_call,
                   LogOutput ouput,
                   LogLevel level,
                   const std::string &file);
@@ -190,7 +190,7 @@ public:
      *
      * @return Status::OK if successful; otherwise, an appropriate error status.
      */
-    Status SetPower(HexagonPowerLevel target_level, MI_BOOL enable_dcvs, MI_U32 client_id = 0);
+    Status SetPower(HexagonPowerLevel target_level, DT_BOOL enable_dcvs, DT_U32 client_id = 0);
 
     /**
      * @brief Run the Hexagon Engine with the specified parameters.
@@ -198,11 +198,11 @@ public:
      * @param package The name of the package.
      * @param module The name of the operation module.
      * @param rpc_param The HexagonRpcParam object containing operation parameters.
-     * @param profiling Optional pointer to HexagonProfiling object for profiling information (default is MI_NULL).
+     * @param profiling Optional pointer to HexagonProfiling object for profiling information (default is DT_NULL).
      *
      * @return Status::OK if the operation is successful; otherwise, an appropriate error status.
      */
-    Status Run(const std::string &package, const std::string &module, HexagonRpcParam &rpc_param, HexagonProfiling *profiling = MI_NULL) const;
+    Status Run(const std::string &package, const std::string &module, HexagonRpcParam &rpc_param, HexagonProfiling *profiling = DT_NULL) const;
 
     /**
      * @brief Get the version information for Hexagon Engine.

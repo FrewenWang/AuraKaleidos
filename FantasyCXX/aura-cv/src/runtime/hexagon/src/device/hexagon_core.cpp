@@ -23,7 +23,7 @@ AEEResult aura_hexagon_open(const char *uri, remote_handle64 *h)
 {
     AURA_UNUSED(uri);
     aura::Context *ctx = new aura::Context;
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return AEE_EFAILED;
     }
@@ -36,7 +36,7 @@ AEEResult aura_hexagon_open(const char *uri, remote_handle64 *h)
 AEEResult aura_hexagon_close(remote_handle64 h)
 {
     aura::Context *ctx = reinterpret_cast<aura::Context*>(h);
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return AEE_EFAILED;
     }
@@ -63,13 +63,13 @@ AEEResult aura_hexagon_call(remote_handle64 h, const char *name, int name_len, c
     AURA_UNUSED(mem_len);
 
     aura::Context *ctx = reinterpret_cast<aura::Context*>(h);
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return AEE_EFAILED;
     }
 
-    MI_U64 start_time = HAP_perf_get_time_us();
-    MI_U64 start_cycs = HAP_perf_get_pcycles();
+    DT_U64 start_time = HAP_perf_get_time_us();
+    DT_U64 start_cycs = HAP_perf_get_pcycles();
 
     std::string full_name(name, name_len);
 
@@ -86,13 +86,13 @@ AEEResult aura_hexagon_call(remote_handle64 h, const char *name, int name_len, c
 
     aura::Status ret = func(ctx, rpc_param);
 
-    MI_U64 end_time = HAP_perf_get_time_us();
-    MI_U64 end_cycs = HAP_perf_get_pcycles();
+    DT_U64 end_time = HAP_perf_get_time_us();
+    DT_U64 end_cycs = HAP_perf_get_pcycles();
 
-    MI_U64 cycles = end_cycs - start_cycs;
-    profiling->status = static_cast<MI_U32>(ret);
+    DT_U64 cycles = end_cycs - start_cycs;
+    profiling->status = static_cast<DT_U32>(ret);
     profiling->skel_time = end_time - start_time;
-    profiling->clk_mhz = static_cast<MI_U64>(cycles / profiling->skel_time);
+    profiling->clk_mhz = static_cast<DT_U64>(cycles / profiling->skel_time);
 
     if (aura::Status::ERROR == ret)
     {

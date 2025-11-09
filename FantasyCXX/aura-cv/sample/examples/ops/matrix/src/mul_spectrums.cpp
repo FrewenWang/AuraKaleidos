@@ -45,7 +45,7 @@ aura::Status MulSpectrumsSampleTest(aura::Context *ctx, aura::TargetType type)
 
     // run and time
     aura::Time start_time = aura::Time::Now();
-    status = IMulSpectrums(ctx, src_f32, src_f32, dst_f32, MI_FALSE, aura::OpTarget(type));
+    status = IMulSpectrums(ctx, src_f32, src_f32, dst_f32, DT_FALSE, aura::OpTarget(type));
     aura::Time end_time = aura::Time::Now();
     
     // ---------------------

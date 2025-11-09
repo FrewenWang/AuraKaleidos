@@ -54,7 +54,7 @@ public:
      *
      * For more details, please refer to @ref minmaxloc_details
      */
-    Status SetArgs(const Array *src, MI_F64 *min_val, MI_F64 *max_val, Point3i *min_pos, Point3i *max_pos);
+    Status SetArgs(const Array *src, DT_F64 *min_val, DT_F64 *max_val, Point3i *min_pos, Point3i *max_pos);
 };
 
 /**
@@ -82,7 +82,7 @@ public:
  *
  * @note N is positive integer.
  */
-AURA_EXPORTS Status IMinMaxLoc(Context *ctx, const Mat &src, MI_F64 *min_val, MI_F64 *max_val,
+AURA_EXPORTS Status IMinMaxLoc(Context *ctx, const Mat &src, DT_F64 *min_val, DT_F64 *max_val,
                                Point3i *min_pos, Point3i *max_pos, const OpTarget &target = OpTarget::Default());
 
 /**

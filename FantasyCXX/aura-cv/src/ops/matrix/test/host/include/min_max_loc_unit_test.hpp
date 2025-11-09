@@ -14,7 +14,7 @@ AURA_TEST_PARAM(MinMaxLocParam,
                 MatSize,   mat_size,
                 OpTarget,  target);
 
-AURA_INLINE Status CvMinMaxLoc(Mat &src, MI_F64 &ref_min, MI_F64 &ref_max, Point3i &min_pos, Point3i &max_pos)
+AURA_INLINE Status CvMinMaxLoc(Mat &src, DT_F64 &ref_min, DT_F64 &ref_max, Point3i &min_pos, Point3i &max_pos)
 {
     if (ElemType::U32 == src.GetElemType() || ElemType::F16 == src.GetElemType())
     {
@@ -22,14 +22,14 @@ AURA_INLINE Status CvMinMaxLoc(Mat &src, MI_F64 &ref_min, MI_F64 &ref_max, Point
     }
 
 #if !defined(AURA_BUILD_XPLORER)
-    MI_F64 min = 0.0;
-    MI_F64 max = 0.0;
+    DT_F64 min = 0.0;
+    DT_F64 max = 0.0;
 
     cv::Mat cv_src = MatToOpencv(src);
 
     Sizes3 sz = src.GetSizes();
-    MI_S32 min_p[3] = {-1, -1, -1};
-    MI_S32 max_p[3] = {-1, -1, -1};
+    DT_S32 min_p[3] = {-1, -1, -1};
+    DT_S32 max_p[3] = {-1, -1, -1};
 
     if (1 == sz.m_channel)
     {
@@ -37,7 +37,7 @@ AURA_INLINE Status CvMinMaxLoc(Mat &src, MI_F64 &ref_min, MI_F64 &ref_max, Point
     }
     else
     {
-        cv::minMaxIdx(cv_src, &min, &max, MI_NULL, MI_NULL);
+        cv::minMaxIdx(cv_src, &min, &max, DT_NULL, DT_NULL);
     }
 
     ref_min = min;
@@ -65,7 +65,7 @@ public:
     MinMaxLocTest(Context *ctx, MinMaxLocParam::TupleTable &table) : TestBase(table), m_ctx(ctx), m_factory(ctx)
     {}
 
-    MI_S32 RunOne(MI_S32 index, TestCase *test_case, MI_S32 stress_count) override
+    DT_S32 RunOne(DT_S32 index, TestCase *test_case, DT_S32 stress_count) override
     {
         // Get next param set
         MinMaxLocParam run_param(GetParam((index)));
@@ -76,19 +76,19 @@ public:
         AURA_LOGI(m_ctx, AURA_TAG, "\n\n######################### MinMaxLoc param: %s\n", run_param.ToString().c_str());
 
         // Create src mats
-        Mat src_mat = m_factory.GetRandomMat((MI_F32)INT32_MIN, (MI_F32)INT32_MAX, elem_type, mat_size.m_sizes);
+        Mat src_mat = m_factory.GetRandomMat((DT_F32)INT32_MIN, (DT_F32)INT32_MAX, elem_type, mat_size.m_sizes);
 
         TestTime time_val;
         TestResult result;
         result.input  = mat_size.ToString() + " " + ElemTypesToString(elem_type);
-        result.output = "MI_F64, MI_F64";
+        result.output = "DT_F64, DT_F64";
 
         Status ret = Status::OK;
 
-        MI_F64 res_min = 0.0;
-        MI_F64 res_max = 0.0;
-        MI_F64 ref_min = 0.0;
-        MI_F64 ref_max = 0.0;
+        DT_F64 res_min = 0.0;
+        DT_F64 res_max = 0.0;
+        DT_F64 ref_min = 0.0;
+        DT_F64 ref_max = 0.0;
 
         Point3i res_min_pos = {-1, -1, -1};
         Point3i res_max_pos = {-1, -1, -1};
@@ -97,7 +97,7 @@ public:
         Point3i ref_max_pos = {-1, -1, -1};
 
         // Run interface
-        MI_S32 loop_count = stress_count ? stress_count : 10;
+        DT_S32 loop_count = stress_count ? stress_count : 10;
 
         ret = Executor(loop_count, 2, time_val, IMinMaxLoc, m_ctx, src_mat, &res_min, &res_max, &res_min_pos, &res_max_pos, run_param.target);
 

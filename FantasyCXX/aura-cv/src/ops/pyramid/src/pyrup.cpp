@@ -56,9 +56,9 @@ static std::shared_ptr<PyrUpImpl> CreatePyrUpImpl(Context *ctx, const OpTarget &
 PyrUp::PyrUp(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status PyrUp::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma, BorderType border_type)
+Status PyrUp::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma, BorderType border_type)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
@@ -107,14 +107,14 @@ Status PyrUp::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma, 
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreatePyrUpImpl(m_ctx, impl_target);
     }
 
     // run initialize
     PyrUpImpl *pyrup_impl = dynamic_cast<PyrUpImpl*>(m_impl.get());
-    if (MI_NULL == pyrup_impl)
+    if (DT_NULL == pyrup_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "pyrup_impl is null ptr");
         return Status::ERROR;
@@ -125,10 +125,10 @@ Status PyrUp::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma, 
     AURA_RETURN(m_ctx, ret);
 }
 
-Status PyrUp::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type)
+Status PyrUp::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
@@ -150,7 +150,7 @@ Status PyrUp::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_
     return Status::OK;
 }
 
-AURA_EXPORTS Status IPyrUp(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize, MI_F32 sigma, BorderType border_type,
+AURA_EXPORTS Status IPyrUp(Context *ctx, const Mat &src, Mat &dst, DT_S32 ksize, DT_F32 sigma, BorderType border_type,
                            const OpTarget &target)
 {
     PyrUp pyrup(ctx, target);
@@ -160,12 +160,12 @@ AURA_EXPORTS Status IPyrUp(Context *ctx, const Mat &src, Mat &dst, MI_S32 ksize,
 
 PyrUpImpl::PyrUpImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx, "PyrUp", target),
                                                              m_ksize(0), m_sigma(0.f), m_border_type(BorderType::REFLECT_101),
-                                                             m_src(MI_NULL), m_dst(MI_NULL)
+                                                             m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status PyrUpImpl::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sigma, BorderType border_type)
+Status PyrUpImpl::SetArgs(const Array *src, Array *dst, DT_S32 ksize, DT_F32 sigma, BorderType border_type)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -226,7 +226,7 @@ Status PyrUpImpl::SetArgs(const Array *src, Array *dst, MI_S32 ksize, MI_F32 sig
 
 Status PyrUpImpl::Initialize()
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -267,7 +267,7 @@ std::string PyrUpImpl::ToString() const
 {
     std::string str;
 
-    MI_CHAR sigma_str[20];
+    DT_CHAR sigma_str[20];
     snprintf(sigma_str, sizeof(sigma_str), "%.2f", m_sigma);
 
     str = "op(PyrUp)";
@@ -277,7 +277,7 @@ std::string PyrUpImpl::ToString() const
     return str;
 }
 
-AURA_VOID PyrUpImpl::Dump(const std::string &prefix) const
+DT_VOID PyrUpImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -295,16 +295,16 @@ AURA_VOID PyrUpImpl::Dump(const std::string &prefix) const
 
 Status PyrUpImpl::PrepareKmat()
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
-    std::vector<MI_F32> kernel = GetGaussianKernel(m_ksize, m_sigma);
+    std::vector<DT_F32> kernel = GetGaussianKernel(m_ksize, m_sigma);
 
 #define GET_PYRUP_KMAT(type)                                     \
     using KernelType   = typename PyrUpTraits<type>::KernelType; \
-    constexpr MI_U32 Q = PyrUpTraits<type>::Q + 1;               \
+    constexpr DT_U32 Q = PyrUpTraits<type>::Q + 1;               \
                                                                  \
     m_kmat = GetPyrKernelMat<KernelType, Q>(m_ctx, kernel);      \
 
@@ -312,19 +312,19 @@ Status PyrUpImpl::PrepareKmat()
     {
         case ElemType::U8:
         {
-            GET_PYRUP_KMAT(MI_U8)
+            GET_PYRUP_KMAT(DT_U8)
             break;
         }
 
         case ElemType::U16:
         {
-            GET_PYRUP_KMAT(MI_U16)
+            GET_PYRUP_KMAT(DT_U16)
             break;
         }
 
         case ElemType::S16:
         {
-            GET_PYRUP_KMAT(MI_S16)
+            GET_PYRUP_KMAT(DT_S16)
             break;
         }
 

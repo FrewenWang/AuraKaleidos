@@ -87,14 +87,14 @@ static ResizeParam::TupleTable g_resize_down_table_hvx
 
     // target
     {
-        OpTarget::Hvx(MI_TRUE)
+        OpTarget::Hvx(DT_TRUE)
     },
 };
 
 NEW_TESTCASE(resize, Resize, hvx)
 {
     HexagonEngine *engine = UnitTest::GetInstance()->GetContext()->GetHexagonEngine();
-    engine->SetPower(HexagonPowerLevel::TURBO, MI_FALSE);
+    engine->SetPower(HexagonPowerLevel::TURBO, DT_FALSE);
 
     ResizeTest test_up(UnitTest::GetInstance()->GetContext(), g_resize_up_table_hvx);
     test_up.RunTest(this, UnitTest::GetInstance()->GetStressCount());
@@ -102,5 +102,5 @@ NEW_TESTCASE(resize, Resize, hvx)
     ResizeTest test_down(UnitTest::GetInstance()->GetContext(), g_resize_down_table_hvx);
     test_down.RunTest(this, UnitTest::GetInstance()->GetStressCount());
 
-    engine->SetPower(HexagonPowerLevel::STANDBY, MI_FALSE);
+    engine->SetPower(HexagonPowerLevel::STANDBY, DT_FALSE);
 }

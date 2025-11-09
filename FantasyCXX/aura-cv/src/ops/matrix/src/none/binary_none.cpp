@@ -5,7 +5,7 @@
 namespace aura
 {
 
-template <typename Tp = AURA_VOID>
+template <typename Tp = DT_VOID>
 struct BinaryMinFunctor
 {
     constexpr Tp operator()(const Tp& left, const Tp& right) const
@@ -14,7 +14,7 @@ struct BinaryMinFunctor
     }
 };
 
-template <typename Tp = AURA_VOID>
+template <typename Tp = DT_VOID>
 struct BinaryMaxFunctor
 {
     constexpr Tp operator()(const Tp& left, const Tp& right) const
@@ -24,21 +24,21 @@ struct BinaryMaxFunctor
 };
 
 template <typename Tp, typename Functor>
-static Status BinaryNoneImpl(const Mat &src0, const Mat &src1, Mat &dst, MI_S32 start_row, MI_S32 end_row)
+static Status BinaryNoneImpl(const Mat &src0, const Mat &src1, Mat &dst, DT_S32 start_row, DT_S32 end_row)
 {
     Functor op;
 
-    const MI_S32 width       = src0.GetSizes().m_width;
-    const MI_S32 channel     = src0.GetSizes().m_channel;
-    const MI_S32 num_per_row = width * channel;
+    const DT_S32 width       = src0.GetSizes().m_width;
+    const DT_S32 channel     = src0.GetSizes().m_channel;
+    const DT_S32 num_per_row = width * channel;
 
-    for (MI_S32 y = start_row; y < end_row; y++)
+    for (DT_S32 y = start_row; y < end_row; y++)
     {
         const Tp *src0_row = src0.Ptr<Tp>(y);
         const Tp *src1_row = src1.Ptr<Tp>(y);
         Tp *dst_row = dst.Ptr<Tp>(y);
 
-        for (MI_S32 x = 0; x < num_per_row; x++)
+        for (DT_S32 x = 0; x < num_per_row; x++)
         {
             dst_row[x] = op(src0_row[x], src1_row[x]);
         }
@@ -51,28 +51,28 @@ template <typename Tp>
 static Status BinaryNoneHelper(Context *ctx, BinaryOpType type, const Mat &src0, const Mat &src1, Mat &dst, OpTarget &target)
 {
     Status ret = Status::OK;
-    MI_S32 height = dst.GetSizes().m_height;
+    DT_S32 height = dst.GetSizes().m_height;
 
 #define BINARY_NONE_IMPL(functor)                                                                       \
     if (target.m_data.none.enable_mt)                                                                   \
     {                                                                                                   \
         WorkerPool *wp = ctx->GetWorkerPool();                                                          \
-        if (MI_NULL == wp)                                                                              \
+        if (DT_NULL == wp)                                                                              \
         {                                                                                               \
             AURA_ADD_ERROR_STRING(ctx, "GetWorkerpool failed");                                         \
             return Status::ERROR;                                                                       \
         }                                                                                               \
-        ret = wp->ParallelFor(static_cast<MI_S32>(0), height, BinaryNoneImpl<Tp, functor>,              \
+        ret = wp->ParallelFor(static_cast<DT_S32>(0), height, BinaryNoneImpl<Tp, functor>,              \
                               std::cref(src0), std::cref(src1), std::ref(dst));                         \
     }                                                                                                   \
     else                                                                                                \
     {                                                                                                   \
-        ret = BinaryNoneImpl<Tp, functor>(src0, src1, dst, static_cast<MI_S32>(0), height);             \
+        ret = BinaryNoneImpl<Tp, functor>(src0, src1, dst, static_cast<DT_S32>(0), height);             \
     }                                                                                                   \
                                                                                                         \
     if (ret != Status::OK)                                                                              \
     {                                                                                                   \
-        MI_CHAR error_msg[128];                                                                         \
+        DT_CHAR error_msg[128];                                                                         \
         std::snprintf(error_msg, sizeof(error_msg), "BinaryNoneImpl<%s> failed", #functor);             \
         AURA_ADD_ERROR_STRING(ctx, error_msg);                                                          \
     }
@@ -138,55 +138,55 @@ Status BinaryNone::Run()
     {
         case ElemType::U8:
         {
-            ret = BinaryNoneHelper<MI_U8>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNoneHelper<DT_U8>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<MI_U8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<DT_U8> failed.");
             }
             break;
         }
         case ElemType::S8:
         {
-            ret = BinaryNoneHelper<MI_S8>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNoneHelper<DT_S8>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<MI_S8> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<DT_S8> failed.");
             }
             break;
         }
         case ElemType::U16:
         {
-            ret = BinaryNoneHelper<MI_U16>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNoneHelper<DT_U16>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<MI_U16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<DT_U16> failed.");
             }
             break;
         }
         case ElemType::S16:
         {
-            ret = BinaryNoneHelper<MI_S16>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNoneHelper<DT_S16>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<MI_S16> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<DT_S16> failed.");
             }
             break;
         }
         case ElemType::U32:
         {
-            ret = BinaryNoneHelper<MI_U32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNoneHelper<DT_U32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<MI_U32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<DT_U32> failed.");
             }
             break;
         }
         case ElemType::S32:
         {
-            ret = BinaryNoneHelper<MI_S32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNoneHelper<DT_S32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<MI_S32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<DT_S32> failed.");
             }
             break;
         }
@@ -202,10 +202,10 @@ Status BinaryNone::Run()
         }
         case ElemType::F32:
         {
-            ret = BinaryNoneHelper<MI_F32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
+            ret = BinaryNoneHelper<DT_F32>(m_ctx, m_type, *src0, *src1, *dst, m_target);
             if (ret != Status::OK)
             {
-                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<MI_F32> failed.");
+                AURA_ADD_ERROR_STRING(m_ctx, "BinaryNoneHelper<DT_F32> failed.");
             }
             break;
         }

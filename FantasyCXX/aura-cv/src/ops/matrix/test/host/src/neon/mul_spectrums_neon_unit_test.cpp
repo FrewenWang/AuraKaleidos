@@ -10,8 +10,8 @@ static MulSpectrumsParam::TupleTable g_mul_spectrums_table_neon
     },
     // conj_src1
     {
-        MI_TRUE,
-        MI_FALSE
+        DT_TRUE,
+        DT_FALSE
     },
     // impl
     {

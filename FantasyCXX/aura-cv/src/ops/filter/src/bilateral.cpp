@@ -55,15 +55,15 @@ static std::shared_ptr<BilateralImpl> CreateBilateralImpl(Context *ctx, const Op
 Bilateral::Bilateral(Context *ctx, const OpTarget &target) : Op(ctx, target)
 {}
 
-Status Bilateral::SetArgs(const Array *src, Array *dst, MI_F32 sigma_color, MI_F32 sigma_space,
-                          MI_S32 ksize, BorderType border_type, const Scalar &border_value)
+Status Bilateral::SetArgs(const Array *src, Array *dst, DT_F32 sigma_color, DT_F32 sigma_space,
+                          DT_S32 ksize, BorderType border_type, const Scalar &border_value)
 {
-    if ((MI_NULL == m_ctx))
+    if ((DT_NULL == m_ctx))
     {
         return Status::ERROR;
     }
 
-    if ((MI_NULL == src) || (MI_NULL == dst))
+    if ((DT_NULL == src) || (DT_NULL == dst))
     {
         AURA_ADD_ERROR_STRING(m_ctx, "src/dst is null ptr");
         return Status::ERROR;
@@ -113,14 +113,14 @@ Status Bilateral::SetArgs(const Array *src, Array *dst, MI_F32 sigma_color, MI_F
     }
 
     // set m_impl
-    if (MI_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
+    if (DT_NULL == m_impl.get() || impl_target != m_impl->GetOpTarget())
     {
         m_impl = CreateBilateralImpl(m_ctx, impl_target);
     }
 
     // run SetArgs
     BilateralImpl *bilateral_impl = dynamic_cast<BilateralImpl *>(m_impl.get());
-    if (MI_NULL == bilateral_impl)
+    if (DT_NULL == bilateral_impl)
     {
         AURA_ADD_ERROR_STRING(m_ctx, "bilateral_impl is null ptr");
         return Status::ERROR;
@@ -131,23 +131,23 @@ Status Bilateral::SetArgs(const Array *src, Array *dst, MI_F32 sigma_color, MI_F
     AURA_RETURN(m_ctx, ret);
 }
 
-Status Bilateral::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel, MI_S32 ksize, BorderType border_type)
+Status Bilateral::CLPrecompile(Context *ctx, ElemType elem_type, DT_S32 channel, DT_S32 ksize, BorderType border_type)
 {
 #if defined(AURA_ENABLE_OPENCL)
-    if (MI_NULL == ctx)
+    if (DT_NULL == ctx)
     {
         return Status::ERROR;
     }
 
-    MI_S32 ksh        = ksize >> 1;
-    MI_S32 ksh_square = ksh * ksh;
-    MI_S32 valid_num  = 0;
+    DT_S32 ksh        = ksize >> 1;
+    DT_S32 ksh_square = ksh * ksh;
+    DT_S32 valid_num  = 0;
 
-    for (MI_S32 i = -ksh; i <= ksh; i++)
+    for (DT_S32 i = -ksh; i <= ksh; i++)
     {
-        for (MI_S32 j = -ksh; j <= ksh; j++)
+        for (DT_S32 j = -ksh; j <= ksh; j++)
         {
-            MI_S32 r_square = i * i + j * j;
+            DT_S32 r_square = i * i + j * j;
             if (r_square > ksh_square)
             {
                 continue;
@@ -173,8 +173,8 @@ Status Bilateral::CLPrecompile(Context *ctx, ElemType elem_type, MI_S32 channel,
     return Status::OK;
 }
 
-AURA_EXPORTS Status IBilateral(Context *ctx, const Mat &src, Mat &dst, MI_F32 sigma_color, MI_F32 sigma_space,
-                               MI_S32 ksize, BorderType border_type, const Scalar &border_value, const OpTarget &target)
+AURA_EXPORTS Status IBilateral(Context *ctx, const Mat &src, Mat &dst, DT_F32 sigma_color, DT_F32 sigma_space,
+                               DT_S32 ksize, BorderType border_type, const Scalar &border_value, const OpTarget &target)
 {
     Bilateral bilateral(ctx, target);
 
@@ -185,13 +185,13 @@ BilateralImpl::BilateralImpl(Context *ctx, const OpTarget &target) : OpImpl(ctx,
                                                                      m_ksize(0), m_border_type(BorderType::REFLECT_101),
                                                                      m_sigma_color(0.f), m_sigma_space(0.f),
                                                                      m_valid_num(0), m_scale_index(0.f),
-                                                                     m_src(MI_NULL), m_dst(MI_NULL)
+                                                                     m_src(DT_NULL), m_dst(DT_NULL)
 {}
 
-Status BilateralImpl::SetArgs(const Array *src, Array *dst, MI_F32 sigma_color, MI_F32 sigma_space,
-                                 MI_S32 ksize, BorderType border_type, const Scalar &border_value)
+Status BilateralImpl::SetArgs(const Array *src, Array *dst, DT_F32 sigma_color, DT_F32 sigma_space,
+                                 DT_S32 ksize, BorderType border_type, const Scalar &border_value)
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
@@ -233,17 +233,17 @@ Status BilateralImpl::SetArgs(const Array *src, Array *dst, MI_F32 sigma_color, 
 
 Status BilateralImpl::Initialize()
 {
-    if (MI_NULL == m_ctx)
+    if (DT_NULL == m_ctx)
     {
         return Status::ERROR;
     }
 
     Status ret = Status::OK;
-    MI_S32 ksh = 0;
+    DT_S32 ksh = 0;
 
     m_sigma_space = (m_sigma_space <= 0) ? 1.f : m_sigma_space;
     ksh           = m_ksize <= 0 ? Round(m_sigma_space * 1.5) : m_ksize / 2;
-    ksh           = Max(ksh, static_cast<MI_S32>(1));
+    ksh           = Max(ksh, static_cast<DT_S32>(1));
     m_ksize       = ksh * 2 + 1;
 
     ret = PrepareSpaceMat();
@@ -286,9 +286,9 @@ std::string BilateralImpl::ToString() const
 {
     std::string str;
 
-    MI_CHAR sigma_color_str[20];
+    DT_CHAR sigma_color_str[20];
     snprintf(sigma_color_str, sizeof(sigma_color_str), "%.2f", m_sigma_color);
-    MI_CHAR sigma_space_str[20];
+    DT_CHAR sigma_space_str[20];
     snprintf(sigma_space_str, sizeof(sigma_space_str), "%.2f", m_sigma_space);
 
     str = "op(Bilateral)";
@@ -300,7 +300,7 @@ std::string BilateralImpl::ToString() const
     return str;
 }
 
-AURA_VOID BilateralImpl::Dump(const std::string &prefix) const
+DT_VOID BilateralImpl::Dump(const std::string &prefix) const
 {
     JsonWrapper json_wrapper(m_ctx, prefix, m_name);
 
@@ -328,7 +328,7 @@ Status BilateralImpl::PrepareSpaceMat()
 {
     Status ret = Status::OK;
 
-    MI_S32 ksh        = m_ksize >> 1;
+    DT_S32 ksh        = m_ksize >> 1;
     Sizes3 space_size = Sizes3(1, m_ksize * m_ksize, 1);
 
     // space
@@ -348,31 +348,31 @@ Status BilateralImpl::PrepareSpaceMat()
         return ret;
     }
 
-    MI_F32 *sp_weight_data = (MI_F32*)m_space_weight.Ptr<MI_F32>(0);
-    MI_S32 *sp_ofs_data    = (MI_S32*)m_space_ofs.Ptr<MI_S32>(0);
+    DT_F32 *sp_weight_data = (DT_F32*)m_space_weight.Ptr<DT_F32>(0);
+    DT_S32 *sp_ofs_data    = (DT_S32*)m_space_ofs.Ptr<DT_S32>(0);
 
-    MI_S32 ksh_square     = ksh * ksh;
-    MI_F64 gauss_sp_coeff = -0.5 / (m_sigma_space * m_sigma_space);
-    const MI_S32 ch       = m_src->GetSizes().m_channel;
+    DT_S32 ksh_square     = ksh * ksh;
+    DT_F64 gauss_sp_coeff = -0.5 / (m_sigma_space * m_sigma_space);
+    const DT_S32 ch       = m_src->GetSizes().m_channel;
 
     // Add (ksh<<1) because the input data calculated by the none code is after makeborder, neon/opencl don't need to use istep/space_ofs
-    MI_S32 step  = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
-    MI_S32 istep = (m_src->GetSizes().m_width + (ksh << 1)) * ch;
+    DT_S32 step  = m_src->GetRowPitch() / ElemTypeSize(m_src->GetElemType());
+    DT_S32 istep = (m_src->GetSizes().m_width + (ksh << 1)) * ch;
     step         = (istep > step) ? istep : step;
     m_valid_num  = 0;
 
-    for (MI_S32 i = -ksh; i <= ksh; i++)
+    for (DT_S32 i = -ksh; i <= ksh; i++)
     {
-        for (MI_S32 j = -ksh; j <= ksh; j++)
+        for (DT_S32 j = -ksh; j <= ksh; j++)
         {
-            MI_S32 r_square = i * i + j * j;
+            DT_S32 r_square = i * i + j * j;
             if (r_square > ksh_square)
             {
                 continue;
             }
 
-            sp_weight_data[m_valid_num]   = static_cast<MI_F32>(Exp(r_square * gauss_sp_coeff));
-            sp_ofs_data[m_valid_num++] = static_cast<MI_S32>(i * step + j * ch);
+            sp_weight_data[m_valid_num]   = static_cast<DT_F32>(Exp(r_square * gauss_sp_coeff));
+            sp_ofs_data[m_valid_num++] = static_cast<DT_S32>(i * step + j * ch);
         }
     }
 
@@ -383,12 +383,12 @@ Status BilateralImpl::PrepareColorMat()
 {
     Status ret = Status::OK;
 
-    const MI_S32 ch            = m_src->GetSizes().m_channel;
-    const MI_S32 bin_scale     = (m_src->GetElemType() == ElemType::U8) ? 256 : (1 << 12);
-    const MI_S32 total_bin_num = bin_scale * ch;
+    const DT_S32 ch            = m_src->GetSizes().m_channel;
+    const DT_S32 bin_scale     = (m_src->GetElemType() == ElemType::U8) ? 256 : (1 << 12);
+    const DT_S32 total_bin_num = bin_scale * ch;
 
     m_sigma_color            = (m_sigma_color <= 0) ? 1.f : m_sigma_color;
-    MI_F64 gauss_color_coeff = -0.5 / (m_sigma_color * m_sigma_color);
+    DT_F64 gauss_color_coeff = -0.5 / (m_sigma_color * m_sigma_color);
     m_scale_index            = 1.0f;
 
     Sizes3 color_size  = Sizes3(1, total_bin_num + 2, 1);
@@ -402,20 +402,20 @@ Status BilateralImpl::PrepareColorMat()
         return ret;
     }
 
-    MI_F32 *color_weight_data = (MI_F32*)m_color_weight.Ptr<MI_F32>(0);
+    DT_F32 *color_weight_data = (DT_F32*)m_color_weight.Ptr<DT_F32>(0);
 
     if (ElemType::U8 == m_src->GetElemType())
     {
-        for (MI_S32 i = 0; i < 256 * ch; i++)
+        for (DT_S32 i = 0; i < 256 * ch; i++)
         {
-            color_weight_data[i] = static_cast<MI_F32>(Exp(i * i * gauss_color_coeff));
+            color_weight_data[i] = static_cast<DT_F32>(Exp(i * i * gauss_color_coeff));
         }
     }
     else
     {
         Point3i min_pos;
         Point3i max_pos;
-        MI_F64 min_val, max_val;
+        DT_F64 min_val, max_val;
 
         OpTarget cur_impl = m_target;
         cur_impl.m_type = (cur_impl.m_type != TargetType::NONE && cur_impl.m_type != TargetType::NEON) ? TargetType::NEON : cur_impl.m_type;
@@ -427,13 +427,13 @@ Status BilateralImpl::PrepareColorMat()
         }
 
         m_scale_index = bin_scale / (max_val - min_val);
-        MI_F32 last_exp_val = 1.f;
-        for (MI_S32 i = 0; i < total_bin_num + 2; i++)
+        DT_F32 last_exp_val = 1.f;
+        for (DT_S32 i = 0; i < total_bin_num + 2; i++)
         {
             if (last_exp_val > 0.f)
             {
-                MI_F32 val           = i / m_scale_index;
-                color_weight_data[i] = static_cast<MI_F32>(Exp(val * val * gauss_color_coeff));
+                DT_F32 val           = i / m_scale_index;
+                color_weight_data[i] = static_cast<DT_F32>(Exp(val * val * gauss_color_coeff));
                 last_exp_val         = color_weight_data[i];
             }
             else

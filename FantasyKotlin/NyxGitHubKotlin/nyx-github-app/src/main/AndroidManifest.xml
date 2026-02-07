@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.frewen.android.github">
+
+    <permission
+        android:name="com.frewen.android.github.permission.ACCESS_TICKET_SERVICE"
+        android:protectionLevel="normal" /> <!-- 这个权限的声明是在客户端来进行的。所以需要绑定到我们的服务的都需要声明这个权限 -->
+    <uses-permission android:name="com.frewen.android.demo.permission.ACCESS_TICKET_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 声明蓝牙权限 -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 使用permission验证。使用这种验证方式，我们要先在AndroidMenifest中声明所需的权限 -->
+    <!-- AIDL的学习：在这个地方声明绑定购票服务的权限 -->
+    <!-- 这个权限的声明是在服务端来进行的。所以需要绑定到我们的服务的都需要声明这个权限 -->
+    <!-- 所以这个权限不要随便泄漏啊 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <application
+        android:name="com.frewen.android.github.app.MyApp"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="com.frewen.android.github.HomeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.frewen.android.github.samples.hook.target.TargetActivity" />
+        <activity android:name="com.frewen.android.github.samples.hook.HookDemoActivity" />
+        <activity android:name="com.frewen.android.github.samples.unitest.AndroidUnitTestActivity" />
+        <activity android:name="com.frewen.android.github.samples.view.ViewTouchConflictActivity" />
+        <activity android:name="com.frewen.android.github.samples.retrofit.RetrofitActivity" />
+
+        <activity
+            android:name="com.frewen.android.github.SplashActivity"
+            android:theme="@style/LauncherTheme"></activity>
+        <activity android:name="com.frewen.android.github.samples.bluetooth.BlueToothDemoActivity" />
+        <activity android:name="com.frewen.android.github.samples.jobscheduler.JobSchedulerDemoActivity" />
+        <activity android:name="com.frewen.android.github.samples.network.WebSocketDemoActivity" />
+        <activity android:name="com.frewen.android.github.samples.keeplive.KeepLiveActivity" />
+        <activity android:name="com.frewen.android.github.samples.webview.WebViewActivity" />
+        <activity android:name="com.frewen.android.github.samples.view.ViewDemoActivity" />
+        <activity android:name="com.frewen.android.github.samples.glide.Glide4Activity" />
+        <activity android:name="com.frewen.android.github.samples.OptimusNetWorkActivity" />
+        <activity android:name="com.frewen.android.github.samples.rxjava2.OperatorActivity" />
+        <activity android:name="com.frewen.android.github.samples.PermissionActivity" />
+        <activity android:name="com.frewen.android.github.samples.okhttp.OkHttp3Activity" />
+        <activity android:name="com.frewen.android.github.samples.AgoraDemoActivity" />
+        <activity
+            android:name="com.frewen.android.github.samples.fragment.FragmentActivity"
+            android:label="@string/title_activity_fragment" />
+        <activity android:name="com.frewen.android.github.concurrent.HandlerThreadActivity" />
+        <activity android:name="com.frewen.android.github.samples.ipc.IPCDemoActivity" />
+        <activity android:name="com.frewen.android.github.samples.ipc.client.ContentProviderActivity" />
+        <activity android:name="com.frewen.android.github.samples.ipc.socket.SocketActivity" />
+        <activity android:name="com.frewen.android.github.samples.rxjava2.RxJava2Activity" />
+        <activity android:name="com.frewen.android.github.samples.ipc.client.AIDLDemoActivity" />
+        <activity android:name="com.frewen.android.github.samples.bitmap.BitmapDemoActivity" /> <!-- android:authorities是Content-Provider的唯一标识，通过这个属性外部应用就可以访问我们的StudentContentProvider， -->
+        <!-- 因此，android:authorities必须是唯一的，这里建议读者在命名的时候加上包名前缀。 -->
+        <!-- 为了演示进程间通信，我们让BookProvider运行在独立的进程中并给它添加了权限， -->
+        <!-- 这样外界应用如果想访问BookProvider，就必须声明“com.frewen.content.provider”这个权限。 -->
+        <!-- ContentProvider的权限还可以细分为读权限和写权限， -->
+        <!-- 分别对应android:readPermission和android:writePermission属性， -->
+        <!-- 如果分别声明了读权限和写权限，那么外界应用也必须依次声明相应的权限才可以进行读/写操作，否则外界应用会异常终止。 -->
+        <activity android:name="com.frewen.android.github.samples.eventbus.StickyMsgActivity" />
+        <activity android:name="com.frewen.android.github.samples.fragment.FragmentDemoActivity" />
+        <activity android:name="com.frewen.android.github.samples.fragment.FragmentStackActivity" />
+
+        <provider
+            android:name="com.frewen.android.github.samples.ipc.server.StudentContentProvider"
+            android:authorities="com.frewen.ipc.content.provider"
+            android:process=":server"
+            android:readPermission="com.frewen.content.provider.READ"
+            android:writePermission="com.frewen.content.provider.WRITE" />
+
+        <service
+            android:name="com.frewen.android.github.samples.ipc.remote.aidl.RemoteService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":aidl_remote" />
+        <service
+            android:name="com.frewen.android.github.samples.ipc.remote.socket.RemoteTCPService"
+            android:process=":socket_server" />
+    </application>
+
+</manifest>

@@ -1,0 +1,5 @@
+//独立应用的远程Service
+include ':app', ':ipc_service_sample'
+
+//同一应用的远程Service
+//include ':app',':ipc_service'

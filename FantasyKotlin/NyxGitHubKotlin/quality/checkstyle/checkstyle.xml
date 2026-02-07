@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE module PUBLIC
+    "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+    "http://www.puppycrawl.com/dtds/configuration_1_2.dtd"><!-- 所有的模块中,其ROOT必须为Checker -->
+<module name="Checker">
+    <!-- 对于所有的模块,如果有这个模块则说明检测这一项,没有则不检测这一项 -->
+
+    <!-- 检验每个包是否存在package.html文件-->
+    <!-- See http://checkstyle.sf.net/config_javadoc.html#PackageHtml -->
+    <!--http://checkstyle.sourceforge.net/version/4.4/index.html-->
+    <!--
+    <module name="PackageHtml"/>
+    -->
+    <!-- 检验每个文件末尾是否有一个空行-->
+    <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
+    <!--
+    <module name="NewlineAtEndOfFile"/>
+    -->
+    <!-- Checks that property files contain the same keys. -->
+    <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
+    <module name="Translation" />
+    <module name="TreeWalker">
+        <!-- Checks for Javadoc comments. -->
+        <!-- See http://checkstyle.sf.net/config_javadoc.html -->
+        <!-- Checks Javadoc comments for method definitions.-->
+        <module name="JavadocMethod">
+            <property name="scope" value="public" />
+            <!-- 是否允许错误的参数声明,true为允许,缺省为不允许 -->
+            <property name="allowMissingParamTags" value="true" />
+            <!-- 是否允许错误的错误声明,true为允许,缺省为不允许 -->
+            <property name="allowMissingThrowsTags" value="true" />
+            <!-- 是否允许错误的返回类型声明,true为允许,缺省为不允许 -->
+            <property name="allowMissingReturnTag" value="true" />
+        </module>
+        <!--Checks Javadoc comments for class and interface definitions.-->
+        <module name="JavadocType" />
+        <!-- Checks that variables have Javadoc comments.-->
+        <module name="JavadocVariable">
+            <property name="scope" value="protected" />
+        </module>
+        <!-- 检查Javadoc的格式 -->
+        <module name="JavadocStyle">
+            <property name="scope" value="public" />
+            <!-- Comment的第一句的末尾是否要有一个句号,true必须有,default为true -->
+            <property name="checkFirstSentence" value="false" />
+            <!-- 检查错误的HTML脚本,比如不匹配,true检查,default为true -->
+            <property name="checkHtml" value="true" />
+        </module>
+        <!-- Checks for Naming Conventions. -->
+        <!-- See http://checkstyle.sf.net/config_naming.html -->
+        <!-- 确省必须以Abstract开始或者以Factory结束 -->
+        <!--
+        <module name="AbstractClassName"/>
+        -->
+        <module name="ConstantName" />
+        <module name="LocalFinalVariableName" />
+        <module name="LocalVariableName" />
+        <module name="MemberName" />
+        <module name="MethodName" />
+        <module name="PackageName" />
+        <module name="ParameterName" />
+        <module name="StaticVariableName" />
+        <module name="TypeName" />
+        <!-- Checks for Headers -->
+        <!-- See http://checkstyle.sf.net/config_header.html -->
+        <!-- 检查文件是否以指定文件开始,这里最好是放一些版权信息和工程描述 -->
+        <!-- headerFile:指定的文件 -->
+        <!-- ignoreLines:忽略哪些行,以","分隔 -->
+        <!--
+        <module name="Header">
+        <property name="headerFile" value="java.header"/>
+        <property name="ignoreLines" value="2, 3, 4, 5"/>
+        </module>
+        -->
+        <!-- Following interprets the header file as regular expressions. -->
+        <!--
+        <module name="RegexpHeader"/>
+        -->
+        <!-- Checks for imports -->
+        <!-- See http://checkstyle.sf.net/config_import.html -->
+        <!-- 检查使用*号的导入,默认为全部类 -->
+        <module name="AvoidStarImport" />
+        <!-- 检查是否有非法的包,确省检查sun.*;对于某些包是不建议直接调用的 -->
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="sun.*" />
+        </module>
+        <!-- 检查多于的导入,如一个类导入了多次 -->
+        <module name="RedundantImport" />
+        <!-- 检查没有使用的导入 -->
+        <module name="UnusedImports" />
+        <!-- 导入排序 -->
+        <!-- groups:分组,哪些是一组的 -->
+        <!-- ordered:同一个组内是否排序,true排序,确省为true -->
+        <!-- separated:各个组之间是否需要用空行分隔,确省为false -->
+        <!-- caseSensitive:是否是大小写敏感的,确省是 -->
+        <!--
+        <module name="ImportOrder">
+        <property name="groups" value="java,javax"/>
+        <property name="ordered" value="true"/>
+        <property name="separated" value="true"/>
+        <property name="caseSensitive" value="true"/>
+        </module>
+        -->
+        <!-- Checks for Size Violations. -->
+        <!-- See http://checkstyle.sf.net/config_sizes.html -->
+        <!-- 检查方法内可执行语句的个数,确省为30行 -->
+        <!--
+        <module name="ExecutableStatementCount">
+        <property name="max" value="30"/>
+        </module>
+        -->
+        <!-- 文件的最大行数,缺省为1500 -->
+        <!--<module name="FileLength">-->
+        <!--<property name="max" value="2000" />-->
+        <!--</module>-->
+        <!-- 每行的最大字符数,缺省为80 -->
+        <module name="LineLength">
+            <!-- 忽略指定格式的行,如*号开始的,等 -->
+            <!--
+            <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
+            -->
+            <property name="max" value="120" />
+        </module>
+        <!-- 方法的最大行数,缺省为120 -->
+        <module name="MethodLength">
+            <property name="max" value="120" />
+            <!-- 统计时是否包括空行和以//开始的注释,缺省为统计(true)-->
+            <property name="countEmpty" value="false" />
+        </module>
+        <!-- 匿名类的最大行数,缺省为20 -->
+        <module name="AnonInnerLength">
+            <property name="max" value="60" />
+        </module>
+        <!-- 检查方法和构造子参数的最大个数,缺省为7 -->
+        <module name="ParameterNumber" />
+        <!-- Checks for whitespace -->
+        <!-- See http://checkstyle.sf.net/config_whitespace.html -->
+        <module name="EmptyForInitializerPad" />
+        <module name="EmptyForIteratorPad" />
+        <module name="MethodParamPad">
+            <property name="allowLineBreaks" value="true" />
+        </module>
+        <module name="NoWhitespaceAfter" />
+        <module name="NoWhitespaceBefore" />
+        <module name="OperatorWrap" />
+        <module name="ParenPad" />
+        <module name="TypecastParenPad" />
+        <!--<module name="TabCharacter" />-->
+        <module name="WhitespaceAfter" />
+        <module name="WhitespaceAround" />
+        <!-- Modifier Checks -->
+        <!-- See http://checkstyle.sf.net/config_modifiers.html -->
+        <!-- 要求JLS suggestions -->
+        <!--
+        <module name="ModifierOrder"/>
+        -->
+        <module name="RedundantModifier" />
+        <!-- Checks for blocks. You know, those {}'s -->
+        <!-- See http://checkstyle.sf.net/config_blocks.html -->
+        <!-- 检查空块 -->
+        <!--
+        <module name="EmptyBlock"/>
+        -->
+        <module name="LeftCurly" />
+        <!-- 检查只有必须有{},确省为必须,主要在if,else时有这样的情况 -->
+        <module name="NeedBraces" />
+        <!-- 检查"}",确省在同一行 -->
+        <module name="RightCurly">
+            <!--alone:The brace must be alone on the line  -->
+            <!--same:The brace must be on the same line as the next statement-->
+            <!--<property name="option" value="alone" />-->
+        </module>
+
+
+        <!-- Checks for common coding problems -->
+
+        <!-- 检查多余嵌套的{},请看文档,不易说明 -->
+        <module name="AvoidNestedBlocks" />
+
+        <!--避免使用内联条件，例如：？:操作符  具体见 http://checkstyle.sf.net/config_coding.html -->
+        <!--<module name="AvoidInlineConditionals" />-->
+
+        <module name="CovariantEquals" />
+        <module name="DeclarationOrder" />
+        <module name="DefaultComesLast" />
+        <!--<module name="DoubleCheckedLocking" />-->
+        <!--
+        <module name="EmptyStatement"/>
+        -->
+        <module name="EqualsHashCode" />
+        <!-- 变量必须初始化为自己的类型,如果给一个Object类型的变量初始化为null会提示 -->
+        <!--
+        <module name="ExplicitInitialization"/>
+        -->
+        <module name="FallThrough" />
+        <!--
+        <module name="FinalLocalVariable"/>
+        -->
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true" />
+            <property name="ignoreSetter" value="true" />
+        </module>
+        <!-- Exception, Throwable, RuntimeException是不允许catch的 -->
+        <!--
+        <module name="IllegalCatch"/>
+        -->
+        <module name="IllegalInstantiation" />
+        <!--
+        <module name="IllegalToken"/>
+        -->
+        <module name="IllegalTokenText" />
+        <module name="IllegalType" />
+        <module name="InnerAssignment" />
+        <!--检查直接数
+        <module name="MagicNumber"/>
+        检查是否有构造子
+        <module name="MissingCtor"/>
+        -->
+        <module name="MissingSwitchDefault" />
+        <module name="MultipleVariableDeclarations" />
+        <!--
+        <module name="JUnitTestCase"/>
+        <module name="NestedIfDepth"">
+        <property name="max" value="5"/>
+        </module>
+        <module name="NestedTryDepth"">
+        <property name="max" value="5"/>
+        </module>
+        <module name="PackageDeclaration"/>
+        <module name="ReturnCount"/>
+        -->
+        <!-- 不能为参数付值 -->
+        <!--
+        <module name="ParameterAssignment"/>
+        -->
+        <module name="RedundantThrows" />
+        <!-- 不能理解的,好像是bug
+        <module name="RequireThis"/>
+        -->
+        <module name="SimplifyBooleanExpression" />
+        <module name="SimplifyBooleanReturn" />
+        <module name="StringLiteralEquality" />
+        <module name="SuperClone" />
+        <module name="SuperFinalize" />
+        <module name="UnnecessaryParentheses" />
+        <!-- Checks for class design -->
+        <!-- See http://checkstyle.sf.net/config_design.html -->
+        <!-- 要求一个方法必须声明为Extension的,否则必声明为abstract, final or empty -->
+        <!--
+        <module name="DesignForExtension"/>
+        -->
+        <!-- 检查private构造子是否声明为final,这里有个问题,在Java中构造子是不能声明为final的 -->
+        <!--
+        <module name="FinalClass"/>
+        -->
+        <!-- 要求一定要有一个构造子 -->
+        <!--
+        <module name="HideUtilityClassConstructor"/>
+        -->
+        <module name="InterfaceIsType" />
+        <!-- 检查变量的可见性,确省只允许static final 为public,否则只能为private -->
+        <module name="VisibilityModifier">
+            <property name="packageAllowed" value="true" />
+            <property name="protectedAllowed" value="true" />
+        </module>
+        <!--
+        <module name="MutableException"/>
+        -->
+        <!-- 限制抛出声明的指定数量,确省为1 -->
+        <!--
+        <module name="ThrowsCount"/>
+        -->
+        <!-- Miscellaneous other checks. -->
+        <!-- See http://checkstyle.sf.net/config_misc.html -->
+        <!-- 数组的声明是否允许Java的类型,确省为允许,Java类型为String[] xx,C++的类型为String xx[]; -->
+        <module name="ArrayTypeStyle" />
+        <!--
+        <module name="FinalParameters"/>
+        -->
+        <!-- 一般性的代码问题,不好的习惯等,可以多 -->
+        <!-- 文件中使用了System.out.print等-->
+        <!--<module name="GenericIllegalRegexp">-->
+        <!--<property name="format" value="System\.out\.print" />-->
+        <!--<property name="message" value="bad practice of use System.out.print" />-->
+        <!--</module>-->
+        <!--<module name="GenericIllegalRegexp">-->
+        <!--<property name="format" value="System\.exit" />-->
+        <!--<property name="message" value="bad practice of use System.exit" />-->
+        <!--</module>-->
+        <!--<module name="GenericIllegalRegexp">-->
+        <!--<property name="format" value="printStackTrace" />-->
+        <!--<property name="message" value="bad practice of use printStackTrace" />-->
+        <!--</module>-->
+        <!-- 关于Task,你可以声明自己的Task标识 -->
+        <module name="TodoComment">
+            <property name="format" value="TODO" />
+        </module>
+        <!-- 强迫//注释必须如何,入下要求只能有一行,具体看文档 -->
+        <!--
+        <module name="TrailingComment">
+        <property name="format" value="^\\s*$"/>
+        </module>
+        -->
+        <!-- main方法经常会在debug时使用,但发行版本的时候可能并不需要这个方法,提示 -->
+        <module name="UncommentedMain" />
+        <!-- 当定义一个常量时,希望使用大写的L来代替小写的l,原因是小写的l和数字1很象 -->
+        <module name="UpperEll" />
+        <!-- 检查正确的缩进,这个更象是个人习惯 -->
+        <!--
+        <module name="Indentation">
+        <property name="braceAdjustment" value="0"/>
+        </module>
+        -->
+        <!-- Checks For Metrics -->
+        <!-- See http://checkstyle.sf.net/config_metrics.html -->
+        <!-- 检查嵌套复杂度 -->
+        <module name="CyclomaticComplexity">
+            <property name="max" value="12" />
+        </module>
+    </module>
+</module>

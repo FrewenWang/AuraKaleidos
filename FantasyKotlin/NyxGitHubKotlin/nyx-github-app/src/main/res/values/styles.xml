@@ -1,0 +1,53 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <!-- To see how these attributes are used, please visit https://material.io/develop/android/theming/color/ -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/gray_50</item>
+        <item name="colorPrimaryDark">@color/gray_50</item>
+        <item name="colorAccent">@color/gray_50</item>
+        <item name="colorSecondary">@color/gray_50</item>
+        <item name="android:colorBackground">@color/gray_50</item>
+    </style>
+
+
+    <!-- 启动页面的布局Style。主要解决启动速度过慢的问题-->
+    <style name="LauncherTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:background">@drawable/drawable_launcher</item>
+    </style>
+
+    <!--titleBar样式-->
+    <style name="ToolbarStyle" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <!--    AppBar的覆盖的Style文件   -->
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="toolbarStyle" parent="@style/AppTheme">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
+    <style name="toolbarTheme" parent="@style/AppTheme">
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+    <!--首页新闻页面的Style -->
+    <style name="itemNewsCardViewStyle">
+        <item name="android:background">@color/white</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+</resources>

@@ -1,0 +1,74 @@
+apply plugin: 'checkstyle'
+
+checkstyle {
+    toolVersion '6.1.1'
+    ignoreFailures = false
+    showViolations = true
+}
+
+def configDir = "${project.rootDir}/quality"
+def reportsDir = "${project.buildDir}/reports"
+
+task checkstyle(type: Checkstyle) {
+    configFile file("$configDir/checkstyle/checkstyle.xml")
+    // 检查抑制的文件
+    configProperties.checkstyleSuppressionsPath = file("$configDir/checkstyle/suppressions.xml").absolutePath
+    //source "././app/src/main/java"
+    // 设置代码文件为整个工程目录
+    source "${project.rootDir}"
+
+    // 下面就是来解析commit提交的修改文件的代码规范
+    if (project.hasProperty('checkCommit') && project.property("checkCommit")) {
+        def ft = filterCommitter(getChangeFiles())
+        println("commit file size = " + ft.size())
+        def includeList = new ArrayList<String>()
+        for (int i = 0; i < ft.size(); i++) {
+            String splitter = ft.getAt(i)
+            String[] splitterList = splitter.split("/")
+            String fileName = splitterList[splitterList.length - 1]
+            println("Checkstyle:file=" + fileName)
+            includeList.add("**/" + fileName)
+        }
+        println("includeList file size = " + includeList.size())
+        if (includeList.size() == 0) {
+            exclude '**/*.java'
+            include '**/build.gradle'
+        } else {
+            include includeList
+        }
+    } else {
+        include '**/*.java'
+    }
+
+    // 排除所有不需要进行检查的文件
+    exclude '**/gen/**'
+    exclude '**/build/**'
+    exclude '**/test/**'
+    exclude '**/androidTest/**'
+    classpath = files()
+}
+
+def getChangeFiles() {
+    try {
+        String changeInfo = 'git status -s'.execute(null, project.rootDir).text.trim()
+        return changeInfo == null ? "" : changeInfo
+    } catch (Exception e) {
+        return ""
+    }
+}
+
+def filterCommitter(String gitStatusInfo) {
+    ArrayList<String> filterList = new ArrayList<String>()
+    String[] lines = gitStatusInfo.split("\\n")
+    for (String line : lines) {
+        if (line.contains(".java")) {
+            String[] filters = line.trim().split(" ")
+            for (String str : filters) {
+                if (str.contains(".java")) {
+                    filterList.add(str)
+                }
+            }
+        }
+    }
+    return filterList
+}

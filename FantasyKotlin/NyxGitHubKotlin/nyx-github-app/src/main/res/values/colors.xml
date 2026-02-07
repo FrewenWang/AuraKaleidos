@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="black">#de000000</color>
+    <color name="gray_50">#fafafa</color>
+    <color name="gray_50_a600">#99fafafa</color>
+    <color name="green_300">#6dc790</color>
+    <color name="green_500">#49bb79</color>
+    <color name="green_700">#005d2b</color>
+    <color name="green_900">#1a231e</color>
+    <color name="white">#deffffff</color>
+    <color name="yellow_300">#f8f99f</color>
+    <color name="yellow_500">#ffff63</color>
+
+
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimaryLight">#00A74B</color>
+    <color name="colorAccent">#D81B60</color>
+
+
+    <color name="none_received">#999999</color>
+    <color name="start_received">#00FF00</color>
+    <color name="stop_received">#FF0000</color>
+
+    <color name="subTextColor">#959595</color>
+</resources>

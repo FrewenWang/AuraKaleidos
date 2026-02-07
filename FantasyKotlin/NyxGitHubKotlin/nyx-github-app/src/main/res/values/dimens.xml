@@ -1,0 +1,23 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="flower_detail_app_bar_height">278dp</dimen>
+    <dimen name="margin_normal">16dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_extra_small">4dp</dimen>
+    <!-- minimum height of plant detail page so that the collapsing toolbar can be shown on every page -->
+    <dimen name="plant_description_min_height">555dp</dimen>
+
+    <!--应用页面的字体的大小尺寸 -->
+    <dimen name="common_text_size_lager">30sp</dimen>
+    <dimen name="common_text_size_big">23sp</dimen>
+    <dimen name="common_text_size_common">18sp</dimen>
+    <dimen name="common_text_size_middle">16sp</dimen>
+    <dimen name="common_text_size_small">14sp</dimen>
+    <dimen name="common_text_size_min">12sp</dimen>
+
+
+</resources>

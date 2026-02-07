@@ -1,0 +1,18 @@
+
+// 删除hooks文件
+//task deleteGitHooks(type: Delete) {
+//    File file = new File(rootProject.rootDir, '.git/hooks/pre-commit')
+//    delete file
+//}
+//deleteGitHooks.execute()
+
+
+task installGitHooks(type: Copy) {
+    from new File(rootProject.rootDir, 'hooks/pre-commit')
+    into { new File(rootProject.rootDir, '.git/hooks') }
+    File file = new File(rootProject.rootDir, '.git/hooks/pre-commit')
+    file.setExecutable(true, false)
+}
+
+//clean.dependsOn installGitHooks
+//installGitHooks.execute()

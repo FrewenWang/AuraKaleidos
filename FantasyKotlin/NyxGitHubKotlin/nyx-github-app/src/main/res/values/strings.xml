@@ -1,0 +1,92 @@
+<resources>
+    <string name="app_name">NyxGitHub</string>
+    <!-- 首页的相关-->
+    <string name="main_home">首页</string>
+    <string name="main_recommend">推荐</string>
+    <string name="main_discovery">发现</string>
+    <string name="main_profile">我的</string>
+
+
+    <string name="title_activity_fragment">FragmentActivity</string>
+    <string name="title_home">主页</string>
+    <string name="title_dashboard">扩展</string>
+    <string name="title_notifications">通知</string>
+    <string name="agora_app_id">9d396b2200cf40eda79a6d734da20c4a</string>
+
+    <!-- PLEASE KEEP THIS App ID IN SAFE PLACE -->
+    <!-- Get your own App ID at https://dashboard.agora.io/ -->
+    <!-- After you entered the App ID, remove <##> outside of Your App ID -->
+    <!-- For formal released project, please use Security Keys/Token
+        https://docs.agora.io/en/2.3.1/product/Video/Agora%20Platform/key_native?platform=Android -->
+    <string name="enable_camera">Enable Camera</string>
+    <string name="shower_str11">其他方式绑定</string>
+
+    <string name="shower_str12">停止搜索</string>
+    <string name="shower_str4">搜索中</string>
+    <string name="shower_str5">未绑定</string>
+    <string name="shower_str6">搜索终止</string>
+    <string name="onstoptask">onStopTask</string>
+    <string name="onstarttask">onStartTask</string>
+    <string name="defaultparamtext">task params will show up here.</string>
+    <string name="schedule_job_button_text">Schedule Job</string>
+    <string name="cancel_all_jobs_button_text">Cancel all</string>
+    <string name="finish_job_button_text">Finish last task</string>
+    <string name="idle_mode_text">Requires device in idle mode.</string>
+    <string name="charging_caption">Charging:</string>
+    <string name="charging_text">Requires device plugged in.</string>
+    <string name="idle_caption">Idle:</string>
+    <string name="connectivity">Connectivity:</string>
+    <string name="any">Any</string>
+    <string name="unmetered">WiFi</string>
+    <string name="timing">Timing:</string>
+    <string name="delay">Delay:</string>
+    <string name="deadline">Deadline:</string>
+    <string name="work_duration">Work duration:</string>
+    <string name="cancelled_job">Cancelled job %d</string>
+    <string name="no_jobs_to_cancel">No jobs to cancel</string>
+    <string name="all_jobs_cancelled">All jobs cancelled</string>
+    <string name="title_activity_jet_pack">JetPackActivity</string>
+    <string name="flower_details_title">花朵详情</string>
+    <!-- Translatable resources -->
+    <string name="menu_filter_by_grow_zone" translation_description="The label for the menu item to filter the displayed plants by grow zone.">Filter by grow zone</string>
+    <string name="plant_detail_image_content_description" translation_description="Content description for the header / hero image that is show at the top of the plant detail screen.">Image of plant</string>
+    <string name="my_garden_title" translation_description="Title for the 'My garden' screen where the user can see the list of plants that have been added to their garden.">My garden</string>
+    <string name="plant_list_title" translation_description="Title for the plant list screen where the user can see a list of plants available to add to their garden.">Plant list</string>
+    <string name="available" translation_description="Text for the header of the plant list page indicating the available plants for users to choose from.">Available Plants</string>
+    <string name="plant_details_title" translation_description="Title for the plant details screen where the user can see the details for a specific plant.">Plant details</string>
+    <string name="add_plant" translation_description="Button text that prompts user to navigate to the Plant List to add plants to their empty garden.">Add plant</string>
+    <string name="added_plant_to_garden" translation_description="Confirmation text that is shown when a user adds a plant to their empty garden.">Added plant to garden</string>
+    <string name="garden_empty" translation_description="Text that is shown on the 'My Garden' screen when no plants have been added to the user's garden">Your garden is empty</string>
+    <string name="plant_date_header" translation_description="Text that is shown on each plant on the 'My Garden' screen which says the word Planted to show date of planting below">Planted</string>
+    <string name="watered_date_header" translation_description="Text that is shown on each plant on the 'My Garden' screen which says the word Last Watered to show date of last watering below">Last Watered</string>
+    <string name="menu_item_share_plant" translation_description="The label for the Share menu item">Share</string>
+    <string name="share_text_plant" translation_description="The default messaged used when sharing a plant on SNS, etc.">Check out the %s plant in the Android Sunflower app</string>
+    <string name="hello_blank_fragment">空白页面</string>
+
+    <!-- String plurals and their related prefix / suffix strings -->
+    <string name="watering_needs_prefix" translation_description="Prefix for the text describing how often a plant should be watered. Used in combination with watering_needs_suffix.">Watering needs</string>
+    <plurals name="watering_needs_suffix">
+        <item quantity="one" translation_description="Suffix for the text describing how often a plant should be watered, singular. Used in combination with watering_needs_prefix: 'Watering needs: every day'.">every day</item>
+        <item quantity="other" translation_description="Suffix for the text describing how often a plant should be watered, plural. Used in combination with watering_needs_prefix: 'Watering needs: every 8 days'.">every %d days</item>
+    </plurals>
+
+    <plurals name="watering_next">
+        <item quantity="one" translation_description="Text indicating when the the plant should next be watered, singular. Used in conjunction with last watered date. 'May 24, 2018 - water tomorrow.'.">water tomorrow.</item>
+        <item quantity="other" translation_description="Text indicating when the the plant should next be watered, plural. Used in conjunction with last watered date. 'May 24, 2018 - water in 8 days.'.">water in %d days.</item>
+    </plurals>
+
+    <!-- Accessibility -->
+    <string name="a11y_plant_item_image" translation_description="Accessibility text for each of the plant images shown in the 'My garden' and 'Plant list' screens.">Picture of plant</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string-array name="responseStrArray">
+        <item> 你好啊，哈哈！ </item>
+        <item> 请问你叫什么名字呀？？ </item>
+        <item> 今天北京的天气貌似不错呀！！！</item>
+        <item> 你知道吗？？ 我可以同时和多个人聊天哦！！</item>
+        <item> 给你讲个笑话吧,据说爱笑的人运气并不会太差啊！！！</item>
+    </string-array>
+
+
+</resources>

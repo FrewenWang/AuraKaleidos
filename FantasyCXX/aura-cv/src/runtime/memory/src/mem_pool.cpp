@@ -449,8 +449,8 @@ std::string MemPool::Impl::MemTraceReport()
 
         DT_CHAR tag_buffer[256]     = {0};
         DT_CHAR mem_str_buffer[512] = {0};
-        sprintf(tag_buffer, "%s[%s]", std::string(data.level * 4, ' ').c_str(), tag.c_str());
-        sprintf(mem_str_buffer, "%-50s count: %-3zu peak: %.2f KB(%.4f MB)", tag_buffer, data.alloc_cnt,
+        snprintf(tag_buffer, sizeof(tag_buffer), "%s[%s]", std::string(data.level * 4, ' ').c_str(), tag.c_str());
+        snprintf(mem_str_buffer, sizeof(mem_str_buffer), "%-50s count: %-3zu peak: %.2f KB(%.4f MB)", tag_buffer, data.alloc_cnt,
                                                                              data.max_size / 1024.0f,
                                                                              data.max_size / 1048576.0f);
 

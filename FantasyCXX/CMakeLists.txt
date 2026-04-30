@@ -61,16 +61,15 @@ include(cmake/macro.cmake)
 include(3rdparty/dependence.cmake)
 
 # 添加项目子工程目录的cmake文件
-# add_subdirectory(aura-utils)
-# add_subdirectory(aura-cv)
-#add_subdirectory(aura-auto-driving)
-#add_subdirectory(examples)
-#add_subdirectory(test)
-#add_subdirectory(aura-lightbuffer)
-#add_subdirectory(aura-perfguard)
-#add_subdirectory(aura-vision)
-#add_subdirectory(aura-vision-hpc)
+add_subdirectory(aura-utils)
 add_subdirectory(aura-cv)
+# add_subdirectory(aura-auto-driving)     # 需要 Eigen Core
+add_subdirectory(examples)
+# add_subdirectory(test)                  # 需要 GTest
+# add_subdirectory(aura-lightbuffer)      # 头文件问题
+add_subdirectory(aura-perfguard)
+# add_subdirectory(aura-vision)           # 头文件问题
+# add_subdirectory(aura-vision-hpc)       # OpenCL 问题
 
 
 message(STATUS "[${PROJECT_NAME}] ================= Build Start==============================")

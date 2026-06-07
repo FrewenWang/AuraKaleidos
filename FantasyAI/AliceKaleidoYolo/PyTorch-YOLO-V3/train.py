@@ -13,13 +13,17 @@ warnings.filterwarnings("ignore")
 from terminaltables import AsciiTable
 
 import os
+import sys
 import time
 import datetime
 import argparse
 
 import torch
 from torch.utils.data import DataLoader
+from torchvision import datasets
+from torchvision import transforms
 from torch.autograd import Variable
+import torch.optim as optim
 
 """
 --data_config config/coco.data  
@@ -41,9 +45,9 @@ if __name__ == "__main__":
     parser.add_argument("--compute_map", default=False, help="if True computes mAP every tenth batch")
     parser.add_argument("--multiscale_training", default=True, help="allow for multi-scale training")
     opt = parser.parse_args()
-    print("解析参数:", opt)
+    print(opt)
 
-    logger = Logger("output/logs")
+    logger = Logger("logs")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -54,11 +58,7 @@ if __name__ == "__main__":
     data_config = parse_data_config(opt.data_config)
     train_path = data_config["train"]
     valid_path = data_config["valid"]
-    names_path = data_config["names"]
-    # 当前文件的目录，也就是此项目的根路径
-    current_path = os.path.dirname(os.path.realpath(__file__))
-
-    class_names = load_classes(os.path.join(current_path, names_path))
+    class_names = load_classes(data_config["names"])
 
     # Initiate model
     model = Darknet(opt.model_def).to(device)
@@ -72,8 +72,7 @@ if __name__ == "__main__":
             model.load_darknet_weights(opt.pretrained_weights)
 
     # Get dataloader
-    images_path = os.path.join(current_path, "dataset/coco")
-    dataset = ListDataset(images_path,train_path, augment=True, multiscale=opt.multiscale_training)
+    dataset = ListDataset(train_path, augment=True, multiscale=opt.multiscale_training)
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.batch_size,

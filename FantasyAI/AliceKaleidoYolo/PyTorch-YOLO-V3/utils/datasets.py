@@ -81,8 +81,11 @@ class ListDataset(Dataset):
         # ---------
 
         img_path = self.img_files[index % len(self.img_files)].rstrip()
-        img_path = 'E:\\eclipse-workspace\\PyTorch\\PyTorch-YOLOv3\\data\\coco' + img_path
-        #print (img_path)
+        # 移除开头的斜杠，转换为相对路径
+        if img_path.startswith('/'):
+            img_path = img_path.lstrip('/')
+        img_path = os.path.join('data', img_path)
+
         # Extract image as PyTorch tensor
         img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
 
@@ -102,8 +105,10 @@ class ListDataset(Dataset):
         # ---------
 
         label_path = self.label_files[index % len(self.img_files)].rstrip()
-        label_path = 'E:\\eclipse-workspace\\PyTorch\\PyTorch-YOLOv3\\data\\coco\\labels' + label_path
-        #print (label_path)
+        # 移除开头的斜杠，转换为相对路径
+        if label_path.startswith('/'):
+            label_path = label_path.lstrip('/')
+        label_path = os.path.join('data', 'coco', 'labels', label_path)
 
         targets = None
         if os.path.exists(label_path):

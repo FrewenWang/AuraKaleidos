@@ -17,7 +17,7 @@ add_subdirectory(src/proto)
 add_subdirectory(src)
 
 if (BUILD_EXAMPLES)
-    add_subdirectory(examples)
+    add_subdirectory(samples)
 endif ()
 
 if (BUILD_TOOLS)

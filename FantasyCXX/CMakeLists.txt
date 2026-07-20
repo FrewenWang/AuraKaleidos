@@ -46,6 +46,16 @@ option(BUILD_BOOST_LIB "open build boost lib" ON)
 option(BUILD_OSQP "open build osqp lib" ON)
 option(BUILD_OSQP_EIGEN "open build osqp eigen lib" ON)
 
+# aura-cv 依赖 OpenCV（已内置 mac-x86_64 预编译库），源码量大、构建较慢，默认关闭；
+# 如需构建请打开此开关（目标平台需与 bundled OpenCV 的 mac-x86_64 一致）。
+option(BUILD_AURA_CV "build aura-cv (Mac-compatible, requires bundled OpenCV; large build)" OFF)
+
+# aura-vision / aura-vision-hpc 为设备/嵌入式视觉与 HPC SDK：
+# 依赖 Android / NCNN / SNPE / QNN / 设备 OpenCL 等 SDK，无法在 macOS x86_64 上编译。
+# 仅在对应设备工具链下通过下面两个开关开启。
+option(BUILD_AURA_VISION "build aura-vision (device/embedded vision SDK; needs Android/NCNN/SNPE/QNN toolchains)" OFF)
+option(BUILD_AURA_VISION_HPC "build aura-vision-hpc (OpenCL/NEON HPC examples; needs device OpenCL SDK)" OFF)
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 #                                               设置编译工程的配置参数
@@ -62,14 +72,22 @@ include(3rdparty/dependence.cmake)
 
 # 添加项目子工程目录的cmake文件
 add_subdirectory(aura-utils)
-add_subdirectory(aura-cv)
-# add_subdirectory(aura-auto-driving)     # 需要 Eigen Core
-add_subdirectory(examples)
-# add_subdirectory(test)                  # 需要 GTest
-# add_subdirectory(aura-lightbuffer)      # 头文件问题
+if(BUILD_AURA_CV)
+    add_subdirectory(aura-cv)   # Mac 可编译（依赖内置 OpenCV）；源码量大，默认关闭
+endif()
+add_subdirectory(aura-auto-driving)      # 依赖 Eigen（内置）+ aura-utils + aura-config-parser
+add_subdirectory(aura-config-parser)    # 头文件库 INI 解析
+add_subdirectory(aura-lightbuffer)      # LightBuffer 序列化库
+add_subdirectory(samples)
+add_subdirectory(test)                  # 依赖 GTest（内置）+ aura-utils
 add_subdirectory(aura-perfguard)
-# add_subdirectory(aura-vision)           # 头文件问题
-# add_subdirectory(aura-vision-hpc)       # OpenCL 问题
+# aura-vision / aura-vision-hpc 为设备/嵌入式 SDK，macOS x86_64 无法编译，默认关闭（见上方 option）
+if(BUILD_AURA_VISION)
+    add_subdirectory(aura-vision)
+endif()
+if(BUILD_AURA_VISION_HPC)
+    add_subdirectory(aura-vision-hpc)
+endif()
 
 
 message(STATUS "[${PROJECT_NAME}] ================= Build Start==============================")

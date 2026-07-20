@@ -11,11 +11,11 @@ add_executable(${APP_NAME} ${app_srcs})
 
 # 设置目标产物的include头文件的路径
 target_include_directories(${APP_NAME} PUBLIC
-        ${CMAKE_SOURCE_DIR}/AuraUtils/include)
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 # 设置目标产物link链接依赖库
 message(STATUS "[AuraPerfGuard] OPENCV_LIB:${OPENCV_LIB}")
 target_link_libraries(${APP_NAME} PUBLIC
-        AuraUtils)
+        PerfGuard)
 
 message(STATUS "[AuraPerfGuard] ==================== AuraPerfGuardDemo Examples Build End============================")

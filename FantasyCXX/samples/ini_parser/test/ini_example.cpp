@@ -4,13 +4,16 @@
 #include <iostream>
 #include "xiaomi/parser/iniparser.h"
 
+#ifndef INI_ASSET_DIR
+#define INI_ASSET_DIR "assets/example.ini"
+#endif
+
 using namespace xiaomi::parser;
 
 int main() {
 
   IniParser parser;
-  auto url = "/Users/frewen/03.ProgramSpace/01.WorkSpace/AuraKaleidoscope/AuraFantasyCXX/ini_parse/assets/example.ini";
-
+  auto url = INI_ASSET_DIR;
   if (parser.Parse(url)) {
     // read
     const int port = parser.GetInt("udp", "port", 8080);

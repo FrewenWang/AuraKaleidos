@@ -1,47 +1,25 @@
-message(STATUS "[AuraLightBuffer] =================== AuraLightBuffer Build ===================")
-cmake_minimum_required(VERSION 3.10)
-project(LightBuffer)
-
-# 编译配置
-option(BUILD_TEST "build unit test" OFF)                    # 编译单测程序
-option(BUILD_EXAMPLE "build example" ON)                   # 编译示例程序
-option(BUILD_LIGHT_C "build LightBuffer compiler" ON)        # 编译生成 LightBuffer 的编译程序
-
-# 编译变量设置
+# AuraLightBuffer
+# 轻量级结构化二进制序列化（LightBuffer）库。仅依赖标准库 + 内置 FileUtil。
+#
+# 说明：本文件早先是一份从别处拷贝来的 CMake（误引用了并不存在/不属于本模块的
+# AuraLib、AuraCV、OPENCV_LIB 目标，以及 OpenCL 等），导致无法参与顶层构建。
+# 实际源码（src/ 下）只用到标准库与 aura/auralib/utils/FileUtil.h，
+# 因此这里改为只构建一个静态库 light_buffer。
+#
+# 注意：example/ 引用的是另一套 "plainbuffer" 示例源码（error.cpp / schema_parser.cpp /
+# serializer.cpp / text_format.cpp / util.cpp）以及一个缺失的 prebuilt/plainc 代码生成工具，
+# 与 src/ 实际源码不一致，故默认不构建 example。
 set(LIB_NAME light_buffer)
-set(COMPILER_NAME LightBufferC)
+message(STATUS "[AuraLightBuffer] =================== AuraLightBuffer Build ===================")
 
-# 设置工具类库的源码根路径以及include头文件根路径
 set(INCLUDE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(SRC_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# 设置工具类库的文件列表
 collect_source_files(LIB_SRCS GLOB_RECURSE .)
 
-message(STATUS "[AuraLightBuffer] include_root:${INCLUDE_ROOT}")
-message(STATUS "[AuraLightBuffer] src_root:${SRC_ROOT}")
-message(STATUS "[AuraLightBuffer] lib_srcs:${LIB_SRCS}")
-
-list(APPEND src_compiler)
-
-# 设置生成静态库
+# 静态库：不依赖 OpenCV / AuraLib / AuraCV（这些是旧工程布局的残留引用，本模块用不到）
 add_library(${LIB_NAME} STATIC ${LIB_SRCS})
-# 设置当前目标物的include文件夹
-target_include_directories(${LIB_NAME} PUBLIC include)
+target_include_directories(${LIB_NAME} PUBLIC ${INCLUDE_ROOT})
 target_compile_options(${LIB_NAME} PRIVATE -O3 -std=c++11 -fPIC)
-
-# 设施目标生成物需要连接的三方依赖库
-target_link_libraries(${LIB_NAME} PUBLIC
-                      ${OPENCV_LIB}
-                      AuraLib
-                      AuraCV)
-
-if(BUILD_TEST)
-    add_subdirectory(test)
-endif()
-
-if(BUILD_EXAMPLE)
-    add_subdirectory(example)
-endif()
 
 message(STATUS "[AuraLightBuffer] =================== AuraLightBuffer Build End===================")

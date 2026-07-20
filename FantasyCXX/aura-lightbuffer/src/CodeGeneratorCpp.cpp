@@ -50,6 +50,14 @@ bool CodeGeneratorCpp::generateHeader(const std::string &fileName, const std::st
        << std::endl
        << "namespace " << schema->packageName << " {" << std::endl
        << std::endl;
+
+    // 写出生成的头文件（目录处理与 generateSource 保持一致）
+    std::string dir = outDir;
+    if (!dir.empty() && dir[dir.size() - 1] == '/') {
+        dir = dir.substr(0, dir.size() - 1);
+    }
+    aura::auralib::utils::FileUtil::save_file(dir + "/" + fileName + ".plain.h", ss.str());
+    return true;
 }
 
 bool CodeGeneratorCpp::generateSource(const std::string &fileName, const std::string &outDir,
@@ -336,23 +344,23 @@ bool CodeGeneratorCpp::generateSource(const std::string &fileName, const std::st
            << indent << indent << "return false;" << std::endl
            << indent << "}" << std::endl
            << std::endl;
-        const auto& lower_type_name = Util::to_lower(type_name);
+        const auto& lower_type_name = CommonUtil::toLower(type_name);
         ss << indent << "auto& desc_" << lower_type_name << " = data_map[key];" << std::endl
            << std::endl;
 
-        for (const auto& value : msg.value_list) {
-            const auto& v_type = value.type_name_str;
-            const auto& v_name = value.value_name_str;
+        for (const auto& value : msg.valueList) {
+            const auto& v_type = value.typeNameStr;
+            const auto& v_name = value.valueNameStr;
             if (v_type == "bytes") {
                 continue; // bytes data is ignored for text-format
             }
             std::string cpp_type = v_type;
             if (value.qualifier != Qualifier::REPEATED) {
-                cpp_type = Keyword::cast_cpp_type(v_type);
+                cpp_type = Keyword::castCppType(v_type);
                 ss << indent << "if (desc_" << lower_type_name << ".find(\"" << v_name << "\") != desc_" << lower_type_name << ".end()) {" << std::endl
                    << indent << indent << "auto& datalist = desc_" << lower_type_name << "[\"" << v_name << "\"];" << std::endl
                    << indent << indent << "if (!datalist.empty()) {" << std::endl;
-                if (value.value_type == ValueType::PRIMARY_TYPE) {
+                if (value.valueType == ValueType::PRIMARY_TYPE) {
                     ss << indent << indent << indent << "_" << v_name << " = ";
                     if (v_type != "string") {
                         ss << "Util::parse_from_str<" << cpp_type << ">(datalist[0]);" << std::endl;
@@ -368,8 +376,8 @@ bool CodeGeneratorCpp::generateSource(const std::string &fileName, const std::st
             } else {
                 ss << indent << "if (desc_" << lower_type_name << ".find(\"" << v_name << "\") != desc_" << lower_type_name << ".end()) {" << std::endl
                    << indent << indent << "auto& datalist = desc_" << lower_type_name << "[\"" << v_name << "\"];" << std::endl;
-                if (value.value_type == ValueType::PRIMARY_TYPE) {
-                    cpp_type = Keyword::cast_cpp_type(v_type);
+                if (value.valueType == ValueType::PRIMARY_TYPE) {
+                    cpp_type = Keyword::castCppType(v_type);
                     ss << indent << indent << "for (auto& s : datalist) {" << std::endl
                        << indent << indent << indent << "_" << v_name << ".emplace_back(";
                     if (v_type != "string") {
@@ -378,7 +386,7 @@ bool CodeGeneratorCpp::generateSource(const std::string &fileName, const std::st
                         ss << "s);" << std::endl;
                     }
                 } else {
-                    const auto& lower_v_type = Util::to_lower(v_type);
+                    const auto& lower_v_type = CommonUtil::toLower(v_type);
                     ss << indent << indent << "if (!datalist.empty()) {" << std::endl
                        << indent << indent << indent << "int cnt = std::stoi(datalist[0]);" << std::endl
                        << indent << indent << indent << "for (int i = 0; i < cnt; ++i) {" << std::endl
@@ -399,13 +407,13 @@ bool CodeGeneratorCpp::generateSource(const std::string &fileName, const std::st
         // internal_bytes_size
         ss << "size_t " << type_name << "::internal_bytes_size() const {" << std::endl
            << indent << "size_t size = 0;" << std::endl;
-        for (const auto& value : msg.value_list) {
-            const auto& v_type = value.type_name_str;
-            const auto& v_name = value.value_name_str;
+        for (const auto& value : msg.valueList) {
+            const auto& v_type = value.typeNameStr;
+            const auto& v_name = value.valueNameStr;
             auto q_type = static_cast<Qualifier>(value.qualifier);
             std::string cpp_type = v_type;
-            if (EnumHelper::is_primary_type(v_type)) {
-                cpp_type = Keyword::cast_cpp_type(v_type);
+            if (EnumHelper::isPrimaryType(v_type)) {
+                cpp_type = Keyword::castCppType(v_type);
                 if (q_type != Qualifier::REPEATED) {
                     if (v_type == "string") {
                         ss << indent << "size += sizeof(int) + _" << v_name << ".size();" << std::endl;
@@ -473,8 +481,8 @@ bool CodeGeneratorCpp::generateSource(const std::string &fileName, const std::st
     if (!dir.empty() && dir[dir.size() - 1] == '/') {
         dir = dir.substr(0, dir.size() - 1);
     }
-    FileUtil::save_file(dir + "/" + file_name + ".plain.cpp", ss.str());
-    return false;
+    aura::auralib::utils::FileUtil::save_file(dir + "/" + fileName + ".plain.cpp", ss.str());
+    return true;
 }
 
 }// namespace lightbuffer

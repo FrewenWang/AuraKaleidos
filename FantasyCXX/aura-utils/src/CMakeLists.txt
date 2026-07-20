@@ -20,7 +20,8 @@ else ()
 endif ()
 
 # include
-target_include_directories(${TARGET_NAME} PRIVATE ${AURA_LIB_INCLUDE_DIRS} ${AURA_LIB_PRIVATE_DIRS})
+# PUBLIC：aura-utils 包含公开头文件（aura/aura_utils/...），需要向链接它的目标（test、各模块单测等）传递包含目录
+target_include_directories(${TARGET_NAME} PUBLIC ${AURA_LIB_INCLUDE_DIRS} ${AURA_LIB_PRIVATE_DIRS})
 
 install(TARGETS ${TARGET_NAME} DESTINATION ${SUB_INSTALL_PREFIX}/lib)
 

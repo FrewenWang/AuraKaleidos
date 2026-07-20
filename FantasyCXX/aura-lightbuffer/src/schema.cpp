@@ -58,12 +58,12 @@ std::string Keyword::castJavaType(const std::string &type_str) {
 
 std::string Message::toString() const {
     std::stringstream ss;
-    for (const auto value: value_list) {
+    for (const auto &value : valueList) {
         ss << std::endl;
-        ss << "value type: " << value.type_name_str << std::endl;
-        ss << "default_value: " << value.default_value_str << std::endl;
+        ss << "value type: " << value.typeNameStr << std::endl;
+        ss << "default_value: " << value.defaultValueStr << std::endl;
         ss << "offset: " << value.offset << std::endl;
-        ss << "qualifier: " << Keyword::qualifier_set[static_cast<int>(value.qualifier)] << std::endl;
+        ss << "qualifier: " << Keyword::qualifierSet[static_cast<int>(value.qualifier)] << std::endl;
     }
     return ss.str();
 }
@@ -72,18 +72,18 @@ std::string Schema::toString() const {
     std::stringstream ss;
     ss << std::endl;
     ss << "syntax: " << syntax << std::endl;
-    ss << "package: " << package_name << std::endl;
+    ss << "package: " << packageName << std::endl;
 
-    for (const auto &msg: message_list) {
+    for (const auto &msg: messageList) {
         ss << std::endl;
         ss << "==== message: " << msg.first << " ====";
-        ss << msg.second.to_string();
+        ss << msg.second.toString();
     }
     return ss.str();
 }
 
 
-Qualifier EnumHelper::qualifier_from_str(const std::string &str) {
+Qualifier EnumHelper::qualifierFromStr(const std::string &str) {
     if (str == "optional") {
         return Qualifier::OPTIONAL;
     } else if (str == "required") {
@@ -94,21 +94,21 @@ Qualifier EnumHelper::qualifier_from_str(const std::string &str) {
     return Qualifier::UNKNOWN;
 }
 
-PrimaryType EnumHelper::primary_type_from_str(const std::string &str) {
-    for (auto i = 0; i < Keyword::primary_type_list.size(); ++i) {
-        if (Keyword::primary_type_list[i] == str) {
+PrimaryType EnumHelper::primaryTypeFromStr(const std::string &str) {
+    for (auto i = 0; i < Keyword::primaryTypeList.size(); ++i) {
+        if (Keyword::primaryTypeList[i] == str) {
             return static_cast<PrimaryType>(i);
         }
     }
     return PrimaryType::UNKNOWN;
 }
 
-ValueType EnumHelper::value_type_from_str(const std::string &str) {
+ValueType EnumHelper::valueTypeFromStr(const std::string &str) {
     return ValueType::PRIMARY_TYPE;
 }
 
-bool EnumHelper::is_primary_type(const std::string &str) {
-    for (auto &s: Keyword::primary_type_list) {
+bool EnumHelper::isPrimaryType(const std::string &str) {
+    for (auto &s: Keyword::primaryTypeList) {
         if (s == str) {
             return true;
         }
@@ -116,5 +116,4 @@ bool EnumHelper::is_primary_type(const std::string &str) {
     return false;
 }
 
-} // namespace plainbuffer
-
+} // namespace aura::light_buffer

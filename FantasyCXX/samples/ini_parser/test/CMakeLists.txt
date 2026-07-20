@@ -14,6 +14,10 @@ add_executable(${TARGET_NAME} ini_example.cpp)
 # 设置生成物的include的目录
 target_include_directories(${TARGET_NAME} PRIVATE ${INCLUDE_ROOT})
 
+# 指定示例 INI 资源文件路径（相对源码目录）
+target_compile_definitions(${TARGET_NAME} PRIVATE
+        INI_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../assets/example.ini")
+
 target_link_libraries(${TARGET_NAME} PRIVATE iniparser)
 
 message(STATUS "[${TARGET_NAME}] ==================== Build End ====================")

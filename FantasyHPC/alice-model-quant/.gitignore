@@ -1,0 +1,9 @@
+
+
+!data/
+data/*
+!data/.keep_info
+
+!logs/
+logs/*
+!logs/.keep_info

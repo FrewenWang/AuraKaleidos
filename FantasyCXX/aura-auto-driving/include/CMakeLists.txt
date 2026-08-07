@@ -37,7 +37,7 @@ target_link_libraries(${TARGET_NAME} PRIVATE ${GTEST_LIB} AuraUtils)
 
 # 设置附属生成物的编译控制
 if (BUILD_UNIT_TEST_LIB)
-    add_subdirectory(test)
+    add_subdirectory(../tests tests)
 endif ()
 
 message(STATUS "[${TARGET_NAME}] ====================Build End============================")

@@ -2,8 +2,8 @@
 
 !data/
 data/*
-!data/.keep_info
+!data/.gitkeep
 
 !logs/
 logs/*
-!logs/.keep_info
+!logs/.gitkeep

@@ -1,40 +1,29 @@
-AuraNodeCli的命令行工具开发
+# AuraNodeCli
 
-index.js的中需要加入
+命令行入口位于 `src/index.js`，文件开头需要保留 Node.js shebang：
 
-```
+```javascript
 #!/usr/bin/env node
 
 const fs = require('fs');
 const execCmd = require('./tools/execCmd');
 ```
 
-我们还需要在package.json中添加
+`package.json` 通过 `bin` 字段暴露命令：
 
-```
+```json
 {
   "name": "aura_node_cli",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "src/index.js",
   "bin": {
-    "aura-cli": "index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "aura-cli": "src/index.js"
+  }
 }
 ```
 
-​		我们怎么才能直接执行aura-cli的命令呢？
+在工程目录执行以下命令即可将 `aura-cli` 链接到本机：
 
+```shell
+npm link
 ```
-$ npm link
-```
-
-​		
-
-​		

@@ -11,35 +11,35 @@ set(CMAKE_CXX_STANDARD 11)
 find_package(CUDA REQUIRED)
 
 # 编译连接
-cuda_add_executable(hello-cuda 01_hello_cuda.cu)
+cuda_add_executable(hello-cuda src/01_hello_cuda.cu)
 
 # 编译连接
-cuda_add_executable(hello-gpu 02_hello-gpu.cu)
+cuda_add_executable(hello-gpu src/01_02_hello-gpu.cu)
 target_link_libraries(hello-gpu)
 
 # 编译连接
-cuda_add_executable(hello-malloc 03_hello-malloc.cu)
+cuda_add_executable(hello-malloc src/01_03_hello-malloc.cu)
 target_link_libraries(hello-malloc)
 
-cuda_add_executable(demo_cuda_matadd 04_demo_cuda_matadd.cu)
+cuda_add_executable(demo_cuda_matadd src/01_04_demo_cuda_matadd.cu)
 target_link_libraries(demo_cuda_matadd)
 
 
 # 编译连接
-cuda_add_executable(demo_stride 05_demo_stride.cu)
+cuda_add_executable(demo_stride src/01_05_demo_stride.cu)
 target_link_libraries(demo_stride)
 
 
 # 编译连接
-cuda_add_executable(demo_error 06_demo_error.cu)
+cuda_add_executable(demo_error src/01_06_demo_error.cu)
 target_link_libraries(demo_error)
 
 
-cuda_add_executable(demo_matrix_add 07_demo_matrix_add.cu)
+cuda_add_executable(demo_matrix_add src/01_07_demo_matrix_add.cu)
 target_link_libraries(demo_matrix_add)
 
 
-cuda_add_executable(demo_matrix 10_demo_matrix.cu)
+cuda_add_executable(demo_matrix src/01_10_demo_matrix.cu)
 target_link_libraries(demo_matrix)
 
 

@@ -6,9 +6,9 @@
 # 实际源码（src/ 下）只用到标准库与 aura/auralib/utils/FileUtil.h，
 # 因此这里改为只构建一个静态库 light_buffer。
 #
-# 注意：example/ 引用的是另一套 "plainbuffer" 示例源码（error.cpp / schema_parser.cpp /
+# 注意：examples/ 引用的是另一套 "plainbuffer" 示例源码（error.cpp / schema_parser.cpp /
 # serializer.cpp / text_format.cpp / util.cpp）以及一个缺失的 prebuilt/plainc 代码生成工具，
-# 与 src/ 实际源码不一致，故默认不构建 example。
+# 与 src/ 实际源码不一致，故默认不构建 examples。
 set(LIB_NAME light_buffer)
 message(STATUS "[AuraLightBuffer] =================== AuraLightBuffer Build ===================")
 

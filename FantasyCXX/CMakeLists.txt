@@ -83,7 +83,7 @@ add_subdirectory(aura-config-parser)    # 头文件库 INI 解析
 add_subdirectory(aura-lightbuffer)      # LightBuffer 序列化库
 add_subdirectory(samples)
 if(BUILD_UNIT_TEST)
-    add_subdirectory(test)              # 依赖 GTest（内置）+ aura-utils
+    add_subdirectory(tests)             # 依赖 GTest（内置）+ aura-utils
 endif()
 add_subdirectory(aura-perfguard)
 # aura-vision / aura-vision-hpc 为设备/嵌入式 SDK，macOS x86_64 无法编译，默认关闭（见上方 option）

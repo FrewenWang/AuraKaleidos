@@ -1,6 +1,13 @@
-import click
-from app.app import ObjectTrackerApp
 import os
+from pathlib import Path
+import sys
+
+import click
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+
+from app.app import ObjectTrackerApp
 
 def load_class_names(filename):
     """Load class names from a file."""
@@ -17,7 +24,7 @@ def load_class_names(filename):
 
 @click.command()
 @click.option('--mode', default='single', help='Tracking mode: "single" or "multi".')
-@click.option('--video-source', default="./videos/video_senators.mp4", help='Video source (default is "./videos/video_senators.mp4" ). Use 0 for webcam')
+@click.option('--video-source', default=str(PROJECT_ROOT / "data/videos/video_senators.mp4"), help='Video source. Use 0 for webcam')
 @click.option('--show-classes', is_flag=True, help='Display all possible object classes and their IDs.')
 @click.option('--target-class', multiple=True, type=int, help='Class(es) to be tracked. Can specify multiple by repeating the flag.')
 @click.option('--estimate-acceleration', default=False, type=bool, help='Flag on whether to estimate acceleration of objects. Advisable to set to true for fast moving objects. (default False)')
@@ -43,9 +50,9 @@ def run_tracking(mode, video_source, show_classes, target_class, estimate_accele
         assert os.path.exists(video_source), f'Specified video path: {video_source} is not found.'
     
     try:    
-        classes = load_class_names("./app/classes.txt")
+        classes = load_class_names(PROJECT_ROOT / "src/app/classes.txt")
     except Exception as e:
-        raise click.ClickException(f'Unable to load "./app/classes.txt": {e}') from e
+        raise click.ClickException(f'Unable to load class names: {e}') from e
     
     if show_classes:
         print("Possible object classes and their IDs:\n")

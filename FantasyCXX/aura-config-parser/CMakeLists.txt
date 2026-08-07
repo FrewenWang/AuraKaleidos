@@ -13,7 +13,7 @@ add_library(${TARGET_NAME} STATIC ${LIB_SRCS})
 target_include_directories(${TARGET_NAME} PUBLIC ${INCLUDE_ROOT})
 
 # 示例程序（注意：samples/ini_parser 已占用 DemoIniParser 名称，这里用不同名称避免冲突）
-add_executable(DemoAuraConfigParser example/main.cpp)
+add_executable(DemoAuraConfigParser examples/main.cpp)
 target_link_libraries(DemoAuraConfigParser PRIVATE ${TARGET_NAME})
 
 message(STATUS "[${TARGET_NAME}] ====================Build End============================")

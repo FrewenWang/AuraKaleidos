@@ -32,7 +32,7 @@ add_subdirectory(src)
 
 # 设置附属生成物的编译控制
 if (BUILD_UNIT_TEST)
-    add_subdirectory(test)
+    add_subdirectory(tests)
 endif ()
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/aura" DESTINATION ${SUB_INSTALL_PREFIX}/include)

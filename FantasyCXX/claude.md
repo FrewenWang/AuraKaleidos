@@ -61,7 +61,7 @@ cd aura-utils/test && ./aura-utils-tests
 ```
 
 ### Test Organization
-- Main test directory: `/test/`
+- Main test directory: `/tests/`
 - Module-specific tests: Each module contains its own test directory
 - Test framework: Google Test (GTest)
 
@@ -104,7 +104,7 @@ Each module follows a consistent pattern:
 - `CMakeLists.txt`: Module build configuration
 - `src/`: Source code implementation
 - `include/`: Public header files (if applicable)
-- `test/`: Unit tests
+- `tests/`: Unit tests
 - `samples/` or `examples/`: Demonstration code
 
 ### Third-party Dependencies
@@ -134,7 +134,7 @@ The project integrates multiple third-party libraries:
 2. Implement `CMakeLists.txt` following existing patterns
 3. Add source code in `src/` subdirectory
 4. Add public headers in `include/` if needed
-5. Create tests in `test/` subdirectory
+5. Create tests in `tests/` subdirectory
 6. Add module to main `CMakeLists.txt` with `add_subdirectory()`
 
 ### Working with Examples
@@ -176,7 +176,7 @@ The project integrates multiple third-party libraries:
 - `aura-cv/`: Core computer vision algorithms
 - `aura-utils/`: Foundation utilities and helpers
 - `samples/`: Demonstration and example code
-- `test/`: Main test suite
+- `tests/`: Main test suite
 
 ## Troubleshooting
 

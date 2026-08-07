@@ -776,4 +776,4 @@ cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 如需更多帮助，请参考：
 - `TECHNICAL_ARCHITECTURE.md` - 技术架构详情
 - `USAGE_DOCUMENTATION.md` - 使用指南
-- 项目中的 `examples/` 和 `test/` 目录
+- 项目中的 `examples/` 和 `tests/` 目录

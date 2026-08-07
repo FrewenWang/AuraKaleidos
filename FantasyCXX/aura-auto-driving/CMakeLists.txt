@@ -26,7 +26,7 @@ target_include_directories(${TARGET_NAME} PUBLIC
 target_link_libraries(${TARGET_NAME} PUBLIC aura_utils)
 
 if (BUILD_UNIT_TEST_LIB)
-    add_subdirectory(test)
+    add_subdirectory(tests)
 endif ()
 
 message(STATUS "[${TARGET_NAME}] ====================Build End============================")

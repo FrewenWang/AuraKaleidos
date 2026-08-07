@@ -30,10 +30,10 @@ target_compile_options(${LIB_NAME} PRIVATE -O3 -std=c++11 -fPIC)
 # 设施目标生成物需要连接的三方依赖库
 # 注：PerfGuard 仅依赖标准库，无需链接 AuraLib
 
-# PerfGuard 的单测（test/）引用了旧工程布局中的 AuraCV / AuraUtils 目标与头文件，
-# 在当前工程下不存在，属于过期代码，默认不参与构建。如需启用请改为 add_subdirectory(test)。
+# PerfGuard 的单测（tests/）引用了旧工程布局中的 AuraCV / AuraUtils 目标与头文件，
+# 在当前工程下不存在，属于过期代码，默认不参与构建。如需启用请改为 add_subdirectory(tests)。
 # if(BUILD_TEST)
-#     add_subdirectory(test)
+#     add_subdirectory(tests)
 # endif()
 
 if(BUILD_EXAMPLE)

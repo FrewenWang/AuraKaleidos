@@ -47,7 +47,7 @@ endif ()
 
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
     set(CMAKE_BUILD_TYPE debug)
-    add_definitions(-DDEBUG)
+    add_definitions(-DAURA_DEBUG=1)
     set(DEBUG True)
 elseif (CMAKE_BUILD_TYPE MATCHES "Release")
     set(CMAKE_BUILD_TYPE release)

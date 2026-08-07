@@ -3,6 +3,7 @@
 //
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 
 namespace aura::utils {
@@ -67,7 +68,7 @@ private:
     /**
      * Looper对象的正在loop标志变量
      */
-    bool looping;
+    std::atomic<bool> looping;
 
     static void initTLSKey();
 

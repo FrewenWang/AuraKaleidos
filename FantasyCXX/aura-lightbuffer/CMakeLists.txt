@@ -20,6 +20,8 @@ collect_source_files(LIB_SRCS GLOB_RECURSE .)
 # 静态库：不依赖 OpenCV / AuraLib / AuraCV（这些是旧工程布局的残留引用，本模块用不到）
 add_library(${LIB_NAME} STATIC ${LIB_SRCS})
 target_include_directories(${LIB_NAME} PUBLIC ${INCLUDE_ROOT})
-target_compile_options(${LIB_NAME} PRIVATE -O3 -std=c++11 -fPIC)
+target_compile_features(${LIB_NAME} PUBLIC cxx_std_17)
+set_target_properties(${LIB_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_compile_options(${LIB_NAME} PRIVATE $<$<CONFIG:Release>:-O3>)
 
 message(STATUS "[AuraLightBuffer] =================== AuraLightBuffer Build End===================")

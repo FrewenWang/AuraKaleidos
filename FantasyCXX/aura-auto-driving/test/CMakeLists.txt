@@ -14,7 +14,7 @@ collect_source_files(TARGET_SRCS GLOB_RECURSE utils)
 collect_source_files(TARGET_SRCS GLOB_RECURSE utils/math)
 
 # QSQPSplineSmoother 依赖 OsqpEigen（未随工程发布），跳过其单测
-list(REMOVE_ITEM TARGET_SRCS ${SRC_ROOT}/bspline/TestFitBSpline.cpp)
+list(FILTER TARGET_SRCS EXCLUDE REGEX ".*/bspline/TestFitBSpline\\.cpp$")
 
 add_executable(${TARGET_NAME} ${TARGET_SRCS})
 
@@ -24,5 +24,6 @@ target_include_directories(${TARGET_NAME} PRIVATE
         ${CMAKE_SOURCE_DIR}/aura-auto-driving/src
         ${CMAKE_SOURCE_DIR}/aura-config-parser/include)
 target_link_libraries(${TARGET_NAME} PRIVATE ${GTEST_LIB} aura_utils AuraAutoDriving)
+add_test(NAME ${TARGET_NAME} COMMAND ${TARGET_NAME})
 
 message(STATUS "[${TARGET_NAME}] ====================Build End============================")

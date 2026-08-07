@@ -3,6 +3,7 @@
 #include "Handler.h"
 #include "Looper.h"
 #include <condition_variable>
+#include <string>
 #include <thread>
 
 namespace aura::utils {
@@ -18,7 +19,7 @@ private:
      */
     int mPriority;
     std::thread::id mTid;
-    const char *mName;
+    std::string mName;
     /**
      * 线程绑定的Looper对象
      */
@@ -27,9 +28,9 @@ private:
     /**
      * HandlerThread线程
      */
-    std::thread *mThread;
+    std::thread mThread;
     std::condition_variable mCondition;
-    std::mutex mMutex;
+    mutable std::mutex mMutex;
 
 protected:
     void onLooperPrepared() { }

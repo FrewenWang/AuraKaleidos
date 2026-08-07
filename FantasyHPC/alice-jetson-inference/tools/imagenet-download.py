@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2014 Seiya Tokui
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,14 +21,15 @@
 
 import argparse
 import imghdr
-import Queue
+import queue
 import os
 import socket
 import sys
 import tempfile
 import threading
 import time
-import urllib2
+import urllib.error
+import urllib.request
 import glob
 
 def download(url, timeout, retry, sleep, verbose=False):
@@ -36,13 +37,13 @@ def download(url, timeout, retry, sleep, verbose=False):
     count = 0
     while True:
         try:
-            f = urllib2.urlopen(url, timeout=timeout)
+            f = urllib.request.urlopen(url, timeout=timeout)
             if f is None:
                 raise Exception('Cannot open URL {0}'.format(url))
             content = f.read()
             f.close()
             break
-        except urllib2.HTTPError as e:
+        except urllib.error.HTTPError as e:
             if 500 <= e.code < 600:
                 if verbose:
                     sys.stderr.write('Error: HTTP with code {0}\n'.format(e.code))
@@ -55,7 +56,7 @@ def download(url, timeout, retry, sleep, verbose=False):
                 if verbose:
                     sys.stderr.write('Error: HTTP with code {0}\n'.format(e.code))
                 raise
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             if isinstance(e.reason, socket.gaierror):
                 count += 1
                 time.sleep(sleep)
@@ -110,11 +111,11 @@ def download_imagenet(list_filename,
     
     num_jobs = max(num_jobs, 1)
 
-    entries = Queue.Queue(num_jobs)
+    entries = queue.Queue(num_jobs)
     done = [False]
 
-    counts_fail = [0 for i in xrange(num_jobs)]
-    counts_success = [0 for i in xrange(num_jobs)]
+    counts_fail = [0 for _ in range(num_jobs)]
+    counts_success = [0 for _ in range(num_jobs)]
 
     def producer():
         count = 0
@@ -146,7 +147,7 @@ def download_imagenet(list_filename,
                 rpath = os.path.join(directory, '{0}.*'.format(name))
                 lf = glob.glob(rpath)
                 if lf:
-                    print "skipping: already have", lf[0]
+                    print("skipping: already have", lf[0])
                     counts_success[i] += 1
                     entries.task_done()
                     continue
@@ -158,7 +159,7 @@ def download_imagenet(list_filename,
                 except:
                     pass
                 path = os.path.join(directory, '{0}.{1}'.format(name, ext))
-                with open(path, 'w') as f:
+                with open(path, 'wb') as f:
                     f.write(content)
                 counts_success[i] += 1
                 time.sleep(sleep_after_dl)
@@ -192,7 +193,7 @@ def download_imagenet(list_filename,
         sys.stderr.write('done')
 
     producer_thread = threading.Thread(target=producer)
-    consumer_threads = [threading.Thread(target=consumer, args=(i,)) for i in xrange(num_jobs)]
+    consumer_threads = [threading.Thread(target=consumer, args=(i,)) for i in range(num_jobs)]
     message_thread = threading.Thread(target=message_loop)
 
     producer_thread.start()
@@ -202,7 +203,7 @@ def download_imagenet(list_filename,
 
     # Explicitly wait to accept SIGINT
     try:
-        while producer_thread.isAlive():
+        while producer_thread.is_alive():
             time.sleep(1)
     except:
         sys.exit(1)

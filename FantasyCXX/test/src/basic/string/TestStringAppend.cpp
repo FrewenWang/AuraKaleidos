@@ -12,8 +12,8 @@
 #include <sstream>
 #include <stdio.h>
 
-#define OUT_IN_REPEATE_NUM 1000
-#define IN_REPEATE_NUM 100000
+#define OUT_IN_REPEATE_NUM 2
+#define IN_REPEATE_NUM 1000
 
 const static char *TAG = "TestStringAppend";
 

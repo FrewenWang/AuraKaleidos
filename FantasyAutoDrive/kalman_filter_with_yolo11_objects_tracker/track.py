@@ -37,13 +37,15 @@ def run_tracking(mode, video_source, show_classes, target_class, estimate_accele
         mode = "multi"
     print(f"Tracking mode set to: {mode}.")
     
+    if video_source == "0":
+        video_source = 0
     if video_source != 0:
         assert os.path.exists(video_source), f'Specified video path: {video_source} is not found.'
     
     try:    
         classes = load_class_names("./app/classes.txt")
     except Exception as e:
-        print(f'File: "./app/classes.txt" is not Found!')
+        raise click.ClickException(f'Unable to load "./app/classes.txt": {e}') from e
     
     if show_classes:
         print("Possible object classes and their IDs:\n")
@@ -78,4 +80,3 @@ def run_tracking(mode, video_source, show_classes, target_class, estimate_accele
 
 if __name__ == '__main__':
     run_tracking()
-

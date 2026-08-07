@@ -15,7 +15,7 @@ passport.serializeUser<any, any>((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => {
+    User.findById(id, (err: any, user: UserDocument | null) => {
         done(err, user);
     });
 });
@@ -25,7 +25,7 @@ passport.deserializeUser((id, done) => {
  * Sign in using Email and Password.
  */
 passport.use(new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
-    User.findOne({ email: email.toLowerCase() }, (err, user: any) => {
+    User.findOne({ email: email.toLowerCase() }, (err: any, user: any) => {
         if (err) { return done(err); }
         if (!user) {
             return done(undefined, false, { message: `Email ${email} not found.` });
@@ -68,13 +68,13 @@ passport.use(new FacebookStrategy({
     passReqToCallback: true
 }, (req: any, accessToken, refreshToken, profile, done) => {
     if (req.user) {
-        User.findOne({ facebook: profile.id }, (err, existingUser) => {
+        User.findOne({ facebook: profile.id }, (err: any, existingUser: UserDocument | null) => {
             if (err) { return done(err); }
             if (existingUser) {
                 req.flash("errors", { msg: "There is already a Facebook account that belongs to you. Sign in with that account or delete it, then link it with your current account." });
                 done(err);
             } else {
-                User.findById(req.user.id, (err, user: any) => {
+                User.findById(req.user.id, (err: any, user: any) => {
                     if (err) { return done(err); }
                     user.facebook = profile.id;
                     user.tokens.push({ kind: "facebook", accessToken });
@@ -89,12 +89,12 @@ passport.use(new FacebookStrategy({
             }
         });
     } else {
-        User.findOne({ facebook: profile.id }, (err, existingUser) => {
+        User.findOne({ facebook: profile.id }, (err: any, existingUser: UserDocument | null) => {
             if (err) { return done(err); }
             if (existingUser) {
                 return done(undefined, existingUser);
             }
-            User.findOne({ email: profile._json.email }, (err, existingEmailUser) => {
+            User.findOne({ email: profile._json.email }, (err: any, existingEmailUser: UserDocument | null) => {
                 if (err) { return done(err); }
                 if (existingEmailUser) {
                     req.flash("errors", { msg: "There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings." });

@@ -5,6 +5,6 @@ spawn adb shell
 
 expect "e171" { send "busybox telnet 192.168.78.2 ; exit\r" }
 expect "login" { send "root\r" }
-expect "Password" { send "togxuh-8Cyzto-juqven\r" }
+expect "Password" { send "$env(AURA_DEVICE_PASSWORD)\r" }
 
 interact

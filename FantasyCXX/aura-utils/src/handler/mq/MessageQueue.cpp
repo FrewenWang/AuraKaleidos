@@ -5,7 +5,7 @@
 #include "MessageQueue.h"
 #include "Message.h"
 #include "aura/aura_utils/utils/AuraLog.h"
-#include "aura/aura_utils/utils/SystemClock.h"
+#include "aura/utils/system_clock.h"
 
 namespace aura::utils {
 
@@ -23,8 +23,12 @@ MessageQueue::~MessageQueue() {
 }
 
 void MessageQueue::enqueueAtTime(Message *msg, const std::int64_t &when) {
+    if (msg == nullptr) {
+        return;
+    }
     if (msg->target == nullptr) {
         ALOGW(TAG, "enqueueAtTime target is null");
+        Message::recycle(msg);
         return;
     }
     // 获取互斥锁。获取当前变量的锁
@@ -73,7 +77,10 @@ Message *MessageQueue::dequeue() {
         // 它使用 std::unique_lock(通过 std::mutex) 来锁住当前线程。
         // 当前线程会一直被阻塞，
         // 直到另外一个线程在相同的 std::condition_variable对象上调用了 notification 函数来唤醒当前线程。
-        mCondition.wait(lck);
+        mCondition.wait(lck, [this] { return mMessages != nullptr || mQuitting.load(); });
+    }
+    if (mQuitting.load()) {
+        return nullptr;
     }
 
     // // avoid crash in case of the situation notify() is called
@@ -83,11 +90,14 @@ Message *MessageQueue::dequeue() {
     // when the looper is waiting here for the next message (with time delayed),
     // the message could be removed when the caller invokes removeMessage(),
     // therefore, the mMessages might be nullptr in while condition
-    while (mMessages && SystemClock::uptimeMillisStartup() < mMessages->when) {
+    while (!mQuitting.load() && mMessages && SystemClock::uptimeMillisStartup() < mMessages->when) {
         // next message is not ready, wait until it is ready
         auto waitDuration = std::chrono::milliseconds(mMessages->when
                                                       - SystemClock::uptimeMillisStartup());
         mCondition.wait_for(lck, waitDuration);
+    }
+    if (mQuitting.load()) {
+        return nullptr;
     }
     // got a message
     if (mMessages) {

@@ -1,4 +1,3 @@
-from time import sleep
 import numpy as np
 from ai.tracker.kalman_filter import KalmanFilter
 import cv2
@@ -46,7 +45,7 @@ class TrackedObject:
         self.initialize() 
         self.id = id
         
-        if state != None:
+        if state is not None:
             self.state = state
         self.age = age           # How long the object has been tracked
         self.lost_frames = 0     # Count of frames since last detection
@@ -65,6 +64,7 @@ class TrackedObject:
         assert isinstance(value, np.ndarray), f'Expected the state to be of type numpy array got {type(value)}'
         assert value.shape == self.__kalman__.post_state.shape, f'New value shape : {value.shape} != {self.__kalman__.post_state.shape} Expected shape'
         self.__kalman__.post_state  = value
+        self.__kalman__.predicted_state = value.copy()
     
     @property
     def pred_state(self):
@@ -74,7 +74,8 @@ class TrackedObject:
     @property
     def cov(self):
         """Returns the residual covariance of the object from the Kalman filter."""
-        return self.__kalman__.residual_cov    
+        return (self.__kalman__.measurement_matrix @ self.__kalman__.predicted_err_cov @
+                self.__kalman__.measurement_matrix.T + self.__kalman__.measurement_noise_cov)
     
     
     def predict(self):
@@ -116,10 +117,8 @@ class TrackedObject:
         measurements = np.array([[np.float32(x_c)], 
                                 [np.float32(y_c)]])
         
-        # Update the state of the Kalman filter
+        # Prediction is performed once per frame by KalmanTracker.update().
         self.update(measurements)
-        # Predict the next position of the object
-        self.predict()
 
         # Draw the boxes + center point for tracking
         x = int(x_c - w/2)
@@ -131,8 +130,8 @@ class TrackedObject:
                     (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         
         # Circle in green to indicate that the object is detected + tracked
-        predicted_x, predicted_y = int(self.pred_state[0])%frame.shape[1], \
-                                    int(self.pred_state[2])%frame.shape[0]
+        predicted_x = int(np.clip(self.state[0, 0], 0, frame.shape[1] - 1))
+        predicted_y = int(np.clip(self.state[2, 0], 0, frame.shape[0] - 1))
         
         cv2.circle(frame, (predicted_x, predicted_y), 5, (0, 255, 0), -1)
         
@@ -249,10 +248,12 @@ class KalmanTracker:
         if len(candidates) == 0:
             return None
         
-        position_pred = int(tracked_object.pred_state[0]), int(tracked_object.pred_state[2]) 
+        position_pred = (int(tracked_object.pred_state[0, 0]),
+                         int(tracked_object.pred_state[2, 0]))
         
         if distance == "euclidean":
-            distances = [euclidean(np.array(position_pred,np.int16), np.array(box_center,np.int16)) for box_center in candidates]
+            distances = [euclidean(np.asarray(position_pred, dtype=np.float64),
+                                   np.asarray(box_center, dtype=np.float64)) for box_center in candidates]
         
         elif distance == "mahalanobis":
             # residual covariance could be used in this case
@@ -288,11 +289,11 @@ class KalmanTracker:
         
         else:
             # Track all detected objects
-            for idx, box in enumerate(boxes):
+            for box in boxes:
                 
                 initial_estimates = initial_estimates | self.__add_new_tracked_object__(box, frame)
             
-            logger.info(f'Total of: {idx} objects are being tracked')
+            logger.info(f'Total of: {len(boxes)} objects are being tracked')
         return initial_estimates        
                 
         
@@ -305,15 +306,22 @@ class KalmanTracker:
             acceleration (bool): Whether to include acceleration in the state model.
         """
         initial_estimates = {}
-        obj = TrackedObject(id=self.number_objects,acceleration=self.estimate_acceleration)
-        obj.track(box, frame)     
+        _, x_c, y_c, _, _ = box
+        if self.estimate_acceleration:
+            state = np.array([[x_c], [0], [y_c], [0], [0], [0]], dtype=np.float32)
+        else:
+            state = np.array([[x_c], [0], [y_c], [0]], dtype=np.float32)
+        obj = TrackedObject(id=self.number_objects, state=state,
+                            acceleration=self.estimate_acceleration)
+        obj.predict()
+        obj.track(box, frame)
         self.tracked_objects.append(obj)
         
         # Update the dictionary of id_estimates
-        initial_estimates[obj.id] = ([float(obj.state[1]), #velocity
-                                float(obj.state[3])],
-                                [int(obj.state[0]), #displacement
-                                int(obj.state[2])])
+        initial_estimates[obj.id] = ([float(obj.state[1, 0]), #velocity
+                                float(obj.state[3, 0])],
+                                [int(obj.state[0, 0]), #displacement
+                                int(obj.state[2, 0])])
         self.number_objects += 1
         return initial_estimates
             
@@ -329,6 +337,7 @@ class KalmanTracker:
         
         # dictionary of estimated variables: velocity+position
         id_estimates = {}
+        boxes = list(boxes)
         
         if len(boxes) > 0:
             
@@ -337,8 +346,9 @@ class KalmanTracker:
                 id_estimates = self.initialize(boxes, frame)
             
             else:
-                candidates = list(map(lambda box: (box[1], box[2]), boxes))
+                candidates = [(box[1], box[2]) for box in boxes]
                 for obj in self.tracked_objects:
+                    obj.predict()
                     # Associate past trackers with detections
                     best_id = self.__search_best_fit__(candidates,obj,self.association_metric)
                     
@@ -347,14 +357,13 @@ class KalmanTracker:
                         obj.mark_lost()
                         
                         
-                        # Perform a prediction step
-                        # 卡尔曼滤波预测
-                        predicted_state = obj.predict()
+                        predicted_state = obj.pred_state
                         logger.info(f'Object with id : {obj.id} is lost. Estimated state (x,vx,y,vy) is : {predicted_state}')
                         
                         # Draw an orange dot to indicate that the object is lost
                         # state = (x,vx,y,vy)
-                        predicted_x, predicted_y = int(predicted_state[0])%frame.shape[1], int(predicted_state[2])%frame.shape[0]
+                        predicted_x = int(np.clip(predicted_state[0, 0], 0, frame.shape[1] - 1))
+                        predicted_y = int(np.clip(predicted_state[2, 0], 0, frame.shape[0] - 1))
 
                         # Draw the predicted position
                         # Orange: to indicate that the object is lost
@@ -366,7 +375,7 @@ class KalmanTracker:
                         cv2.circle(frame, (predicted_x, predicted_y), 5, red if almost_reached_threshold else orange , -1)
                         
                         # Update the dictionary of id_estimates
-                        id_estimates[obj.id] = ([float(predicted_state[1]), float(predicted_state[3])], #velocity
+                        id_estimates[obj.id] = ([float(predicted_state[1, 0]), float(predicted_state[3, 0])], #velocity
                                             [predicted_x, predicted_y]) # positions
                         
                     else:
@@ -376,10 +385,14 @@ class KalmanTracker:
                         box = boxes.pop(best_id)
                         obj.track(box, frame)
                         # Update the dictionary of id_estimates
-                        id_estimates[obj.id] = ([float(obj.state[1]), #velocity
-                                                float(obj.state[3])],
-                                                [int(obj.state[0]), #displacement
-                                                int(obj.state[2])])
+                        id_estimates[obj.id] = ([float(obj.state[1, 0]), #velocity
+                                                float(obj.state[3, 0])],
+                                                [int(obj.state[0, 0]), #displacement
+                                                int(obj.state[2, 0])])
+
+                if self.mode == "multi":
+                    for unmatched_box in boxes:
+                        id_estimates.update(self.__add_new_tracked_object__(unmatched_box, frame))
                   
         else:
             # Check if there are already tracked objects
@@ -398,7 +411,8 @@ class KalmanTracker:
                     logger.info(f'Object with id : {obj.id} is lost. Estimated state (x,vx,y,vy) is : {predicted_state}')
                     # Draw an orange dot to indicate that the object is lost
                     # state = (x,vx,y,vy)
-                    predicted_x, predicted_y = int(predicted_state[0]), int(predicted_state[2])
+                    predicted_x = int(np.clip(predicted_state[0, 0], 0, frame.shape[1] - 1))
+                    predicted_y = int(np.clip(predicted_state[2, 0], 0, frame.shape[0] - 1))
 
                     # Draw the predicted position
                     # Orange: to indicate that the object is lost
@@ -410,7 +424,7 @@ class KalmanTracker:
                     cv2.circle(frame, (predicted_x, predicted_y), 5, red if almost_reached_threshold else orange , -1)
                     
                     # Update the dictionary of id_estimates
-                    id_estimates[obj.id] = ([float(predicted_state[1]), float(predicted_state[3])], #velocity
+                    id_estimates[obj.id] = ([float(predicted_state[1, 0]), float(predicted_state[3, 0])], #velocity
                                             [predicted_x, predicted_y]) # positions
                     
         

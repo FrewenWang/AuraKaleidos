@@ -15,6 +15,7 @@ target_include_directories(${TARGET_NAME} PRIVATE ${INCLUDE_ROOT} ${AURA_LIB_INC
 target_link_libraries(${TARGET_NAME} PRIVATE
                       ${GTEST_LIB}
                       aura_utils)
+add_test(NAME ${TARGET_NAME} COMMAND ${TARGET_NAME})
 
 
 #logger_d("[${TARGET_NAME}] CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")

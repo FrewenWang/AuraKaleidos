@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "aura/aura_utils/safe_stl/safe_vector.h"
+#include "safe_vector.h"
 #include "aura/aad/utils/math/aura_vector2d.h"
 
 namespace aura{

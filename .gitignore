@@ -31,12 +31,62 @@
 *.out
 *.app
 
-*__pycache__*
+# IDE, caches, and local environments
+**/__pycache__/
+*.py[cod]
 .vscode/
-data/
-build/
 .idea/
 .cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+node_modules/
+**/.env
+**/.env.*
+!**/.env.example
+local.properties
 
-*cmake-build-debug/*
-*.history/*
+# Build and generated output
+**/build/
+**/dist/
+**/cmake-build-*/
+**/DerivedData/
+*.history/
+
+# Credentials and signing material
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+
+# Large model artifacts (kept outside Git; no Git LFS)
+*.onnx
+*.pt
+*.pth
+*.tflite
+*.engine
+*.mlmodel
+**/models/cache/**
+!**/models/cache/.gitkeep
+**/detection-weights/**
+**/weights/**
+!**/weights/.gitignore
+
+# Large datasets and media
+FantasyAI/AliceAILearn/dataset/cifar-10-batches-py/
+FantasyAI/AliceKaleidoYOLO/PyTorch-YOLO-V3/data/
+FantasyAI/AlicePyTorch/data/
+FantasyAI/AlicePyTorch/alice-pytorch/第十章/实战汉字拼音转化/zh.tsv
+FantasyCXX/aura-vision-hpc/examples/neon_gaussian/data/
+**/videos/*.mp4
+**/videos/*.avi
+**/videos/*.mov
+**/videos/*.mkv
+
+# Bundled platform tools (install them locally instead of committing binaries)
+**/bin/Darwin/adb
+**/bin/Linux/adb
+FantasyCXX/aura-vision/tools/paddle_lite_converter/opt_mac

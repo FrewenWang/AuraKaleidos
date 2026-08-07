@@ -15,7 +15,7 @@ import passport from "passport";
 // bluebird功能齐全的Promise库，侧重于创新功能和性能
 // http://bluebirdjs.com/docs/install.html
 import bluebird from "bluebird";
-import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
+import { ENVIRONMENT, MONGODB_URI, SESSION_SECRET } from "./util/secrets";
 
 const MongoStore = mongo(session);
 
@@ -38,16 +38,20 @@ const mongoUrl = MONGODB_URI;
 // 设置mongoose Promise 的为 bluebird
 mongoose.Promise = bluebird;
 // 进行MongoDB的连接
-mongoose.connect(mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true } ).then(
-    () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
-).catch(err => {
-    console.log("MongoDB 连接异常，请确认MongoDB正在运行中: " + err);
-    console.log("MongoDB connection error. Please make sure MongoDB is running. " + err);
-    // process.exit();
-});
+if (ENVIRONMENT !== "test") {
+    mongoose.connect(mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true } ).then(
+        () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
+    ).catch(err => {
+        console.log("MongoDB 连接异常，请确认MongoDB正在运行中: " + err);
+        console.log("MongoDB connection error. Please make sure MongoDB is running. " + err);
+    });
+}
 
 // Express configuration Express的相关配置
 app.set("port", process.env.PORT || 3000);
+if (ENVIRONMENT === "production") {
+    app.set("trust proxy", 1);
+}
 // 设置Express的View路径
 app.set("views", path.join(__dirname, "../views"));
 // 设置Express的模板引擎
@@ -57,15 +61,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // 设置Express的会话
-app.use(session({
-    resave: true,
-    saveUninitialized: true,
+const sessionOptions: session.SessionOptions = {
+    resave: false,
+    saveUninitialized: false,
     secret: SESSION_SECRET,
-    store: new MongoStore({
+    cookie: {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: ENVIRONMENT === "production"
+    }
+};
+if (ENVIRONMENT !== "test") {
+    sessionOptions.store = new MongoStore({
         url: mongoUrl,
         autoReconnect: true
-    })
-}));
+    });
+}
+app.use(session(sessionOptions));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());

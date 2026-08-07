@@ -17,8 +17,6 @@ using namespace std;
 static pthread_once_t gTLSOnce = PTHREAD_ONCE_INIT;
 /** 线程存储：创建一个类型pthread_key_t的变量 */
 static pthread_key_t gTLSKey = 0;
-static Looper *threadLooper = nullptr;
-
 Looper::Looper() {
     mMsgQueue = new MessageQueue();
     looping = false;
@@ -26,6 +24,8 @@ Looper::Looper() {
 
 Looper::~Looper() {
     looping = false;
+    delete mMsgQueue;
+    mMsgQueue = nullptr;
 }
 
 void Looper::initTLSKey() {
@@ -84,11 +84,11 @@ void Looper::loop() {
 
 
 void Looper::threadDestructor(void *st) {
-    delete threadLooper;
+    delete static_cast<Looper *>(st);
 }
 
 Looper *Looper::getForThread() {
-    int result = pthread_once(&gTLSOnce, initTLSKey);
+    pthread_once(&gTLSOnce, initTLSKey);
     // 如果需要取出所存储的值，调用pthread_getspecific()。
     // 该函数的参数为前面提到的pthread_key_t变量，该函数返回void *类型的值。
     return (Looper *) pthread_getspecific(gTLSKey);
@@ -97,7 +97,9 @@ Looper *Looper::getForThread() {
 void Looper::setForThread(Looper *looper) {
     Looper *old = getForThread();
     pthread_setspecific(gTLSKey, looper);
-    delete old;
+    if (old != looper) {
+        delete old;
+    }
 }
 
 void Looper::enqueueAtTime(Message *msg, const std::int64_t &uptimeMillis) {

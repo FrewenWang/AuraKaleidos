@@ -14,6 +14,6 @@ adb push $file /data/local/tmp/
 expect << EOF
     set timeout -1
     spawn adb shell
-    expect "e171" { send "busybox ftpput -u root -p togxuh-8Cyzto-juqven 192.168.78.2 /data/$file /data/local/tmp/$file; rm -r /data/local/tmp/$file; exit\r" }
+    expect "e171" { send "busybox ftpput -u root -p ${AURA_DEVICE_PASSWORD:?Set AURA_DEVICE_PASSWORD} 192.168.78.2 /data/$file /data/local/tmp/$file; rm -r /data/local/tmp/$file; exit\r" }
     expect eof
 EOF

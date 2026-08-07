@@ -184,7 +184,7 @@ _qdb() {
           forward_args="$forward_args -L ${1%%:*}:${TARGET_QNX}:${1##*:}" ;;
         --3x)
           _vlan_setup usb vlan9 172.16.9.1
-          sshpass -p caros ssh caros@172.16.9.21
+          sshpass -p "${AURA_3X_PASSWORD:?Set AURA_3X_PASSWORD}" ssh caros@172.16.9.21
           return $? ;;
         --4x)
           __network_setup () {
@@ -206,11 +206,11 @@ _qdb() {
           }
 
           __network_setup
-          sshpass -p 123 ssh -o StrictHostKeyChecking=no root@172.16.104.90
+          sshpass -p "${AURA_4X_PASSWORD:?Set AURA_4X_PASSWORD}" ssh -o StrictHostKeyChecking=no root@172.16.104.90
           return $? ;;
         --qemu)
         local target=($(arp -i br0 | grep -E "172.*ether"))
-          sshpass -p root ssh -o StrictHostKeyChecking=no root@$target
+          sshpass -p "${AURA_QEMU_PASSWORD:?Set AURA_QEMU_PASSWORD}" ssh -o StrictHostKeyChecking=no root@$target
           return $? ;;
         *)
           other_args="$other_args $1" ;;

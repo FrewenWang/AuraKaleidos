@@ -16,7 +16,7 @@ class Message;
  */
 class MessageRunnable {
 public:
-    virtual void onMessage(Message *msg) { };
+    virtual void onMessage(Message *) { };
 
     virtual ~MessageRunnable() = default;
 };
@@ -37,7 +37,7 @@ public:
 
     Message(int what, int arg1, int arg2, Handler *handler);
 
-    ~Message();
+    ~Message() = default;
 
     static Message *obtain();
 

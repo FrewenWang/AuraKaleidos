@@ -1,4 +1,4 @@
-ubfy nv# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # 作者：小土堆
 # 公众号：我是土堆
 import torchvision
@@ -21,5 +21,4 @@ print(vgg16_true)
 print(vgg16_false)
 vgg16_false.classifier[6] = nn.Linear(4096, 10)
 print(vgg16_false)
-
 

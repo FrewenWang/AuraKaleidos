@@ -1,75 +1,68 @@
 #include "HandlerThread.h"
-#include <unistd.h>
+#include <atomic>
 
 namespace aura::utils {
-    static int gIndex = 1;
+    static std::atomic<int> gIndex{1};
 
     using namespace std;
 
-    HandlerThread::HandlerThread() : HandlerThread(reinterpret_cast<const char *>(gIndex), 0) {
+    HandlerThread::HandlerThread() : HandlerThread(("HandlerThread-" + std::to_string(gIndex.fetch_add(1))).c_str(), 0) {
     }
 
     HandlerThread::HandlerThread(const char *name) : HandlerThread(name, 0) {
     }
 
     HandlerThread::HandlerThread(const char *name, int priority) {
-        mName = name;
+        mName = name ? name : "HandlerThread";
         mPriority = priority;
         mLooper = nullptr;
         mHandler = nullptr;
-        mThread = nullptr;
     }
 
     HandlerThread::~HandlerThread() {
-        mLooper = nullptr;
+        quit();
+        if (mThread.joinable() && mThread.get_id() != std::this_thread::get_id()) {
+            mThread.join();
+        }
+        delete mHandler;
         mHandler = nullptr;
-        mThread = nullptr;
     }
 
     void HandlerThread::start() {
-        if (mThread == nullptr) {
-            mThread = new std::thread(&HandlerThread::run, this);
-            while (true) {
-                usleep(1000);
-                if (mLooper != nullptr) {
-                    break;
-                }
-            }
-            // TODO: wait() 没有被 notify，需要确认问题。暂时用 usleep 解决
-            // unique_lock<mutex> lck(_m_mutex);
-            // std::cout << "11" << std::endl;
-            // _m_condition.wait(lck, [this] { return _m_looper != nullptr; });
-            //  std::cout << "22" << std::endl;
-            //  mVisThread->join();
+        std::unique_lock<std::mutex> lock(mMutex);
+        if (!mThread.joinable()) {
+            mThread = std::thread(&HandlerThread::run, this);
+            mCondition.wait(lock, [this] { return mLooper != nullptr; });
         }
     }
 
     void HandlerThread::run() {
-#if defined(MAC) or defined(IOS)
-        pthread_setname_np(mName);
+#if defined(__APPLE__)
+        pthread_setname_np(mName.c_str());
 #else
-    pthread_setname_np(pthread_self(), mName);
+    pthread_setname_np(pthread_self(), mName.c_str());
 #endif
         mTid = std::this_thread::get_id();
         Looper::prepare();
-        std::unique_lock<std::mutex> lck(mMutex);
-        mLooper = Looper::getForThread();
+        {
+            std::lock_guard<std::mutex> lock(mMutex);
+            mLooper = Looper::getForThread();
+        }
         mCondition.notify_all();
-        lck.unlock();
 
         // set priority
         onLooperPrepared();
         Looper::loop();
         // 如果执行到此处，说明loop方法执行完毕（异常结束)，后续进行资源回收
-        mLooper->quit();
         Looper::setForThread(nullptr);
-        mLooper = nullptr;
-        delete mHandler;
-        mHandler = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(mMutex);
+            mLooper = nullptr;
+        }
     }
 
     Looper *HandlerThread::getLooper() {
-        if (!mThread) {
+        if (!mThread.joinable()) {
             throw std::domain_error{"must start thread before get looper"};
         }
         std::unique_lock<std::mutex> lck(mMutex);
@@ -80,16 +73,19 @@ namespace aura::utils {
     }
 
     Handler *HandlerThread::getThreadHandler() {
-        if (!mThread) {
+        if (!mThread.joinable()) {
             throw domain_error{"must start thread before get handler"};
         }
+        Looper *looper = getLooper();
+        std::lock_guard<std::mutex> lock(mMutex);
         if (!mHandler) {
-            mHandler = new Handler(getLooper());
+            mHandler = new Handler(looper);
         }
         return mHandler;
     }
 
     bool HandlerThread::quit() const {
+        std::lock_guard<std::mutex> lock(mMutex);
         if (mLooper) {
             mLooper->quit();
             return true;

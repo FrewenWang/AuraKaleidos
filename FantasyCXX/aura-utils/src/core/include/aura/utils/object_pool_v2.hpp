@@ -5,8 +5,11 @@
 #include <functional>
 #include <tuple>
 #include <map>
+#include <memory>
+#include <mutex>
+#include <vector>
 
-#include "Any.hpp"
+#include "any.hpp"
 
 constexpr size_t POOL_SIZE = 10;
 
@@ -18,17 +21,28 @@ class ObjectPool {
     using Constructor = std::function<std::shared_ptr<T>(Args...)>;
 
 public:
-    ObjectPool() : needClear(false) {
-    }
+    ObjectPool() : m_storage(std::make_shared<Storage>()) { }
+
+    ObjectPool(const ObjectPool &) = delete;
+    ObjectPool &operator=(const ObjectPool &) = delete;
     
     ~ObjectPool() {
-        needClear = true;
+        std::vector<CachedObject> objects;
+        {
+            std::lock_guard<std::mutex> lock(m_storage->mutex);
+            m_storage->accepting = false;
+            for (const auto &item : m_storage->objects)
+                objects.push_back(item.second);
+            m_storage->objects.clear();
+        }
+        for (const auto &object : objects)
+            object.destroy(object.pointer);
     }
     
     //默认创建多少个对象
     template<typename T, typename... Args>
     void Create(int num) {
-        if (num <= 0 || num > POOL_SIZE)
+        if (num <= 0 || static_cast<size_t>(num) > POOL_SIZE)
             throw std::logic_error("object num errer");
         
         auto constructName = typeid(Constructor<T, Args...>).name();
@@ -40,19 +54,14 @@ public:
         
         m_map.emplace(typeid(T).name(), f); ///< 存储函数对象
         
-        m_counter.emplace(constructName, num);
+        std::lock_guard<std::mutex> lock(m_storage->mutex);
+        m_storage->capacities[constructName] = static_cast<size_t>(num);
     }
     
     /// @note 返回智能指针
     template<typename T, typename... Args>
-    std::shared_ptr<T> createPtr(std::string &constructName, Args... args) {
-        /// 调用构造函数创建指针
-        return std::shared_ptr<T>(new T(args...), [constructName, this](T *t) {///< Deleter 回收器
-            if (needClear)
-                delete[] t;
-            else
-                m_object_map.emplace(constructName, std::shared_ptr<T>(t)); ///< 放回对象池（存储对象指针）
-        });
+    std::shared_ptr<T> createPtr(const std::string &constructName, Args... args) {
+        return wrapPtr<T>(constructName, new T(args...));
     }
     
     template<typename T, typename... Args>
@@ -71,7 +80,7 @@ public:
                 if (ptr != nullptr)
                     return ptr;
                 
-                return CreateInstance<T, Args...>(it->second, constructName, args...);
+                return CreateInstance<T, Args...>(it->second, args...);
             }
         }
         
@@ -80,49 +89,69 @@ public:
 
 private:
     template<typename T, typename... Args>
-    std::shared_ptr<T> CreateInstance(Any &any,
-                                      std::string &constructName, Args... args) {
+    std::shared_ptr<T> CreateInstance(any &any, Args... args) {
         using ConstructType = Constructor<T, Args...>;
         ConstructType f = any.AnyCast<ConstructType>();
         /// @note 返回智能指针
-        return createPtr<T, Args...>(constructName, args...);
-    }
-    
-    /// @note 初始化对象池
-    template<typename T, typename... Args>
-    void InitPool(T &f, std::string &constructName, Args... args) {
-        int num = m_counter[constructName]; ///< 获取该类型需创建的对象个数
-        
-        if (num != 0) {
-            for (int i = 0; i < num - 1; i++) {
-                m_object_map.emplace(constructName, f(args...)); ///< 直接构造对象并存储
-            }
-            m_counter[constructName] = 0;
-        }
+        return f(args...);
     }
     
     /// @note 从对象池中获取对象
     template<typename T, typename... Args>
     std::shared_ptr<T> GetInstance(std::string &constructName, Args... args) {
         /// @note 寻找对象池中是否已经存有该对象
-        auto it = m_object_map.find(constructName);
-        if (it == m_object_map.end())
+        std::lock_guard<std::mutex> lock(m_storage->mutex);
+        auto it = m_storage->objects.find(constructName);
+        if (it == m_storage->objects.end())
             return nullptr;
         
         /// @note 取出并转型该指针
-        auto ptr = it->second.AnyCast<std::shared_ptr<T>>();
+        T *ptr = static_cast<T *>(it->second.pointer);
         if (sizeof...(Args) > 0)
-            *ptr.get() = std::move(T(args...));
+            *ptr = T(args...);
         
-        m_object_map.erase(it); ///< 从对象池中除名该对象
-        return ptr;
+        m_storage->objects.erase(it); ///< 从对象池中除名该对象
+        return wrapPtr<T>(constructName, ptr);
     }
 
 private:
-    std::multimap<std::string, Any> m_map;
-    std::multimap<std::string, Any> m_object_map;
-    std::map<std::string, int> m_counter;
-    bool needClear;
+    struct CachedObject {
+        void *pointer;
+        void (*destroy)(void *);
+    };
+
+    struct Storage {
+        std::mutex mutex;
+        bool accepting = true;
+        std::multimap<std::string, CachedObject> objects;
+        std::map<std::string, size_t> capacities;
+    };
+
+    template<typename T>
+    std::shared_ptr<T> wrapPtr(const std::string &constructName, T *pointer) {
+        auto storage = m_storage;
+        return std::shared_ptr<T>(pointer, [constructName, storage](T *object) noexcept {
+            bool cached = false;
+            try {
+                std::lock_guard<std::mutex> lock(storage->mutex);
+                const auto capacity = storage->capacities.find(constructName);
+                if (storage->accepting && capacity != storage->capacities.end()
+                    && storage->objects.count(constructName) < capacity->second) {
+                    storage->objects.emplace(constructName, CachedObject{
+                        object, [](void *value) { delete static_cast<T *>(value); }
+                    });
+                    cached = true;
+                }
+            } catch (...) {
+                // shared_ptr deleters must not throw; fall back to releasing the object.
+            }
+            if (!cached)
+                delete object;
+        });
+    }
+
+    std::multimap<std::string, any> m_map;
+    std::shared_ptr<Storage> m_storage;
 };
 
 } }

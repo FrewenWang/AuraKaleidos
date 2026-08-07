@@ -14,25 +14,62 @@ https://github.com/quic/aimet/blob/develop/packaging/google_colab/Install_AIMET_
 """
 
 import os
-os.environ['SRC_URL'] = 'https://raw.githubusercontent.com/quic/aimet/develop/packaging/google_colab/'
-!curl ${SRC_URL}reqs_deb_common.txt | xargs apt-get --assume-yes install
-!wget ${SRC_URL}reqs_pip_torch_cpu.txt
-!pip3 install -r reqs_pip_torch_cpu.txt -f https://download.pytorch.org/whl/torch_stable.html
-
-os.environ['release_tag']="1.18.0.py37"
-!pip3 install https://github.com/quic/aimet/releases/download/${release_tag}/AimetCommon-torch_cpu_${release_tag}-cp37-cp37m-linux_x86_64.whl
-!pip3 install https://github.com/quic/aimet/releases/download/${release_tag}/AimetTorch-torch_cpu_${release_tag}-cp37-cp37m-linux_x86_64.whl
-
+import subprocess
 import sys
-sys.path.append('/usr/local/lib/python3.7/dist-packages/aimet_common/x86_64-linux-gnu')
-sys.path.append('/usr/local/lib/python3.7/dist-packages/aimet_common/x86_64-linux-gnu/aimet_tensor_quantizer-0.0.0-py3.7-linux-x86_64.egg/')
+import urllib.request
 
-import os
-os.environ['LD_LIBRARY_PATH'] +=':/usr/local/lib/python3.6/dist-packages/aimet_common/x86_64-linux-gnu'
 
-import torch
-from torchvision import models
-from aimet_torch.quantsim import QuantizationSimModel
-m = models.resnet18()
-sim = QuantizationSimModel(m, dummy_input=torch.rand(1, 3, 224, 224))
-print(sim)
+SOURCE_URL = "https://raw.githubusercontent.com/quic/aimet/develop/packaging/google_colab/"
+RELEASE_TAG = "1.18.0.py37"
+
+
+def install_aimet() -> None:
+    """Install the legacy Python 3.7 CPU build used by this Colab example."""
+    with urllib.request.urlopen(SOURCE_URL + "reqs_deb_common.txt") as response:
+        packages = [
+            package
+            for line in response.read().decode("utf-8").splitlines()
+            for package in line.split()
+            if package and not package.startswith("#")
+        ]
+    subprocess.run(["apt-get", "--assume-yes", "install", *packages], check=True)
+    subprocess.run([
+        sys.executable,
+        "-m",
+        "pip",
+        "install",
+        "-r",
+        SOURCE_URL + "reqs_pip_torch_cpu.txt",
+        "-f",
+        "https://download.pytorch.org/whl/torch_stable.html",
+    ], check=True)
+
+    release_url = f"https://github.com/quic/aimet/releases/download/{RELEASE_TAG}"
+    for component in ("AimetCommon", "AimetTorch"):
+        wheel = f"{component}-torch_cpu_{RELEASE_TAG}-cp37-cp37m-linux_x86_64.whl"
+        subprocess.run([sys.executable, "-m", "pip", "install", f"{release_url}/{wheel}"], check=True)
+
+
+def main() -> None:
+    install_aimet()
+    sys.path.extend([
+        "/usr/local/lib/python3.7/dist-packages/aimet_common/x86_64-linux-gnu",
+        "/usr/local/lib/python3.7/dist-packages/aimet_common/x86_64-linux-gnu/"
+        "aimet_tensor_quantizer-0.0.0-py3.7-linux-x86_64.egg/",
+    ])
+    os.environ["LD_LIBRARY_PATH"] = (
+        os.environ.get("LD_LIBRARY_PATH", "")
+        + ":/usr/local/lib/python3.7/dist-packages/aimet_common/x86_64-linux-gnu"
+    )
+
+    import torch
+    from torchvision import models
+    from aimet_torch.quantsim import QuantizationSimModel
+
+    model = models.resnet18()
+    simulation = QuantizationSimModel(model, dummy_input=torch.rand(1, 3, 224, 224))
+    print(simulation)
+
+
+if __name__ == "__main__":
+    main()

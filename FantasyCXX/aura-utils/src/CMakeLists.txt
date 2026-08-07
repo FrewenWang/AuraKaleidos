@@ -7,7 +7,7 @@ aura_add_module(concurrent)
 #aura_add_module(handler)
 aura_add_module(logger)
 aura_add_module(runtime)
-#aura_add_module(safe_stl)
+# safe_stl is header-only and currently has no nested aura/ install tree.
 #aura_add_module(schedule)
 #aura_add_module(utils)
 
@@ -21,7 +21,10 @@ endif ()
 
 # include
 # PUBLIC：aura-utils 包含公开头文件（aura/aura_utils/...），需要向链接它的目标（test、各模块单测等）传递包含目录
-target_include_directories(${TARGET_NAME} PUBLIC ${AURA_LIB_INCLUDE_DIRS} ${AURA_LIB_PRIVATE_DIRS})
+target_include_directories(${TARGET_NAME} PUBLIC
+        ${AURA_LIB_INCLUDE_DIRS}
+        ${AURA_LIB_PRIVATE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/safe_stl/include)
 
 install(TARGETS ${TARGET_NAME} DESTINATION ${SUB_INSTALL_PREFIX}/lib)
 

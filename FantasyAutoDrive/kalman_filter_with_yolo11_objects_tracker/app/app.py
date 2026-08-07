@@ -29,6 +29,7 @@ class ObjectTrackerApp:
         assert isinstance(target_classes, list) , f'Expected target_classes to be list. Got: {type(target_classes)}'
         
         self.mode = mode
+        self.detector = Detector()
         self.tracker = KalmanTracker(mode= self.mode,
                                      association_metric=association_metric,
                                      estimate_acceleration=estimate_acceleration)
@@ -47,8 +48,10 @@ class ObjectTrackerApp:
         """ 
         assert isinstance(video_source,(int,str)), f"Expected video_source \
                 to be either 0 or a string path. Got: {type(video_source)}"
+        cap = cv2.VideoCapture(video_source)
+        if not cap.isOpened():
+            raise ValueError(f"Unable to open video source: {video_source}")
         try:
-            cap = cv2.VideoCapture(video_source)
             
             
             while True:
@@ -57,7 +60,7 @@ class ObjectTrackerApp:
                     break
                 
                 # 1- Detect objects
-                boxes = Detector().detect_object(frame) # Assume outputs are [[cls_id, center_x,center_y, w, h]]
+                boxes = self.detector.detect_object(frame) # [[class_name, center_x, center_y, w, h]]
                 
                 # 2- Filter objects
                 # Take only boxes that have a class id in the list of tracked objects
@@ -78,9 +81,6 @@ class ObjectTrackerApp:
                 if cv2.waitKey(30) & 0xFF == ord('q'):
                     break
             
-            cap.release()
-            cv2.destroyAllWindows()
-
             logger.info("Plotting estimated movement graph per tracked object ...")
             
             destination_figure = "results.png" if video_source == 0 else "movement_"+video_source.split("/")[-1].split(".")[0]+".png"
@@ -88,6 +88,10 @@ class ObjectTrackerApp:
         
         except Exception as e:
             logger.exception(f"Exception during processing video: {e}",exc_info=True)
+            raise
+        finally:
+            cap.release()
+            cv2.destroyAllWindows()
         
     
     
@@ -98,13 +102,16 @@ class ObjectTrackerApp:
         """
         
         nb_objects = len(self.history_cache)
+        if nb_objects == 0:
+            logger.info("No tracked objects; skipping movement plot.")
+            return
         
         if self.mode == "single":
             fig, axes = plt.subplots(nb_objects,2, figsize=(8,15))
         else:
             fig, axes = plt.subplots(nb_objects,2,figsize=(15,80))
         
-        for object_id in self.history_cache.keys():
+        for row, object_id in enumerate(self.history_cache.keys()):
             
             velocity = self.history_cache[object_id]['velocity']
             displacement = self.history_cache[object_id]['displacement']
@@ -118,19 +125,19 @@ class ObjectTrackerApp:
             
             
             if nb_objects >1:
-                axes[object_id][0].plot(range(len(vx)),vx, label='vx')
-                axes[object_id][0].plot(range(len(vy)),vy, label='vy')
-                axes[object_id][0].set_xlabel(f'Time step')
-                axes[object_id][0].set_ylabel(f'Velocity')
-                axes[object_id][0].set_title(f'Object {object_id +1} Velocity over Time')
-                axes[object_id][0].legend()
+                axes[row][0].plot(range(len(vx)),vx, label='vx')
+                axes[row][0].plot(range(len(vy)),vy, label='vy')
+                axes[row][0].set_xlabel('Time step')
+                axes[row][0].set_ylabel('Velocity')
+                axes[row][0].set_title(f'Object {object_id +1} Velocity over Time')
+                axes[row][0].legend()
                 
-                axes[object_id][1].plot(range(len(dx)), dx, label='dx')
-                axes[object_id][1].plot(range(len(dy)),dy, label='dy')
-                axes[object_id][1].set_xlabel(f'Time step')
-                axes[object_id][1].set_ylabel(f'Displacement')
-                axes[object_id][1].set_title(f'Object {object_id +1} Displacement over Time')
-                axes[object_id][1].legend()
+                axes[row][1].plot(range(len(dx)), dx, label='dx')
+                axes[row][1].plot(range(len(dy)),dy, label='dy')
+                axes[row][1].set_xlabel('Time step')
+                axes[row][1].set_ylabel('Displacement')
+                axes[row][1].set_title(f'Object {object_id +1} Displacement over Time')
+                axes[row][1].legend()
             else:
                 axes[0].plot(range(len(vx)),vx, label='vx')
                 axes[0].plot(range(len(vy)),vy, label='vy')
@@ -154,6 +161,7 @@ class ObjectTrackerApp:
                 os.makedirs('./results')
             
             plt.savefig(os.path.join('./results', dest),dpi=150)
+            plt.close(fig)
             logger.info(f'Saved the graph to the following path: "./results/{dest}"')
         except Exception as e:
             logger.error(f"Couldn't save the plotted graphs to the path: './results/object_movement.png'\nError: {e}")

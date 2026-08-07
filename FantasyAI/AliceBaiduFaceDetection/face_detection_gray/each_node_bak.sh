@@ -16,7 +16,7 @@ function raw_afs_mount() {
 }
 fs_name="afs://cygnus.afs.baidu.com:9902"
 username="ad-lable-read"
-password="ad-lable-zODiYlWe4"
+password="${AFS_PASSWORD:?Set AFS_PASSWORD before running this script}"
 afs_local_mount_point_01="/root/paddlejob/workspace/env_run/afs_aicv/"
 afs_remote_mount_point_01="/user/adt-platform/lable"
 #iafs_local_mount_point_02="/root/paddlejob/workspace/env_run/afs_02/"

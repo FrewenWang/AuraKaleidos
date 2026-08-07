@@ -37,9 +37,6 @@ Message::Message(int what, int arg1, int arg2, Handler *handler) {
     this->target = handler;
 }
 
-Message::~Message() {
-}
-
 Message *Message::obtain() {
     return new Message();
 }
@@ -84,6 +81,7 @@ Message *Message::obtain(Handler *h, int what, void *obj) {
 Message *Message::obtain(Handler *h, int what, int arg1, int arg2) {
     Message *m = obtain();
     m->target = h;
+    m->what = what;
     m->arg1 = arg1;
     m->arg2 = arg2;
     return m;
@@ -104,12 +102,16 @@ void Message::clear() {
     arg1 = 0;
     arg2 = 0;
     obj = nullptr;
+    when = 0;
     target = nullptr;
     next = nullptr;
+    callback = nullptr;
 }
 
 void Message::sendToTarget() {
-    target->sendMessage(this);
+    if (target != nullptr) {
+        target->sendMessage(this);
+    }
 }
 
 }

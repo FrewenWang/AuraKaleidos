@@ -28,7 +28,7 @@ public:
     
     ~KalmanCVFilter();
     
-    bool Init(const Eigen::VectorXd &initial_belief_states, const Eigen::MatrixXd &initial_uncertainty);
+    bool Init(const Eigen::VectorXd &initial_belief_states, const Eigen::MatrixXd &initial_uncertainty) override;
     
     // @brief predict the current state and uncertainty of system
     // @params[IN] transform_matrix: transform the state from the

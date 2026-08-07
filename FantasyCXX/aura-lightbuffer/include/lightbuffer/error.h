@@ -7,7 +7,11 @@
 
 namespace aura ::light_buffer {
 
-class LineInfo;
+/// @brief Source location (line number) attached to a compile error.
+struct LineInfo {
+    int line = 0;
+    int column = 0;
+};
 
 enum class ErrCode {
     OK,                    // 正常

@@ -56,8 +56,7 @@ bool CodeGeneratorCpp::generateHeader(const std::string &fileName, const std::st
     if (!dir.empty() && dir[dir.size() - 1] == '/') {
         dir = dir.substr(0, dir.size() - 1);
     }
-    aura::auralib::utils::FileUtil::save_file(dir + "/" + fileName + ".plain.h", ss.str());
-    return true;
+    return aura::auralib::utils::save_file(dir + "/" + fileName + ".plain.h", ss.str());
 }
 
 bool CodeGeneratorCpp::generateSource(const std::string &fileName, const std::string &outDir,
@@ -481,8 +480,7 @@ bool CodeGeneratorCpp::generateSource(const std::string &fileName, const std::st
     if (!dir.empty() && dir[dir.size() - 1] == '/') {
         dir = dir.substr(0, dir.size() - 1);
     }
-    aura::auralib::utils::FileUtil::save_file(dir + "/" + fileName + ".plain.cpp", ss.str());
-    return true;
+    return aura::auralib::utils::save_file(dir + "/" + fileName + ".plain.cpp", ss.str());
 }
 
 }// namespace lightbuffer

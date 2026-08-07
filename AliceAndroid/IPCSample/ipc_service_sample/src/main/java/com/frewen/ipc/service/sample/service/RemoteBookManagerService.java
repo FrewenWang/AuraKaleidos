@@ -23,12 +23,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RemoteBookManagerService extends Service {
     private static final String TAG = "BookManagerService";
 
-    private CopyOnWriteArrayList<RemoteBook> mBookList = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<RemoteBook> mBookList = new CopyOnWriteArrayList<>();
 
-    private AtomicBoolean mIsServiceDestoryed = new AtomicBoolean(false);
+    private final AtomicBoolean mIsServiceDestroyed = new AtomicBoolean(false);
 
-    private RemoteCallbackList<IOnNewBookArrivedListener> mListenerList = new
+    private final RemoteCallbackList<IOnNewBookArrivedListener> mListenerList = new
             RemoteCallbackList<>();
+
+    private Thread mWorkerThread;
 
     /**
      * Binder的注册监听者
@@ -81,7 +83,8 @@ public class RemoteBookManagerService extends Service {
         super.onCreate();
         mBookList.add(new RemoteBook(1, "Hello Android"));
         mBookList.add(new RemoteBook(2, "Hello Java"));
-        new Thread(new ServiceWorker()).start();
+        mWorkerThread = new Thread(new ServiceWorker(), "remote-book-worker");
+        mWorkerThread.start();
     }
 
 
@@ -89,11 +92,15 @@ public class RemoteBookManagerService extends Service {
         @Override
         public void run() {
             // do background processing here.....
-            while (!mIsServiceDestoryed.get()) {
+            while (!mIsServiceDestroyed.get()) {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                if (mIsServiceDestroyed.get()) {
+                    return;
                 }
                 int bookId = mBookList.size() + 1;
                 RemoteBook newBook = new RemoteBook(bookId, "new book#" + bookId);
@@ -109,17 +116,20 @@ public class RemoteBookManagerService extends Service {
     private void onNewBookArrived(RemoteBook newBook) throws RemoteException {
         mBookList.add(newBook);
         final int N = mListenerList.beginBroadcast();
-        for (int i = 0; i < N; i++) {
-            IOnNewBookArrivedListener l = mListenerList.getBroadcastItem(i);
-            if (l != null) {
-                try {
-                    l.onNewBookArrived(newBook, onNewBookArrivedSuccessListener);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
+        try {
+            for (int i = 0; i < N; i++) {
+                IOnNewBookArrivedListener l = mListenerList.getBroadcastItem(i);
+                if (l != null) {
+                    try {
+                        l.onNewBookArrived(newBook, onNewBookArrivedSuccessListener);
+                    } catch (RemoteException e) {
+                        Log.w(TAG, "Failed to notify a book listener", e);
+                    }
                 }
             }
+        } finally {
+            mListenerList.finishBroadcast();
         }
-        mListenerList.finishBroadcast();
     }
 
 
@@ -134,6 +144,11 @@ public class RemoteBookManagerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mIsServiceDestoryed.set(true);
+        mIsServiceDestroyed.set(true);
+        if (mWorkerThread != null) {
+            mWorkerThread.interrupt();
+            mWorkerThread = null;
+        }
+        mListenerList.kill();
     }
 }

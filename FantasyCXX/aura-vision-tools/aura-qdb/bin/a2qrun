@@ -14,7 +14,7 @@ expect << EOF
 
     expect "e171" { send "busybox telnet 192.168.78.2 ; exit\r" }
     expect "login" { send "root\r" }
-    expect "Password" { send "togxuh-8Cyzto-juqven\r" }
+    expect "Password" { send "${AURA_DEVICE_PASSWORD:?Set AURA_DEVICE_PASSWORD}\r" }
     expect "#" { send "$cmd\r" }
     expect "#" { send "exit\r" }
     expect eof

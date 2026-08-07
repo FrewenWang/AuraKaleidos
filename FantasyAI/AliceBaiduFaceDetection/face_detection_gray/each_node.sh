@@ -16,7 +16,7 @@ function raw_afs_mount() {
 }
 fs_name="afs://shaolin.afs.baidu.com:9902"
 username="iov_cv_data"
-password="iovcv@baidu123"
+password="${AFS_PASSWORD:?Set AFS_PASSWORD before running this script}"
 afs_local_mount_point_01="/root/paddlejob/workspace/env_run/afs_aicv/"
 afs_remote_mount_point_01="/user/iov_cv_data/vision_tasks/face_detect"
 #iafs_local_mount_point_02="/root/paddlejob/workspace/env_run/afs_02/"

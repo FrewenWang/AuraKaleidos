@@ -5,10 +5,10 @@ import passport from "passport";
 import { User, UserDocument, AuthToken } from "../models/User";
 import { Request, Response, NextFunction } from "express";
 import { IVerifyOptions } from "passport-local";
-import { WriteError } from "mongodb";
 // 
 import { check, sanitize, validationResult } from "express-validator";
 import "../config/passport";
+import { APP_BASE_URL } from "../util/secrets";
 
 /**
  * GET /login GET请求打开登录页面
@@ -100,13 +100,13 @@ export const postSignup = async (req: Request, res: Response, next: NextFunction
         password: req.body.password
     });
 
-    User.findOne({ email: req.body.email }, (err, existingUser) => {
+    User.findOne({ email: req.body.email }, (err: any, existingUser: UserDocument | null) => {
         if (err) { return next(err); }
         if (existingUser) {
             req.flash("errors", { msg: "Account with that email address already exists." });
             return res.redirect("/signup");
         }
-        user.save((err) => {
+        user.save((err: any) => {
             if (err) { return next(err); }
             req.logIn(user, (err) => {
                 if (err) {
@@ -145,14 +145,14 @@ export const postUpdateProfile = async (req: Request, res: Response, next: NextF
     }
 
     const user = req.user as UserDocument;
-    User.findById(user.id, (err, user: UserDocument) => {
+    User.findById(user.id, (err: any, user: UserDocument) => {
         if (err) { return next(err); }
         user.email = req.body.email || "";
         user.profile.name = req.body.name || "";
         user.profile.gender = req.body.gender || "";
         user.profile.location = req.body.location || "";
         user.profile.website = req.body.website || "";
-        user.save((err: WriteError) => {
+        user.save((err: any) => {
             if (err) {
                 if (err.code === 11000) {
                     req.flash("errors", { msg: "The email address you have entered is already associated with an account." });
@@ -182,10 +182,10 @@ export const postUpdatePassword = async (req: Request, res: Response, next: Next
     }
 
     const user = req.user as UserDocument;
-    User.findById(user.id, (err, user: UserDocument) => {
+    User.findById(user.id, (err: any, user: UserDocument) => {
         if (err) { return next(err); }
         user.password = req.body.password;
-        user.save((err: WriteError) => {
+        user.save((err: any) => {
             if (err) { return next(err); }
             req.flash("success", { msg: "Password has been changed." });
             res.redirect("/account");
@@ -199,7 +199,7 @@ export const postUpdatePassword = async (req: Request, res: Response, next: Next
  */
 export const postDeleteAccount = (req: Request, res: Response, next: NextFunction) => {
     const user = req.user as UserDocument;
-    User.remove({ _id: user.id }, (err) => {
+    User.remove({ _id: user.id }, (err: any) => {
         if (err) { return next(err); }
         req.logout();
         req.flash("info", { msg: "Your account has been deleted." });
@@ -214,11 +214,11 @@ export const postDeleteAccount = (req: Request, res: Response, next: NextFunctio
 export const getOauthUnlink = (req: Request, res: Response, next: NextFunction) => {
     const provider = req.params.provider;
     const user = req.user as UserDocument;
-    User.findById(user.id, (err, user: any) => {
+    User.findById(user.id, (err: any, user: any) => {
         if (err) { return next(err); }
         user[provider] = undefined;
         user.tokens = user.tokens.filter((token: AuthToken) => token.kind !== provider);
-        user.save((err: WriteError) => {
+        user.save((err: any) => {
             if (err) { return next(err); }
             req.flash("info", { msg: `${provider} account has been unlinked.` });
             res.redirect("/account");
@@ -278,7 +278,7 @@ export const postReset = async (req: Request, res: Response, next: NextFunction)
                     user.password = req.body.password;
                     user.passwordResetToken = undefined;
                     user.passwordResetExpires = undefined;
-                    user.save((err: WriteError) => {
+                    user.save((err: any) => {
                         if (err) { return next(err); }
                         req.logIn(user, (err) => {
                             done(err, user);
@@ -348,7 +348,7 @@ export const postForgot = async (req: Request, res: Response, next: NextFunction
             });
         },
         function setRandomToken(token: AuthToken, done: Function) {
-            User.findOne({ email: req.body.email }, (err, user: any) => {
+            User.findOne({ email: req.body.email }, (err: any, user: any) => {
                 if (err) { return done(err); }
                 if (!user) {
                     req.flash("errors", { msg: "Account with that email address does not exist." });
@@ -356,7 +356,7 @@ export const postForgot = async (req: Request, res: Response, next: NextFunction
                 }
                 user.passwordResetToken = token;
                 user.passwordResetExpires = Date.now() + 3600000; // 1 hour
-                user.save((err: WriteError) => {
+                user.save((err: any) => {
                     done(err, token, user);
                 });
             });
@@ -375,7 +375,7 @@ export const postForgot = async (req: Request, res: Response, next: NextFunction
                 subject: "Reset your password on Hackathon Starter",
                 text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
           Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://${req.headers.host}/reset/${token}\n\n
+          ${APP_BASE_URL}/reset/${token}\n\n
           If you did not request this, please ignore this email and your password will remain unchanged.\n`
             };
             transporter.sendMail(mailOptions, (err) => {

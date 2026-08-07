@@ -32,29 +32,32 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("admips.keystore")
-            storePassword "admips"
-            keyAlias "admips-key"
-            keyPassword "admips"
-            v2SigningEnabled true
+            def keystorePath = System.getenv("ADMIPS_KEYSTORE_PATH")
+            if (keystorePath) {
+                storeFile file(keystorePath)
+                storePassword System.getenv("ADMIPS_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ADMIPS_KEY_ALIAS") ?: "admips-key"
+                keyPassword System.getenv("ADMIPS_KEY_PASSWORD")
+                v2SigningEnabled true
+            }
         }
     }
 
     buildTypes {
-        buildTypes {
-            debug {
-                debuggable true
-                jniDebuggable true
-                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            }
-            release {
-                debuggable false
-                jniDebuggable false
-                zipAlignEnabled true // 默认true,是否进行zip align优化
-                minifyEnabled true // 默认false,是否混淆的开关
+        debug {
+            debuggable true
+            jniDebuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            debuggable false
+            jniDebuggable false
+            zipAlignEnabled true // 默认true,是否进行zip align优化
+            minifyEnabled true // 默认false,是否混淆的开关
+            if (System.getenv("ADMIPS_KEYSTORE_PATH")) {
                 signingConfig signingConfigs.release
-                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             }
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 

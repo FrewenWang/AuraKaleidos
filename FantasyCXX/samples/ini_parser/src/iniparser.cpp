@@ -312,7 +312,7 @@ bool IniParser::SetFloat(const char *section, const char *key, float val)
     {
         sec = AddSection(section);
     }
-    SetValue(sec, key, Value(val));
+    return SetValue(sec, key, Value(val));
 }
 
 bool IniParser::SetStr(const char *section, const char *key, const char *val)
@@ -322,7 +322,7 @@ bool IniParser::SetStr(const char *section, const char *key, const char *val)
     {
         sec = AddSection(section);
     }
-    SetValue(sec, key, Value(val));
+    return SetValue(sec, key, Value(val));
 }
 
 IniParser::Entry *IniParser::FindEntry(Section *sec, const char *key) const

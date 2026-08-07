@@ -1,6 +1,7 @@
 import request from "supertest";
 import app from "../src/app";
 import { expect } from "chai";
+import { User } from "../src/models/User";
 
 describe("GET /login", () => {
     it("should return 200 OK", () => {
@@ -25,9 +26,18 @@ describe("GET /signup", () => {
 });
 
 describe("GET /reset", () => {
-    it("should return 302 Found for redirection", () => {
-        return request(app).get("/reset/1")
-            .expect(302);
+    it("should return 302 Found for redirection", async () => {
+        const query: any = {
+            where: () => query,
+            gt: () => query,
+            exec: (callback: Function) => callback(undefined, null)
+        };
+        const findOne = jest.spyOn(User, "findOne").mockReturnValue(query);
+        try {
+            await request(app).get("/reset/1").expect(302);
+        } finally {
+            findOne.mockRestore();
+        }
     });
 });
 

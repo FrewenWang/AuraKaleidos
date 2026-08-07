@@ -1,5 +1,5 @@
 #!/bin/bash
 
-sshpass -p togxuh-8Cyzto-juqven sftp root@192.168.78.2
+sshpass -p "${AURA_DEVICE_PASSWORD:?Set AURA_DEVICE_PASSWORD}" sftp root@192.168.78.2
 
 

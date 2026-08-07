@@ -37,19 +37,15 @@ class KalmanFilter:
                 f"Control vector shape {control_vector.shape} does not match expected shape ({self.nb_controls}, 1)"
             self.control_vector = control_vector
             
-        process_noise = self.process_noise(np.zeros(self.nb_dynamics),
-                                               self.process_noise_cov).reshape((self.nb_dynamics,1))
         if not self.nb_controls:
             # Case of no control parameters provided
-            self.predicted_state = self.transition_matrix @ self.post_state +\
-                                    process_noise
+            self.predicted_state = self.transition_matrix @ self.post_state
             
             assert self.predicted_state.shape == (self.nb_dynamics,1), f'Predicted state: {self.predicted_state.shape}'
         else:
             # Case: control parameters provided
             self.predicted_state = self.transition_matrix @ self.post_state +\
-                                    self.control_matrix @ self.control_vector + \
-                                    process_noise
+                                    self.control_matrix @ self.control_vector
             
                                 
         self.predicted_err_cov = self.transition_matrix @ self.post_err_cov @\
@@ -83,11 +79,16 @@ class KalmanFilter:
             raise np.linalg.LinAlgError("Residual covariance matrix is non-invertible or ill-conditioned.")
 
         # Kalman gain
-        self.gain = self.predicted_err_cov @ self.measurement_matrix.T @ np.linalg.inv(self.residual_cov) 
+        innovation_cross_cov = self.predicted_err_cov @ self.measurement_matrix.T
+        self.gain = np.linalg.solve(self.residual_cov, innovation_cross_cov.T).T
         # Estimate state update 
         self.post_state = self.predicted_state + self.gain @ residual   
         # Estimate error covariance update     
-        self.post_err_cov = (np.eye(self.nb_dynamics) - self.gain @ self.measurement_matrix) @ self.predicted_err_cov  # Updated covariance estimate
+        identity = np.eye(self.nb_dynamics, dtype=self.predicted_err_cov.dtype)
+        correction = identity - self.gain @ self.measurement_matrix
+        # Joseph form is more numerically stable and preserves positive semidefiniteness.
+        self.post_err_cov = (correction @ self.predicted_err_cov @ correction.T +
+                             self.gain @ self.measurement_noise_cov @ self.gain.T)
         
         return self.post_state
     
@@ -96,33 +97,26 @@ class KalmanFilter:
         Initialize all matrices and variables required for the Kalman filter.
         """
         
-        self.transition_matrix = np.empty((self.nb_dynamics, self.nb_dynamics))
-        self.measurement_matrix = np.empty((self.nb_measurements, self.nb_dynamics))
+        self.transition_matrix = np.eye(self.nb_dynamics, dtype=np.float32)
+        self.measurement_matrix = np.zeros((self.nb_measurements, self.nb_dynamics), dtype=np.float32)
         
         if self.nb_controls:
-            self.control_matrix = np.empty((self.nb_dynamics, self.nb_controls))
-            self.control_vector = np.empty((self.nb_controls, 1))
+            self.control_matrix = np.zeros((self.nb_dynamics, self.nb_controls), dtype=np.float32)
+            self.control_vector = np.zeros((self.nb_controls, 1), dtype=np.float32)
         else:
             self.control_matrix = None
             self.control_vector = None
             
-        self.process_noise_cov = np.empty((self.nb_dynamics, self.nb_dynamics))
-        self.measurement_noise_cov = np.empty((self.nb_measurements, self.nb_measurements))
+        self.process_noise_cov = np.eye(self.nb_dynamics, dtype=np.float32)
+        self.measurement_noise_cov = np.eye(self.nb_measurements, dtype=np.float32)
         
         self.predicted_err_cov = np.eye(self.nb_dynamics, dtype=np.float32)
         self.post_err_cov = np.eye( self.nb_dynamics, dtype=np.float32)
         
-        self.predicted_state = np.empty((self.nb_dynamics, 1))
-        self.post_state = np.empty((self.nb_dynamics, 1))
-        self.gain = np.empty((self.nb_dynamics, self.nb_measurements))
-        self.residual_cov = np.empty((self.nb_measurements, self.nb_measurements))
-        
-        
-        # function to simulate process noise drawn from gaussian
-        # distribution with parameters (0, process_noise_cov)
-        # The parameters will be specified 
-        # on the moment of calling the function
-        self.process_noise = np.random.default_rng().multivariate_normal
+        self.predicted_state = np.zeros((self.nb_dynamics, 1), dtype=np.float32)
+        self.post_state = np.zeros((self.nb_dynamics, 1), dtype=np.float32)
+        self.gain = np.zeros((self.nb_dynamics, self.nb_measurements), dtype=np.float32)
+        self.residual_cov = np.eye(self.nb_measurements, dtype=np.float32)
         
     
             

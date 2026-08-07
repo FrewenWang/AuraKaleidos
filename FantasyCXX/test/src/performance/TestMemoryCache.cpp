@@ -9,7 +9,6 @@
 
 #include <random>
 #include <Eigen/Dense>       // Eigen 矩阵库
-#include <ceres/ceres.h>     // Ceres 优化库
 
 const static char *TAG = "TestCubicCurveFitting";
 using namespace std;

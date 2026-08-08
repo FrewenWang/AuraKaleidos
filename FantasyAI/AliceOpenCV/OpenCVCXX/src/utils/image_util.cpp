@@ -4,7 +4,13 @@
 
 #include "image_util.h"
 
+#include <algorithm>
+#include <stdexcept>
+
 cv::Mat vision::ImageUtil::average_pooling(cv::Mat in) {
+    if (in.empty() || in.type() != CV_8UC3) {
+        throw std::invalid_argument("average_pooling expects a non-empty CV_8UC3 image");
+    }
     // 计算输入图片资源的行列数
     int width = in.cols;  // 图像的列数为图像的宽度
     int height = in.rows;  // 图像的行数为图像的高度
@@ -17,16 +23,18 @@ cv::Mat vision::ImageUtil::average_pooling(cv::Mat in) {
 
     for (int j = 0; j < height; j += r) {
         for (int i = 0; i < width; i += r) {
+            const int block_height = std::min(r, height - j);
+            const int block_width = std::min(r, width - i);
             for (int c = 0; c < 3; c++) {
                 v = 0;
-                for (int _j = 0; _j < r; _j++) {
-                    for (int _i = 0; _i < r; _i++) {
+                for (int _j = 0; _j < block_height; _j++) {
+                    for (int _i = 0; _i < block_width; _i++) {
                         v += (double) in.at<cv::Vec3b>(j + _j, i + _i)[c];
                     }
                 }
-                v /= (r * r);
-                for (int _j = 0; _j < r; _j++) {
-                    for (int _i = 0; _i < r; _i++) {
+                v /= (block_height * block_width);
+                for (int _j = 0; _j < block_height; _j++) {
+                    for (int _i = 0; _i < block_width; _i++) {
                         out.at<cv::Vec3b>(j + _j, i + _i)[c] = (uchar) v;
                     }
                 }
@@ -39,6 +47,9 @@ cv::Mat vision::ImageUtil::average_pooling(cv::Mat in) {
 }
 
 cv::Mat vision::ImageUtil::gaussian_filter(cv::Mat in) {
+    if (in.empty() || in.type() != CV_8UC3) {
+        throw std::invalid_argument("gaussian_filter expects a non-empty CV_8UC3 image");
+    }
     //  获取输入图像尺寸的宽度和高度
     int width = in.cols;
     int height = in.rows;
@@ -78,7 +89,8 @@ cv::Mat vision::ImageUtil::gaussian_filter(cv::Mat in) {
                 v = 0;
                 for (int _j = -p; _j < p + 1; _j++) {
                     for (int _i = -p; _i < p + 1; _i++) {
-                        if (((j + _j) >= 0) && ((i + _i) >= 0)) {
+                        if (((j + _j) >= 0) && ((i + _i) >= 0) &&
+                            ((j + _j) < height) && ((i + _i) < width)) {
                             v += (double) in.at<cv::Vec3b>(j + _j, i + _i)[c] * k[_j + p][_i + p];
                         }
                     }

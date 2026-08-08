@@ -8,17 +8,17 @@ const {reportCli} = require("./cliHook");
  */
 
 function execCmd(inputs, callBack) {
-    console.log(inputs);
     // 获取输出的参数，process.argv是返回的一个数组
     // process.argv.slice(2)获取的就是下表从2开始拷贝出来的一个数组
     let args = inputs ? inputs.slice(2) : process.argv.slice(2);
     // TODO 进行相关上报
     reportCli(args);
 
-    if (needShowCliHelp(args)) {
-        return;
+    const result = {args, showHelp: needShowCliHelp(args)};
+    if (typeof callBack === 'function') {
+        callBack(result);
     }
-
+    return result;
 }
 
 
@@ -28,10 +28,11 @@ function needShowCliHelp(args) {
         args[0] === '-h' ||
         args[0] === '-H') {
         reportTime(args[0] || '-h');
-        return false;
+        return true;
     }
     return false;
 }
 
 //默认导出execCmd方法
 module.exports = execCmd;
+module.exports.needShowCliHelp = needShowCliHelp;

@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "node --test tests/*.test.js",
     "test:safe": "npm audit",
     "pretest": "",
     "start": "node ./src/index.js",
-    "watch-node": "nodemon index.js",
+    "watch-node": "nodemon src/index.js",
     "build": "npm run lint && npm run test",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
@@ -16,15 +16,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.7.2",
-    "cheerio": "^1.0.0-rc.3",
-    "dotenv": "^8.2.0",
-    "lodash": "latest",
-    "moment": "latest",
-    "mongoose": "^5.9.7",
-    "probe-image-size": "^5.0.0",
-    "requestretry": "^4.1.0",
-    "winston": "^3.2.1",
-    "winston-daily-rotate-file": "^4.4.2"
+    "dotenv": "^17.2.2"
   }
 }

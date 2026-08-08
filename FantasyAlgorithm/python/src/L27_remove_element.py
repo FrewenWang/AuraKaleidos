@@ -54,34 +54,14 @@ from typing import List
 
 class Solution(object):
     def removeElement(self, nums: List[int], val: int) -> int:
-        if len(nums) == 0:
-            return 0
-
-        if len(nums) == 1:
-            if nums[0] == val:
-                nums.remove(val)
-                print(nums)
-                return 1
-            else:
-                # 这个是nums的反向排序
-                # nums = nums[::-1]
-                print(nums)
-                return 0
-
-        p1, p2 = 0, len(nums) - 1
-        while p1 < p2:
-            if nums[p1] != val:
-                p1 = p1 + 1
-            if nums[p1] == val and nums[p2] != val:
-                nums[p1], nums[p2] = nums[p2], nums[p1]
-                p1 = p1 + 1
-                p2 = p2 - 1
-            if nums[p1] == val and nums[p2] == val:
-                p2 = p2 - 1
-        print(nums)
-        if p1 == 0:
-            return p1
-        return p1 + 1
+        """Remove ``val`` in-place and return the number of retained values."""
+        write_index = 0
+        for value in nums:
+            if value != val:
+                nums[write_index] = value
+                write_index += 1
+        del nums[write_index:]
+        return write_index
 
 
 if __name__ == "__main__":

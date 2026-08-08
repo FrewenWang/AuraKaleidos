@@ -28,7 +28,15 @@ try {
  */
 let bar;
 
-visitSite('http://www.mm131.com/').then(html => analyzeMain(html))
+if (require.main === module) {
+    visitSite('http://www.mm131.com/')
+        .then(analyzeMain)
+        .then(links => console.log(`Found ${links.length} links`))
+        .catch(error => {
+            console.error(error);
+            process.exitCode = 1;
+        });
+}
 
 /**
  *请求爬取的网页地址
@@ -54,7 +62,6 @@ function visitSite(url) {
  * @param html
  */
 function analyzeMain(html) {
-    console.log("analyzeMain===html==="+html)
     return new Promise((resolve, reject) => {
         //将html文件传入cheerio进行解析
         let $ = cheerio.load(html);
@@ -72,3 +79,5 @@ function analyzeMain(html) {
     });
 
 }
+
+module.exports = {analyzeMain, visitSite};

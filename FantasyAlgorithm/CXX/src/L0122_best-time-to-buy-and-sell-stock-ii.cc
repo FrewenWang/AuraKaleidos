@@ -1,31 +1,15 @@
-//
-// Created by Frewen.Wang on 25-2-27.
-//
-#include<vector>
+#include "alice_algorithm/stock_profit.h"
 
-using namespace std;
+namespace alice::algorithm {
 
-class Solution {
-public:
-  /**
-  * 这个问题的思路比较简单
-  * 因为交易次数不受限，如果可以把所有的上坡全部收集到，一定是利益最大化的
-  */
-  //  int maxProfit(vector<int>& prices) {
-  //    int result = 0;
-  //    int len = prices.size();
-  //    for(int i=1;i<len;i++) {
-  //       if(prices[i] > prices[i-1]) {
-  //         result += prices[i] - prices[i-1];
-  //       }
-  //    }
-  //    return result;
-  //  }
+int max_profit(const std::vector<int>& prices) {
+    int result = 0;
+    for (std::size_t index = 1; index < prices.size(); ++index) {
+        if (prices[index] > prices[index - 1]) {
+            result += prices[index] - prices[index - 1];
+        }
+    }
+    return result;
+}
 
-  int maxProfit(vector<int>& prices) {
-     int ans = 0;
-     int l=0,r=0;
-     int profit = Integer.
-  }
-
-};
+}  // namespace alice::algorithm

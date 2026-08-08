@@ -7,18 +7,24 @@ set(TARGET_NAME AliceAlgorithm)
 message(STATUS "[${TARGET_NAME}] ====================Start Build============================")
 # 第三步：设置CMake设置的C++的版本
 project(${TARGET_NAME})
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 第四步：指定生成的目标产出
-#add_executable(${TARGET_NAME} src/L0005_longest-palindromic-substring.cc)
-#add_executable(${TARGET_NAME} src/L0003_longest-substring-without-repeating-characters.cc)
-#add_executable(${TARGET_NAME} src/L0027_remove_element.cc)
-#add_executable(${TARGET_NAME} src/L0026_remove-duplicates-from-sorted-array.cc)
-#add_executable(${TARGET_NAME} src/L0035_search-insert-position.cc)
-#add_executable(${TARGET_NAME} src/L0079_word-search.cc)
-#add_executable(${TARGET_NAME} src/L0080_remove-duplicates-from-sorted-array-ii)
-add_executable(${TARGET_NAME} src/L0122_best-time-to-buy-and-sell-stock-ii.cc)
-#add_executable(${TARGET_NAME} src/L0392_is-subsequence.cc)
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/AuraPlatform.cmake")
+
+add_library(${TARGET_NAME} STATIC src/L0122_best-time-to-buy-and-sell-stock-ii.cc)
+target_include_directories(${TARGET_NAME} PUBLIC include)
+aura_apply_platform(${TARGET_NAME})
+
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(${TARGET_NAME}Tests tests/test_stock_profit.cc)
+    target_link_libraries(${TARGET_NAME}Tests PRIVATE ${TARGET_NAME})
+    aura_apply_platform(${TARGET_NAME}Tests)
+    if(NOT CMAKE_CROSSCOMPILING)
+        add_test(NAME ${TARGET_NAME}Tests COMMAND ${TARGET_NAME}Tests)
+    endif()
+endif()
 
 
 message(STATUS "[${TARGET_NAME}] ====================Build End============================")

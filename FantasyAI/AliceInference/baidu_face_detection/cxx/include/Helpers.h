@@ -1,15 +1,15 @@
 #pragma once
 
-#include <opencv2/imgproc/imgproc.hpp>
+#include <cstdint>
+#include <string>
+#include <vector>
 
-using namespace std;
+namespace alice::inference {
 
-class Helpers {
-public:
-    static vector<float> loadImage;
-    static vector<string> loadLabels;
+std::vector<float> load_image_nchw(
+    const std::string& filename,
+    std::int64_t channels,
+    std::int64_t height,
+    std::int64_t width);
 
-    static vector<float> loadFaceImage;
-};
-
-
+}  // namespace alice::inference

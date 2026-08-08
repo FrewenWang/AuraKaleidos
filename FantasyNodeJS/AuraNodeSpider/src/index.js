@@ -5,11 +5,15 @@ dotEnv.config();
 
 const TAG = "AuraNodeSpider";
 
-console.debug(TAG, "Spider Start");
+async function main() {
+    console.debug(TAG, "Spider Start");
+}
 
-;(async function () {
+if (require.main === module) {
+    main().catch(error => {
+        console.error(TAG, error);
+        process.exitCode = 1;
+    });
+}
 
-
-})().finally(() => {
-    disconnect();
-});
+module.exports = {main};

@@ -1,77 +1,54 @@
 #include "Helpers.h"
 
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <array>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/core/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 
-using namespace std;
-using namespace cv;
+#include <algorithm>
+#include <stdexcept>
 
-static vector<float> loadImage(const string &filename, int sizeX = 224, int sizeY = 224) {
-    Mat image = imread(filename);
-    if (image.empty()) {
-        cout << "No image found.";
+namespace alice::inference {
+
+std::vector<float> load_image_nchw(
+    const std::string& filename,
+    std::int64_t channels,
+    std::int64_t height,
+    std::int64_t width) {
+    if (channels != 1 && channels != 3) {
+        throw std::invalid_argument("Only one-channel and three-channel inputs are supported");
+    }
+    if (height <= 0 || width <= 0) {
+        throw std::invalid_argument("The model must have static positive image dimensions");
     }
 
-    // convert from BGR to RGB
-    cvtColor(image, image, COLOR_BGR2RGB);
+    cv::Mat image = cv::imread(filename, cv::IMREAD_COLOR);
+    if (image.empty()) {
+        throw std::runtime_error("Unable to load image: " + filename);
+    }
 
-    // resize
-    resize(image, image, Size(sizeX, sizeY));
+    cv::resize(image, image, cv::Size(static_cast<int>(width), static_cast<int>(height)));
+    if (channels == 1) {
+        cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
+    } else {
+        cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+    }
+    image.convertTo(image, CV_32F, 1.0 / 255.0);
 
-    // reshape to 1D
-    image = image.reshape(1, 1);
+    const std::size_t plane_size = static_cast<std::size_t>(height * width);
+    std::vector<float> output(static_cast<std::size_t>(channels) * plane_size);
+    if (channels == 1) {
+        std::copy_n(image.ptr<float>(), plane_size, output.begin());
+        return output;
+    }
 
-    // uint_8, [0, 255] -> float, [0, 1]
-    // Normailze number to between 0 and 1
-    // Convert to vector<float> from cv::Mat.
-    vector<float> vec;
-    image.convertTo(vec, CV_32FC1, 1. / 255);
-
-    // Transpose (Height, Width, Channel)(224,224,3) to (Chanel, Height, Width)(3,224,224)
-    vector<float> output;
-    for (size_t ch = 0; ch < 3; ++ch) {
-        for (size_t i = ch; i < vec.size(); i += 3) {
-            output.emplace_back(vec[i]);
-        }
+    std::vector<cv::Mat> planes;
+    cv::split(image, planes);
+    for (std::int64_t channel = 0; channel < channels; ++channel) {
+        std::copy_n(
+            planes[static_cast<std::size_t>(channel)].ptr<float>(),
+            plane_size,
+            output.begin() + channel * static_cast<std::int64_t>(plane_size));
     }
     return output;
 }
 
-static vector<float> loadFaceImage(const string &filename, int dstSizeX = 320, int dstSizeY = 224) {
-    Mat image = imread(filename);
-    if (image.empty()) {
-        cout << "No image found.";
-    }
-    // convert from BGR to gray
-    cvtColor(image, image, COLOR_BGR2GRAY);
-
-    // resize
-    resize(image, image, Size(dstSizeX, dstSizeY));
-
-    // reshape to 1D
-    image = image.reshape(1, 1);
-
-    vector<float> vec;
-    image.convertTo(vec, CV_32FC1);
-    return vec;
-}
-
-static vector<string> loadLabels(const string &filename) {
-    vector<string> output;
-
-    ifstream file(filename);
-    if (file) {
-        string s;
-        while (getline(file, s)) {
-            output.emplace_back(s);
-        }
-        file.close();
-    }
-
-    return output;
-}
+}  // namespace alice::inference

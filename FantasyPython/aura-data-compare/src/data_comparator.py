@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 import os
 
@@ -30,7 +29,8 @@ class SimpleDataComparator:
         tolerance: 允许的差异容限（0表示完全相等）
         """
         # 比较数据，找出差异位置
-        diff_map = np.abs(self.data1 - self.data2) > tolerance
+        numeric_diff = self.data1.astype(np.float64) - self.data2.astype(np.float64)
+        diff_map = np.abs(numeric_diff) > tolerance
         diff_indices = np.where(diff_map)
 
         # 收集差异详情
@@ -41,7 +41,7 @@ class SimpleDataComparator:
                 'col': x,
                 'value1': self.data1[y, x],
                 'value2': self.data2[y, x],
-                'difference': abs(self.data1[y, x] - self.data2[y, x])
+                'difference': abs(float(self.data1[y, x]) - float(self.data2[y, x]))
             })
 
         # 基本统计
@@ -64,6 +64,8 @@ class SimpleDataComparator:
         diff_info: find_differences返回的差异信息
         max_display: 最多显示的点数
         """
+        import matplotlib.pyplot as plt
+
         # 基本统计
         print(f"发现 {diff_info['diff_count']} 个不同的位置")
         print(f"占总像素的 {diff_info['diff_percent']:.4f}%")

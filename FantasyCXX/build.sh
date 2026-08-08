@@ -23,16 +23,19 @@ EXTRA_MODULES_PATH=""
 # set environment variables
 
 #  set current HOST_OS and HOST_ARCH
-if [ "$(uname)" == "Darwin" ]; then
-    HOST_OS="mac"
-    HOST_ARCH="x86_64"
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    HOST_OS="linux"
-    HOST_ARCH="x86_64"
-elif [ "$(expr substr $(uname -s) 1 10)"=="MINGW32_NT" ]; then
-    HOST_OS="windows"
-    HOST_ARCH="x86_64"
-fi
+case "$(uname -s)" in
+    Darwin) HOST_OS="mac" ;;
+    Linux) HOST_OS="linux" ;;
+    MINGW*|MSYS*|CYGWIN*) HOST_OS="windows" ;;
+    *) echo "Unsupported host system: $(uname -s)" >&2; exit 1 ;;
+esac
+
+case "$(uname -m)" in
+    x86_64|amd64) HOST_ARCH="x86_64" ;;
+    arm64|aarch64) HOST_ARCH="arm64" ;;
+    i386|i686) HOST_ARCH="x86" ;;
+    *) HOST_ARCH="$(uname -m)" ;;
+esac
 
 #################################################################################
 # 0- target os  same as host os
@@ -86,16 +89,8 @@ done
 
 case "$TARGET_INDEX" in
 0)
-    if [ "$HOST_OS" == "mac" ]; then
-        BUILD_TARGET_OS="mac"
-        BUILD_TARGET_ARCH="x86_64"
-    elif [ "$HOST_OS" == "linux" ]; then
-        BUILD_TARGET_OS="linux"
-        BUILD_TARGET_ARCH="x86_64"
-    elif [ "$HOST_OS" == "windows" ]; then
-        BUILD_TARGET_OS="windows"
-        BUILD_TARGET_ARCH="x86_64"
-    fi
+    BUILD_TARGET_OS="$HOST_OS"
+    BUILD_TARGET_ARCH="$HOST_ARCH"
     ;;
 1)
     BUILD_TARGET_OS="android"
@@ -111,11 +106,12 @@ TARGET=$BUILD_TARGET_OS-$BUILD_TARGET_ARCH
 
 if [[ $TARGET == *"android"* ]]; then
   # 编译Android版本，需要看一下DNK的环境变量
-  if [ "$NDK_HOME" = "" ]; then
-      echo "[===Compiler===] NDK_HOME is not set in environment!!!"
-      exit 0
+  AURA_ANDROID_NDK="${ANDROID_NDK_ROOT:-${NDK_HOME:-}}"
+  if [ -z "$AURA_ANDROID_NDK" ]; then
+      echo "[===Compiler===] ANDROID_NDK_ROOT or NDK_HOME is not set!!!" >&2
+      exit 1
   fi
-  TARGET_TOOLCHAIN=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+  TARGET_TOOLCHAIN="$AURA_ANDROID_NDK/build/cmake/android.toolchain.cmake"
   ANDROID_PLATFORM="android-34"
 fi
 
@@ -165,27 +161,27 @@ buildTarget(){
                  -D CMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
                  "$BUILD_CMAKE_ARGS" \
                  ../..
-    elif [ "$TARGET" = "windows-x86_64" ]; then
-         cmake   -D TARGET_OS=osx \
-                 -D TARGET_ARCH=x86_64 \
+    elif [[ "$TARGET" == windows-* ]]; then
+         cmake   -D TARGET_OS=windows \
+                 -D TARGET_ARCH="$BUILD_TARGET_ARCH" \
                  -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
                  -D PRODUCTION="$BUILD_PRODUCTION" \
                  -D SOC_VENDOR="$BUILD_SOC_VENDOR" \
                  -D CMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
                  "$BUILD_CMAKE_ARGS" \
                  ../..
-    elif [ "$TARGET" = "linux-x86_64" ]; then
+    elif [[ "$TARGET" == linux-* ]]; then
          cmake   -D TARGET_OS=linux \
-                 -D TARGET_ARCH=x86_64 \
+                 -D TARGET_ARCH="$BUILD_TARGET_ARCH" \
                  -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
                  -D PRODUCTION="$BUILD_PRODUCTION" \
                  -D SOC_VENDOR="$BUILD_SOC_VENDOR" \
                  -D CMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
                  "$BUILD_CMAKE_ARGS" \
                  ../..
-    elif [ "$TARGET" = "mac-x86_64" ]; then
+    elif [[ "$TARGET" == mac-* ]]; then
          cmake   -D TARGET_OS=mac \
-                 -D TARGET_ARCH=x86_64 \
+                 -D TARGET_ARCH="$BUILD_TARGET_ARCH" \
                  -D CMAKE_BUILD_TYPE=$BUILD_TYPE \
                  -D PRODUCTION="$BUILD_PRODUCTION" \
                  -D SOC_VENDOR="$BUILD_SOC_VENDOR" \
@@ -194,11 +190,15 @@ buildTarget(){
                  ../..
     fi
 
-    echo "[===Compiler===] make target with 18 threads"
-    # make -j 18 VERBOSE=1
-     make -j 18
-    echo "[===Compiler===] make target success!!!"
-    make install
+    case "$BUILD_TYPE" in
+        debug|Debug) CMAKE_CONFIG="Debug" ;;
+        relwithdebinfo|RelWithDebInfo) CMAKE_CONFIG="RelWithDebInfo" ;;
+        *) CMAKE_CONFIG="Release" ;;
+    esac
+    echo "[===Compiler===] build target with CMake"
+    cmake --build . --config "$CMAKE_CONFIG" --parallel
+    echo "[===Compiler===] build target success!!!"
+    cmake --install . --config "$CMAKE_CONFIG"
     echo "[===Compiler===] install target success!!!"
     cd -
 }

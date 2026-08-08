@@ -11,10 +11,7 @@ var index = require('./routes/index');
 //引入当前目录下的路由目下中的Users
 var users = require('./routes/admin');
 //引入当前目录下的路由目下中的测试的路由分发
-var test = require('./routes/admin');
-
-//我们还可以在这里自定义设置监听的端口
-var port = process.env.PORT || 5000;
+var test = require('./routes/test');
 
 var app = express();
 
@@ -24,10 +21,6 @@ app.set('views', path.join(projectRoot, 'views/pages'));
 //设置模板引擎为Jade
 app.set('view engine', 'jade');
 
-
-app.listen(port);
-
-console.log("Server running at port:" + port);
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(projectRoot, 'public', 'favicon.ico')));

@@ -23,6 +23,10 @@ app.delete('/user', function (req, res) {
 
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!')
-})
+if (require.main === module) {
+    app.listen(3000, function () {
+        console.log('Example app listening on port 3000!')
+    })
+}
+
+module.exports = app;

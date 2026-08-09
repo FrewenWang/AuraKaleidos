@@ -58,8 +58,8 @@ cv::Mat vision::ImageUtil::gaussian_filter(cv::Mat in) {
 
     // 使用高斯滤波器（3×3 大小，标准差 s=1.3）来对图片进行降噪处理
     double s = 1.3;
-    int k_size = 3;
-    int p = floor(k_size / 2);
+    constexpr int k_size = 3;
+    constexpr int p = k_size / 2;
     int x = 0, y = 0;
     double k_sum = 0;
 

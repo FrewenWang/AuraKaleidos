@@ -1,4 +1,3 @@
-import cv
 # 代码参考：https://blog.csdn.net/youcans/article/details/121870848
 # 1.70：图像的低通滤波 (盒式滤波器核)
 import cv2
@@ -8,8 +7,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from matplotlib import pyplot as plt
 import numpy as np
-from utils import cv_utils
-from utils import filter_utils
+from alice_pyopencv import filter_utils
 
 # img = cv2.imread("../assets/images/lena_color.tiff", flags=0)  # # flags=0 读取为灰度图像
 #
@@ -44,9 +42,10 @@ from utils import filter_utils
 # plt.imshow(imgConv11, cmap='gray', vmin=0, vmax=255)
 # plt.tight_layout()
 # plt.show()
-img = cv2.imread("../assets/images/lena_color.tiff")
+image_path = Path(__file__).resolve().parents[1] / "assets/images/lena_color.tiff"
+img = cv2.imread(str(image_path))
 if img is None:
-    print('Failed to read the image')
+    raise FileNotFoundError(f"Failed to read the image: {image_path}")
 
 img1 = filter_utils.add_peppersalt_noise(img)
 cv2.imshow('img', img1)

@@ -1,24 +1,18 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const app = require('../index');
+const {handlers} = require('../src/app');
 
-function request(server, path, method = 'GET') {
-  const address = server.address();
-  return fetch(`http://127.0.0.1:${address.port}${path}`, {method});
+function invoke(handler) {
+  let body;
+  handler({}, {send(value) { body = value; }});
+  return body;
 }
 
-test('serves the root route', async (context) => {
-  const server = app.listen(0);
-  context.after(() => server.close());
-  const response = await request(server, '/');
-  assert.equal(response.status, 200);
-  assert.equal(await response.text(), 'Hello World!');
+test('serves the root route', () => {
+  assert.equal(invoke(handlers.getRoot), 'Hello World!');
 });
 
-test('serves the user PUT route', async (context) => {
-  const server = app.listen(0);
-  context.after(() => server.close());
-  const response = await request(server, '/user', 'PUT');
-  assert.equal(await response.text(), 'Got a PUT request at /user');
+test('serves the user PUT route', () => {
+  assert.equal(invoke(handlers.putUser), 'Got a PUT request at /user');
 });

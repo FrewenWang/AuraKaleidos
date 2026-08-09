@@ -43,6 +43,8 @@ run_node_tests() {
 
 mkdir -p "${build_root}"
 
+"${python_bin}" "${repo_root}/scripts/check_project_layout.py"
+
 run_cmake_tests fantasy-cxx FantasyCXX \
     -DBUILD_AURA_CV=OFF \
     -DBUILD_AURA_VISION=OFF \
@@ -51,11 +53,12 @@ run_cmake_tests fantasy-cxx FantasyCXX \
 run_cmake_tests algorithms-cxx FantasyAlgorithm/CXX
 run_cmake_tests opencv-cxx FantasyAI/AliceOpenCV/OpenCVCXX
 
-run_python_tests FantasyAlgorithm/python
+run_python_tests FantasyAlgorithm/python src
 run_python_tests FantasyPython/alice-auto-driving src
 run_python_tests FantasyPython/aura-data-compare src
 run_python_tests FantasyPython/aura-pyutils src
-run_python_tests FantasyAutoDrive/kalman_filter_with_yolo11_objects_tracker
+run_python_tests FantasyPython/alice-pyopencv src
+run_python_tests FantasyAutoDrive/kalman_filter_with_yolo11_objects_tracker src
 
 run_node_tests FantasyJS
 run_node_tests FantasyNodeJS/AuraNodeCli
@@ -68,7 +71,12 @@ npm --prefix "${repo_root}/FantasyNodeJS/NyxTSExpress" run build
 run_node_tests FantasyNodeJS/NyxTSExpress
 run_node_tests FantasyNodeJS/myExpressGenarator
 
-bash -n "${repo_root}/FantasyShell/scripts/addr.sh"
-bash -n "${repo_root}/FantasyShell/scripts/addr_parser_file.sh"
+bash "${repo_root}/FantasyShell/tests/test_scripts.sh"
+
+if command -v mvn >/dev/null 2>&1; then
+    mvn -q -f "${repo_root}/AliceJava/pom.xml" test
+else
+    echo "Maven not installed; AliceJava Maven tests skipped."
+fi
 
 echo "All supported macOS tests passed."

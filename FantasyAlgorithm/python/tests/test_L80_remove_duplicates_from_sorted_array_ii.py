@@ -1,6 +1,6 @@
 import unittest
 
-from src.L80_remove_duplicates_from_sorted_array_ii import Solution
+from L80_remove_duplicates_from_sorted_array_ii import Solution
 
 
 class RemoveDuplicatesTest(unittest.TestCase):

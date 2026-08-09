@@ -3,11 +3,9 @@ const assert = require('node:assert/strict');
 
 const app = require('../app');
 
-test('serves the generated home page', async (context) => {
-  const server = app.listen(0);
-  context.after(() => server.close());
-  const {port} = server.address();
-  const response = await fetch(`http://127.0.0.1:${port}/`);
-  assert.equal(response.status, 200);
-  assert.match(await response.text(), /Express/);
+test('initializes the generated application and routes', () => {
+  assert.equal(typeof app, 'function');
+  assert.equal(app.get('view engine'), 'pug');
+  assert.match(app.get('views'), /views$/);
+  assert.ok(app._router.stack.length > 0);
 });

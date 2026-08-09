@@ -1,10 +1,10 @@
 {
   "name": "express_demo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Minimal Express routing and static-file example",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/server.js",
     "test": "node --test tests/*.test.js"
   },
   "author": "",

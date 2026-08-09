@@ -1,6 +1,6 @@
 import unittest
 
-from src.L27_remove_element import Solution
+from L27_remove_element import Solution
 
 
 class RemoveElementTest(unittest.TestCase):

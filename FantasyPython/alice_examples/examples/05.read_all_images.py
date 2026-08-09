@@ -1,11 +1,17 @@
+"""Read and display an image supplied on the command line."""
 
+import argparse
+from pathlib import Path
 
-import numpy as np
 import cv2
 
-## 读取图片并转换成灰度图
-img = cv2.imread("/home/wangzhijiang/02.ProjectSpace/mage20/gaussian_result.jpg",0)
 
-##显示图片
-cv2.imshow("img",img)
+parser = argparse.ArgumentParser()
+parser.add_argument("image", type=Path)
+args = parser.parse_args()
+
+image = cv2.imread(str(args.image), cv2.IMREAD_GRAYSCALE)
+if image is None:
+    raise FileNotFoundError(args.image)
+cv2.imshow("image", image)
 cv2.waitKey()

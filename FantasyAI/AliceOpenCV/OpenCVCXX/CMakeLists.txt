@@ -21,6 +21,15 @@ add_executable(OpenCVDemo src/main.cpp)
 target_link_libraries(OpenCVDemo PRIVATE alice_opencv)
 aura_apply_platform(OpenCVDemo)
 
+option(BUILD_OPENCV_EXAMPLES "Build standalone OpenCV learning examples" OFF)
+if(BUILD_OPENCV_EXAMPLES)
+    foreach(example_name IN ITEMS channel_exchange image_gray otsu_threshold binary_threshold)
+        add_executable(opencv_${example_name} "examples/${example_name}.cpp")
+        target_link_libraries(opencv_${example_name} PRIVATE ${OpenCV_LIBS})
+        aura_apply_platform(opencv_${example_name})
+    endforeach()
+endif()
+
 include(CTest)
 if(BUILD_TESTING)
     add_executable(OpenCVDemoTests tests/image_util_test.cpp)
@@ -31,7 +40,7 @@ if(BUILD_TESTING)
         add_test(
             NAME OpenCVDemoCli
             COMMAND OpenCVDemo
-                "${CMAKE_CURRENT_SOURCE_DIR}/image1.jpg"
+                "${CMAKE_CURRENT_SOURCE_DIR}/assets/images/image1.jpg"
                 "${CMAKE_CURRENT_BINARY_DIR}/average_pooling.jpg")
     endif()
 endif()

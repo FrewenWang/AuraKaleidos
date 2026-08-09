@@ -1,6 +1,7 @@
 from collections import deque
 import json
 import os
+from pathlib import Path
 import cv2
 import numpy as np
 from ai.detect import Detector
@@ -14,8 +15,8 @@ logger = configure_logger("appLogger")
 
 class ObjectTrackerApp:
     def __init__(self, mode: str ='single', 
-                    target_classes: list=["person"],
-                    cache_file: str ="./tmp/cache.json",
+                    target_classes: list | None = None,
+                    cache_file: str | Path | None = None,
                     estimate_acceleration: bool=False,
                     association_metric: str="euclidean"):
         """
@@ -26,6 +27,7 @@ class ObjectTrackerApp:
         :param association_metric:  马氏距离关联、欧式距离关联
         """
         assert (mode == 'single') | (mode == 'multi'), f'Unknown mode : {mode}'
+        target_classes = ["person"] if target_classes is None else target_classes
         assert isinstance(target_classes, list) , f'Expected target_classes to be list. Got: {type(target_classes)}'
         
         self.mode = mode
@@ -36,7 +38,8 @@ class ObjectTrackerApp:
         self.target_classes = target_classes
         self.history_cache = {}
         self.cache_size = 100
-        self.cache_file = cache_file  # File to store the cache
+        project_root = Path(__file__).resolve().parents[2]
+        self.cache_file = Path(cache_file) if cache_file else project_root / "outputs/cache/history.json"
 
         # Load existing cache if it exists
         self.load_cache()
@@ -208,7 +211,8 @@ class ObjectTrackerApp:
                 for obj_id, history in self.history_cache.items()
             }
             
-            with open(self.cache_file, 'w') as f:
+            self.cache_file.parent.mkdir(parents=True, exist_ok=True)
+            with self.cache_file.open('w', encoding='utf-8') as f:
                 json.dump(serializable_cache, f)
         except Exception as e:
             logger.exception(f"Exception happened while saving the cache: {e}")
@@ -218,7 +222,7 @@ class ObjectTrackerApp:
         Loads the cache from a JSON file if it exists.
         """
         try:
-            with open(self.cache_file, 'r') as f:
+            with self.cache_file.open('r', encoding='utf-8') as f:
                 serializable_cache = json.load(f)
 
             # Convert lists back to deques
@@ -235,6 +239,4 @@ class ObjectTrackerApp:
             
             # If the parent folder doesn't exist
             # create it
-            parent_path = "/".join(self.cache_file.split('/')[:-1])
-            if not os.path.exists(parent_path):
-                os.makedirs(parent_path)
+            self.cache_file.parent.mkdir(parents=True, exist_ok=True)

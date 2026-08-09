@@ -1,6 +1,7 @@
 # Alice ONNX Runtime 推理示例
 
-工程支持 macOS、Linux 和 Windows 本机构建，也可配合 Android/QNX 工具链交叉编译。平台变量遵循仓库的 `cmake/AuraPlatform.cmake`。
+工程支持 macOS、Linux 和 Windows 本机构建，也可配合 Android/QNX 工具链交叉编译。
+这是独立 CMake 工程，不读取聚合仓库根目录配置。
 
 准备 OpenCV 4 和目标平台对应的 ONNX Runtime，然后执行：
 
@@ -12,7 +13,7 @@ cmake -S . -B build \
 cmake --build build --parallel
 ```
 
-仓库存在匹配 `<系统>-<架构>-release` 的预编译包时会自动选择，也可以通过 `AURA_OPENCV_ROOT` 和 `ONNXRUNTIME_ROOT` 覆盖。
+依赖通过 `OpenCV_DIR`、`AURA_OPENCV_ROOT` 和 `ONNXRUNTIME_ROOT` 显式指定，不自动读取其他子工程。
 
 运行：
 

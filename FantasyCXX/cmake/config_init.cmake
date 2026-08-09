@@ -2,7 +2,7 @@ set(CONFIG_TAG CmakeConfig)
 message(STATUS "[${CONFIG_TAG}] ==================${CONFIG_TAG} Build==============================")
 
 include(utils)
-include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/AuraPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/AuraPlatform.cmake")
 
 if(NOT CMAKE_CONFIGURATION_TYPES AND AURA_BUILD_TYPE STREQUAL "debug")
     set(DEBUG TRUE)

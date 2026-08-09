@@ -14,4 +14,9 @@ ctest --test-dir build --output-on-failure
 ./build/OpenCVDemo assets/images/image1.jpg build/result.jpg
 ```
 
-OpenCV 依赖选择遵循仓库根目录 `cmake/AuraOpenCV.cmake`。
+工程不读取聚合仓库的根目录配置。系统已安装 OpenCV 时可以直接构建；使用自定义 OpenCV 时传入
+`OpenCV_DIR` 或 `AURA_OPENCV_ROOT`：
+
+```bash
+cmake -S . -B build -DOpenCV_DIR=/path/to/opencv/lib/cmake/opencv4
+```

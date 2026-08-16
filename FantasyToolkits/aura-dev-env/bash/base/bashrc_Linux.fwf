@@ -1,0 +1,10 @@
+# 自定义的文件后缀名 .fwf (Frewen.Wang’s custom file)
+# Base environment - shared by all environments
+
+######################## >>> 快捷指令别名定义 >>> ########################
+alias open="nautilus"
+alias o="nautilus"
+alias md5="md5sum"
+alias hist="history"
+
+######################## <<< 快捷指令别名定义 <<< ########################

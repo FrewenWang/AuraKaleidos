@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+
+if {![info exists env(AURA_QNX_HOST)] || $env(AURA_QNX_HOST) eq ""} {
+    puts stderr "请设置 AURA_QNX_HOST"
+    exit 2
+}
+spawn adb root
+spawn adb remount
+spawn adb shell
+
+expect "e171" { send "busybox telnet $env(AURA_QNX_HOST); exit\r" }
+expect "login" { send "root\r" }
+expect "#" { send "tdebug -X\r" }
+sleep 1
+expect "#" { send "tdebug -B\r" }
+expect "#" { send "exit\r" }
+
+interact

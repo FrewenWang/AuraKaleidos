@@ -1,0 +1,17 @@
+#! /bin/bash
+
+adb root
+
+adb remount
+
+echo "get cutrtent EnableSNPECONFIG:"
+
+adb shell "cat /odm/etc/camera/camxoverridesettings.txt | grep EnableSNPECONFIG"
+
+echo "set debug EnableSNPECONFIG:"
+
+adb shell "chmod 777 /odm/etc/camera/camxoverridesettings.txt"
+
+adb shell "echo EnableSNPECONFIG=TRUE >> /odm/etc/camera/camxoverridesettings.txt"
+
+adb shell "cat /odm/etc/camera/camxoverridesettings.txt | grep EnableSNPECONFIG"

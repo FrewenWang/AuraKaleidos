@@ -13,3 +13,14 @@ ctest --test-dir build
 ```
 
 聚合仓库根目录不提供统一编译入口。
+
+## 一级工程
+
+- `AliceAndroid`、`AliceJava`、`FantasyKotlin`、`FantasyFlutter`、`FantasySwiftIOS`：客户端与语言示例。
+- `FantasyAI`、`FantasyHPC`、`FantasyCuda`、`FantasyAutoDrive`：AI、异构计算与自动驾驶工程。
+- `FantasyAlgorithm`、`FantasyCXX`、`FantasyPython`、`FantasyJS`、`FantasyNodeJS`：算法与语言工程。
+- `AliceAutoTest`：Phoenix 自动化测试工程，完整业务流程主要面向 Windows，macOS/Linux 可运行离线单元测试。
+- `FantasyAIAgent`：独立的 AI Agent 工具与技能集合。
+- `FantasyShell`、`FantasyToolkits`：Shell 命令与开发环境工具。
+
+大模型、数据集、测试视频和平台工具二进制不纳入 Git，也不使用 Git LFS；请根据各子工程说明单独准备。

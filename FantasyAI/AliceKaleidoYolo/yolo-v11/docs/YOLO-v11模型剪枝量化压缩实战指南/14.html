@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第14章 ONNX模型优化</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 课程导论与模型压缩概览</a></li>
+<li><a href="02.html" class="">第2章 环境搭建与工具链准备</a></li>
+<li><a href="03.html" class="">第3章 YOLOv11模型结构与原理</a></li>
+<li><a href="04.html" class="">第4章 模型剪枝基础理论</a></li>
+<li><a href="05.html" class="">第5章 稀疏化训练原理</a></li>
+<li><a href="06.html" class="">第6章 YOLOv11稀疏化训练实战</a></li>
+<li><a href="07.html" class="">第7章 通道剪枝算法详解</a></li>
+<li><a href="08.html" class="">第8章 YOLOv11通道剪枝实战</a></li>
+<li><a href="09.html" class="">第9章 剪枝后模型微调</a></li>
+<li><a href="10.html" class="">第10章 模型量化基础理论</a></li>
+<li><a href="11.html" class="">第11章 YOLOv11后训练量化实战</a></li>
+<li><a href="12.html" class="">第12章 量化感知训练实战</a></li>
+<li><a href="13.html" class="">第13章 模型导出与格式转换</a></li>
+<li><a href="14.html" class="active">第14章 ONNX模型优化</a></li>
+<li><a href="15.html" class="">第15章 TensorRT部署实战</a></li>
+<li><a href="16.html" class="">第16章 OpenVINO部署实战</a></li>
+<li><a href="17.html" class="">第17章 NCNN移动端部署</a></li>
+<li><a href="18.html" class="">第18章 TFLite与CoreML部署</a></li>
+<li><a href="19.html" class="">第19章 模型压缩效果评估体系</a></li>
+<li><a href="20.html" class="">第20章 剪枝与量化联合压缩策略</a></li>
+<li><a href="21.html" class="">第21章 自动化压缩工具链</a></li>
+<li><a href="22.html" class="">第22章 YOLOv11自定义数据集压缩</a></li>
+<li><a href="23.html" class="">第23章 模型压缩中的常见问题与调试</a></li>
+<li><a href="24.html" class="">第24章 模型压缩安全性与鲁棒性</a></li>
+<li><a href="25.html" class="">第25章 边缘设备部署实战</a></li>
+<li><a href="26.html" class="">第26章 云端部署实战</a></li>
+<li><a href="27.html" class="">第27章 模型压缩项目实战</a></li>
+<li><a href="28.html" class="">第28章 模型压缩前沿技术</a></li>
+<li><a href="29.html" class="">第29章 课程总结与最佳实践</a></li>
+<li><a href="30.html" class="">第30章 综合考核与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第14章：ONNX模型优化：ONNX Runtime推理、算子融合、动态形状处理、精度对比验证</h2>
+
+<p>模型剪枝量化完了，导出ONNX了，然后呢？</p>
+<p>说实话，很多同学走到这一步就觉得大功告成。但我见过太多人，ONNX导出来直接往手机上一扔，结果要么跑不起来，要么速度还不如PyTorch。问题出在哪？</p>
+<p>ONNX只是一个中间格式，它不会自动变快。你得「伺候」它——做推理优化、算子融合、形状处理。这一章，我就带你把这些坑一个个填平。</p>
+
+<h3>14.1 ONNX Runtime推理：别小看这个引擎</h3>
+
+<p>ONNX Runtime（简称ORT）是微软开源的推理引擎。我个人习惯，所有部署项目首选ORT，原因很简单：它把优化都封装好了。</p>
+
+<div class="highlight">
+  <p><strong>核心优势：</strong></p>
+  <ul>
+    <li>跨平台：Windows、Linux、ARM、移动端全覆盖</li>
+    <li>自动图优化：算子融合、内存复用、常量折叠</li>
+    <li>支持多种执行提供者：CPU、CUDA、TensorRT、OpenVINO</li>
+  </ul>
+</div>
+
+<p>先看一个最基本的推理代码：</p>
+
+<pre><code>import onnxruntime as ort
+import numpy as np
+
+# 创建推理会话
+session = ort.InferenceSession("yolov11_pruned.onnx")
+
+# 获取输入输出信息
+input_name = session.get_inputs()[0].name
+output_name = session.get_outputs()[0].name
+print(f"输入形状: {session.get_inputs()[0].shape}")
+print(f"输出形状: {session.get_outputs()[0].shape}")
+
+# 构造输入数据（假设是640x640）
+input_data = np.random.randn(1, 3, 640, 640).astype(np.float32)
+
+# 推理
+outputs = session.run([output_name], {input_name: input_data})
+print(f"推理结果形状: {outputs[0].shape}")
+</code></pre>
+
+<p>嗯，这里要注意：<code>session.run</code>的第一个参数是输出名称列表，可以只取你需要的输出。YOLOv11通常有多个输出头，如果你只做检测，取第一个就够了。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>ORT默认会启用所有图优化。但如果你在移动端部署，建议设置<code>SessionOptions().graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED</code>，效果更明显。</p>
+</div>
+
+<h3>14.2 算子融合：为什么能提速30%？</h3>
+
+<p>算子融合，说白了就是把多个小操作合并成一个大操作。比如Conv + BatchNorm + ReLU，这三个步骤可以融合成一个Conv+ReLU。为什么？因为减少了内存读写次数。</p>
+
+<p>我举个例子：</p>
+<ul>
+  <li>不融合：Conv写一次内存 → BN读一次、写一次 → ReLU读一次、写一次 → 总共4次内存访问</li>
+  <li>融合后：Conv+BN+ReLU一次搞定 → 只有1次读、1次写</li>
+</ul>
+
+<p>ORT默认会自动做这些融合。但有些融合需要手动触发，比如QLinearConv融合。</p>
+
+<pre><code># 手动启用所有优化
+options = ort.SessionOptions()
+options.enable_all_optimizations = True
+options.optimized_model_filepath = "yolov11_optimized.onnx"
+
+session = ort.InferenceSession("yolov11_pruned.onnx", options)
+</code></pre>
+
+<p>我曾经在一个项目中，只靠这一步，推理速度从45ms降到了32ms。你想想看，30%的提速，零成本。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经遇到过一个情况——量化后的模型，ORT自动融合反而导致精度下降。原因是某些融合操作对量化参数敏感。解决办法：设置<code>options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL</code>，然后手动逐个开启融合选项。</p>
+</div>
+
+<h3>14.3 动态形状处理：别让输入尺寸卡死你</h3>
+
+<p>YOLOv11在训练时通常固定输入尺寸（比如640x640）。但实际部署中，你可能会遇到不同分辨率的图片。如果ONNX模型是静态形状，那只能resize到固定尺寸，既损失信息又增加计算量。</p>
+
+<p>ORT支持动态形状，但需要你在导出时做点手脚。</p>
+
+<p>先看怎么导出动态形状的ONNX：</p>
+
+<pre><code>import torch
+import torch.onnx
+
+# 假设你的模型是yolo_model
+dummy_input = torch.randn(1, 3, 640, 640)
+
+# 关键：设置dynamic_axes
+dynamic_axes = {
+    'input': {0: 'batch_size', 2: 'height', 3: 'width'},
+    'output': {0: 'batch_size'}
+}
+
+torch.onnx.export(
+    yolo_model,
+    dummy_input,
+    "yolov11_dynamic.onnx",
+    input_names=['input'],
+    output_names=['output'],
+    dynamic_axes=dynamic_axes,
+    opset_version=17
+)
+</code></pre>
+
+<p>然后在推理时，你可以传入任意尺寸：</p>
+
+<pre><code>session = ort.InferenceSession("yolov11_dynamic.onnx")
+
+# 传入不同尺寸的输入
+input_640 = np.random.randn(1, 3, 640, 640).astype(np.float32)
+input_480 = np.random.randn(1, 3, 480, 480).astype(np.float32)
+
+out1 = session.run(None, {'input': input_640})
+out2 = session.run(None, {'input': input_480})
+</code></pre>
+
+<div class="highlight">
+  <p><strong>注意：</strong>动态形状会带来额外的性能开销。ORT需要为每个新形状重新编译部分图。我的建议是：如果业务场景只有2-3种固定尺寸，不如导出多个静态模型，速度更快。</p>
+</div>
+
+<h3>14.4 精度对比验证：别让模型「变傻」了</h3>
+
+<p>优化完了，你得确认模型没变傻。精度对比验证，这一步不能省。</p>
+
+<p>我一般做三件事：</p>
+
+<ol>
+  <li><strong>逐层输出对比</strong>：对比PyTorch和ORT的中间层输出，看误差有多大</li>
+  <li><strong>最终结果对比</strong>：跑100张图，对比检测框的IoU和置信度</li>
+  <li><strong>统计指标对比</strong>：mAP、Recall、Precision，一个都不能少</li>
+</ol>
+
+<p>先看逐层对比的代码：</p>
+
+<pre><code>import numpy as np
+
+def compare_outputs(pytorch_output, onnx_output, name="layer"):
+    diff = np.abs(pytorch_output - onnx_output)
+    max_diff = np.max(diff)
+    mean_diff = np.mean(diff)
+    print(f"{name}: 最大误差={max_diff:.6f}, 平均误差={mean_diff:.6f}")
+
+    if max_diff > 1e-3:
+        print(f"  ⚠️ 警告：{name} 误差较大，建议检查")
+    else:
+        print(f"  ✅ {name} 精度正常")
+</code></pre>
+
+<p>然后是最终检测结果的对比：</p>
+
+<pre><code>def compare_detections(pt_boxes, ort_boxes, iou_thresh=0.5):
+    """
+    pt_boxes: PyTorch输出的检测框 [N, 6] (x1,y1,x2,y2,conf,cls)
+    ort_boxes: ONNX Runtime输出的检测框 [M, 6]
+    """
+    # 计算每个框的IoU
+    ious = compute_iou(pt_boxes[:, :4], ort_boxes[:, :4])
+
+    # 统计匹配率
+    matched = np.sum(ious > iou_thresh)
+    total = max(len(pt_boxes), len(ort_boxes))
+    match_rate = matched / total
+
+    print(f"检测框匹配率: {match_rate:.2%}")
+    if match_rate < 0.95:
+        print("⚠️ 检测结果差异较大，建议检查优化过程")
+    else:
+        print("✅ 检测结果一致")
+</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>精度对比时，不要只看mAP。我遇到过mAP只掉了0.5%，但某些小目标完全检测不到的情况。建议按目标尺寸分组对比——大目标、中目标、小目标分别看。</p>
+</div>
+
+<h3>14.5 知识体系总览</h3>
+
+<p>这一章的内容比较多，我画了一张图帮你理清思路：</p>
+
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;height:auto;margin:20px auto;display:block;">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f5e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f1f8e9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#43a047;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#66bb6a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1b5e20;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2e7d32;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#558b2f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#689f38;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="500" rx="15" fill="url(#bgGrad)" stroke="#2e7d32" stroke-width="2"/>
+
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#1b5e20">ONNX模型优化知识体系</text>
+
+  <!-- 中心节点 -->
+  <rect x="300" y="60" width="200" height="50" rx="25" fill="url(#boxGrad2)" filter="url(#shadow)"/>
+  <text x="400" y="91" text-anchor="middle" font-size="16" font-weight="bold" fill="white">ONNX模型优化</text>
+
+  <!-- 四个分支 -->
+  <!-- 分支1: ONNX Runtime推理 -->
+  <rect x="50" y="150" width="160" height="45" rx="10" fill="url(#boxGrad1)" filter="url(#shadow)"/>
+  <text x="130" y="178" text-anchor="middle" font-size="14" font-weight="bold" fill="white">ONNX Runtime推理</text>
+
+  <line x1="300" y1="110" x2="130" y2="150" stroke="#43a047" stroke-width="2" stroke-dasharray="5,3"/>
+
+  <text x="130" y="215" text-anchor="middle" font-size="12" fill="#2e7d32">创建推理会话</text>
+  <text x="130" y="235" text-anchor="middle" font-size="12" fill="#2e7d32">执行提供者选择</text>
+  <text x="130" y="255" text-anchor="middle" font-size="12" fill="#2e7d32">图优化级别设置</text>
+
+  <!-- 分支2: 算子融合 -->
+  <rect x="320" y="150" width="160" height="45" rx="10" fill="url(#boxGrad1)" filter="url(#shadow)"/>
+  <text x="400" y="178" text-anchor="middle" font-size="14" font-weight="bold" fill="white">算子融合</text>
+
+  <line x1="400" y1="110" x2="400" y2="150" stroke="#43a047" stroke-width="2" stroke-dasharray="5,3"/>
+
+  <text x="400" y="215" text-anchor="middle" font-size="12" fill="#2e7d32">Conv+BN+ReLU融合</text>
+  <text x="400" y="235" text-anchor="middle" font-size="12" fill="#2e7d32">QLinearConv融合</text>
+  <text x="400" y="255" text-anchor="middle" font-size="12" fill="#2e7d32">常量折叠优化</text>
+
+  <!-- 分支3: 动态形状处理 -->
+  <rect x="590" y="150" width="160" height="45" rx="10" fill="url(#boxGrad1)" filter="url(#shadow)"/>
+  <text x="670" y="178" text-anchor="middle" font-size="14" font-weight="bold" fill="white">动态形状处理</text>
+
+  <line x1="500" y1="110" x2="670" y2="150" stroke="#43a047" stroke-width="2" stroke-dasharray="5,3"/>
+
+  <text x="670" y="215" text-anchor="middle" font-size="12" fill="#2e7d32">dynamic_axes设置</text>
+  <text x="670" y="235" text-anchor="middle" font-size="12" fill="#2e7d32">多尺寸推理支持</text>
+  <text x="670" y="255" text-anchor="middle" font-size="12" fill="#2e7d32">性能与灵活性权衡</text>
+
+  <!-- 分支4: 精度对比验证 -->
+  <rect x="200" y="310" width="400" height="45" rx="10" fill="url(#boxGrad3)" filter="url(#shadow)"/>
+  <text x="400" y="338" text-anchor="middle" font-size="14" font-weight="bold" fill="white">精度对比验证</text>
+
+  <line x1="400" y1="195" x2="400" y2="310" stroke="#558b2f" stroke-width="2" stroke-dasharray="5,3"/>
+
+  <text x="400" y="375" text-anchor="middle" font-size="12" fill="#1b5e20">逐层输出对比 → 最终结果对比 → 统计指标对比</text>
+
+  <!-- 底部总结 -->
+  <rect x="150" y="410" width="500" height="55" rx="10" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.5"/>
+  <text x="400" y="435" text-anchor="middle" font-size="13" fill="#1b5e20" font-weight="bold">核心目标：在保证精度的前提下，最大化推理速度</text>
+  <text x="400" y="455" text-anchor="middle" font-size="12" fill="#2e7d32">ORT推理 + 算子融合 + 动态形状 + 精度验证 = 生产级部署</text>
+</svg>
+
+<h3>14.6 完整优化流程</h3>
+
+<p>最后，我把整个优化流程串起来，给你一个可以直接用的脚本框架：</p>
+
+<pre><code>def optimize_onnx_model(input_path, output_path):
+    """
+    完整的ONNX模型优化流程
+    """
+    # 1. 加载模型并启用所有优化
+    options = ort.SessionOptions()
+    options.enable_all_optimizations = True
+    options.optimized_model_filepath = output_path
+
+    session = ort.InferenceSession(input_path, options)
+
+    # 2. 精度验证
+    print("开始精度验证...")
+    pt_model = load_pytorch_model()  # 你的PyTorch模型
+    test_images = load_test_images()  # 测试图片
+
+    total_max_diff = 0
+    for img in test_images:
+        pt_out = pt_model(img)
+        ort_out = session.run(None, {'input': img.numpy()})
+
+        diff = np.max(np.abs(pt_out.detach().numpy() - ort_out[0]))
+        total_max_diff = max(total_max_diff, diff)
+
+    print(f"最大误差: {total_max_diff:.6f}")
+
+    if total_max_diff > 1e-3:
+        print("⚠️ 精度下降明显，建议检查优化选项")
+        # 回退到基本优化
+        options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_BASIC
+        session = ort.InferenceSession(input_path, options)
+    else:
+        print("✅ 精度验证通过")
+
+    return session
+</code></pre>
+
+<div class="warning">
+  <p><strong>最后提醒：</strong>优化后的ONNX模型，一定要在目标硬件上测试。我在服务器上跑得好好的模型，放到Jetson上就崩了——因为CUDA版本不匹配。ORT的执行提供者（Execution Provider）配置，是另一个大坑，后面章节会细讲。</p>
+</div>
+
+<p>好了，这一章的内容就到这里。ONNX优化不是玄学，每一步都有理可循。你只要按照这个流程走，模型部署基本不会出大问题。</p>
+        <div class="footer-nav">
+            <a href="13.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15.html">下一章 →</a>
+        </div>
+        <footer>公众号:蓝海资料掘金营，微信deep3321</footer>
+    </div>
+</div>
+</div>
+</body>
+</html>

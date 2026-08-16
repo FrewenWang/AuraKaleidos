@@ -1,0 +1,75 @@
+# 自定义的文件后缀名 .fwf (Frewen.Wang’s custom file)
+# Base environment - shared by all environments
+
+######################## >>> 快捷指令别名定义 >>> ########################
+
+# >>>>>>>>>>> File listing aliases >>>>>>>>>>>
+alias ll="ls -lh"
+alias la="ls -la"
+alias l="ls -lh"
+alias c="clear"
+# <<<<<<<<<<< File listing aliases <<<<<<<<<<<
+
+# >>>>>>>>>>> Navigation aliases >>>>>>>>>>>
+alias cd..="cd .."
+alias ..="cd .."
+alias ...="cd ../.."
+# <<<<<<<<<<< Navigation aliases <<<<<<<<<<<
+
+# >>>>>>>>>>> Utility aliases >>>>>>>>>>>
+alias grep="grep --color=auto"
+# <<<<<<<<<<< Utility aliases <<<<<<<<<<<
+
+# >>>>>>>>>>> Git aliases >>>>>>>>>>>
+alias gt="git"
+alias gti="git"
+alias gst="git status"
+alias gl="git log"
+alias gb="git branch"
+alias gpr="git pull --rebase"
+alias gpm="git pull --merge"
+alias gpo="git push origin"
+# <<<<<<<<<<< Git aliases <<<<<<<<<<<
+
+
+# >>>>>>>>>>> ADB aliases >>>>>>>>>>>
+alias ashell="adb shell"
+alias alog="adb logcat"
+alias adevices="adb devices"
+# <<<<<<<<<<< ADB aliases <<<<<<<<<<<
+
+
+######################## <<< 快捷指令别名定义 <<< ########################
+
+######################## >>>    系统环境变量  >>> ########################
+
+# >>>>>>>>>>> NDK 环境变量 >>>>>>>>>>>
+# rm "$HOME/Library/AAuraLib/ndk/ndk-home"
+# ln -s "$HOME/snap/ndk/android-ndk-r26d" "$HOME/Library/AAuraLib/ndk/ndk-home"
+export NDK_HOME="$HOME/Library/AAuraLib/ndk/ndk-home"
+export NDK_PATH="$HOME/Library/AAuraLib/ndk/ndk-home"
+export ANDROID_NDK_HOME="$HOME/Library/AAuraLib/ndk/ndk-home"
+export ANDROID_NDK_ROOT="$HOME/Library/AAuraLib/ndk/ndk-home"
+export ANDROID_NDK="$HOME/Library/AAuraLib/ndk/ndk-home"
+export PATH=$PATH:$NDK_HOME
+export PATH=$PATH:$NDK_PATH
+export PATH=$PATH:$ANDROID_NDK_HOME
+export PATH=$PATH:$ANDROID_NDK_ROOT
+export PATH=$PATH:$ANDROID_NDK
+# <<<<<<<<<<< NDK 环境变量 <<<<<<<<<<<
+
+# >>>>>>>>>>> NDK 环境变量 >>>>>>>>>>>
+export OPENCV_HOME="$HOME/Library/AAuraLib/opencv/opencv4.1.0"
+export OPENCV_ROOT="$HOME/Library/AAuraLib/opencv/opencv4.1.0"
+export PATH=$PATH:$OPENCV_HOME
+export PATH=$PATH:$OPENCV_ROOT
+# <<<<<<<<<<< NDK 环境变量 <<<<<<<<<<<
+
+# >>> 设置Hexagon环境变量 >>>
+export HEXAGON_SDK_PATH="$HOME/Library/AAuraLib/hexagon/6.2.0.1"
+export HEXAGON_SDK_ROOT="$HOME/Library/AAuraLib/hexagon/6.2.0.1"
+export PATH=$PATH:$HEXAGON_SDK_PATH
+export PATH=$PATH:$HEXAGON_SDK_ROOT
+# <<< 设置Hexagon环境变量 <<<
+
+######################## <<<    系统环境变量  <<< ########################

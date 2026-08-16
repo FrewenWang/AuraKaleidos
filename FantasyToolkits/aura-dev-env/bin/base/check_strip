@@ -1,0 +1,63 @@
+#!/bin/bash
+# 检查目录下所有 .a 和 .so 文件是否被 strip
+
+ROOT_DIR=${1:-.}
+TMP_DIR=$(mktemp -d)
+RESULT_FILE=$(mktemp)
+
+echo "扫描目录: $ROOT_DIR"
+echo "-------------------------------------------"
+
+# 函数：检查一个 .a 文件
+check_a_file() {
+  local lib="$1"
+  local has_symbols=0
+  local tmpdir="$TMP_DIR/a_check"
+  mkdir -p "$tmpdir"
+
+  # 提取并检查每个 .o
+  for obj in $(ar t "$lib" 2> /dev/null); do
+    ar x "$lib" "$obj" -C "$tmpdir" > /dev/null 2>&1
+    if readelf -S "$tmpdir/$obj" 2> /dev/null | grep -Eq '\.symtab|\.debug'; then
+      echo "obj has_symbols==============$obj"
+      has_symbols=1
+      break
+    fi
+    rm -f "$tmpdir/$obj"
+  done
+
+  rm -rf "$tmpdir"
+  echo "has_symbols==============$has_symbols"
+  if [ "$has_symbols" -eq 1 ]; then
+    echo "$lib | .a | ✅ 未 strip"
+  else
+    echo "$lib | .a | ❌ 已 strip"
+  fi
+}
+
+# 函数：检查一个 .so 文件
+check_so_file() {
+  local so="$1"
+  if readelf -S "$so" 2> /dev/null | grep -Eq '\.symtab|\.dynsym|\.debug'; then
+    echo "$so | .so | ✅ 未 strip"
+  else
+    echo "$so | .so | ❌ 已 strip"
+  fi
+}
+
+# 遍历所有文件
+find "$ROOT_DIR" \( -name "*.a" -o -name "*.so" \) | while read f; do
+  if [[ "$f" == *.a ]]; then
+    check_a_file "$f" >> "$RESULT_FILE"
+  else
+    check_so_file "$f" >> "$RESULT_FILE"
+  fi
+done
+
+# 输出结果
+echo
+echo "📊 检测结果："
+echo "-------------------------------------------"
+column -t -s '|' "$RESULT_FILE"
+
+rm -rf "$TMP_DIR" "$RESULT_FILE"

@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第22章 YOLOv11自定义数据集压缩</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 课程导论与模型压缩概览</a></li>
+<li><a href="02.html" class="">第2章 环境搭建与工具链准备</a></li>
+<li><a href="03.html" class="">第3章 YOLOv11模型结构与原理</a></li>
+<li><a href="04.html" class="">第4章 模型剪枝基础理论</a></li>
+<li><a href="05.html" class="">第5章 稀疏化训练原理</a></li>
+<li><a href="06.html" class="">第6章 YOLOv11稀疏化训练实战</a></li>
+<li><a href="07.html" class="">第7章 通道剪枝算法详解</a></li>
+<li><a href="08.html" class="">第8章 YOLOv11通道剪枝实战</a></li>
+<li><a href="09.html" class="">第9章 剪枝后模型微调</a></li>
+<li><a href="10.html" class="">第10章 模型量化基础理论</a></li>
+<li><a href="11.html" class="">第11章 YOLOv11后训练量化实战</a></li>
+<li><a href="12.html" class="">第12章 量化感知训练实战</a></li>
+<li><a href="13.html" class="">第13章 模型导出与格式转换</a></li>
+<li><a href="14.html" class="">第14章 ONNX模型优化</a></li>
+<li><a href="15.html" class="">第15章 TensorRT部署实战</a></li>
+<li><a href="16.html" class="">第16章 OpenVINO部署实战</a></li>
+<li><a href="17.html" class="">第17章 NCNN移动端部署</a></li>
+<li><a href="18.html" class="">第18章 TFLite与CoreML部署</a></li>
+<li><a href="19.html" class="">第19章 模型压缩效果评估体系</a></li>
+<li><a href="20.html" class="">第20章 剪枝与量化联合压缩策略</a></li>
+<li><a href="21.html" class="">第21章 自动化压缩工具链</a></li>
+<li><a href="22.html" class="active">第22章 YOLOv11自定义数据集压缩</a></li>
+<li><a href="23.html" class="">第23章 模型压缩中的常见问题与调试</a></li>
+<li><a href="24.html" class="">第24章 模型压缩安全性与鲁棒性</a></li>
+<li><a href="25.html" class="">第25章 边缘设备部署实战</a></li>
+<li><a href="26.html" class="">第26章 云端部署实战</a></li>
+<li><a href="27.html" class="">第27章 模型压缩项目实战</a></li>
+<li><a href="28.html" class="">第28章 模型压缩前沿技术</a></li>
+<li><a href="29.html" class="">第29章 课程总结与最佳实践</a></li>
+<li><a href="30.html" class="">第30章 综合考核与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第22章 YOLOv11自定义数据集压缩：数据标注格式、数据集划分、训练配置、压缩流程适配</h2>
+
+<p>说实话，模型压缩这件事，很多人一上来就调参数、跑脚本，结果发现效果一塌糊涂。我见过太多人栽在数据准备这一步。你想想看，模型压缩的本质是让网络学会「更高效地表达」，如果数据本身就有问题，那压缩出来的模型能好用才怪。</p>
+
+<p>这一章，咱们就聊聊自定义数据集压缩的那些坑。我会把数据标注格式、数据集划分、训练配置、压缩流程适配这几个环节串起来讲。嗯，都是我在项目里踩过的坑，希望能帮你省点时间。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>数据质量决定了压缩效果的上限。标注不规范，后面所有工作都是白费。</p>
+</div>
+
+<h3>22.1 数据标注格式：别小看这一步</h3>
+
+<p>YOLOv11默认用的是YOLO格式的标注。说白了，就是每个图片对应一个同名的txt文件，里面每行代表一个目标。格式长这样：</p>
+
+<pre><code>class_id x_center y_center width height</code></pre>
+
+<p>注意，这里的坐标都是归一化后的值，范围在0到1之间。我刚开始做的时候，就犯过傻——直接把像素坐标写进去了，结果训练出来的模型啥也检测不到。</p>
+
+<p>举个例子，一张640x640的图片，目标中心在(320, 240)，宽高是(100, 80)。那标注应该是：</p>
+
+<pre><code>0 0.5 0.375 0.15625 0.125</code></pre>
+
+<p>计算方式很简单：</p>
+<ul>
+  <li>x_center = 320 / 640 = 0.5</li>
+  <li>y_center = 240 / 640 = 0.375</li>
+  <li>width = 100 / 640 = 0.15625</li>
+  <li>height = 80 / 640 = 0.125</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的习惯：</strong>我会用LabelImg或者CVAT来标注，导出时直接选YOLO格式。省得自己手动算坐标，容易出错。</p>
+</div>
+
+<p>还有一个容易忽略的点——类别编号必须从0开始连续。比如你有3类：人、车、自行车，那编号就是0、1、2。中间不能跳号，否则训练时会报错。我曾经因为删了一个类别没重新编号，排查了半天才发现问题。</p>
+
+<h3>22.2 数据集划分：别让验证集变成摆设</h3>
+
+<p>数据集划分这事，看着简单，其实门道不少。YOLOv11的训练脚本通常要求你把数据分成三部分：训练集、验证集、测试集。比例我一般用8:1:1。</p>
+
+<p>但这里有个坑——随机划分。你想想看，如果随机分，很可能某个类别的样本全跑到了训练集，验证集里一个都没有。那验证集的mAP算出来虚高，实际部署时直接翻车。</p>
+
+<p>我建议用分层采样。说白了，就是保证每个类别在三个集合里的比例差不多。代码实现也不复杂：</p>
+
+<pre><code>from sklearn.model_selection import train_test_split
+
+# 假设你有图片列表和对应的类别标签
+images = [...]  # 图片路径列表
+labels = [...]  # 每个图片包含的类别列表（取第一个类别做分层依据）
+
+train_imgs, temp_imgs, train_labels, temp_labels = train_test_split(
+    images, labels, test_size=0.2, stratify=labels, random_state=42
+)
+
+val_imgs, test_imgs, val_labels, test_labels = train_test_split(
+    temp_imgs, temp_labels, test_size=0.5, stratify=temp_labels, random_state=42
+)</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>stratify参数要求标签是离散的。如果你的图片里包含多个类别，可以取主要类别或者随机选一个作为分层依据。虽然不是完美方案，但比纯随机强得多。</p>
+</div>
+
+<p>划分完之后，目录结构应该是这样的：</p>
+
+<pre><code>dataset/
+├── images/
+│   ├── train/
+│   ├── val/
+│   └── test/
+├── labels/
+│   ├── train/
+│   ├── val/
+│   └── test/
+└── dataset.yaml</code></pre>
+
+<h3>22.3 训练配置：压缩前的准备工作</h3>
+
+<p>训练配置这块，我直接说重点。YOLOv11的配置文件是YAML格式，你需要关注这几个参数：</p>
+
+<table>
+  <tr>
+    <th>参数名</th>
+    <th>说明</th>
+    <th>我的建议值</th>
+  </tr>
+  <tr>
+    <td>batch</td>
+    <td>批次大小</td>
+    <td>16或32，看显存</td>
+  </tr>
+  <tr>
+    <td>epochs</td>
+    <td>训练轮数</td>
+    <td>300（压缩前）</td>
+  </tr>
+  <tr>
+    <td>imgsz</td>
+    <td>输入图片尺寸</td>
+    <td>640</td>
+  </tr>
+  <tr>
+    <td>optimizer</td>
+    <td>优化器</td>
+    <td>SGD（压缩场景更稳）</td>
+  </tr>
+  <tr>
+    <td>lr0</td>
+    <td>初始学习率</td>
+    <td>0.01</td>
+  </tr>
+</table>
+
+<p>这里有个经验——压缩前的训练，学习率可以稍微大一点。因为我们要让模型充分收敛，后面剪枝量化的时候才有「冗余」可以去掉。如果模型本身就没训练好，剪完直接废了。</p>
+
+<p>dataset.yaml文件的内容大概是这样：</p>
+
+<pre><code>path: /path/to/dataset
+train: images/train
+val: images/val
+test: images/test
+
+nc: 3
+names: ['person', 'car', 'bicycle']</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>path路径最好用绝对路径。我之前用相对路径，换台机器跑就报错，排查了半天才发现是路径问题。</p>
+</div>
+
+<h3>22.4 压缩流程适配：把通用流程嫁接到你的数据上</h3>
+
+<p>好了，数据准备好了，训练配置也调好了。接下来就是压缩流程的适配。说白了，就是把前面几章讲的剪枝、量化、蒸馏这些技术，套到你的自定义数据集上。</p>
+
+<p>我画了一张流程图，帮你理清整个流程：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">YOLOv11自定义数据集压缩流程</text>
+
+  <!-- 步骤1：数据准备 -->
+  <rect x="50" y="70" width="200" height="60" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="100" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤1：数据准备</text>
+  <text x="150" y="118" text-anchor="middle" font-size="11" fill="white">标注 → 划分 → 配置</text>
+
+  <!-- 箭头1 -->
+  <line x1="250" y1="100" x2="320" y2="100" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤2：基础训练 -->
+  <rect x="320" y="70" width="200" height="60" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="420" y="100" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤2：基础训练</text>
+  <text x="420" y="118" text-anchor="middle" font-size="11" fill="white">训练基线模型</text>
+
+  <!-- 箭头2 -->
+  <line x1="520" y1="100" x2="590" y2="100" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤3：剪枝 -->
+  <rect x="590" y="70" width="160" height="60" rx="10" fill="#27ae60" opacity="0.9"/>
+  <text x="670" y="100" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤3：剪枝</text>
+  <text x="670" y="118" text-anchor="middle" font-size="11" fill="white">结构化/非结构化</text>
+
+  <!-- 向下箭头 -->
+  <line x1="670" y1="130" x2="670" y2="180" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤4：微调 -->
+  <rect x="590" y="180" width="160" height="60" rx="10" fill="#f39c12" opacity="0.9"/>
+  <text x="670" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤4：微调</text>
+  <text x="670" y="228" text-anchor="middle" font-size="11" fill="white">恢复精度</text>
+
+  <!-- 向左箭头 -->
+  <line x1="590" y1="210" x2="520" y2="210" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤5：量化 -->
+  <rect x="320" y="180" width="200" height="60" rx="10" fill="#8e44ad" opacity="0.9"/>
+  <text x="420" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤5：量化</text>
+  <text x="420" y="228" text-anchor="middle" font-size="11" fill="white">PTQ / QAT</text>
+
+  <!-- 向下箭头 -->
+  <line x1="420" y1="240" x2="420" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤6：评估 -->
+  <rect x="320" y="290" width="200" height="60" rx="10" fill="#1abc9c" opacity="0.9"/>
+  <text x="420" y="320" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤6：评估</text>
+  <text x="420" y="338" text-anchor="middle" font-size="11" fill="white">mAP / 速度 / 体积</text>
+
+  <!-- 向右箭头 -->
+  <line x1="520" y1="320" x2="590" y2="320" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤7：部署 -->
+  <rect x="590" y="290" width="160" height="60" rx="10" fill="#e67e22" opacity="0.9"/>
+  <text x="670" y="320" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤7：部署</text>
+  <text x="670" y="338" text-anchor="middle" font-size="11" fill="white">ONNX / TensorRT</text>
+
+  <!-- 反馈箭头 -->
+  <path d="M 670 350 L 670 400 L 150 400 L 150 130" stroke="#95a5a6" stroke-width="1.5" fill="none" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  <text x="400" y="420" text-anchor="middle" font-size="11" fill="#7f8c8d">精度不达标？返回调整剪枝率或重新训练</text>
+
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这个流程里，最关键的适配点有两个：</p>
+
+<ol>
+  <li><strong>剪枝率的设定</strong>：不同数据集的最佳剪枝率不一样。我一般从0.3开始试，然后0.5、0.7，看mAP下降曲线。如果下降超过5%，就退回到上一个档位。</li>
+  <li><strong>量化校准数据</strong>：PTQ量化需要一小部分校准数据。我习惯从验证集里随机抽100-200张，覆盖所有类别。太少的话，量化后的精度会崩。</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>实战经验：</strong>我在一个工业检测项目里，数据集只有5000张图片，类别分布极不均匀。剪枝到0.5时mAP掉了8%，但量化后反而只掉了3%。后来发现是剪枝把一些「小目标检测通道」给剪没了。解决办法是——剪枝时保留前几层的通道数，只剪后面的。</p>
+</div>
+
+<h3>22.5 训练脚本适配：改几行代码的事</h3>
+
+<p>YOLOv11官方代码其实已经支持自定义数据集了。你只需要改两处：</p>
+
+<p>第一处，是数据加载部分。确保你的数据集路径和标注格式正确：</p>
+
+<pre><code>from ultralytics import YOLO
+
+# 加载预训练模型
+model = YOLO('yolo11n.pt')
+
+# 训练自定义数据集
+results = model.train(
+    data='dataset.yaml',  # 你的配置文件
+    epochs=300,
+    imgsz=640,
+    batch=16,
+    device='cuda:0'
+)</code></pre>
+
+<p>第二处，是压缩后的微调。剪枝或量化后，需要重新训练几个epoch来恢复精度：</p>
+
+<pre><code># 剪枝后的模型
+pruned_model = YOLO('path/to/pruned_model.pt')
+
+# 微调
+results = pruned_model.train(
+    data='dataset.yaml',
+    epochs=50,  # 微调不需要太多轮数
+    lr0=0.001,  # 学习率要调小
+    resume=False
+)</code></pre>
+
+<div class="tip">
+  <p><strong>我的习惯：</strong>微调时我会把学习率降到原来的1/10。因为模型已经收敛过了，学习率太大容易把权重「冲散」。</p>
+</div>
+
+<h3>22.6 常见问题与避坑</h3>
+
+<p>最后，我总结几个我在自定义数据集压缩时遇到过的坑：</p>
+
+<ul>
+  <li><strong>标注文件缺失</strong>：有些图片没有目标，但YOLO要求每个图片都有对应的txt文件。空文件也要放一个，否则训练会报错。</li>
+  <li><strong>类别名称不一致</strong>：dataset.yaml里的names顺序必须和标注文件里的class_id一一对应。我见过有人把顺序搞反了，结果模型把「人」识别成了「车」。</li>
+  <li><strong>图片尺寸不统一</strong>：虽然YOLOv11会自动resize，但如果图片长宽比差异太大，压缩后的模型容易在小目标上翻车。我建议训练前先统计一下图片尺寸分布，把特别离谱的筛掉。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>曾经有一次：</strong>我帮客户压缩一个交通监控模型，数据集里全是白天场景。压缩后部署到晚上场景，mAP直接掉了20%。后来才发现是数据分布和部署场景不匹配。所以，压缩前一定要确认你的验证集能代表真实场景。</p>
+</div>
+
+<p>好了，自定义数据集压缩的流程就这些。数据准备好了，后面的事情就顺理成章了。</p>
+
+<hr>
+<footer>
+  <p style="text-align:center; color:#7f8c8d; font-size:12px;">公众号：蓝海资料掘金营，微信deep3321</p>
+</footer>
+        <div class="footer-nav">
+            <a href="21.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="23.html">下一章 →</a>
+        </div>
+        <footer>公众号:蓝海资料掘金营，微信deep3321</footer>
+    </div>
+</div>
+</div>
+</body>
+</html>

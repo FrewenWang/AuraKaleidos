@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第21章 自动化压缩工具链</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 课程导论与模型压缩概览</a></li>
+<li><a href="02.html" class="">第2章 环境搭建与工具链准备</a></li>
+<li><a href="03.html" class="">第3章 YOLOv11模型结构与原理</a></li>
+<li><a href="04.html" class="">第4章 模型剪枝基础理论</a></li>
+<li><a href="05.html" class="">第5章 稀疏化训练原理</a></li>
+<li><a href="06.html" class="">第6章 YOLOv11稀疏化训练实战</a></li>
+<li><a href="07.html" class="">第7章 通道剪枝算法详解</a></li>
+<li><a href="08.html" class="">第8章 YOLOv11通道剪枝实战</a></li>
+<li><a href="09.html" class="">第9章 剪枝后模型微调</a></li>
+<li><a href="10.html" class="">第10章 模型量化基础理论</a></li>
+<li><a href="11.html" class="">第11章 YOLOv11后训练量化实战</a></li>
+<li><a href="12.html" class="">第12章 量化感知训练实战</a></li>
+<li><a href="13.html" class="">第13章 模型导出与格式转换</a></li>
+<li><a href="14.html" class="">第14章 ONNX模型优化</a></li>
+<li><a href="15.html" class="">第15章 TensorRT部署实战</a></li>
+<li><a href="16.html" class="">第16章 OpenVINO部署实战</a></li>
+<li><a href="17.html" class="">第17章 NCNN移动端部署</a></li>
+<li><a href="18.html" class="">第18章 TFLite与CoreML部署</a></li>
+<li><a href="19.html" class="">第19章 模型压缩效果评估体系</a></li>
+<li><a href="20.html" class="">第20章 剪枝与量化联合压缩策略</a></li>
+<li><a href="21.html" class="active">第21章 自动化压缩工具链</a></li>
+<li><a href="22.html" class="">第22章 YOLOv11自定义数据集压缩</a></li>
+<li><a href="23.html" class="">第23章 模型压缩中的常见问题与调试</a></li>
+<li><a href="24.html" class="">第24章 模型压缩安全性与鲁棒性</a></li>
+<li><a href="25.html" class="">第25章 边缘设备部署实战</a></li>
+<li><a href="26.html" class="">第26章 云端部署实战</a></li>
+<li><a href="27.html" class="">第27章 模型压缩项目实战</a></li>
+<li><a href="28.html" class="">第28章 模型压缩前沿技术</a></li>
+<li><a href="29.html" class="">第29章 课程总结与最佳实践</a></li>
+<li><a href="30.html" class="">第30章 综合考核与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第二十一章：自动化压缩工具链</h2>
+
+<p>说实话，模型压缩这件事，手动做一两次还行。但你要是跟我一样，在项目里要反复调参、对比不同压缩策略、还要适配不同硬件平台……那手动操作真的会让人崩溃。</p>
+
+<p>我最早做YOLOv5剪枝的时候，就是纯手工操作。改一次剪枝率，跑一遍验证，再改，再跑。一个周末就这么搭进去了。后来我学乖了——自动化工具链才是正道。</p>
+
+<p>这一章，我就把常用的几个自动化压缩工具给你捋一遍。NNI、Intel POT、TensorRT Model Optimizer，还有我自己写的自定义脚本。每个工具我都踩过坑，咱们直接说干货。</p>
+
+<div class="highlight">
+  <p><strong>核心思路：</strong>自动化工具链的本质，就是把「剪枝→量化→微调→验证」这个循环，变成一键执行。你只需要定义好策略，剩下的交给工具。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:20px auto; background:#f0f8ff; border-radius:12px;">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50" />
+    </marker>
+  </defs>
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a5276">自动化压缩工具链全景图</text>
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="10" fill="#2980b9" stroke="#1a5276" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" fill="white" font-size="16" font-weight="bold">YOLOv11 模型</text>
+  <!-- 四个工具分支 -->
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="160" x2="120" y2="200" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="160" x2="400" y2="200" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="160" x2="680" y2="200" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="160" x2="400" y2="240" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <!-- NNI -->
+  <rect x="30" y="200" width="180" height="60" rx="8" fill="#e8f8f5" stroke="#1abc9c" stroke-width="2"/>
+  <text x="120" y="225" text-anchor="middle" fill="#0e6655" font-size="14" font-weight="bold">NNI</text>
+  <text x="120" y="245" text-anchor="middle" fill="#0e6655" font-size="12">自动剪枝 + 量化搜索</text>
+  <!-- Intel POT -->
+  <rect x="310" y="200" width="180" height="60" rx="8" fill="#fef9e7" stroke="#f39c12" stroke-width="2"/>
+  <text x="400" y="225" text-anchor="middle" fill="#7d6608" font-size="14" font-weight="bold">Intel POT</text>
+  <text x="400" y="245" text-anchor="middle" fill="#7d6608" font-size="12">OpenVINO 后训练量化</text>
+  <!-- TensorRT MO -->
+  <rect x="590" y="200" width="180" height="60" rx="8" fill="#f5eef8" stroke="#8e44ad" stroke-width="2"/>
+  <text x="680" y="225" text-anchor="middle" fill="#6c3483" font-size="14" font-weight="bold">TensorRT MO</text>
+  <text x="680" y="245" text-anchor="middle" fill="#6c3483" font-size="12">FP16/INT8 自动优化</text>
+  <!-- 自定义脚本 -->
+  <rect x="310" y="260" width="180" height="60" rx="8" fill="#fdedec" stroke="#e74c3c" stroke-width="2"/>
+  <text x="400" y="285" text-anchor="middle" fill="#922b21" font-size="14" font-weight="bold">自定义自动化脚本</text>
+  <text x="400" y="305" text-anchor="middle" fill="#922b21" font-size="12">灵活组合 + 流水线</text>
+  <!-- 输出 -->
+  <line x1="120" y1="260" x2="120" y2="310" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="320" x2="400" y2="350" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="680" y1="260" x2="680" y2="310" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <rect x="250" y="340" width="300" height="40" rx="10" fill="#2c3e50" stroke="#1a252f" stroke-width="2"/>
+  <text x="400" y="365" text-anchor="middle" fill="white" font-size="14" font-weight="bold">压缩后模型（小体积 + 高速度）</text>
+</svg>
+
+<h3>1. NNI：微软的自动压缩工具箱</h3>
+
+<p>NNI（Neural Network Intelligence）是我个人用得最多的工具。它最大的好处是——你不用自己写剪枝算法。NNI 内置了十几种剪枝策略，比如 L1 剪枝、FPGM、激活值剪枝等等。</p>
+
+<p>我记得第一次用 NNI 做 YOLOv5 剪枝时，只写了不到 50 行配置代码，就自动跑完了剪枝→微调→评估的完整流程。嗯，当时确实被惊艳到了。</p>
+
+<div class="tip">
+  <p><strong>我的习惯：</strong>先用 NNI 的自动搜索功能，跑一轮不同剪枝率的组合。它会自动记录每个组合的精度和 FLOPs，你直接挑一个性价比最高的就行。</p>
+</div>
+
+<p>NNI 的量化模块也值得一提。它支持 QAT（量化感知训练）和 PTQ（后训练量化）。我个人建议：如果时间充裕，用 QAT；如果赶项目，PTQ 就够了。</p>
+
+<pre><code># NNI 剪枝配置示例（YAML）
+experimentName: yolo11_prune
+searchSpaceFile: search_space.json
+trialCommand: python train.py --prune
+trialConcurrency: 2
+maxTrialNumber: 20
+tuner:
+  name: TPE
+  classArgs:
+    optimize_mode: maximize
+trainingService:
+  platform: local</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>NNI 的剪枝结果默认是稀疏权重，不是真正减少参数量。你需要额外调用一次 <code>apply_compression</code> 才能得到真正的轻量模型。我当初就因为这个多花了半天排查问题。</p>
+</div>
+
+<h3>2. Intel POT：OpenVINO 生态的量化利器</h3>
+
+<p>如果你最终要部署在 Intel 的 CPU 或 VPU 上，那 Intel POT（Post-training Optimization Tool）就是首选。它专门为 OpenVINO 格式的模型做量化优化。</p>
+
+<p>POT 的工作方式很简单：你给它一个 OpenVINO IR 模型，再给一小部分校准数据，它就能自动完成 INT8 量化。整个过程不需要反向传播，跑得飞快。</p>
+
+<p>我曾经在一个边缘设备项目里，用 POT 把 YOLOv5s 从 FP32 量化到 INT8，推理速度提升了 2.3 倍，mAP 只掉了 0.8%。说实话，这个性价比真的很高。</p>
+
+<pre><code># POT 量化命令示例
+pot \
+  --model /path/to/model.xml \
+  --weights /path/to/model.bin \
+  --engine simplified \
+  --data-source /path/to/calibration_data \
+  --quantize default \
+  --output /path/to/quantized_model</code></pre>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>POT 的校准数据不需要很多，一般 200-500 张图片就够了。但数据分布一定要和真实场景一致，否则量化后的精度会崩。我吃过这个亏。</p>
+</div>
+
+<h3>3. TensorRT Model Optimizer：NVIDIA 的加速引擎</h3>
+
+<p>TensorRT Model Optimizer（简称 TRT MO）是 NVIDIA 官方推出的工具。它专门针对 TensorRT 推理引擎做优化，支持 FP16、INT8 量化，以及层融合、内存优化等操作。</p>
+
+<p>TRT MO 的使用流程很清晰：先把 PyTorch 模型导出为 ONNX，然后用 TRT MO 做量化优化，最后生成 TensorRT 引擎文件。整个过程可以写成一个脚本，一键执行。</p>
+
+<p>我建议你在使用 TRT MO 时，重点关注 INT8 量化。因为 FP16 基本是无损的，但 INT8 需要校准数据。TRT MO 支持两种校准方式：熵校准和最小化均方误差校准。我个人更推荐熵校准，效果更稳定。</p>
+
+<pre><code># TensorRT Model Optimizer 量化示例
+import tensorrt as trt
+from tensorrt_model_optimizer import ModelOptimizer
+
+optimizer = ModelOptimizer(
+    onnx_path="yolo11.onnx",
+    precision="int8",
+    calibration_cache="calibration.cache",
+    calibration_data="calibration_images"
+)
+
+optimizer.optimize()
+optimizer.save_engine("yolo11_int8.engine")</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>TRT MO 支持动态形状输入。如果你的 YOLOv11 需要处理不同分辨率的图片，记得在配置里开启动态形状支持。否则推理时会报 shape 不匹配的错误。</p>
+</div>
+
+<h3>4. 自定义自动化脚本：灵活才是王道</h3>
+
+<p>工具再好，也总有满足不了需求的时候。比如，我想在剪枝后先做一次 PTQ，再做一次 QAT，最后用 TensorRT 做层融合。这种组合操作，现成工具很难一步到位。</p>
+
+<p>所以，我通常会写一套自定义自动化脚本。核心思路是：把每个压缩步骤封装成一个函数，然后用一个主脚本串联起来。</p>
+
+<pre><code># 自定义自动化脚本框架
+def prune_model(model, prune_ratio):
+    # 剪枝逻辑
+    pass
+
+def quantize_ptq(model, calib_loader):
+    # 后训练量化
+    pass
+
+def quantize_qat(model, train_loader):
+    # 量化感知训练
+    pass
+
+def export_tensorrt(model, precision):
+    # 导出 TensorRT 引擎
+    pass
+
+# 主流水线
+if __name__ == "__main__":
+    model = load_yolo11()
+    model = prune_model(model, 0.3)
+    model = quantize_ptq(model, calib_loader)
+    model = quantize_qat(model, train_loader)
+    export_tensorrt(model, "int8")</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在自定义脚本里忘了保存中间结果，结果剪枝跑了 8 小时后，量化阶段报错，所有工作白费。所以，一定要在每个步骤后保存 checkpoint。血的教训。</p>
+</div>
+
+<p>自定义脚本的好处是灵活，但缺点也很明显——你需要自己处理各种异常情况。比如，剪枝后的模型结构变了，量化工具可能不兼容。这时候，你就要在脚本里加入兼容性检查。</p>
+
+<h3>5. 工具选型对比</h3>
+
+<p>说了这么多，到底该选哪个？我整理了一个对比表，你根据自己情况选就行。</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:20px 0;">
+  <tr style="background-color:#d5f4e6;">
+    <th>工具</th>
+    <th>适用场景</th>
+    <th>剪枝支持</th>
+    <th>量化支持</th>
+    <th>自动化程度</th>
+    <th>我的推荐指数</th>
+  </tr>
+  <tr>
+    <td>NNI</td>
+    <td>通用 PyTorch 模型</td>
+    <td>强（多种策略）</td>
+    <td>QAT + PTQ</td>
+    <td>高（自动搜索）</td>
+    <td>⭐⭐⭐⭐⭐</td>
+  </tr>
+  <tr>
+    <td>Intel POT</td>
+    <td>Intel 硬件部署</td>
+    <td>不支持</td>
+    <td>PTQ（INT8）</td>
+    <td>中（需手动配置）</td>
+    <td>⭐⭐⭐⭐</td>
+  </tr>
+  <tr>
+    <td>TensorRT MO</td>
+    <td>NVIDIA GPU 部署</td>
+    <td>不支持</td>
+    <td>FP16 + INT8</td>
+    <td>高（一键优化）</td>
+    <td>⭐⭐⭐⭐⭐</td>
+  </tr>
+  <tr>
+    <td>自定义脚本</td>
+    <td>特殊需求 / 组合流程</td>
+    <td>自定义</td>
+    <td>自定义</td>
+    <td>完全可控</td>
+    <td>⭐⭐⭐（灵活但费时）</td>
+  </tr>
+</table>
+
+<p>我个人建议：如果你刚开始接触自动化压缩，先从 NNI 入手。它文档全、社区活跃，踩坑了也容易找到解决方案。等你对流程熟悉了，再根据部署平台选择 POT 或 TRT MO。</p>
+
+<p>至于自定义脚本，那是进阶玩法。等你用工具解决不了问题时，再考虑自己写。毕竟，我们的目标是快速交付，不是炫技。</p>
+
+<div class="highlight">
+  <p><strong>最后说一句：</strong>自动化工具链不是万能的。它帮你省了重复劳动，但压缩策略的选择、校准数据的准备、精度损失的评估，这些还是得靠你自己。工具是枪，你才是那个扣扳机的人。</p>
+</div>
+
+<footer style="margin-top:40px; padding-top:20px; border-top:1px solid #ccc; text-align:center; font-size:14px; color:#666;">
+  公众号：蓝海资料掘金营，微信 deep3321
+</footer>
+        <div class="footer-nav">
+            <a href="20.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22.html">下一章 →</a>
+        </div>
+        <footer>公众号:蓝海资料掘金营，微信deep3321</footer>
+    </div>
+</div>
+</div>
+</body>
+</html>

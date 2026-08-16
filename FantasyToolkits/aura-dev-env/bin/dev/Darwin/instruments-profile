@@ -1,0 +1,26 @@
+#!/bin/bash
+# Performance profiling tool - macOS specific
+
+set -e
+
+if [ $# -lt 1 ]; then
+  echo "Usage: instruments-profile <app_path> [arguments...]"
+  exit 1
+fi
+
+echo "📊 [macOS Instruments Profiling]"
+APP_PATH="$1"
+shift
+
+echo "Profiling: $APP_PATH"
+echo ""
+
+# Use macOS Instruments tool
+TEMPLATE="System Trace"
+RESULTS_DIR="/tmp/instruments_results_$(date +%s)"
+
+instruments -t "$TEMPLATE" "$APP_PATH" "$@" -e XRAY_OUTPUT "$RESULTS_DIR" || true
+
+echo ""
+echo "Results saved to: $RESULTS_DIR"
+echo "✅ Profile complete"

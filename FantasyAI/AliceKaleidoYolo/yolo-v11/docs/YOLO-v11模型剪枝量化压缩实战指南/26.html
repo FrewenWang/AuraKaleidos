@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第26章 云端部署实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 课程导论与模型压缩概览</a></li>
+<li><a href="02.html" class="">第2章 环境搭建与工具链准备</a></li>
+<li><a href="03.html" class="">第3章 YOLOv11模型结构与原理</a></li>
+<li><a href="04.html" class="">第4章 模型剪枝基础理论</a></li>
+<li><a href="05.html" class="">第5章 稀疏化训练原理</a></li>
+<li><a href="06.html" class="">第6章 YOLOv11稀疏化训练实战</a></li>
+<li><a href="07.html" class="">第7章 通道剪枝算法详解</a></li>
+<li><a href="08.html" class="">第8章 YOLOv11通道剪枝实战</a></li>
+<li><a href="09.html" class="">第9章 剪枝后模型微调</a></li>
+<li><a href="10.html" class="">第10章 模型量化基础理论</a></li>
+<li><a href="11.html" class="">第11章 YOLOv11后训练量化实战</a></li>
+<li><a href="12.html" class="">第12章 量化感知训练实战</a></li>
+<li><a href="13.html" class="">第13章 模型导出与格式转换</a></li>
+<li><a href="14.html" class="">第14章 ONNX模型优化</a></li>
+<li><a href="15.html" class="">第15章 TensorRT部署实战</a></li>
+<li><a href="16.html" class="">第16章 OpenVINO部署实战</a></li>
+<li><a href="17.html" class="">第17章 NCNN移动端部署</a></li>
+<li><a href="18.html" class="">第18章 TFLite与CoreML部署</a></li>
+<li><a href="19.html" class="">第19章 模型压缩效果评估体系</a></li>
+<li><a href="20.html" class="">第20章 剪枝与量化联合压缩策略</a></li>
+<li><a href="21.html" class="">第21章 自动化压缩工具链</a></li>
+<li><a href="22.html" class="">第22章 YOLOv11自定义数据集压缩</a></li>
+<li><a href="23.html" class="">第23章 模型压缩中的常见问题与调试</a></li>
+<li><a href="24.html" class="">第24章 模型压缩安全性与鲁棒性</a></li>
+<li><a href="25.html" class="">第25章 边缘设备部署实战</a></li>
+<li><a href="26.html" class="active">第26章 云端部署实战</a></li>
+<li><a href="27.html" class="">第27章 模型压缩项目实战</a></li>
+<li><a href="28.html" class="">第28章 模型压缩前沿技术</a></li>
+<li><a href="29.html" class="">第29章 课程总结与最佳实践</a></li>
+<li><a href="30.html" class="">第30章 综合考核与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第26章：云端部署实战</h2>
+
+<p>模型剪枝量化完了，本地跑得飞快。</p>
+<p>然后呢？</p>
+<p>不上线等于白干。我见过太多团队，模型在笔记本上精度99%，一上生产环境就崩。说白了，部署才是真正见真章的地方。</p>
+<p>这一章，咱们聊聊云端部署的几种主流方案。AWS SageMaker、阿里云PAI、Docker容器化、弹性伸缩。我会把我在生产环境踩过的坑，一个一个说清楚。</p>
+
+<h3>26.1 AWS SageMaker部署</h3>
+
+<p>SageMaker是我个人比较喜欢的方案。为什么？因为它把训练、调优、部署全串起来了。你不需要自己搭推理服务器，也不用操心负载均衡。</p>
+
+<p>部署一个剪枝后的YOLOv11模型，大概分三步：</p>
+
+<ol>
+  <li><strong>打包模型</strong>：把.pt或.onnx文件打成tar.gz</li>
+  <li><strong>写推理脚本</strong>：定义输入输出格式</li>
+  <li><strong>创建Endpoint</strong>：指定实例类型和数量</li>
+</ol>
+
+<p>我给你们看一个我常用的推理脚本模板：</p>
+
+<pre><code>import torch
+import json
+import numpy as np
+from yolov11 import YOLO
+
+def model_fn(model_dir):
+    model = YOLO(f"{model_dir}/yolov11_pruned.pt")
+    model.eval()
+    return model
+
+def predict_fn(input_data, model):
+    images = input_data['images']
+    results = model(images)
+    return results
+
+def input_fn(request_body, request_content_type):
+    if request_content_type == 'application/json':
+        return json.loads(request_body)
+    raise ValueError("Unsupported content type")
+</code></pre>
+
+<p>这里有个坑，我曾经踩过：<strong>模型文件路径</strong>。SageMaker会把模型文件解压到<code>/opt/ml/model/</code>目录下。你如果写死了本地路径，部署上去肯定报错。嗯，这个我吃过亏。</p>
+
+<div class="tip">
+  <strong>我的建议</strong>：用环境变量<code>SM_MODEL_DIR</code>来获取模型路径，别写死。
+</div>
+
+<h3>26.2 阿里云PAI部署</h3>
+
+<p>如果你在国内做项目，阿里云PAI可能是更实际的选择。PAI的EAS服务，专门做模型在线推理。</p>
+
+<p>PAI部署有个好处：<strong>自动优化</strong>。你上传模型，它会自动做一次量化加速。对于我们已经剪枝过的模型，效果更明显。</p>
+
+<p>部署流程：</p>
+
+<ul>
+  <li>在PAI控制台创建模型服务</li>
+  <li>上传模型文件（支持onnx、pmml、pytorch）</li>
+  <li>配置资源规格（我一般选ecs.g6.xlarge起步）</li>
+  <li>设置弹性伸缩策略</li>
+</ul>
+
+<p>我记得有一次，客户要求延迟低于50ms。本地测试没问题，一上PAI就超时。查了半天，发现是<strong>数据预处理</strong>太慢。图像解码、resize这些操作，在CPU上跑，拖了后腿。</p>
+
+<p>解决方案？把预处理也搬到GPU上。用torchvision的transforms，一步到位。</p>
+
+<div class="warning">
+  <strong>注意</strong>：PAI的免费额度有限，生产环境记得开按量付费。我曾经忘了关实例，一晚上跑了三千多块。
+</div>
+
+<h3>26.3 Docker容器化</h3>
+
+<p>不管用哪个云平台，Docker容器化都是必须的。为什么？因为环境一致性。</p>
+
+<p>你想想看，本地Python 3.10，服务器Python 3.6，CUDA版本还不一样。模型能跑才怪。</p>
+
+<p>我一般这么写Dockerfile：</p>
+
+<pre><code>FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY model/ ./model/
+COPY app.py .
+
+EXPOSE 8080
+
+CMD ["python", "app.py"]
+</code></pre>
+
+<p>这里有个细节：<strong>基础镜像选择</strong>。别用full版本，太大了。runtime版本就够了，少了300MB。我刚开始做容器化时，镜像动不动就2GB，上传一次等十分钟。后来改用slim版本，快多了。</p>
+
+<p>构建命令：</p>
+
+<pre><code>docker build -t yolov11-serving:latest .
+docker tag yolov11-serving:latest your-registry/yolov11-serving:latest
+docker push your-registry/yolov11-serving:latest
+</code></pre>
+
+<h3>26.4 弹性伸缩</h3>
+
+<p>流量是波动的。白天上班时间请求多，半夜几乎没人。如果一直开着10台机器，成本扛不住。</p>
+
+<p>弹性伸缩就是干这个的。说白了，<strong>根据CPU使用率或请求数，自动加减机器</strong>。</p>
+
+<p>在SageMaker里配置：</p>
+
+<ul>
+  <li>最小实例数：1（保证基础服务）</li>
+  <li>最大实例数：10（应对突发流量）</li>
+  <li>扩缩容策略：CPU超过70%扩容，低于30%缩容</li>
+</ul>
+
+<p>在阿里云PAI里类似，叫<strong>自动弹性</strong>。我建议设置一个冷却时间，比如300秒。防止频繁扩缩容，造成抖动。</p>
+
+<p>我曾经遇到过一个情况：双十一流量暴增，弹性伸缩没来得及反应，服务直接挂了。后来加了<strong>预热策略</strong>——提前半小时预扩容。嗯，这个经验值钱。</p>
+
+<div class="highlight">
+  <strong>核心要点</strong>：弹性伸缩不是万能的。它适合应对可预测的流量波动。如果是突发的尖峰流量，建议配合限流和降级策略一起用。
+</div>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，是我梳理的云端部署核心逻辑。你看一眼，心里就有数了。</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="780" height="380" fill="#f0f8ff" stroke="#4a90d9" stroke-width="2" rx="10"/>
+
+  <text x="400" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">YOLOv11云端部署核心流程</text>
+
+  <!-- 本地模型 -->
+  <rect x="50" y="80" width="160" height="60" fill="#e8f5e9" stroke="#66bb6a" stroke-width="2" rx="8"/>
+  <text x="130" y="115" text-anchor="middle" font-size="14" fill="#2e7d32">剪枝量化后的模型</text>
+
+  <!-- 箭头 -->
+  <line x1="210" y1="110" x2="270" y2="110" stroke="#4a90d9" stroke-width="2"/>
+  <polygon points="270,105 280,110 270,115" fill="#4a90d9"/>
+
+  <!-- Docker容器化 -->
+  <rect x="280" y="80" width="160" height="60" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="8"/>
+  <text x="360" y="105" text-anchor="middle" font-size="14" fill="#e65100">Docker容器化</text>
+  <text x="360" y="125" text-anchor="middle" font-size="12" fill="#bf360c">环境打包</text>
+
+  <!-- 箭头 -->
+  <line x1="440" y1="110" x2="500" y2="110" stroke="#4a90d9" stroke-width="2"/>
+  <polygon points="500,105 510,110 500,115" fill="#4a90d9"/>
+
+  <!-- 云平台 -->
+  <rect x="510" y="80" width="160" height="60" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="8"/>
+  <text x="590" y="105" text-anchor="middle" font-size="14" fill="#1565c0">云平台部署</text>
+  <text x="590" y="125" text-anchor="middle" font-size="12" fill="#1976d2">SageMaker / PAI</text>
+
+  <!-- 箭头 -->
+  <line x1="670" y1="110" x2="730" y2="110" stroke="#4a90d9" stroke-width="2"/>
+  <polygon points="730,105 740,110 730,115" fill="#4a90d9"/>
+
+  <!-- 弹性伸缩 -->
+  <rect x="50" y="200" width="160" height="60" fill="#fce4ec" stroke="#e91e63" stroke-width="2" rx="8"/>
+  <text x="130" y="225" text-anchor="middle" font-size="14" fill="#c2185b">弹性伸缩</text>
+  <text x="130" y="245" text-anchor="middle" font-size="12" fill="#d81b60">自动扩缩容</text>
+
+  <!-- 箭头 -->
+  <line x1="210" y1="230" x2="270" y2="230" stroke="#4a90d9" stroke-width="2"/>
+  <polygon points="270,225 280,230 270,235" fill="#4a90d9"/>
+
+  <!-- 监控告警 -->
+  <rect x="280" y="200" width="160" height="60" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2" rx="8"/>
+  <text x="360" y="225" text-anchor="middle" font-size="14" fill="#7b1fa2">监控与告警</text>
+  <text x="360" y="245" text-anchor="middle" font-size="12" fill="#8e24aa">延迟 / 吞吐 / 错误率</text>
+
+  <!-- 箭头 -->
+  <line x1="440" y1="230" x2="500" y2="230" stroke="#4a90d9" stroke-width="2"/>
+  <polygon points="500,225 510,230 500,235" fill="#4a90d9"/>
+
+  <!-- 持续优化 -->
+  <rect x="510" y="200" width="160" height="60" fill="#e0f7fa" stroke="#00bcd4" stroke-width="2" rx="8"/>
+  <text x="590" y="225" text-anchor="middle" font-size="14" fill="#00838f">持续优化</text>
+  <text x="590" y="245" text-anchor="middle" font-size="12" fill="#0097a7">模型迭代 / 资源调优</text>
+
+  <!-- 底部说明 -->
+  <text x="400" y="330" text-anchor="middle" font-size="13" fill="#546e7a">核心原则：先容器化，再上云，最后配弹性伸缩</text>
+  <text x="400" y="355" text-anchor="middle" font-size="12" fill="#78909c">监控先行，避免服务雪崩</text>
+</svg>
+
+<h3>避坑指南</h3>
+
+<p>最后，分享几个我亲身踩过的坑：</p>
+
+<ul>
+  <li><strong>模型加载慢</strong>：第一次请求可能要等5秒。解决方案：用<code>warmup</code>，启动时先跑一次推理。</li>
+  <li><strong>GPU显存泄漏</strong>：每次推理完没释放显存，跑几天就OOM。加个<code>torch.cuda.empty_cache()</code>。</li>
+  <li><strong>日志太多</strong>：每个请求都打印完整结果，磁盘很快写满。只记录关键指标，比如延迟和错误码。</li>
+  <li><strong>版本管理混乱</strong>：模型更新了，但线上还是旧版本。用<code>模型版本号</code>，每次部署都打tag。</li>
+</ul>
+
+<p>嗯，云端部署这件事，说难不难，说简单也不简单。关键是每个环节都别偷懒。容器化、弹性伸缩、监控告警，一个都不能少。</p>
+
+<p>你按照这个流程走一遍，基本不会出大问题。</p>
+
+<hr />
+
+<footer>
+  <p>公众号：蓝海资料掘金营，微信deep3321</p>
+</footer>
+        <div class="footer-nav">
+            <a href="25.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="27.html">下一章 →</a>
+        </div>
+        <footer>公众号:蓝海资料掘金营，微信deep3321</footer>
+    </div>
+</div>
+</div>
+</body>
+</html>

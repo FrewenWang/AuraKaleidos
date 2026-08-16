@@ -1,0 +1,9 @@
+#! /bin/bash
+
+adb wait-for-device root
+
+adb shell settings put secure user_setup_complete 1
+adb shell settings put global device_provisioned 1
+
+adb wait-for-device root
+adb shell pm disable com.xiaomi.account

@@ -1,0 +1,370 @@
+#!/usr/local/bin/bash
+# ============================================================
+# 🔧 OpenCV 版本管理工具
+# ============================================================
+# 用法：
+#   opencv                     查看当前 OpenCV 版本信息
+#   opencv <版本号>            切换 OpenCV 版本（如 4.6、4.8、4.11）
+#   opencv -v / --version      查看当前 OpenCV 版本信息
+#   opencv -l / --list         列出所有支持的 OpenCV 版本
+#   opencv -h / --help         显示帮助信息
+#
+# 版本映射在 toolkit_versions.conf 中统一管理，直接修改配置即可。
+# ========================================================
+
+# ========================
+# 📦 加载配置文件
+# ========================
+# 配置文件在项目根目录的 config/ 下
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+CONFIG_FILE="$PROJECT_ROOT/config/toolkit_versions.conf"
+
+if [ -f "$CONFIG_FILE" ]; then
+  source "$CONFIG_FILE"
+else
+  # 如果配置文件不存在，定义基本的颜色和函数
+  C_RESET='\033[0m'
+  C_BOLD='\033[1m'
+  C_RED='\033[31m'
+  error() { echo -e "${C_RED}❌ $*${C_RESET}"; }
+  error "找不到配置文件: $CONFIG_FILE"
+  exit 1
+fi
+
+# ========================
+# 🔀 版本映射函数
+# ========================
+# 将用户输入的友好名称映射到实际版本号（直接读 map）
+get_mapped_opencv_version() {
+  local result="${OPENCV_VERSION_MAP[$1]}"
+  echo "${result:-$1}" # 找不到则原样返回
+}
+
+# ==========================
+# 📋 版本映射表（从配置文件动态生成）
+# ==========================
+# OPENCV_VERSION_MAP 和 OPENCV_FRIENDLY_MAP 由配置文件提供
+
+# 显示版本映射表
+show_opencv_version_map() {
+  echo ""
+  echo -e "  ${C_BOLD}┌─────────┬────────────────┬──────────────────────────┐${C_RESET}"
+  echo -e "  ${C_BOLD}│ 友好名称 │ 版本号          │ 说明                     │${C_RESET}"
+  echo -e "  ${C_BOLD}├─────────┼────────────────┼──────────────────────────┤${C_RESET}"
+  for key in $(echo "${!OPENCV_VERSION_MAP[@]}" | tr ' ' '\n' | sort); do
+    local ver="${OPENCV_VERSION_MAP[$key]}"
+    printf "  ${C_BOLD}│${C_RESET} %-7s ${C_BOLD}│${C_RESET} %-14s ${C_BOLD}│${C_RESET} %-24s ${C_BOLD}│${C_RESET}\n" \
+      "$key" "$ver" ""
+  done
+  echo -e "  ${C_BOLD}└─────────┴────────────────┴──────────────────────────┘${C_RESET}"
+}
+
+# ========================
+# 🔍 模糊匹配建议
+# ========================
+suggest_similar_opencv_versions() {
+  local input="$1"
+  local suggestions=()
+
+  for key in "${!OPENCV_VERSION_MAP[@]}"; do
+    local ver="${OPENCV_VERSION_MAP[$key]}"
+    # 前缀匹配或子串匹配
+    if [[ "$key" == *"$input"* ]] || [[ "$input" == *"$key"* ]] ||
+      [[ "$ver" == *"$input"* ]] || [[ "$input" == *"$ver"* ]]; then
+      suggestions+=("$key ($ver)")
+    fi
+  done
+
+  if [ ${#suggestions[@]} -gt 0 ]; then
+    echo ""
+    warn "您是否想找："
+    for s in "${suggestions[@]}"; do
+      echo -e "    ${C_CYAN}→${C_RESET} $s"
+    done
+  fi
+}
+
+# ========================
+# 🔎 查找匹配的 OpenCV 目录
+# ========================
+find_opencv_path() {
+  local version=$1
+  local mapped_version
+
+  mapped_version=$(get_mapped_opencv_version "$version")
+
+  # 首先检查映射后的版本
+  if [ "$mapped_version" != "$version" ]; then
+    local opencv_path="$OPENCV_BASE_PATH/$mapped_version"
+    if [ -d "$opencv_path" ]; then
+      echo "$opencv_path"
+      return 0
+    fi
+  fi
+
+  # 尝试直接匹配 opencv-<version> 格式
+  local opencv_path="$OPENCV_BASE_PATH/opencv-$version"
+  if [ -d "$opencv_path" ]; then
+    echo "$opencv_path"
+    return 0
+  fi
+
+  # 尝试匹配 v-prefixed 版本
+  opencv_path="$OPENCV_BASE_PATH/v$version"
+  if [ -d "$opencv_path" ]; then
+    echo "$opencv_path"
+    return 0
+  fi
+
+  # 尝试匹配纯版本号
+  opencv_path="$OPENCV_BASE_PATH/$version"
+  if [ -d "$opencv_path" ]; then
+    echo "$opencv_path"
+    return 0
+  fi
+
+  echo ""
+  return 1
+}
+
+# ========================
+# ℹ️  显示当前版本信息
+# ========================
+show_opencv_version() {
+  header "📱 当前 OpenCV 信息"
+  echo -e "  ${C_GRAY}$(printf '═%.0s' {1..50})${C_RESET}"
+
+  if [ -L "$OPENCV_LINK_PATH" ]; then
+    local current_target
+    current_target=$(readlink "$OPENCV_LINK_PATH")
+    local current_version
+    current_version=$(basename "$current_target")
+
+    # 反向查找友好名称
+    local friendly_name
+    friendly_name=$(get_opencv_friendly_name "$current_version")
+
+    echo -e "  当前版本:   ${C_GREEN}${C_BOLD}${friendly_name:-$current_version}${C_RESET}"
+    echo -e "  版本号:     ${C_CYAN}$current_version${C_RESET}"
+    echo -e "  实际路径:   ${C_DIM}$current_target${C_RESET}"
+    echo -e "  符号链接:   ${C_DIM}$OPENCV_LINK_PATH${C_RESET}"
+    echo ""
+
+    if [ -d "$OPENCV_LINK_PATH" ]; then
+      echo -e "  ${C_BOLD}OpenCV 目录结构 (前 10 项):${C_RESET}"
+      find "$OPENCV_LINK_PATH" -maxdepth 1 -mindepth 1 | head -10 | while IFS= read -r line; do
+        echo -e "    ${C_GRAY}$(basename "$line")${C_RESET}"
+      done
+    fi
+  else
+    warn "当前未设置 OpenCV 符号链接"
+    echo -e "  符号链接: ${C_DIM}$OPENCV_LINK_PATH (不存在)${C_RESET}"
+  fi
+
+  # 显示可用版本
+  echo ""
+  header "📦 可用 OpenCV 版本"
+  if [ -d "$OPENCV_BASE_PATH" ]; then
+    local count=0
+    for dir in "$OPENCV_BASE_PATH"/*/; do
+      if [ -d "$dir" ] && [ "$(basename "$dir")" != "opencv-home" ]; then
+        local dirname
+        dirname=$(basename "$dir")
+        local friendly_name=""
+        friendly_name=$(get_opencv_friendly_name "$dirname")
+
+        count=$((count + 1))
+        if [ -n "$friendly_name" ]; then
+          echo -e "    ${C_GREEN}✓${C_RESET} ${C_CYAN}$dirname${C_RESET} ${C_GRAY}($friendly_name)${C_RESET}"
+        else
+          echo -e "    ${C_GREEN}✓${C_RESET} $dirname"
+        fi
+      fi
+    done
+    if [ $count -eq 0 ]; then
+      echo -e "    ${C_GRAY}(无已安装的 OpenCV 版本)${C_RESET}"
+    fi
+  else
+    error "OpenCV 基础目录不存在: $OPENCV_BASE_PATH"
+  fi
+
+  # 显示版本映射表
+  header "🔀 版本映射表"
+  show_opencv_version_map
+}
+
+# ========================
+# 📋 列出所有支持的版本
+# ========================
+show_opencv_list() {
+  header "📋 支持的 OpenCV 版本"
+  echo ""
+
+  echo -e "  ${C_BOLD}预定义版本映射:${C_RESET}"
+  show_opencv_version_map
+
+  echo ""
+  header "📂 已安装的 OpenCV 版本"
+  echo -e "  基础路径: ${C_DIM}$OPENCV_BASE_PATH${C_RESET}"
+  echo ""
+
+  if [ -d "$OPENCV_BASE_PATH" ]; then
+    local count=0
+    for dir in "$OPENCV_BASE_PATH"/*/; do
+      if [ -d "$dir" ] && [ "$(basename "$dir")" != "opencv-home" ]; then
+        local dirname
+        dirname=$(basename "$dir")
+
+        # 反向查找友好名称（从 map 中查）
+        local friendly_name=""
+        for key in "${!OPENCV_VERSION_MAP[@]}"; do
+          if [ "${OPENCV_VERSION_MAP[$key]}" = "$dirname" ]; then
+            if [ -z "$friendly_name" ]; then
+              friendly_name="$key"
+            else
+              friendly_name="$friendly_name/$key"
+            fi
+          fi
+        done
+
+        count=$((count + 1))
+        if [ -n "$friendly_name" ]; then
+          echo -e "    ${C_GREEN}✓${C_RESET} ${C_CYAN}$dirname${C_RESET} ${C_GRAY}($friendly_name)${C_RESET}"
+        else
+          echo -e "    ${C_GREEN}✓${C_RESET} $dirname"
+        fi
+      fi
+    done
+    if [ $count -eq 0 ]; then
+      echo -e "    ${C_GRAY}(无已安装的 OpenCV 版本)${C_RESET}"
+    fi
+  else
+    error "OpenCV 基础目录不存在: $OPENCV_BASE_PATH"
+  fi
+
+  echo ""
+  header "💡 使用方式"
+  echo -e "    ${C_CYAN}opencv <版本号>${C_RESET}          切换到指定版本"
+  echo -e "    ${C_CYAN}opencv 4.8${C_RESET}              切换到 OpenCV v4.8.0"
+  echo -e "    ${C_CYAN}opencv --list${C_RESET}            列出所有版本"
+  echo -e "    ${C_CYAN}opencv --version${C_RESET}         查看当前版本"
+}
+
+# ========================
+# ❓ 显示帮助信息
+# ========================
+show_opencv_help() {
+  echo ""
+  echo -e "${C_BOLD}${C_CYAN}  🔧 OpenCV 版本管理工具${C_RESET}"
+  echo -e "  ${C_GRAY}$(printf '═%.0s' {1..40})${C_RESET}"
+  echo ""
+  echo -e "  ${C_BOLD}用法:${C_RESET}"
+  echo -e "    ${C_CYAN}opencv${C_RESET}                     查看当前 OpenCV 版本信息"
+  echo -e "    ${C_CYAN}opencv -v, --version${C_RESET}       查看当前 OpenCV 版本信息"
+  echo -e "    ${C_CYAN}opencv -l, --list${C_RESET}          查看所有支持的 OpenCV 版本"
+  echo -e "    ${C_CYAN}opencv -h, --help${C_RESET}          显示此帮助信息"
+  echo -e "    ${C_CYAN}opencv <版本号>${C_RESET}            切换 OpenCV 版本"
+  echo ""
+  echo -e "  ${C_BOLD}支持版本:${C_RESET}"
+  for key in $(echo "${!OPENCV_VERSION_MAP[@]}" | tr ' ' '\n' | sort); do
+    local ver="${OPENCV_VERSION_MAP[$key]}"
+    printf "    ${C_GREEN}%-6s${C_RESET} → %-14s\n" "$key" "$ver"
+  done
+  echo ""
+  echo -e "  ${C_BOLD}示例:${C_RESET}"
+  echo -e "    ${C_CYAN}opencv 4.6${C_RESET}    切换到 OpenCV v4.9.0"
+  echo -e "    ${C_CYAN}opencv 4.8${C_RESET}    切换到 OpenCV v4.8.0"
+  echo -e "    ${C_CYAN}opencv 4.11${C_RESET}   切换到 OpenCV v4.11.0 (最新)"
+  echo -e "    ${C_CYAN}opencv v4.8.0${C_RESET} 使用完整版本号切换"
+  echo ""
+}
+
+# ========================
+# 🚀 主逻辑
+# ========================
+main() {
+  # 如果没有参数，显示版本信息
+  if [[ $# -eq 0 ]]; then
+    show_opencv_version
+    return 0
+  fi
+
+  local arg=$1
+
+  case "$arg" in
+    -v | --version)
+      show_opencv_version
+      return 0
+      ;;
+    -l | --list)
+      show_opencv_list
+      return 0
+      ;;
+    -h | --help)
+      show_opencv_help
+      return 0
+      ;;
+  esac
+
+  # 处理切换版本命令
+  local VERSION=$arg
+
+  # 检查 OpenCV 基础目录是否存在
+  if [ ! -d "$OPENCV_BASE_PATH" ]; then
+    error "OpenCV 基础目录不存在！"
+    echo -e "  路径: ${C_DIM}$OPENCV_BASE_PATH${C_RESET}"
+    exit 1
+  fi
+
+  # 查找匹配的 OpenCV 目录
+  local MATCHED_OPENCV_PATH
+  MATCHED_OPENCV_PATH=$(find_opencv_path "$VERSION")
+
+  if [ -z "$MATCHED_OPENCV_PATH" ]; then
+    error "找不到版本 ${C_BOLD}$VERSION${C_RESET} 对应的 OpenCV 目录！"
+    echo ""
+
+    # 模糊匹配建议
+    suggest_similar_opencv_versions "$VERSION"
+
+    echo ""
+    echo -e "  ${C_BOLD}已安装的目录:${C_RESET}"
+    for dir in "$OPENCV_BASE_PATH"/*/; do
+      if [ -d "$dir" ] && [ "$(basename "$dir")" != "opencv-home" ]; then
+        echo -e "    ${C_CYAN}→${C_RESET} $(basename "$dir")"
+      fi
+    done
+
+    echo ""
+    echo -e "  ${C_BOLD}版本映射表:${C_RESET}"
+    show_opencv_version_map
+    exit 1
+  fi
+
+  # 获取映射信息用于显示
+  local MAPPED_VERSION
+  MAPPED_VERSION=$(get_mapped_opencv_version "$VERSION")
+
+  # 获取友好名称
+  local FRIENDLY_NAME
+  FRIENDLY_NAME=$(get_opencv_friendly_name "$MAPPED_VERSION")
+
+  # 更新符号链接
+  rm -f "$OPENCV_LINK_PATH"
+  ln -s "$MATCHED_OPENCV_PATH" "$OPENCV_LINK_PATH"
+
+  echo ""
+  if [ "$MAPPED_VERSION" != "$VERSION" ]; then
+    success "已切换至 OpenCV ${C_BOLD}${FRIENDLY_NAME:-$VERSION}${C_RESET}"
+    info "映射关系: ${C_CYAN}$VERSION${C_RESET} → ${C_CYAN}$MAPPED_VERSION${C_RESET}"
+  else
+    success "已切换至 OpenCV ${C_BOLD}${FRIENDLY_NAME:-$VERSION}${C_RESET}"
+  fi
+  echo -e "  实际路径: ${C_DIM}$MATCHED_OPENCV_PATH${C_RESET}"
+  echo -e "  符号链接: ${C_DIM}$OPENCV_LINK_PATH${C_RESET}"
+  echo ""
+}
+
+# 运行主函数
+main "$@"

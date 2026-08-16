@@ -1,0 +1,19 @@
+#!/bin/bash
+# Development debug build tool - macOS specific
+
+set -e
+
+echo "🔧 [macOS Debug Build]"
+echo "Building with debug symbols for Xcode..."
+
+# macOS specific debug options with Xcode integration
+cmake -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
+  -DENABLE_COVERAGE=ON \
+  -DCMAKE_CXX_FLAGS_DEBUG="-g -O0 -fno-omit-frame-pointer" \
+  -GXcode \
+  "$@"
+
+xcodebuild -configuration Debug -parallelizeTargets
+
+echo "✅ Debug build complete"

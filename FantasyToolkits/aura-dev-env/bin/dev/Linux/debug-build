@@ -1,0 +1,18 @@
+#!/bin/bash
+# Development debug build tool - Linux specific
+
+set -e
+
+echo "🔧 [Linux Debug Build]"
+echo "Building with debug symbols..."
+
+# Linux specific debug options
+cmake -DCMAKE_BUILD_TYPE=Debug \
+  -DENABLE_SANITIZERS=ON \
+  -DENABLE_COVERAGE=ON \
+  -DCMAKE_CXX_FLAGS_DEBUG="-g -O0 -fno-omit-frame-pointer" \
+  "$@"
+
+make -j$(nproc)
+
+echo "✅ Debug build complete"

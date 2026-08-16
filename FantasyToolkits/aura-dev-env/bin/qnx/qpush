@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+: "${AURA_QNX_HOST:?请设置 AURA_QNX_HOST}"
+: "${SSHPASS:?请通过 SSHPASS 设置 QNX 密码}"
+file=$1
+
+expect << EOF
+    set timeout -1
+    spawn adb shell
+    expect "e171" { send "mkdir /data/local/tmp\r" }
+    expect "e171" { send "rm -r /data/local/tmp/$file\r" }
+    expect "e171" { send "exit\r" }
+    expect eof
+EOF
+adb push $file /data/local/tmp/
+
+expect << EOF
+    set timeout -1
+    spawn adb shell
+    expect "e171" { send "busybox ftpput -u root -p ${SSHPASS} ${AURA_QNX_HOST} /data/$file /data/local/tmp/$file; rm -r /data/local/tmp/$file; exit\r" }
+    expect eof
+EOF

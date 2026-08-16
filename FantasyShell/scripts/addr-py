@@ -1,0 +1,6 @@
+if [[ $# -lt 2 ]]; then
+    echo "Usage: $0 <堆栈文件> <产出文件>"
+    exit 1
+fi
+
+python /home/wangzhijiang/03.ProgramSpace/01.WorkSpace/AuraKaleidoscope/AuraFantasyShell/addr_py.py  --log  $1  --so-dir $2

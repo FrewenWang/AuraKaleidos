@@ -1,0 +1,7 @@
+#!/bin/bash
+set -euo pipefail
+
+: "${AURA_QNX_HOST:?请设置 AURA_QNX_HOST}"
+: "${SSHPASS:?请通过 SSHPASS 设置 SSH 密码，或改用 SSH Key}"
+
+exec sshpass -e sftp "${AURA_QNX_USER:-root}@${AURA_QNX_HOST}"

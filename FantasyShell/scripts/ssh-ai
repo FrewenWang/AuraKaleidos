@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${AURA_SSH_AI_HOST:?请设置 AURA_SSH_AI_HOST}"
+: "${SSHPASS:?请通过 SSHPASS 设置 SSH 密码，或改用 SSH Key}"
+
+exec sshpass -e ssh "${AURA_SSH_AI_USER:-root}@${AURA_SSH_AI_HOST}" \
+    -p "${AURA_SSH_AI_PORT:-22}" "$@"

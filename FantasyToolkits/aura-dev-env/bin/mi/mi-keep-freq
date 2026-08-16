@@ -1,0 +1,3 @@
+#!/bin/bash
+
+bash /home/frewen/01.WorkSpace/MiPPM/frequency_tools/start-agent.sh

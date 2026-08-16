@@ -1,0 +1,3 @@
+#!/bin/bash
+time=$1
+zrun "rm /var/log/pavaro_record_*_*_*$time*.bag; rm -r /var/log/perf; rm -r /var/log/slog; ls -l /var/log/"

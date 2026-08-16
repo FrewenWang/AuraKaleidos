@@ -1,0 +1,41 @@
+seed: 20260808
+
+data:
+  root: data/wider/manifests
+  image_size: [192, 320]
+  resize_mode: letterbox
+  max_boxes: 512
+
+model:
+  variant: mbv3
+  num_classes: 1
+  anchors:
+    - [1, 1]
+    - [2, 2]
+    - [2, 3]
+    - [3, 4]
+    - [4, 6]
+    - [6, 8]
+    - [10, 12]
+    - [15, 20]
+    - [33, 44]
+  anchor_masks:
+    - [6, 7, 8]
+    - [3, 4, 5]
+    - [0, 1, 2]
+
+training:
+  device: cpu
+  epochs: 50
+  batch_size: 4
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  num_workers: 0
+  output_dir: outputs/wider_cpu
+  log_dir: logs/wider_cpu
+
+evaluation:
+  confidence_threshold: 0.20
+  ap_confidence_floor: 0.001
+  nms_iou_threshold: 0.45
+  match_iou_threshold: 0.50

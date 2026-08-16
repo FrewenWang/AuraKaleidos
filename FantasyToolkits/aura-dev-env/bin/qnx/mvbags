@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+spawn adb root
+spawn adb remount
+spawn adb shell
+
+expect "e171" { send "mkdir /data/bag\r" }
+expect "e171" { send "ls /mnt/vendor/var_log/*.bag\r" }
+expect "e171" { send "mv /mnt/vendor/var_log/pavaro_record_*_*_??????????????.bag /data/bag\r" }
+expect "e171" { send "ls /mnt/vendor/logdata/*.bag\r" }
+expect "e171" { send "mv /mnt/vendor/logdata/pavaro_record_*_*_??????????????.bag /data/bag\r" }
+expect "e171" { send "exit\r" }
+
+spawn mkdir bag
+spawn cd bag
+spawn adb pull /data/bag/*.bag
+spawn cd -
+sleep 10
+spawn adb shell rm /data/bag/*.bag
+
+interact

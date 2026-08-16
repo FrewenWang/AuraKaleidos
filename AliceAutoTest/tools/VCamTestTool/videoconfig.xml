@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+<!-- type:描述信息 time:这组视频循环的时长 dir:视频集合-->
+    <videoset type='normal' time="4:0:10" dir="videoSet1"/>
+    <!--
+	<videoset type="handup" time="4:0:40" dir="./videoSet2"/>
+    <videoset type="bicha" time="4:0:40" dir="./videoSet3"/>
+	-->
+</config>

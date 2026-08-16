@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# 使用方法：
+#
+
+cdsprestart() {
+  set -x
+  adb -s $1 shell setenforce 0
+  # 1. disable recovery
+  for i in {0..4}; do
+    remote_proc_dir="/sys/class/remoteproc/remoteproc$i"
+    if adb -s $1 wait-for-device shell "[ -d $remote_proc_dir ]"; then
+      name=$(adb -s $1 wait-for-device shell "cat $remote_proc_dir/name")
+
+      if echo "$name" | grep -q "32300000.remoteproc-cdsp"; then
+
+        echo "find remoteproc-cdsp: remoteproc${i}"
+        # restart cdsp
+        adb -s $1 wait-for-device shell "echo stop > $remote_proc_dir/state"
+
+        adb -s $1 wait-for-device shell "echo start > $remote_proc_dir/state"
+      fi
+    else
+      echo "don't exist remoteproc-cdsp || remoteproc-mss || remoteproc-adsp"
+    fi
+  done
+
+  set +x
+}
+
+killCameraServer() {
+  set -x
+  for pid in $(adb -s $1 shell ps -ef | grep "cameraserver" | awk '{print $2}'); do
+    adb -s $1 shell kill -9 ${pid}
+  done
+  sleep 2
+  set +x
+}
+
+run_case() {
+  cdsprestart $1
+  # 控制是否杀相机
+  # killCameraServer $1
+}
+
+IFS=$'\n'
+
+if [ ! -n "$*" ]; then
+  line=$(adb devices | grep device$ | awk '{print $1}')
+  for device in $line; do
+    run_case $device
+  done
+else
+  device=$1
+  run_case $device
+fi

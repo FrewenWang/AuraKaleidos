@@ -1,0 +1,14 @@
+#!/bin/bash
+# 脚本名: calc_so_md5.sh
+# 功能: 递归计算当前目录及子目录下所有 .so 文件的 MD5 值并打印
+
+find . -type f -name "*.so" | while read -r file; do
+  if command -v md5sum > /dev/null 2>&1; then
+    md5sum "$file"
+  elif command -v md5 > /dev/null 2>&1; then
+    md5 "$file"
+  else
+    echo "未找到 md5sum 或 md5 命令，请安装 md5 工具"
+    exit 1
+  fi
+done

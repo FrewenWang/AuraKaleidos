@@ -1,0 +1,67 @@
+
+# AiAgent Project Files
+.claude/
+
+
+
+# Compiled class file
+*.class
+*.o
+*.so
+*.dll
+*.exe
+*.pid
+
+# Log file
+logs/
+log/
+*.log
+
+# Package Files
+*.jar
+*.war
+*.ear
+*.sar
+*.iso
+*.dmg
+*.rpm
+
+# Eclipse project files
+.classpath
+.project
+.settings/
+
+# Intellij project files
+*.iml
+.idea/
+
+# VSCode project files
+.vscode/
+
+# project
+application-local.properties
+build/
+
+
+# Mobile Tools for Java
+.mtj.tmp/
+
+# BlueJ files
+*.ctxt
+
+# virtual machine crash logs
+hs_err_pid*
+
+# tmp
+tmp/
+temp/
+
+# OS generated files
+.DS_Store
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+
+## maven
+target/

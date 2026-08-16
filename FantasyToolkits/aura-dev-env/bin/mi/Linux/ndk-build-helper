@@ -1,0 +1,31 @@
+#!/bin/bash
+# NDK build helper - Linux specific
+
+set -e
+
+BUILD_TYPE="${1:-release}"
+PARALLEL_JOBS="${2:-$(nproc)}"
+
+echo "🏗️  [Linux NDK Build]"
+echo "Type: $BUILD_TYPE"
+echo "Parallel jobs: $PARALLEL_JOBS"
+echo ""
+
+case "$BUILD_TYPE" in
+  debug)
+    ndk-build -j"$PARALLEL_JOBS" APP_OPTIM=debug V=1
+    ;;
+  release)
+    ndk-build -j"$PARALLEL_JOBS" APP_OPTIM=release
+    ;;
+  clean)
+    ndk-build clean
+    ;;
+  *)
+    echo "Usage: ndk-build-helper {debug|release|clean} [jobs]"
+    exit 1
+    ;;
+esac
+
+echo ""
+echo "✅ NDK build complete"

@@ -1,0 +1,31 @@
+{
+    "graphs": [
+        {
+            "graph_names": ["model"],
+            "vtcm_mb": 8,
+            "hvx_threads": 6,
+            "fp16_relaxed_precision": 0,
+            "O": 3,
+            "dlbc": 1
+        }
+    ],
+    "devices": [
+        {
+            "device_id": 0,
+            "soc_id": 69,
+            "soc_model": 0,
+            "dsp_arch": "v79",
+            "pd_session": "unsigned",
+            "cores": [
+                {
+                    "core_id": 0,
+                    "perf_profile": "burst",
+                    "rpc_polling_time": 9999,
+                    "rpc_control_latency":100,
+                    "hmx_timeout_us": 100
+
+                }
+            ]
+        }
+    ]
+}

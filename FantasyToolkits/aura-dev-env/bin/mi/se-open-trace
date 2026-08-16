@@ -1,0 +1,70 @@
+#!/bin/bash
+
+#!/usr/bin/env bash
+set -e
+
+# ==============================
+# Usage check
+# ==============================
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 <0|1>"
+  echo "  1 : open_se_trace"
+  echo "  0 : close_se_trace"
+  exit 1
+fi
+
+OPEN_LOG="$1"
+
+if ! [[ "$OPEN_LOG" =~ ^[01]$ ]]; then
+  echo "ERROR: argument must be 0 or 1"
+  exit 1
+fi
+
+# ==============================
+# ADB prepare
+# ==============================
+adb wait-for-device
+adb root
+adb wait-for-device
+adb remount
+
+# ==============================
+# se open trace control functions
+# ==============================
+open_se_trace() {
+  echo "============= OPEN SE TRACE =========================="
+
+  adb shell setprop persist.vendor.camera.algo.mage.systrace_enable 1
+  adb shell setprop persist.vendor.camera.perf.mialgojdd.systrace_enable 2
+  adb shell setprop persist.vendor.camera.algo.ai_align.systrace_enable 1
+  adb shell setprop persist.vendor.camera.algo.se.systrace_enable 1
+  adb shell setprop persist.vendor.camera.algo.xiaomi.mage.systrace.se se,se.*
+}
+
+close_se_trace() {
+  echo "============= FORCE OPEN SE CLOSE=========================="
+
+  adb shell setprop persist.vendor.camera.algo.mage.systrace_enable 0
+  adb shell setprop persist.vendor.camera.perf.mialgojdd.systrace_enable 0
+  adb shell setprop persist.vendor.camera.algo.ai_align.systrace_enable 0
+  adb shell setprop persist.vendor.camera.algo.se.systrace_enable 0
+  adb shell setprop persist.vendor.camera.algo.xiaomi.mage.systrace.se 0
+}
+
+# ==============================
+# Main logic
+# ==============================
+if [ "$OPEN_LOG" -eq 1 ]; then
+  open_se_trace
+else
+  close_se_trace
+fi
+
+# ==============================
+# Restart camera services
+# ==============================
+echo "============= Restart camera services ==============="
+
+mi-kcam
+
+echo "============= Done ================================"

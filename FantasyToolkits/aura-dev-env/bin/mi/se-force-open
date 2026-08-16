@@ -1,0 +1,66 @@
+#!/bin/bash
+
+#!/usr/bin/env bash
+set -e
+
+# ==============================
+# Usage check
+# ==============================
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 <0|1>"
+  echo "  1 : Force Open SE"
+  echo "  0 : Close Force Open SE"
+  exit 1
+fi
+
+OPEN_LOG="$1"
+
+if ! [[ "$OPEN_LOG" =~ ^[01]$ ]]; then
+  echo "ERROR: argument must be 0 or 1"
+  exit 1
+fi
+
+# ==============================
+# ADB prepare
+# ==============================
+adb wait-for-device
+adb root
+adb wait-for-device
+adb remount
+
+# ==============================
+# se open control functions
+# ==============================
+force_open_se() {
+  echo "============= FORCE OPEN SE =========================="
+
+  adb shell setprop vendor.debug.smartAE.enable 1
+  adb shell setprop vendor.debug.smartAE.fixAlgoEnable 1
+  adb shell setprop vendor.debug.smartAE.fixAlgoType 5
+  adb shell setprop persist.vendor.camera.aisp.algo_se.log 1
+  adb shell setprop persist.vendor.camera.aisp.log_level 1
+}
+
+force_open_se_close() {
+  echo "============= FORCE OPEN SE CLOSE=========================="
+
+  echo "not implement yet !!!!!"
+}
+
+# ==============================
+# Main logic
+# ==============================
+if [ "$OPEN_LOG" -eq 1 ]; then
+  force_open_se
+else
+  force_open_se_close
+fi
+
+# ==============================
+# Restart camera services
+# ==============================
+echo "============= Restart camera services ==============="
+
+mi-kcam
+
+echo "============= Done ================================"

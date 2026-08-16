@@ -1,0 +1,6 @@
+
+    adb -s shell “echo 695000 >/proc/gpufreq/gpufreq_opp_freq”
+    adb -s shell "echo -1 -1 > /proc/ppm/policy/ut_fix_freq_idx"
+    adb -s shell "echo 0 0 > /proc/ppm/policy/ut_fix_freq_idx"
+    adb -s shell "echo 0 1 > /proc/ppm/policy/ut_fix_freq_idx"
+    adb -s shell "echo 0 2 > /proc/ppm/policy/ut_fix_freq_idx"

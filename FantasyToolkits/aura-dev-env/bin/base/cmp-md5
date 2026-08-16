@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# ==========================================================
+#  通用 MD5 + SIZE 对比工具（最终稳健版）
+# ==========================================================
+
+RED="\033[31m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+RESET="\033[0m"
+
+ANDROID_DIR=${1:-"/data/local/tmp/supernight/dump_benchmark"}
+
+echo "=== 扫描安卓设备中目录: $ANDROID_DIR ==="
+echo "拉取 md5sum / size 信息..."
+
+# ----------------------------------------------------------
+# 拉取：md5 size filename
+# ----------------------------------------------------------
+INFO_LIST=$(adb shell "
+cd \"$ANDROID_DIR\" || exit 1
+ls -1 2>/dev/null | while read f; do
+    if [ -f \"\$f\" ]; then
+        md=\$(md5sum \"\$f\" | awk '{print \$1}')
+        sz=\$(ls -l \"\$f\" | awk '{print \$5}')
+        echo \"\$md \$sz \$f\"
+    fi
+done
+")
+
+if [[ -z "$INFO_LIST" ]]; then
+  echo "未找到可计算 MD5 的文件"
+  exit 1
+fi
+
+TMP_FILE=$(mktemp)
+echo "$INFO_LIST" > "$TMP_FILE"
+
+# ----------------------------------------------------------
+# 数据结构
+#   groups[base]          -> 文件名列表
+#   md5_map[base,md5]     -> 唯一 md5
+# ----------------------------------------------------------
+declare -A groups
+declare -A md5_map
+
+# ----------------------------------------------------------
+# 解析
+# ----------------------------------------------------------
+while read -r md size name; do
+  [[ "$name" != *.* ]] && continue
+
+  base=${name%.*}
+
+  groups["$base"]+="$name"$'\n'
+  md5_map["$base,$md"]=1
+done < "$TMP_FILE"
+
+echo -e "\n${YELLOW}=========== MD5 / SIZE 对比结果 ===========${RESET}"
+
+# ----------------------------------------------------------
+# 对比输出
+# ----------------------------------------------------------
+for base in "${!groups[@]}"; do
+  files="${groups[$base]}"
+  file_cnt=$(echo "$files" | grep -c .)
+  [[ $file_cnt -lt 2 ]] && continue
+
+  uniq_md=0
+  for key in "${!md5_map[@]}"; do
+    [[ "$key" == "$base,"* ]] && ((uniq_md++))
+  done
+
+  echo -e "\n文件组: ${YELLOW}$base${RESET}"
+
+  if [[ $uniq_md -eq 1 ]]; then
+    echo -e "${GREEN}  ✔ 所有文件 MD5 相同${RESET}"
+  else
+    echo -e "${RED}  ✘ 文件 MD5 不一致${RESET}"
+  fi
+
+  echo "$files" | while read -r f; do
+    line=$(grep " $f\$" "$TMP_FILE")
+    md=$(echo "$line" | awk '{print $1}')
+    sz=$(echo "$line" | awk '{print $2}')
+
+    if [[ $uniq_md -eq 1 ]]; then
+      echo -e "    ${GREEN}$md  ${sz}  $f${RESET}"
+    else
+      echo -e "    ${RED}$md  ${sz}  $f${RESET}"
+    fi
+  done
+done
+
+echo -e "\n${YELLOW}=========== 扫描结束 ===========${RESET}"
+rm -f "$TMP_FILE"

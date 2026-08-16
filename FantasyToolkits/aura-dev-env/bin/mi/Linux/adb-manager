@@ -1,0 +1,41 @@
+#!/bin/bash
+# ADB device management tool - Linux specific
+
+set -e
+
+ACTION="${1:-list}"
+
+case "$ACTION" in
+  list)
+    echo "📱 Connected devices:"
+    adb devices -l
+    ;;
+  tcp)
+    if [ -z "$2" ]; then
+      echo "Usage: adb-manager tcp <device_ip:port>"
+      exit 1
+    fi
+    echo "🔌 Connecting via TCP to $2..."
+    adb connect "$2"
+    ;;
+  restart)
+    echo "🔄 Restarting ADB server..."
+    adb kill-server
+    sleep 1
+    adb start-server
+    adb devices
+    ;;
+  logcat)
+    FILTER="${2:-}"
+    echo "📋 Logcat (device count: $(adb devices | wc -l))"
+    if [ -n "$FILTER" ]; then
+      adb logcat | grep "$FILTER"
+    else
+      adb logcat
+    fi
+    ;;
+  *)
+    echo "Usage: adb-manager {list|tcp|restart|logcat}"
+    exit 1
+    ;;
+esac

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: $0 <产出文件> <堆栈地址>"
+  exit 1
+fi
+
+BINARY=$1
+
+shift # 去掉第一个参数，后面的都是地址
+
+echo "$BINARY 堆栈解析如下:"
+# addr2line -e "$BINARY" -f -C -p "$@"
+for ADDR in "$@"; do
+  echo "address: $ADDR"
+  addr2line -e "$BINARY" -f -C -p "$ADDR"
+done

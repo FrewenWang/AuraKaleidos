@@ -1,0 +1,26 @@
+# 自定义的文件后缀名 .fwf (Frewen.Wang’s custom file)
+# Base environment - shared by all environments
+
+######################## >>> macOS Base Aliases >>> ########################
+
+# macOS-specific open command (already default on macOS, but explicit for clarity)
+alias open="open"
+alias o="open"
+
+# macOS-specific file operations
+# alias show-hidden="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
+# alias hide-hidden="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
+
+
+######################## <<< macOS Base Aliases >>> ########################
+
+######################## >>> macOS Base Variables >>> ########################
+
+
+######################## <<< MacOS App Variables >>> ########################
+
+alias code="/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code"
+
+######################## <<< MacOS App Variables >>> #######################neng#
+
+######################## <<< MacOS App Variables >>> ########################

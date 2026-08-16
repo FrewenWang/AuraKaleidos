@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -e
+
+# ==============================
+# Usage check
+# ==============================
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <0|1>"
+    echo "  1 : open asd log"
+    echo "  0 : close asd log"
+    exit 1
+fi
+
+OPEN_LOG="$1"
+
+if ! [[ "$OPEN_LOG" =~ ^[01]$ ]]; then
+    echo "ERROR: argument must be 0 or 1"
+    exit 1
+fi
+
+# ==============================
+# ADB prepare
+# ==============================
+adb wait-for-device
+adb root
+adb wait-for-device
+adb remount
+
+# ==============================
+# Log control functions
+# ==============================
+open_asd_log() {
+    echo "============= OPEN ASD LOG =========================="
+
+    adb shell setprop persist.vendor.camera.mivi.loglevel 0
+    adb shell setprop persist.vendor.camera.mivi.groupsEnable 0xFFFF
+    adb shell setprop persist.vendor.camera.offlinedebug.mask 1
+
+    adb shell setprop persist.vendor.mialgo.sd.log 1
+}
+
+close_asd_log() {
+    echo "============= CLOSE ASD LOG =========================="
+
+    adb shell setprop persist.vendor.camera.mivi.loglevel 0
+    adb shell setprop persist.vendor.camera.mivi.groupsEnable 0xFFFF
+    adb shell setprop persist.vendor.camera.offlinedebug.mask 0
+
+    adb shell setprop persist.vendor.mialgo.sd.log 0
+}
+
+# ==============================
+# Main logic
+# ==============================
+if [ "$OPEN_LOG" -eq 1 ]; then
+    open_asd_log
+else
+    close_asd_log
+fi
+
+# ==============================
+# Restart camera services
+# ==============================
+echo "============= Restart camera services ==============="
+adb shell killall cameraserver \
+    com.android.camera \
+    vendor.qti.camera.provider-service_64
+
+echo "============= Done ================================"
+echo "=== Filter the regular expression: (SD_Init|SD_Process|ModelRun) ==="

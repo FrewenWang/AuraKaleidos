@@ -1,0 +1,555 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第24章 模型压缩安全性与鲁棒性</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 课程导论与模型压缩概览</a></li>
+<li><a href="02.html" class="">第2章 环境搭建与工具链准备</a></li>
+<li><a href="03.html" class="">第3章 YOLOv11模型结构与原理</a></li>
+<li><a href="04.html" class="">第4章 模型剪枝基础理论</a></li>
+<li><a href="05.html" class="">第5章 稀疏化训练原理</a></li>
+<li><a href="06.html" class="">第6章 YOLOv11稀疏化训练实战</a></li>
+<li><a href="07.html" class="">第7章 通道剪枝算法详解</a></li>
+<li><a href="08.html" class="">第8章 YOLOv11通道剪枝实战</a></li>
+<li><a href="09.html" class="">第9章 剪枝后模型微调</a></li>
+<li><a href="10.html" class="">第10章 模型量化基础理论</a></li>
+<li><a href="11.html" class="">第11章 YOLOv11后训练量化实战</a></li>
+<li><a href="12.html" class="">第12章 量化感知训练实战</a></li>
+<li><a href="13.html" class="">第13章 模型导出与格式转换</a></li>
+<li><a href="14.html" class="">第14章 ONNX模型优化</a></li>
+<li><a href="15.html" class="">第15章 TensorRT部署实战</a></li>
+<li><a href="16.html" class="">第16章 OpenVINO部署实战</a></li>
+<li><a href="17.html" class="">第17章 NCNN移动端部署</a></li>
+<li><a href="18.html" class="">第18章 TFLite与CoreML部署</a></li>
+<li><a href="19.html" class="">第19章 模型压缩效果评估体系</a></li>
+<li><a href="20.html" class="">第20章 剪枝与量化联合压缩策略</a></li>
+<li><a href="21.html" class="">第21章 自动化压缩工具链</a></li>
+<li><a href="22.html" class="">第22章 YOLOv11自定义数据集压缩</a></li>
+<li><a href="23.html" class="">第23章 模型压缩中的常见问题与调试</a></li>
+<li><a href="24.html" class="active">第24章 模型压缩安全性与鲁棒性</a></li>
+<li><a href="25.html" class="">第25章 边缘设备部署实战</a></li>
+<li><a href="26.html" class="">第26章 云端部署实战</a></li>
+<li><a href="27.html" class="">第27章 模型压缩项目实战</a></li>
+<li><a href="28.html" class="">第28章 模型压缩前沿技术</a></li>
+<li><a href="29.html" class="">第29章 课程总结与最佳实践</a></li>
+<li><a href="30.html" class="">第30章 综合考核与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第24章：模型压缩安全性与鲁棒性</h2>
+
+<p>模型压缩做到最后，你会发现一个扎心的事实：<strong>模型变小了，但可能也变“脆”了</strong>。</p>
+
+<p>我最早做剪枝时，只盯着精度不掉、推理变快，觉得万事大吉。直到有一次，我把剪枝后的YOLOv5部署到安防摄像头上，结果一张加了轻微噪点的图片，直接让模型把行人识别成了“不明物体”。嗯，从那以后，我再也不敢忽视鲁棒性这回事。</p>
+
+<p>这一章，我们就来聊聊压缩后的模型到底有多“抗揍”。说白了，就是三个维度：<strong>对抗攻击</strong>、<strong>量化噪声</strong>、<strong>剪枝后遗症</strong>。</p>
+
+<h3>24.1 对抗攻击：模型压缩后的“照妖镜”</h3>
+
+<p>对抗攻击是什么？就是给输入图片加一点点人眼看不出的扰动，让模型输出完全错误的结果。你想想看，自动驾驶里一个“停止”标志被贴了几块小贴纸，模型就当成“限速80”——这可不是开玩笑的。</p>
+
+<p>压缩后的模型，因为参数变少、表征能力下降，往往对这类扰动更敏感。我个人习惯在剪枝前后都跑一遍对抗攻击测试，看看模型是不是“纸老虎”。</p>
+
+<h4>24.1.1 快速对抗攻击测试（FGSM）</h4>
+
+<p>最简单的攻击方法就是FGSM（Fast Gradient Sign Method）。原理不复杂：沿着梯度方向加一点噪声，让损失函数变大。</p>
+
+<pre><code>import torch
+import torch.nn.functional as F
+
+def fgsm_attack(model, images, labels, epsilon=0.03):
+    """
+    快速梯度符号法攻击
+    epsilon: 扰动强度，一般0.01~0.1
+    """
+    model.eval()
+    images.requires_grad = True
+
+    outputs = model(images)
+    loss = F.cross_entropy(outputs, labels)
+
+    # 反向传播，计算梯度
+    model.zero_grad()
+    loss.backward()
+
+    # 生成对抗样本
+    sign_data = images.grad.sign()
+    perturbed_images = images + epsilon * sign_data
+
+    # 裁剪到有效像素范围
+    perturbed_images = torch.clamp(perturbed_images, 0, 1)
+
+    return perturbed_images
+
+# 测试剪枝前后的鲁棒性
+def evaluate_robustness(model, dataloader, epsilon=0.03):
+    correct = 0
+    total = 0
+
+    for images, labels in dataloader:
+        perturbed = fgsm_attack(model, images, labels, epsilon)
+        outputs = model(perturbed)
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+
+    return 100 * correct / total
+
+# 对比测试
+print(f"原始模型对抗鲁棒性: {evaluate_robustness(original_model, test_loader):.2f}%")
+print(f"剪枝后模型对抗鲁棒性: {evaluate_robustness(pruned_model, test_loader):.2f}%")
+</code></pre>
+
+<div class="warning">
+  <strong>⚠️ 避坑指南</strong><br>
+  我曾经遇到过剪枝后模型精度掉了不到1%，但对抗鲁棒性直接腰斩的情况。所以别只看精度，鲁棒性才是部署后的“保命符”。
+</div>
+
+<h4>24.1.2 更强的攻击：PGD</h4>
+
+<p>FGSM是一次性攻击，有点“莽”。PGD（Projected Gradient Descent）则是多步迭代，攻击效果更强。我个人做安全评估时，至少会用PGD跑一轮。</p>
+
+<pre><code>def pgd_attack(model, images, labels, epsilon=0.03, alpha=0.01, steps=10):
+    """
+    PGD攻击：多步迭代，更精准
+    """
+    perturbed = images.clone().detach()
+    perturbed.requires_grad = True
+
+    for _ in range(steps):
+        outputs = model(perturbed)
+        loss = F.cross_entropy(outputs, labels)
+
+        model.zero_grad()
+        loss.backward()
+
+        # 梯度方向更新
+        with torch.no_grad():
+            perturbed = perturbed + alpha * perturbed.grad.sign()
+            # 投影到epsilon球内
+            delta = torch.clamp(perturbed - images, -epsilon, epsilon)
+            perturbed = torch.clamp(images + delta, 0, 1)
+
+        perturbed.requires_grad = True
+
+    return perturbed.detach()
+</code></pre>
+
+<h3>24.2 量化噪声鲁棒性：小模型怕“抖”</h3>
+
+<p>量化，说白了就是把FP32的浮点数变成INT8的整数。这中间会有精度损失，我们叫它“量化噪声”。</p>
+
+<p>为什么量化后的模型更怕噪声？因为数值精度低了，一点点扰动就可能让激活值跳到错误的区间。我做过一个实验：给量化后的YOLOv11输入图片加0.5%的高斯噪声，mAP直接掉了8个点。而原始模型只掉了2个点。</p>
+
+<h4>24.2.1 量化噪声模拟测试</h4>
+
+<p>在部署前，我建议先模拟一下量化噪声的影响。可以用简单的均匀噪声来近似。</p>
+
+<pre><code>import numpy as np
+
+def simulate_quantization_noise(model, dataloader, noise_level=0.01):
+    """
+    模拟量化噪声对模型的影响
+    noise_level: 噪声强度，一般0.005~0.02
+    """
+    total_loss = 0
+    count = 0
+
+    for images, labels in dataloader:
+        # 添加均匀噪声
+        noise = torch.rand_like(images) * noise_level
+        noisy_images = images + noise
+        noisy_images = torch.clamp(noisy_images, 0, 1)
+
+        outputs = model(noisy_images)
+        loss = F.cross_entropy(outputs, labels)
+
+        total_loss += loss.item()
+        count += 1
+
+    return total_loss / count
+
+# 对比量化前后的噪声敏感度
+orig_noise_loss = simulate_quantization_noise(original_model, test_loader)
+quant_noise_loss = simulate_quantization_noise(quantized_model, test_loader)
+print(f"原始模型噪声损失: {orig_noise_loss:.4f}")
+print(f"量化模型噪声损失: {quant_noise_loss:.4f}")
+</code></pre>
+
+<div class="tip">
+  <strong>💡 我的经验</strong><br>
+  如果量化后模型对噪声的敏感度增加了3倍以上，我建议你考虑<strong>量化感知训练（QAT）</strong>。它能让模型在训练时就“习惯”量化噪声，部署后更稳定。
+</div>
+
+<h3>24.3 剪枝后鲁棒性评估：别只看mAP</h3>
+
+<p>剪枝后的模型，mAP可能只掉了0.5%，但鲁棒性可能已经千疮百孔。我总结了一套“鲁棒性体检”流程，每次剪枝完必做。</p>
+
+<h4>24.3.1 多维鲁棒性评估指标</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>评估维度</th>
+      <th>测试方法</th>
+      <th>可接受下降</th>
+      <th>严重警告线</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>对抗鲁棒性</td>
+      <td>FGSM/PGD攻击</td>
+      <td>&lt; 5%</td>
+      <td>&gt; 15%</td>
+    </tr>
+    <tr>
+      <td>噪声鲁棒性</td>
+      <td>高斯/均匀噪声</td>
+      <td>&lt; 3%</td>
+      <td>&gt; 10%</td>
+    </tr>
+    <tr>
+      <td>光照变化</td>
+      <td>亮度/对比度调整</td>
+      <td>&lt; 2%</td>
+      <td>&gt; 8%</td>
+    </tr>
+    <tr>
+      <td>遮挡鲁棒性</td>
+      <td>随机遮挡块</td>
+      <td>&lt; 4%</td>
+      <td>&gt; 12%</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>24.3.2 完整的鲁棒性评估代码</h4>
+
+<pre><code>def comprehensive_robustness_eval(model, dataloader):
+    """
+    全面的鲁棒性评估
+    """
+    results = {}
+
+    # 1. 基线精度
+    results['baseline'] = evaluate_accuracy(model, dataloader)
+
+    # 2. 对抗攻击测试
+    results['fgsm_0.03'] = evaluate_robustness(model, dataloader, epsilon=0.03)
+    results['pgd_0.03'] = evaluate_pgd_robustness(model, dataloader)
+
+    # 3. 噪声测试
+    results['gaussian_noise'] = evaluate_noise_robustness(model, dataloader, 'gaussian')
+    results['uniform_noise'] = evaluate_noise_robustness(model, dataloader, 'uniform')
+
+    # 4. 光照变化
+    results['brightness_+20%'] = evaluate_brightness(model, dataloader, factor=1.2)
+    results['brightness_-20%'] = evaluate_brightness(model, dataloader, factor=0.8)
+
+    # 5. 遮挡测试
+    results['occlusion_10%'] = evaluate_occlusion(model, dataloader, ratio=0.1)
+    results['occlusion_20%'] = evaluate_occlusion(model, dataloader, ratio=0.2)
+
+    return results
+
+# 对比剪枝前后的鲁棒性变化
+orig_results = comprehensive_robustness_eval(original_model, test_loader)
+pruned_results = comprehensive_robustness_eval(pruned_model, test_loader)
+
+for key in orig_results:
+    diff = pruned_results[key] - orig_results[key]
+    status = "✅" if abs(diff) < 3 else ("⚠️" if abs(diff) < 8 else "❌")
+    print(f"{status} {key}: 原始={orig_results[key]:.2f}% → 剪枝后={pruned_results[key]:.2f}% (变化={diff:+.2f}%)")
+</code></pre>
+
+<div class="highlight">
+  <strong>🔑 核心判断标准</strong><br>
+  我个人认为：<br>
+  - 如果所有维度下降 &lt; 3%：安全，可以部署<br>
+  - 如果有1-2个维度下降 3-8%：需要针对性优化<br>
+  - 如果有维度下降 &gt; 8%：建议回退剪枝比例，或者改用结构化剪枝
+</div>
+
+<h3>24.4 提升鲁棒性的实用技巧</h3>
+
+<p>发现问题不是目的，解决问题才是。这里分享几个我踩坑后总结的方法。</p>
+
+<h4>24.4.1 对抗训练（Adversarial Training）</h4>
+
+<p>在剪枝或量化前，先用对抗样本做数据增强。说白了，就是让模型在训练时就见过“坏蛋”，部署时就不怕了。</p>
+
+<pre><code>def adversarial_training_step(model, images, labels, optimizer, epsilon=0.03):
+    """
+    对抗训练：每个batch都生成对抗样本再训练
+    """
+    # 生成对抗样本
+    adv_images = fgsm_attack(model, images, labels, epsilon)
+
+    # 混合训练：原始样本 + 对抗样本
+    combined_images = torch.cat([images, adv_images], dim=0)
+    combined_labels = torch.cat([labels, labels], dim=0)
+
+    # 前向传播
+    outputs = model(combined_images)
+    loss = F.cross_entropy(outputs, combined_labels)
+
+    # 反向传播
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    return loss.item()
+</code></pre>
+
+<h4>24.4.2 量化感知训练（QAT）</h4>
+
+<p>量化感知训练能让模型在训练时模拟量化过程，从而学会抵抗量化噪声。我建议在剪枝后、量化前做这个。</p>
+
+<pre><code># 使用PyTorch的量化感知训练
+import torch.quantization as quant
+
+# 准备模型
+model.qconfig = quant.get_default_qat_qconfig('fbgemm')
+model_prepared = quant.prepare_qat(model, inplace=False)
+
+# 正常训练
+for epoch in range(num_epochs):
+    for images, labels in train_loader:
+        outputs = model_prepared(images)
+        loss = criterion(outputs, labels)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+# 训练完成后，转换为量化模型
+model_quantized = quant.convert(model_prepared, inplace=False)
+</code></pre>
+
+<div class="warning">
+  <strong>⚠️ 注意</strong><br>
+  对抗训练会降低模型在干净样本上的精度，一般会掉1-3%。这是“用精度换安全”的权衡。我个人习惯控制在2%以内。
+</div>
+
+<h3>24.5 本章知识体系</h3>
+
+<p>下面这张图，是我自己总结的模型压缩安全性与鲁棒性评估框架。每次做压缩项目，我都会对着这张图过一遍。</p>
+
+<svg width="800" height="520" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="520" fill="#f0f8ff" rx="10"/>
+
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">模型压缩安全性与鲁棒性评估框架</text>
+
+  <!-- 中心节点 -->
+  <rect x="300" y="60" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">压缩后模型</text>
+
+  <!-- 三个主要分支 -->
+  <!-- 对抗攻击 -->
+  <rect x="50" y="150" width="200" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="150" y="176" text-anchor="middle" font-size="15" fill="white" font-weight="bold">对抗攻击鲁棒性</text>
+
+  <!-- 量化噪声 -->
+  <rect x="300" y="150" width="200" height="40" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="400" y="176" text-anchor="middle" font-size="15" fill="white" font-weight="bold">量化噪声鲁棒性</text>
+
+  <!-- 剪枝后遗症 -->
+  <rect x="550" y="150" width="200" height="40" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="650" y="176" text-anchor="middle" font-size="15" fill="white" font-weight="bold">剪枝后鲁棒性</text>
+
+  <!-- 连接线 -->
+  <line x1="350" y1="110" x2="150" y2="150" stroke="#bdc3c7" stroke-width="2"/>
+  <line x1="400" y1="110" x2="400" y2="150" stroke="#bdc3c7" stroke-width="2"/>
+  <line x1="450" y1="110" x2="650" y2="150" stroke="#bdc3c7" stroke-width="2"/>
+
+  <!-- 对抗攻击子项 -->
+  <rect x="30" y="220" width="130" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="95" y="243" text-anchor="middle" font-size="13" fill="#c0392b">FGSM攻击</text>
+
+  <rect x="170" y="220" width="130" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="235" y="243" text-anchor="middle" font-size="13" fill="#c0392b">PGD攻击</text>
+
+  <!-- 量化噪声子项 -->
+  <rect x="280" y="220" width="130" height="35" rx="5" fill="#fdebd0" stroke="#e67e22" stroke-width="1"/>
+  <text x="345" y="243" text-anchor="middle" font-size="13" fill="#d35400">均匀噪声</text>
+
+  <rect x="420" y="220" width="130" height="35" rx="5" fill="#fdebd0" stroke="#e67e22" stroke-width="1"/>
+  <text x="485" y="243" text-anchor="middle" font-size="13" fill="#d35400">高斯噪声</text>
+
+  <!-- 剪枝后遗症子项 -->
+  <rect x="530" y="220" width="130" height="35" rx="5" fill="#ebdef0" stroke="#9b59b6" stroke-width="1"/>
+  <text x="595" y="243" text-anchor="middle" font-size="13" fill="#8e44ad">光照变化</text>
+
+  <rect x="670" y="220" width="130" height="35" rx="5" fill="#ebdef0" stroke="#9b59b6" stroke-width="1"/>
+  <text x="735" y="243" text-anchor="middle" font-size="13" fill="#8e44ad">遮挡测试</text>
+
+  <!-- 评估方法 -->
+  <rect x="150" y="290" width="500" height="40" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="316" text-anchor="middle" font-size="15" fill="white" font-weight="bold">综合评估：多维指标 + 对比基线</text>
+
+  <!-- 优化策略 -->
+  <rect x="100" y="360" width="200" height="40" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="200" y="386" text-anchor="middle" font-size="14" fill="white" font-weight="bold">对抗训练</text>
+
+  <rect x="350" y="360" width="200" height="40" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="450" y="386" text-anchor="middle" font-size="14" fill="white" font-weight="bold">量化感知训练</text>
+
+  <rect x="600" y="360" width="150" height="40" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="675" y="386" text-anchor="middle" font-size="14" fill="white" font-weight="bold">结构化剪枝</text>
+
+  <!-- 最终目标 -->
+  <rect x="250" y="440" width="300" height="50" rx="25" fill="#34495e" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="470" text-anchor="middle" font-size="16" fill="white" font-weight="bold">安全、鲁棒、高效的压缩模型</text>
+
+  <!-- 连接线 -->
+  <line x1="150" y1="255" x2="250" y2="290" stroke="#bdc3c7" stroke-width="1.5"/>
+  <line x1="235" y1="255" x2="250" y2="290" stroke="#bdc3c7" stroke-width="1.5"/>
+  <line x1="345" y1="255" x2="350" y2="290" stroke="#bdc3c7" stroke-width="1.5"/>
+  <line x1="485" y1="255" x2="450" y2="290" stroke="#bdc3c7" stroke-width="1.5"/>
+  <line x1="595" y1="255" x2="550" y2="290" stroke="#bdc3c7" stroke-width="1.5"/>
+  <line x1="735" y1="255" x2="550" y2="290" stroke="#bdc3c7" stroke-width="1.5"/>
+
+  <line x1="250" y1="330" x2="200" y2="360" stroke="#bdc3c7" stroke-width="1.5"/>
+  <line x1="450" y1="330" x2="450" y2="360" stroke="#bdc3c7" stroke-width="1.5"/>
+  <line x1="550" y1="330" x2="675" y2="360" stroke="#bdc3c7" stroke-width="1.5"/>
+
+  <line x1="200" y1="400" x2="350" y2="440" stroke="#bdc3c7" stroke-width="1.5"/>
+  <line x1="450" y1="400" x2="450" y2="440" stroke="#bdc3c7" stroke-width="1.5"/>
+  <line x1="675" y1="400" x2="550" y2="440" stroke="#bdc3c7" stroke-width="1.5"/>
+</svg>
+
+<p>最后说一句：模型压缩不是终点，安全部署才是。我见过太多项目在实验室跑得飞起，一上线就翻车。所以，<strong>请把鲁棒性评估写进你的压缩流程里，就像写单元测试一样自然</strong>。</p>
+
+<hr>
+<p style="text-align:center; color:#7f8c8d; font-size:14px;">公众号:蓝海资料掘金营，微信deep3321</p>
+        <div class="footer-nav">
+            <a href="23.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="25.html">下一章 →</a>
+        </div>
+        <footer>公众号:蓝海资料掘金营，微信deep3321</footer>
+    </div>
+</div>
+</div>
+</body>
+</html>

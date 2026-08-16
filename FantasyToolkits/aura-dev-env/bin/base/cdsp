@@ -1,0 +1,13 @@
+#!/bin/bash
+
+SYS_MON_PATH="/vendor/bin/sysMonApp"
+
+if [ $# -eq 1 ]; then
+  SYS_MON_PATH=$1
+  echo "SysMonApp:$SYS_MON_PATH"
+fi
+
+echo "CDSP负载查询 SysMonApp:$SYS_MON_PATH"
+echo "================================================="
+
+adb shell "$SYS_MON_PATH getstate --getvotes 1 --q6 cdsp"

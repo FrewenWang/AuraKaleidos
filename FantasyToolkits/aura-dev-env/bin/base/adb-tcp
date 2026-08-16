@@ -1,0 +1,5 @@
+#!/bin/bash
+
+adb tcpip 5555
+
+adb shell ifconfig

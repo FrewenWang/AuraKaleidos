@@ -1,7 +1,11 @@
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from AlicePyTorch.face_rect_train.FaceDataset import FaceDataset
-from AlicePyTorch.face_rect_train.YOLOv8MobileNet import YOLOv8MobileNet
+try:
+    from .FaceDataset import FaceDataset
+    from .YOLOv8MobileNet import YOLOv8MobileNet
+except ImportError:  # 兼容直接执行 python src/train.py
+    from FaceDataset import FaceDataset
+    from YOLOv8MobileNet import YOLOv8MobileNet
 import torch
 import torch.nn as nn
 import torchvision
@@ -9,7 +13,6 @@ from albumentations.pytorch import ToTensorV2
 import albumentations as A
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = YOLOv8MobileNet(num_classes=1).to(device)
 
 
 def yolo_loss(pred, target):
@@ -50,19 +53,27 @@ def train_model(model, dataloader, criterion, optimizer, num_epochs=25):
     return model
 
 
-transform = A.Compose([
-    A.Resize(416, 416),
-    A.HorizontalFlip(p=0.5),
-    A.RandomBrightnessContrast(p=0.2),
-    ToTensorV2()
-], bbox_params=A.BboxParams(format='pascal_voc', label_fields=[]))
+def main():
+    """运行训练草稿。执行前需将占位路径替换为真实数据。"""
+    transform = A.Compose([
+        A.Resize(416, 416),
+        A.HorizontalFlip(p=0.5),
+        A.RandomBrightnessContrast(p=0.2),
+        ToTensorV2()
+    ], bbox_params=A.BboxParams(format='pascal_voc', label_fields=[]))
 
-model = YOLOv8MobileNet(num_classes=1).to(device)
-criterion = yolo_loss
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+    model = YOLOv8MobileNet(num_classes=1).to(device)
+    criterion = yolo_loss
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-train_dataset = FaceDataset(annotations_file='path/to/train_annotations.csv', img_dir='path/to/train_images',
-                            transform=transform)
-train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+    train_dataset = FaceDataset(
+        annotations_file='path/to/train_annotations.csv',
+        img_dir='path/to/train_images',
+        transform=transform,
+    )
+    train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+    train_model(model, train_dataloader, criterion, optimizer, num_epochs=25)
 
-trained_model = train_model(model, train_dataloader, criterion, optimizer, num_epochs=25)
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,82 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alice-face-detection"
+version = "0.1.0"
+description = "Lightweight grayscale face detection based on PaddlePaddle and PP-YOLO"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy==1.26.4",
+    "opencv-python-headless==4.10.0.84",
+    "PyYAML==6.0.2",
+    "six==1.17.0",
+]
+
+[project.optional-dependencies]
+cpu = ["paddlepaddle==2.6.2"]
+data = ["Pillow==11.0.0", "scikit-learn==1.5.2", "scipy==1.14.1"]
+export = [
+    "onnx==1.17.0",
+    "onnxruntime==1.23.2",
+    "paddle2onnx==1.0.9",
+]
+dev = ["coverage[toml]>=7.6"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.coverage.run]
+branch = true
+source = ["alice_face_detection"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 80
+extend-exclude = [
+    "scripts/evaluation",
+    "scripts/legacy",
+    "src/alice_face_detection/PPYoloMobileNetV3.py",
+    "src/alice_face_detection/bbox_utils.py",
+    "src/alice_face_detection/darknet.py",
+    "src/alice_face_detection/dataset.py",
+    "src/alice_face_detection/iou_loss.py",
+    "src/alice_face_detection/layers.py",
+    "src/alice_face_detection/lmdb_util.py",
+    "src/alice_face_detection/logger.py",
+    "src/alice_face_detection/map_utils.py",
+    "src/alice_face_detection/metrics.py",
+    "src/alice_face_detection/mobilenet_*.py",
+    "src/alice_face_detection/op_helper.py",
+    "src/alice_face_detection/operators*.py",
+    "src/alice_face_detection/ops.py",
+    "src/alice_face_detection/post_process.py",
+    "src/alice_face_detection/reader.py",
+    "src/alice_face_detection/shape_spec.py",
+    "src/alice_face_detection/stats.py",
+    "src/alice_face_detection/train_utils.py",
+    "src/alice_face_detection/vehicle_*.py",
+    "src/alice_face_detection/x2paddle_*.py",
+    "src/alice_face_detection/yolo_*.py",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "N", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/evaluate_repro.py" = ["E402"]
+"scripts/verify_onnx.py" = ["E402"]
+"tests/test_repro_pipeline.py" = ["E402"]
+
+[tool.ruff.format]
+docstring-code-format = true
+line-ending = "lf"

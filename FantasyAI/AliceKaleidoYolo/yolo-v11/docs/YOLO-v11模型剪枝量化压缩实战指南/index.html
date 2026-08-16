@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>YOLOv11 模型剪枝量化压缩实战 · 课程目录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f9f3e8 0%, #ffe9d6 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1.5rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(255, 250, 240, 0.7);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 48px 32px 32px;
+            padding: 2rem 2rem 1.8rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(255, 180, 100, 0.15);
+            border: 1px solid rgba(255, 215, 175, 0.5);
+        }
+
+        /* 中小学生风格：明亮、圆润、活泼色系 */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 4px solid #ffb882;
+            padding-bottom: 1.2rem;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f5673a, #ff8c5a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 small {
+            font-size: 1rem;
+            background: #ffdec2;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            -webkit-text-fill-color: #7a4a2e;
+            color: #7a4a2e;
+            font-weight: 500;
+            background: #ffd9bb;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            background: #ffb882;
+            padding: 0.4rem 1.2rem;
+            border-radius: 60px;
+            color: #4d2e1b;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 8px rgba(255, 150, 70, 0.2);
+            display: inline-block;
+            border: 1px solid #ffa96a;
+        }
+
+        .badge i {
+            font-style: normal;
+            background: #fff1e0;
+            padding: 0 8px;
+            border-radius: 30px;
+            margin-left: 6px;
+        }
+
+        /* 卡片网格 —— 紧凑卡片 */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin: 1.2rem 0 1.8rem;
+        }
+
+        .card {
+            background: #fffffffa;
+            border-radius: 28px;
+            padding: 0.9rem 1.2rem 0.9rem 1.2rem;
+            box-shadow: 0 6px 14px rgba(250, 180, 100, 0.12);
+            transition: all 0.2s ease;
+            border: 1px solid #ffe1c6;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(2px);
+            background: rgba(255, 252, 245, 0.95);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 24px rgba(245, 150, 70, 0.18);
+            border-color: #ffb27a;
+            background: #fffcf5;
+        }
+
+        .card a {
+            text-decoration: none;
+            color: #2f1f12;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .chapter-num {
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: #ffd5b0;
+            padding: 0 12px 0 10px;
+            border-radius: 40px;
+            color: #4f2f18;
+            letter-spacing: 0.3px;
+            line-height: 1.8;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .chapter-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #3f281a;
+            line-height: 1.4;
+            margin-top: 2px;
+        }
+
+        .card-desc {
+            font-size: 0.82rem;
+            color: #6b4d34;
+            margin-top: 6px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            opacity: 0.85;
+            padding-right: 4px;
+        }
+
+        /* 紧凑调整 */
+        .card-desc span {
+            background: #f7ede2;
+            padding: 0 6px;
+            border-radius: 12px;
+        }
+
+        .footer-note {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 1rem;
+            color: #4d2f1b;
+            border-top: 2px dashed #ffc9a2;
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.8rem 2rem;
+        }
+
+        .footer-note .highlight {
+            background: #ffdcc0;
+            padding: 0.3rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #3f2413;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(255, 150, 70, 0.2);
+        }
+
+        .footer-note .wechat {
+            background: #fae6d4;
+            padding: 0.3rem 1.4rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #2f1a0c;
+            border: 1px solid #ffb27a;
+        }
+
+        /* 响应式 */
+        @media (max-width: 700px) {
+            body { padding: 1rem 0.8rem; }
+            .container { padding: 1.2rem 1rem; }
+            .header h1 { font-size: 1.8rem; }
+            .course-grid { grid-template-columns: 1fr; gap: 14px; }
+            .card { padding: 0.8rem 1rem; }
+        }
+
+        @media (min-width: 1200px) {
+            .course-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* 小点缀 */
+        .card:nth-child(odd) .chapter-num {
+            background: #ffd0a8;
+        }
+        .card:nth-child(even) .chapter-num {
+            background: #ffc19e;
+        }
+        .card:nth-child(5n+1) {
+            border-left: 4px solid #ffa75c;
+        }
+        .card:nth-child(5n+2) {
+            border-left: 4px solid #ffb77a;
+        }
+        .card:nth-child(5n+3) {
+            border-left: 4px solid #ffc28b;
+        }
+        .card:nth-child(5n+4) {
+            border-left: 4px solid #ffd19e;
+        }
+        .card:nth-child(5n+5) {
+            border-left: 4px solid #ffddb0;
+        }
+
+        /* 30个卡片完整展示 */
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>
+            📘 YOLOv11 压缩实战
+            <small>剪枝·量化·部署</small>
+        </h1>
+        <div class="badge">
+            🎯 30章 完整路径
+        </div>
+    </div>
+
+    <div class="course-grid">
+        <!-- 1 -->
+        <div class="card"><a href="01.html">
+            <div class="card-header"><span class="chapter-num">01</span><span class="chapter-title">课程导论与模型压缩概览</span></div>
+            <div class="card-desc">YOLOv11简介 · 压缩必要性 · 剪枝量化核心概念 · 学习路径</div>
+        </a></div>
+        <!-- 2 -->
+        <div class="card"><a href="02.html">
+            <div class="card-header"><span class="chapter-num">02</span><span class="chapter-title">环境搭建与工具链准备</span></div>
+            <div class="card-desc">Python虚拟环境 · PyTorch/CUDA · YOLOv11源码 · 依赖验证</div>
+        </a></div>
+        <!-- 3 -->
+        <div class="card"><a href="03.html">
+            <div class="card-header"><span class="chapter-num">03</span><span class="chapter-title">YOLOv11模型结构与原理</span></div>
+            <div class="card-desc">Backbone/Neck/Head · C2f/SPPF · 参数量&计算量</div>
+        </a></div>
+        <!-- 4 -->
+        <div class="card"><a href="04.html">
+            <div class="card-header"><span class="chapter-num">04</span><span class="chapter-title">模型剪枝基础理论</span></div>
+            <div class="card-desc">结构化/非结构化 · 剪枝粒度 · 评价指标</div>
+        </a></div>
+        <!-- 5 -->
+        <div class="card"><a href="05.html">
+            <div class="card-header"><span class="chapter-num">05</span><span class="chapter-title">稀疏化训练原理</span></div>
+            <div class="card-desc">L1正则化 · BN Gamma · 超参数设置</div>
+        </a></div>
+        <!-- 6 -->
+        <div class="card"><a href="06.html">
+            <div class="card-header"><span class="chapter-num">06</span><span class="chapter-title">YOLOv11稀疏化训练实战</span></div>
+            <div class="card-desc">修改脚本 · 稀疏损失 · 监控进度 · 保存模型</div>
+        </a></div>
+        <!-- 7 -->
+        <div class="card"><a href="07.html">
+            <div class="card-header"><span class="chapter-num">07</span><span class="chapter-title">通道剪枝算法详解</span></div>
+            <div class="card-desc">BN Gamma剪枝 · 全局/局部阈值 · 剪枝率策略</div>
+        </a></div>
+        <!-- 8 -->
+        <div class="card"><a href="08.html">
+            <div class="card-header"><span class="chapter-num">08</span><span class="chapter-title">YOLOv11通道剪枝实战</span></div>
+            <div class="card-desc">剪枝脚本 · 结构解析 · 执行剪枝 · 验证模型</div>
+        </a></div>
+        <!-- 9 -->
+        <div class="card"><a href="09.html">
+            <div class="card-header"><span class="chapter-num">09</span><span class="chapter-title">剪枝后模型微调</span></div>
+            <div class="card-desc">学习率策略 · 冻结训练 · epoch设置 · 损失调整</div>
+        </a></div>
+        <!-- 10 -->
+        <div class="card"><a href="10.html">
+            <div class="card-header"><span class="chapter-num">10</span><span class="chapter-title">模型量化基础理论</span></div>
+            <div class="card-desc">对称/非对称 · INT8/FP16 · 量化感知/后训练量化</div>
+        </a></div>
+        <!-- 11 -->
+        <div class="card"><a href="11.html">
+            <div class="card-header"><span class="chapter-num">11</span><span class="chapter-title">YOLOv11后训练量化实战</span></div>
+            <div class="card-desc">PyTorch量化API · 校准集 · 模型导出 · 精度评估</div>
+        </a></div>
+        <!-- 12 -->
+        <div class="card"><a href="12.html">
+            <div class="card-header"><span class="chapter-num">12</span><span class="chapter-title">量化感知训练实战</span></div>
+            <div class="card-desc">FakeQuantize · 模拟量化训练 · 参数调整 · 转换</div>
+        </a></div>
+        <!-- 13 -->
+        <div class="card"><a href="13.html">
+            <div class="card-header"><span class="chapter-num">13</span><span class="chapter-title">模型导出与格式转换</span></div>
+            <div class="card-desc">ONNX · 简化优化 · TensorRT · OpenVINO</div>
+        </a></div>
+        <!-- 14 -->
+        <div class="card"><a href="14.html">
+            <div class="card-header"><span class="chapter-num">14</span><span class="chapter-title">ONNX模型优化</span></div>
+            <div class="card-desc">ONNX Runtime · 算子融合 · 动态形状 · 精度对比</div>
+        </a></div>
+        <!-- 15 -->
+        <div class="card"><a href="15.html">
+            <div class="card-header"><span class="chapter-num">15</span><span class="chapter-title">TensorRT部署实战</span></div>
+            <div class="card-desc">TensorRT安装 · Engine构建 · 动态batch · FP16/INT8</div>
+        </a></div>
+        <!-- 16 -->
+        <div class="card"><a href="16.html">
+            <div class="card-header"><span class="chapter-num">16</span><span class="chapter-title">OpenVINO部署实战</span></div>
+            <div class="card-desc">OpenVINO安装 · 模型转换 · 推理优化 · 异构执行</div>
+        </a></div>
+        <!-- 17 -->
+        <div class="card"><a href="17.html">
+            <div class="card-header"><span class="chapter-num">17</span><span class="chapter-title">NCNN移动端部署</span></div>
+            <div class="card-desc">NCNN编译 · 模型转换 · Android/iOS · 性能调优</div>
+        </a></div>
+        <!-- 18 -->
+        <div class="card"><a href="18.html">
+            <div class="card-header"><span class="chapter-num">18</span><span class="chapter-title">TFLite与CoreML部署</span></div>
+            <div class="card-desc">TFLite转换量化 · CoreML转换 · 边缘设备适配</div>
+        </a></div>
+        <!-- 19 -->
+        <div class="card"><a href="19.html">
+            <div class="card-header"><span class="chapter-num">19</span><span class="chapter-title">模型压缩效果评估体系</span></div>
+            <div class="card-desc">mAP · FPS · 模型大小 · 内存 · 功耗</div>
+        </a></div>
+        <!-- 20 -->
+        <div class="card"><a href="20.html">
+            <div class="card-header"><span class="chapter-num">20</span><span class="chapter-title">剪枝与量化联合压缩策略</span></div>
+            <div class="card-desc">先剪枝后量化 · 联合训练 · 迭代压缩 · 对比</div>
+        </a></div>
+        <!-- 21 -->
+        <div class="card"><a href="21.html">
+            <div class="card-header"><span class="chapter-num">21</span><span class="chapter-title">自动化压缩工具链</span></div>
+            <div class="card-desc">NNI · Intel POT · TensorRT Model Optimizer · 自定义脚本</div>
+        </a></div>
+        <!-- 22 -->
+        <div class="card"><a href="22.html">
+            <div class="card-header"><span class="chapter-num">22</span><span class="chapter-title">YOLOv11自定义数据集压缩</span></div>
+            <div class="card-desc">数据标注 · 数据集划分 · 训练配置 · 压缩适配</div>
+        </a></div>
+        <!-- 23 -->
+        <div class="card"><a href="23.html">
+            <div class="card-header"><span class="chapter-num">23</span><span class="chapter-title">模型压缩常见问题与调试</span></div>
+            <div class="card-desc">精度下降 · 梯度爆炸 · 过拟合 · 收敛困难</div>
+        </a></div>
+        <!-- 24 -->
+        <div class="card"><a href="24.html">
+            <div class="card-header"><span class="chapter-num">24</span><span class="chapter-title">模型压缩安全性与鲁棒性</span></div>
+            <div class="card-desc">对抗攻击 · 量化噪声鲁棒性 · 剪枝鲁棒性评估</div>
+        </a></div>
+        <!-- 25 -->
+        <div class="card"><a href="25.html">
+            <div class="card-header"><span class="chapter-num">25</span><span class="chapter-title">边缘设备部署实战</span></div>
+            <div class="card-desc">Jetson Nano · 树莓派 · RK3588 · 性能对比</div>
+        </a></div>
+        <!-- 26 -->
+        <div class="card"><a href="26.html">
+            <div class="card-header"><span class="chapter-num">26</span><span class="chapter-title">云端部署实战</span></div>
+            <div class="card-desc">AWS SageMaker · 阿里云PAI · Docker · 弹性伸缩</div>
+        </a></div>
+        <!-- 27 -->
+        <div class="card"><a href="27.html">
+            <div class="card-header"><span class="chapter-num">27</span><span class="chapter-title">模型压缩项目实战</span></div>
+            <div class="card-desc">目标检测全流程 · 训练到压缩到部署 · 效果展示</div>
+        </a></div>
+        <!-- 28 -->
+        <div class="card"><a href="28.html">
+            <div class="card-header"><span class="chapter-num">28</span><span class="chapter-title">模型压缩前沿技术</span></div>
+            <div class="card-desc">知识蒸馏 · 神经架构搜索 · 混合精度 · 动态网络</div>
+        </a></div>
+        <!-- 29 -->
+        <div class="card"><a href="29.html">
+            <div class="card-header"><span class="chapter-num">29</span><span class="chapter-title">课程总结与最佳实践</span></div>
+            <div class="card-desc">压缩流程总结 · 参数选择 · 常见误区 · 学习资源</div>
+        </a></div>
+        <!-- 30 -->
+        <div class="card"><a href="30.html">
+            <div class="card-header"><span class="chapter-num">30</span><span class="chapter-title">综合考核与项目答辩</span></div>
+            <div class="card-desc">项目要求 · 评分标准 · 答辩技巧 · 优秀案例</div>
+        </a></div>
+    </div>
+
+    <!-- footer 区域 -->
+    <div class="footer-note">
+        <span class="highlight">📢 公众号：蓝海资料掘金营</span>
+        <span class="wechat">📱 微信 deep3321</span>
+        <span style="color:#7a4f32; font-size:0.9rem; background: #f7e7da; padding:0.2rem 1rem; border-radius:30px;">🚀 30章 从入门到部署</span>
+    </div>
+</div>
+</body>
+</html>

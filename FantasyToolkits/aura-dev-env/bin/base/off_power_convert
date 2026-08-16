@@ -1,0 +1,15 @@
+#! /bin/bash
+#get input parameter number
+num=$#
+
+#loop through all parameters
+for file in $*; do
+  echo $file
+  sed -i -e 's/Main current at time //g' $file
+  sed -i -e 's/mA//g' $file
+  sed -i 's/ is: /,/g' $file
+  #去掉文件名后缀.txt
+  file=${file%.*}
+  echo $file
+  cp $file.txt $file.csv
+done

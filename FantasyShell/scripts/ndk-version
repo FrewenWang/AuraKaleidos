@@ -1,0 +1,24 @@
+#!/bin/bash
+# 用法：./ndk <版本号> (如 r26d、r25c、r23c)
+
+ls -ll $NDK_HOME
+
+# 检查编译器路径（示例）
+# $NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-clang --version
+
+# 验证NDK版本
+echo "====================ndk-build --version============="
+ndk-build --version
+
+# 动态切换NDK版本的实践
+
+# 初始化链接
+# ln -s ~/Library/Android/Sdk/ndk/android-ndk-r26d ~/Library/Android/Sdk/ndk/ndk_home
+
+# 动态切换版本
+# rm ~/Library/Android/Sdk/ndk/ndk_home  # 删除旧链接
+# ln -s ~/Library/Android/Sdk/ndk/android-ndk-r26d  ~/Library/Android/Sdk/ndk/ndk_home  # 指向新版本
+
+# 在 ~/.bashrc 中固定指向符号链接：
+# export ANDROID_NDK_HOME=~/ndk/current
+# export PATH="$ANDROID_NDK_HOME:$PATH"

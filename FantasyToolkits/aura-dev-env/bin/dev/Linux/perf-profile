@@ -1,0 +1,23 @@
+#!/bin/bash
+# Performance profiling tool - Linux specific
+
+set -e
+
+if [ $# -lt 1 ]; then
+  echo "Usage: perf-profile <command> [args...]"
+  exit 1
+fi
+
+echo "📊 [Linux Performance Profiling]"
+echo "Profiling: $*"
+echo ""
+
+# Use Linux perf tool
+perf record -g -F 99 "$@"
+
+echo ""
+echo "Report:"
+perf report --stdio | head -50
+
+echo ""
+echo "✅ Profile complete"

@@ -1,0 +1,48 @@
+[core]
+	quotepath = false
+	excludesfile = $HOME/.gitignore_global.fwf
+	filemode = false
+	editor = vim
+[alias]
+	# git checkout 相关的自定义别名
+	cha = checkout ./
+	ch = checkout
+
+	# git commit 相关的自定义别名
+	c = commit
+	cm = commit -m
+	ca = commit --amend
+
+	# git status 相关的自定义别名
+	st = status
+
+	# Show verbose output about tags, branches or remotes
+	tags = tag -l
+
+	# git branch 相关的自定义别名
+	b = branch
+	ba = branch -a
+
+	# git pull 相关的自定义别名
+	p  =  pull
+	pr =  pull --rebase
+	pm =  pull --merge
+
+	# git push 相关的自定义别名
+	po = push origin
+
+	# git remote 相关的自定义别名
+	rv = remote -v
+
+	# git push 相关的自定义别名
+	l =  log
+[color]
+	ui = auto
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+	email = frewen1225@gmail.com
+	name = Frewen.Wang

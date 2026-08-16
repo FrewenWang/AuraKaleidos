@@ -1,0 +1,4 @@
+# 权重文件通过 download_weights.sh 下载，不纳入版本控制
+darknet53.conv.74
+yolov3-tiny.weights
+yolov3.weights

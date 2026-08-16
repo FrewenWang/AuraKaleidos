@@ -1,0 +1,33 @@
+#!/bin/bash
+# 用法：./ndk <版本号> (如 r26d、r25c、r23c、r21e)
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: hsdk <版本号> (如 5.3.0、6.2.0.1)"
+  exit 1
+fi
+
+VERSION=$1
+HEXAGON_PATH="$HOME/Library/Library/hexagon-sdk-$VERSION"
+
+if [ ! -d "$NDK_PATH" ]; then
+  echo "错误：hexagon版本 $VERSION 不存在！hexagon_PATH:$HEXAGON_PATH"
+  exit 1
+fi
+
+# 更新符号链接
+rm -f ~/Library/hexagon-sdk/hexagon-sdk-home
+ln -s "$HEXAGON_PATH" ~/Library/hexagon-sdk/hexagon-sdk-home
+echo "已切换至 HEXAGON_PATH $VERSION ！NDK_PATH:$HEXAGON_PATH"
+
+# 动态切换NDK版本的实践
+
+# 初始化链接
+# ln -s ~/Library/Android/Sdk/ndk/android-ndk-r26d ~/Library/Android/Sdk/ndk/ndk_home
+
+# 动态切换版本
+# rm ~/Library/Android/Sdk/ndk/ndk_home  # 删除旧链接
+# ln -s ~/Library/Android/Sdk/ndk/android-ndk-r26d  ~/Library/Android/Sdk/ndk/ndk_home  # 指向新版本
+
+# 在 ~/.bashrc 中固定指向符号链接：
+# export ANDROID_NDK_HOME=~/ndk/current
+# export PATH="$ANDROID_NDK_HOME:$PATH"

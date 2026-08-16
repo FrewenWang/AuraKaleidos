@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+#######################################
+# 配置
+#######################################
+BC_CMD="bcompare"
+TMP_DIRS=()
+
+#######################################
+# 日志函数
+#######################################
+log() {
+    echo "[cmp-text] $*" >&2
+}
+
+die() {
+    log "ERROR: $*"
+    exit 1
+}
+
+#######################################
+# 清理函数（脚本退出时自动执行）
+#######################################
+cleanup() {
+    for d in "${TMP_DIRS[@]}"; do
+        [[ -d "$d" ]] && rm -rf "$d"
+    done
+}
+trap cleanup EXIT
+
+#######################################
+# 从 adb 拉取文件
+# 参数: adb:/path/on/device
+# 输出: 本地文件路径
+#######################################
+adb_pull_file() {
+    local adb_path="$1"
+    local path_on_device="${adb_path#adb:}"
+
+    [[ -z "$path_on_device" ]] && die "adb 路径非法: $adb_path"
+
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+    TMP_DIRS+=("$tmp_dir")
+
+    local local_file="$tmp_dir/$(basename "$path_on_device")"
+
+    log "ADB pull: $path_on_device"
+    if ! adb pull "$path_on_device" "$local_file" >/dev/null; then
+        die "ADB 拉取失败: $path_on_device"
+    fi
+
+    echo "$local_file"
+}
+
+#######################################
+# 解析输入路径
+#######################################
+resolve_path() {
+    local input="$1"
+
+    if [[ "$input" == adb:* ]]; then
+        adb_pull_file "$input"
+    else
+        [[ ! -e "$input" ]] && die "文件不存在: $input"
+        echo "$input"
+    fi
+}
+
+#######################################
+# 主流程
+#######################################
+main() {
+
+    path1="adb:/data/local/tmp/supernight/dump_benchmark/se.tonemapping.cvtone_gamma_and_weights_670201366580_input_CVToneGammaAndWeights.json"
+    path2="adb:/data/local/tmp/supernight/dump_benchmark/se.tonemapping.cvtone_gamma_and_weights_670201366580_input_CVToneGammaAndWeights.json"
+
+    command -v adb >/dev/null || die "adb 未安装"
+    command -v "$BC_CMD" >/dev/null || die "Beyond Compare(bcompare) 未安装"
+
+    local file1 file2
+    file1="$(resolve_path "$path1")"
+    file2="$(resolve_path "$path2")"
+
+    log "Compare:"
+    log "  $file1"
+    log "  $file2"
+
+    "$BC_CMD" "$file1" "$file2"
+}
+
+main "$@"

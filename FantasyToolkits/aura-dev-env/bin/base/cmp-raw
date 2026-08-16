@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# parser = argparse.ArgumentParser(description="Compare image/raw data visually (support Android ADB)")
+# parser.add_argument("--input1", required=True)
+# parser.add_argument("--input2", required=True)
+# parser.add_argument("--width", type=int, default=None)
+# parser.add_argument("--height", type=int, default=None)
+# parser.add_argument("--dtype", type=str, default=None)
+# parser.add_argument("--threshold", type=int, default=5)
+
+input1="adb:/data/local/tmp/supernight/dump_develop/hightlight_mat_after1111.ben"
+input2="adb:/data/local/tmp/supernight/dump_develop/hightlight_mat_after1111.dev"
+
+height=1
+width=76
+dtype=u16
+threshold=0
+
+SCRIPT_PATH="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_FILE="$SCRIPT_PATH/$(basename "$0")"
+
+python3 "$SCRIPT_PATH/cmp_raw.py" --input1 $input1 --input2 $input2 --width $width --height $height --dtype $dtype --threshold $threshold

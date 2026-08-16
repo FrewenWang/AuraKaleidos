@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第18章 TFLite与CoreML部署</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 课程导论与模型压缩概览</a></li>
+<li><a href="02.html" class="">第2章 环境搭建与工具链准备</a></li>
+<li><a href="03.html" class="">第3章 YOLOv11模型结构与原理</a></li>
+<li><a href="04.html" class="">第4章 模型剪枝基础理论</a></li>
+<li><a href="05.html" class="">第5章 稀疏化训练原理</a></li>
+<li><a href="06.html" class="">第6章 YOLOv11稀疏化训练实战</a></li>
+<li><a href="07.html" class="">第7章 通道剪枝算法详解</a></li>
+<li><a href="08.html" class="">第8章 YOLOv11通道剪枝实战</a></li>
+<li><a href="09.html" class="">第9章 剪枝后模型微调</a></li>
+<li><a href="10.html" class="">第10章 模型量化基础理论</a></li>
+<li><a href="11.html" class="">第11章 YOLOv11后训练量化实战</a></li>
+<li><a href="12.html" class="">第12章 量化感知训练实战</a></li>
+<li><a href="13.html" class="">第13章 模型导出与格式转换</a></li>
+<li><a href="14.html" class="">第14章 ONNX模型优化</a></li>
+<li><a href="15.html" class="">第15章 TensorRT部署实战</a></li>
+<li><a href="16.html" class="">第16章 OpenVINO部署实战</a></li>
+<li><a href="17.html" class="">第17章 NCNN移动端部署</a></li>
+<li><a href="18.html" class="active">第18章 TFLite与CoreML部署</a></li>
+<li><a href="19.html" class="">第19章 模型压缩效果评估体系</a></li>
+<li><a href="20.html" class="">第20章 剪枝与量化联合压缩策略</a></li>
+<li><a href="21.html" class="">第21章 自动化压缩工具链</a></li>
+<li><a href="22.html" class="">第22章 YOLOv11自定义数据集压缩</a></li>
+<li><a href="23.html" class="">第23章 模型压缩中的常见问题与调试</a></li>
+<li><a href="24.html" class="">第24章 模型压缩安全性与鲁棒性</a></li>
+<li><a href="25.html" class="">第25章 边缘设备部署实战</a></li>
+<li><a href="26.html" class="">第26章 云端部署实战</a></li>
+<li><a href="27.html" class="">第27章 模型压缩项目实战</a></li>
+<li><a href="28.html" class="">第28章 模型压缩前沿技术</a></li>
+<li><a href="29.html" class="">第29章 课程总结与最佳实践</a></li>
+<li><a href="30.html" class="">第30章 综合考核与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>第十八章：TFLite与CoreML部署</h2>
+
+<p>模型训练完了，剪枝量化也搞定了。接下来呢？</p>
+<p>说白了，得让模型跑在真实设备上。手机、平板、嵌入式板子，这些才是YOLOv11真正发光发热的地方。我个人习惯把这一步叫做「最后一公里」——前面做得再好，部署不上等于白干。</p>
+
+<h3>TFLite转换与量化</h3>
+
+<p>TensorFlow Lite，简称TFLite，是Google为移动端和边缘设备准备的推理框架。YOLOv11虽然原生是PyTorch的，但转成TFLite后，在Android设备上跑起来特别顺。</p>
+
+<p>转换流程其实不复杂，核心就三步：</p>
+
+<ol>
+  <li><strong>导出ONNX</strong>：从PyTorch导出ONNX格式</li>
+  <li><strong>ONNX转TFLite</strong>：用onnx2tf或直接走TensorFlow路径</li>
+  <li><strong>量化</strong>：FP16或INT8量化，减小模型体积</li>
+</ol>
+
+<p>我直接给你看代码，这是我项目里用过的转换脚本：</p>
+
+<pre><code>import torch
+import onnx
+from onnx_tf.backend import prepare
+import tensorflow as tf
+
+# 第一步：PyTorch转ONNX
+model = torch.load('yolov11_pruned.pt')
+model.eval()
+dummy_input = torch.randn(1, 3, 640, 640)
+
+torch.onnx.export(
+    model,
+    dummy_input,
+    'yolov11.onnx',
+    opset_version=12,
+    input_names=['input'],
+    output_names=['output']
+)
+
+# 第二步：ONNX转TensorFlow
+onnx_model = onnx.load('yolov11.onnx')
+tf_rep = prepare(onnx_model)
+tf_rep.export_graph('yolov11_saved_model')
+
+# 第三步：TFLite转换 + INT8量化
+converter = tf.lite.TFLiteConverter.from_saved_model('yolov11_saved_model')
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+converter.target_spec.supported_types = [tf.float16]
+# 如果想用INT8，需要提供代表数据集
+# converter.representative_dataset = representative_dataset
+
+tflite_model = converter.convert()
+with open('yolov11_int8.tflite', 'wb') as f:
+    f.write(tflite_model)
+</code></pre>
+
+<div class="warning">
+  <strong>注意：</strong>INT8量化需要提供代表数据集（representative dataset）。我曾经偷懒随便传了几张图，结果模型精度掉了8个点，后来老老实实准备了200张验证集图片才稳住。
+</div>
+
+<p>量化方式怎么选？我整理了个表格，方便你对比：</p>
+
+<table>
+  <tr>
+    <th>量化类型</th>
+    <th>模型体积</th>
+    <th>推理速度</th>
+    <th>精度损失</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>FP32（无量化）</td>
+    <td>100%</td>
+    <td>基准</td>
+    <td>无</td>
+    <td>服务器端</td>
+  </tr>
+  <tr>
+    <td>FP16</td>
+    <td>~50%</td>
+    <td>快1.5-2倍</td>
+    <td>几乎无</td>
+    <td>高端手机、iPad</td>
+  </tr>
+  <tr>
+    <td>INT8</td>
+    <td>~25%</td>
+    <td>快3-4倍</td>
+    <td>1-3%</td>
+    <td>中低端手机、嵌入式</td>
+  </tr>
+</table>
+
+<p>嗯，这里要注意。INT8量化虽然香，但YOLOv11的某些层对量化特别敏感。我建议你先跑FP16，确认没问题再上INT8。</p>
+
+<h3>CoreML模型转换</h3>
+
+<p>苹果生态嘛，就得用CoreML。说实话，CoreML的转换比TFLite要顺滑一些，苹果的工具链做得挺完善。</p>
+
+<p>核心工具是<code>coremltools</code>。直接从PyTorch模型转，或者从ONNX转，都行。我个人更推荐从ONNX转，因为中间可以做一些算子优化。</p>
+
+<pre><code>import coremltools as ct
+import torch
+import onnx
+
+# 方式一：从PyTorch直接转
+model = torch.load('yolov11_pruned.pt')
+model.eval()
+
+example_input = torch.randn(1, 3, 640, 640)
+traced_model = torch.jit.trace(model, example_input)
+
+mlmodel = ct.convert(
+    traced_model,
+    inputs=[ct.TensorType(shape=(1, 3, 640, 640))],
+    convert_to='mlprogram'  # 推荐使用mlprogram格式
+)
+
+# 方式二：从ONNX转（我常用这个）
+mlmodel = ct.convert(
+    'yolov11.onnx',
+    convert_to='mlprogram',
+    minimum_deployment_target=ct.target.iOS15
+)
+
+mlmodel.save('yolov11.mlpackage')
+</code></pre>
+
+<div class="tip">
+  <strong>小技巧：</strong>CoreML支持<code>mlprogram</code>和<code>neuralnetwork</code>两种格式。mlprogram是苹果主推的新格式，支持更多算子，而且可以针对Apple Neural Engine做优化。我建议你直接用mlprogram。
+</div>
+
+<p>转换过程中，最常遇到的问题是算子不支持。YOLOv11里有些自定义算子，比如Focus层、某些激活函数。怎么办？</p>
+<p>两个思路：要么在导出ONNX时把这些算子替换成标准算子，要么在CoreML转换时手动添加自定义层。我个人更倾向第一种，省事。</p>
+
+<h3>边缘设备适配</h3>
+
+<p>模型转换完了，还得适配具体设备。不同设备的算力、内存、NPU支持都不一样。</p>
+
+<p>我画了个流程图，帮你理清整个部署决策逻辑：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f8f9fa" rx="10"/>
+
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">YOLOv11边缘设备部署决策流程</text>
+
+  <!-- 开始节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" fill="white" font-size="16" font-weight="bold">训练好的YOLOv11模型</text>
+
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 决策：目标平台 -->
+  <polygon points="400,160 520,210 400,260 280,210" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="215" text-anchor="middle" fill="white" font-size="14" font-weight="bold">目标平台？</text>
+
+  <!-- 箭头分叉 -->
+  <line x1="280" y1="210" x2="150" y2="210" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="520" y1="210" x2="650" y2="210" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Android分支 -->
+  <rect x="30" y="185" width="120" height="50" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="90" y="215" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Android</text>
+
+  <!-- iOS分支 -->
+  <rect x="650" y="185" width="120" height="50" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="710" y="215" text-anchor="middle" fill="white" font-size="14" font-weight="bold">iOS</text>
+
+  <!-- Android流程 -->
+  <line x1="90" y1="235" x2="90" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="20" y="290" width="140" height="40" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="90" y="315" text-anchor="middle" fill="white" font-size="12">TFLite转换</text>
+
+  <line x1="90" y1="330" x2="90" y2="370" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="20" y="370" width="140" height="40" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="90" y="395" text-anchor="middle" fill="white" font-size="12">INT8/FP16量化</text>
+
+  <line x1="90" y1="410" x2="90" y2="450" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="20" y="450" width="140" height="40" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="90" y="475" text-anchor="middle" fill="white" font-size="12">部署到APK</text>
+
+  <!-- iOS流程 -->
+  <line x1="710" y1="235" x2="710" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="640" y="290" width="140" height="40" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="710" y="315" text-anchor="middle" fill="white" font-size="12">CoreML转换</text>
+
+  <line x1="710" y1="330" x2="710" y2="370" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="640" y="370" width="140" height="40" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="710" y="395" text-anchor="middle" fill="white" font-size="12">FP16/INT8量化</text>
+
+  <line x1="710" y1="410" x2="710" y2="450" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="640" y="450" width="140" height="40" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="710" y="475" text-anchor="middle" fill="white" font-size="12">嵌入Xcode项目</text>
+
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>你看，决策点其实就两个：平台和精度要求。Android走TFLite，iOS走CoreML，这个没得选。</p>
+
+<p>适配过程中，有几个坑我踩过，分享给你：</p>
+
+<ul>
+  <li><strong>输入尺寸</strong>：边缘设备上640x640可能太大。我试过把输入降到416x416，速度提升明显，但mAP掉了约2%。如果目标是小物体检测，不建议降太多。</li>
+  <li><strong>NMS后处理</strong>：TFLite和CoreML都不原生支持NMS。你得在应用层自己实现，或者用各自框架提供的NMS扩展。CoreML有个<code>NonMaximumSuppression</code>层，可以直接加到模型里。</li>
+  <li><strong>内存占用</strong>：YOLOv11的参数量虽然不大，但特征图占内存。在内存只有2GB的设备上，我遇到过OOM。解决办法是减少batch size，或者用更浅的backbone。</li>
+</ul>
+
+<div class="highlight">
+  <strong>核心要点：</strong>部署不是简单的格式转换。你得考虑设备算力、内存、NPU支持、甚至散热。我建议你在目标设备上做一次完整的压力测试，跑个1000帧看看会不会降频。
+</div>
+
+<p>最后说一句，TFLite和CoreML都在快速迭代。苹果每年WWDC都会更新CoreML，Google也在持续优化TFLite的XNNPACK后端。保持关注，及时更新工具链，能让你的模型跑得更快。</p>
+
+<div class="tip">
+  <strong>我的习惯：</strong>每次部署前，我都会在三个设备上测试：一台旗舰机、一台中端机、一台低端机。这样能全面了解模型在不同硬件上的表现。别只盯着最好的设备测，用户手里的机器五花八门。
+</div>
+
+<p>好了，部署这块就聊到这儿。代码都给你了，流程也画清楚了，剩下的就是动手试。记住，纸上得来终觉浅，绝知此事要躬行。</p>
+
+<footer>
+  <p>公众号:蓝海资料掘金营，微信deep3321</p>
+</footer>
+        <div class="footer-nav">
+            <a href="17.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19.html">下一章 →</a>
+        </div>
+        <footer>公众号:蓝海资料掘金营，微信deep3321</footer>
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+#!/bin/bash
+# 用法：./ndk <版本号> (如 r26d、r25c、r23c、r21e)
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: ndk <版本号> (如 r26d、r25c、r23c、r21e)"
+  exit 1
+fi
+
+VERSION=$1
+NDK_PATH="$HOME/snap/ndk/android-ndk-$VERSION"
+NDK_LINK_PATH="$HOME/snap/ndk/ndk-home"
+
+if [ ! -d "$NDK_PATH" ]; then
+  echo "错误：NDK版本 $VERSION 不存在！NDK_PATH:$NDK_PATH"
+  exit 1
+fi
+
+# 更新符号链接
+rm -f "$NDK_LINK_PATH"
+ln -s "$NDK_PATH" "$NDK_LINK_PATH"
+echo "已切换至 NDK $VERSION ！NDK_PATH:$NDK_PATH"

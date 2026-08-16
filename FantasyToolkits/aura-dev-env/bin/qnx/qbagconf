@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+: "${AURA_QNX_HOST:?请设置 AURA_QNX_HOST}"
+: "${SSHPASS:?请通过 SSHPASS 设置 QNX 密码}"
+adb root
+adb remount
+
+expect << EOF
+    spawn adb shell
+
+    expect "e171" { send "busybox telnet ${AURA_QNX_HOST}; exit\r" }
+    expect "login" { send "root\r" }
+    expect "Password" { send "${SSHPASS}\r" }
+    expect "#" { send "mount -uw /mnt/vendor/adas\r" }
+    expect "#" { send "sed -i 's/output_encode_data :.*/output_encode_data : true/g' /mnt/vendor/adas/conf/drivers/camera_data.conf\r" }
+    expect "#" { send "cat /mnt/vendor/adas/conf/drivers/camera_data.conf\r" }
+    expect "#" { send "sed -i 's/save_path.*/save_path : \"\\\/fs\\\/usb0\"/g' /mnt/vendor/adas/conf/base/polaris_recorder.config\r" }
+    expect "#" { send "cat /mnt/vendor/adas/conf/base/polaris_recorder.config\r" }
+    expect "#" { send "mount -ur /mnt/vendor/adas\r" }
+    expect "#" { send "sh /mnt/vendor/adas/scripts/recordbag.sh\r" }
+    expect "#" { send "exit\r" }
+    expect eof
+EOF
+
+#adb shell sh /data/bin/export.sh

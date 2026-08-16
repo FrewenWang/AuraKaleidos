@@ -1,0 +1,430 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>第11章 YOLOv11后训练量化实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01.html" class="">第1章 课程导论与模型压缩概览</a></li>
+<li><a href="02.html" class="">第2章 环境搭建与工具链准备</a></li>
+<li><a href="03.html" class="">第3章 YOLOv11模型结构与原理</a></li>
+<li><a href="04.html" class="">第4章 模型剪枝基础理论</a></li>
+<li><a href="05.html" class="">第5章 稀疏化训练原理</a></li>
+<li><a href="06.html" class="">第6章 YOLOv11稀疏化训练实战</a></li>
+<li><a href="07.html" class="">第7章 通道剪枝算法详解</a></li>
+<li><a href="08.html" class="">第8章 YOLOv11通道剪枝实战</a></li>
+<li><a href="09.html" class="">第9章 剪枝后模型微调</a></li>
+<li><a href="10.html" class="">第10章 模型量化基础理论</a></li>
+<li><a href="11.html" class="active">第11章 YOLOv11后训练量化实战</a></li>
+<li><a href="12.html" class="">第12章 量化感知训练实战</a></li>
+<li><a href="13.html" class="">第13章 模型导出与格式转换</a></li>
+<li><a href="14.html" class="">第14章 ONNX模型优化</a></li>
+<li><a href="15.html" class="">第15章 TensorRT部署实战</a></li>
+<li><a href="16.html" class="">第16章 OpenVINO部署实战</a></li>
+<li><a href="17.html" class="">第17章 NCNN移动端部署</a></li>
+<li><a href="18.html" class="">第18章 TFLite与CoreML部署</a></li>
+<li><a href="19.html" class="">第19章 模型压缩效果评估体系</a></li>
+<li><a href="20.html" class="">第20章 剪枝与量化联合压缩策略</a></li>
+<li><a href="21.html" class="">第21章 自动化压缩工具链</a></li>
+<li><a href="22.html" class="">第22章 YOLOv11自定义数据集压缩</a></li>
+<li><a href="23.html" class="">第23章 模型压缩中的常见问题与调试</a></li>
+<li><a href="24.html" class="">第24章 模型压缩安全性与鲁棒性</a></li>
+<li><a href="25.html" class="">第25章 边缘设备部署实战</a></li>
+<li><a href="26.html" class="">第26章 云端部署实战</a></li>
+<li><a href="27.html" class="">第27章 模型压缩项目实战</a></li>
+<li><a href="28.html" class="">第28章 模型压缩前沿技术</a></li>
+<li><a href="29.html" class="">第29章 课程总结与最佳实践</a></li>
+<li><a href="30.html" class="">第30章 综合考核与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>11. YOLOv11后训练量化实战：使用PyTorch量化API、校准数据集准备、量化模型导出、精度评估</h2>
+
+<p>模型剪枝完了，参数量下来了，但推理速度可能还没达到你的预期。这时候，量化就该登场了。</p>
+
+<p>说白了，量化就是把模型里那些浮点数（FP32）换成整数（INT8）。你想想看，一个32位的数变成8位，内存占用直接降到四分之一，计算速度也能翻倍。我最早接触量化时觉得这玩意儿很玄乎，后来发现，其实PyTorch早就把工具给你准备好了。</p>
+
+<h3>11.1 后训练量化 vs 量化感知训练</h3>
+
+<p>先搞清楚一个概念。量化分两种：</p>
+
+<ul>
+  <li><strong>后训练量化（PTQ）</strong>：模型训练完，直接拿来做量化。不需要重新训练，快，但精度会有损失。</li>
+  <li><strong>量化感知训练（QAT）</strong>：在训练过程中模拟量化效果，让模型学会适应低精度。精度更高，但需要重新训练。</li>
+</ul>
+
+<p>对于YOLOv11这种大模型，我个人习惯先用PTQ试试水。如果精度掉得不多，那就直接用。如果掉得厉害，再考虑QAT。毕竟时间就是金钱，对吧？</p>
+
+<div class="highlight">
+  <p><strong>核心结论</strong>：PTQ适合快速部署，QAT适合精度敏感场景。YOLOv11的PTQ通常能保持95%以上的原始精度。</p>
+</div>
+
+<h3>11.2 校准数据集准备</h3>
+
+<p>PTQ需要一个关键步骤——<strong>校准</strong>。校准的目的是让量化器知道数据的分布范围，从而确定量化的缩放因子和零点。</p>
+
+<p>校准数据集怎么准备？我一般从训练集中随机抽取200-500张图片。注意，不要用验证集做校准，否则精度评估会虚高。我曾经犯过这个错误，结果部署到现场才发现模型表现不对，排查了半天才找到原因。</p>
+
+<p>代码示例：</p>
+
+<pre><code>import torch
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+
+# 准备校准数据集
+calib_transform = transforms.Compose([
+    transforms.Resize((640, 640)),
+    transforms.ToTensor(),
+])
+
+calib_dataset = datasets.ImageFolder(
+    root='path/to/train/images',
+    transform=calib_transform
+)
+
+# 随机抽取300张
+indices = torch.randperm(len(calib_dataset))[:300]
+calib_subset = torch.utils.data.Subset(calib_dataset, indices)
+calib_loader = DataLoader(calib_subset, batch_size=16, shuffle=False)
+</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧</strong>：校准数据集最好覆盖各种场景——白天、夜晚、不同角度、不同目标大小。这样量化出来的模型泛化能力更强。</p>
+</div>
+
+<h3>11.3 使用PyTorch量化API</h3>
+
+<p>PyTorch从1.8版本开始就提供了完善的量化API。对于YOLOv11这种目标检测模型，我们主要用<code>torch.quantization.quantize_dynamic</code>做动态量化，或者用<code>torch.quantization.prepare</code> + <code>torch.quantization.convert</code>做静态量化。</p>
+
+<p>我个人更推荐静态量化，因为YOLOv11的卷积层占大头，静态量化能把这些层都转成INT8，加速效果更明显。</p>
+
+<p>具体步骤：</p>
+
+<ol>
+  <li>加载训练好的YOLOv11模型</li>
+  <li>将模型设置为eval模式</li>
+  <li>使用<code>torch.quantization.QuantStub</code>和<code>torch.quantization.DeQuantStub</code>包装模型</li>
+  <li>调用<code>torch.quantization.prepare</code>插入量化观察器</li>
+  <li>用校准数据集跑一遍前向传播</li>
+  <li>调用<code>torch.quantization.convert</code>完成量化</li>
+</ol>
+
+<p>代码示例：</p>
+
+<pre><code>import torch.quantization as quant
+
+# 加载模型
+model = torch.load('yolov11_pruned.pth')
+model.eval()
+
+# 添加量化/反量化节点
+model.qconfig = quant.get_default_qconfig('fbgemm')
+model = quant.QuantWrapper(model)
+
+# 准备量化
+model_prepared = quant.prepare(model)
+
+# 校准：用校准数据集跑一遍
+with torch.no_grad():
+    for images, _ in calib_loader:
+        model_prepared(images)
+
+# 转换量化模型
+model_quantized = quant.convert(model_prepared)
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意</strong>：校准过程中，模型必须处于eval模式。如果混入了训练模式，BatchNorm层的统计量会乱掉，量化后的模型精度会崩。我见过有人因为这个原因折腾了两天。</p>
+</div>
+
+<h3>11.4 量化模型导出</h3>
+
+<p>量化完成后，我们需要把模型导出成可部署的格式。PyTorch支持两种导出方式：</p>
+
+<ul>
+  <li><strong>TorchScript</strong>：PyTorch原生格式，跨平台支持好</li>
+  <li><strong>ONNX</strong>：开放神经网络交换格式，兼容性最强</li>
+</ul>
+
+<p>对于YOLOv11，我建议导出成ONNX格式。因为ONNX可以直接被TensorRT、OpenVINO等推理引擎加载，部署起来更方便。</p>
+
+<p>导出代码：</p>
+
+<pre><code># 导出为TorchScript
+traced_model = torch.jit.trace(model_quantized, torch.randn(1, 3, 640, 640))
+traced_model.save('yolov11_quantized.pt')
+
+# 导出为ONNX
+dummy_input = torch.randn(1, 3, 640, 640)
+torch.onnx.export(
+    model_quantized,
+    dummy_input,
+    'yolov11_quantized.onnx',
+    opset_version=13,
+    input_names=['input'],
+    output_names=['output']
+)
+</code></pre>
+
+<div class="tip">
+  <p><strong>提示</strong>：导出ONNX时，opset_version建议用13或更高版本，低版本可能不支持量化操作。</p>
+</div>
+
+<h3>11.5 精度评估</h3>
+
+<p>量化完，最关心的问题就是：精度掉了多少？</p>
+
+<p>评估方法很简单：用验证集分别跑原始模型和量化模型，对比mAP（平均精度均值）。</p>
+
+<p>我一般会关注两个指标：</p>
+
+<ul>
+  <li><strong>mAP@0.5</strong>：IOU阈值0.5时的平均精度，对量化不太敏感</li>
+  <li><strong>mAP@0.5:0.95</strong>：多个IOU阈值的平均，对量化更敏感</li>
+</ul>
+
+<p>如果mAP@0.5下降不超过2%，mAP@0.5:0.95下降不超过5%，那这个量化就是成功的。</p>
+
+<p>评估代码：</p>
+
+<pre><code>from utils.metrics import compute_map
+
+# 原始模型评估
+orig_map = compute_map(model, val_loader)
+print(f'原始模型 mAP@0.5: {orig_map:.4f}')
+
+# 量化模型评估
+quant_map = compute_map(model_quantized, val_loader)
+print(f'量化模型 mAP@0.5: {quant_map:.4f}')
+
+# 精度损失
+loss = orig_map - quant_map
+print(f'精度损失: {loss:.4f}')
+</code></pre>
+
+<div class="highlight">
+  <p><strong>经验之谈</strong>：如果精度损失超过预期，可以尝试以下方法：</p>
+  <ul>
+    <li>增加校准数据集规模（从300张增加到1000张）</li>
+    <li>使用per-channel量化（对卷积层效果更好）</li>
+    <li>改用量化感知训练（QAT）</li>
+  </ul>
+</div>
+
+<h3>11.6 知识体系总览</h3>
+
+<p>下面这张图总结了本章的核心流程，你可以把它当作一个快速参考：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">YOLOv11后训练量化流程</text>
+
+  <!-- 步骤1：准备校准数据集 -->
+  <rect x="50" y="80" width="160" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="130" y="110" text-anchor="middle" font-size="14" fill="white" font-weight="bold">准备校准数据集</text>
+  <text x="130" y="130" text-anchor="middle" font-size="11" fill="#ecf0f1">随机抽取200-500张</text>
+
+  <!-- 箭头1 -->
+  <line x1="210" y1="110" x2="270" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤2：加载模型 -->
+  <rect x="270" y="80" width="160" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="350" y="110" text-anchor="middle" font-size="14" fill="white" font-weight="bold">加载YOLOv11模型</text>
+  <text x="350" y="130" text-anchor="middle" font-size="11" fill="#ecf0f1">设置eval模式</text>
+
+  <!-- 箭头2 -->
+  <line x1="430" y1="110" x2="490" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤3：插入量化节点 -->
+  <rect x="490" y="80" width="160" height="60" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="570" y="110" text-anchor="middle" font-size="14" fill="white" font-weight="bold">插入量化节点</text>
+  <text x="570" y="130" text-anchor="middle" font-size="11" fill="#ecf0f1">QuantStub/DeQuantStub</text>
+
+  <!-- 箭头3 -->
+  <line x1="650" y1="110" x2="710" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤4：prepare -->
+  <rect x="710" y="80" width="80" height="60" rx="8" fill="#f39c12" opacity="0.9"/>
+  <text x="750" y="110" text-anchor="middle" font-size="14" fill="white" font-weight="bold">prepare</text>
+  <text x="750" y="130" text-anchor="middle" font-size="11" fill="#ecf0f1">插入观察器</text>
+
+  <!-- 向下箭头 -->
+  <line x1="750" y1="140" x2="750" y2="200" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤5：校准 -->
+  <rect x="650" y="200" width="200" height="60" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="750" y="230" text-anchor="middle" font-size="14" fill="white" font-weight="bold">校准（前向传播）</text>
+  <text x="750" y="250" text-anchor="middle" font-size="11" fill="#ecf0f1">用校准数据集跑一遍</text>
+
+  <!-- 向左箭头 -->
+  <line x1="650" y1="230" x2="570" y2="230" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤6：convert -->
+  <rect x="410" y="200" width="160" height="60" rx="8" fill="#e67e22" opacity="0.9"/>
+  <text x="490" y="230" text-anchor="middle" font-size="14" fill="white" font-weight="bold">convert</text>
+  <text x="490" y="250" text-anchor="middle" font-size="11" fill="#ecf0f1">完成量化转换</text>
+
+  <!-- 向下箭头 -->
+  <line x1="490" y1="260" x2="490" y2="320" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 步骤7：导出 -->
+  <rect x="350" y="320" width="280" height="60" rx="8" fill="#1abc9c" opacity="0.9"/>
+  <text x="490" y="350" text-anchor="middle" font-size="14" fill="white" font-weight="bold">导出量化模型</text>
+  <text x="490" y="370" text-anchor="middle" font-size="11" fill="#ecf0f1">TorchScript / ONNX</text>
+
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3>11.7 常见问题与避坑</h3>
+
+<p>最后，分享几个我在项目中踩过的坑：</p>
+
+<ul>
+  <li><strong>校准数据量太少</strong>：少于100张时，量化后的模型精度可能崩掉。我建议至少200张。</li>
+  <li><strong>忘记设置eval模式</strong>：校准过程中如果模型处于train模式，BatchNorm层会更新，导致量化后精度异常。</li>
+  <li><strong>ONNX导出失败</strong>：某些自定义算子可能不支持量化。解决办法是替换成PyTorch原生算子，或者用TorchScript导出。</li>
+  <li><strong>精度评估不一致</strong>：量化模型在CPU和GPU上的推理结果可能略有差异。评估时最好在目标硬件上跑。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>最后一句</strong>：量化不是银弹，但它确实是目前最实用的模型加速手段之一。只要校准数据集选得好，精度损失完全可以控制在可接受范围内。</p>
+</div>
+
+<footer>
+  <p>公众号:蓝海资料掘金营，微信deep3321</p>
+</footer>
+        <div class="footer-nav">
+            <a href="10.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12.html">下一章 →</a>
+        </div>
+        <footer>公众号:蓝海资料掘金营，微信deep3321</footer>
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+seed: 20260807
+
+data:
+  root: data/olivetti_synthetic
+  image_size: [96, 160]
+  resize_mode: stretch
+  max_boxes: 10
+  train_samples: 240
+  val_samples: 60
+  min_faces: 1
+  max_faces: 3
+  source: auto
+
+model:
+  variant: mbv3
+  num_classes: 1
+  anchors:
+    - [10, 15]
+    - [24, 36]
+    - [72, 42]
+    - [35, 87]
+    - [102, 96]
+    - [60, 170]
+    - [220, 125]
+    - [128, 222]
+    - [264, 266]
+  anchor_masks:
+    - [6, 7, 8]
+    - [3, 4, 5]
+    - [0, 1, 2]
+
+training:
+  device: cpu
+  epochs: 8
+  batch_size: 4
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  num_workers: 0
+  output_dir: outputs/repro_cpu
+  log_dir: logs/repro_cpu
+
+evaluation:
+  confidence_threshold: 0.20
+  ap_confidence_floor: 0.001
+  nms_iou_threshold: 0.45
+  match_iou_threshold: 0.50

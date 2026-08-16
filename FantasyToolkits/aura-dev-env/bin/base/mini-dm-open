@@ -1,0 +1,4 @@
+
+adb root
+adb remount
+adb shell setprop sys.usb.config diag,adb

@@ -1,0 +1,25 @@
+#!/usr/bin/expect -f
+
+if {![info exists env(AURA_QNX_HOST)] || $env(AURA_QNX_HOST) eq ""} {
+    puts stderr "请设置 AURA_QNX_HOST"
+    exit 2
+}
+
+if {![info exists env(SSHPASS)] || $env(SSHPASS) eq ""} {
+    puts stderr "请通过 SSHPASS 设置 QNX 密码"
+    exit 2
+}
+
+# 在 Expect 脚本中，spawn 用于启动一个新的外部进程。
+# 1.启动指定的命令/进程
+# 2.为该进程分配一个伪终端（pty）
+# 3.Expect 通过这个pty来往进程里写输入（send）和读进程的输出（expect）
+spawn adb root
+spawn adb remount
+spawn adb shell
+
+expect "e171" { send "busybox telnet $env(AURA_QNX_HOST) ; exit\r" }
+expect "login" { send "root\r" }
+expect "Password" { send "$env(SSHPASS)\r" }
+
+interact

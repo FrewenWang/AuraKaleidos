@@ -1,0 +1,6 @@
+#!/bin/bash
+# MI Build Tool
+# 移动基础设施构建工具
+echo "🔨 MI Dev Run"
+echo "Environment: MI"
+echo "Usage: mi-dev-run"

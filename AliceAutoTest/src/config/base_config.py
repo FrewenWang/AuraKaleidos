@@ -6,6 +6,8 @@ from pathlib import Path
 
 from src.config.platform_compat import get_platform, is_windows
 
+_MISSING = object()
+
 
 class ConfigParser:
     def __init__(self):
@@ -56,9 +58,14 @@ class ReadBaseConfig(ConfigParser):
 
         self.set_format(self.config_path)
 
-    def _get(self, section, name):
+    def _get(self, section, name, fallback=_MISSING):
         env_name = f"ALICE_AUTOTEST_{section}_{name}".upper()
-        return os.getenv(env_name, self.cf.get(section, name))
+        env_value = os.getenv(env_name)
+        if env_value is not None:
+            return env_value
+        if fallback is _MISSING:
+            return self.cf.get(section, name)
+        return self.cf.get(section, name, fallback=fallback)
 
     # 获取数据库基础配置信息
     def get_db(self, name):
@@ -86,6 +93,14 @@ class ReadBaseConfig(ConfigParser):
     # 获取参数化文档路径
     def get_filepath(self, name):
         return self._get("FILE_PATH", name)
+
+    def get_dingtalk(self, name):
+        """读取通知配置；敏感值应放在环境变量或本地配置中。"""
+        return self._get("DINGTALK", name, fallback="")
+
+    def get_contacts(self, name):
+        """读取联系人配置；未配置时返回空字符串。"""
+        return self._get("CONTACTS", name, fallback="")
 
 
 class GetLogin(ReadBaseConfig):

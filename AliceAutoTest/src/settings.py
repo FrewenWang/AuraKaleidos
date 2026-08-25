@@ -112,8 +112,26 @@ CHANGE_ONE_STATUS_URL = r"http://phoenix.100tal.com/courseCheck/action/autoCheck
 
 # ==================== 钉钉机器人配置 ====================
 
-ERROR_COURSE = os.getenv("ALICE_AUTOTEST_ERROR_WEBHOOK", "")
-START_COURSE = os.getenv("ALICE_AUTOTEST_START_WEBHOOK", "")
+
+def _get_notification_url(config_name, env_name):
+    """环境变量优先，本地配置缺失时安全降级为空值。"""
+    env_value = os.getenv(env_name)
+    if env_value is not None:
+        return env_value
+    try:
+        from src.config.base_config import ReadBaseConfig
+
+        return ReadBaseConfig().get_dingtalk(config_name)
+    except Exception:
+        return ""
+
+
+ERROR_COURSE = _get_notification_url(
+    "error_course", "ALICE_AUTOTEST_ERROR_WEBHOOK"
+)
+START_COURSE = _get_notification_url(
+    "start_course", "ALICE_AUTOTEST_START_WEBHOOK"
+)
 
 # ==================== 数据库配置 ====================
 HOST_MYSQL = os.getenv("ALICE_AUTOTEST_DB_HOST", "127.0.0.1")

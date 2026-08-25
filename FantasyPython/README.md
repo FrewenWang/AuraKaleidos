@@ -30,8 +30,11 @@ python <目标脚本.py>
 ## 验证
 
 ```bash
-# 进入具体 demo 后检查目标脚本，不在聚合目录批量执行所有示例
+# 有 tests/ 的标准化子工程可直接运行 pytest，无需先 editable 安装
 cd FantasyPython/<subproject>
+python -m pytest -q
+
+# 无测试的历史 demo 只检查目标脚本
 python -m py_compile <目标脚本.py>
 ```
 

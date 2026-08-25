@@ -177,7 +177,7 @@ def run_tests():
     if platform.ensure_dir(str(test_dir)):
         print(f"  测试目录: {test_dir}")
         print("  ✅ 目录创建正常")
-        with contextlib.suppress(BaseException):
+        with contextlib.suppress(OSError):
             test_dir.rmdir()
     else:
         print("  ❌ 目录创建失败")

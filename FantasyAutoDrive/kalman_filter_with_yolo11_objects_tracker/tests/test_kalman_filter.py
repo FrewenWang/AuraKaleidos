@@ -12,13 +12,9 @@ from ai.tracker.kalman_filter import KalmanFilter
 def make_constant_velocity_filter():
     kalman = KalmanFilter(nb_dynamics=4, nb_measurements=2)
     kalman.transition_matrix = np.array(
-        [[1, 1, 0, 0],
-         [0, 1, 0, 0],
-         [0, 0, 1, 1],
-         [0, 0, 0, 1]], dtype=np.float32)
-    kalman.measurement_matrix = np.array(
-        [[1, 0, 0, 0],
-         [0, 0, 1, 0]], dtype=np.float32)
+        [[1, 1, 0, 0], [0, 1, 0, 0], [0, 0, 1, 1], [0, 0, 0, 1]], dtype=np.float32
+    )
+    kalman.measurement_matrix = np.array([[1, 0, 0, 0], [0, 0, 1, 0]], dtype=np.float32)
     kalman.process_noise_cov = np.eye(4, dtype=np.float32) * 1e-3
     kalman.measurement_noise_cov = np.eye(2, dtype=np.float32) * 1e-2
     kalman.post_state = np.array([[10], [2], [20], [-1]], dtype=np.float32)
@@ -35,7 +31,8 @@ class KalmanFilterTest(unittest.TestCase):
 
         np.testing.assert_array_equal(first_state, second_state)
         np.testing.assert_array_equal(
-            first_state, np.array([[12], [2], [19], [-1]], dtype=np.float32))
+            first_state, np.array([[12], [2], [19], [-1]], dtype=np.float32)
+        )
 
     def test_correction_remains_finite_and_reduces_position_error(self):
         kalman = make_constant_velocity_filter()
@@ -48,7 +45,9 @@ class KalmanFilterTest(unittest.TestCase):
 
         self.assertTrue(np.isfinite(corrected).all())
         self.assertLess(after, before)
-        np.testing.assert_allclose(kalman.post_err_cov, kalman.post_err_cov.T, atol=1e-6)
+        np.testing.assert_allclose(
+            kalman.post_err_cov, kalman.post_err_cov.T, atol=1e-6
+        )
 
 
 if __name__ == "__main__":

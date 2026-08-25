@@ -6,7 +6,7 @@
 tools/run.py
   ├── platform_compat / settings       环境与路径
   ├── ConfigLogging / ConfigScreen     日志与截图
-  ├── ProcessManager                   清理 Phoenix/虚拟摄像头
+  ├── runtime / ProcessManager         启动、清理 Phoenix/虚拟摄像头
   ├── Windows Phoenix/VCam             启动外部客户端
   └── PxPtAuto
        ├── HTTP/WebSocket              登录、课程和状态交互
@@ -32,6 +32,7 @@ tools/run.py
 
 ## 测试边界
 
-`tests/` 只覆盖平台兼容、配置读取、文件工具和硬件信息等无外部副作用逻辑。以下属于环境
+`tests/` 覆盖平台兼容、配置优先级、通知降级、参数化 SQL、进程生命周期、日志编码、文件
+工具和硬件信息等无外部副作用逻辑。以下属于环境
 验收，不应伪装成普通单元测试：Phoenix GUI、虚拟摄像头、真实账号登录、内部 API、MySQL、
 钉钉通知和完整三小时跑课。

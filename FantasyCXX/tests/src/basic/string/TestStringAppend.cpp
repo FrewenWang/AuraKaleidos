@@ -10,6 +10,7 @@
 #include <string>
 #include <sys/time.h>
 #include <sstream>
+#include <stdexcept>
 #include <stdio.h>
 
 #define OUT_IN_REPEATE_NUM 2
@@ -43,15 +44,18 @@ void  appendTest(string& ret)
 }
 
 void sprintfTest(string &ret) {
-  const size_t length = 26 * IN_REPEATE_NUM;
-  char tmp[length];
-  char *cp = tmp;
-  size_t strLength = s1.length() + s2.length() + s3.length();
+  const size_t itemLength = s1.length() + s2.length() + s3.length();
+  vector<char> buffer(itemLength * IN_REPEATE_NUM + 1, '\0');
+  size_t offset = 0;
   for (int i = 0; i < IN_REPEATE_NUM; i++) {
-    sprintf(cp, "%s%s%s", s1.c_str(), s2.c_str(), s3.c_str());
-    cp += strLength;
+    const int written = snprintf(buffer.data() + offset, buffer.size() - offset,
+                                 "%s%s%s", s1.c_str(), s2.c_str(), s3.c_str());
+    if (written < 0 || static_cast<size_t>(written) != itemLength) {
+      throw runtime_error("snprintf failed while building the test string");
+    }
+    offset += static_cast<size_t>(written);
   }
-  ret = tmp;
+  ret.assign(buffer.data(), offset);
 }
 
 void  ssTest(string& ret)

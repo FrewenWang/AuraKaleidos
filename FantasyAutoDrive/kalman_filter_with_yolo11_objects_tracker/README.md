@@ -1,29 +1,58 @@
+# YOLO11 与卡尔曼目标跟踪
 
+这是一个使用 YOLO11 检测结果和卡尔曼滤波器跟踪单个或多个目标的教学工程。跟踪器支持
+欧式距离和马氏距离关联，可在短时漏检时继续预测目标位置，也可选用包含加速度的运动模型。
 
+实现参考 [kalman-object-tracker](https://github.com/CherifiImene/kalman-object-tracker)，并已整理为
+标准 Python `src/` 包布局。模型权重、输入视频和运行输出不纳入 Git。
 
+## 环境与安装
 
-# 概述
+支持 Python 3.10 及以上版本。OpenCV/YOLO 的 GUI、摄像头和硬件加速能力取决于宿主平台；
+纯卡尔曼滤波和命令行解析测试可在 Windows、macOS 与 Linux 离线运行。
 
-文章参考：https://github.com/CherifiImene/kalman-object-tracker.git
-	这个程序实例专为使用卡尔曼滤波器进行多目标跟踪而设计的跟踪系统。它使用从 YOLO11 和卡尔曼滤波器中检测到的边界框来跟踪视频流或图像序列中的对象，以估计和预测它们随时间推移的位置。
-此应用程序可用于各种场景，例如监控、车辆跟踪和零售监控。
+```bash
+cd FantasyAutoDrive/kalman_filter_with_yolo11_objects_tracker
+python -m venv .venv
+source .venv/bin/activate              # Windows: .venv\Scripts\activate
+python -m pip install -e '.[dev]'
+```
 
+## 运行
 
+安装后可使用 `alice-object-tracker`，或直接执行模块入口：
 
-# 功能列表
-单对象和多对象跟踪：支持实时跟踪多个对象。
+```bash
+# 查看参数
+alice-object-tracker --help
 
-基于卡尔曼滤波器的跟踪：使用卡尔曼滤波器对对象位置进行平滑预测和校正。
+# 摄像头单目标跟踪，默认跟踪 person
+alice-object-tracker --mode single --video-source 0 --target-class 0
 
-支持欧式距离和马氏距离匹配：使用不同的距离指标动态匹配检测到被跟踪的对象。
+# 视频文件多目标跟踪
+alice-object-tracker --mode multi --video-source ./input.mp4 \
+  --target-class 0 --target-class 2 --association-metric mahalanobis
+```
 
-预测漏检：即使对象在检测中暂时丢失，也会继续跟踪。
+首次运行 Ultralytics 可能下载默认模型；离线环境应提前准备模型缓存。摄像头编号 `0` 仅适用于
+已授权访问摄像头的桌面环境，无显示服务的 Linux CI 不应运行视频入口。
 
-加速模型支持：（可选）支持加速模型，以便更平滑地跟踪运动中的对象。
+## 测试
 
+```bash
+python -m pytest -q
+python -m compileall -q src tests
+```
 
+测试不下载模型、不连接摄像头，覆盖类别配置解析、错误输入、卡尔曼预测确定性，以及观测校正
+是否降低位置误差。pytest 已配置 `src/` 导入路径，因此无需先执行 editable 安装也能收集测试。
 
+## 目录
 
-
-# 代码运行
-
+```text
+src/app/          命令行入口与视频应用
+src/ai/tracker/   卡尔曼滤波和目标关联实现
+tests/            离线单元测试
+models/           本地模型目录（不提交大模型）
+outputs/          本地运行结果（不提交）
+```

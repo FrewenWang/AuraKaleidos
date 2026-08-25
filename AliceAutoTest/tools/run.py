@@ -44,10 +44,14 @@ def main():
 
     # 导入核心模块
     from src.config.base_file import BaseFile
-    from src.config.config_hardware import PidConfig, ProcessManager
+    from src.config.config_hardware import PidConfig
     from src.config.config_logging import ConfigLogging
     from src.config.config_screen import ConfigScreen
     from src.config.platform_compat import is_windows
+    from src.config.runtime import (
+        cleanup_phoenix_processes,
+        start_phoenix_client,
+    )
     from src.modules.tools.three_hours import main as three_hours_main
 
     # 初始化
@@ -71,21 +75,18 @@ def main():
     kid.copy_mockfile()
 
     # 清理进程（使用跨平台方法）
-    pm = ProcessManager()
-    pm.kill("Phoenix.exe")
-    pm.kill("Phoenix")
-    pm.kill("VCamDemo.exe")
-    pm.kill("VCamDemo")
+    cleanup_phoenix_processes(kid)
 
     import time
 
     time.sleep(2)
 
     # 启动学生端（仅Windows支持）
-    if is_windows():
-        os.system(r"/px_pt_auto/BaseConfig/start_phoenix.bat")
-    else:
-        print("⚠️  Phoenix学生端仅支持Windows系统，跳过启动")
+    if not start_phoenix_client(_PROJECT_ROOT):
+        if is_windows():
+            print("⚠️  未找到 config/start_phoenix.bat，跳过启动")
+        else:
+            print("⚠️  Phoenix学生端仅支持Windows系统，跳过启动")
 
     # 消息队列
     import multiprocessing
@@ -103,7 +104,7 @@ def main():
         try:
             from tools.VCamTestTool.control2 import run_vcamtest
 
-            pm.run_kill()
+            kid.run_kill()
             pm_proc = Process(target=run_vcamtest, args=("e",))
             pm_proc.start()
             time.sleep(1)
@@ -121,8 +122,10 @@ def main():
     three.start()
 
     # 实例化主进程
+    pw = None
+    exit_code = 0
     try:
-        from modules.px_run import PxPtAuto
+        from src.modules.px_run import PxPtAuto
 
         pea = PxPtAuto(pipe)
 
@@ -133,18 +136,21 @@ def main():
         # 课中组件交互主程序
         pea.handle_info()
 
-        # 清理
-        pw.terminate()
-        if pm_proc:
-            pm_proc.terminate()
-        psc.terminate()
-
     except Exception as e:
         print(f"运行出错: {e}")
         import traceback
 
         traceback.print_exc()
-        sys.exit(1)
+        exit_code = 1
+    finally:
+        for process in (pw, pm_proc, psc, three):
+            if process is not None and process.is_alive():
+                process.terminate()
+                process.join(timeout=5)
+        cleanup_phoenix_processes(kid)
+
+    if exit_code:
+        sys.exit(exit_code)
 
 
 if __name__ == "__main__":

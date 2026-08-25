@@ -8,27 +8,39 @@ from pathlib import Path
 def load_class_names(filename: str | Path) -> dict[int, str]:
     """Load ``id: label`` pairs from a UTF-8 text file."""
     classes: dict[int, str] = {}
-    for line_number, line in enumerate(Path(filename).read_text(encoding="utf-8").splitlines(), 1):
+    for line_number, line in enumerate(
+        Path(filename).read_text(encoding="utf-8").splitlines(), 1
+    ):
         if not line.strip():
             continue
         try:
             class_id, class_name = line.split(":", maxsplit=1)
             classes[int(class_id)] = class_name.strip()
         except ValueError as error:
-            raise ValueError(f"Invalid class entry on line {line_number}: {line!r}") from error
+            raise ValueError(
+                f"Invalid class entry on line {line_number}: {line!r}"
+            ) from error
     return classes
 
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the CLI parser without importing optional AI dependencies."""
-    parser = argparse.ArgumentParser(description="YOLO and Kalman-filter object tracking demo")
+    parser = argparse.ArgumentParser(
+        description="YOLO and Kalman-filter object tracking demo"
+    )
     parser.add_argument("--mode", choices=("single", "multi"), default="single")
-    parser.add_argument("--video-source", default="0", help="Video path or 0 for webcam")
-    parser.add_argument("--show-classes", action="store_true", help="Display supported class IDs")
+    parser.add_argument(
+        "--video-source", default="0", help="Video path or 0 for webcam"
+    )
+    parser.add_argument(
+        "--show-classes", action="store_true", help="Display supported class IDs"
+    )
     parser.add_argument("--target-class", action="append", type=int, default=[])
     parser.add_argument("--estimate-acceleration", action="store_true")
     parser.add_argument(
-        "--association-metric", choices=("euclidean", "mahalanobis"), default="euclidean"
+        "--association-metric",
+        choices=("euclidean", "mahalanobis"),
+        default="euclidean",
     )
     return parser
 

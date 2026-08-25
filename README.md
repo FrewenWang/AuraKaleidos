@@ -12,7 +12,12 @@ cmake --build build
 ctest --test-dir build
 ```
 
-聚合仓库根目录不提供统一编译入口。
+聚合仓库根目录不提供统一编译入口，但提供无外部副作用的结构与仓库卫生检查：
+
+```bash
+python tools/repository_check.py
+python -m unittest discover -s tests -v
+```
 
 ## 一级工程
 
@@ -24,3 +29,11 @@ ctest --test-dir build
 - `FantasyShell`、`FantasyToolkits`：Shell 命令与开发环境工具。
 
 大模型、数据集、测试视频和平台工具二进制不纳入 Git，也不使用 Git LFS；请根据各子工程说明单独准备。
+
+完整的分层测试矩阵、平台工具链边界、CI 覆盖和提交规范见
+[工程维护与测试指南](docs/工程维护与测试指南.md)。
+
+## AliceKaleidos 合并记录
+
+`/Users/frewen/01.WorkSpace/AliceKaleidos` 已按子工程职责合并到本仓库；目录映射、取舍原则、
+平台边界和验证方式见 [工程合并说明](docs/工程合并说明.md)。

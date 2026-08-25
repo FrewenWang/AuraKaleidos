@@ -11,9 +11,8 @@ setup(
     version="2.0.0",
     description="Phoenix教育软件自动化测试框架",
     author="Phoenix Team",
-    packages=find_packages(where="src") + find_packages(where="modules"),
-    package_dir={"": "src", "modules": "modules"},
-    python_requires=">=3.6",
+    packages=find_packages(include=["src", "src.*", "tools", "tools.*"]),
+    python_requires=">=3.10",
     install_requires=[
         "psutil>=5.6.2",
         "requests>=2.21.0",
@@ -23,6 +22,9 @@ setup(
         "websocket-client>=0.57.0",
         "gevent>=1.4.0",
         "Pillow>=6.0.0",
+        "xlrd>=1.2.0",
+        "xlwt>=1.3.0",
+        "xlutils>=2.0.0",
     ],
     entry_points={
         "console_scripts": [

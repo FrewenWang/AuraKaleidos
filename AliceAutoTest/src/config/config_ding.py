@@ -7,40 +7,62 @@ import os
 
 import requests
 
+from src.config.base_config import ReadBaseConfig
 from src.config.config_logging import ConfigLogging
 
 
-def _env_list(name):
-    """读取逗号分隔的通知用户列表，未配置时返回空列表。"""
-    return [
-        item.strip() for item in os.getenv(name, "").split(",") if item.strip()
-    ]
+def _split_list(value):
+    """将逗号分隔的配置转换为去空值的列表。"""
+    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 class ConfigDing:
-    def __init__(self):
+    def __init__(self, config=None):
         self.logger = ConfigLogging().write_logging()
-        self.release_pass_url = os.getenv(
-            "ALICE_AUTOTEST_DING_RELEASE_PASS", ""
+        self._config = config or ReadBaseConfig()
+        self.release_pass_url = self._setting(
+            "release_pass_url", "ALICE_AUTOTEST_DING_RELEASE_PASS"
         )
-        self.release_error_url = os.getenv(
-            "ALICE_AUTOTEST_DING_RELEASE_ERROR", ""
+        self.release_error_url = self._setting(
+            "release_error_url", "ALICE_AUTOTEST_DING_RELEASE_ERROR"
         )
-        self.test_pass_url = os.getenv("ALICE_AUTOTEST_DING_TEST_PASS", "")
-        # self.test_pass_url=r'<configured by environment>'
-        self.test_error_url = os.getenv("ALICE_AUTOTEST_DING_TEST_ERROR", "")
-        # self.test_error_url=r'<configured by environment>'
-        # 错误课发送钉钉消息的token
-        self.error_course = os.getenv("ALICE_AUTOTEST_DING_ERROR_COURSE", "")
+        self.test_pass_url = self._setting(
+            "test_pass_url", "ALICE_AUTOTEST_DING_TEST_PASS"
+        )
+        self.test_error_url = self._setting(
+            "test_error_url", "ALICE_AUTOTEST_DING_TEST_ERROR"
+        )
+        self.error_course = self._setting(
+            "error_course", "ALICE_AUTOTEST_DING_ERROR_COURSE"
+        )
         self.timeout = 6
         self.headers = {"Content-Type": "application/json"}
-        self.user_right_info = _env_list("ALICE_AUTOTEST_DING_SUCCESS_USERS")
-        self.user_error_info = _env_list("ALICE_AUTOTEST_DING_ERROR_USERS")
+        self.user_right_info = self._setting_list(
+            "user_right_info", "ALICE_AUTOTEST_DING_SUCCESS_USERS"
+        )
+        self.user_error_info = self._setting_list(
+            "user_error_info", "ALICE_AUTOTEST_DING_ERROR_USERS"
+        )
+
+    def _setting(self, config_name, legacy_env_name):
+        env_value = os.getenv(legacy_env_name)
+        if env_value is not None:
+            return env_value
+        return self._config.get_dingtalk(config_name)
+
+    def _setting_list(self, config_name, legacy_env_name):
+        env_value = os.getenv(legacy_env_name)
+        if env_value is not None:
+            return _split_list(env_value)
+        return _split_list(self._config.get_dingtalk(config_name))
 
     # 钉钉机器人请求数据
     def base_request(self, *args):
         # try:
         # rq = requests.post(url=url, data=json.dumps(content), headers=self.headers, timeout=self.timeout)
+        if not args or not args[0]:
+            self.logger.warning("未配置钉钉 webhook，跳过消息发送")
+            return False
         try:
             rq = requests.post(
                 args[0],
@@ -51,8 +73,10 @@ class ConfigDing:
             print(rq.text)
             if not rq:
                 self.logger.debug("ding:" + str(rq))
-        except BaseException as e:
+            return bool(rq)
+        except requests.RequestException as e:
             self.logger.error("ding_error:" + str(e))
+            return False
 
     # markdown数据组装
     def base_content(self, content):

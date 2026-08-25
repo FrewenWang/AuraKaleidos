@@ -1,0 +1,172 @@
+name: Repository validation
+
+on:
+  pull_request:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  repository-metadata:
+    name: Repository metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate repository structure and documentation
+        run: python tools/repository_check.py
+      - name: Test repository validator
+        run: python -m unittest discover -s tests -v
+
+  offline-python:
+    name: Offline Python (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: AliceAutoTest/config/requirements-dev.txt
+      - name: Install offline test dependencies
+        run: >-
+          python -m pip install
+          -r AliceAutoTest/config/requirements-dev.txt
+          "numpy==1.26.4"
+          "scipy>=1.10,<2"
+          "opencv-python-headless>=4.8,<5"
+          "matplotlib>=3.8"
+      - name: Test AliceAutoTest
+        working-directory: AliceAutoTest
+        run: python -m pytest -q
+      - name: Lint AliceAutoTest
+        working-directory: AliceAutoTest
+        run: ruff check .
+      - name: Compile AliceAutoTest
+        working-directory: AliceAutoTest
+        run: python -m compileall -q src tools tests
+      - name: Test Python algorithms
+        working-directory: FantasyAlgorithm/python
+        run: python -m pytest -q
+      - name: Test autonomous-driving utilities
+        working-directory: FantasyPython/alice-auto-driving
+        run: python -m pytest -q
+      - name: Test OpenCV utilities
+        working-directory: FantasyPython/alice-pyopencv
+        run: python -m pytest -q
+      - name: Test data comparator
+        working-directory: FantasyPython/aura-data-compare
+        run: python -m pytest -q
+      - name: Test shared Python utilities
+        working-directory: FantasyPython/aura-pyutils
+        run: python -m pytest -q
+      - name: Test object tracker
+        working-directory: FantasyAutoDrive/kalman_filter_with_yolo11_objects_tracker
+        run: python -m pytest -q
+      - name: Test face-detection data utilities
+        working-directory: FantasyAI/AliceBaiduFaceDetection
+        run: python -m pytest -q
+      - name: Lint newly maintained Python projects
+        run: >-
+          ruff check
+          FantasyAutoDrive/kalman_filter_with_yolo11_objects_tracker
+          FantasyAI/AliceBaiduFaceDetection/tests
+
+  node:
+    name: Node.js projects
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: |
+            FantasyJS/package-lock.json
+            FantasyNodeJS/**/package-lock.json
+      - name: Install and test each Node.js project
+        shell: bash
+        run: |
+          projects=(
+            FantasyJS
+            FantasyNodeJS/AuraNodeCli
+            FantasyNodeJS/AuraNodeSpider
+            FantasyNodeJS/MyMovieWeb
+            FantasyNodeJS/MyPicSpider
+            FantasyNodeJS/MySpiderDemo
+            FantasyNodeJS/NodeJsSamples/ExpressDemo
+            FantasyNodeJS/myExpressGenarator
+            FantasyNodeJS/NyxTSExpress
+          )
+          for project in "${projects[@]}"; do
+            npm --prefix "$project" ci --ignore-scripts --no-audit --no-fund
+            npm --prefix "$project" test
+          done
+
+  java:
+    name: Java
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Test and package Maven project
+        working-directory: AliceJava
+        run: mvn --batch-mode verify
+
+  portable-native-and-shell:
+    name: Portable C++ and Shell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build and test C++ algorithms
+        working-directory: FantasyAlgorithm/CXX
+        run: |
+          cmake -S . -B build
+          cmake --build build --parallel 2
+          ctest --test-dir build --output-on-failure
+      - name: Configure CUDA examples without requiring CUDA
+        working-directory: FantasyCuda
+        run: cmake -S . -B build
+      - name: Validate AI project structure
+        working-directory: FantasyAI
+        run: python tools/check_structure.py
+      - name: Validate Shell toolbox
+        working-directory: FantasyShell
+        run: bash tests/test_scripts.sh
+      - name: Validate development-environment scripts
+        working-directory: FantasyToolkits/aura-dev-env
+        run: |
+          find . -type f \( -name '*.sh' -o -name '*.fwf' \) -print0 |
+            xargs -0 -n1 bash -n
+          sandbox_home="$(mktemp -d)"
+          env HOME="$sandbox_home" bash scripts/env-manager.sh list
+          env HOME="$sandbox_home" bash scripts/env-manager.sh select dev
+          env HOME="$sandbox_home" bash scripts/env-manager.sh validate dev
+
+  apple-build:
+    name: iOS build-for-testing
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile app and XCTest bundles
+        working-directory: FantasySwiftIOS
+        run: >-
+          xcodebuild build-for-testing
+          -project AliceSwiftIOSApp.xcodeproj
+          -scheme AliceSwiftIOSApp
+          -destination 'generic/platform=iOS Simulator'
+          CODE_SIGNING_ALLOWED=NO

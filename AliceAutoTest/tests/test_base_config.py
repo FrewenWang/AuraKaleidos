@@ -67,6 +67,22 @@ class TestReadBaseConfig:
         assert path
         assert len(path) > 0
 
+    def test_environment_takes_precedence(self, config, monkeypatch):
+        """环境变量覆盖文件值，且不会预先读取不存在的配置项。"""
+        monkeypatch.setenv(
+            "ALICE_AUTOTEST_HTTP_NONEXISTENT_KEY", "https://example.test"
+        )
+        assert config.get_http("nonexistent_key") == "https://example.test"
+
+    def test_optional_merge_sections(self, config):
+        """通知和联系人节可安全读取空占位值。"""
+        assert config.get_dingtalk("release_pass_url") == ""
+        assert config.get_contacts("test_phone") == ""
+
+    def test_generic_contact_environment_override(self, config, monkeypatch):
+        monkeypatch.setenv("ALICE_AUTOTEST_CONTACTS_TEST_PHONE", "test-contact")
+        assert config.get_contacts("test_phone") == "test-contact"
+
 
 class TestGetVersion:
     """GetVersion 测试"""

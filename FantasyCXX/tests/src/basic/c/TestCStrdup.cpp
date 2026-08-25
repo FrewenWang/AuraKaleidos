@@ -2,6 +2,7 @@
 // Created by Frewen.Wang on 2022/11/20.
 //
 #include <iostream>
+#include <cstdlib>
 #include "aura/aura_utils/utils/AuraLog.h"
 #include "gtest/gtest.h"
 #include <stdio.h>
@@ -33,9 +34,10 @@ public:
 };
 
 TEST_F(TestCStrdup, testCStrdup) {
-  char *s = "hello world";
-  char *p;
+  const char *s = "hello world";
+  char *p = strdup(s);
 
-  p = strdup(s);
-  printf("%s\n", p);
+  ASSERT_NE(p, nullptr);
+  EXPECT_STREQ(p, s);
+  free(p);
 }

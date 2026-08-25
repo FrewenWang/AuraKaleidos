@@ -9,6 +9,10 @@
   },
   "author": "frewen",
   "license": "ISC",
-  "engines": {"node": ">=18"},
-  "dependencies": {"cheerio": "^1.0.0"}
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cheerio": "1.0.0"
+  }
 }

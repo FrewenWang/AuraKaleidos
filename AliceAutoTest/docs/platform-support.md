@@ -13,8 +13,9 @@
 ## 路径策略
 
 `PlatformCompat` 使用 `Path.home()`、`APPDATA`、`~/Library/Application Support`、
-`XDG_CONFIG_HOME` 和 `tempfile.gettempdir()` 处理通用路径。业务层仍有历史固定 Windows
-路径，完整跨平台前必须逐项参数化。
+`XDG_CONFIG_HOME` 和 `tempfile.gettempdir()` 处理通用路径。完整入口通过
+`src/config/runtime.py` 从项目根目录推导 `config/start_phoenix.bat`，不依赖
+`C:\px_pt_auto` 等作者机器目录。Phoenix 安装目录和业务资源仍需在目标机配置。
 
 ## 平台注意事项
 
@@ -29,6 +30,7 @@
 cd AliceAutoTest
 python -m pytest -q
 python tools/setup.py --test
+python -m compileall -q src tools tests
 ```
 
 第二条命令会创建少量临时目录，但不应启动 Phoenix 或连接业务服务。

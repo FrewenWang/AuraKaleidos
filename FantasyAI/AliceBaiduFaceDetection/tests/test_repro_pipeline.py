@@ -6,7 +6,13 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import paddle
+
+try:
+    import paddle
+except ModuleNotFoundError as error:
+    raise unittest.SkipTest(
+        "模型回归测试需要可选依赖 PaddlePaddle；请安装项目的 cpu 依赖组"
+    ) from error
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = PROJECT_ROOT / "src"

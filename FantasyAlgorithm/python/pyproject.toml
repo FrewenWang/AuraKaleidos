@@ -12,3 +12,7 @@ requires-python = ">=3.10"
 [tool.setuptools]
 package-dir = {"" = "src"}
 py-modules = ["L27_remove_element", "L43_multiply_strings_TODO", "L80_remove_duplicates_from_sorted_array_ii"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

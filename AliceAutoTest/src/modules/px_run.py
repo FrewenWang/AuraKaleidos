@@ -7,7 +7,6 @@
 # 获取配置文件中的基础信息
 # 新增版本号统计
 import multiprocessing
-import os
 import random
 import string
 import time
@@ -19,6 +18,20 @@ from src.config.config_ding import ConfigDing
 from src.config.config_hardware import HardwareConfig, PidConfig
 from src.config.config_logging import ConfigLogging
 from src.config.config_screen import ConfigScreen
+from src.config.runtime import (
+    cleanup_phoenix_processes,
+    start_phoenix_client,
+)
+from src.modules.px_constants import (
+    AI_MODEL_CODE,
+    COURSE_OK,
+    DEVICE_ANSWER_MACHINE_OK,
+    DEVICE_CAMERA_OK,
+    DEVICE_NETWORK_OK,
+    MSG_AVATAR_EXPIRED,
+    MSG_OPERATION_OK,
+    MSG_VIDEO_STREAM_ERROR,
+)
 
 # 调用超过三个小时报错策略
 from src.modules.tools.three_hours import main
@@ -201,7 +214,7 @@ class PxPtAuto(InitData):
             elif msg["command"] == "SOFTWARE_STATUS" and count == 0:
                 ai_code = msg["content"]["software"]["code"]
                 ai_status = msg["content"]["software"]["status"]
-                if ai_code == 8000 and ai_status == "fail":
+                if ai_code == AI_MODEL_CODE and ai_status == "fail":
                     print("AI模型检测失败")
                     self.logger.error(
                         "***************************AI模型检测失败****************************"
@@ -232,7 +245,7 @@ class PxPtAuto(InitData):
             elif msg["command"] == "DEVICE_STATUS" and count == 0:
                 device = msg["content"]["device"]
                 if (
-                    device["answerMachine"]["code"] != 3000
+                    device["answerMachine"]["code"] != DEVICE_ANSWER_MACHINE_OK
                     and answer_machine_count <= 3
                 ):
                     if answer_machine_count == 3:
@@ -241,7 +254,7 @@ class PxPtAuto(InitData):
                     else:
                         answer_machine_count += 1
                 if (
-                    device["camera"]["code"] != 4000
+                    device["camera"]["code"] != DEVICE_CAMERA_OK
                     and courseware_camera_count <= 3
                 ):
                     if courseware_camera_count == 3:
@@ -250,7 +263,7 @@ class PxPtAuto(InitData):
                     else:
                         courseware_camera_count += 1
                 if (
-                    device["network"]["code"] != 5000
+                    device["network"]["code"] != DEVICE_NETWORK_OK
                     and courseware_network_count <= 3
                 ):
                     if courseware_network_count == 3:
@@ -260,9 +273,9 @@ class PxPtAuto(InitData):
                         courseware_network_count += 1
             elif msg["command"] == "COURSE_STATUS" and count == 0:
                 course = msg["content"]["course"]
-                if course["code"] == 9000 and courseware_count <= 3:
+                if course["code"] == COURSE_OK and courseware_count <= 3:
                     pass
-                elif course["code"] != 9000 and courseware_count <= 3:
+                elif course["code"] != COURSE_OK and courseware_count <= 3:
                     self.logger.warning("课件ERROR:" + str(course))
                     time.sleep(1)
                     self.info_data.get_checkaction_url(
@@ -311,7 +324,7 @@ class PxPtAuto(InitData):
                 )
             elif (
                 msg["command"] == "Back_Portrait_From_Screen"
-                and msg["content"]["code"] == 1002
+                and msg["content"]["code"] == MSG_VIDEO_STREAM_ERROR
             ):
                 head_count += 1
                 self.logger.warning("识别端未接收到可用视频流,返回1002,ERROR")
@@ -324,7 +337,11 @@ class PxPtAuto(InitData):
                     gid_lists = self.info_data.get_student_positions_api(
                         self.login_token, self.classid, self.lessonnum
                     )
-                if msg["content"]["code"] == 1000 and gid_lists and stu_lists:
+                if (
+                    msg["content"]["code"] == MSG_OPERATION_OK
+                    and gid_lists
+                    and stu_lists
+                ):
                     time.sleep(1)
                     # ipad端发送绑定头像
                     bindstu = self.info_data.send_bind_headpictures(
@@ -372,7 +389,7 @@ class PxPtAuto(InitData):
             else:
                 # ipad绑定头像状态
                 if msg["command"] == "BIND_AVATARS_BACK":
-                    if msg["content"]["code"] == 1000:
+                    if msg["content"]["code"] == MSG_OPERATION_OK:
                         # ipad端点击上课
                         time.sleep(1)
                         self.info_data.start_lesson_api(
@@ -387,7 +404,7 @@ class PxPtAuto(InitData):
                             self.login_userid,
                             self.lessonnum,
                         )
-                    elif msg["content"]["code"] == 1104:
+                    elif msg["content"]["code"] == MSG_AVATAR_EXPIRED:
                         time.sleep(1)
                         self.logger.error("绑定头像已失效ERROR")
                         count -= 1
@@ -709,22 +726,16 @@ if __name__ == "__main__":
     kid.copy_mockfile()
 
     # 上课前清理端无用进程（跨平台）
-    if is_windows():
-        kill_cmd = r"python /px_pt_auto/BaseConfig/kill_process.py"
-    else:
-        # macOS/Linux使用相对路径或配置路径
-        kill_cmd = f"python3 {os.path.join(platform.get_user_home(), 'px_pt_auto', 'BaseConfig', 'kill_process.py')}"
-
-    os.system(kill_cmd)
+    cleanup_phoenix_processes(kid)
     time.sleep(2)
 
-    # 启动学生端（仅Windows支持）
-    if is_windows():
-        start_cmd = r"/px_pt_auto/BaseConfig/start_phoenix.bat"
-        os.system(start_cmd)
-    else:
-        print("警告: Phoenix学生端仅支持Windows系统，跳过启动")
-        print("在macOS/Linux上，部分功能可能不可用")
+    # 启动学生端（仅 Windows 支持，路径由项目根目录推导）
+    if not start_phoenix_client():
+        if is_windows():
+            print("警告: 未找到 config/start_phoenix.bat，跳过启动")
+        else:
+            print("警告: Phoenix学生端仅支持Windows系统，跳过启动")
+            print("在macOS/Linux上，部分功能可能不可用")
 
     # 消息队列
     pipe = Pipe()
@@ -770,4 +781,4 @@ if __name__ == "__main__":
     three.terminate()
     # 清理视频播放进程
     kid.run_kill()
-    os.system(r"python /px_pt_auto/BaseConfig/kill_process.py")
+    cleanup_phoenix_processes(kid)

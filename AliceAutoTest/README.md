@@ -31,6 +31,11 @@ python tools/setup.py --test
 ```
 
 `tools/setup.py` 默认会联网安装依赖并创建运行目录；如已手动安装依赖，仅执行 `--test`。
+项目也可用 editable 模式验证安装元数据：
+
+```bash
+python -m pip install --no-deps -e .
+```
 
 ## 完整业务入口
 
@@ -71,7 +76,7 @@ AliceAutoTest/
 
 ## 已知限制
 
-- 历史入口仍存在固定 Windows 路径、私有服务和模块路径不一致，完整流程尚未达到开箱即用。
-- `config/config.ini`、`src/settings.py` 不应继续保存真实账号、数据库或通知令牌。
+- 部分历史业务 API 和资源路径仍依赖 Phoenix 环境，完整流程尚未达到开箱即用。
+- `config/config.local.ini` 只用于本地凭据且已被 Git 忽略；示例配置不得保存真实账号、数据库或通知令牌。
 - `tools/VCamTestTool/` 含 Windows 可执行文件，只能在受控 Windows 测试机上使用。
 - 运行日志、截图、报告、临时 PID 和客户端资源不应提交 Git。

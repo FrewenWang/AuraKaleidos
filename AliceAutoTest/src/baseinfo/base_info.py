@@ -179,7 +179,10 @@ class BaseLogin(BaseApi, BaseConfig):
             "clientVersion": "auto_test_clientVersion",
             "channel": "PHOENIX",
             "deviceId": "phoenix_ipad_test_deviceId",
-            "phone": os.getenv("ALICE_AUTOTEST_PHONE", ""),
+            "phone": os.getenv(
+                "ALICE_AUTOTEST_PHONE",
+                self.base_config_data.get_contacts("test_phone"),
+            ),
         }
         headers = {
             "T-px-Post-ID": str(random.randint(0, 10000)),
@@ -210,7 +213,10 @@ class BaseLogin(BaseApi, BaseConfig):
             "clientVersion": "auto_test_clientVersion",
             "channel": "PHOENIX",
             "deviceId": "phoenix_ipad_test_deviceId",
-            "phone": os.getenv("ALICE_AUTOTEST_PHONE", ""),
+            "phone": os.getenv(
+                "ALICE_AUTOTEST_PHONE",
+                self.base_config_data.get_contacts("test_phone"),
+            ),
         }
         headers = {
             "T-px-Post-ID": str(random.randint(0, 10000)),

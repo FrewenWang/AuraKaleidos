@@ -7,7 +7,7 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from app.cli import run_tracking
+from app.cli import run_tracking  # noqa: E402
 
 
 if __name__ == "__main__":

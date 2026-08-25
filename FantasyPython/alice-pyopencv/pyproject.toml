@@ -12,3 +12,7 @@ dependencies = ["numpy>=1.24,<3", "opencv-python>=4.8,<5"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

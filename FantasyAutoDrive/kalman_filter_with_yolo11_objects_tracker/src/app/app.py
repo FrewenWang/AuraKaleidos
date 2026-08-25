@@ -1,10 +1,7 @@
 from collections import deque
 import json
-import os
 from pathlib import Path
 import cv2
-import numpy as np
-from ai.detect import Detector
 from ai.object_trackers import KalmanTracker
 import matplotlib.pyplot as plt
 from app.utils import configure_logger
@@ -14,185 +11,207 @@ logger = configure_logger("appLogger")
 
 
 class ObjectTrackerApp:
-    def __init__(self, mode: str ='single', 
-                    target_classes: list | None = None,
-                    cache_file: str | Path | None = None,
-                    estimate_acceleration: bool=False,
-                    association_metric: str="euclidean"):
+    def __init__(
+        self,
+        mode: str = "single",
+        target_classes: list | None = None,
+        cache_file: str | Path | None = None,
+        estimate_acceleration: bool = False,
+        association_metric: str = "euclidean",
+        detector=None,
+    ):
         """
         :param mode:
         :param target_classes:
         :param cache_file:
         :param estimate_acceleration:
         :param association_metric:  马氏距离关联、欧式距离关联
+        :param detector: 可选的检测器实例；测试可注入不访问模型的替身
         """
-        assert (mode == 'single') | (mode == 'multi'), f'Unknown mode : {mode}'
+        assert mode in {"single", "multi"}, f"Unknown mode : {mode}"
         target_classes = ["person"] if target_classes is None else target_classes
-        assert isinstance(target_classes, list) , f'Expected target_classes to be list. Got: {type(target_classes)}'
-        
+        assert isinstance(target_classes, list), (
+            f"Expected target_classes to be list. Got: {type(target_classes)}"
+        )
+
         self.mode = mode
-        self.detector = Detector()
-        self.tracker = KalmanTracker(mode= self.mode,
-                                     association_metric=association_metric,
-                                     estimate_acceleration=estimate_acceleration)
+        if detector is None:
+            from ai.detect import Detector
+
+            detector = Detector()
+        self.detector = detector
+        self.tracker = KalmanTracker(
+            mode=self.mode,
+            association_metric=association_metric,
+            estimate_acceleration=estimate_acceleration,
+        )
         self.target_classes = target_classes
         self.history_cache = {}
         self.cache_size = 100
         project_root = Path(__file__).resolve().parents[2]
-        self.cache_file = Path(cache_file) if cache_file else project_root / "outputs/cache/history.json"
+        self.cache_file = (
+            Path(cache_file)
+            if cache_file
+            else project_root / "outputs/cache/history.json"
+        )
 
         # Load existing cache if it exists
         self.load_cache()
-    
-    
-    def process_video(self, video_source:int|str =0)-> None:
+
+    def process_video(self, video_source: int | str = 0) -> None:
         """
         Tracks objects of type target_classes in the provided video
-        """ 
-        assert isinstance(video_source,(int,str)), f"Expected video_source \
+        """
+        assert isinstance(video_source, (int, str)), (
+            f"Expected video_source \
                 to be either 0 or a string path. Got: {type(video_source)}"
+        )
         cap = cv2.VideoCapture(video_source)
         if not cap.isOpened():
             raise ValueError(f"Unable to open video source: {video_source}")
         try:
-            
-            
             while True:
                 ret, frame = cap.read()
                 if not ret:
                     break
-                
+
                 # 1- Detect objects
-                boxes = self.detector.detect_object(frame) # [[class_name, center_x, center_y, w, h]]
-                
+                boxes = self.detector.detect_object(
+                    frame
+                )  # [[class_name, center_x, center_y, w, h]]
+
                 # 2- Filter objects
                 # Take only boxes that have a class id in the list of tracked objects
-                boxes = list(filter(lambda box:  sum([box[0] == class_id\
-                                                for class_id in self.target_classes]) > 0,
-                                    boxes))
-                
+                boxes = [box for box in boxes if box[0] in self.target_classes]
+
                 # 3- Update the tracker
                 frame, id_estimates = self.tracker.update(boxes, frame)
-                
-                if id_estimates != None:
+
+                if id_estimates is not None:
                     self.update_cache(id_estimates)
-                
+
                 # Display the frame
-                cv2.imshow('Object Tracking', frame)
-                
+                cv2.imshow("Object Tracking", frame)
+
                 # Break on 'q' key
-                if cv2.waitKey(30) & 0xFF == ord('q'):
+                if cv2.waitKey(30) & 0xFF == ord("q"):
                     break
-            
+
             logger.info("Plotting estimated movement graph per tracked object ...")
-            
-            destination_figure = "results.png" if video_source == 0 else "movement_"+video_source.split("/")[-1].split(".")[0]+".png"
+
+            destination_figure = (
+                "results.png"
+                if video_source == 0
+                else f"movement_{Path(video_source).stem}.png"
+            )
             self.plot_estimates(destination_figure)
-        
+
         except Exception as e:
-            logger.exception(f"Exception during processing video: {e}",exc_info=True)
+            logger.exception(f"Exception during processing video: {e}", exc_info=True)
             raise
         finally:
             cap.release()
             cv2.destroyAllWindows()
-        
-    
-    
-    
+
     def plot_estimates(self, dest="object_movement.png"):
         """
         Plots the velocity (vx, vy) for the specified object.
         """
-        
+
         nb_objects = len(self.history_cache)
         if nb_objects == 0:
             logger.info("No tracked objects; skipping movement plot.")
             return
-        
+
         if self.mode == "single":
-            fig, axes = plt.subplots(nb_objects,2, figsize=(8,15))
+            fig, axes = plt.subplots(nb_objects, 2, figsize=(8, 15))
         else:
-            fig, axes = plt.subplots(nb_objects,2,figsize=(15,80))
-        
+            fig, axes = plt.subplots(nb_objects, 2, figsize=(15, 80))
+
         for row, object_id in enumerate(self.history_cache.keys()):
-            
-            velocity = self.history_cache[object_id]['velocity']
-            displacement = self.history_cache[object_id]['displacement']
-            
+            velocity = self.history_cache[object_id]["velocity"]
+            displacement = self.history_cache[object_id]["displacement"]
+
             # Extract estimates
             vx = [v[0] for v in velocity]
             vy = [v[1] for v in velocity]
-            
+
             dx = [d[0] for d in displacement]
             dy = [d[1] for d in displacement]
-            
-            
-            if nb_objects >1:
-                axes[row][0].plot(range(len(vx)),vx, label='vx')
-                axes[row][0].plot(range(len(vy)),vy, label='vy')
-                axes[row][0].set_xlabel('Time step')
-                axes[row][0].set_ylabel('Velocity')
-                axes[row][0].set_title(f'Object {object_id +1} Velocity over Time')
+
+            if nb_objects > 1:
+                axes[row][0].plot(range(len(vx)), vx, label="vx")
+                axes[row][0].plot(range(len(vy)), vy, label="vy")
+                axes[row][0].set_xlabel("Time step")
+                axes[row][0].set_ylabel("Velocity")
+                axes[row][0].set_title(f"Object {object_id + 1} Velocity over Time")
                 axes[row][0].legend()
-                
-                axes[row][1].plot(range(len(dx)), dx, label='dx')
-                axes[row][1].plot(range(len(dy)),dy, label='dy')
-                axes[row][1].set_xlabel('Time step')
-                axes[row][1].set_ylabel('Displacement')
-                axes[row][1].set_title(f'Object {object_id +1} Displacement over Time')
+
+                axes[row][1].plot(range(len(dx)), dx, label="dx")
+                axes[row][1].plot(range(len(dy)), dy, label="dy")
+                axes[row][1].set_xlabel("Time step")
+                axes[row][1].set_ylabel("Displacement")
+                axes[row][1].set_title(f"Object {object_id + 1} Displacement over Time")
                 axes[row][1].legend()
             else:
-                axes[0].plot(range(len(vx)),vx, label='vx')
-                axes[0].plot(range(len(vy)),vy, label='vy')
-                axes[0].set_xlabel(f'Time step')
-                axes[0].set_ylabel(f'Velocity')
-                axes[0].set_title(f'Object {object_id +1} Velocity over Time')
+                axes[0].plot(range(len(vx)), vx, label="vx")
+                axes[0].plot(range(len(vy)), vy, label="vy")
+                axes[0].set_xlabel("Time step")
+                axes[0].set_ylabel("Velocity")
+                axes[0].set_title(f"Object {object_id + 1} Velocity over Time")
                 axes[0].legend()
-                
-                axes[1].plot(range(len(dx)),dx, label='vx')
-                axes[1].plot(range(len(dy)),dy, label='vy')
-                axes[1].set_xlabel(f'Time step')
-                axes[1].set_ylabel(f'Displacement')
-                axes[1].set_title(f'Object {object_id +1} Displacement over Time')
+
+                axes[1].plot(range(len(dx)), dx, label="vx")
+                axes[1].plot(range(len(dy)), dy, label="vy")
+                axes[1].set_xlabel("Time step")
+                axes[1].set_ylabel("Displacement")
+                axes[1].set_title(f"Object {object_id + 1} Displacement over Time")
                 axes[1].legend()
-        
+
         plt.legend()
-        # plt.show()    
+        # plt.show()
         # Save the figure
         try:
-            output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'outputs', 'figures')
-            os.makedirs(output_dir, exist_ok=True)
+            output_dir = Path(__file__).resolve().parents[2] / "outputs" / "figures"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            destination = output_dir / Path(dest).name
 
-            plt.savefig(os.path.join(output_dir, dest),dpi=150)
+            plt.savefig(destination, dpi=150)
             plt.close(fig)
-            logger.info(f'Saved the graph to the following path: "{output_dir}/{dest}"')
+            logger.info(f'Saved the graph to the following path: "{destination}"')
         except Exception as e:
-            logger.error(f"Couldn't save the plotted graphs to '{output_dir}'\nError: {e}")
-            
-            
+            logger.error(
+                f"Couldn't save the plotted graphs to '{output_dir}'\nError: {e}"
+            )
+
     def update_cache(self, id_estimates_dict):
         """
         Updates the history cache for the specified object and saves it to a JSON file.
         """
-        assert isinstance(id_estimates_dict,dict), f'Expected id_estimates_dict to be of type dict. Got: {type(id_estimates_dict)}'
-        
+        assert isinstance(id_estimates_dict, dict), (
+            f"Expected id_estimates_dict to be of type dict. Got: {type(id_estimates_dict)}"
+        )
+
         for object_id, (velocity, displacement) in id_estimates_dict.items():
-            
             if object_id not in self.history_cache:
                 # Initialize deque with max length
                 self.history_cache[object_id] = {
-                    'velocity': deque(maxlen=self.cache_size),
-                    'displacement': deque(maxlen=self.cache_size)
+                    "velocity": deque(maxlen=self.cache_size),
+                    "displacement": deque(maxlen=self.cache_size),
                 }
 
             # Append the new velocity and displacement to the cache
-            
-            assert len(velocity) == 2 , f"Expected the velocity(vx,vy) to have length 2. Got: {len(velocity)}"
-            assert len(displacement) == 2 , f"Expected the velocity(vx,vy) to have length 2. Got: {len(displacement)}"
-            
-            
-            self.history_cache[object_id]['velocity'].append(velocity)
-            self.history_cache[object_id]['displacement'].append(displacement)
+
+            assert len(velocity) == 2, (
+                f"Expected the velocity(vx,vy) to have length 2. Got: {len(velocity)}"
+            )
+            assert len(displacement) == 2, (
+                "Expected the displacement(x,y) to have length 2. "
+                f"Got: {len(displacement)}"
+            )
+
+            self.history_cache[object_id]["velocity"].append(velocity)
+            self.history_cache[object_id]["displacement"].append(displacement)
 
         # Save the cache to a JSON file
         # self.save_cache()
@@ -204,39 +223,49 @@ class ObjectTrackerApp:
         # Convert deques to lists for JSON serialization
         try:
             serializable_cache = {
-                obj_id: {
-                    'velocity': list(history['velocity']),
-                    'displacement': list(history['displacement'])
+                int(obj_id): {
+                    "velocity": list(history["velocity"]),
+                    "displacement": list(history["displacement"]),
                 }
                 for obj_id, history in self.history_cache.items()
             }
-            
+
             self.cache_file.parent.mkdir(parents=True, exist_ok=True)
-            with self.cache_file.open('w', encoding='utf-8') as f:
+            with self.cache_file.open("w", encoding="utf-8") as f:
                 json.dump(serializable_cache, f)
         except Exception as e:
             logger.exception(f"Exception happened while saving the cache: {e}")
-    
+
     def load_cache(self):
         """
         Loads the cache from a JSON file if it exists.
         """
         try:
-            with self.cache_file.open('r', encoding='utf-8') as f:
+            with self.cache_file.open("r", encoding="utf-8") as f:
                 serializable_cache = json.load(f)
 
             # Convert lists back to deques
             self.history_cache = {
-                obj_id: {
-                    'velocity': deque(history['velocity'], maxlen=self.cache_size),
-                    'displacement': deque(history['displacement'], maxlen=self.cache_size)
+                int(obj_id): {
+                    "velocity": deque(history["velocity"], maxlen=self.cache_size),
+                    "displacement": deque(
+                        history["displacement"], maxlen=self.cache_size
+                    ),
                 }
                 for obj_id, history in serializable_cache.items()
             }
             logger.info("Cache loaded successfully.")
-        except (FileNotFoundError, json.JSONDecodeError):
+        except (
+            AttributeError,
+            FileNotFoundError,
+            json.JSONDecodeError,
+            KeyError,
+            TypeError,
+            ValueError,
+        ):
+            self.history_cache = {}
             logger.info("No existing cache found. Starting fresh.")
-            
+
             # If the parent folder doesn't exist
             # create it
             self.cache_file.parent.mkdir(parents=True, exist_ok=True)
